@@ -80,10 +80,10 @@ Display Device
 - In ``DC_SINGLE`` mode, the framebuffer size is ``screen_width * screen_height * bit_depth / 8``.
 - In ``DC_RAMLESS`` mode, two partial framebuffers are used, with size ``fb_width * fb_height * bit_depth / 8``, where ``fb_height`` is the segmented height.
 
-Interface
-~~~~~~~~~
+Supported Interface Types
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following table lists the LCD-related interfaces supported by mainstream chips. If you want to know more information, please click on the specific chip name.
+The following table lists the :term:`LCD`-related interfaces supported by mainstream chips. If you want to know more information, please click on the specific chip name.
 
 +-------------------+------+------+------+------+------+
 | SOC               | 8080 | QSPI | RGB  | MIPI | SPI  |
@@ -104,10 +104,10 @@ The following table lists the LCD-related interfaces supported by mainstream chi
     'Y' means the driver is already included in the library.
     'NA' means the driver is not yet included in the library.
 
-Driver IC
-~~~~~~~~~~~~~~~~~~
+Verified Screen Drivers
+~~~~~~~~~~~~~~~~~~~~~~~
 
-The following table lists the LCD-related driver ICs supported by mainstream chips. If you want to know more information, please click on the specific chip name.
+The following table lists the LCD-related driver :term:`IC` supported by mainstream chips. If you want to know more information, please click on the specific chip name.
 
 +-------------------+------+--------+-------+-------+--------+--------+-------+---------+--------+--------+--------+-------+--------+
 | SOC               |EK9716|ICNA3311|NT35510|NV3047 |ST7701S |ST77903 |ST7796 |OTM8009A |SH8601A |SH8601Z |RM69330 |ST7789 |NV3041A |
@@ -165,10 +165,10 @@ Input Device
 
 - If a specific input device is needed, the corresponding data acquisition function needs to be implemented in ``gui_indev``, and the required time thresholds need to be filled in.
 
-Touch IC
-~~~~~~~~
+Touch Chips
+~~~~~~~~~~~
 
-The following table lists the Touch-related ICs supported by all chips. If you want to know more information, please click on the specific chip name.
+The following table lists the touch-related IC supported by all chips. If you want to know more information, please click on the specific chip name.
 
 +-------------------+--------+---------+--------+-------+--------+--------+--------+
 | SOC               | CST816S| CHSC6417| FT3169 | GT911 | ZT2717 | CST816T| GT9147 |
@@ -225,7 +225,7 @@ To reduce power consumption and increase the device's usage time, sleep (low pow
         bool close_sync;
     };
 
-``active_ms`` is the standby time of the term:`GUI` application, which can be defined as different values in different applications.
+``active_ms`` is the standby time of the :term:`GUI` application, which can be defined as different values in different applications.
 Like other types of electronic devices, when the screen continuously displays an interface for the standby time, the device will enter sleep mode.
 In sleep mode, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
 In the chip manual, this low power state where peripherals can be turned off is called Deep Low Power State (DLPS). More information about DLPS can be found in the relevant SDK documentation.

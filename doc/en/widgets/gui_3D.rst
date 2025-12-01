@@ -137,7 +137,7 @@ Before a 3D model can be rendered, it needs to be converted into a binary format
          :width: 800px
          :align: center
 
-      Generating Binary Arrays
+         Generating Binary Files
 
    - Processing GLTF Model
 

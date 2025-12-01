@@ -62,8 +62,6 @@ typedef struct gui_lite3d
  *                         Functions
  *============================================================================*/
 
-
-
 /**
  * @brief Lite3D Widget Create.
  *

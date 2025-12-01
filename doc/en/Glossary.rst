@@ -39,9 +39,6 @@ Glossary
     IC
         Integrated Circuit
 
-    KB
-        Key Board
-
     LCD
         Liquid Crystal Display
 

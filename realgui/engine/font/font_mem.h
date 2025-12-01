@@ -56,124 +56,125 @@ typedef struct
 
 /**
  * @brief Initialize the character binary file and store the font and
- * corresponding information in the font list
+ * corresponding information in the font list.
  *
- * @param font_bin_addr the binary file address of this font type
+ * @param font_bin_addr The binary file address of this font type.
+ * @return Font library index.
  */
 uint8_t gui_font_mem_init(uint8_t *font_bin_addr);
 
 /**
  * @brief Initialize the character binary file and store the font and
- * corresponding information in the font list
+ * corresponding information in the font list.
  *
- * @param font_bin_addr font file address
- * @return uint8_t
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
  */
 uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr);
 
 /**
  * @brief Initialize the character binary file and store the font and
- * corresponding information in the font list
+ * corresponding information in the font list.
  *
- * @param font_bin_addr font file address
- * @return uint8_t
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
  */
 uint8_t gui_font_mem_init_fs(uint8_t *font_bin_addr);
 
 /**
  * @brief Initialize the character binary file and store the font and
- * corresponding information in the font list
+ * corresponding information in the font list.
  *
- * @param font_bin_addr font file address
- * @return uint8_t
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
  */
 uint8_t gui_font_mem_init_mem(uint8_t *font_bin_addr);
 
 /**
- * @brief Destroy this flot type in font list
+ * @brief Destroy this font type in font list.
  *
- * @param font_bin_addr font file address
- * @return uint8_t
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
  */
 uint8_t gui_font_mem_delate(uint8_t *font_bin_addr);
 
 /**
- * @brief Preprocessing of bitmap fonts using internal engines
+ * @brief Preprocessing of bitmap fonts using internal engines.
  *
- * @param text Widget pointer
- * @param rect Widget boundary
-*/
+ * @param text Widget pointer.
+ * @param rect Widget boundary.
+ */
 void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect);
 
 /**
- * @brief Drawing of bitmap fonts using internal engine
+ * @brief Drawing of bitmap fonts using internal engine.
  *
- * @param text Widget pointer
- * @param rect Widget boundary
+ * @param text Widget pointer.
+ * @param rect Widget boundary.
  */
 void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect);
 
 /**
- * @brief Post-processing work for drawing bitmap fonts using internal engines
+ * @brief Post-processing work for drawing bitmap fonts using internal engines.
  *
- * @param text Widget pointer
+ * @param text Widget pointer.
  */
 void gui_font_mem_unload(gui_text_t *text);
 
 /**
  * @brief GUI_FONT_SRC_BMP text widget destroy function.
  *
- * @param text Widget pointer
+ * @param text Widget pointer.
  */
 void gui_font_mem_destroy(gui_text_t *text);
 
 /**
  * @brief Get the pixel width of the text in the current font file.
  *
- * @param content text pointer
- * @param font_bin_addr font file address
- * @param charset text encoding format
- * @return uint32_t
+ * @param content Text pointer.
+ * @param font_bin_addr Font file address.
+ * @param charset Text encoding format.
+ * @return Character width.
  */
 uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset);
 
 /**
  * @brief Get the pixel width of the utf-8 text in the current font file.
  *
- * @param content text pointer
- * @param font_bin_addr font file address
- * @return uint32_t
+ * @param content Text pointer.
+ * @param font_bin_addr Font file address.
+ * @return Character width.
  */
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
 
 /**
- * @brief Get the fontlib name object
+ * @brief Get the font library index by size.
  *
- * @param font_size font size
- * @return uint8_t font lib index
+ * @param font_size Font size.
+ * @return Font library index.
  */
 uint8_t get_fontlib_by_size(uint8_t font_size);
 
 /**
- * @brief Get the fontlib name object
+ * @brief Get the font library index by name.
  *
- * @param font_file font file
- * @return uint8_t font lib index
+ * @param font_file Font file.
+ * @return Font library index.
  */
 uint8_t get_fontlib_by_name(uint8_t *font_file);
 
 /**
- * @brief text layout by mode
+ * @brief Text layout by mode.
  *
- * @param text Widget pointer
- * @param rect Widget boundary
+ * @param text Widget pointer.
+ * @param rect Widget boundary.
  */
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect);
 
 /**
- * @brief get dot info by utf-8 or utf-16
+ * @brief Get dot information by utf-8 or utf-16.
  *
- * @param text Widget pointer
+ * @param text Widget pointer.
  */
 void gui_font_get_dot_info(gui_text_t *text);
 

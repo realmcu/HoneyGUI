@@ -14,7 +14,7 @@ HoneyGUI
   Porting <Porting/index>
   Samples <sample/index>
   Tool <tool/index>
-  Design Spec<Design/index>
+  Design Spec <Design/index>
   Third-party Support <3rd-party-support/index>
   FAQ <FAQ/index>
   Get PDF <get-pdf/index>

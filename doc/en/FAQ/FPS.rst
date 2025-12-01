@@ -4,7 +4,7 @@
 How To Increase FPS
 =====================
 
-Pixel format
+Pixel Format
 ------------
 
 Using RGBA/RGB images can get great display effects, but if the FPS is low, then you can use
@@ -14,19 +14,16 @@ Hardware Acceleration
 ---------------------
 
 Use hardware acceleration to render images instead of software acceleration whenever possible.
-Different chip models may have different term:`GPU`, please refer to the guidance document in the SDK for
+Different chip models may have different :term:`GPU`, please refer to the guidance document in the SDK for
 details.
 
 Data Transmission Speed
 -----------------------
 
-HoneyGUI supports image compression, and some chips have built-in hardware decompression modules.
-Using hardware decompression modules is very fast, but software decompression requires a certain
-amount of time. Compressed images can reduce the size of the original image resources, allowing more
-resources to be stored in user data, and will also reduce the time needed to read from flash.
+Data transmission speed also affects the drawing speed of HoneyGUI, so please ensure the bandwidth and frequency of memory (FLASH and :term:`PSRAM`).
 
-term:`UI` Design
----------
+UI Design
+-----------------
 
 Reducing complexity in the UI, as well as the number and size of images in a single interface, can
 increase the frame rate. Make sure that every pixel of the image data that needs to be loaded is

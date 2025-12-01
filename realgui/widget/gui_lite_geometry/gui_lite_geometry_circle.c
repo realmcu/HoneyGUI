@@ -367,12 +367,6 @@ static void draw_one_tile(gui_lite_circle_t *this, gui_obj_t *obj,
  *                           Public Functions
  *============================================================================*/
 
-/**
- * @brief Create circle geometry widget
- * @param parent Parent widget
- * @param name Widget name
- * @return gui_lite_circle_t* Created widget pointer
- */
 gui_lite_circle_t *gui_lite_circle_create(void *parent, const char *name)
 {
     GUI_ASSERT(parent != NULL);
@@ -406,14 +400,7 @@ gui_lite_circle_t *gui_lite_circle_create(void *parent, const char *name)
     return circle;
 }
 
-/**
- * @brief Set circle geometry
- * @param this Pointer to the circle widget
- * @param x Center X coordinate relative to widget
- * @param y Center Y coordinate relative to widget
- * @param radius circle radius
- * @param color circle color
- */
+
 void gui_lite_circle_set_style(gui_lite_circle_t *this,
                                int x, int y,
                                int radius, uint32_t color)
@@ -426,12 +413,6 @@ void gui_lite_circle_set_style(gui_lite_circle_t *this,
     this->opacity_value = (color >> 24) & 0xFF;
 }
 
-/**
- * @brief Set circle position
- * @param this Pointer to the circle widget
- * @param x Center X coordinate relative to widget
- * @param y Center Y coordinate relative to widget
- */
 void gui_lite_circle_set_position(gui_lite_circle_t *this, int x, int y)
 {
     GUI_ASSERT(this != NULL);

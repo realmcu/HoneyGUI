@@ -8,11 +8,11 @@ LVGL 简介
 - `LVGL 在线文档 <https://docs.lvgl.io/9.3/>`_
 - `LVGL 简介 <https://docs.lvgl.io/9.3/intro/introduction.html>`_
 
-LVGL (Light and Versatile Graphics Library) 是一个免费且开源的 C 语言图形库，提供了一切所需的工具，以创建嵌入式 term:`GUI` ，具有易于使用的图形元素、美观的视觉效果和低内存占用。
+LVGL (Light and Versatile Graphics Library) 是一个免费且开源的 C 语言图形库，提供了一切所需的工具，以创建嵌入式 :term:`GUI` ，具有易于使用的图形元素、美观的视觉效果和低内存占用。
 
 LVGL 提供了“ GUI 引擎”，处理应用程序与最终用户的所有交互，不仅包括绘制显示内容、接受用户输入并将其转化为应用程序可捕获的事件，还提供了 30 多个内置小部件、100 多个样式属性、滚动、动画、先进的软件渲染、从 MCU 到 OpenGL 的内置 GPU 支持等等。这些功能的结合使您能够高效地开发用户界面，而无需重新发明轮子。
 
-LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 term:`UI` 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解 LVGL 的功能和特性。
+LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 :term:`UI` 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解 LVGL 的功能和特性。
 
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
@@ -134,11 +134,11 @@ LVGL 结构
 实机移植
 ==========================
 
-LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 term:`GPU` 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Integration and Drivers <https://docs.lvgl.io/9.3/details/integration/index.html>`_ 以及 `LVGL Main Modules <https://docs.lvgl.io/9.3/details/main-modules/index.html>`_ 。
+LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 :term:`GPU` 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Integration and Drivers <https://docs.lvgl.io/9.3/details/integration/index.html>`_ 以及 `LVGL Main Modules <https://docs.lvgl.io/9.3/details/main-modules/index.html>`_ 。
 
 
 .. note::
-    以下示例不包含硬件设备驱动的具体实现，仅示例如何将驱动对接到 LVGL 的接口。开发者在实现硬件设备驱动时，可在与示例驱动一致的 term:`API` 框架下来完成驱动功能，以对接到 driver 层接口，往上则可复用示例工程的 porting 接口。
+    以下示例不包含硬件设备驱动的具体实现，仅示例如何将驱动对接到 LVGL 的接口。开发者在实现硬件设备驱动时，可在与示例驱动一致的 :term:`API` 框架下来完成驱动功能，以对接到 driver 层接口，往上则可复用示例工程的 porting 接口。
 
 
 显示
@@ -155,7 +155,7 @@ LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的
 
   - 利用较小的缓冲区将屏幕分为若干小部分逐步渲染。
   - 推荐缓冲区大小至少为屏幕的 1/10。
-  - 优点：节省 term:`RAM` ，适合内存有限的场景。
+  - 优点：节省 :term:`RAM` ，适合内存有限的场景。
 
 - LV_DISPLAY_RENDER_MODE_DIRECT （直写渲染）
 
@@ -176,8 +176,8 @@ LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的
 
   - 使用分块渲染方案
   - 配置两块 RAM 区域缓存
-  - 适用于没有 term:`PSRAM` 的 MCU
-  - 该方案仅支持带有 RAM 的 display term:`IC`
+  - 适用于没有 :term:`PSRAM` 的 MCU
+  - 该方案仅支持带有 RAM 的 display :term:`IC`
 
 - ``SCHEME_RAM_PSRAM_PARTIAL`` 带有整屏缓存的区域绘制方案
 
@@ -350,7 +350,7 @@ LVGL 基准测试的官方文档位于 :file:`your lvgl dir\\lvgl\\demos\\README
     all screen, SW+MVE+PPE, 11, 12
 
 .. csv-table:: 不同平台渲染加速
-  :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, term:`RLE` 解码, 字符, 线条
+  :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, :term:`RLE` 解码, 字符, 线条
   :align: center
 
   RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
@@ -633,7 +633,7 @@ LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，
   资源（图片/字库）会被转换为 C 语言数组。这些数组作为代码的一部分，被编译进主应用程序二进制文件。
 
   - 每当程序逻辑发生变化时，这些资源文件都会随之重新编译。
-  - 所有资源的大小都会计入 term:`APP` 镜像，即 APP image ，因此整体空间需求更大（ OTA 时需要更大空间）。
+  - 所有资源的大小都会计入 :term:`APP` 镜像，即 APP image ，因此整体空间需求更大（ OTA 时需要更大空间）。
 
 2. bin 文件格式
   资源会被保存为独立的二进制文件，不参与编译过程。
@@ -717,7 +717,7 @@ Media Convert Tool 在转换生成 bin 文件的同时，还将生成一份资�
 LVGL
 ^^^^^^^^^
 
-该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 term:`PNG` 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时， bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
+该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 :term:`PNG` 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时， bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
 .. figure:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
    :align: center

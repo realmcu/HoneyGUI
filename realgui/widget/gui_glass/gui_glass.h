@@ -5,7 +5,7 @@
 *****************************************************************************************
   * @file gui_glass.h
   * @brief Glass widget header file.
-  * @details Glass widget is used to simulate the refraction effect of glass
+  * @details Glass widget is used to simulate the refraction effect of glass.
   * @author astor_zhang@realsil.com.cn
   * @date 2025/10/13
   * @version 1.0

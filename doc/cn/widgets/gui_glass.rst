@@ -31,7 +31,7 @@
    :header-rows: 1
 
    * - 描述
-     - API 
+     - :term:`API` 
    * - 创建控件
      - :cpp:any:`gui_glass_create_from_mem`  
    * - 设置属性

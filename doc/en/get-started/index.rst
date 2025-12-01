@@ -86,12 +86,14 @@ Install kconfiglib for configuration management:
 
    > pip install kconfiglib
 
-Configure Application (menuconfig)
+.. _Configure Application (Menuconfig):
+
+Configure Application (Menuconfig)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Before compiling, you can use the ``menuconfig`` graphical configuration tool to select the example application to run. This configuration is common to both **SCons** and **CMake** build systems.
 
-Using menuconfig for Configuration
+Using Menuconfig for Configuration
 """""""""""""""""""""""""""""""""""
 
 Execute the following commands in the ``win32_sim`` directory:
@@ -188,7 +190,7 @@ In the ``HoneyGUI`` folder, execute:
 Configuring the Application
 """"""""""""""""""""""""""""
 
-If you need to change the application configuration, refer to the previous ``Configure Application (menuconfig)`` section and execute the ``menuconfig ../Kconfig.gui`` command in the ``win32_sim`` directory.
+If you need to change the application configuration, refer to the previous :ref:`Configure Application (Menuconfig)` section and execute the ``menuconfig ../Kconfig.gui`` command in the ``win32_sim`` directory.
 
 Compiling the Project
 """""""""""""""""""""
@@ -246,10 +248,10 @@ You can select the ``Run and Debug`` options after entering the vscode interface
 
 
 Display
-^^^^^^^^
+-------
 
 Watch Project
-"""""""""""""""
+^^^^^^^^^^^^^
 
 The watchface is displayed in the window, and you can interact with it by swiping and clicking.
 
@@ -261,7 +263,7 @@ The watchface is displayed in the window, and you can interact with it by swipin
    Watch Project Example
 
 Dashboard Project
-"""""""""""""""""""
+^^^^^^^^^^^^^^^^^
 
 The dashboard is displayed in the window.
 

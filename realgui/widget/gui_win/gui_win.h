@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_win.h
-  * @brief Window widget
-  * @details A rectangular container widget which can listen to many gestures
+  * @brief Window widget.
+  * @details A rectangular container widget which can listen to many gestures.
   * @author triton_yu@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0

@@ -411,16 +411,6 @@ gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name
     return round_rect;
 }
 
-/**
- * @brief Set round_rect geometry
- * @param this Pointer to the round_rect widget
- * @param x Center X coordinate relative to widget
- * @param y Center Y coordinate relative to widget
- * @param w round_rect width
- * @param h round_rect height
- * @param radius round_rect radius
- * @param color round_rect color
- */
 void gui_lite_round_rect_set_style(gui_lite_round_rect_t *this,
                                    int x, int y, int w, int h,
                                    int radius, gui_color_t color)

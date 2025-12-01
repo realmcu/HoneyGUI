@@ -5,7 +5,7 @@
 *****************************************************************************************
   * @file gui_img.h
   * @brief Image widget header file.
-  * @details Image widget is used to show image on the screen
+  * @details Image widget is used to show image on the screen.
   * @author howie_wang@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0

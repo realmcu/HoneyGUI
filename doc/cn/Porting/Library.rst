@@ -4,7 +4,7 @@
 HoneyGUI 移植
 ==============
 
-HoneyGUI 是一个轻量级的嵌入式 term:`GUI` 系统，专为 Realtek 系列芯片优化设计。本文档将指导您如何在不同的 Realtek 芯片平台上编译 HoneyGUI 库，包括 Armclang 和 Armcc 两种编译器环境的配置和使用方法。
+HoneyGUI 是一个轻量级的嵌入式 :term:`GUI` 系统，专为 Realtek 系列芯片优化设计。本文档将指导您如何在不同的 Realtek 芯片平台上编译 HoneyGUI 库，包括 Armclang 和 Armcc 两种编译器环境的配置和使用方法。
 
 注意事项
 --------
@@ -150,7 +150,7 @@ Armclang 编译
 工程移植示例
 ------------
 
-本示例以RTL8773GWP仪表盘工程为例。
+本示例以 RTL8773GWP 仪表盘工程为例。
 
 1. 将编译生成的资源文件复制到工程目录：
 

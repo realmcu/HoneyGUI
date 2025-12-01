@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_view.c
-  * @brief the view widget is a kind of container that makes switching more convenient and effectively reduces memory consumption.
-  * @details switch the current view by sliding or clicking
+  * @brief The view widget is a kind of container that makes switching more convenient and effectively reduces memory consumption.
+  * @details Switch the current view by sliding or clicking.
   * @author shel_deng@realsil.com.cn
   * @date 2025/02/18
   * @version 1.0

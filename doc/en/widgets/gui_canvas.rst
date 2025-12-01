@@ -16,8 +16,8 @@ The Canvas widget provides 2D graphics rendering capabilities based on NanoVG, s
 
    Before usage, ensure: Sufficient frame buffer memory.
 
-Overview
---------
+Component Overview
+------------------
 :term:`GUI` Canvas is a 2D drawing component based on NanoVG, providing:
 
 - Basic shape drawing (rectangles, circles, arcs, etc.)
@@ -32,7 +32,7 @@ Core Features
 Creation & Initialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Using ``gui_canvas_create`` function
+1. Using ``gui_canvas_create`` function.
 
    Creates a NanoVG canvas widget and returns a pointer to the canvas object.
 
@@ -51,7 +51,7 @@ Creation & Initialization
            // Error handling
        }
 
-2. Using ``gui_canvas_set_canvas_cb`` to set drawing callback
+2. Using ``gui_canvas_set_canvas_cb`` to set drawing callback.
 
    Sets the redraw callback function that gets called when canvas needs refreshing.
 
@@ -71,12 +71,13 @@ Creation & Initialization
        // Set callback
        gui_canvas_set_canvas_cb(canvas, my_draw_function);
 
-
-Manual Refresh:
-Set canvas->render = 1 to manually trigger redraw (callback will be called next frame).
+Trigger Redraw:
+You can manually trigger a redraw by setting canvas->render = 1. The system will call the drawing callback on the next frame.
 
 Image Output
 ~~~~~~~~~~~~
+
+Using ``gui_canvas_output_buffer`` function (pre-allocated buffer).
 
 This function requires a pre-allocated buffer and is suitable for scenarios where repeated rendering or memory constraints are important.
 
@@ -106,6 +107,6 @@ Enable macro ``CONFIG_REALTEK_BUILD_CANVAS`` in :file:`menu_config.h` to run thi
    :end-before: /* canvas example end */
 
 API
---------------
+---
 
 .. doxygenfile:: gui_canvas.h

@@ -2,7 +2,7 @@
 Qbcode
 =======
 
-The qbcode widget can be used to create or display qrcode and barcode. You can set the border, location and size attribute for qbcode widget. Qbcode widget support text and binary data for qrcode encode, and support text for barcode encode. The qrcode widget follows the QR Code Model 2 standard, upports various specifications from 1 to 40, and supports 4 error correction levels and 4 character encoding modes. By default, the error correction level of QR codes is set to the highest level. For barcode, it supports the code128 format.
+The qbcode widget can be used to create or display qrcode and barcode. You can set the border, location and size attribute for qbcode widget. Qbcode widget support text and binary data for qrcode encode, and support text for barcode encode. The qrcode widget follows the QR Code Model 2 standard, supports various specifications from 1 to 40, and supports 4 error correction levels and 4 character encoding modes. By default, the error correction level of QR codes is set to the highest level. For barcode, it supports the code128 format.
 
 Usage
 -----
@@ -13,8 +13,8 @@ To create a qbcode widget, you can use the function :cpp:any:`gui_qbcode_create`
 
 .. literalinclude:: ../../../realgui/widget/gui_qbcode/gui_qbcode.h
    :language: c
-   :start-after: /** @brief  T_QBCODE_ENCODE_TYPE structure */
-   :end-before: /** @brief  T_QBCODE_DISPLAY_TYPE structure */
+   :start-after: /** @brief  T_QBCODE_ENCODE_TYPE structure. */
+   :end-before: /** @brief  T_QBCODE_DISPLAY_TYPE structure. */
 
 
 Set Size and Border

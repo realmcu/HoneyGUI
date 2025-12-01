@@ -13,7 +13,7 @@ HoneyGUI
    :maxdepth: 2
 
    入门指南 <get-started/index>
-   GUI应用程序 <GUI-APP/index>
+   GUI 应用程序 <GUI-APP/index>
    控件 <widgets/index>
    移植 <Porting/index>
    示例 <sample/index>
@@ -21,7 +21,7 @@ HoneyGUI
    设计说明 <Design/index>
    第三方支持 <3rd-party-support/index>
    常见问题 <FAQ/index>
-   获取PDF <get-pdf/index>
+   获取 PDF <get-pdf/index>
    专业术语 <Glossary>
    版本说明 <release_notes/index>
 

@@ -15,7 +15,7 @@ Graphics
      - RTL8772F
      - RTL87X2G
      - RTL8763E
-     - term:`PC`
+     - :term:`PC`
    * - RGB565
      - Y
      - Y

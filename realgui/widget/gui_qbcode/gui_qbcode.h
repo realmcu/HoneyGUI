@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_qbcode.h
-  * @brief qbcode widget header file
-  * @details qbcode widget is the widget used to create or display qrcode and barcode
+  * @brief Qbcode widget header file.
+  * @details Qbcode widget is the widget used to create or display qrcode and barcode.
   * @author yuyin1_zhang@realsil.com.cn
   * @date 2024/04/17
   * @version 1.0
@@ -37,7 +37,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  T_QBCODE_ENCODE_TYPE structure */
+/** @brief  T_QBCODE_ENCODE_TYPE structure. */
 typedef enum
 {
     QRCODE_ENCODE_TEXT,
@@ -45,7 +45,7 @@ typedef enum
     BARCODE_ENCODE_TEXT,
 } T_QBCODE_ENCODE_TYPE;
 
-/** @brief  T_QBCODE_DISPLAY_TYPE structure */
+/** @brief  T_QBCODE_DISPLAY_TYPE structure. */
 typedef enum
 {
     QRCODE_DISPLAY_SECTION,
@@ -54,7 +54,7 @@ typedef enum
     BARCODE_DISPLAY_IMAGE,
 } T_QBCODE_DISPLAY_TYPE;
 
-/** @brief  qrcode widget structure */
+/** @brief  Qrcode widget structure. */
 typedef struct gui_qbcode
 {
     gui_obj_t base;
@@ -92,16 +92,16 @@ typedef struct gui_qbcode
 /**
  * @brief Create a qrcode widget.
  *
- * @param parent the father widget
- * @param filename this qrcode widget's name.
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w qrcode image display width including border
- * @param h qrcode image display height including border
+ * @param parent The father widget.
+ * @param filename This qrcode widget's name.
+ * @param x The X-axis coordinate relative to parent widget.
+ * @param y The Y-axis coordinate relative to parent widget.
+ * @param w Qrcode image display width including border.
+ * @param h Qrcode image display height including border.
  * @param type QRCODE_DISPLAY_SECTION (gui in real-time) or QRCODE_DISPLAY_IMAGE(save in psRAM by default) or BARCODE_DISPLAY_SECTION or BARCODE_DISPLAY_IMAGE.
  * @param encodeType QRCODE_ENCODE_TEXT or QRCODE_ENCODE_BINARY or BARCODE_ENCODE_TEXT supported.
- * @return gui_qbcode_t* success, NULL failed.
- * @note  this function just create a qrcode object, qbcode data and param should be config by gui_qbcode_config() api.
+ * @return gui_qbcode_t* Success, NULL failed.
+ * @note This function just creates a qrcode object, qbcode data and param should be configured by gui_qbcode_config() API.
  */
 
 gui_qbcode_t *gui_qbcode_create(void                  *parent,
@@ -114,13 +114,13 @@ gui_qbcode_t *gui_qbcode_create(void                  *parent,
                                 T_QBCODE_ENCODE_TYPE   encodeType);
 
 /**
- * @brief config qbcode data and border param for a qbcode object.
+ * @brief Config qbcode data and border param for a qbcode object.
  *
- * @param qbcode a qbcode object pointer.
- * @param data  input data encoded for qbcode
- * @param data_len input data length for encode data
- * @param border_size qrode border size, can be 1, 2, 3... by qbcode size, default white color border;
- * @return null
+ * @param qbcode A qbcode object pointer.
+ * @param data Input data encoded for qbcode.
+ * @param data_len Input data length for encode data.
+ * @param border_size Qrcode border size, can be 1, 2, 3... by qbcode size, default white color border.
+ * @return Null.
  */
 void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, uint8_t border_size);
 

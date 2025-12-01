@@ -139,7 +139,7 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
          :width: 800px
          :align: center
 
-         生成二进制数组
+         生成二进制文件
 
    - 处理 GLTF 模型
 

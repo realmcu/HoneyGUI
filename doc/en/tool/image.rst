@@ -27,12 +27,12 @@ Convert pictures in various formats into RGB raw pictures
 
 Configuration
 ^^^^^^^^^^^^^^^^^
-- Color head : BeeGUI wants this head to display.
-- Big-endian : Whether the input image is big-endian.
+- Color Head : BeeGUI requires this header information for rendering images.
+- Big-Endian : Whether the input image uses big-endian format.
 - Compress : Enable image compression.
-- MixAlphaChannel Flag : Whether to mix alpha channel to rgb when converting rgba to rgb or rgb565.
-- Scan Mode : Select whether the scan direction is horizontal or vertical, BeeGUI only wants horizontal.
-- Color Space : Select colorSpace (RGB565, RGBA, BINARY...), BeeGUI can display all of them.
+- MixAlphaChannel Flag : Whether to mix alpha channel to RGB when converting RGBA to RGB or RGB565.
+- Scan Mode : Select whether the scan direction is horizontal or vertical. BeeGUI only requires horizontal.
+- Color Space : Select color space (RGB565, RGBA, BINARY...). BeeGUI can display all of them.
 
 Color Space
 ^^^^^^^^^^^^^^^^^

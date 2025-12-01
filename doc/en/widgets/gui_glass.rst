@@ -32,7 +32,7 @@ Usage
    :header-rows: 1
 
    * - Description
-     - API 
+     - :term:`API`
    * - Create Widget
      - :cpp:any:`gui_glass_create_from_mem`  
    * - Set Attribute 
@@ -43,7 +43,7 @@ Usage
      - :cpp:any:`gui_glass_get_width`
    * - Refresh Attribute
      - :cpp:any:`gui_glass_refresh_size`
-   * - Posistion Translation
+   * - Position Translation
      - :cpp:any:`gui_glass_translate`
 
 .. _glass_example_en:

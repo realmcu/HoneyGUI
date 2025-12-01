@@ -84,12 +84,14 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
 
    > pip install kconfiglib
 
-配置应用程序（menuconfig）
+.. _配置应用程序（Menuconfig）:
+
+配置应用程序（Menuconfig）
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 在编译之前，可以使用 ``menuconfig`` 图形化配置工具来选择要运行的示例应用程序。此配置对 **SCons** 和 **CMake** 两种构建系统都通用。
 
-使用 menuconfig 进行配置
+使用 Menuconfig 进行配置
 """"""""""""""""""""""""
 
 在 ``win32_sim`` 目录下执行以下命令：
@@ -143,7 +145,7 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
 通过 CMD 启动（Scons）
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-在 ``HoneyGUI``文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
+在 ``HoneyGUI`` 文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
 
 .. code-block:: shell
 
@@ -186,7 +188,7 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
 配置应用程序
 """"""""""""
 
-如需更改应用程序配置，请参考前面的 ``配置应用程序（menuconfig）`` 部分，在 ``win32_sim`` 目录下执行 ``menuconfig ../Kconfig.gui`` 命令。
+如需更改应用程序配置，请参考前面的 :ref:`配置应用程序（Menuconfig）` 部分，在 ``win32_sim`` 目录下执行 ``menuconfig ../Kconfig.gui`` 命令。
 
 编译项目
 """"""""

@@ -1,6 +1,6 @@
-==================
-RealUI System
-==================
+=======================
+RealUI System Overview
+=======================
 
 RealUI system is an efficient embedded solution for display projects based on HoneyGUI.
 
@@ -32,11 +32,11 @@ GUI Server Task
 
 GUI server is the running function of GUI task, and its specific running process is divided into six parts:
 
-1. GUI :term:`APP` EXIST: First, the currently running GUI APP needs to be obtained. When the GUI detects that there is a running GUI APP, it will proceed to the next step;
-2. GET :term:`LCD` DATA: Get real-time information about the screen;
-3. GET :term:`TP` DATA: Get real-time information about the touchpad and run the touch algorithm;
-4. GET :term:`KB` DATA: Get real-time information about the keyboard and run the keyboard algorithm;
-5. OBJ DRAW: Drawing widgets in the APP, including functional operations and image processing.
-6. UPDATE :term:`FB`: Delivers the drawn results to the screen.
+1. GUI :term:`APP` exist: First, the currently running GUI APP needs to be obtained. When the GUI detects that there is a running GUI APP, it will proceed to the next step;
+2. Get :term:`LCD` data: Get real-time information about the screen;
+3. Get :term:`TP` data: Get real-time information about the touchpad and run the touch algorithm;
+4. Get keyboard data: Get real-time information about the keyboard and run the keyboard algorithm;
+5. Obj draw: Drawing widgets in the APP, including functional operations and image processing.
+6. Update :term:`FB`: Delivers the drawn results to the screen.
 
 More detailed operation of the GUI APP can be found in the online documentation.

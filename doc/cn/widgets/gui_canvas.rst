@@ -18,7 +18,7 @@
 
 组件概述
 --------
- :term:`GUI` Canvas 是基于 NanoVG 的 2D 绘图组件，提供：
+:term:`GUI` Canvas 是基于 NanoVG 的 2D 绘图组件，提供：
 
 - 基础形状绘制（矩形/圆形/弧形等）
 - 支持 RGBA/RGB565/ :term:`PNG`/JPG输出格式
@@ -32,7 +32,7 @@
 创建与初始化
 ~~~~~~~~~~~~
 
-1. 使用 ``gui_canvas_create`` 函数创建画布控件
+1. 使用 ``gui_canvas_create`` 函数创建画布控件。
 
    此函数用于创建一个基于 NanoVG 的画布控件，返回画布对象指针。
 
@@ -51,7 +51,7 @@
            // 错误处理
        }
 
-2. 使用 ``gui_canvas_set_canvas_cb`` 设置绘制回调
+2. 使用 ``gui_canvas_set_canvas_cb`` 设置绘制回调。
 
    此函数用于设置画布的重绘回调函数，当需要刷新画布时会调用此回调。
 
@@ -77,7 +77,7 @@
 图像输出
 ~~~~~~~~~~
 
-使用 ``gui_canvas_output_buffer`` 函数（预分配缓冲区）
+使用 ``gui_canvas_output_buffer`` 函数（预分配缓冲区）。
 
    此函数需要预先分配缓冲区，适用于需要重复渲染或内存受限的场景。
 
@@ -85,7 +85,7 @@
    
         // 示例：输出到预分配的RGBA缓冲区
         uint8_t img_head_size = sizeof(gui_rgb_data_head_t);
-        uint8_t img_size = img_head_size + 640 * 480 * 4;// RGBA 需分配 width*height*4 字节，加上头部
+        uint32_t img_size = img_head_size + 640 * 480 * 4;// RGBA 需分配 width*height*4 字节，加上头部
         uint8_t *buffer = gui_lower_malloc(img_size); 
         gui_canvas_render_to_image_buffer(
             GUI_CANVAS_OUTPUT_RGBA,

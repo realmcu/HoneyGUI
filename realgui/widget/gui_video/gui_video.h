@@ -3,8 +3,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_video.h
-  * @brief video widget
-  * @details video widget
+  * @brief Video widget.
+  * @details Video widget.
   * @author roy@realsil.com.cn
   * @date 2024/5/15
   * @version 1.0

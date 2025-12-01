@@ -10,9 +10,9 @@ Introduction to LVGL
 
 LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library in C language, providing all the necessary tools to create embedded GUIs with easy-to-use graphical elements, attractive visual effects, and low memory usage.
 
-LVGL offers a term:`GUI` engine that handles all interactions between the application and the end user. This includes not only drawing display content and accepting user input to convert it into events that the application can capture, but also providing over 30 built-in widgets, more than 100 style properties, scrolling, animations, advanced software rendering, and built-in term:`GPU` support ranging from MCU to OpenGL, among other features. This combination of features allows you to efficiently develop user interfaces without reinventing the wheel.
+LVGL offers a :term:`GUI` engine that handles all interactions between the application and the end user. This includes not only drawing display content and accepting user input to convert it into events that the application can capture, but also providing over 30 built-in widgets, more than 100 style properties, scrolling, animations, advanced software rendering, and built-in :term:`GPU` support ranging from MCU to OpenGL, among other features. This combination of features allows you to efficiently develop user interfaces without reinventing the wheel.
 
-LVGL showcases demo effects on its official website to demonstrate LVGL's term:`UI` building capabilities. The online documentation serves as the primary development resource for LVGL, detailing the design and operational logic of LVGL, usage methods for various controls, a wealth of example programs, and porting methods. Whether you are a beginner or an experienced developer, you can quickly get started and gain an in-depth understanding of LVGL's functions and features based on the online documentation.
+LVGL showcases demo effects on its official website to demonstrate LVGL's :term:`UI` building capabilities. The online documentation serves as the primary development resource for LVGL, detailing the design and operational logic of LVGL, usage methods for various controls, a wealth of example programs, and porting methods. Whether you are a beginner or an experienced developer, you can quickly get started and gain an in-depth understanding of LVGL's functions and features based on the online documentation.
 
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
@@ -136,7 +136,7 @@ Actual Device Porting
 LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `LVGL Integration and Drivers <https://docs.lvgl.io/9.3/details/integration/index.html>`_ and `LVGL Main Modules <https://docs.lvgl.io/9.3/details/main-modules/index.html>`_.
 
 .. note::
-    The following examples do not include the specific implementation of hardware device drivers, but simply demonstrate how to connect the drivers to LVGL's interfaces. Developers can complete the driver functions within the same term:`API` framework as the example driver to connect to the driver layer interface, and then reuse the porting interfaces of the example project.
+    The following examples do not include the specific implementation of hardware device drivers, but simply demonstrate how to connect the drivers to LVGL's interfaces. Developers can complete the driver functions within the same :term:`API` framework as the example driver to connect to the driver layer interface, and then reuse the porting interfaces of the example project.
 
 Display
 -----------------------------
@@ -152,7 +152,7 @@ LVGL supports three rendering modes for display buffers, each suitable for diffe
 
   - Uses a smaller buffer to divide the screen into several small parts for gradual rendering.
   - Recommended buffer size is at least 1/10 of the screen.
-  - Advantage: Saves term:`RAM`, suitable for scenarios with limited memory.
+  - Advantage: Saves :term:`RAM`, suitable for scenarios with limited memory.
 
 - LV_DISPLAY_RENDER_MODE_DIRECT (Direct Write Rendering)
 
@@ -173,7 +173,7 @@ Based on actual development needs, different memory resources, and rendering mod
 
   - Uses partial rendering scheme
   - Configures two RAM area caches
-  - Suitable for MCUs without term:`PSRAM`
+  - Suitable for MCUs without :term:`PSRAM`
   - This scheme only supports display ICs with RAM
 
 - ``SCHEME_RAM_PSRAM_PARTIAL`` Region Drawing Scheme with Full Screen Cache
@@ -181,7 +181,7 @@ Based on actual development needs, different memory resources, and rendering mod
   - Uses partial rendering scheme
   - Configures two RAM area caches and one PSRAM full screen cache
   - This scheme only supports MCUs with PSRAM
-  - No special requirements for display term:`IC`
+  - No special requirements for display :term:`IC`
 
 - ``SCHEME_PSRAM_DIRECT`` Full Screen Direct Write Scheme
 
@@ -347,7 +347,7 @@ Compilation environment: armclang6.22 version, optimization mode -Ofast to enabl
     all screen, SW+MVE+PPE, 11, 12
 
 .. csv-table:: Rendering Acceleration on Different Platforms
-  :header: Chip Model, Processor Frequency, Hardware Accelerator, Image Drawing, Image Transparency, Image Scaling, Image Rotation, Rounded Rectangle, Rectangle Fill, term:`RLE` Decoding, Character, Line
+  :header: Chip Model, Processor Frequency, Hardware Accelerator, Image Drawing, Image Transparency, Image Scaling, Image Rotation, Rounded Rectangle, Rectangle Fill, :term:`RLE` Decoding, Character, Line
   :align: center
 
   RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
@@ -627,7 +627,7 @@ To use images and fonts in LVGL-based UIs, you must first convert them into LVGL
   Resources (images/fonts) are converted into C arrays. These arrays become part of the code and are compiled into the main application binary.
 
   - Every time you change your application logic, these resource files will be recompiled.
-  - The combined resource size is included in the term:`APP` image, meaning a larger space is required, particularly during OTA (Over-The-Air) updates.
+  - The combined resource size is included in the :term:`APP` image, meaning a larger space is required, particularly during OTA (Over-The-Air) updates.
 
 2. Binary (bin) File Format
   Resources are saved as separate binary files and do not participate in the compilation process.
@@ -722,7 +722,7 @@ For platforms that support direct flash addressing, such as Nor Flash, the resou
 LVGL
 ^^^^^^^^^
 
-This conversion feature is fully supported by the native LVGL conversion script. The tool only accepts term:`PNG` images as input files and can output both C files and bin files, supporting multiple color formats.
+This conversion feature is fully supported by the native LVGL conversion script. The tool only accepts :term:`PNG` images as input files and can output both C files and bin files, supporting multiple color formats.
 When outputting image resources in the bin file format, the data in the bin file is stored as ``12 Byte lv_img_header_t + data``, where the ``lv_img_header_t`` contains information such as the ``color format``, ``width``, and ``height``.
 For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
 

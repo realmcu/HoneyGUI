@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_scroll_text.c
-  * @brief scroll text widget
-  * @details scroll text widget
+  * @brief Scroll text widget.
+  * @details Scroll text widget.
   * @author luke_sun@realsil.com.cn
   * @date 2023/11/08
   * @version v1.0

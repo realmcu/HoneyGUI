@@ -10,9 +10,9 @@ LVGL 简介
 - `LVGL 在线文档 <https://docs.lvgl.io/8.3/intro/index.html>`_
 - `LVGL 简介 <https://docs.lvgl.io/8.3/intro/index.html>`_
 
-LVGL（Light and Versatile Graphics Library）是最受欢迎的免费开源嵌入式图形库，可为任何 MCU、MPU 和显示类型创建漂亮的用户界面，提供了一切你需要创建嵌入式 term:`GUI` 所需的功能，包括易于使用的图形元素、美观的视觉效果和低内存占用。
+LVGL（Light and Versatile Graphics Library）是最受欢迎的免费开源嵌入式图形库，可为任何 MCU、MPU 和显示类型创建漂亮的用户界面，提供了一切你需要创建嵌入式 :term:`GUI` 所需的功能，包括易于使用的图形元素、美观的视觉效果和低内存占用。
 
-LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 term:`UI` 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解 LVGL 的功能和特性。
+LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 :term:`UI` 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解 LVGL 的功能和特性。
 
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_
@@ -23,7 +23,7 @@ LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 term:`UI` 构建能�
 
 HoneyGUI 模拟器
 ==========================
-..  term:`PC` 模拟器运行 lvgl demo（脱离EVB开发）
+..  :term:`PC` 模拟器运行 lvgl demo（脱离EVB开发）
 
 模拟器是开发 UI 时使用的一个强大的工具，用于在计算机上模拟嵌入式设备的UI界面。它可以模拟真实硬件平台的行为和外观，提供给开发人员一个便捷的环境来快速创建、调试和测试UI设计。
 
@@ -183,12 +183,12 @@ HoneyGUI LVGL
 ==========================
 - 文档说明： `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_
 
-LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 term:`GPU` 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_。
+LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 :term:`GPU` 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_。
 
 
 
 .. note::
-    以下示例不包含硬件设备驱动的具体实现，仅示例如何将驱动对接到 LVGL 的接口。开发者在实现硬件设备驱动时，可在与示例驱动一致的 term:`API` 框架下来完成驱动功能，以对接到 HoneyGUI driver 层接口，往上则可复用示例工程的 porting 接口。
+    以下示例不包含硬件设备驱动的具体实现，仅示例如何将驱动对接到 LVGL 的接口。开发者在实现硬件设备驱动时，可在与示例驱动一致的 :term:`API` 框架下来完成驱动功能，以对接到 HoneyGUI driver 层接口，往上则可复用示例工程的 porting 接口。
 
 
 显示
@@ -199,12 +199,12 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 ``void lv_port_disp_init(void)`` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``。
 
-文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 ``DISPLAY_FLUSH_TYPE`` 以切换模式，其中 ``RAMLESS_XXX`` 适用于不带有 RAM 的 display term:`IC` ， ``RAM_XXX`` 适用于带有 RAM 的 display IC ， ``XXX_FULL_SCREEN_XXX`` 表示为每次整屏推出， ``XXX_TWO_SEC`` 表示为只绘制变化的显示内容，单位为两个 buffer 大小， buffer 的像素高度由 ``SECTION_HEIGHT`` 定义。
+文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 ``DISPLAY_FLUSH_TYPE`` 以切换模式，其中 ``RAMLESS_XXX`` 适用于不带有 RAM 的 display :term:`IC` ， ``RAM_XXX`` 适用于带有 RAM 的 display IC ， ``XXX_FULL_SCREEN_XXX`` 表示为每次整屏推出， ``XXX_TWO_SEC`` 表示为只绘制变化的显示内容，单位为两个 buffer 大小， buffer 的像素高度由 ``SECTION_HEIGHT`` 定义。
 
 
-详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 term:`RAM` 的 display IC：
+详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 :term:`RAM` 的 display IC：
 
-- 使用不带有 RAM 的 display IC 时，必须为其分配整屏尺寸的 frame buffer，因此在 term:`PSRAM` 上分配了两个整屏尺寸的 frame buffer 用于显示。显示的参数宏定义已定义在文件 :file:`lv_conf.h` 中。
+- 使用不带有 RAM 的 display IC 时，必须为其分配整屏尺寸的 frame buffer，因此在 :term:`PSRAM` 上分配了两个整屏尺寸的 frame buffer 用于显示。显示的参数宏定义已定义在文件 :file:`lv_conf.h` 中。
 - 若使用的 display IC 带有 RAM，则 frame buffer 的大小不必为整屏尺寸。由于刷屏方式的不同，需要配置 :file:`lv_port_disp.c` 中的 ``LVGL_USE_EDPI`` 为不启用(0)，以切换 ``disp_flush`` 函数适配刷屏。
 
 
@@ -681,7 +681,7 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir\\lvgl\\demos\\be
 
 
 .. csv-table:: 不同平台渲染加速
-  :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, term:`RLE` 解码, 字符, 线条
+  :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, :term:`RLE` 解码, 字符, 线条
   :align: center
 
   RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
@@ -719,7 +719,7 @@ LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控
 ==========================
 .. <!-- （Img + font，介绍和演示） -->
 
-LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 term:`APP` image（OTA 时需要更大空间），bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。在路径 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets\\` 下已提供 example :file:`lvgl_example_assets.c` 示例如何为控件配置不同格式的资源。
+LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 :term:`APP` image（OTA 时需要更大空间），bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。在路径 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets\\` 下已提供 example :file:`lvgl_example_assets.c` 示例如何为控件配置不同格式的资源。
 
 图片转换器
 -----------------------------
@@ -785,7 +785,7 @@ HoneyGUI 图像转换工具
 
 用户可利用 HoneyGUI 图像转换工具将图片资源转换为 RLE 压缩的二进制文件格式，具体使用步骤请参考 `HoneyGUI Image Converter - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_：
 
-1. 选择需要压缩的图片文件（支持 term:`PNG` 、JPEG 等格式）
+1. 选择需要压缩的图片文件（支持 :term:`PNG` 、JPEG 等格式）
 2. 配置图片的转换参数：启用 :guilabel:`Compress`，:guilabel:`Compress Mode` 选择 :guilabel:`RLE`， 启用 :guilabel:`Color Head`，:guilabel:`Color Space` 按需选择
 3. 点击 :guilabel:`Convert` 生成压缩的二进制文件
 

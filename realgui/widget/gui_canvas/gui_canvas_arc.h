@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_canvas_round_rect.h
-  * @brief image canvas rect widget header file
-  * @details image widget is used to show image on the screen
+  * @brief Image canvas rect widget header file.
+  * @details Image widget is used to show image on the screen.
   * @author howie_wang@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0

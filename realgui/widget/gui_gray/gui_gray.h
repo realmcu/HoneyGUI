@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_gray.h
-  * @brief Gray scale widget
-  * @details Widget that converts content in its area to grayscale
+  * @brief Gray scale widget.
+  * @details Widget that converts content in its area to grayscale.
   * @author howie_wang@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0

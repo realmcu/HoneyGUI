@@ -15,14 +15,14 @@ data header size.
 JS Malloc Heap
 --------------
 
-JS (javascript) is included in term:`GUI` module, the heap space JS used may fail to malloc due to resource
-limitation, so this heap space could relocate on term:`PSRAM` if SoC supports PSRAM feature. The specific
-information can be found in the term:`API` ``void *context_alloc(size_t size, void *cb_data_p)``.
+JS (javascript) is included in :term:`GUI` module, the heap space JS used may fail to malloc due to resource
+limitation, so this heap space could relocate on :term:`PSRAM` if SoC supports PSRAM feature. The specific
+information can be found in the :term:`API` ``void *context_alloc(size_t size, void *cb_data_p)``.
 
 Feed Watch Dog
 --------------
 
-GUI task does not support feeding the watch dog, so the term:`APP` should do this in a hook function registered
+GUI task does not support feeding the watch dog, so the :term:`APP` should do this in a hook function registered
 by the APP and used by GUI. The registered function is ``void gui_task_ext_execution_sethook(void (*hook)(void))``.
 
 Not Support FPU

@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_soccer.h
-  * @brief soccer widget
-  * @details soccer widget
+  * @brief Soccer widget.
+  * @details Soccer widget.
   * @author howie_wang@realsil.com.cn
   * @date 2024/08/16
   * @version 1.0

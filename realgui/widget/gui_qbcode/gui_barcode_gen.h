@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file  gui_barcode_gen.c
-  * @brief barcode widget
-  * @details barcode
+  * @brief Barcode widget.
+  * @details Barcode.
   * @author yuyin1_zhang@realsil.com.cn
   * @date 2024/4/17
   * @version 1.0
@@ -79,10 +79,10 @@ typedef struct barcode_symbol
  *============================================================================*/
 
 /**
- * @brief barcode encode
+ * @brief Barcode encode.
  *
- * @param source[]
- * @param length
+ * @param source[] Source data.
+ * @param length Length of the data.
  */
 barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int length);
 

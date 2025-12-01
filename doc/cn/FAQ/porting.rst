@@ -12,12 +12,12 @@
 JS 分配堆内存
 --------------
 
-JS ( JavaScript ) 包含在 term:`GUI` 模块中， JS 使用的堆空间可能会受到资源限制，导致 ``malloc`` 失败。如果 SoC 支持 term:`PSRAM` 特性，可以将此堆空间重定位到 PSRAM 。具体信息请参考 API ``void *context_alloc(size_t size, void *cb_data_p)``。
+JS ( JavaScript ) 包含在 :term:`GUI` 模块中， JS 使用的堆空间可能会受到资源限制，导致 ``malloc`` 失败。如果 SoC 支持 :term:`PSRAM` 特性，可以将此堆空间重定位到 PSRAM 。具体信息请参考 API ``void *context_alloc(size_t size, void *cb_data_p)``。
 
 喂狗
 ----
 
-GUI 任务不支持喂狗功能，因此应用程序应在 term:`APP` 注册的 hook 函数中进行喂狗操作，并由 GUI 使用。注册函数为 ``void gui_task_ext_execution_sethook(void (*hook)(void))``。
+GUI 任务不支持喂狗功能，因此应用程序应在 :term:`APP` 注册的 hook 函数中进行喂狗操作，并由 GUI 使用。注册函数为 ``void gui_task_ext_execution_sethook(void (*hook)(void))``。
 
 不支持 FPU
 -----------
