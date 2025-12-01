@@ -25,7 +25,7 @@ static void img_cb(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, gui_view_descriptor_get("white_view"),
+    gui_view_switch_direct(gui_view_get("blue_view"), gui_view_descriptor_get("white_view"),
                            SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_OUT_NONE_ANIMATION);
 }

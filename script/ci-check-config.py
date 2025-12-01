@@ -40,7 +40,7 @@ ci_check_config = {
         r"example/widget/text/test_multi_language.c",
         r"realgui/engine/draw_font.c",
         r"doxygen_graphviz/readme.md",
-        r"tool/D2XML/",
+        r"tool/",
         r"example/application/FHY_320_200",
     ],
     "ignore_cpp_astyle_check":[

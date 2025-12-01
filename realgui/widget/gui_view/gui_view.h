@@ -202,6 +202,12 @@ void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor);
 const gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
 
 /**
+ * @brief Get target view by name.
+ * @param name View descriptor's name that can be used to find the target view.
+ */
+gui_view_t *gui_view_get(const char *name);
+
+/**
  * @brief Switches the current GUI view to a new view based on the specified event.
  *
  * This function handles the transition between GUI views. It takes the current

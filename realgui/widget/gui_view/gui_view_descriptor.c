@@ -62,6 +62,17 @@ void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor)
     descriptor_count++;
 }
 
+gui_view_t *gui_view_get(const char *name)
+{
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(name);
+    if (descriptor == NULL || descriptor->pView == NULL || *(descriptor->pView) == NULL)
+    {
+        GUI_ASSERT(0);
+        return NULL;
+    }
+    return *(descriptor->pView);
+}
+
 const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
 {
     for (uint32_t i = 0; i < descriptor_count; i++)

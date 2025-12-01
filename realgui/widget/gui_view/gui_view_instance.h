@@ -35,12 +35,12 @@
 
 // Intermediate macro implementation
 #define _GUI_VIEW_INSTANCE_IMPL(view_name, view_keep, on_switch_in_func, on_switch_out_func, line) \
-    static gui_view_t *current_view = NULL; \
+    static gui_view_t *_GUI_CONCAT_EXPANDED(current_view_line_, line) = NULL; \
     \
     static const gui_view_descriptor_t _GUI_CONCAT_EXPANDED(descriptor_line_, line) = \
             { \
               .name          = (const char *)view_name, \
-              .pView         = &current_view, \
+              .pView         = &_GUI_CONCAT_EXPANDED(current_view_line_, line), \
               .on_switch_in  = on_switch_in_func, \
               .on_switch_out = on_switch_out_func, \
               .keep          = view_keep \
