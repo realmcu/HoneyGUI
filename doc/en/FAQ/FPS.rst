@@ -14,8 +14,7 @@ Hardware Acceleration
 ---------------------
 
 Use hardware acceleration to render images instead of software acceleration whenever possible.
-Different chip models may have different :term:`GPU`, please refer to the guidance document in the SDK for
-details.
+Different chip models may have different :term:`GPU`, please refer to the guidance document in the SDK for details.
 
 Data Transmission Speed
 -----------------------
@@ -25,15 +24,13 @@ Data transmission speed also affects the drawing speed of HoneyGUI, so please en
 UI Design
 -----------------
 
-Reducing complexity in the UI, as well as the number and size of images in a single interface, can
-increase the frame rate. Make sure that every pixel of the image data that needs to be loaded is
-useful.
+Reducing complexity in the UI, as well as the number and size of images in a single interface, can increase the frame rate.
+Make sure that every pixel of the image data that needs to be loaded is useful.
 
 Image Compression
 -----------------
 
-Almost all image compression reduces the refresh rate of the UI, so avoid using compressed images
-if the memory size is sufficient.
+HoneyGUI supports image compression, and some chips have built-in hardware decompression modules. Using the hardware decompression module is very fast, but using software decompression takes some time. Using compressed images can reduce the size of the original image resources, allowing you to place more resources in ``userrdata`` and reducing the time needed to read from flash.
 
 Font
 ----
@@ -42,8 +39,7 @@ Custom Binary Files
 ~~~~~~~~~~~~~~~~~~~~
 
 - Use multiples of 8 for font size whenever possible.
-- When the file contains several hundred characters, `indexMethod` should be set to 0 when creating
-  the font file.
+- When the file contains several hundred characters, ``indexMethod`` should be set to 0 when creating the font file.
 
 Standard TTF Files
 ~~~~~~~~~~~~~~~~~~~

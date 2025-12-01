@@ -5,8 +5,8 @@ Use LVGL V9 to Design
 Introduction to LVGL
 ==========================
 - `LVGL Official Website <https://lvgl.io/>`_
-- `LVGL Online Documentation <https://docs.lvgl.io/9.3/>`_
-- `LVGL Introduction <https://docs.lvgl.io/9.3/intro/introduction.html>`_
+- `LVGL Online Documentation <https://docs.lvgl.io/9.4/index.html>`_
+- `LVGL Introduction <https://docs.lvgl.io/9.4/introduction/index.html>`_
 
 LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library in C language, providing all the necessary tools to create embedded GUIs with easy-to-use graphical elements, attractive visual effects, and low memory usage.
 
@@ -15,7 +15,7 @@ LVGL offers a :term:`GUI` engine that handles all interactions between the appli
 LVGL showcases demo effects on its official website to demonstrate LVGL's :term:`UI` building capabilities. The online documentation serves as the primary development resource for LVGL, detailing the design and operational logic of LVGL, usage methods for various controls, a wealth of example programs, and porting methods. Whether you are a beginner or an experienced developer, you can quickly get started and gain an in-depth understanding of LVGL's functions and features based on the online documentation.
 
 - `LVGL Demo <https://lvgl.io/demos>`_
-- `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
+- `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_
 
 Simulator
 ==========================
@@ -112,7 +112,7 @@ Below are the directories and files related to LVGL:
 
 - env_support: Support for some environments or platforms.
 
-- examples: Contains built-in examples of LVGL, which can be experienced at `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ .
+- examples: Contains built-in examples of LVGL, which can be experienced at `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_ .
 
 - libs: Contains library files used by LVGL.
 
@@ -133,14 +133,14 @@ Below are the directories and files related to LVGL:
 Actual Device Porting
 ==========================
 
-LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `LVGL Integration and Drivers <https://docs.lvgl.io/9.3/details/integration/index.html>`_ and `LVGL Main Modules <https://docs.lvgl.io/9.3/details/main-modules/index.html>`_.
+LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `LVGL Integration and Drivers <https://docs.lvgl.io/9.4/integration/index.html>`_ and `LVGL Main Modules <https://docs.lvgl.io/9.4/main-modules/index.html>`_.
 
 .. note::
     The following examples do not include the specific implementation of hardware device drivers, but simply demonstrate how to connect the drivers to LVGL's interfaces. Developers can complete the driver functions within the same :term:`API` framework as the example driver to connect to the driver layer interface, and then reuse the porting interfaces of the example project.
 
 Display
 -----------------------------
-- Documentation: `LVGL Display (lv_display) <https://docs.lvgl.io/9.3/details/main-modules/display/index.html>`_, `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.3/details/main-modules/display/setup.html>`_
+- Documentation: `LVGL Display (lv_display) <https://docs.lvgl.io/9.4/main-modules/display/index.html>`_, `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.4/main-modules/display/setup.html>`_
 
 After developers complete the debugging of display device driver functions, the device can communicate normally with the display device and show colors. This section introduces how to connect the driver to LVGL's display interface to display LVGL's UI.
 
@@ -200,13 +200,13 @@ Based on actual development needs, different memory resources, and rendering mod
 
 Input Devices
 -----------------------------
-- Documentation: `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.3/details/main-modules/indev.html>`_
+- Documentation: `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_
 
 Once developers have completed the debugging of the input device driver functionality, the device can communicate normally with the input device. This section introduces how to interface the driver with LVGL's input interface to interact with LVGL's UI.
 
 LVGL's input interface is implemented in the file :file:`lv_port_indev.c`, and input device parameters are configured in the initialization function ``void lv_port_indev_init(void)``, such as selecting the device type, configuring the data read callback function, and pointer binding.
 
-For detailed input device porting methods and precautions, please refer to the documentation `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.3/details/main-modules/indev.html>`_ .
+For detailed input device porting methods and precautions, please refer to the documentation `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_ .
 
 - In the initialization function ``void lv_port_indev_init(void)``, select and register the corresponding type of input device, such as **Touchpad** for touch screen devices, and implement the corresponding interface.
 
@@ -283,7 +283,7 @@ For detailed input device porting methods and precautions, please refer to the d
 File System
 -----------------------------
 
- - Documentation: `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.3/details/main-modules/fs.html>`_
+ - Documentation: `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.4/main-modules/fs.html>`_
 
 LVGL Benchmark Test
 ==========================
@@ -299,28 +299,30 @@ Platform background: 8773G platform, 200MHz main frequency, QSPI410*502 screen, 
 
 Compilation environment: armclang6.22 version, optimization mode -Ofast to enable LTO; gcc 12.2 version, optimization mode -Ofast.
 
+Divide 1000 by the rendering time (ms) to obtain the maximum frame rate in the current scene, measured in frames per second.
+
 .. csv-table:: Benchmark Test Results with Different Acceleration Methods
    :header: Scenario, SW Rendering Time, SW+MVE+ARM2D Rendering Time, SW+MVE+ARM2D+PPE Rendering Time
    :widths: 60 50 50 50
    :align: center
 
-   empty screen, 4, 4, 4
-   moving wallpaper, 16, 16, 11
-   single rectangle, 0, 0, 0
-   multiple rectangles, 4, 4, 2
-   multiple RGB images, 5, 5, 2
-   multiple ARGB images, 10, 9, 2
-   rotated ARGB images, 11, 12, 0
-   multiple labels, 8, 9, 9
-   screen sized text, 32, 31, 30
-   multiple arcs, 6, 6, 5
-   containers, 6, 6, 6
-   containers with overlay, 27, 21, 24
-   containers with opa, 9, 11, 7
-   containers with opa_layer, 15, 11, 10
-   containers with scrolling, 23, 20, 21
-   widget demo, 31, 29, 30
-   all screen, 12, 11, 10
+   Empty screen, 4, 4, 4
+   Moving wallpaper, 16, 16, 11
+   Single rectangle, 0, 0, 0
+   Multiple rectangles, 4, 4, 2
+   Multiple RGB images, 5, 5, 2
+   Multiple ARGB images, 10, 9, 2
+   Rotated ARGB images, 11, 12, 0
+   Multiple labels, 8, 9, 9
+   Screen sized text, 32, 31, 30
+   Multiple arcs, 6, 6, 5
+   Containers, 6, 6, 6
+   Containers with overlay, 27, 21, 24
+   Containers with opa, 9, 11, 7
+   Containers with opa_layer, 15, 11, 10
+   Containers with scrolling, 23, 20, 21
+   Widget demo, 31, 29, 30
+   All screen, 12, 11, 10
 
 
 .. csv-table:: Benchmark Test Results in Different Compilation Environments
@@ -328,31 +330,31 @@ Compilation environment: armclang6.22 version, optimization mode -Ofast to enabl
   :widths: 60 50 50 50
   :align: center
 
-    empty screen, SW+MVE+PPE, 5, 5
-    moving wallpaper, SW+MVE+PPE, 16, 16
-    single rectangle, SW+MVE+PPE, 0, 0
-    multiple rectangles, SW+MVE+PPE, 2, 4
-    multiple RGB images, SW+MVE+PPE, 2, 5
-    multiple ARGB images, SW+MVE+PPE, 3, 3
-    rotated ARGB images, SW+MVE+PPE, 1, 0
-    multiple labels, SW+MVE+PPE, 11, 13
-    screen sized text, SW+MVE+PPE, 38, 37
-    multiple arcs, SW+MVE+PPE, 6, 8
-    containers, SW+MVE+PPE, 6, 6
-    containers with overlay, SW+MVE+PPE, 24, 25
-    containers with opa, SW+MVE+PPE, 6, 6
-    containers with opa_layer, SW+MVE+PPE, 11, 10
-    containers with scrolling, SW+MVE+PPE, 21, 22
-    widget demo, SW+MVE+PPE, 30, 34
-    all screen, SW+MVE+PPE, 11, 12
+   Empty screen, SW+MVE+PPE, 5, 5
+   Moving wallpaper, SW+MVE+PPE, 16, 16
+   Single rectangle, SW+MVE+PPE, 0, 0
+   Multiple rectangles, SW+MVE+PPE, 2, 4
+   Multiple RGB images, SW+MVE+PPE, 2, 5
+   Multiple ARGB images, SW+MVE+PPE, 3, 3
+   Rotated ARGB images, SW+MVE+PPE, 1, 0
+   Multiple labels, SW+MVE+PPE, 11, 13
+   Screen sized text, SW+MVE+PPE, 38, 37
+   Multiple arcs, SW+MVE+PPE, 6, 8
+   Containers, SW+MVE+PPE, 6, 6
+   Containers with overlay, SW+MVE+PPE, 24, 25
+   Containers with opa, SW+MVE+PPE, 6, 6
+   Containers with opa_layer, SW+MVE+PPE, 11, 10
+   Containers with scrolling, SW+MVE+PPE, 21, 22
+   Widget demo, SW+MVE+PPE, 30, 34
+   All screen, SW+MVE+PPE, 11, 12
 
 .. csv-table:: Rendering Acceleration on Different Platforms
-  :header: Chip Model, Processor Frequency, Hardware Accelerator, Image Drawing, Image Transparency, Image Scaling, Image Rotation, Rounded Rectangle, Rectangle Fill, :term:`RLE` Decoding, Character, Line
+  :header: Chip Model, Processor Frequency, Hardware Accelerator, Fill, Border, Shadow, Letter, Label, Image, Layer, Line, Arc, Triangle, Rectangle Mask, Vector, 3D
   :align: center
 
-  RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
-  RTL8773E, 100MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
-  RTL8773G, 200MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
+  RTL8772G, 125MHz, PPE1.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL8773E, 100MHz, PPE2.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL8773G, 200MHz, PPE2.2, HW, SW, HW, HW, HW, HW, HW, SW, SW, SW, SW, SW, SW
 
 
 .. note::
@@ -367,15 +369,15 @@ LVGL Native Demo
 -------------------
 
 - `LVGL Demo <https://lvgl.io/demos>`_
-- `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
+- `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_
 
-It is recommended that developers read and understand the `LVGL Introduction <https://docs.lvgl.io/9.3/intro/introduction.html>`_ and `LVGL Widget Basics <https://docs.lvgl.io/9.3/details/common-widget-features/basics.html>`_ sections before starting development to grasp the design concepts and logic of LVGL.
+It is recommended that developers read and understand the `LVGL Introduction <https://docs.lvgl.io/9.4/introduction/index.html>`_ and `LVGL Widget Basics <https://docs.lvgl.io/9.4/common-widget-features/index.html>`_ sections before starting development to grasp the design concepts and logic of LVGL.
 
 LVGL offers a wealth of demos and examples to help developers become familiar with the use of various controls and features.
 
 - The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos, with their source code stored in the directory :file:`your lvgl dir\\lvgl\\src\\demo`. Developers can directly call the corresponding ``lv_demo_xxx()`` functions to familiarize themselves.
 
-- The online documentation `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir\\example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
+- The online documentation `LVGL Example <<https://docs.lvgl.io/9.4/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir\\example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
 
 RTK Extension Demo
 -------------------
@@ -643,9 +645,9 @@ LVGL Image Converter
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - Online Image Converter: `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
-- Documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
+- Documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_
 
-The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.3/details/main-modules/image.html#online-converter>`_:
+The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.4/main-modules/images/adding_images.html#online-converter>`_:
 
 1. Select the LVGL Version: Choose ``LVGL v9``
 2. Upload Image Files: Select one or more local image files for batch conversion.
@@ -653,10 +655,10 @@ The LVGL Online Image Converter is a website provided by the LVGL development te
    The output C files will have the same name as the input files, and the variable name describing the image will also match the input file name. Therefore, avoid using Chinese characters or any illegal characters in the file names.
 3. Choose Output Color Format:
 
-   For an explanation of color formats, refer to  `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.3/details/main-modules/image.html#color-formats>`_.
+   For an explanation of color formats, refer to  `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.4/main-modules/images/color_formats.html>`_.
 4. Click :guilabel:`Convert` to obtain the output file
 
-The document `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ provides a detailed introduction on using image resources and the image converter tool in LVGL, as well as simple usage examples.
+The document `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_ provides a detailed introduction on using image resources and the image converter tool in LVGL, as well as simple usage examples.
 
 
 The online image converter for LVGL v9 only supports output in C file format and a limited selection of color formats. If you need features such as image compression, bin file output, or other color formats, please use the  `Python Image Converter <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_.
@@ -799,7 +801,7 @@ LVGL Online Conversion Tool
 
 - Online Conversion Tool: `LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
 
-- Documentation: `LVGL Font (lv_font) <https://docs.lvgl.io/9.3/details/main-modules/font.html>`_
+- Documentation: `LVGL Font (lv_font) <https://docs.lvgl.io/9.4/main-modules/fonts/index.html>`_
 
 Please refer to `LVGL Frequently Asked Questions - How to use the font converter? <https://lvgl.io/tools/fontconverter>`_ for usage steps:
 

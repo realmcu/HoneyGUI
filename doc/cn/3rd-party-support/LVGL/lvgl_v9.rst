@@ -5,8 +5,8 @@
 LVGL 简介
 ==========================
 - `LVGL 官网 <https://lvgl.io/>`_
-- `LVGL 在线文档 <https://docs.lvgl.io/9.3/>`_
-- `LVGL 简介 <https://docs.lvgl.io/9.3/intro/introduction.html>`_
+- `LVGL 在线文档 <https://docs.lvgl.io/9.4/index.html>`_
+- `LVGL 简介 <https://docs.lvgl.io/9.4/introduction/index.html>`_
 
 LVGL (Light and Versatile Graphics Library) 是一个免费且开源的 C 语言图形库，提供了一切所需的工具，以创建嵌入式 :term:`GUI` ，具有易于使用的图形元素、美观的视觉效果和低内存占用。
 
@@ -15,7 +15,7 @@ LVGL 提供了“ GUI 引擎”，处理应用程序与最终用户的所有交�
 LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 :term:`UI` 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解 LVGL 的功能和特性。
 
 - `LVGL Demo <https://lvgl.io/demos>`_
-- `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
+- `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_
 
 模拟器
 ==========================
@@ -113,7 +113,7 @@ LVGL 结构
 
 - env_support ：一些环境或者平台的支持。
 
-- examples ：存放 LVGL 的内置示例，可在 `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ 中体验。
+- examples ：存放 LVGL 的内置示例，可在 `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_ 中体验。
 
 - libs ：存放 LVGL 使用到的的库文件。
 
@@ -143,7 +143,7 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 显示
 -----------------------------
-- 文档说明： `LVGL Display (lv_display) <https://docs.lvgl.io/9.3/details/main-modules/display/index.html>`_ 以及 `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.3/details/main-modules/display/setup.html>`_
+- 文档说明： `LVGL Display (lv_display) <https://docs.lvgl.io/9.4/main-modules/display/index.html>`_ 以及 `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.4/main-modules/display/setup.html>`_
 
 在开发者完成显示设备的驱动功能调试后，设备能够与显示设备正常通信并显示色彩。本小节介绍如何将驱动与 LVGL 的显示接口进行对接以展现 LVGL 的 UI 界面。
 
@@ -203,13 +203,13 @@ LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的
 
 输入设备
 -----------------------------
-- 文档说明： `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.3/details/main-modules/indev.html>`_
+- 文档说明： `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_
 
 在开发者完成输入设备的驱动功能调试后，设备能够与输入设备正常通信。本小节介绍如何将驱动与 LVGL 的输入接口进行对接以与 LVGL 的 UI 界面进行交互。
 
 LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备参数在初始化函数 ``void lv_port_indev_init(void)`` 中进行配置，如选择设备类型，配置数据读取回调函数，以及指针绑定等。
 
-详尽的输入设备移植方法和注意事项请参阅文档 `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.3/details/main-modules/indev.html>`_。
+详尽的输入设备移植方法和注意事项请参阅文档 `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_。
 
 - 在初始化函数 ``void lv_port_indev_init(void)`` 中选择注册对应类型的输入设备，如触屏设备则选择 **Touchpad** ， 并选择对应的接口进行实现。
 
@@ -286,7 +286,7 @@ LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备�
 文件系统
 -----------------------------
 
-- 文档说明： `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.3/details/main-modules/fs.html>`_
+- 文档说明： `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.4/main-modules/fs.html>`_
 
 LVGL Benchmark 测试
 ==========================
@@ -302,28 +302,30 @@ LVGL 基准测试的官方文档位于 :file:`your lvgl dir\\lvgl\\demos\\README
 
 编译环境： armclang6.22 版本，优化方式 -Ofast 开启 LTO ； gcc 12.2 版本，优化方式 -Ofast。
 
+使用1000除以渲染时间（ms），可以得到当前场景下的极限帧率，单位为帧率/秒。
+
 .. csv-table:: Benchmark 不同加速方式测试结果
-   :header: 场景, SW 渲染时间, SW+MVE+ARM2D 渲染时间, SW+MVE+ARM2D+PPE 渲染时间
+   :header: 场景, SW 渲染时间(ms), SW+MVE+ARM2D 渲染时间(ms), SW+MVE+ARM2D+PPE 渲染时间(ms)
    :widths: 60 50 50 50
    :align: center
 
-   empty screen, 4, 4, 4
-   moving wallpaper, 16, 16, 11
-   single rectangle, 0, 0, 0
-   multiple rectangles, 4, 4, 2
-   multiple RGB images, 5, 5, 2
-   multiple ARGB images, 10, 9, 2
-   rotated ARGB images, 11, 12, 0
-   multiple labels, 8, 9, 9
-   screen sized text, 32,  31, 30
-   multiple arcs, 6, 6, 5
-   containers, 6, 6, 6
-   containers with overlay, 27, 21, 24
-   containers with opa, 9, 11, 7
-   containers with opa_layer, 15, 11, 10
-   containers with scrolling, 23, 20, 21
-   widget demo, 31, 29, 30
-   all screen, 12, 11, 10
+   Empty screen, 4, 4, 4
+   Moving wallpaper, 16, 16, 11
+   Single rectangle, 0, 0, 0
+   Multiple rectangles, 4, 4, 2
+   Multiple RGB images, 5, 5, 2
+   Multiple ARGB images, 10, 9, 2
+   Rotated ARGB images, 11, 12, 0
+   Multiple labels, 8, 9, 9
+   Screen sized text, 32, 31, 30
+   Multiple arcs, 6, 6, 5
+   Containers, 6, 6, 6
+   Containers with overlay, 27, 21, 24
+   Containers with opa, 9, 11, 7
+   Containers with opa_layer, 15, 11, 10
+   Containers with scrolling, 23, 20, 21
+   Widget demo, 31, 29, 30
+   All screen, 12, 11, 10
 
 
 .. csv-table:: Benchmark 不同编译环境测试结果
@@ -331,31 +333,31 @@ LVGL 基准测试的官方文档位于 :file:`your lvgl dir\\lvgl\\demos\\README
   :widths: 60 50 50 50
   :align: center
 
-    empty screen, SW+MVE+PPE, 5, 5
-    moving wallpaper, SW+MVE+PPE, 16, 16
-    single rectangle, SW+MVE+PPE, 0, 0
-    multiple rectangles, SW+MVE+PPE, 2, 4
-    multiple RGB images, SW+MVE+PPE, 2, 5
-    multiple ARGB images, SW+MVE+PPE, 3, 3
-    rotated ARGB images, SW+MVE+PPE, 1, 0
-    multiple labels, SW+MVE+PPE, 11, 13
-    screen sized text, SW+MVE+PPE, 38, 37
-    multiple arcs, SW+MVE+PPE, 6, 8
-    containers, SW+MVE+PPE, 6, 6
-    containers with overlay, SW+MVE+PPE, 24, 25
-    containers with opa, SW+MVE+PPE, 6, 6
-    containers with opa_layer, SW+MVE+PPE, 11, 10
-    containers with scrolling, SW+MVE+PPE, 21, 22
-    widget demo, SW+MVE+PPE, 30, 34
-    all screen, SW+MVE+PPE, 11, 12
+   Empty screen, SW+MVE+PPE, 5, 5
+   Moving wallpaper, SW+MVE+PPE, 16, 16
+   Single rectangle, SW+MVE+PPE, 0, 0
+   Multiple rectangles, SW+MVE+PPE, 2, 4
+   Multiple RGB images, SW+MVE+PPE, 2, 5
+   Multiple ARGB images, SW+MVE+PPE, 3, 3
+   Rotated ARGB images, SW+MVE+PPE, 1, 0
+   Multiple labels, SW+MVE+PPE, 11, 13
+   Screen sized text, SW+MVE+PPE, 38, 37
+   Multiple arcs, SW+MVE+PPE, 6, 8
+   Containers, SW+MVE+PPE, 6, 6
+   Containers with overlay, SW+MVE+PPE, 24, 25
+   Containers with opa, SW+MVE+PPE, 6, 6
+   Containers with opa_layer, SW+MVE+PPE, 11, 10
+   Containers with scrolling, SW+MVE+PPE, 21, 22
+   Widget demo, SW+MVE+PPE, 30, 34
+   All screen, SW+MVE+PPE, 11, 12
 
 .. csv-table:: 不同平台渲染加速
-  :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, :term:`RLE` 解码, 字符, 线条
+  :header: 芯片型号, 处理器主频, 硬件加速器, 填充, 边框, 阴影, 字符, 标签, 图像, 图层, 线条, 圆弧, 三角形, 矩形蒙版, 矢量, 3D
   :align: center
 
-  RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
-  RTL8773E, 100MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
-  RTL8773G, 200MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
+  RTL8772G, 125MHz, PPE1.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL8773E, 100MHz, PPE2.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL8773G, 200MHz, PPE2.2, HW, HW, HW, SW, HW, HW, HW, SW, SW, SW, SW, SW, SW
 
 
 .. note::
@@ -370,15 +372,15 @@ LVGL 原生 Demo
 -----------------
 
 - `LVGL Demo <https://lvgl.io/demos>`_
-- `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
+- `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_
 
-建议开发者开发前先行阅读理解 `LVGL Introduction <https://docs.lvgl.io/9.3/intro/introduction.html>`_ 和 `LVGL Widget Basics <https://docs.lvgl.io/9.3/details/common-widget-features/basics.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
+建议开发者开发前先行阅读理解 `LVGL Introduction <https://docs.lvgl.io/9.4/introduction/index.html>`_ 和 `LVGL Widget Basics <https://docs.lvgl.io/9.4/common-widget-features/index.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
 
 LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控件和特性的使用。
 
 - `LVGL Demo <https://lvgl.io/demos>`_ 中展示了综合性比较强的 Demo ，其源码保存在目录 :file:`your lvgl dir\\lvgl\\src\\demo` 下，开发者可直接调用对应的 ``lv_demo_xxx()`` 函数来熟悉了解。
 
-- 在线文档 `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your lvgl dir/example` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
+- 在线文档 `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your lvgl dir/example` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
 
 RTK 扩展 Demo
 -----------------
@@ -649,9 +651,9 @@ LVGL 在线图片转换工具
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - 在线转换工具： `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
-- 文档说明： `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
+- 文档说明： `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_
 
-LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持上传本地的图片文件，转换输出标准 C 文件，其中以变量方式描述了图片信息。使用步骤请参考 `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.3/details/main-modules/image.html#online-converter>`_：
+LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持上传本地的图片文件，转换输出标准 C 文件，其中以变量方式描述了图片信息。使用步骤请参考 `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.4/main-modules/images/adding_images.html#online-converter>`_：
 
 1. 选择 LVGL 版本 ``LVGL v9``
 2. 选取本地图片文件，支持多选批量转换
@@ -659,10 +661,10 @@ LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持
    输出 C 文件将与输入文件同名，图片描述变量也会与输入文件同名，因此输入文件名应避免使用中文或其他非法字符。
 3. 选择输出文件的颜色格式
 
-   颜色格式的说明请参考 `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.3/details/main-modules/image.html#color-formats>`_
+   颜色格式的说明请参考 `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.4/main-modules/images/color_formats.html>`_
 4. 点击 :guilabel:`Convert` 获取输出文件
 
-在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
+在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
 
 LVGL v9 的在线图片转换工具仅支持输出 C 文件格式和有限的颜色格式输出，如需图片压缩、bin 文件和其他的颜色格式输出，请使用 `python 转换脚本 <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_。
@@ -717,7 +719,7 @@ Media Convert Tool 在转换生成 bin 文件的同时，还将生成一份资�
 LVGL
 ^^^^^^^^^
 
-该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 :term:`PNG` 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时， bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
+该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 :term:`PNG` 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时， bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html#>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
 .. figure:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
    :align: center
@@ -794,7 +796,7 @@ LVGL 在线转换工具
 
 - 在线转换工具：`LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
 
-- 文档说明：`LVGL Font (lv_font) <https://docs.lvgl.io/9.3/details/main-modules/font.html>`_
+- 文档说明：`LVGL Font (lv_font) <https://docs.lvgl.io/9.4/main-modules/fonts/index.html>`_
 
 使用步骤请参考  `LVGL Frequently Asked Questions - How to use the font converter? <https://lvgl.io/tools/fontconverter>`_ ：
 
