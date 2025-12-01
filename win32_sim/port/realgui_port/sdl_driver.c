@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include "unistd.h"
 #include "tp_algo.h"
@@ -169,6 +170,7 @@ void *sdl_driver_thread(void *arg)
         case SDL_QUIT:
             {
                 SDL_Quit();
+                exit(0);
             }
             break;
 
