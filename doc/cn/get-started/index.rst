@@ -84,28 +84,66 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
 
    > pip install kconfiglib
 
-配置 HoneyGUI
-^^^^^^^^^^^^^^^
-在编译之前，需要配置要构建的 Demo。
+配置应用程序（menuconfig）
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在编译之前，可以使用 ``menuconfig`` 图形化配置工具来选择要运行的示例应用程序。此配置对 **SCons** 和 **CMake** 两种构建系统都通用。
+
+使用 menuconfig 进行配置
+""""""""""""""""""""""""
+
+在 ``win32_sim`` 目录下执行以下命令：
 
 .. code-block:: shell
 
    > cd win32_sim
    > menuconfig ../Kconfig.gui
 
-这将打开一个配置菜单，您可以选择：
+执行命令后，将打开图形化配置界面：
 
-   - 要构建哪个 Demo（互斥选择）
-   - 要启用哪些功能（cJSON、拼音输入等）
+.. figure:: https://foruda.gitee.com/images/1764320806391041617/417b0f55_13406851.png
+   :align: center
+   :width: 600
 
-配置将保存到 ``win32_sim/.config`` 文件中。
+   menuconfig 配置界面
 
-安装 ``MinGW-w64`` 工具链和 ``scons`` 库后，可以通过两种方式启动应用程序：通过 CMD 启动或通过 VSCode 启动。
+操作说明
+""""""""
+
+1. 使用 **方向键** 上下移动选择项目
+2. 使用 **空格键** 或 **回车键** 取消/选中配置项
+3. 选择 ``Select HoneyGUI Demo (Watch Turnkey Demo 410x502)`` 进入应用程序配置
+4. 选择要运行的示例应用程序：
+
+   - ``Watch Turnkey Demo 410x502``：手表应用示例（410x502 分辨率）
+   - ``GUI Demo 800x480``：仪表盘应用示例（800x480 分辨率）
+   - 其他可用的示例应用程序
+
+.. figure:: https://foruda.gitee.com/images/1764321915931205772/1248fc4d_13406851.png
+   :align: center
+   :width: 600
+
+   Menuconfig 应用程序配置界面
+
+5. 按 **ESC** 键返回上一级菜单
+6. 选择 ``< s >`` 保存配置到 ``.config`` 文件
+7. 选择 ``< q >`` 退出配置界面
+
+配置文件说明
+""""""""""""
+
+配置完成后，会在 ``HoneyGUI\win32_sim`` 目录下自动生成 ``.config`` 文件。构建系统（SCons 或 CMake）会自动读取此配置文件，并根据配置编译相应的应用程序。
+
+.. note::
+
+   如果不使用 menuconfig 进行配置，构建系统将使用默认配置或已存在的 ``.config`` 文件。
+
+安装 ``MinGW-w64`` 工具链和 ``scons`` 库后，可以通过多种方式启动应用程序。
 
 通过 CMD 启动（Scons）
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-在 ``HoneyGUI`` 或 ``gui`` 文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
+在 ``HoneyGUI``文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
 
 .. code-block:: shell
 
@@ -126,13 +164,17 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
 通过 CMD 启动（CMake）
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-- 依赖软件
+依赖软件
+""""""""
     
-     **CMake** （测试版本为 3.31.2）：`https://cmake.org/download/ <https://cmake.org/download/>`_
-    
-     **MinGW-w64**：如前所述
+**CMake** （测试版本为 3.31.2）：`https://cmake.org/download/ <https://cmake.org/download/>`_
 
-- 初始化：在 ``HoneyGUI`` 文件夹中
+**MinGW-w64**：如前所述
+
+初始化构建环境
+""""""""""""""
+
+在 ``HoneyGUI`` 文件夹中执行：
 
 .. code-block:: shell
 
@@ -141,24 +183,36 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
    > cd build
    > cmake -G "MinGW Makefiles" ..
 
-- 编译：在 ``HoneyGUI\win32_sim\build`` 文件夹中
+配置应用程序
+""""""""""""
+
+如需更改应用程序配置，请参考前面的 ``配置应用程序（menuconfig）`` 部分，在 ``win32_sim`` 目录下执行 ``menuconfig ../Kconfig.gui`` 命令。
+
+编译项目
+""""""""
+
+在 ``HoneyGUI\win32_sim\build`` 文件夹中执行：
 
 .. code-block:: shell
       
    > cmake -G "MinGW Makefiles" ..
    > mingw32-make -j 32
 
-- 配置：在 ``HoneyGUI\win32_sim\build`` 文件夹中
+编译过程中，CMake 会自动：
 
-.. code-block:: shell
+- 读取 ``.config`` 文件中的配置
+- 根据配置选择相应的应用程序源代码
+- 自动处理应用程序所需的二进制资源文件（``.bin`` 文件）
+- 生成可执行文件 ``gui.exe``
 
-   > cmake --build . --target menuconfig
+运行程序
+""""""""
 
-- 运行：在 ``HoneyGUI`` 文件夹中
+在 ``HoneyGUI`` 文件夹中执行：
 
 .. code-block:: shell
    
-   > .\win32_sim\gui.exe
+   > .\win32_sim\build\gui.exe
 
 通过 VSCode 启动
 ^^^^^^^^^^^^^^^^^

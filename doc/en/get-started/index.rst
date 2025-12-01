@@ -86,27 +86,65 @@ Install kconfiglib for configuration management:
 
    > pip install kconfiglib
 
-Configure HoneyGUI
-^^^^^^^^^^^^^^^^^^^
-Before building, you need to configure which demo to build.
+Configure Application (menuconfig)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Before compiling, you can use the ``menuconfig`` graphical configuration tool to select the example application to run. This configuration is common to both **SCons** and **CMake** build systems.
+
+Using menuconfig for Configuration
+"""""""""""""""""""""""""""""""""""
+
+Execute the following commands in the ``win32_sim`` directory:
 
 .. code-block:: shell
 
    > cd win32_sim
    > menuconfig ../Kconfig.gui
 
-This will open a configuration menu where you can select:
+After executing the command, a graphical configuration interface will open:
 
-   - Which demo to build (mutually exclusive)
-   - Which features to enable (cJSON, pinyin input, etc.)
+.. figure:: https://foruda.gitee.com/images/1764320806391041617/417b0f55_13406851.png
+   :align: center
+   :width: 600
 
-The configuration will be saved to the ``win32_sim/.config`` file.
+   menuconfig Configuration Interface
 
-After installing the ``MinGW-w64`` toolchain and ``scons`` library, you can launch the application in two ways: stratup by CMD or startup by VSCode.
+Operation Instructions
+""""""""""""""""""""""
+
+1. Use **arrow keys** to move up and down to select items
+2. Use **space bar** or **enter key** to cancel/select configuration items
+3. Select ``Select HoneyGUI Demo (Watch Turnkey Demo 410x502)`` to enter application configuration
+4. Select the example application to run:
+
+   - ``Watch Turnkey Demo 410x502``: Watch application example (410x502 resolution)
+   - ``GUI Demo 800x480``: Dashboard application example (800x480 resolution)
+   - Other available example applications
+
+.. figure:: https://foruda.gitee.com/images/1764321915931205772/1248fc4d_13406851.png
+   :align: center
+   :width: 600
+
+   Menuconfig APP Configuration Interface
+
+5. Press **ESC** key to return to the previous menu
+6. Select ``< s >`` to save the configuration to the ``.config`` file
+7. Select ``< q >`` to exit the configuration interface
+
+Configuration File Description
+""""""""""""""""""""""""""""""
+
+After configuration, the ``.config`` file will be automatically generated in the ``HoneyGUI\win32_sim`` directory. The build system (SCons or CMake) will automatically read this configuration file and compile the corresponding application based on the configuration.
+
+.. note::
+
+   If menuconfig is not used for configuration, the build system will use the default configuration or an existing ``.config`` file.
+
+After installing the ``MinGW-w64`` toolchain and ``scons`` library, you can start the application in several ways.
 
 Startup by CMD (Scons)
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Open a CMD window in the ``HoneyGUI`` or ``gui`` folder, and then run the following command to start the application.
+Open a CMD window in the ``HoneyGUI`` folder, and then run the following command to start the application.
 
 .. code-block:: shell
 
@@ -128,13 +166,17 @@ The ``scons`` command to perform the build process and then execute ``gui.exe`` 
 Startup by CMD (CMake)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- Dependency Software
+Dependencies
+""""""""""""
     
-     **CMake** (tested with version 3.31.2): `https://cmake.org/download/ <https://cmake.org/download/>`_
-    
-     **MinGW-w64**: mentioned before
+**CMake** (tested with version 3.31.2): `https://cmake.org/download/ <https://cmake.org/download/>`_
 
-- Initialization: In the ``HoneyGUI`` folder
+**MinGW-w64**: As mentioned earlier
+
+Initializing the Build Environment
+"""""""""""""""""""""""""""""""""""
+
+In the ``HoneyGUI`` folder, execute:
 
 .. code-block:: shell
 
@@ -143,24 +185,36 @@ Startup by CMD (CMake)
    > cd build
    > cmake -G "MinGW Makefiles" ..
 
-- Compilation: In the ``HoneyGUI\win32_sim\build`` folder
+Configuring the Application
+""""""""""""""""""""""""""""
+
+If you need to change the application configuration, refer to the previous ``Configure Application (menuconfig)`` section and execute the ``menuconfig ../Kconfig.gui`` command in the ``win32_sim`` directory.
+
+Compiling the Project
+"""""""""""""""""""""
+
+In the ``HoneyGUI\win32_sim\build`` folder, execute:
 
 .. code-block:: shell
       
    > cmake -G "MinGW Makefiles" ..
    > mingw32-make -j 32
 
-- Configuration: In the ``HoneyGUI\win32_sim\build`` folder
+During compilation, CMake will automatically:
+
+- Read the configuration from the ``.config`` file
+- Select the corresponding application source code based on the configuration
+- Automatically process the binary resource files (``.bin`` files) required by the application
+- Generate the executable file ``gui.exe``
+
+Running the Program
+"""""""""""""""""""
+
+In the ``HoneyGUI`` folder, execute:
 
 .. code-block:: shell
-
-   > cmake --build . --target menuconfig
-
-- Run: In the ``HoneyGUI`` folder
-
-.. code-block:: shell
-
-   > .\win32_sim\gui.exe
+   
+   > .\win32_sim\build\gui.exe
 
 
 

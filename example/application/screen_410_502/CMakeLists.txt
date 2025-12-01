@@ -1,45 +1,49 @@
-# Copyright (c) 2024 Realtek Semiconductor Corp.
-# SPDX-License-Identifier: Apache-2.0
-
+# CMakeLists.txt for screen_410_502 demo
 cmake_minimum_required(VERSION 3.10)
 
-
-# Define a variable for the library name
-if(CONFIG_REALTEK_BUILD_GUI_410_502_DEMO) #set to 1 to enable or variable to for dependency
-
-    file(GLOB SOURCES "*.c" "*.cpp")
-    file(GLOB HEADERS "*.h" "*.hpp")
-
-
-    # Determine if we should create a library
-    if((NOT HEADERS) AND (NOT SOURCES))
-        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
-		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(CONFIG_REALTEK_BUILD_GUI_410_502_DEMO)
+    # Collect all source files
+    file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+    file(GLOB SOURCES_CPP "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+    
+    # Convert binary resource file to object file using objcopy
+    set(BIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400.bin")
+    set(OBJ_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400_bin.o")
+    
+    if(EXISTS ${BIN_FILE})
+        add_custom_command(
+            OUTPUT ${OBJ_FILE}
+            COMMAND objcopy -I binary -O elf64-x86-64 --binary-architecture i386:x86-64
+                    "root_0x704D1400.bin" "${OBJ_FILE}"
+            DEPENDS ${BIN_FILE}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/root_image
+            COMMENT "Converting root_0x704D1400.bin to object file"
+            VERBATIM
+        )
+        list(APPEND SOURCES ${OBJ_FILE})
+        message(STATUS "Added binary resource: ${BIN_FILE}")
     endif()
-
-    if(HEADERS AND (NOT SOURCES))
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    
+    # Add sources to target
+    if(SOURCES OR SOURCES_CPP)
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES} ${SOURCES_CPP})
     endif()
-
-    if(SOURCES AND (NOT HEADERS))
-        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
-    endif()
-
-    if(SOURCES AND HEADERS)
-        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
-
-    # Process subdirectories regardless
-    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
-
-    foreach(subdir ${SUBDIRS})
-        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
-            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
-                add_subdirectory(${subdir})
-            else()
-                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
-            endif()
-        endif()
-    endforeach()
+    
+    # Add include directories
+    target_include_directories(${GUI_TARGET_NAME} PUBLIC 
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/root_image
+    )
+    
+    # Add compile definitions
+    target_compile_definitions(${GUI_TARGET_NAME} PRIVATE
+        ENABLE_RTK_GUI_410_502_DEMO
+        DRV_LCD_WIDTH=410
+        DRV_LCD_HEIGHT=502
+        DRV_PIXEL_BITS=16
+    )
+    
+    message(STATUS "Building screen_410_502 demo (410x502)")
+    
+    message(STATUS "Added screen_410_502 demo sources")
 endif()
