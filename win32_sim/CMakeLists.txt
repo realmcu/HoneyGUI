@@ -37,13 +37,17 @@ include(${CMAKE_SOURCE_DIR}/config.cmake)
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")
     message(STATUS "Target processor is ARM.")
+    set(GUI_PLATFORM_EMBEDDED ON)
 else()
-	message(STATUS "Target processor is X86.")  
+	message(STATUS "Target processor is X86.")
+	set(GUI_PLATFORM_SIMULATOR ON)
 endif()
 
 set(GUI_BASE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 message("HoneyGUI base path ${GUI_BASE_PATH}")
 
+message(STATUS "GUI_PLATFORM_SIMULATOR: ${GUI_PLATFORM_SIMULATOR}")
+message(STATUS "GUI_PLATFORM_EMBEDDED: ${GUI_PLATFORM_EMBEDDED}")
 
 set(GUI_TARGET_NAME gui)
 

@@ -6,22 +6,24 @@ if(CONFIG_REALTEK_BUILD_GUI_410_502_DEMO)
     file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
     file(GLOB SOURCES_CPP "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
     
-    # Convert binary resource file to object file using objcopy
-    set(BIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400.bin")
-    set(OBJ_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400_bin.o")
-    
-    if(EXISTS ${BIN_FILE})
-        add_custom_command(
-            OUTPUT ${OBJ_FILE}
-            COMMAND objcopy -I binary -O elf64-x86-64 --binary-architecture i386:x86-64
-                    "root_0x704D1400.bin" "${OBJ_FILE}"
-            DEPENDS ${BIN_FILE}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/root_image
-            COMMENT "Converting root_0x704D1400.bin to object file"
-            VERBATIM
-        )
-        list(APPEND SOURCES ${OBJ_FILE})
-        message(STATUS "Added binary resource: ${BIN_FILE}")
+    # Convert binary resource file to object file using objcopy (Simulator only)
+    if(GUI_PLATFORM_SIMULATOR)
+        set(BIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400.bin")
+        set(OBJ_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400_bin.o")
+        
+        if(EXISTS ${BIN_FILE})
+            add_custom_command(
+                OUTPUT ${OBJ_FILE}
+                COMMAND objcopy -I binary -O elf64-x86-64 --binary-architecture i386:x86-64
+                        "root_0x704D1400.bin" "${OBJ_FILE}"
+                DEPENDS ${BIN_FILE}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/root_image
+                COMMENT "Converting root_0x704D1400.bin to object file"
+                VERBATIM
+            )
+            list(APPEND SOURCES ${OBJ_FILE})
+            message(STATUS "Added binary resource: ${BIN_FILE}")
+        endif()
     endif()
     
     # Add sources to target

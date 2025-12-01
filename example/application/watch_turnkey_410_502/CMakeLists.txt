@@ -1,28 +1,37 @@
 # CMakeLists.txt for watch_turnkey_410_502 demo
 cmake_minimum_required(VERSION 3.10)
 
+# Allow target_link_libraries in subdirectories
+cmake_policy(SET CMP0079 NEW)
+
 if(CONFIG_REALTEK_BUILD_GUI_WATCH_TURNKEY_410_502_DEMO)
     # Collect all source files
     file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
     file(GLOB SOURCES_CPP "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
     
-    # Convert binary resource file to object file using objcopy
-    set(BIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400.bin")
-    set(OBJ_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400_bin.o")
-    
-    if(EXISTS ${BIN_FILE})
-        add_custom_command(
-            OUTPUT ${OBJ_FILE}
-            COMMAND objcopy -I binary -O elf64-x86-64 --binary-architecture i386:x86-64
-                    "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400.bin"
-                    "${OBJ_FILE}"
-            DEPENDS ${BIN_FILE}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/root_image
-            COMMENT "Converting root_0x704D1400.bin to object file"
-            VERBATIM
-        )
-        list(APPEND SOURCES ${OBJ_FILE})
-        message(STATUS "Added binary resource: ${BIN_FILE}")
+    # Convert binary resource file to object file using objcopy (Simulator only)
+    if(GUI_PLATFORM_SIMULATOR)
+        set(BIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400.bin")
+        set(OBJ_FILE "${CMAKE_CURRENT_SOURCE_DIR}/root_image/root_0x704D1400.o")
+        
+        if(EXISTS ${BIN_FILE})
+            add_custom_command(
+                OUTPUT ${OBJ_FILE}
+                COMMAND objcopy -I binary -O elf64-x86-64 --binary-architecture i386:x86-64
+                        "root_0x704D1400.bin" "root_0x704D1400.o"
+                DEPENDS ${BIN_FILE}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/root_image
+                COMMENT "Converting root_0x704D1400.bin to object file"
+                VERBATIM
+            )
+            # Create a custom target to ensure the object file is built
+            add_custom_target(watch_turnkey_410_502_resources DEPENDS ${OBJ_FILE})
+            add_dependencies(${GUI_TARGET_NAME} watch_turnkey_410_502_resources)
+            
+            # Link the object file directly
+            target_link_libraries(${GUI_TARGET_NAME} PRIVATE ${OBJ_FILE})
+            message(STATUS "Added binary resource: ${BIN_FILE}")
+        endif()
     endif()
     
     # Add sources to target
