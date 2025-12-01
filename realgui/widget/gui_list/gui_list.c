@@ -58,6 +58,7 @@ static void gui_list_note_animate_timer_cb(void *obj)
         _this->animate_cnt = 0;
         gui_obj_delete_timer(o);
     }
+    gui_fb_change();
 }
 
 static void gui_list_update_speed(gui_list_t *_this, int16_t tp_delta)
@@ -265,13 +266,13 @@ static void gui_list_free_notes(gui_obj_t *obj)
 
         if (pos + _this->note_length <= temp)
         {
-            gui_log("free note %d\n", note->index);
+            // gui_log("free note %d\n", note->index);
             _this->last_created_note_index += (_this->last_created_note_index == note->index);
             gui_obj_tree_free(o);
         }
         else if (pos >= range)
         {
-            gui_log("free note %d\n", note->index);
+            // gui_log("free note %d\n", note->index);
             _this->last_created_note_index -= (_this->last_created_note_index == note->index);
             gui_obj_tree_free(o);
             _this->max_created_note_index -= 1;
@@ -471,6 +472,15 @@ static void gui_list_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
+static inline void gui_list_note_start_anim(gui_list_note_t *note, gui_obj_t *o,
+                                            bool speed_positive)
+{
+    note->is_speed_positive = speed_positive;
+    gui_obj_create_timer(o, 10, true, gui_list_note_animate_timer_cb);
+    gui_obj_start_timer(o);
+    note->animate_cnt = 1;
+}
+
 static void gui_list_note_input_prepare(gui_obj_t *obj)
 {
     gui_list_note_t *_this = (gui_list_note_t *)obj;
@@ -484,17 +494,11 @@ static void gui_list_note_input_prepare(gui_obj_t *obj)
         {
             if (x_old + obj->w <= 0 && obj->x + obj->w > 0)
             {
-                _this->is_speed_positive = true;
-                gui_obj_create_timer(obj, 10, true, gui_list_note_animate_timer_cb);
-                gui_obj_start_timer(obj);
-                _this->animate_cnt = 1;
+                gui_list_note_start_anim(_this, obj, true);
             }
             else if (x_old >= list->base.w && obj->x < list->base.w)
             {
-                _this->is_speed_positive = false;
-                gui_obj_create_timer(obj, 10, true, gui_list_note_animate_timer_cb);
-                gui_obj_start_timer(obj);
-                _this->animate_cnt = 1;
+                gui_list_note_start_anim(_this, obj, false);
             }
         }
     }
@@ -506,17 +510,11 @@ static void gui_list_note_input_prepare(gui_obj_t *obj)
         {
             if (y_old + obj->h <= 0 && obj->y + obj->h > 0)
             {
-                _this->is_speed_positive = true;
-                gui_obj_create_timer(obj, 10, true, gui_list_note_animate_timer_cb);
-                gui_obj_start_timer(obj);
-                _this->animate_cnt = 1;
+                gui_list_note_start_anim(_this, obj, true);
             }
             else if (y_old >= list->base.h && obj->y < list->base.h)
             {
-                _this->is_speed_positive = false;
-                gui_obj_create_timer(obj, 10, true, gui_list_note_animate_timer_cb);
-                gui_obj_start_timer(obj);
-                _this->animate_cnt = 1;
+                gui_list_note_start_anim(_this, obj, false);
             }
         }
     }
@@ -568,8 +566,8 @@ static void gui_list_note_card(gui_obj_t *obj)
     int16_t index = ((gui_list_note_t *)obj)->index;
     matrix_translate(-obj->x, -obj->y, obj->matrix);
 
-    float scale_0 = 1.0f;
-    float scale_1 = 0.8f;
+    const float scale_0 = 1.0f;
+    const float scale_1 = 0.8f;
     int obj_location;
     int16_t temp = 0;
     if (list->dir == HORIZONTAL)
@@ -950,11 +948,6 @@ static void gui_list_create_bar(gui_list_t *_this,
 
 static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
 {
-    // if (!list->loop)
-    // {
-    //     GUI_ASSERT(index < list->note_num);
-    // }
-
     list->last_created_note_index = index;
     // gui_log("add note %d\n", index);
 
@@ -1009,7 +1002,6 @@ static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
         gui_list_insert(&((GET_BASE(_this)->parent)->child_list),
                         &(GET_BASE(_this)->brother_list));
     }
-    // gui_log("create note %d\n", index);
 
     if (list->note_design != NULL)
     {

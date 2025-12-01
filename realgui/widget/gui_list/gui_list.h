@@ -214,7 +214,7 @@ void gui_list_set_auto_align(gui_list_t *list, bool auto_align);
 void gui_list_set_inertia(gui_list_t *list, bool inertia);
 
 /**
- * @brief Set loop of list, which is used to enable loop effect. Only valid when list total length is greater than list width or height.
+ * @brief Set loop of list, which is used to enable loop effect. Only valid when list total length is greater than list width or height. Don't enable loop when list style is LIST_CARD.
  * @param loop Default is false. true: enable loop, false: disable loop.
  */
 void gui_list_enable_loop(gui_list_t *list, bool loop);

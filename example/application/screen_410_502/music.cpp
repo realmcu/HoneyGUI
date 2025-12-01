@@ -1,4 +1,4 @@
-#ifdef _WIN32
+#if defined(_WIN32) && defined(MINIMP3_IMPLEMENTATION)
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -7,7 +7,7 @@
 #include <SDL.h>
 #include <exception>
 
-#define MINIMP3_IMPLEMENTATION
+
 #include "minimp3.h"
 #include "minimp3_ex.h"
 using namespace std;

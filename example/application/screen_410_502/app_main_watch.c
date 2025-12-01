@@ -429,7 +429,7 @@ static int app_init(void)
 {
 #ifdef _WIN32
     resource_root = (unsigned char *)_binary_root_0x704D1400_bin_start;
-
+#ifdef MINIMP3_IMPLEMENTATION
     extern void win32_load_music(void *p);
     extern void win32_play_music(void *p);
     extern void win32_stop_music(void);
@@ -444,6 +444,7 @@ static int app_init(void)
     gui_audio_info.music_length = win32_music_get_music_length;
     gui_audio_info.music_current_time = win32_music_get_music_current_time;
     gui_audio_info.record_stop = local_record_stop;
+#endif
 #endif
 
     extern int l3_init(void);
