@@ -555,8 +555,88 @@ static void l3_render_with_texture_argb8888(float y, float y0, float y1, float y
 }
 
 
+// Helper function to render a triangle half (top or bottom)
+static void l3_render_triangle_half(l3_draw_tria_img_t *image,
+                                    l3_vertex_t *p0, l3_vertex_t *p1, l3_vertex_t *p2,
+                                    float y_start, float y_end,
+                                    float *zbuffer, uint8_t *writebuf, int width)
+{
+    bool k01infinite, k02infinite;
+    float k01, b01, k02, b02;
+
+    float x0 = p0->position.x, y0 = p0->position.y, z0 = p0->position.z;
+    float x1 = p1->position.x, y1 = p1->position.y, z1 = p1->position.z;
+    float x2 = p2->position.x, y2 = p2->position.y, z2 = p2->position.z;
+
+    float s0 = p0->u, t0 = p0->v;
+    float s1 = p1->u, t1 = p1->v;
+    float s2 = p2->u, t2 = p2->v;
+
+    // Calculate slopes
+    l3_get_line_params(x0, y0, x1, y1, &k01infinite, &k01, &b01);
+    l3_get_line_params(x0, y0, x2, y2, &k02infinite, &k02, &b02);
+
+    // Pre-calculate depth
+    float inv_z0 = 1.0f / z0;
+    float inv_z1 = 1.0f / z1;
+    float inv_z2 = 1.0f / z2;
+
+    // Render based on fill type
+    if (image->fill_type == L3_FILL_COLOR_RGB565)
+    {
+        uint16_t fill_color = *((uint16_t *)image->fill_data);
+        for (float y = y_start; y <= y_end; y++)
+        {
+            l3_render_with_color_rgb565(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                        k01infinite, k01, b01, k02infinite, k02, b02,
+                                        zbuffer, writebuf, width, fill_color);
+        }
+    }
+    else if (image->fill_type == L3_FILL_COLOR_ARGB8888)
+    {
+        uint32_t fill_color = *((uint32_t *)image->fill_data);
+        for (float y = y_start; y <= y_end; y++)
+        {
+            l3_render_with_color_argb8888(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                          k01infinite, k01, b01, k02infinite, k02, b02,
+                                          zbuffer, writebuf, width, fill_color);
+        }
+    }
+    else if (image->fill_type == L3_FILL_IMAGE_RGB565 || image->fill_type == L3_FILL_IMAGE_ARGB8888)
+    {
+        // Pre-calculate texture coordinates
+        float soverz0 = s0 * inv_z0, soverz1 = s1 * inv_z1, soverz2 = s2 * inv_z2;
+        float toverz0 = t0 * inv_z0, toverz1 = t1 * inv_z1, toverz2 = t2 * inv_z2;
+
+        l3_img_head_t *src_head = (l3_img_head_t *)image->fill_data;
+        uint32_t image_addr = sizeof(l3_img_head_t) + (uint32_t)(uintptr_t)(image->fill_data);
+
+        if (image->fill_type == L3_FILL_IMAGE_RGB565)
+        {
+            for (float y = y_start; y <= y_end; y++)
+            {
+                l3_render_with_texture_rgb565(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                              soverz0, soverz1, soverz2, toverz0, toverz1, toverz2,
+                                              k01infinite, k01, b01, k02infinite, k02, b02,
+                                              zbuffer, writebuf, width, src_head, image_addr);
+            }
+        }
+        else
+        {
+            for (float y = y_start; y <= y_end; y++)
+            {
+                l3_render_with_texture_argb8888(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                                soverz0, soverz1, soverz2, toverz0, toverz1, toverz2,
+                                                k01infinite, k01, b01, k02infinite, k02, b02,
+                                                zbuffer, writebuf, width, src_head, image_addr);
+            }
+        }
+    }
+}
+
 void (*l3_draw_tria_to_canvas_imp)(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combined_image,
                                    float *zbuffer) = NULL;
+
 void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combined_image,
                             float *zbuffer)
 {
@@ -565,16 +645,6 @@ void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combi
         l3_draw_tria_to_canvas_imp(image, combined_image, zbuffer);
         return;
     }
-
-    bool k01infinite, k02infinite;
-    float k01, b01, k02, b02;
-    float x0, y0, z0, s0, t0;
-    float x1, y1, z1, s1, t1;
-    float x2, y2, z2, s2, t2;
-
-    float inv_z0, inv_z1, inv_z2;
-    float soverz0, soverz1, soverz2;
-    float toverz0, toverz1, toverz2;
 
     l3_vertex_t p0 = image->p0;
     l3_vertex_t p1 = image->p1;
@@ -603,108 +673,13 @@ void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combi
         p0 = vt;
     }
 
-    float midy = p2.position.y < p1.position.y ? p2.position.y : p1.position.y;
-
+    float midy = fminf(p1.position.y, p2.position.y);
     l3_adjust_triangle_winding(&p0, &p1, &p2);
 
-    // Reassignment and reordering of vertex coordinates and texture coordinates
-    x0 = p0.position.x; y0 = p0.position.y; z0 = p0.position.z; s0 = p0.u; t0 = p0.v;
-    x1 = p1.position.x; y1 = p1.position.y; z1 = p1.position.z; s1 = p1.u; t1 = p1.v;
-    x2 = p2.position.x; y2 = p2.position.y; z2 = p2.position.z; s2 = p2.u; t2 = p2.v;
-
-    // Calculate slope and intercept
-    l3_get_line_params(x0, y0, x1, y1, &k01infinite, &k01, &b01);
-    l3_get_line_params(x0, y0, x2, y2, &k02infinite, &k02, &b02);
-
-    // Pre calculate constants
-    inv_z0 = 1.0f / z0;
-    inv_z1 = 1.0f / z1;
-    inv_z2 = 1.0f / z2;
-
-    float y_start = fmaxf((int)(y0 + 0.5f) + 0.5f, 0.5f);
-    float y_end = fminf(midy, height);
-
-    if (image->fill_type == L3_FILL_COLOR_RGB565)
-    {
-        uint16_t fill_color = *((uint16_t *)image->fill_data);
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_color_rgb565(y, y0, y1, y2, \
-                                        inv_z0, inv_z1, inv_z2, \
-                                        k01infinite, k01, b01, \
-                                        k02infinite, k02, b02, \
-                                        zbuffer, writebuf, width, \
-                                        fill_color);
-        }
-    }
-    else if (image->fill_type == L3_FILL_COLOR_ARGB8888)
-    {
-        uint32_t fill_color = *((uint32_t *)image->fill_data);
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_color_argb8888(y, y0, y1, y2, \
-                                          inv_z0, inv_z1, inv_z2, \
-                                          k01infinite, k01, b01, \
-                                          k02infinite, k02, b02, \
-                                          zbuffer, writebuf, width, \
-                                          fill_color);
-        }
-    }
-    else if (image->fill_type == L3_FILL_IMAGE_RGB565)
-    {
-        // Interpolate texture coordinates
-        soverz0 = s0 * inv_z0;
-        soverz1 = s1 * inv_z1;
-        soverz2 = s2 * inv_z2;
-
-        toverz0 = t0 * inv_z0;
-        toverz1 = t1 * inv_z1;
-        toverz2 = t2 * inv_z2;
-
-        l3_img_head_t *src_head = (l3_img_head_t *)image->fill_data;
-        uint32_t image_addr = sizeof(l3_img_head_t) + (uint32_t)(uintptr_t)(image->fill_data);
-
-
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_texture_rgb565(y, y0, y1, y2, \
-                                          inv_z0, inv_z1, inv_z2, \
-                                          soverz0, soverz1, soverz2, \
-                                          toverz0, toverz1, toverz2, \
-                                          k01infinite, k01, b01, \
-                                          k02infinite, k02, b02, \
-                                          zbuffer, writebuf, width, \
-                                          src_head, image_addr);
-        }
-    }
-    else if (image->fill_type == L3_FILL_IMAGE_ARGB8888)
-    {
-        // Interpolate texture coordinates
-        soverz0 = s0 * inv_z0;
-        soverz1 = s1 * inv_z1;
-        soverz2 = s2 * inv_z2;
-
-        toverz0 = t0 * inv_z0;
-        toverz1 = t1 * inv_z1;
-        toverz2 = t2 * inv_z2;
-
-        l3_img_head_t *src_head = (l3_img_head_t *)image->fill_data;
-        uint32_t image_addr = sizeof(l3_img_head_t) + (uint32_t)(uintptr_t)(image->fill_data);
-
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_texture_argb8888(y, y0, y1, y2, \
-                                            inv_z0, inv_z1, inv_z2, \
-                                            soverz0, soverz1, soverz2, \
-                                            toverz0, toverz1, toverz2, \
-                                            k01infinite, k01, b01, \
-                                            k02infinite, k02, b02, \
-                                            zbuffer, writebuf, width, \
-                                            src_head, image_addr);
-        }
-    }
-
-
+    // Render top half
+    float y_start = fmaxf((int)(p0.position.y + 0.5f) + 0.5f, 0.5f);
+    float y_end = fminf(midy, (float)height);
+    l3_render_triangle_half(image, &p0, &p1, &p2, y_start, y_end, zbuffer, writebuf, width);
 
     // p1   p2
     //    p0
@@ -722,104 +697,13 @@ void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combi
         p0 = vt;
     }
 
-    midy = p2.position.y < p1.position.y ? p1.position.y : p2.position.y;
-
+    midy = fmaxf(p1.position.y, p2.position.y);
     l3_adjust_triangle_winding(&p0, &p1, &p2);
 
-    x0 = p0.position.x; y0 = p0.position.y; z0 = p0.position.z; s0 = p0.u; t0 = p0.v;
-    x1 = p1.position.x; y1 = p1.position.y; z1 = p1.position.z; s1 = p1.u; t1 = p1.v;
-    x2 = p2.position.x; y2 = p2.position.y; z2 = p2.position.z; s2 = p2.u; t2 = p2.v;
-
-    l3_get_line_params(x0, y0, x1, y1, &k01infinite, &k01, &b01);
-    l3_get_line_params(x0, y0, x2, y2, &k02infinite, &k02, &b02);
-
-    // Pre calculate constants
-    inv_z0 = 1.0f / z0;
-    inv_z1 = 1.0f / z1;
-    inv_z2 = 1.0f / z2;
-
+    // Render bottom half
     y_start = fmaxf((int)(midy + 0.5f) + 0.5f, 0.5f);
-    y_end = fminf(y0, height);
-
-    if (image->fill_type == L3_FILL_COLOR_RGB565)
-    {
-        uint16_t fill_color = *((uint16_t *)image->fill_data);
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_color_rgb565(y, y0, y1, y2, \
-                                        inv_z0, inv_z1, inv_z2, \
-                                        k01infinite, k01, b01, \
-                                        k02infinite, k02, b02, \
-                                        zbuffer, writebuf, width, \
-                                        fill_color);
-        }
-    }
-    else if (image->fill_type == L3_FILL_COLOR_ARGB8888)
-    {
-        uint32_t fill_color = *((uint32_t *)image->fill_data);
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_color_argb8888(y, y0, y1, y2, \
-                                          inv_z0, inv_z1, inv_z2, \
-                                          k01infinite, k01, b01, \
-                                          k02infinite, k02, b02, \
-                                          zbuffer, writebuf, width, \
-                                          fill_color);
-        }
-    }
-    else if (image->fill_type == L3_FILL_IMAGE_RGB565)
-    {
-        // Interpolate texture coordinates
-        soverz0 = s0 * inv_z0;
-        soverz1 = s1 * inv_z1;
-        soverz2 = s2 * inv_z2;
-
-        toverz0 = t0 * inv_z0;
-        toverz1 = t1 * inv_z1;
-        toverz2 = t2 * inv_z2;
-
-        l3_img_head_t *src_head = (l3_img_head_t *)image->fill_data;
-        uint32_t image_addr = sizeof(l3_img_head_t) + (uint32_t)(uintptr_t)(image->fill_data);
-
-
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_texture_rgb565(y, y0, y1, y2, \
-                                          inv_z0, inv_z1, inv_z2, \
-                                          soverz0, soverz1, soverz2, \
-                                          toverz0, toverz1, toverz2, \
-                                          k01infinite, k01, b01, \
-                                          k02infinite, k02, b02, \
-                                          zbuffer, writebuf, width, \
-                                          src_head, image_addr);
-        }
-    }
-    else if (image->fill_type == L3_FILL_IMAGE_ARGB8888)
-    {
-        // Interpolate texture coordinates
-        soverz0 = s0 * inv_z0;
-        soverz1 = s1 * inv_z1;
-        soverz2 = s2 * inv_z2;
-
-        toverz0 = t0 * inv_z0;
-        toverz1 = t1 * inv_z1;
-        toverz2 = t2 * inv_z2;
-
-        l3_img_head_t *src_head = (l3_img_head_t *)image->fill_data;
-        uint32_t image_addr = sizeof(l3_img_head_t) + (uint32_t)(uintptr_t)(image->fill_data);
-
-        for (float y = y_start; y <= y_end; y++)
-        {
-            l3_render_with_texture_argb8888(y, y0, y1, y2, \
-                                            inv_z0, inv_z1, inv_z2, \
-                                            soverz0, soverz1, soverz2, \
-                                            toverz0, toverz1, toverz2, \
-                                            k01infinite, k01, b01, \
-                                            k02infinite, k02, b02, \
-                                            zbuffer, writebuf, width, \
-                                            src_head, image_addr);
-        }
-    }
+    y_end = fminf(p0.position.y, (float)height);
+    l3_render_triangle_half(image, &p0, &p1, &p2, y_start, y_end, zbuffer, writebuf, width);
 }
 
 

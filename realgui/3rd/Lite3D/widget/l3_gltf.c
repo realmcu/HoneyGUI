@@ -49,15 +49,10 @@ static float get_animation_duration(l3_gltf_single_animation_t *anim)
 {
     float max_duration = 0.0f;
 
-    if (!anim)
-    {
-        return 0.0f;
-    }
-
     for (uint32_t i = 0; i < anim->sampler_count; ++i)
     {
         l3_gltf_sampler_t *sampler = &anim->samplers[i];
-        if (sampler->input_count > 0)
+        if (sampler->input_count > 0 && sampler->input_data)
         {
             // The input_data stores timestamps, and the last timestamp represents the end time of this sampler.
             float last_time = sampler->input_data[sampler->input_count - 1];
@@ -99,6 +94,10 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
     // 1. Allocate memory for the model description structure.
     l3_gltf_model_description_t *desc = (l3_gltf_model_description_t *)l3_malloc(sizeof(
             l3_gltf_model_description_t));
+    if (!desc)
+    {
+        return NULL;
+    }
     memset(desc, 0, sizeof(l3_gltf_model_description_t));
     desc->scene_root_count = header->scene_root_count;
     desc->node_count = header->node_count;
@@ -108,20 +107,58 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
 
     // 2. Allocate memory for the top-level arrays.
     desc->nodes = (l3_gltf_node_t *)l3_malloc(sizeof(l3_gltf_node_t) * desc->node_count);
+    if (!desc->nodes)
+    {
+        l3_free(desc);
+        return NULL;
+    }
     memset(desc->nodes, 0, sizeof(l3_gltf_node_t) * desc->node_count);
+
     desc->meshes = (l3_gltf_mesh_t *)l3_malloc(sizeof(l3_gltf_mesh_t) * desc->mesh_count);
+    if (!desc->meshes)
+    {
+        l3_free(desc->nodes);
+        l3_free(desc);
+        return NULL;
+    }
     memset(desc->meshes, 0, sizeof(l3_gltf_mesh_t) * desc->mesh_count);
+
     l3_gltf_primitive_t *all_primitives_ram = (l3_gltf_primitive_t *)l3_malloc(sizeof(
                                                                                    l3_gltf_primitive_t) * header->primitive_count);
+    if (!all_primitives_ram)
+    {
+        l3_free(desc->meshes);
+        l3_free(desc->nodes);
+        l3_free(desc);
+        return NULL;
+    }
     memset(all_primitives_ram, 0, sizeof(l3_gltf_primitive_t) * header->primitive_count);
+
     if (desc->skin_count > 0)
     {
         desc->skins = (l3_gltf_skin_t *)l3_malloc(sizeof(l3_gltf_skin_t) * desc->skin_count);
+        if (!desc->skins)
+        {
+            l3_free(all_primitives_ram);
+            l3_free(desc->meshes);
+            l3_free(desc->nodes);
+            l3_free(desc);
+            return NULL;
+        }
         memset(desc->skins, 0, sizeof(l3_gltf_skin_t) * desc->skin_count);
     }
 
     desc->materials = (l3_gltf_material_t *)l3_malloc(sizeof(l3_gltf_material_t) *
                                                       desc->material_count);
+    if (!desc->materials)
+    {
+        if (desc->skins) { l3_free(desc->skins); }
+        l3_free(all_primitives_ram);
+        l3_free(desc->meshes);
+        l3_free(desc->nodes);
+        l3_free(desc);
+        return NULL;
+    }
     memset(desc->materials, 0, sizeof(l3_gltf_material_t) * desc->material_count);
 
     // 2. Pointer Redirection
@@ -296,6 +333,10 @@ l3_gltf_model_t *l3_create_gltf_model(void                 *desc_addr,
                                       int16_t               h)
 {
     l3_gltf_model_description_t *desc = l3_load_gltf_description((void *)desc_addr);
+    if (!desc)
+    {
+        return NULL;
+    }
 
     l3_gltf_model_t *this = l3_malloc(sizeof(l3_gltf_model_t));
     memset(this, 0x00, sizeof(l3_gltf_model_t));
@@ -310,15 +351,37 @@ l3_gltf_model_t *l3_create_gltf_model(void                 *desc_addr,
 
     this->desc = desc;
 
+    // Initialize animation time
+    this->last_time_ms = 0;
+
     this->base.combined_img = l3_malloc(sizeof(l3_draw_rect_img_t));
+    if (!this->base.combined_img)
+    {
+        l3_free(this);
+        return NULL;
+    }
     memset(this->base.combined_img, 0x00, sizeof(l3_draw_rect_img_t));
 
-    this->depthBuffer = l3_malloc(w * h * sizeof(float));
-    memset(this->depthBuffer, 0x00, w * h * sizeof(float));
+    size_t depth_buffer_size = (size_t)w * h * sizeof(float);
+    this->depthBuffer = l3_malloc(depth_buffer_size);
+    if (!this->depthBuffer)
+    {
+        l3_free(this->base.combined_img);
+        l3_free(this);
+        return NULL;
+    }
+    memset(this->depthBuffer, 0x00, depth_buffer_size);
 
-
-    this->base.combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
-    memset(this->base.combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
+    size_t img_buffer_size = (size_t)w * h * 2 + sizeof(l3_img_head_t);
+    this->base.combined_img->data = l3_malloc(img_buffer_size);
+    if (!this->base.combined_img->data)
+    {
+        l3_free(this->depthBuffer);
+        l3_free(this->base.combined_img);
+        l3_free(this);
+        return NULL;
+    }
+    memset(this->base.combined_img->data, 0x00, img_buffer_size);
 
     l3_img_head_t *head = (l3_img_head_t *)this->base.combined_img->data;
     head->w = w;

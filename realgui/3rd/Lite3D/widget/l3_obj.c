@@ -106,6 +106,11 @@ static l3_obj_model_description_t *l3_load_obj_description(void *desc_addr)
         desc->texture_sizes = (unsigned int *)ptr;
         ptr += desc->num_materials * sizeof(unsigned int);
         desc->textures = (unsigned char **)l3_malloc(desc->num_materials * sizeof(unsigned char *));
+        if (!desc->textures)
+        {
+            l3_free(desc);
+            return NULL;
+        }
         // texture content
         for (uint32_t i = 0; i < desc->num_materials; i++)
         {
@@ -143,6 +148,10 @@ l3_obj_model_t *l3_create_obj_model(void                 *desc_addr,
                                     int16_t               h)
 {
     l3_obj_model_description_t *desc = l3_load_obj_description((void *)desc_addr);
+    if (!desc)
+    {
+        return NULL;
+    }
 
     l3_obj_model_t *this = l3_malloc(sizeof(l3_obj_model_t));
     memset(this, 0x00, sizeof(l3_obj_model_t));

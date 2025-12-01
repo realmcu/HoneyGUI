@@ -46,13 +46,13 @@ static float dot_quaternion(const l3_4d_point_t *q1, const l3_4d_point_t *q2)
 static void normalize_quaternion(l3_4d_point_t *q)
 {
     float len_sq = q->x * q->x + q->y * q->y + q->z * q->z + q->w * q->w;
-    if (len_sq > 0.0f)
+    if (len_sq > 1e-6f)
     {
-        float len = sqrtf(len_sq);
-        q->x /= len;
-        q->y /= len;
-        q->z /= len;
-        q->w /= len;
+        float inv_len = 1.0f / sqrtf(len_sq);
+        q->x *= inv_len;
+        q->y *= inv_len;
+        q->z *= inv_len;
+        q->w *= inv_len;
     }
 }
 
@@ -136,7 +136,7 @@ static void l3_gltf_update_animation(l3_gltf_model_t *_this, float dt)
     anim->animation_time += dt;
 
     // 2. Wrap the animation time within [0, duration)
-    if (anim->animation_time > anim->duration)
+    if (anim->duration > 0.0f && anim->animation_time > anim->duration)
     {
         anim->animation_time = fmodf(anim->animation_time, anim->duration);
     }
@@ -149,17 +149,55 @@ static void l3_gltf_update_animation(l3_gltf_model_t *_this, float dt)
         l3_gltf_sampler_t *sampler = &anim->samplers[channel->sampler_index];
         l3_gltf_node_t *target_node = &desc->nodes[channel->target_node_index];
 
-        // 3.1 Find the keyframes interval that current_time lies between
+        // 3.1 Find the keyframes interval using binary search - O(log n) instead of O(n)
         uint32_t prev_key_idx = 0;
         uint32_t next_key_idx = 0;
-        for (uint32_t j = 0; j < sampler->input_count - 1; ++j)
+
+        if (!sampler->input_data || sampler->input_count < 2)
         {
-            if (current_time >= sampler->input_data[j] && current_time <= sampler->input_data[j + 1])
+            continue;
+        }
+
+        // Handle edge cases
+        if (current_time <= sampler->input_data[0])
+        {
+            prev_key_idx = 0;
+            next_key_idx = 0;
+        }
+        else if (current_time >= sampler->input_data[sampler->input_count - 1])
+        {
+            prev_key_idx = sampler->input_count - 1;
+            next_key_idx = sampler->input_count - 1;
+        }
+        else
+        {
+            // Binary search to find interval [left, right] containing current_time
+            uint32_t left = 0;
+            uint32_t right = sampler->input_count - 1;
+
+            while (left < right - 1)
             {
-                prev_key_idx = j;
-                next_key_idx = j + 1;
-                break;
+                uint32_t mid = left + (right - left) / 2;  // Avoid overflow
+
+                if (current_time < sampler->input_data[mid])
+                {
+                    right = mid;
+                }
+                else if (current_time > sampler->input_data[mid])
+                {
+                    left = mid;
+                }
+                else
+                {
+                    // Exact match
+                    left = mid;
+                    right = mid;
+                    break;
+                }
             }
+
+            prev_key_idx = left;
+            next_key_idx = right;
         }
 
         // 3.2 Interpolate t within [0, 1]
@@ -232,7 +270,7 @@ static void l3_draw_single_tria(l3_gltf_model_t *_this, l3_gltf_primitive_t *pri
         memset(&tria_img, 0x00, sizeof(l3_draw_tria_img_t));
         memcpy(&tria_img, face->transform_vertex, 3 * sizeof(l3_vertex_t));
 
-        if (prim->material->texture_data != NULL)
+        if (prim->material && prim->material->texture_data != NULL)
         {
             tria_img.fill_data = prim->material->texture_data;
 
@@ -240,10 +278,12 @@ static void l3_draw_single_tria(l3_gltf_model_t *_this, l3_gltf_primitive_t *pri
         }
         else
         {
-            uint8_t *base_color = prim->material->base_color;
+            uint8_t *base_color = prim->material ? prim->material->base_color : (uint8_t[]) {128, 128, 128, 255};
 
             float nz = fabsf(tria_img.p0.normal.uz);
-            float light_intensity = fmaxf(0.7f, fminf(1.0f, nz));
+            const float MIN_LIGHT_INTENSITY = 0.7f;
+            const float MAX_LIGHT_INTENSITY = 1.0f;
+            float light_intensity = fmaxf(MIN_LIGHT_INTENSITY, fminf(MAX_LIGHT_INTENSITY, nz));
 
             uint8_t color_r = (uint8_t)(base_color[0] * light_intensity);
             uint8_t color_g = (uint8_t)(base_color[1] * light_intensity);
@@ -388,6 +428,11 @@ static void render_node_recursive(l3_gltf_model_t *_this, int node_index,
 
 void l3_gltf_prepare(l3_gltf_model_t *_this)
 {
+    if (!_this || !_this->desc || !_this->base.combined_img)
+    {
+        return;
+    }
+
     // global transform
     if (_this->global_transform_cb != NULL)
     {
@@ -415,10 +460,11 @@ void l3_gltf_prepare(l3_gltf_model_t *_this)
     // Update animation
     if (_this->desc->animation != NULL)
     {
-        static uint32_t current_time_ms = 0;
-        current_time_ms = gui_ms_get();
-        l3_gltf_update_animation(_this, (current_time_ms - _this->last_time_ms) / 1000.0f);
+        // Calculate delta time
+        uint32_t current_time_ms = gui_ms_get();
+        float dt = (_this->last_time_ms > 0) ? ((current_time_ms - _this->last_time_ms) / 1000.0f) : 0.0f;
         _this->last_time_ms = current_time_ms;
+        l3_gltf_update_animation(_this, dt);
     }
 
     // Start recursive rendering from the root node of all scenes.
