@@ -100,22 +100,38 @@ void *sdl_driver_thread(void *arg)
         {
         case SDL_USEREVENT_LCD_UPDATE:
             {
+#if 0
                 SDL_BlitSurface(customSurface, NULL, windowSurface, NULL);
                 SDL_UpdateWindowSurface(window);
                 break;
+#else
+                /* Flush pending LCD_UPDATE events to prevent event queue buildup on Linux.
+                 * This fixes MOUSEMOTION event lag caused by slow SDL_UpdateWindowSurface. */
+                SDL_Event next;
+                while (SDL_PeepEvents(&next, 1, SDL_PEEKEVENT, SDL_USEREVENT_LCD_UPDATE,
+                                      SDL_USEREVENT_LCD_UPDATE) > 0)
+                {
+                    SDL_PeepEvents(&next, 1, SDL_GETEVENT, SDL_USEREVENT_LCD_UPDATE, SDL_USEREVENT_LCD_UPDATE);
+                }
+
+                SDL_BlitSurface(customSurface, NULL, windowSurface, NULL);
+                SDL_UpdateWindowSurface(window);
+                break;
+#endif
             }
         case SDL_MOUSEMOTION:
+            gui_log("mouse move:(%d,%d)\n", event.button.x, event.button.y);
             tp_port_data.x_coordinate = event.button.x;
             tp_port_data.y_coordinate = event.button.y;
             break;
         case SDL_MOUSEBUTTONDOWN:
             {
+                gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
                 tp_port_data.event = GUI_TOUCH_EVENT_DOWN;
                 tp_port_data.x_coordinate = event.button.x;
                 tp_port_data.y_coordinate = event.button.y;
-                //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
                 if (event.button.button == SDL_BUTTON_MIDDLE)
                 {
                     wheel_port_data.event = GUI_WHEEL_BUTTON_DOWN;
@@ -124,12 +140,12 @@ void *sdl_driver_thread(void *arg)
             break;
         case SDL_MOUSEBUTTONUP:
             {
+                gui_log("mouse up:(%d,%d)\n", event.button.x, event.button.y);
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
                 tp_port_data.event = GUI_TOUCH_EVENT_UP;
                 tp_port_data.x_coordinate = event.button.x;
                 tp_port_data.y_coordinate = event.button.y;
-                //gui_log("mouse up:(%d,%d)\n", event.button.x, event.button.y);
                 if (event.button.button == SDL_BUTTON_MIDDLE)
                 {
                     wheel_port_data.event = GUI_WHEEL_BUTTON_UP;
