@@ -107,7 +107,7 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
    :align: center
    :width: 600
 
-   menuconfig 配置界面
+   Menuconfig 配置界面
 
 操作说明
 """"""""
@@ -169,9 +169,9 @@ HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS`
 依赖软件
 """"""""
     
-**CMake** （测试版本为 3.31.2）：`https://cmake.org/download/ <https://cmake.org/download/>`_
+- **CMake** （测试版本为 3.31.2）：`https://cmake.org/download/ <https://cmake.org/download/>`_
 
-**MinGW-w64**：如前所述
+- **MinGW-w64**：如前所述
 
 初始化构建环境
 """"""""""""""

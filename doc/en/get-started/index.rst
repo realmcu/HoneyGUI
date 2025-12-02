@@ -109,7 +109,7 @@ After executing the command, a graphical configuration interface will open:
    :align: center
    :width: 600
 
-   menuconfig Configuration Interface
+   Menuconfig Configuration Interface
 
 Operation Instructions
 """"""""""""""""""""""
@@ -171,9 +171,9 @@ Startup by CMD (CMake)
 Dependencies
 """"""""""""
     
-**CMake** (tested with version 3.31.2): `https://cmake.org/download/ <https://cmake.org/download/>`_
+- **CMake** (tested with version 3.31.2): `https://cmake.org/download/ <https://cmake.org/download/>`_
 
-**MinGW-w64**: As mentioned earlier
+- **MinGW-w64**: As mentioned earlier
 
 Initializing the Build Environment
 """""""""""""""""""""""""""""""""""
