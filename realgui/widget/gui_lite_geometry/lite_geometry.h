@@ -88,6 +88,7 @@ typedef struct
     PixelFormat format;     // pixel format
     bool enable_aa; //anti-aliasing
     Rect clip_rect;
+    bool enable_stroke_cap; //enable stroke cap
 } DrawContext;
 
 void add_pixel_with_coverage_rgb565(DrawContext *ctx, int x, int y, PixelColor color,

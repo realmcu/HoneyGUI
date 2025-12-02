@@ -199,11 +199,15 @@ PixelColor blend_colors_argb8888(PixelColor bg_color, PixelColor fg_color, uint8
     if (alpha == 255) { return fg_color; }
 
     uint8_t bg_a = (bg_color >> 24) & 0xFF;
+
+    // CRITICAL FIX: When blending onto transparent background, output straight alpha
+    // to avoid black edges. Do NOT premultiply RGB components!
     if (bg_a == 0)
     {
-        uint8_t r = ((fg_color >> 16) & 0xFF) * alpha / 255;
-        uint8_t g = ((fg_color >> 8) & 0xFF) * alpha / 255;
-        uint8_t b = (fg_color & 0xFF) * alpha / 255;
+        uint8_t r = (fg_color >> 16) & 0xFF;
+        uint8_t g = (fg_color >> 8) & 0xFF;
+        uint8_t b = fg_color & 0xFF;
+        // Keep RGB unchanged, only set alpha channel
         return (alpha << 24) | (r << 16) | (g << 8) | b;
     }
 
@@ -1014,614 +1018,8 @@ void fill_circle_no_aa(DrawContext *ctx, int center_x, int center_y, int radius,
     }
 }
 
-// ==================== Arc drawing area calculation ====================
-// arc angle range check
-bool check_degree_arc_range(uint16_t angle, uint16_t start_angle, uint16_t end_angle,
-                            bool is_closed)
-{
-    if (is_closed) { return true; }
+// ==================== Arc Helper Functions ====================
 
-    if (start_angle <= end_angle)
-    {
-        return angle >= start_angle && angle <= end_angle;
-    }
-    else
-    {
-        return angle >= start_angle || angle <= end_angle;
-    }
-}
-void lg_draw_arc_get_area(int32_t x, int32_t y, uint16_t radius,  int32_t start_angle,
-                          int32_t end_angle,
-                          int32_t w, bool rounded, lg_area_t *area)
-{
-    int32_t rout = radius;
-    int32_t start_angle_int = (int32_t) start_angle;
-    int32_t end_angle_int = (int32_t) end_angle;
-
-    /*Special case: full arc invalidation */
-    if (end_angle_int == start_angle_int + 360 || start_angle_int == end_angle_int)
-    {
-        area->x1 = x - rout;
-        area->y1 = y - rout;
-        area->x2 = x + rout;
-        area->y2 = y + rout;
-        return;
-    }
-
-    if (start_angle_int > 360) { start_angle_int -= 360; }
-    if (end_angle_int > 360) { end_angle_int -= 360; }
-
-
-    int32_t rin = radius - w;
-    int32_t extra_area = rounded ? w / 2 + 1 : 0;
-    uint8_t start_quarter = start_angle_int / 90;
-    uint8_t end_quarter = end_angle_int / 90;
-
-    /*360 deg still counts as quarter 3 (360 / 90 would be 4)*/
-    if (start_quarter == 4) { start_quarter = 3; }
-    if (end_quarter == 4) { end_quarter = 3; }
-
-    if (start_quarter == end_quarter && start_angle_int <= end_angle_int)
-    {
-        if (start_quarter == 0)
-        {
-            area->y1 = y + ((lg_trigo_sin(start_angle_int) * rin) >> LG_TRIGO_SHIFT) - extra_area;
-            area->x2 = x + ((lg_trigo_sin(start_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-
-            area->y2 = y + ((lg_trigo_sin(end_angle_int) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-            area->x1 = x + ((lg_trigo_sin(end_angle_int + 90) * rin) >> LG_TRIGO_SHIFT) - extra_area;
-        }
-        else if (start_quarter == 1)
-        {
-            area->y2 = y + ((lg_trigo_sin(start_angle_int) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-            area->x2 = x + ((lg_trigo_sin(start_angle_int + 90) * rin) >> LG_TRIGO_SHIFT) + extra_area;
-
-            area->y1 = y + ((lg_trigo_sin(end_angle_int) * rin) >> LG_TRIGO_SHIFT) - extra_area;
-            area->x1 = x + ((lg_trigo_sin(end_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-        }
-        else if (start_quarter == 2)
-        {
-            area->x1 = x + ((lg_trigo_sin(start_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-            area->y2 = y + ((lg_trigo_sin(start_angle_int) * rin) >> LG_TRIGO_SHIFT) + extra_area;
-
-            area->y1 = y + ((lg_trigo_sin(end_angle_int) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-            area->x2 = x + ((lg_trigo_sin(end_angle_int + 90) * rin) >> LG_TRIGO_SHIFT) + extra_area;
-        }
-        else if (start_quarter == 3)
-        {
-            area->x1 = x + ((lg_trigo_sin(start_angle_int + 90) * rin) >> LG_TRIGO_SHIFT) - extra_area;
-            area->y1 = y + ((lg_trigo_sin(start_angle_int) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-
-            area->x2 = x + ((lg_trigo_sin(end_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-            area->y2 = y + ((lg_trigo_sin(end_angle_int) * rin) >> LG_TRIGO_SHIFT) + extra_area;
-        }
-    }
-    else if (start_quarter == 0 && end_quarter == 1)
-    {
-        area->x1 = x + ((lg_trigo_sin(end_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-        area->y1 = y + ((LG_MIN(lg_trigo_sin(end_angle_int),
-                                lg_trigo_sin(start_angle_int))  * rin) >> LG_TRIGO_SHIFT) - extra_area;
-        area->x2 = x + ((lg_trigo_sin(start_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-        area->y2 = y + rout + extra_area;
-    }
-    else if (start_quarter == 1 && end_quarter == 2)
-    {
-        area->x1 = x - rout - extra_area;
-        area->y1 = y + ((lg_trigo_sin(end_angle_int) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-        area->x2 = x + ((LG_MAX(lg_trigo_sin(start_angle_int + 90),
-                                lg_trigo_sin(end_angle_int + 90)) * rin) >> LG_TRIGO_SHIFT) + extra_area;
-        area->y2 = y + ((lg_trigo_sin(start_angle_int) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-    }
-    else if (start_quarter == 2 && end_quarter == 3)
-    {
-        area->x1 = x + ((lg_trigo_sin(start_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-        area->y1 = y - rout - extra_area;
-        area->x2 = x + ((lg_trigo_sin(end_angle_int + 90) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-        area->y2 = y + (LG_MAX(lg_trigo_sin(end_angle_int) * rin,
-                               lg_trigo_sin(start_angle_int) * rin) >> LG_TRIGO_SHIFT) + extra_area;
-    }
-    else if (start_quarter == 3 && end_quarter == 0)
-    {
-        area->x1 = x + ((LG_MIN(lg_trigo_sin(end_angle_int + 90),
-                                lg_trigo_sin(start_angle_int + 90)) * rin) >> LG_TRIGO_SHIFT) - extra_area;
-        area->y1 = y + ((lg_trigo_sin(start_angle_int) * rout) >> LG_TRIGO_SHIFT) - extra_area;
-        area->x2 = x + rout + extra_area;
-        area->y2 = y + ((lg_trigo_sin(end_angle_int) * rout) >> LG_TRIGO_SHIFT) + extra_area;
-
-    }
-    else
-    {
-        area->x1 = x - rout;
-        area->y1 = y - rout;
-        area->x2 = x + rout;
-        area->y2 = y + rout;
-    }
-}
-bool is_in_angle_range_quadrant(float dx, float dy, uint16_t start_angle, uint16_t end_angle)
-{
-    int quadrant;
-    if (dx >= 0)
-    {
-        quadrant = (dy >= 0) ? 0 : 3;
-    }
-    else
-    {
-        quadrant = (dy >= 0) ? 1 : 2;
-    }
-
-    uint16_t quadrant_start = quadrant * 90;
-    uint16_t quadrant_end = quadrant_start + 90;
-
-    if (end_angle < start_angle)
-    {
-        //Crossing 0 degrees
-        if (!(quadrant_start < end_angle || quadrant_end > start_angle))
-        {
-            return false;
-        }
-    }
-    else
-    {
-        // continuous range
-        if (quadrant_end < start_angle || quadrant_start > end_angle)
-        {
-            return false;
-        }
-    }
-
-    uint16_t angle = lg_atan2(dy, dx);
-    return check_degree_arc_range(angle, start_angle, end_angle, false);
-}
-
-static inline float compute_coverage(float dist_sq, float outer_radius,
-                                     float inner_radius, float aa_width)
-{
-    float outer_aa_inner_sq = (outer_radius - aa_width) * (outer_radius - aa_width);
-    float outer_aa_outer_sq = (outer_radius + aa_width) * (outer_radius + aa_width);
-    float inner_aa_inner_sq = (inner_radius - aa_width) * (inner_radius - aa_width);
-    float inner_aa_outer_sq = (inner_radius + aa_width) * (inner_radius + aa_width);
-
-    if (dist_sq > outer_aa_inner_sq && dist_sq <= outer_aa_outer_sq)
-    {
-
-        float t = (dist_sq - outer_aa_inner_sq) / (outer_aa_outer_sq - outer_aa_inner_sq);
-        float t_linear = t * t;
-        return 1.0f - t_linear;
-    }
-
-    if (inner_radius > 0 && dist_sq >= inner_aa_inner_sq && dist_sq < inner_aa_outer_sq)
-    {
-        float t = (inner_aa_outer_sq - dist_sq) / (inner_aa_outer_sq - inner_aa_inner_sq);
-        float t_linear = t * t;
-        return 1.0f - t_linear;
-    }
-
-    return 1.0f;
-}
-
-typedef struct
-{
-    bool quadrants[4];  // Mark which quadrants contain arcs
-    uint16_t start_quadrant;
-    uint16_t end_quadrant;
-} ArcQuadrantInfo;
-
-typedef struct
-{
-    int start_x, end_x;
-    int start_y, end_y;
-} QuadrantBounds;
-
-// Quadrants involved in pre-calculation of circular arcs
-static void compute_arc_quadrants(uint16_t start_angle, uint16_t end_angle, ArcQuadrantInfo *info)
-{
-    memset(info->quadrants, 0, sizeof(info->quadrants));
-
-    info->start_quadrant = start_angle / 90;
-    info->end_quadrant = end_angle / 90;
-
-    // Mark all involved quadrants
-    if (end_angle >= start_angle)
-    {
-        // Not exceeding 0 degrees
-        for (int quad = info->start_quadrant; quad <= info->end_quadrant; quad++)
-        {
-            info->quadrants[quad % 4] = true;
-        }
-    }
-    else
-    {
-        // Crossing 0 degrees
-        for (int quad = info->start_quadrant; quad < 4; quad++)
-        {
-            info->quadrants[quad] = true;
-        }
-        for (int quad = 0; quad <= info->end_quadrant; quad++)
-        {
-            info->quadrants[quad] = true;
-        }
-    }
-}
-
-// Calculate the bounding box for each quadrant
-static void compute_quadrant_bounds(ArcQuadrantInfo *info, QuadrantBounds bounds[4],
-                                    DrawContext *ctx, float center_x, float center_y,
-                                    float outer_radius, float aa_width)
-{
-    float safety_margin = 1.0f;
-
-    for (int quad = 0; quad < 4; quad++)
-    {
-        if (!info->quadrants[quad])
-        {
-            bounds[quad].start_x = 1;
-            bounds[quad].end_x = 0;
-            continue;
-        }
-
-        switch (quad)
-        {
-        case 0:
-            bounds[quad].start_x = (int)(center_x + safety_margin);
-            bounds[quad].end_x = (int)(center_x + outer_radius + aa_width - safety_margin);
-            bounds[quad].start_y = (int)(center_y);
-            bounds[quad].end_y = (int)(center_y + outer_radius + aa_width);
-            break;
-        case 1:
-            bounds[quad].start_x = (int)(center_x - outer_radius - aa_width);
-            bounds[quad].end_x = (int)(center_x);
-            bounds[quad].start_y = (int)(center_y);
-            bounds[quad].end_y = (int)(center_y + outer_radius + aa_width);
-            break;
-        case 2:
-            bounds[quad].start_x = (int)(center_x - outer_radius - aa_width);
-            bounds[quad].end_x = (int)(center_x);
-            bounds[quad].start_y = (int)(center_y - outer_radius - aa_width);
-            bounds[quad].end_y = (int)(center_y - safety_margin);
-            break;
-        case 3:
-            bounds[quad].start_x = (int)(center_x + safety_margin);
-            bounds[quad].end_x = (int)(center_x + outer_radius + aa_width);
-            bounds[quad].start_y = (int)(center_y - outer_radius - aa_width);
-            bounds[quad].end_y = (int)(center_y);
-            break;
-        }
-
-        bounds[quad].start_x = LG_MAX(bounds[quad].start_x, 0);
-        bounds[quad].end_x = LG_MIN(bounds[quad].end_x, ctx->width - 1);
-        bounds[quad].start_y = LG_MAX(bounds[quad].start_y, 0);
-        bounds[quad].end_y = LG_MIN(bounds[quad].end_y, ctx->height - 1);
-    }
-}
-static void process_pixel_row(uint32_t *pixel_line, int start_x, int end_x,
-                              float center_x, float dy, float dy_sq,
-                              float outer_sq, float inner_sq,
-                              float outer_aa_sq, float inner_aa_sq,
-                              float outer_solid_sq, float inner_solid_sq,
-                              uint16_t arc_start_deg, uint16_t arc_end_deg,
-                              bool needs_angle_check, PixelColor stroke_color,
-                              lg_color32_t fg)
-{
-    // Pre-calculate the dx relevance value of the current row
-    for (int x = start_x; x <= end_x; x++)
-    {
-        float dx = (x + 0.5f) - center_x;
-        float dist_sq = dx * dx + dy_sq;
-
-        // Quick boundary check
-        if (dist_sq > outer_aa_sq || (inner_sq > 0 && dist_sq < inner_aa_sq))
-        {
-            continue;
-        }
-
-        if (needs_angle_check && !is_in_angle_range_quadrant(dx, dy, arc_start_deg, arc_end_deg))
-        {
-            continue;
-        }
-
-        if (dist_sq <= outer_solid_sq && dist_sq >= inner_solid_sq)
-        {
-            // Solid area - fill directly
-            pixel_line[x] = stroke_color;
-            // if ( fg.alpha== 255) {
-            //     pixel_line[x] = stroke_color;
-            // } else if (fg.alpha > 0) {
-            //     uint32_t bg_color = pixel_line[x];
-            //     pixel_line[x] = blend_colors_argb8888(bg_color, stroke_color, fg.alpha);
-            // }
-        }
-        else
-        {
-            // Anti-aliased edge area
-            float coverage = compute_coverage(dist_sq,
-                                              sqrtf(outer_sq), sqrtf(inner_sq), 2.0f);
-
-            if (coverage > 0.001f)
-            {
-                uint8_t final_alpha = (uint8_t)(fg.alpha * coverage);
-                if (final_alpha == 0) { continue; }
-
-                uint32_t bg_color = pixel_line[x];
-
-                if (final_alpha == 255)
-                {
-                    pixel_line[x] = stroke_color;
-                }
-                else
-                {
-                    uint16_t inv_alpha = 256 - final_alpha;
-
-                    uint8_t bg_r = (bg_color >> 16) & 0xFF;
-                    uint8_t bg_g = (bg_color >> 8)  & 0xFF;
-                    uint8_t bg_b = bg_color & 0xFF;
-
-                    pixel_line[x] = (0xFFU << 24) |
-                                    ((((bg_r * inv_alpha + fg.red * final_alpha) >> 8) & 0xFF) << 16) |
-                                    ((((bg_g * inv_alpha + fg.green * final_alpha) >> 8) & 0xFF) << 8) |
-                                    (((bg_b * inv_alpha + fg.blue * final_alpha) >> 8) & 0xFF);
-                }
-            }
-
-        }
-    }
-}
-static void compute_row_x_range(QuadrantBounds *bounds, float center_x, float dy_sq,
-                                float outer_aa_sq, float inner_aa_sq,
-                                int *start_x, int *end_x)
-{
-    // Calculate the x-range of the current row within the annulus
-    float max_dx_outer = sqrtf(fmaxf(outer_aa_sq - dy_sq, 0));
-    float min_dx_inner = (inner_aa_sq > 0) ? sqrtf(fmaxf(inner_aa_sq - dy_sq, 0)) : 0;
-
-    *start_x = LG_MAX(bounds->start_x, (int)(center_x - max_dx_outer));
-    *end_x = LG_MIN(bounds->end_x, (int)(center_x + max_dx_outer));
-
-    if (inner_aa_sq > 0 && dy_sq < inner_aa_sq)
-    {
-        int inner_start = (int)(center_x - min_dx_inner);
-        int inner_end = (int)(center_x + min_dx_inner);
-
-        if (inner_start <= *end_x && inner_end >= *start_x)
-        {
-            if (*start_x >= inner_start && *end_x <= inner_end)
-            {
-                // Entire row is within inner circle; set invalid range
-                *start_x = *end_x + 1;
-            }
-            else if (*start_x < inner_start)
-            {
-                // Keep only the left side (before inner circle)
-                *end_x = inner_start - 1;
-            }
-            else if (*end_x > inner_end)
-            {
-                // Keep only the right side (after inner circle)
-                *start_x = inner_end + 1;
-            }
-            // First case (*start_x < inner_start && *end_x > inner_end) is already correct
-            // as the row spans both sides of inner circle
-        }
-    }
-}
-static void process_quadrant_by_rows(DrawContext *ctx, int quad, QuadrantBounds *bounds,
-                                     float center_x, float center_y,
-                                     float outer_sq, float inner_sq,
-                                     float outer_aa_sq, float inner_aa_sq,
-                                     float outer_solid_sq, float inner_solid_sq,
-                                     uint16_t arc_start_deg, uint16_t arc_end_deg,
-                                     bool needs_angle_check, PixelColor stroke_color,
-                                     lg_color32_t fg)
-{
-    LG_UNUSED(quad);
-    float *dy_values = malloc((bounds->end_y - bounds->start_y + 1) * sizeof(float));
-    float *dy_sq_values = malloc((bounds->end_y - bounds->start_y + 1) * sizeof(float));
-
-    for (int y = bounds->start_y; y <= bounds->end_y; y++)
-    {
-        int idx = y - bounds->start_y;
-        dy_values[idx] = (y + 0.5f) - center_y;
-        dy_sq_values[idx] = dy_values[idx] * dy_values[idx];
-    }
-
-    for (int y = bounds->start_y; y <= bounds->end_y; y++)
-    {
-        int idx = y - bounds->start_y;
-        float dy = dy_values[idx];
-        float dy_sq = dy_sq_values[idx];
-
-        uint32_t *pixel_line = (uint32_t *)(ctx->buffer + y * ctx->stride);
-
-        int row_start_x, row_end_x;
-        compute_row_x_range(bounds, center_x, dy_sq, outer_aa_sq, inner_aa_sq,
-                            &row_start_x, &row_end_x);
-
-        if (row_start_x > row_end_x) { continue; }
-
-        process_pixel_row(pixel_line, row_start_x, row_end_x, center_x, dy, dy_sq,
-                          outer_sq, inner_sq, outer_aa_sq, inner_aa_sq,
-                          outer_solid_sq, inner_solid_sq,
-                          arc_start_deg, arc_end_deg, needs_angle_check,
-                          stroke_color, fg);
-    }
-
-    free(dy_values);
-    free(dy_sq_values);
-}
-void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
-                    float radius, float line_width,
-                    float start_angle, float end_angle,
-                    PixelColor stroke_color)
-{
-    if (radius <= 0 || line_width <= 0) { return; }
-    uint16_t start_angle_deg = (uint16_t)start_angle;
-    uint16_t end_angle_deg = (uint16_t)end_angle;
-
-    while (start_angle_deg > 360) { start_angle_deg -= 360; }
-    while (end_angle_deg > 360) { end_angle_deg -= 360; }
-
-    uint16_t arc_start_deg = start_angle_deg;
-    uint16_t arc_end_deg = end_angle_deg;
-    if (arc_end_deg < arc_start_deg)
-    {
-        arc_end_deg += 360;
-    }
-
-    bool full_circle = (arc_end_deg - arc_start_deg >= 360);
-    if (full_circle)
-    {
-        draw_arc_as_ring(ctx, center_x, center_y, radius, line_width, stroke_color);
-        return;
-    }
-
-    float outer_radius = radius + line_width / 2;
-    float inner_radius = fmaxf(radius - line_width / 2, 0);
-    float aa_width = 2.0f;
-
-    float outer_sq = outer_radius * outer_radius;
-    float inner_sq = inner_radius * inner_radius;
-    float outer_aa_sq = (outer_radius + aa_width) * (outer_radius + aa_width);
-    float inner_aa_sq = fmaxf((inner_radius - aa_width) * (inner_radius - aa_width), 0);
-
-    float outer_solid = outer_radius - aa_width;
-    float inner_solid = inner_radius + aa_width;
-    float outer_solid_sq = outer_solid * outer_solid;
-    float inner_solid_sq = inner_solid * inner_solid;
-
-    if (line_width > 1)
-    {
-        float start_rad = start_angle * M_PI / 180.0f;
-        float end_rad = end_angle * M_PI / 180.0f;
-
-        int start_cap_x = center_x + radius * cosf(start_rad);
-        int start_cap_y = center_y + radius * sinf(start_rad);
-        int end_cap_x = center_x + radius * cosf(end_rad);
-        int end_cap_y = center_y + radius * sinf(end_rad);
-
-        fill_circle_df_aa(ctx, start_cap_x, start_cap_y, (line_width + aa_width) / 2, stroke_color);
-        fill_circle_df_aa(ctx, end_cap_x, end_cap_y, (line_width + aa_width) / 2, stroke_color);
-    }
-
-    ArcQuadrantInfo quadrant_info;
-    compute_arc_quadrants(start_angle_deg, end_angle_deg, &quadrant_info);
-
-    QuadrantBounds bounds[4];
-    compute_quadrant_bounds(&quadrant_info, bounds, ctx, center_x, center_y, outer_radius, aa_width);
-
-    lg_color32_t fg;
-    fg.red   = (stroke_color >> 16) & 0xFF;
-    fg.green = (stroke_color >> 8)  & 0xFF;
-    fg.blue  = stroke_color & 0xFF;
-    fg.alpha = (stroke_color >> 24) & 0xFF;
-
-    uint16_t start_quadrant = start_angle_deg / 90;
-    uint16_t end_quadrant = end_angle_deg / 90;
-
-    for (int quad = 0; quad < 4; quad++)
-    {
-        if (!quadrant_info.quadrants[quad]) { continue; }
-
-        bool needs_angle_check = (start_quadrant == end_quadrant && quad == start_quadrant) ||
-                                 (start_quadrant != end_quadrant && (quad == start_quadrant ||
-                                                                     quad == end_quadrant));
-
-        process_quadrant_by_rows(ctx, quad, &bounds[quad], center_x, center_y,
-                                 outer_sq, inner_sq, outer_aa_sq, inner_aa_sq,
-                                 outer_solid_sq, inner_solid_sq,
-                                 arc_start_deg, arc_end_deg,
-                                 needs_angle_check, stroke_color,
-                                 fg);
-    }
-}
-void draw_arc(DrawContext *ctx, float center_x, float center_y,
-              float radius, float line_width,
-              float start_angle, float end_angle,
-              PixelColor stroke_color)
-{
-    if (ctx->enable_aa)
-    {
-        draw_arc_df_aa(ctx, center_x, center_y, radius, line_width, start_angle, end_angle, stroke_color);
-    }
-    else
-    {
-        if (radius <= 0 || line_width <= 0) { return; }
-
-        float outer_radius = radius + line_width / 2;
-        float inner_radius = fmaxf(radius - line_width / 2, 0);
-
-        uint16_t start_angle_deg = (uint16_t)start_angle;
-        uint16_t end_angle_deg = (uint16_t)end_angle;
-
-        while (start_angle_deg >= 360) { start_angle_deg -= 360; }
-        while (end_angle_deg >= 360) { end_angle_deg -= 360; }
-
-        bool is_closed_arc = false;
-        if (start_angle_deg == end_angle_deg)
-        {
-            is_closed_arc = true;
-        }
-        else
-        {
-            int angle_diff = (int)end_angle_deg - (int)start_angle_deg;
-            if (angle_diff < 0) { angle_diff += 360; }
-            is_closed_arc = (angle_diff >= 359);
-        }
-
-        uint16_t arc_start_deg = start_angle_deg;
-        uint16_t arc_end_deg = end_angle_deg;
-
-        if (arc_end_deg < arc_start_deg && !is_closed_arc)
-        {
-            arc_end_deg += 360;
-        }
-        lg_area_t draw_area;
-        lg_draw_arc_get_area((int32_t)center_x, (int32_t)center_y, (uint16_t)outer_radius,
-                             start_angle_deg, end_angle_deg, (int32_t)line_width, false, &draw_area);
-
-        int start_x = LG_MAX(draw_area.x1, 0);
-        int end_x = LG_MIN(draw_area.x2, ctx->width - 1);
-        int start_y = LG_MAX(draw_area.y1, 0);
-        int end_y = LG_MIN(draw_area.y2, ctx->height - 1);
-
-        for (int py = start_y; py <= end_y; py++)
-        {
-            for (int px = start_x; px <= end_x; px++)
-            {
-                int dx = px - (int)center_x;
-                int dy = py - (int)center_y;
-                float dist_sq = dx * dx + dy * dy;
-
-                if (dist_sq > outer_radius * outer_radius ||
-                    dist_sq < inner_radius * inner_radius)
-                {
-                    continue;
-                }
-
-                if (!is_closed_arc)
-                {
-                    uint16_t angle_deg = lg_atan2(dy, dx);
-
-                    bool in_angle_range = check_degree_arc_range(angle_deg, arc_start_deg, arc_end_deg, is_closed_arc);
-
-                    if (!in_angle_range) { continue; }
-                }
-                add_pixel_to_context(ctx, px, py, stroke_color);
-            }
-        }
-        if (line_width > 1 && !is_closed_arc)
-        {
-            float start_rad = start_angle * M_PI / 180.0f;
-            float end_rad = end_angle * M_PI / 180.0f;
-
-            float start_cap_x = center_x + radius * cosf(start_rad);
-            float start_cap_y = center_y + radius * sinf(start_rad);
-            float end_cap_x = center_x + radius * cosf(end_rad);
-            float end_cap_y = center_y + radius * sinf(end_rad);
-
-            fill_circle(ctx, start_cap_x, start_cap_y, line_width / 2, stroke_color);
-            fill_circle(ctx, end_cap_x, end_cap_y, line_width / 2, stroke_color);
-        }
-    }
-}
 float calculate_coverage(float dist_sq, float outer_sq, float inner_sq,
                          float outer_aa_sq, float inner_aa_sq)
 {
@@ -1645,6 +1043,62 @@ float calculate_coverage(float dist_sq, float outer_sq, float inner_sq,
     return 0.0f;
 }
 
+void draw_symmetric_pixels(DrawContext *ctx, float cx, float cy, int x, int y,
+                           PixelColor color, float coverage)
+{
+    // Define symmetrical points in 8 quadrants
+    int coords[8][2];
+    int point_count = 0;
+
+    if (x == 0 && y == 0)
+    {
+        // Origin: There is only 1 point
+        coords[point_count][0] = (int)(cx + 0); coords[point_count][1] = (int)(cy + 0); point_count++;
+    }
+    else if (y == 0)
+    {
+        // Plot 4 points on the x-axis (x, 0).
+        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy + 0); point_count++;
+        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy + 0); point_count++;
+        coords[point_count][0] = (int)(cx + 0); coords[point_count][1] = (int)(cy + x); point_count++;
+        coords[point_count][0] = (int)(cx + 0); coords[point_count][1] = (int)(cy - x); point_count++;
+    }
+    else if (x == y)
+    {
+        // Draw 4 points along the 45-degree diagonal.
+        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy + y); point_count++;
+        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy + y); point_count++;
+        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy - y); point_count++;
+        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy - y); point_count++;
+    }
+    else
+    {
+        // Standard points: 8 complete symmetrical points
+        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy + y); point_count++;
+        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy + y); point_count++;
+        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy - y); point_count++;
+        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy - y); point_count++;
+        coords[point_count][0] = (int)(cx + y); coords[point_count][1] = (int)(cy + x); point_count++;
+        coords[point_count][0] = (int)(cx - y); coords[point_count][1] = (int)(cy + x); point_count++;
+        coords[point_count][0] = (int)(cx + y); coords[point_count][1] = (int)(cy - x); point_count++;
+        coords[point_count][0] = (int)(cx - y); coords[point_count][1] = (int)(cy - x); point_count++;
+    }
+
+    // Plot all calculated points
+    for (int i = 0; i < point_count; i++)
+    {
+        int px = coords[i][0];
+        int py = coords[i][1];
+        if (px >= 0 && px < ctx->width && py >= 0 && py < ctx->height)
+        {
+            add_pixel_aa(ctx, px, py, color, coverage);
+        }
+    }
+}
+
+/**
+ * Draw a complete ring (360 degree arc) - optimized for full circles
+ */
 void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
                       float arc_radius, float line_width, PixelColor color)
 {
@@ -1706,56 +1160,272 @@ void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
     }
 }
 
-void draw_symmetric_pixels(DrawContext *ctx, float cx, float cy, int x, int y,
-                           PixelColor color, float coverage)
-{
-    // Define symmetrical points in 8 quadrants
-    int coords[8][2];
-    int point_count = 0;
+// ==================== Optimized Arc Drawing ====================
 
-    if (x == 0 && y == 0)
+// Normalize angle to [0, 360)
+static inline float normalize_angle_arc(float angle)
+{
+    while (angle < 0) { angle += 360.0f; }
+    while (angle > 360.0f) { angle -= 360.0f; }
+    return angle;
+}
+
+// Check if angle is in arc range (handles cross-zero correctly)
+static inline bool is_angle_in_arc_range(float angle, float start, float end)
+{
+    angle = normalize_angle_arc(angle);
+    start = normalize_angle_arc(start);
+    end = normalize_angle_arc(end);
+
+    if (fabsf(end - start) >= 359.9f)
     {
-        // Origin: There is only 1 point
-        coords[point_count][0] = (int)(cx + 0); coords[point_count][1] = (int)(cy + 0); point_count++;
+        return true; // Full circle
     }
-    else if (y == 0)
+
+    if (start <= end)
     {
-        // Plot 4 points on the x-axis (x, 0).
-        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy + 0); point_count++;
-        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy + 0); point_count++;
-        coords[point_count][0] = (int)(cx + 0); coords[point_count][1] = (int)(cy + x); point_count++;
-        coords[point_count][0] = (int)(cx + 0); coords[point_count][1] = (int)(cy - x); point_count++;
-    }
-    else if (x == y)
-    {
-        // Draw 4 points along the 45-degree diagonal.
-        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy + y); point_count++;
-        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy + y); point_count++;
-        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy - y); point_count++;
-        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy - y); point_count++;
+        return (angle >= start && angle <= end);
     }
     else
     {
-        // Standard points: 8 complete symmetrical points
-        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy + y); point_count++;
-        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy + y); point_count++;
-        coords[point_count][0] = (int)(cx + x); coords[point_count][1] = (int)(cy - y); point_count++;
-        coords[point_count][0] = (int)(cx - x); coords[point_count][1] = (int)(cy - y); point_count++;
-        coords[point_count][0] = (int)(cx + y); coords[point_count][1] = (int)(cy + x); point_count++;
-        coords[point_count][0] = (int)(cx - y); coords[point_count][1] = (int)(cy + x); point_count++;
-        coords[point_count][0] = (int)(cx + y); coords[point_count][1] = (int)(cy - x); point_count++;
-        coords[point_count][0] = (int)(cx - y); coords[point_count][1] = (int)(cy - x); point_count++;
-    }
-
-    // Plot all calculated points
-    for (int i = 0; i < point_count; i++)
-    {
-        int px = coords[i][0];
-        int py = coords[i][1];
-        if (px >= 0 && px < ctx->width && py >= 0 && py < ctx->height)
-        {
-            add_pixel_aa(ctx, px, py, color, coverage);
-        }
+        // Cross zero: e.g., start=350, end=10
+        return (angle >= start || angle <= end);
     }
 }
 
+// Compute signed distance from point to arc (negative = inside)
+static inline float arc_sdf(float px, float py, float cx, float cy,
+                            float radius, float line_width,
+                            float start_angle, float end_angle)
+{
+    float dx = px - cx;
+    float dy = py - cy;
+    float dist = sqrtf(dx * dx + dy * dy);
+
+    // Distance to ring
+    float inner_r = radius - line_width / 2.0f;
+    float outer_r = radius + line_width / 2.0f;
+    float ring_dist;
+
+    if (dist < inner_r)
+    {
+        ring_dist = inner_r - dist; // Inside inner circle
+    }
+    else if (dist > outer_r)
+    {
+        ring_dist = dist - outer_r; // Outside outer circle
+    }
+    else
+    {
+        ring_dist = -fminf(dist - inner_r, outer_r - dist); // Inside ring
+    }
+
+    // Check angle constraint
+    if (fabsf(end_angle - start_angle) < 359.9f)
+    {
+        float angle = atan2f(dy, dx) * 180.0f / M_PI;
+        if (!is_angle_in_arc_range(angle, start_angle, end_angle))
+        {
+            // Outside angle range - compute distance to arc endpoints
+            float start_rad = start_angle * M_PI / 180.0f;
+            float end_rad = end_angle * M_PI / 180.0f;
+
+            float start_x = cx + radius * cosf(start_rad);
+            float start_y = cy + radius * sinf(start_rad);
+            float end_x = cx + radius * cosf(end_rad);
+            float end_y = cy + radius * sinf(end_rad);
+
+            float dist_to_start = sqrtf((px - start_x) * (px - start_x) + (py - start_y) * (py - start_y));
+            float dist_to_end = sqrtf((px - end_x) * (px - end_x) + (py - end_y) * (py - end_y));
+
+            float cap_dist = fminf(dist_to_start, dist_to_end) - line_width / 2.0f;
+            return fmaxf(ring_dist, cap_dist);
+        }
+    }
+
+    return ring_dist;
+}
+
+/**
+ * Draw arc with anti-aliasing - optimized version
+ * Fixes: black edges, cross-zero angle issues, improved performance
+ */
+void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
+                    float radius, float line_width,
+                    float start_angle, float end_angle,
+                    PixelColor stroke_color)
+{
+    if (radius <= 0 || line_width <= 0) { return; }
+
+    // Normalize angles
+    start_angle = normalize_angle_arc(start_angle);
+    end_angle = normalize_angle_arc(end_angle);
+
+    // Calculate angle span
+    float angle_span = end_angle - start_angle;
+    if (angle_span <= 0) { angle_span += 360.0f; }
+
+    // Check for full circle (use a small epsilon for floating point comparison)
+    const float EPSILON = 0.001f;
+    bool is_full_circle = (fabsf(angle_span - 360.0f) < (float)EPSILON);
+
+    // Use optimized ring drawing for full circles
+    if (is_full_circle)
+    {
+        draw_arc_as_ring(ctx, center_x, center_y, radius, line_width, stroke_color);
+        return;
+    }
+
+    // Calculate bounding box for partial arcs
+    float outer_r = radius + line_width / 2.0f + 2.0f; // +2 for AA
+    int min_x = (int)(center_x - outer_r);
+    int max_x = (int)(center_x + outer_r) + 1;
+    int min_y = (int)(center_y - outer_r);
+    int max_y = (int)(center_y + outer_r) + 1;
+
+    // Clip to context bounds
+    min_x = LG_MAX(min_x, ctx->clip_rect.x);
+    max_x = LG_MIN(max_x, ctx->clip_rect.x + ctx->clip_rect.w);
+    min_y = LG_MAX(min_y, ctx->clip_rect.y);
+    max_y = LG_MIN(max_y, ctx->clip_rect.y + ctx->clip_rect.h);
+
+    if (min_x >= max_x || min_y >= max_y) { return; }
+
+    // Extract color components
+    uint8_t color_a = (stroke_color >> 24) & 0xFF;
+    uint8_t color_r = (stroke_color >> 16) & 0xFF;
+    uint8_t color_g = (stroke_color >> 8) & 0xFF;
+    uint8_t color_b = stroke_color & 0xFF;
+
+    if (color_a == 0) { return; }
+
+    // AA threshold
+    float aa_width = 1.5f;
+
+    // Direct pixel access for performance
+    int pixel_size = (ctx->format == PIXEL_FORMAT_RGB565) ? 2 : 4;
+    uint8_t *buffer = ctx->buffer;
+    int stride = ctx->width * pixel_size;
+
+    // Render arc
+    for (int py = min_y; py < max_y; py++)
+    {
+        float sample_y = py + 0.5f;
+        uint8_t *row = buffer + py * stride;
+
+        for (int px = min_x; px < max_x; px++)
+        {
+            float sample_x = px + 0.5f;
+
+            // Compute SDF
+            float sdf = arc_sdf(sample_x, sample_y, center_x, center_y,
+                                radius, line_width, start_angle, end_angle);
+
+            // Convert SDF to coverage
+            float coverage = 1.0f - smoothstep(-aa_width, aa_width, sdf);
+
+            if (coverage < 0.001f) { continue; }
+
+            // Compute final alpha (straight alpha - no premultiplication!)
+            uint8_t final_alpha = (uint8_t)(color_a * coverage);
+            if (final_alpha == 0) { continue; }
+
+            // Write pixel directly to avoid black edge issues
+            int byte_offset = px * pixel_size;
+
+            if (ctx->format == PIXEL_FORMAT_ARGB8888)
+            {
+                uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
+
+                if (final_alpha == 255)
+                {
+                    // Fully opaque - direct write
+                    *pixel_ptr = stroke_color;
+                }
+                else
+                {
+                    // Blend with background using straight alpha
+                    uint32_t bg = *pixel_ptr;
+                    uint8_t bg_a = (bg >> 24) & 0xFF;
+
+                    if (bg_a == 0)
+                    {
+                        // Background is transparent - write straight alpha pixel
+                        *pixel_ptr = (final_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
+                    }
+                    else
+                    {
+                        // Standard alpha blending
+                        uint16_t inv_alpha = 256 - final_alpha;
+                        uint8_t bg_r = (bg >> 16) & 0xFF;
+                        uint8_t bg_g = (bg >> 8) & 0xFF;
+                        uint8_t bg_b = bg & 0xFF;
+
+                        uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
+                        uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
+                        uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
+                        uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
+
+                        *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
+                    }
+                }
+            }
+            else if (ctx->format == PIXEL_FORMAT_RGB565)
+            {
+                uint16_t *pixel_ptr = (uint16_t *)(row + byte_offset);
+
+                if (final_alpha == 255)
+                {
+                    *pixel_ptr = (uint16_t)stroke_color;
+                }
+                else
+                {
+                    uint16_t bg = *pixel_ptr;
+                    uint16_t inv_alpha = 256 - final_alpha;
+
+                    uint8_t bg_r = (bg >> 11) & 0x1F;
+                    uint8_t bg_g = (bg >> 5) & 0x3F;
+                    uint8_t bg_b = bg & 0x1F;
+
+                    uint8_t fg_r = (color_r >> 3) & 0x1F;
+                    uint8_t fg_g = (color_g >> 2) & 0x3F;
+                    uint8_t fg_b = (color_b >> 3) & 0x1F;
+
+                    uint8_t out_r = ((bg_r * inv_alpha + fg_r * final_alpha) >> 8) & 0x1F;
+                    uint8_t out_g = ((bg_g * inv_alpha + fg_g * final_alpha) >> 8) & 0x3F;
+                    uint8_t out_b = ((bg_b * inv_alpha + fg_b * final_alpha) >> 8) & 0x1F;
+
+                    *pixel_ptr = (out_r << 11) | (out_g << 5) | out_b;
+                }
+            }
+        }
+    }
+
+    // Draw rounded caps for partial arcs (full circles already returned early)
+    if (line_width > 2.0f && ctx->enable_stroke_cap)
+    {
+        float cap_radius = line_width / 2.0f;
+        float start_rad = start_angle * M_PI / 180.0f;
+        float end_rad = end_angle * M_PI / 180.0f;
+
+        float start_x = center_x + radius * cosf(start_rad);
+        float start_y = center_y + radius * sinf(start_rad);
+        float end_x = center_x + radius * cosf(end_rad);
+        float end_y = center_y + radius * sinf(end_rad);
+
+        fill_circle_df_aa(ctx, (int)start_x, (int)start_y, (int)cap_radius, stroke_color);
+        fill_circle_df_aa(ctx, (int)end_x, (int)end_y, (int)cap_radius, stroke_color);
+    }
+}
+
+void draw_arc(DrawContext *ctx, float center_x, float center_y,
+              float radius, float line_width,
+              float start_angle, float end_angle,
+              PixelColor stroke_color)
+{
+    if (ctx->enable_aa)
+    {
+        draw_arc_df_aa(ctx, center_x, center_y, radius, line_width, start_angle, end_angle, stroke_color);
+    }
+    // No non-AA version for now, always use AA
+}

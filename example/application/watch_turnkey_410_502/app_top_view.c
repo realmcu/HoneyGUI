@@ -64,8 +64,10 @@ static void clear_all_note_cb(gui_event_t *e)
 }
 static void create_clear_note(void *parent)
 {
-    gui_lite_round_rect_t *rect_bg = gui_lite_round_rect_create(GUI_BASE(parent), "canvas_clear", 52,
-                                                                40, 305, 80, 40, gui_rgba(39, 43, 44, 255));
+    gui_img_t *rect_bg = gui_img_create_from_mem(GUI_BASE(parent), "canvas_clear",
+                                                 TOP_LIST_CLEAN_BG_BIN, 52, 40, 0,
+                                                 0);
+    gui_img_set_mode(rect_bg, IMG_SRC_OVER_MODE);
     gui_obj_add_event_cb(GUI_BASE(rect_bg), (gui_event_cb_t)clear_all_note_cb,
                          GUI_EVENT_TOUCH_CLICKED, NULL);
     // text
@@ -95,8 +97,9 @@ static void note_design(gui_obj_t *obj, void *p)
     {
         // note_activity
         {
-            gui_lite_round_rect_t *rect_bg = gui_lite_round_rect_create(obj, "rect_bg", offset_X, 0, 352, 120,
-                                                                        30, gui_rgba(98, 101, 98, 255 * 0.7));
+            gui_img_t *rect_bg = gui_img_create_from_mem(obj, "rect_bg", TOP_TAB_BG_BIN, offset_X, 0, 0,
+                                                         0);
+            gui_img_set_mode(rect_bg, IMG_SRC_OVER_MODE);
 
             gui_text_t *sport_text0 = gui_text_create(rect_bg, "ac_text0", 230, 10, 0, 0);
             gui_text_set(sport_text0, "1 hour ago", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
@@ -115,8 +118,9 @@ static void note_design(gui_obj_t *obj, void *p)
     else if (index == 2)
     {
         // note_music
-        gui_lite_round_rect_t *rect_bg = gui_lite_round_rect_create(obj, "rect_bg", offset_X, 0, 352, 120,
-                                                                    30, gui_rgba(98, 101, 98, 255 * 0.7));
+        gui_img_t *rect_bg = gui_img_create_from_mem(obj, "rect_bg", TOP_TAB_BG_BIN, offset_X, 0, 0,
+                                                     0);
+        gui_img_set_mode(rect_bg, IMG_SRC_OVER_MODE);
         gui_img_t *img = gui_img_create_from_mem(rect_bg, "music", APP_MUSIC_ICON_BIN, 20,
                                                  -50, 0, 0);
         gui_img_scale(img, 0.85, 0.85);

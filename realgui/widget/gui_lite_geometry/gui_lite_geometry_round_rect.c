@@ -65,7 +65,6 @@ static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
 }
 
 /** Create a rectangle image object */
-/** Create a rectangle image object */
 static void set_rect_img(gui_lite_round_rect_t *this, draw_img_t **input_img, int16_t x,
                          int16_t y, uint16_t w, uint16_t h)
 {
@@ -98,20 +97,20 @@ static void prepare_arc_img(gui_lite_round_rect_t *this, uint8_t *circle_data, i
     // Clear the image data
     memset(data, 0, img_size * img_size * 4);
 
-    // Calculate boundary points for anti-aliasing
-    float boundary[this->radius];
+    // Calculate boundary points for anti-aliasing (including row 0)
+    float boundary[img_size];
     memset(boundary, 0, sizeof(boundary));
-    for (int i = 1; i <= this->radius; i++)
+    for (int i = 0; i < img_size; i++)
     {
-        float y = i - 0.5 - this->radius;
-        boundary[i - 1] = this->radius - sqrtf(this->radius * this->radius - y * y);
+        float y = i + 0.5 - this->radius;
+        float x_boundary = this->radius - sqrtf(this->radius * this->radius - y * y);
+        boundary[i] = (x_boundary < 0) ? 0 : x_boundary;
     }
 
     // Fill the corner based on corner type
-    for (int i = 1; i <= this->radius; i++)
+    for (int i = 0; i < img_size; i++)
     {
-        int k = i - 1;
-        uint16_t right = (int)boundary[k];
+        uint16_t right = (int)boundary[i];
 
         // Fill solid pixels
         if (right < img_size)
@@ -150,9 +149,9 @@ static void prepare_arc_img(gui_lite_round_rect_t *this, uint8_t *circle_data, i
         }
 
         // Anti-aliasing edge pixel
-        float portion = ceilf(boundary[k]) - boundary[k];
+        float portion = ceilf(boundary[i]) - boundary[i];
         gui_color_t color = this->color;
-        color.color.rgba.a = roundf(portion * color.color.rgba.a);
+        color.color.rgba.a = (uint8_t)(portion * color.color.rgba.a);
 
         int edge_i, edge_j;
         switch (corner_type)
@@ -257,32 +256,38 @@ static void gui_lite_round_rect_prepare(gui_obj_t *obj)
                      this->base.w, \
                      this->base.h);
     }
-    // Create rectangle parts
+    // Create rectangle parts with precise boundaries (no overlap)
+    // Corners are (radius+1) x (radius+1) and now fill all rows including row 0
     // corner_idx: 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
     else
     {
+        // Top rectangle: between the two top corners
         set_rect_img(this, &this->rect_0, \
-                     this->radius,  \
+                     this->radius + 1,  \
                      0,
-                     this->base.w - 2 * this->radius, \
-                     this->radius);
+                     this->base.w - 2 * (this->radius + 1), \
+                     this->radius + 1);
 
+        // Middle rectangle: full width, between top and bottom strips
         set_rect_img(this, &this->rect_1, \
                      0, \
-                     this->radius, \
+                     this->radius + 1, \
                      this->base.w, \
-                     this->base.h - 2 * this->radius);
+                     this->base.h - 2 * (this->radius + 1));
 
+        // Bottom rectangle: between the two bottom corners
         set_rect_img(this, &this->rect_2, \
-                     this->radius,  \
-                     this->base.h - this->radius,
-                     this->base.w - 2 * this->radius, \
-                     this->radius);
-        this->circle_00 = create_corner_img(this, obj, 0, -1, -1);
-        this->circle_01 = create_corner_img(this, obj, 1, this->base.w - this->radius, -1);
-        this->circle_10 = create_corner_img(this, obj, 3, -1, this->base.h - this->radius);
-        this->circle_11 = create_corner_img(this, obj, 2, this->base.w - this->radius,
-                                            this->base.h - this->radius);
+                     this->radius + 1,  \
+                     this->base.h - this->radius - 1,
+                     this->base.w - 2 * (this->radius + 1), \
+                     this->radius + 1);
+
+        // Four corners: each is (radius+1) x (radius+1)
+        this->circle_00 = create_corner_img(this, obj, 0, 0, 0);
+        this->circle_01 = create_corner_img(this, obj, 1, this->base.w - this->radius - 1, 0);
+        this->circle_10 = create_corner_img(this, obj, 3, 0, this->base.h - this->radius - 1);
+        this->circle_11 = create_corner_img(this, obj, 2, this->base.w - this->radius - 1,
+                                            this->base.h - this->radius - 1);
     }
     last = this->checksum;
     this->checksum = 0;
@@ -300,7 +305,7 @@ static void gui_lite_round_rect_draw(gui_obj_t *obj)
     gui_lite_round_rect_t *this = (gui_lite_round_rect_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
-    // Draw all parts
+    // Draw all parts in order
     if (this->rect_0 != NULL) { gui_acc_blit_to_dc(this->rect_0, dc, NULL); }
     if (this->rect_1 != NULL) { gui_acc_blit_to_dc(this->rect_1, dc, NULL); }
     if (this->rect_2 != NULL) { gui_acc_blit_to_dc(this->rect_2, dc, NULL); }

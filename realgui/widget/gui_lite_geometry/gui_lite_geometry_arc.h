@@ -41,25 +41,32 @@ typedef struct
     gui_obj_t base;             /**< Base widget. */
 
     // Drawing resources
-    draw_img_t *draw_img;       /**< Drawing image object. */
-    uint8_t *block_buffer;      /**< Block buffer for tiled rendering. */
-    uint32_t block_buffer_size; /**< Block buffer size. */
-    bool use_block_drawing;     /**< Use block drawing mode. */
-    uint16_t block_cols;        /**< Number of block columns. */
-    uint16_t block_rows;        /**< Number of block rows. */
+    draw_img_t *draw_img;       /**< Drawing image object */
+    uint8_t *pixel_buffer;      /**< Cached pixel buffer */
+    uint32_t buffer_size;       /**< Buffer size */
+    bool buffer_valid;          /**< Buffer cache valid flag */
 
     // Drawing context
     DrawContext draw_ctx;       /**< Drawing context. */
     uint8_t opacity_value;      /**< Opacity value. */
 
     // Arc geometry data
-    int x;                      /**< Center X coordinate relative to widget. */
-    int y;                      /**< Center Y coordinate relative to widget. */
-    int radius;                 /**< Arc radius. */
-    float start_angle;          /**< Start angle in degrees. */
-    float end_angle;            /**< End angle in degrees. */
-    float line_width;           /**< Line width. */
-    uint32_t color;             /**< Arc color. */
+    int x;                      /**< Center X coordinate relative to widget */
+    int y;                      /**< Center Y coordinate relative to widget */
+    int radius;                 /**< Arc radius */
+    float start_angle;          /**< Start angle in degrees */
+    float end_angle;            /**< End angle in degrees */
+    float line_width;           /**< Line width */
+    gui_color_t color;             /**< Arc color (stored as uint32_t internally) */
+
+    // Cache for dirty checking
+    int cached_x;
+    int cached_y;
+    int cached_radius;
+    float cached_start_angle;
+    float cached_end_angle;
+    float cached_line_width;
+    gui_color_t cached_color;
 } gui_lite_arc_t;
 
 /*============================================================================*
@@ -71,28 +78,22 @@ typedef struct
  *                         Functions
  *============================================================================*/
 /**
- * @brief Create a new lite arc widget.
- * @param parent Parent widget or NULL for top-level widget.
- * @param name Name of the widget.
- * @return Pointer to the created lite arc widget.
+ * @brief Create a new lite arc widget
+ * @param parent Parent widget or NULL for top-level widget
+ * @param name Name of the widget
+ * @param x Center X coordinate
+ * @param y Center Y coordinate
+ * @param radius Arc radius
+ * @param start_angle Start angle in degrees
+ * @param end_angle End angle in degrees
+ * @param line_width Line width
+ * @param color Arc color
+ * @return Pointer to the created lite arc widget
  */
-gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name);
-
-/**
- * @brief Set style for lite arc widget.
- * @param this Pointer to the arc widget.
- * @param x Center X coordinate relative to widget.
- * @param y Center Y coordinate relative to widget.
- * @param radius Arc radius.
- * @param start_angle Start angle in degrees.
- * @param end_angle End angle in degrees.
- * @param line_width Line width.
- * @param color Arc color.
- */
-void gui_lite_arc_set_style(gui_lite_arc_t *this,
-                            int x, int y, int radius,
-                            float start_angle, float end_angle,
-                            float line_width, uint32_t color);
+gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name,
+                                    int x, int y, int radius,
+                                    float start_angle, float end_angle,
+                                    float line_width, gui_color_t color);
 
 /**
  * @brief Move arc geometry.
@@ -114,8 +115,7 @@ void gui_lite_arc_set_radius(gui_lite_arc_t *this, int radius);
  * @param this Pointer to the lite arc widget.
  * @param color Arc color.
  */
-void gui_lite_arc_set_color(gui_lite_arc_t *this, uint32_t color);
-
+void gui_lite_arc_set_color(gui_lite_arc_t *this, gui_color_t color);
 /**
  * @brief Set the start angle of the lite arc widget.
  * @param this Pointer to the lite arc widget.

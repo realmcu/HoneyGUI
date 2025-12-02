@@ -146,7 +146,6 @@ void create_watchface_number(gui_view_t *view)
         gui_img_set_mode(img_dot1, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img_dot1, true);
     }
-
     gui_obj_create_timer(GUI_BASE(win), 30000, true, time_update_cb);
     gui_obj_create_timer(GUI_BASE(win_dot0), 10, true, time_dot_cb);
     gui_obj_create_timer(GUI_BASE(win_dot1), 10, true, time_dot1_cb);

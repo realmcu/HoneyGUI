@@ -11,6 +11,7 @@
 #include "gui_list.h"
 #include "gui_view_instance.h"
 #include "gui_lite_geometry_round_rect.h"
+#include "gui_lite_geometry_arc.h"
 #include "gui_canvas.h"
 /*============================================================================*
  *                            Macros
@@ -70,8 +71,9 @@ static char *move_content = NULL;
 static char *ex_content = NULL;
 static char *stand_content = NULL;
 uint8_t battery_level = 0;
-uint8_t *img_data_battery = NULL;
 static gui_list_t *list = NULL;
+static gui_text_t *battery_text_widget = NULL;
+char battery_content[4] = "100";
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -84,11 +86,6 @@ static void clear_bottom_view(gui_view_t *view)
         gui_lower_free(img_data_activity);
         img_data_activity = NULL;
     }
-    if (img_data_battery)
-    {
-        gui_lower_free(img_data_battery);
-        img_data_battery = NULL;
-    }
     if (move_content)
     {
         gui_free(move_content);
@@ -98,6 +95,7 @@ static void clear_bottom_view(gui_view_t *view)
         ex_content = NULL;
         stand_content = NULL;
     }
+    battery_text_widget = NULL;
 }
 
 static void time_update_cb(void)
@@ -135,13 +133,18 @@ static void time_update_cb(void)
 static void draw_timecard(void *parent)
 {
     gui_win_t *win = gui_win_create(parent, __WIN1_NAME, 0, 0, SCREEN_WIDTH, 60);
-    gui_lite_round_rect_t *rect_timecard = gui_lite_round_rect_create(GUI_BASE(win), __WIN1_NAME, 35, 0,
-                                                                      340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
+    gui_img_t *rect_timecard = gui_img_create_from_mem(win, __WIN0_NAME, BOTTOM_TIME_CARD_BG_BIN, 35, 0,
+                                                       0, 0);
+    // gui_img_set_mode(rect_timecard, IMG_SRC_OVER_MODE);
+    // gui_lite_round_rect_t *rect_timecard = gui_lite_round_rect_create(GUI_BASE(win), __WIN1_NAME, 35, 0,
+    //                                                                   340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
     // text
     gui_text_t *timecard_date_text = gui_text_create(rect_timecard, "date_s",  15, 20, 0, 0);
     gui_text_set(timecard_date_text, (void *)date_timecard_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_timecard_content),
                  32);
+
+
     gui_text_type_set(timecard_date_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_date_text, LEFT);
 
@@ -231,13 +234,38 @@ static int steps_to_calories(int steps)
 {
     return (int)(steps * 0.04f);
 }
-static void arc_activity_cb(NVGcontext *vg)
+// Update activity arcs with new data
+static void update_activity_arcs(void *obj)
 {
+    GUI_UNUSED(obj);
+
+    // Simulated data for testing (remove when real data is available)
+    static int sim_move = 0;
+    static int sim_ex = 0;
+    static int sim_stand = 0;
+    static int sim_direction = 1;
+
     cJSON *root;
     extern char *cjson_content;
+
+    int move_steps = 0;
+    int ex_minutes = 0;
+    int stand_hours = 0;
+
     if (!cjson_content)
     {
-        return;
+        // Use simulated data when no JSON available
+        sim_move += sim_direction * 50;
+        sim_ex += sim_direction * 2;
+        sim_stand += sim_direction * 1;
+
+        if (sim_move >= 8000 || sim_move <= 0) { sim_direction *= -1; }
+
+        move_steps = sim_move;
+        ex_minutes = sim_ex;
+        stand_hours = sim_stand;
+
+        gui_log("Using simulated data: move=%d, ex=%d, stand=%d\n", move_steps, ex_minutes, stand_hours);
     }
     else
     {
@@ -247,127 +275,124 @@ static void arc_activity_cb(NVGcontext *vg)
             gui_log("Error parsing JSON!\r\n");
             return;
         }
-    }
-    // parse activity array
-    cJSON *activity_array = cJSON_GetObjectItemCaseSensitive(root, "activity");
-    if (cJSON_IsArray(activity_array))
-    {
-        cJSON *act = cJSON_GetArrayItem(activity_array, 0);
-        if (!act)
+
+        // parse activity array
+        cJSON *activity_array = cJSON_GetObjectItemCaseSensitive(root, "activity");
+        if (cJSON_IsArray(activity_array))
         {
-            gui_log("get activity_array unsuccessful\n");
+            cJSON *act = cJSON_GetArrayItem(activity_array, 0);
+            if (!act)
+            {
+                gui_log("get activity_array unsuccessful\n");
+                cJSON_Delete(root);
+                return;
+            }
+            else
+            {
+                cJSON *move = cJSON_GetObjectItemCaseSensitive(act, "move");
+                cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "exercise");
+                cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
+
+                move_steps = move ? move->valueint : 0;
+                ex_minutes = ex ? ex->valueint : 0;
+                stand_hours = stand ? stand->valueint : 0;
+            }
+        }
+        cJSON_Delete(root);
+    }
+
+    int calories = steps_to_calories(move_steps);
+
+    // Update move arc (outer ring) - starts from -90° (top), goes clockwise
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_move, "arc_move", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    if (arc_move)
+    {
+        float progress = (float)calories / 500.0f;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float move_angle = -90.0f + 360.0f * progress;
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_move, move_angle);
+    }
+
+    // Update exercise arc (middle ring)
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_ex, "arc_ex", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    if (arc_ex)
+    {
+        float progress = (float)ex_minutes / 60.0f;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float ex_angle = -90.0f + 360.0f * progress;
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_ex, ex_angle);
+    }
+
+    // Update stand arc (inner ring)
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_stand, "arc_stand", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    if (arc_stand)
+    {
+        float progress = (float)stand_hours / 6.0f;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float stand_angle = -90.0f + 360.0f * progress;
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_stand, stand_angle);
+    }
+
+    // Update text labels
+    {
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+        sprintf(move_content, "%d/500 kcol",  calories);
+        gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
+    }
+    {
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(ex_text, "ac_ex", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+        sprintf(ex_content, "%d/60 min", ex_minutes);
+        gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
+    }
+    {
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "ac_stand", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+        sprintf(stand_content, "%d/6 h", stand_hours);
+        gui_text_content_set((gui_text_t *)stand_text, stand_content, strlen(stand_content));
+    }
+}
+// Update battery arc with current level
+static void update_battery_arc(void *obj)
+{
+    GUI_UNUSED(obj);
+
+    // Simulate battery level changes for demo
+    static int sim_battery = 75;
+    static int sim_direction = -1;
+
+    sim_battery += sim_direction;
+    if (sim_battery <= 10 || sim_battery >= 100) { sim_direction *= -1; }
+
+    battery_level = sim_battery;
+
+    // Update battery arc
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_battery, "arc_battery",
+                                    gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    if (arc_battery)
+    {
+        float progress = (float)battery_level / 100.0f;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float battery_angle = -90.0f + 360.0f * progress;
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_battery, battery_angle);
+
+        // Change color based on battery level
+        gui_color_t color;
+        if (battery_level < 20)
+        {
+            color = gui_rgba(255, 59, 48, 255); // Red for low battery
         }
         else
         {
-            cJSON *move = cJSON_GetObjectItemCaseSensitive(act, "move");
-            cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "exercise");
-            cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
-
-            int calories = steps_to_calories(move->valueint);
-            nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI_F / 2,
-                   M_PI_F * 3.5f, NVG_CW);
-            nvgStrokeWidth(vg, 8);
-            nvgStrokeColor(vg, nvgRGB(58, 23, 29));
-            nvgStroke(vg);
-            nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI_F / 2,
-                   M_PI_F * (1.5f + 2.0f * calories / 500.0f), NVG_CW);  // cap 500 kcol
-            nvgStrokeWidth(vg, 8);
-            nvgStrokeColor(vg, nvgRGB(230, 67, 79));
-            nvgStroke(vg);
-
-            nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI_F / 2,
-                   M_PI_F * 3.5f, NVG_CW);
-            nvgStrokeWidth(vg, 8);
-            nvgStrokeColor(vg, nvgRGB(30, 55, 25));
-            nvgStroke(vg);
-            nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI_F / 2,
-                   M_PI_F * (1.5f + 2.0f * ex->valueint / 60.0f), NVG_CW);  // cap 60 min.
-            nvgStrokeWidth(vg, 8);
-            nvgStrokeColor(vg, nvgRGB(186, 253, 79));
-            nvgStroke(vg);
-
-            nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI_F / 2,
-                   M_PI_F * 3.5f, NVG_CW);
-            nvgStrokeWidth(vg, 8);
-            nvgStrokeColor(vg, nvgRGB(22, 50, 47));
-            nvgStroke(vg);
-            nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI_F / 2,
-                   M_PI_F * (1.5f + 2.0f * stand->valueint / 6.0f), NVG_CW); // cap 30 times
-            nvgStrokeWidth(vg, 8);
-            nvgStrokeColor(vg, nvgRGB(117, 230, 229));
-            nvgStroke(vg);
-
-            {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", gui_view_get_current());
-                sprintf(move_content, "%d/500 kcol",  calories);
-                gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
-            }
-            {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(ex_text, "ac_ex", gui_view_get_current());
-                sprintf(ex_content, "%d/60 min", ex->valueint);
-                gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
-            }
-            {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "ac_stand", gui_view_get_current());
-                sprintf(stand_content, "%d/6 h", stand->valueint);
-                gui_text_content_set((gui_text_t *)stand_text, stand_content, strlen(stand_content));
-            }
+            color = gui_rgba(52, 199, 89, 255); // Green for normal
         }
+        gui_lite_arc_set_color((gui_lite_arc_t *)arc_battery, color);
     }
-    // clear
-    cJSON_Delete(root);
-}
-static void draw_battery_arc(NVGcontext *vg)
-{
-    float cx = 45.0f;
-    float cy = 45.0f;
-    float outer_radius = 39.6f;
-    // float inner_radius = 32.4f;
-    float stroke_width = 7.2f;
-    battery_level = 75;
 
-    nvgBeginPath(vg);
-    nvgCircle(vg, cx, cy, outer_radius);
-    nvgFillColor(vg, nvgRGBA(50, 50, 50, 255));
-    nvgFill(vg);
-
-    nvgBeginPath(vg);
-    nvgCircle(vg, cx, cy, outer_radius);
-    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 255));
-    nvgStrokeWidth(vg, stroke_width);
-    nvgStroke(vg);
-
-    nvgBeginPath(vg);
-    nvgArc(vg, cx, cy, outer_radius - stroke_width / 2, 0, 2 * M_PI_F, NVG_CW);
-
-    nvgStrokeColor(vg, battery_level < 10 ? nvgRGBA(255, 0, 0, 80) : nvgRGBA(0, 200, 0, 80));
-    nvgStrokeWidth(vg, stroke_width);
-    nvgStroke(vg);
-
-    float start_angle = -M_PI_F / 2;
-    float sweep_angle = (battery_level / 100.0f) * 2 * M_PI_F;
-
-    nvgBeginPath(vg);
-    nvgArc(vg, cx, cy, outer_radius - stroke_width / 2, start_angle, start_angle + sweep_angle, NVG_CW);
-
-
-    if (battery_level < 10.0f)
+    // Update battery text using saved widget pointer
+    if (battery_text_widget)
     {
-        nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 255));
+        sprintf(battery_content, "%d", battery_level);
+        gui_text_content_set(battery_text_widget, battery_content, strlen(battery_content));
     }
-    else
-    {
-        nvgStrokeColor(vg, nvgRGBA(0, 200, 0, 255));
-    }
-
-    nvgStrokeWidth(vg, stroke_width);
-    nvgStroke(vg);
 }
 static void note_design(gui_obj_t *obj, void *p)
 {
@@ -389,8 +414,11 @@ static void note_design(gui_obj_t *obj, void *p)
         // note_activity
         {
 
-            gui_lite_round_rect_t *rect_activity = gui_lite_round_rect_create(GUI_BASE(obj), "note_ac",
-                                                                              offset_X, 0, 352, 157, 20, gui_rgba(98, 101, 98, 255 * 0.7));
+            gui_img_t *rect_activity = gui_img_create_from_mem(obj, "note_ac", BOTTOM_TAB_BG_BIN, offset_X, 0,
+                                                               0,
+                                                               0);
+            gui_img_set_mode(rect_activity, IMG_SRC_OVER_MODE);
+
             if (move_content == NULL)
             {
                 move_content = (char *)gui_malloc(30);
@@ -418,84 +446,107 @@ static void note_design(gui_obj_t *obj, void *p)
                          strlen(stand_content), 24);
             gui_text_type_set(stand_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(stand_text, LEFT);
-            // activity icon
+            // activity arcs using gui_lite_arc
             {
-                int image_h = 100;
-                int image_w = 100;
-                int pixel_bytes = 4;
-                size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-                if (!img_data_activity)
-                {
-                    img_data_activity = gui_lower_malloc(buffer_size);
-                }
-                memset(img_data_activity, 0, buffer_size);
-                gui_img_t *img = gui_img_create_from_mem(rect_activity, "activity", img_data_activity, 17, 28, 0,
-                                                         0);
-                img->base.w = image_w;
-                img->base.h = image_h;
-                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-                gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb,
-                                                  img_data_activity);
+                int center_x = 17 + 50;  // Local coordinates relative to rect_activity
+                int center_y = 26 + 50;
+
+                // Background arcs (subtle dark colors) - full circles
+                // Move ring background: deep red-brown
+                gui_lite_arc_create(rect_activity, "arc_move_bg",
+                                    center_x, center_y, 42, 0, 360, 8, gui_rgba(45, 20, 25, 255));
+
+                // Exercise ring background: deep green
+                gui_lite_arc_create(rect_activity, "arc_ex_bg",
+                                    center_x, center_y, 29, 0, 360, 8, gui_rgba(20, 40, 20, 255));
+
+                // Stand ring background: deep cyan
+                gui_lite_arc_create(rect_activity, "arc_stand_bg",
+                                    center_x, center_y, 17, 0, 360, 8, gui_rgba(18, 35, 40, 255));
+
+                // Foreground arcs (vibrant Apple Watch colors)
+                // Start from -90° (top) for Apple Watch style
+                // Move ring: bright pink-red (Apple's signature Move color)
+                gui_lite_arc_create(rect_activity, "arc_move",
+                                    center_x, center_y, 42, -90, -90, 8, gui_rgba(250, 50, 90, 255));
+
+                // Exercise ring: bright lime green (Apple's Exercise color)
+                gui_lite_arc_create(rect_activity, "arc_ex",
+                                    center_x, center_y, 29, -90, -90, 8, gui_rgba(160, 250, 80, 255));
+
+                // Stand ring: bright cyan (Apple's Stand color)
+                gui_lite_arc_create(rect_activity, "arc_stand",
+                                    center_x, center_y, 17, -90, -90, 8, gui_rgba(80, 220, 240, 255));
+
+                // Create timer to update arcs
+                gui_obj_create_timer(GUI_BASE(rect_activity), 1000, true, update_activity_arcs);
             }
             gui_obj_add_event_cb(rect_activity, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
     }
     else if (index == 2)
     {
-        gui_lite_round_rect_t *rect_app = gui_lite_round_rect_create(GUI_BASE(obj), "APP_CANVAS", offset_X,
-                                                                     0, 352, 157, 20, gui_rgba(98, 101, 98, 255 * 0.7));
+        gui_img_t *rect_app = gui_img_create_from_mem(obj, "APP_CANVAS", BOTTOM_TAB_BG_BIN, offset_X, 0, 0,
+                                                      0);
+        gui_img_set_mode(rect_app, IMG_SRC_OVER_MODE);
         // Information Statistics Quick Bar
-        //music
+        int item_size = 85;
+        int item_y = 36;  // Vertical position
+        int left_margin = 20;
+        int spacing = 28;
+
+        //music (left item)
         {
-            gui_img_t *img = gui_img_create_from_mem(rect_app, "MUSIC", APP_MUSIC_ICON_BIN, 17, 28,
-                                                     0, 0);
+            int music_x = left_margin;
+            gui_img_t *img = gui_img_create_from_mem(rect_app, "MUSIC", APP_MUSIC_ICON_BIN, music_x, item_y, 0,
+                                                     0);
             gui_img_scale(img, 0.85, 0.85);
             gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
-        //battery
+
+        //battery (center item)
         {
-            battery_level = 75;
+            // battery_level = 75;
 
-            int image_h = 100;
-            int image_w = 100;
-            int pixel_bytes = 4;
-            size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+            int battery_x = left_margin + item_size + spacing;
 
-            if (!img_data_battery)
-            {
-                img_data_battery = gui_lower_malloc(buffer_size);
-            }
-            memset(img_data_battery, 0, buffer_size);
+            // Battery arcs using gui_lite_arc
+            int center_x = battery_x + item_size / 2;  // Center of 100x100 area
+            int center_y = item_y + item_size / 2;
+            float radius = 36.0f;
+            float line_width = 7.0f;
 
+            // Background arc (dark gray) - full circle
+            gui_lite_arc_t *arc_battery_bg = gui_lite_arc_create(rect_app, "BATTERY",
+                                                                 center_x, center_y, (int)radius, 0, 360, line_width, gui_rgba(40, 40, 40, 255));
 
+            // Foreground arc (green for normal battery)
+            gui_lite_arc_t *arc_battery = gui_lite_arc_create(rect_app, "arc_battery",
+                                                              center_x, center_y, (int)radius, -90, -90, line_width, gui_rgba(52, 199, 89, 255));
 
-            gui_img_t *img_battery = gui_img_create_from_mem(rect_app, "BATTERY", img_data_battery, 17 + 109,
-                                                             28, 0, 0);
-
-            img_battery->base.w = image_w;
-            img_battery->base.h = image_h;
-
-            gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_battery_arc,
-                                              img_data_battery);
-            gui_img_set_mode(img_battery, IMG_SRC_OVER_MODE);
-
-            char battery_content[3];
-
+            // Battery percentage text (centered in the circle)
+            // Text is mounted under arc_battery, coordinates are relative to arc widget's origin
             sprintf(battery_content, "%d", battery_level);
 
-            gui_text_t *battery_text = gui_text_create(rect_app, "battery_text", 145, 42, 0, 0);
-            gui_text_set(battery_text, "75", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(battery_content), 50);
-            gui_text_type_set(battery_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
-            gui_text_mode_set(battery_text, LEFT);
+            // Position text to center it in the 100x100 area
+            // Text position relative to arc widget origin (left-aligned)
+            battery_text_widget = gui_text_create(arc_battery, "battery_text", 20, 13, 0, 0);
+            gui_text_set(battery_text_widget, battery_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+                         strlen(battery_content), 50);
+            gui_text_type_set(battery_text_widget, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_mode_set(battery_text_widget, LEFT);
 
-            gui_obj_add_event_cb(img_battery, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+            // Create timer to update battery arc
+            gui_obj_create_timer(GUI_BASE(rect_app), 1000, true, update_battery_arc);
+
+            gui_obj_add_event_cb(arc_battery_bg, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
-        //message
-        {
 
-            gui_img_t *img = gui_img_create_from_mem(rect_app, "MESSAGE", APP_MESSAGE_ICON_BIN, 17 + 109 * 2,
-                                                     28, 0,
-                                                     0);
+        //message (right item)
+        {
+            int message_x = left_margin + (item_size + spacing) * 2;
+            gui_img_t *img = gui_img_create_from_mem(rect_app, "MESSAGE", APP_MESSAGE_ICON_BIN, message_x,
+                                                     item_y, 0, 0);
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             gui_img_scale(img, 0.85, 0.85);
             // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -503,8 +554,10 @@ static void note_design(gui_obj_t *obj, void *p)
     }
     else if (index == 3)
     {
-        gui_lite_round_rect_t *rect_menu_bg = gui_lite_round_rect_create(obj, "APP_MENU", 76, 0, 258, 76,
-                                                                         38, gui_rgba(98, 101, 98, 255 * 0.7));
+        gui_img_t *rect_menu_bg = gui_img_create_from_mem(obj, "APP_MENU", BOTTOM_LIST_MENU_BG_BIN, 76, 0,
+                                                          0,
+                                                          0);
+        gui_img_set_mode(rect_menu_bg, IMG_SRC_OVER_MODE);
         gui_text_t *text = gui_text_create(rect_menu_bg, 0, 70, 20, 0, 0);
         gui_text_set(text, "APP MENU", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("APP MENU"), 32);
         gui_text_type_set(text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);

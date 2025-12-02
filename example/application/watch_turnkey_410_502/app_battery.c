@@ -7,14 +7,12 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "tp_algo.h"
-#include "gui_canvas.h"
-#include "gui_canvas_rect.h"
-#include "gui_canvas_round_rect.h"
 #include "guidef.h"
 #include "gui_list.h"
 #include "app_main_watch.h"
 #include "gui_view_instance.h"
 #include "gui_lite_geometry_round_rect.h"
+#include "gui_lite_geometry_arc.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -34,14 +32,14 @@ static void battery_design(gui_view_t *view);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-// static gui_img_t *img_battery = NULL;
-static uint8_t *img_data_battery = NULL;
-// static gui_text_t *img_battery_text = NULL;
 extern uint8_t battery_level;
+extern char battery_content[4];
+static gui_text_t *battery_remain_text = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
 GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, battery_design, NULL);
+
 static void time_update_cb(void *p)
 {
     GUI_UNUSED(p);
@@ -55,54 +53,50 @@ static void time_update_cb(void *p)
             GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", gui_view_get_current());
             gui_text_content_set((gui_text_t *)t_time, time_str, strlen(time_str));
         }
-
     }
 }
-static void draw_battery_arc(NVGcontext *vg)
+
+static void update_battery_display(void *obj)
 {
-    float cx = SCREEN_WIDTH / 2.0f;
-    float cy = SCREEN_HEIGHT / 2.0f;
-    float outer_radius = 100.0f;
-    // float inner_radius = 32.4f;
-    float stroke_width = 24.0f;
-    battery_level = 75;
+    GUI_UNUSED(obj);
 
-    nvgBeginPath(vg);
-    nvgCircle(vg, cx, cy, outer_radius);
-    nvgFillColor(vg, nvgRGBA(50, 50, 50, 255));
-    nvgFill(vg);
-
-    nvgBeginPath(vg);
-    nvgCircle(vg, cx, cy, outer_radius);
-    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 255));
-    nvgStrokeWidth(vg, stroke_width);
-    nvgStroke(vg);
-
-    nvgBeginPath(vg);
-    nvgArc(vg, cx, cy, outer_radius - stroke_width / 2, 0, 2 * M_PI_F, NVG_CW);
-
-    nvgStrokeColor(vg, battery_level < 10 ? nvgRGBA(255, 0, 0, 80) : nvgRGBA(0, 200, 0, 80));
-    nvgStrokeWidth(vg, stroke_width);
-    nvgStroke(vg);
-
-    float start_angle = -M_PI_F / 2;
-    float sweep_angle = (battery_level / 100.0f) * 2 * M_PI_F;
-
-    nvgBeginPath(vg);
-    nvgArc(vg, cx, cy, outer_radius - stroke_width / 2, start_angle, start_angle + sweep_angle, NVG_CW);
-
-
-    if (battery_level < 10.0f)
+    // Update battery arc
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_battery, "arc_battery",
+                                    gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    if (arc_battery)
     {
-        nvgStrokeColor(vg, nvgRGBA(200, 0, 0, 255));
-    }
-    else
-    {
-        nvgStrokeColor(vg, nvgRGBA(0, 200, 0, 255));
+        float progress = (float)battery_level / 100.0f;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float battery_angle = -90.0f + 360.0f * progress;
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_battery, battery_angle);
+
+        // Change color based on battery level
+        gui_color_t color;
+        if (battery_level < 20)
+        {
+            color = gui_rgba(255, 59, 48, 255); // Red for low battery
+        }
+        else
+        {
+            color = gui_rgba(52, 199, 89, 255); // Green for normal
+        }
+        gui_lite_arc_set_color((gui_lite_arc_t *)arc_battery, color);
     }
 
-    nvgStrokeWidth(vg, stroke_width);
-    nvgStroke(vg);
+    // Update battery percentage text
+    if (battery_remain_text)
+    {
+        sprintf(battery_content, "%d", battery_level);
+        gui_text_content_set(battery_remain_text, battery_content, strlen(battery_content));
+    }
+
+    // Update battery title color
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(sport_text, "ac_text1", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    if (sport_text)
+    {
+        gui_color_t title_color = battery_level < 20 ? gui_rgb(200, 0, 0) : gui_rgb(0, 200, 0);
+        gui_text_color_set((gui_text_t *)sport_text, title_color);
+    }
 }
 // static void battery_press_cb(void *p)
 // {
@@ -138,43 +132,53 @@ static void battery_design(gui_view_t *view)
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer(GUI_BASE(view), 30000, true, time_update_cb);
 
+    gui_color_t title_color = battery_level < 20 ? gui_rgb(200, 0, 0) : gui_rgb(0, 200, 0);
     gui_text_t *sport_text = gui_text_create(parent, "ac_text1",  -40, 60, 0, 0);
-    gui_text_set(sport_text, "Battery", GUI_FONT_SRC_TTF, gui_rgb(0, 200, 0),
+    gui_text_set(sport_text, "Battery", GUI_FONT_SRC_TTF, title_color,
                  strlen("Battery"), 42);
-    if (battery_level < 10)
-    {
-        gui_text_set(sport_text, "Battery", GUI_FONT_SRC_TTF, gui_rgb(200, 0, 0),
-                     strlen("Battery"), 42);
-    }
     gui_text_type_set(sport_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(sport_text, RIGHT);
 
+    // Battery arc display using gui_lite_arc
     {
-        int image_h = 400;
-        int image_w = 350;
-        int pixel_bytes = 4;
-        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        int center_x = SCREEN_WIDTH / 2;
+        int center_y = 220;
+        float radius = 100.0f;
+        float line_width = 24.0f;
 
-        if (!img_data_battery)
-        {
-            img_data_battery = gui_lower_malloc(buffer_size);
-        }
-        memset(img_data_battery, 0, buffer_size);
+        // Background arc (dark gray) - full circle
+        gui_lite_arc_create(parent, "arc_battery_bg",
+                            center_x, center_y, (int)radius, 0, 360, line_width, gui_rgba(50, 50, 50, 255));
 
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_battery_arc,
-                                          img_data_battery);
-        gui_img_t *img_battery = gui_img_create_from_mem(parent, "BATTERY", img_data_battery, 0,
-                                                         0, 0, 0);
-        gui_img_set_mode(img_battery, IMG_SRC_OVER_MODE);
+        // Foreground arc (green for normal battery, red for low)
+        gui_color_t arc_color = battery_level < 20 ? gui_rgba(255, 59, 48, 255) : gui_rgba(52, 199, 89,
+                                255);
+        float progress = (float)battery_level / 100.0f;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float battery_angle = -90.0f + 360.0f * progress;
 
-        // char battery_content[2];
+        gui_lite_arc_create(parent, "arc_battery",
+                            center_x, center_y, (int)radius, -90, battery_angle, line_width, arc_color);
 
-        // sprintf(battery_content, "%d", battery_level);
-
-        gui_text_t *battery_remain_text = gui_text_create(parent, "battery_remain_text", 150, 210, 0, 0);
-        gui_text_set(battery_remain_text, "75%", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("75%"), 65);
+        // Battery percentage text (centered in the circle)
+        // Use the global battery_content buffer from bottom_view
+        sprintf(battery_content, "%d", battery_level);
+        battery_remain_text = gui_text_create(parent, "battery_remain_text", center_x - 60, center_y - 40,
+                                              0, 0);
+        gui_text_set(battery_remain_text, battery_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+                     strlen(battery_content), 85);
         gui_text_type_set(battery_remain_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(battery_remain_text, LEFT);
+
+        // Add "%" unit text next to the number
+        gui_text_t *battery_unit_text = gui_text_create(parent, "battery_unit_text", center_x + 25,
+                                                        center_y - 40, 0, 0);
+        gui_text_set(battery_unit_text, "%", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("%"), 85);
+        gui_text_type_set(battery_unit_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(battery_unit_text, LEFT);
+
+        // Create timer to update battery display
+        gui_obj_create_timer(parent, 1000, true, update_battery_display);
     }
     {
         gui_lite_round_rect_t *battery_rect = gui_lite_round_rect_create(parent, "battery_rect", 35, 400,

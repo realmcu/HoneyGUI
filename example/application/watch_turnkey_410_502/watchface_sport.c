@@ -301,4 +301,3 @@ void create_watchface_sport(gui_view_t *view)
     }
     gui_obj_create_timer(GUI_BASE(win), 500, true, time_update_cb);
 }
-

@@ -118,7 +118,7 @@ static void music_ctr_design(gui_view_t *view)
                          GUI_EVENT_TOUCH_CLICKED, NULL);
 
     {
-        img_music_ctr = gui_img_create_from_mem(parent, "img_music_ctr", PLAY_BIN, 180, 410, 0, 0);
+        img_music_ctr = gui_img_create_from_mem(parent, "img_music_ctr", PLAY_BIN, 180, 415, 0, 0);
         gui_obj_add_event_cb(GUI_BASE(img_music_ctr), (gui_event_cb_t)music_ctr_press_cb,
                              GUI_EVENT_TOUCH_CLICKED, NULL);
 
