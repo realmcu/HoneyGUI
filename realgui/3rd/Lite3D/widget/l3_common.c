@@ -886,6 +886,7 @@ bool l3_calulate_draw_img_target_area(l3_draw_rect_img_t *img, l3_rect_t *rect)
 
 void *(*l3_malloc_imp)(size_t size) = NULL;
 void (*l3_free_imp)(void *ptr) = NULL;
+uint32_t (*l3_get_time_ms_imp)(void) = NULL;
 
 void *l3_malloc(size_t size)
 {
@@ -903,5 +904,13 @@ void l3_free(void *ptr)
         return;
     }
     free(ptr);
+}
+uint32_t l3_get_time_ms(void)
+{
+    if (l3_get_time_ms_imp != NULL)
+    {
+        return l3_get_time_ms_imp();
+    }
+    return 0;
 }
 

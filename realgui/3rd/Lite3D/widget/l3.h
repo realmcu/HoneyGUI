@@ -57,7 +57,7 @@ typedef void (*l3_face_transform_cb)(l3_model_base_t *__this,
                                      size_t face_index/*face offset*/);
 
 
-typedef struct l3_model_base
+struct l3_model_base
 {
     // operation interface
     const l3_model_ops_t *ops;
@@ -76,9 +76,9 @@ typedef struct l3_model_base
 
     void *raw_data_from_ftl;
 
-} l3_model_base_t;
+};
 
-typedef struct l3_model_ops
+struct l3_model_ops
 {
     void (*push)(l3_model_base_t *this);
     void (*draw)(l3_model_base_t *this);
@@ -91,7 +91,7 @@ typedef struct l3_model_ops
     void (*set_face_image)(l3_model_base_t *this, uint8_t face_index, void *image_addr);
     bool (*on_click)(l3_model_base_t *this, int16_t x, int16_t y);
 
-} l3_model_ops_t;
+};
 
 
 /*============================================================================*
@@ -217,6 +217,7 @@ char *l3_version(void);
 
 extern void *(*l3_malloc_imp)(size_t size);
 extern void (*l3_free_imp)(void *ptr);
+extern uint32_t (*l3_get_time_ms_imp)(void);
 extern void (*l3_draw_tria_to_canvas_imp)(l3_draw_tria_img_t *image,
                                           l3_draw_rect_img_t *combined_image, float *zbuffer);
 extern void (*l3_draw_rect_img_to_canvas_imp)(l3_draw_rect_img_t *image, l3_canvas_t *dc,

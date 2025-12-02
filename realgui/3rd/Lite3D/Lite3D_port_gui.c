@@ -31,6 +31,10 @@ void l3_port_free(void *ptr)
 {
     gui_free(ptr);
 }
+uint32_t l3_port_time_ms_get(void)
+{
+    return gui_ms_get();
+}
 
 void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
                                      l3_rect_t *rect)
@@ -49,6 +53,7 @@ int l3_init(void)
     l3_malloc_imp = l3_port_malloc;
     l3_free_imp = l3_port_free;
     l3_draw_rect_img_to_canvas_imp = l3_port_draw_rect_img_to_canvas;
+    l3_get_time_ms_imp = l3_port_time_ms_get;
     gui_log("Lite3D port initialized\n");
     return 0;
 }

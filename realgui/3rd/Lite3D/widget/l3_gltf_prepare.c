@@ -25,7 +25,6 @@
 #include "l3_tria_raster.h"
 #include "l3_rect_raster.h"
 #include "l3_gltf.h"
-#include "gui_api.h"
 
 // Vector Linear Interpolation
 static void lerp_vector(l3_3d_point_t *out, const l3_3d_point_t *start, const l3_3d_point_t *end,
@@ -461,7 +460,7 @@ void l3_gltf_prepare(l3_gltf_model_t *_this)
     if (_this->desc->animation != NULL)
     {
         // Calculate delta time
-        uint32_t current_time_ms = gui_ms_get();
+        uint32_t current_time_ms = l3_get_time_ms();
         float dt = (_this->last_time_ms > 0) ? ((current_time_ms - _this->last_time_ms) / 1000.0f) : 0.0f;
         _this->last_time_ms = current_time_ms;
         l3_gltf_update_animation(_this, dt);
