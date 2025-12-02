@@ -120,13 +120,13 @@ void *sdl_driver_thread(void *arg)
 #endif
             }
         case SDL_MOUSEMOTION:
-            gui_log("mouse move:(%d,%d)\n", event.button.x, event.button.y);
+            // gui_log("mouse move:(%d,%d)\n", event.button.x, event.button.y);
             tp_port_data.x_coordinate = event.button.x;
             tp_port_data.y_coordinate = event.button.y;
             break;
         case SDL_MOUSEBUTTONDOWN:
             {
-                gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
+                // gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
                 tp_port_data.event = GUI_TOUCH_EVENT_DOWN;
@@ -140,7 +140,7 @@ void *sdl_driver_thread(void *arg)
             break;
         case SDL_MOUSEBUTTONUP:
             {
-                gui_log("mouse up:(%d,%d)\n", event.button.x, event.button.y);
+                // gui_log("mouse up:(%d,%d)\n", event.button.x, event.button.y);
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
                 tp_port_data.event = GUI_TOUCH_EVENT_UP;
