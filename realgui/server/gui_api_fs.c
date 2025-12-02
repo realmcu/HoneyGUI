@@ -157,23 +157,7 @@ char *gui_strdup(const char *s)
     return tmp;
 }
 
-char *gui_filepath_transforming(void *addr)
-{
-    // simulator on WIN32: address transforming and check existence
-    char *path = gui_malloc(strlen(addr) + strlen(GUI_ROOT_FOLDER) + 1);
-    GUI_ASSERT(path != NULL);
-    sprintf(path, "%s%s", GUI_ROOT_FOLDER, (char *)addr);
-    // check existence
-    FILE *fd = fopen(path, "r");
-    if (!fd)
-    {
-        gui_log("file not exist\n");
-        gui_free(path);
-        return NULL;
-    }
-    fclose(fd);
-    return path;
-}
+
 const char *gui_get_path_by_relative(const char *relative_path)
 {
     char *path = gui_malloc(strlen(relative_path) + strlen(GUI_ROOT_FOLDER) + 1);

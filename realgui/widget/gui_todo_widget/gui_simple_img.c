@@ -204,11 +204,6 @@ static void gui_simple_img_destroy(gui_obj_t *obj)
 
     if (this->src_mode == IMG_SRC_FILESYS)
     {
-#ifdef _WIN32
-        // free path transforming memory on win
-        gui_free(this->filename);
-        this->filename = NULL;
-#endif
     }
 }
 
@@ -275,9 +270,6 @@ static void gui_simple_img_ctor(gui_simple_img_t     *this,
 
     if (this->src_mode == IMG_SRC_FILESYS)
     {
-#ifdef _WIN32
-        path = gui_filepath_transforming(path);
-#endif
         this->data = (void *)path;
         this->filename = (void *)path;
     }

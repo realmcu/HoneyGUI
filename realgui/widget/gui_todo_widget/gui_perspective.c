@@ -290,10 +290,6 @@ static void gui_perspective_destroy(gui_obj_t *obj)
     {
         if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
-#ifdef _WIN32
-            // free path transforming memory on win
-            gui_free(this->file_path[i]);
-#endif
             this->file_path[i] = NULL;
         }
     }
@@ -360,9 +356,6 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
         if (img_file->src_mode[i] == IMG_SRC_FILESYS)
         {
             path = array[i];
-#ifdef _WIN32
-            path = gui_filepath_transforming(array[i]);
-#endif
             this->file_path[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
@@ -405,9 +398,6 @@ void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_img
         // reset file data
         if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
-#ifdef _WIN32
-            gui_free(this->file_path[i]);
-#endif
             this->file_path[i] = NULL;
             this->data[i] = NULL;
         }
@@ -417,9 +407,6 @@ void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_img
         if (img_file->src_mode[i] == IMG_SRC_FILESYS)
         {
             path = (void *)img_file->img_path[i];
-#ifdef _WIN32
-            path = gui_filepath_transforming(path);
-#endif
             this->file_path[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)

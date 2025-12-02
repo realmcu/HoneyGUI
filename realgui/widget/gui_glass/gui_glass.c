@@ -579,9 +579,6 @@ static void gui_glass_ctor(gui_glass_t            *_this,
     _this->history_y = obj->y;
     if (storage_type == IMG_SRC_FILESYS)
     {
-#ifdef _WIN32
-        path = gui_filepath_transforming(path);
-#endif
         _this->data = (void *)path;
         _this->filename = (void *)path;
     }

@@ -276,11 +276,6 @@ static void gui_img_scope_img_destroy(gui_obj_t *obj)
     //gui_log("do obj %s free\n", obj->name);
     if (this->src_mode == IMG_SRC_FILESYS)
     {
-#ifdef _WIN32
-        // free path transforming memory on win
-        gui_free(this->filename);
-        this->filename = NULL;
-#endif
     }
 }
 
@@ -339,9 +334,6 @@ void gui_img_scope_ctor(gui_img_t  *this,
     this->src_mode = src_mode;
     if (this->src_mode == IMG_SRC_FILESYS)
     {
-#ifdef _WIN32
-        addr = gui_filepath_transforming(addr);
-#endif
         this->data = (void *)addr;
         this->filename = (void *)addr;
     }

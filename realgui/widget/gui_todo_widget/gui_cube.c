@@ -437,10 +437,6 @@ static void gui_cube_destroy(gui_obj_t *obj)
     {
         if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
-#ifdef _WIN32
-            // free path transforming memory on win
-            gui_free(this->filename[i]);
-#endif
             this->filename[i] = NULL;
         }
     }
@@ -511,9 +507,6 @@ static void gui_cube_ctor(gui_cube_t         *this,
         if (img_file->src_mode[i] == IMG_SRC_FILESYS)
         {
             char *path = img_path[i];
-#ifdef _WIN32
-            path = gui_filepath_transforming(path);
-#endif
             this->filename[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
@@ -657,9 +650,6 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
         // reset file data
         if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
-#ifdef _WIN32
-            gui_free(this->filename[i]);
-#endif
             this->filename[i] = NULL;
             this->data[i] = NULL;
         }
@@ -669,9 +659,6 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
         if (img_file->src_mode[i] == IMG_SRC_FILESYS)
         {
             char *path = img_path[i];
-#ifdef _WIN32
-            path = gui_filepath_transforming(path);
-#endif
             this->filename[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
