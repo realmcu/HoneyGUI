@@ -64,18 +64,14 @@ keil_sim/ac6/HoneyGUI.uvguix.*
 lib/RTE/*
 lib/build/*
 lib/gui_engine.uvguix.*
-gui_engine/rtk_gui_sim/cconfig.h
 *.dblite
-
-gui_engine/rtk_gui_sim/gui.bin
-gui_engine/rtk_gui_sim/.sconsign.dblite
+win32_sim/hgconfig.h
 
 doc/doxyxml/html
 doc/doxyxml/xml
 doc/output
 doc/build
 doc/_build
-gui_engine/example/web/tree/diagram.mmd
 doc/**/word_dict.txt
 doxygen_graphviz/_build
 
@@ -85,15 +81,12 @@ win32_sim/gui.bin
 win32_sim/gui
 
 # example
-gui_engine/example/screen_480_480/Visual_Disigner_Prj/480x480/Simulate/
-gui_engine/example/screen_480_480/Visual_Disigner_Prj/480x480/Export/root/
-gui_engine/example/screen_640_360/Simulate/
-gui_engine/example/screen_640_360/Export/root/
-gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Export/root/
-gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Simulate/
-gui_engine/example/web/tree/diagram.mmd
 win32_sim/build/
 
 # tool
 tool/D2XML/MasterGo_plugin/node_modules/
 tool/D2XML/Pixso_plugin/node_modules/
+
+# other
+.kiro/
+.kiro
