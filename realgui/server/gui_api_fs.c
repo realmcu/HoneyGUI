@@ -158,14 +158,6 @@ char *gui_strdup(const char *s)
 }
 
 
-const char *gui_get_path_by_relative(const char *relative_path)
-{
-    char *path = gui_malloc(strlen(relative_path) + strlen(GUI_ROOT_FOLDER) + 1);
-    GUI_ASSERT(path != NULL);
-    sprintf(path, "%s%s", GUI_ROOT_FOLDER, (char *)relative_path);
-    return path;
-}
-
 #if defined(_WIN32)
 struct file_load_node
 {
