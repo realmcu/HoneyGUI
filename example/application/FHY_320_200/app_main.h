@@ -16,6 +16,31 @@ extern "C" {
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+#define WALLPAPER_VIEW          "wallpaper_view" //test
+
+#define AUDIO_MENU_VIEW         "audio_menu"
+#define TOOLS_MENU_VIEW         "tools_menu"
+#define SETTINGS_MENU_VIEW      "settings_menu"
+#define QUICK_VIEW              "quick_view"
+#define MENU_VIEW               "menu_view"
+#define FLASHLIGHT_VIEW         "flashlight"
+#define TIMER_VIEW              "timer"
+#define CHARGING_VIEW           "charging"
+#define DETAIL_VIEW             "detail"
+#define BUTTON_CUSTOMIZE_VIEW   "button_customize"
+#define CALL_VIEW               "call"
+#define CHARGING_VIEW           "charging"
+#define INFORM_CENTER_VIEW      "inform_center"
+#define NOTIFICATION_VIEW       "notification"
+#define LOCK_VIEW               "lock"
+#define OOBE_VIEW               "oobe"
+#define SUPPORT_VIEW            "support"
+#define OTA_VIEW                "ota"
+#define AURACAST_VIEW           "auracast"
+#define SPATIAL_SOUND_VIEW      "spatial_sound"
+
+
+
 #define SS_WITH_HEAD_TRACKING 1
 
 #define QUICK_PAGE_NUM_MAX  4

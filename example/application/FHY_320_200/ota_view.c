@@ -10,7 +10,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "ota_view"
+#define CURRENT_VIEW_NAME OTA_VIEW
 
 #define ICON_TARGET_SCALE  0.5f
 
@@ -24,7 +24,6 @@ static void ota_view_design(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *oobe_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -46,15 +45,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    oobe_view = gui_view_descriptor_get("oobe_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 static void switch_ota_view(void *msg)
 {
     GUI_UNUSED(msg);
@@ -71,7 +61,7 @@ static void switch_ota_view(void *msg)
 static void exit_wait(void *p)
 {
     GUI_UNUSED(p);
-    gui_view_switch_direct(current_view, oobe_view->name, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(current_view, OOBE_VIEW, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 

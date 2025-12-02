@@ -14,7 +14,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "detail_view"
+#define CURRENT_VIEW_NAME DETAIL_VIEW
 
 /*============================================================================*
  *                           Function Declaration
@@ -37,7 +37,7 @@ static gui_view_descriptor_t const descriptor =
 
 void (*detail_page_design_func)(gui_obj_t *parent) = NULL;
 
-static const gui_view_descriptor_t *descriptor_rec = NULL;
+static const char *descriptor_rec = NULL;
 
 static bool is_favorite = false;
 /*============================================================================*
@@ -149,7 +149,7 @@ static void detail_view_design(gui_view_t *view)
                     !strcmp(view_c->descriptor->name, "auracast_view") ||
                     !strcmp(view_c->descriptor->name, "ss_view")))
     {
-        descriptor_rec = view_c->descriptor;
+        descriptor_rec = view_c->descriptor->name;
     }
     gui_obj_t *parent = GUI_BASE(view);
 

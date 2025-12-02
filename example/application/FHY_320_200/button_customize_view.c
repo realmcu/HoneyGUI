@@ -21,7 +21,7 @@ typedef struct note_design_param
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "button_customize_view"
+#define CURRENT_VIEW_NAME BUTTON_CUSTOMIZE_VIEW
 
 #define LIST_Y  60
 
@@ -35,7 +35,6 @@ static void button_customize_view_design(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *detail_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -66,22 +65,12 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    detail_view = gui_view_descriptor_get("detail_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-
 static void click_button_back(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, detail_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, DETAIL_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 

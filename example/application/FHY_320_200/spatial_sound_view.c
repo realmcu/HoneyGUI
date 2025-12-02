@@ -14,7 +14,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "ss_view"
+#define CURRENT_VIEW_NAME SPATIAL_SOUND_VIEW
 
 #define BUTTON_X_LEFT 0
 #define BUTTON_X_MID  99
@@ -38,7 +38,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = spatial_sound_view_design,
 };
 
-static gui_view_descriptor_t *descriptor_rec = NULL;
+static const char *descriptor_rec = NULL;
 static uint8_t button_bg_target_x = 0;
 
 /*============================================================================*
@@ -120,7 +120,7 @@ static void spatial_sound_view_design(gui_view_t *view)
 {
     if (gui_view_get_current())
     {
-        descriptor_rec = (void *)gui_view_get_current()->descriptor;
+        descriptor_rec = gui_view_get_current()->descriptor->name;
     }
 
     gui_view_set_animate_step(view, 10);

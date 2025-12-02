@@ -11,7 +11,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "menu_view"
+#define CURRENT_VIEW_NAME MENU_VIEW
 
 #define BG_AUDIO_X              20
 #define BG_TOOLS_X              120
@@ -37,10 +37,6 @@ static void menu_view_design(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *quick_view = NULL;
-static const gui_view_descriptor_t *audio_menu_view = NULL;
-static const gui_view_descriptor_t *settings_menu_view = NULL;
-static const gui_view_descriptor_t *tools_menu_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -80,18 +76,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    quick_view = gui_view_descriptor_get("quick_view");
-    audio_menu_view = gui_view_descriptor_get("audio_menu_view");
-    settings_menu_view = gui_view_descriptor_get("settings_menu_view");
-    tools_menu_view = gui_view_descriptor_get("tools_menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 static void press_button_audio(void *obj)
 {
     GUI_UNUSED(obj);
@@ -122,7 +106,7 @@ static void press_button_audio(void *obj)
     }
     else if (tp->released && pressed_audio)
     {
-        gui_view_switch_direct(current_view, audio_menu_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+        gui_view_switch_direct(current_view, AUDIO_MENU_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         pressed_audio = false;
     }
@@ -158,7 +142,7 @@ static void press_button_tools(void *obj)
     }
     else if (tp->released && pressed_tools)
     {
-        gui_view_switch_direct(current_view, tools_menu_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+        gui_view_switch_direct(current_view, TOOLS_MENU_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         pressed_tools = false;
     }
@@ -194,7 +178,7 @@ static void press_button_settings(void *obj)
     }
     else if (tp->released && pressed_settings)
     {
-        gui_view_switch_direct(current_view, settings_menu_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+        gui_view_switch_direct(current_view, SETTINGS_MENU_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         pressed_settings = false;
     }
@@ -203,7 +187,7 @@ static void press_button_settings(void *obj)
 static void menu_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
-    gui_view_switch_on_event(view, quick_view->name, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, QUICK_VIEW, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 

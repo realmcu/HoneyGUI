@@ -11,7 +11,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "call_view"
+#define CURRENT_VIEW_NAME CALL_VIEW
 
 
 /*============================================================================*
@@ -32,8 +32,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = call_view_design,
 };
 
-static const gui_view_descriptor_t *descriptor_rec = NULL;
-static const gui_view_descriptor_t *quick_view = NULL;
+static const char *descriptor_rec = NULL;
 
 static const char *connecting_str[13] =
 {
@@ -80,15 +79,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    quick_view = gui_view_descriptor_get("quick_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 static void switch_call_view(void *msg)
 {
     GUI_UNUSED(msg);
@@ -107,7 +97,7 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, quick_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, QUICK_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
@@ -124,7 +114,7 @@ static void click_button_cancel(void *obj, gui_event_t e, void *param)
     f_status.call = CALL_COMING; //reset status
     if (!descriptor_rec)
     {
-        descriptor_rec = quick_view;
+        descriptor_rec = QUICK_VIEW;
     }
     gui_view_set_animate_step(current_view, 400);
     gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_NONE_ANIMATION,
@@ -181,7 +171,7 @@ static void call_view_design(gui_view_t *view)
     gui_view_set_animate_step(view, 10);
     if (gui_view_get_current())
     {
-        descriptor_rec = gui_view_get_current()->descriptor;
+        descriptor_rec = gui_view_get_current()->descriptor->name;
     }
     gui_obj_t *parent = GUI_BASE(view);
 

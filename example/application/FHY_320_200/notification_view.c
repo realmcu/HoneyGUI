@@ -16,7 +16,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "notification_view"
+#define CURRENT_VIEW_NAME NOTIFICATION_VIEW
 
 #define LIST_Y  60
 
@@ -31,7 +31,6 @@ static void clear(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *inform_center_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -58,15 +57,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    inform_center_view = gui_view_descriptor_get("inform_center_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 static void click_button_back(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
@@ -80,7 +70,7 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     else
     {
         list_offset_his = 0;
-        gui_view_switch_direct(current_view, inform_center_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+        gui_view_switch_direct(current_view, INFORM_CENTER_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
     }
 }

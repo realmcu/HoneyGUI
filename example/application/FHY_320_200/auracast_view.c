@@ -15,7 +15,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "auracast_view"
+#define CURRENT_VIEW_NAME AURACAST_VIEW
 
 /*============================================================================*
  *                           Function Declaration
@@ -107,7 +107,7 @@ static void auracast_view_design(gui_view_t *view)
 {
     if (gui_view_get_current())
     {
-        descriptor_rec = (void *)gui_view_get_current()->descriptor;
+        descriptor_rec = gui_view_get_current()->descriptor->name;
     }
 
     gui_view_set_animate_step(view, 10);

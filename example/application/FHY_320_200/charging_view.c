@@ -10,7 +10,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "charging_view"
+#define CURRENT_VIEW_NAME CHARGING_VIEW
 
 #define ICON_CHARGING_X             138
 #define ICON_CHARGING_START_Y       78
@@ -27,7 +27,6 @@ static void charging_view_design(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *wallpaper_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -49,15 +48,6 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    wallpaper_view = gui_view_descriptor_get("wallpaper_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void switch_charging_view(void *msg)
 {
@@ -143,7 +133,7 @@ static void entrance_animation(void *p)
 static void charging_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 400);
-    gui_view_switch_on_event(view, wallpaper_view->name, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_on_event(view, WALLPAPER_VIEW, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 

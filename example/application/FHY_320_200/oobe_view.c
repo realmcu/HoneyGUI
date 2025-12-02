@@ -10,7 +10,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "oobe_view"
+#define CURRENT_VIEW_NAME OOBE_VIEW
 
 /*============================================================================*
  *                           Function Declaration
@@ -30,8 +30,6 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = oobe_view_design,
 };
 
-static const gui_view_descriptor_t *support_view = NULL;
-
 char device_name[16] = "[JBL Buds]";
 static char welcome_str[36] = "Welcome to your ";
 static char warning_str[44] = "Get to know your headphones in a\nfew steps.";
@@ -47,22 +45,13 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    support_view = gui_view_descriptor_get("support_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 static void click_button(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     gui_view_set_animate_step(current_view, 10);
-    gui_view_switch_direct(current_view, support_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(current_view, SUPPORT_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 

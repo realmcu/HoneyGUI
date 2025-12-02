@@ -8,7 +8,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "flashlight_view"
+#define CURRENT_VIEW_NAME FLASHLIGHT_VIEW
 
 /*============================================================================*
  *                           Function Declaration
@@ -28,7 +28,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = flashlight_view_design,
 };
 
-static const gui_view_descriptor_t *descriptor_rec = NULL;
+static const char *descriptor_rec = NULL;
 static int8_t brightness_val_rec = 0;
 
 /*============================================================================*
@@ -56,7 +56,7 @@ static void click_cancel(void *obj, gui_event_t e, void *param)
 
 static void flashlight_view_design(gui_view_t *view)
 {
-    descriptor_rec = gui_view_get_current()->descriptor;
+    descriptor_rec = gui_view_get_current()->descriptor->name;
     gui_view_switch_on_event(view, descriptor_rec, SWITCH_OUT_NONE_ANIMATION, SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 

@@ -15,7 +15,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "support_view"
+#define CURRENT_VIEW_NAME SUPPORT_VIEW
 
 /*============================================================================*
  *                           Function Declaration
@@ -28,8 +28,6 @@ static void resetting_design(gui_obj_t *parent);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *quick_view = NULL;
-static const gui_view_descriptor_t *detail_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -194,22 +192,12 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    quick_view = gui_view_descriptor_get("quick_view");
-    detail_view = gui_view_descriptor_get("detail_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 static void click_button_back(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, detail_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, DETAIL_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
@@ -433,7 +421,7 @@ static void tips_list_timer_cb(void *obj)
             update_page_indicator();
         }
     }
-    else if (page_index != 5 && *quick_view->pView)
+    else if (page_index != 5 && *(gui_view_descriptor_get(QUICK_VIEW)->pView))
     {
         page_index = 5;
         update_page_indicator();
@@ -460,7 +448,7 @@ static void resetting_timer_cb(void *obj)
     cnt++;
     if (f_status.factory_reset_done)
     {
-        gui_view_switch_direct(current_view, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(current_view, QUICK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
     if (cnt > cnt_max)
@@ -473,7 +461,7 @@ static void resetting_timer_cb(void *obj)
 static void resetting_design(gui_obj_t *parent)
 {
     gui_view_set_animate_step((void *)parent, 400);
-    gui_view_switch_on_event((void *)parent, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_on_event((void *)parent, QUICK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED); //test
 
@@ -536,7 +524,7 @@ static void factory_reset_design(gui_obj_t *parent)
 
 static void product_tips_design(gui_obj_t *parent)
 {
-    gui_view_switch_on_event((void *)parent, quick_view->name, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
+    gui_view_switch_on_event((void *)parent, QUICK_VIEW, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION, GUI_EVENT_TOUCH_MOVE_LEFT);
     gui_color_t img_color;
     if (theme_bg_white)

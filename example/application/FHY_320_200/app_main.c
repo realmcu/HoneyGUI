@@ -3,7 +3,6 @@
  *============================================================================*/
 #include <stdio.h>
 #include <time.h>
-#include "cJSON.h"
 #include "root_image/ui_resource.h"
 #include "gui_obj.h"
 #include "gui_text.h"
@@ -33,21 +32,6 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/* VIEW */
-const static gui_view_descriptor_t *test_view = NULL;
-const static gui_view_descriptor_t *lock_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-const static gui_view_descriptor_t *quick_view = NULL;
-const static gui_view_descriptor_t *flashlight_view = NULL;
-const static gui_view_descriptor_t *timer_view = NULL;
-const static gui_view_descriptor_t *charging_view = NULL;
-
-/* FPS */
-static char fps[10] __attribute__((unused));
-static char widget_count_string[20] __attribute__((unused));
-static char mem_string[20] __attribute__((unused));
-static char low_mem_string[20] __attribute__((unused));
-
 #ifdef _WIN32
 unsigned char *resource_root = NULL;
 #endif
@@ -60,68 +44,6 @@ static uint16_t sleep_cnt = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    test_view = gui_view_descriptor_get("quick_view");
-    lock_view = gui_view_descriptor_get("lock_view");
-    menu_view = gui_view_descriptor_get("menu_view");
-    quick_view = gui_view_descriptor_get("quick_view");
-    flashlight_view = gui_view_descriptor_get("flashlight_view");
-    timer_view = gui_view_descriptor_get("timer_view");
-    charging_view = gui_view_descriptor_get("charging_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-#ifdef __WIN32
-static void gui_fps_cb(void *p)
-{
-    int fps_num = gui_fps();
-    gui_obj_t *fps_rect = GUI_BASE(p);
-    sprintf(fps, "FPS:%d", fps_num);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(t_fps, "t_fps", fps_rect);
-    gui_text_content_set((gui_text_t *)t_fps, fps, strlen(fps));
-    int widget_count_number = gui_get_obj_count();
-    sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(widget_count, "widget_count", fps_rect);
-    gui_text_content_set((gui_text_t *)widget_count, widget_count_string, strlen(widget_count_string));
-    uint32_t mem_number =  gui_mem_used();
-    uint32_t low_mem_number =  gui_low_mem_used();
-    sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(mem, "mem", fps_rect);
-    gui_text_content_set((gui_text_t *)mem, mem_string, strlen(mem_string));
-    sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(low_mem, "low_mem", fps_rect);
-    gui_text_content_set((gui_text_t *)low_mem, low_mem_string, strlen(low_mem_string));
-}
-
-// Show the FPS, widget count, memory usage, and low memory usage
-static void fps_create(void *parent)
-{
-    char *text;
-    int font_size = 20;
-    gui_obj_create_timer(GUI_BASE(parent), 10, true, gui_fps_cb);
-    sprintf(fps, "FPS:%d", gui_fps());
-    text = fps;
-    gui_text_t *t_fps = gui_text_create(parent, "t_fps", 10, 0, gui_get_screen_width(), font_size);
-    gui_text_set(t_fps, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(t_fps, HEADING_1_BIN, FONT_SRC_MEMADDR);
-    gui_text_t *widget_count = gui_text_create(parent, "widget_count", 10, 16, gui_get_screen_width(),
-                                               font_size);
-    gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(widget_count, HEADING_1_BIN, FONT_SRC_MEMADDR);
-    gui_text_t *mem = gui_text_create(parent, "mem", 10, 16 * 2, gui_get_screen_width(), font_size);
-    gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
-    gui_text_t *low_mem = gui_text_create(parent, "low_mem", 10, 16 * 3, gui_get_screen_width(),
-                                          font_size);
-    gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(low_mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
-}
-#endif
-
 static void button_2_view(uint8_t index)
 {
     switch (index)
@@ -130,14 +52,14 @@ static void button_2_view(uint8_t index)
         {
             gui_log("Wake up/dim off screen \n");
             gui_view_set_animate_step(gui_view_get_current(), 400);
-            gui_view_switch_direct(gui_view_get_current(), lock_view->name, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_direct(gui_view_get_current(), LOCK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_NONE_ANIMATION);
         }
         break;
     case 1:
         {
             gui_view_set_animate_step(gui_view_get_current(), 400);
-            gui_view_switch_direct(gui_view_get_current(), quick_view->name, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_direct(gui_view_get_current(), QUICK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_NONE_ANIMATION);
         }
         break;
@@ -149,14 +71,14 @@ static void button_2_view(uint8_t index)
     case 3:
         {
             gui_view_set_animate_step(gui_view_get_current(), 400);
-            gui_view_switch_direct(gui_view_get_current(), flashlight_view->name, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_direct(gui_view_get_current(), FLASHLIGHT_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_NONE_ANIMATION);
         }
         break;
     case 4:
         {
             gui_view_set_animate_step(gui_view_get_current(), 400);
-            gui_view_switch_direct(gui_view_get_current(), timer_view->name, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_direct(gui_view_get_current(), TIMER_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_NONE_ANIMATION);
         }
         break;
@@ -253,14 +175,14 @@ static void time_update_cb(void *param)
         sleep_cnt = 0;
         if (f_status.timer)
         {
-            extern const gui_view_descriptor_t *timer_descriptor_rec;
-            timer_descriptor_rec = lock_view;
+            extern const char *timer_descriptor_rec;
+            timer_descriptor_rec = LOCK_VIEW;
             return;
         }
         gui_view_t *current_view = gui_view_get_current();
-        if (current_view->descriptor == charging_view) { return; }
+        if (!strcmp(current_view->descriptor->name, CHARGING_VIEW)) { return; }
         gui_view_set_animate_step(current_view, 400);
-        gui_view_switch_direct(gui_view_get_current(), lock_view->name, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(gui_view_get_current(), LOCK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }
@@ -355,9 +277,8 @@ static int app_init(void)
     gui_obj_create_timer(GUI_BASE(win_touch), 10, true, timer_touch_cb);
 
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
-    // fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win_view), 1000, true, time_update_cb);
-    gui_view_create(win_view, test_view->name, 0, 0, 0, 0);
+    gui_view_create(win_view, QUICK_VIEW, 0, 0, 0, 0);
 
     return 0;
 }

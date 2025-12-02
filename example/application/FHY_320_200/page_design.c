@@ -57,16 +57,6 @@ static void pair_timer_page_tx_management(void *obj);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static const gui_view_descriptor_t *lock_view = NULL;
-static const gui_view_descriptor_t *timer_view = NULL;
-static const gui_view_descriptor_t *flashlight_view = NULL;
-static const gui_view_descriptor_t *quick_view = NULL;
-static const gui_view_descriptor_t *detail_view = NULL;
-static const gui_view_descriptor_t *button_customize_view = NULL;
-static const gui_view_descriptor_t *support_view = NULL;
-static const gui_view_descriptor_t *auracast_view = NULL;
-static const gui_view_descriptor_t *spatial_sound_view = NULL;
-
 static uint8_t toggle_target_x = 0;
 static uint32_t toggle_on_bg_color = 0;
 static bool control_invalid = false;
@@ -167,33 +157,16 @@ static int16_t page_information_center_customize_list_offset_rec = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    lock_view = gui_view_descriptor_get("lock_view");
-    timer_view = gui_view_descriptor_get("timer_view");
-    flashlight_view = gui_view_descriptor_get("flashlight_view");
-    quick_view = gui_view_descriptor_get("quick_view");
-    detail_view = gui_view_descriptor_get("detail_view");
-    button_customize_view = gui_view_descriptor_get("button_customize_view");
-    support_view = gui_view_descriptor_get("support_view");
-    auracast_view = gui_view_descriptor_get("auracast_view");
-    spatial_sound_view = gui_view_descriptor_get("ss_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 static void regenerate_current_view(void *msg)
 {
     GUI_UNUSED(msg);
 
     gui_view_t *current_view = gui_view_get_current();
-    const struct gui_view_descriptor *descriptor = current_view->descriptor;
+    const char *name = current_view->descriptor->name;
     gui_obj_t *parent = current_view->base.parent;
     gui_obj_tree_free(GUI_BASE(current_view));
 
-    gui_view_create(parent, descriptor, 0, 0, 0, 0);
+    gui_view_create(parent, name, 0, 0, 0, 0);
 }
 
 static void toggle_move(void *p)
@@ -224,7 +197,7 @@ static void toggle_move(void *p)
             {
                 gui_view_t *current_view = gui_view_get_current();
                 gui_view_set_animate_step(current_view, 10);
-                gui_view_switch_direct(current_view, auracast_view->name,
+                gui_view_switch_direct(current_view, AURACAST_VIEW,
                                        SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                        SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
             }
@@ -1173,12 +1146,14 @@ static void press_button_page_language(void *obj)
                 language_index--;
                 gui_text_content_set((void *)text, (void *)language_type[language_index],
                                      strlen(language_type[language_index]));
+                msg_2_regenerate_current_view();
             }
             else if (pressed_r)
             {
                 language_index++;
                 gui_text_content_set((void *)text, (void *)language_type[language_index],
                                      strlen(language_type[language_index]));
+                msg_2_regenerate_current_view();
             }
 
             if (language_index == compare)
@@ -1190,7 +1165,6 @@ static void press_button_page_language(void *obj)
                 gui_img_a8_recolor(icon, theme_bg_white ? FG_1_LIGHT.color.argb_full : FG_1_DARK.color.argb_full);
             }
             gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
-            msg_2_regenerate_current_view();
         }
         pressed_l = false;
         pressed_r = false;
@@ -1303,7 +1277,7 @@ static void click_button_page_spatial_sound_with_head_tracking(void *obj, gui_ev
         {
             gui_view_t *current_view = gui_view_get_current();
             gui_view_set_animate_step(current_view, 10);
-            gui_view_switch_direct(current_view, spatial_sound_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+            gui_view_switch_direct(current_view, SPATIAL_SOUND_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                    SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         }
         return;
@@ -1366,7 +1340,7 @@ static void click_wallpaper_page_lock_screen(void *obj, gui_event_t e, void *par
     GUI_UNUSED(param);
     switch_from_lock_screen = true;
     gui_view_set_animate_step(gui_view_get_current(), 400);
-    gui_view_switch_direct(gui_view_get_current(), lock_view->name, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), LOCK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
@@ -1589,7 +1563,7 @@ static void click_button_page_timer(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     f_status.timer = 0;
-    gui_view_switch_direct(gui_view_get_current(), timer_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(gui_view_get_current(), TIMER_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
@@ -1600,7 +1574,7 @@ static void click_button_page_flashlight(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
     f_status.timer = 0;
     gui_view_set_animate_step(gui_view_get_current(), 400);
-    gui_view_switch_direct(gui_view_get_current(), flashlight_view->name, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), FLASHLIGHT_VIEW, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
@@ -1627,7 +1601,7 @@ static void click_button_page_case_button_customize(void *obj, gui_event_t e, vo
         gui_obj_move(bg_note, 0, GUI_BASE(obj)->y + 60);
         gui_obj_hidden(bg_note, false);
 
-        gui_view_switch_direct(gui_view_get_current(), button_customize_view->name,
+        gui_view_switch_direct(gui_view_get_current(), BUTTON_CUSTOMIZE_VIEW,
                                SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
     }
@@ -1968,7 +1942,7 @@ static void click_button_page_support(void *obj, gui_event_t e, void *param)
         support_reset = true;
     }
     gui_obj_hidden(bg, false);
-    gui_view_switch_direct(gui_view_get_current(), support_view->name,
+    gui_view_switch_direct(gui_view_get_current(), SUPPORT_VIEW,
                            SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }

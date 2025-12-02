@@ -16,7 +16,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "quick_view"
+#define CURRENT_VIEW_NAME QUICK_VIEW
 
 /*============================================================================*
  *                           Function Declaration
@@ -29,9 +29,6 @@ static void update_page_indicator(void);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *menu_view = NULL;
-static const gui_view_descriptor_t *inform_center_view = NULL;
-static const gui_view_descriptor_t *wallpaper_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -85,17 +82,6 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    inform_center_view = gui_view_descriptor_get("inform_center_view");
-    wallpaper_view = gui_view_descriptor_get("wallpaper_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
 static void time_update_cb(void *obj)
@@ -211,14 +197,14 @@ static void create_indicator(gui_obj_t *parent)
 
 static void quick_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+    gui_view_switch_on_event(view, MENU_VIEW, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, inform_center_view->name, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, INFORM_CENTER_VIEW, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    // gui_view_switch_on_event(view, wallpaper_view->name, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+    // gui_view_switch_on_event(view, WALLPAPER_VIEW, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
     //                          SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
     //                          GUI_EVENT_TOUCH_MOVE_RIGHT);
 

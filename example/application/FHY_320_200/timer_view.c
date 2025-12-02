@@ -10,7 +10,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "timer_view"
+#define CURRENT_VIEW_NAME TIMER_VIEW
 
 
 /*============================================================================*
@@ -33,7 +33,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_out = clear
 };
 
-const gui_view_descriptor_t *timer_descriptor_rec = NULL;
+const char *timer_descriptor_rec = NULL;
 static void **ring_data_array = NULL;
 static bool reset_flag = 0;
 
@@ -165,7 +165,7 @@ static void timer_view_design(gui_view_t *view)
     gui_view_set_animate_step(view, 10);
     if (gui_view_get_current())
     {
-        timer_descriptor_rec = gui_view_get_current()->descriptor;
+        timer_descriptor_rec = gui_view_get_current()->descriptor->name;
     }
     ring_data_array = gui_malloc(sizeof(void *) * 50);
 

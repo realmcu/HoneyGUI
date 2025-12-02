@@ -10,7 +10,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "lock_view"
+#define CURRENT_VIEW_NAME LOCK_VIEW
 
 #define TAB_MAX_POS_X  180
 #define TAB_UNLOCK_POS_X  102
@@ -25,8 +25,6 @@ static void lock_view_design(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *quick_view = NULL;
-static const gui_view_descriptor_t *charging_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -35,7 +33,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = lock_view_design,
 };
 
-static const gui_view_descriptor_t *descriptor_rec = NULL;
+static const char *descriptor_rec = NULL;
 
 /*============================================================================*
  *                           Private Functions
@@ -47,16 +45,6 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    quick_view = gui_view_descriptor_get("quick_view");
-    charging_view = gui_view_descriptor_get("charging_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void pressing_tab(void *obj)
 {
@@ -83,7 +71,7 @@ static void pressing_tab(void *obj)
         const int16_t step = 20;
         if (x >= TAB_MAX_POS_X)
         {
-            gui_view_switch_direct(current_view, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_direct(current_view, QUICK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_ANIMATION_FADE);
             gui_obj_stop_timer(GUI_BASE(img));
             return;
@@ -149,7 +137,7 @@ static void lock_view_design(gui_view_t *view)
 
     if (switch_from_lock_screen)
     {
-        descriptor_rec = gui_view_get_current()->descriptor;
+        descriptor_rec = gui_view_get_current()->descriptor->name;
         gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(view, 0, 0, 0, 52, 52);
         gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 0, 0, 0);
         gui_obj_add_event_cb(win_icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -170,7 +158,7 @@ static void lock_view_design(gui_view_t *view)
         theme_bg_white = theme_bg_rec;
         if (!f_status.unlock_slider)
         {
-            gui_view_switch_on_event(view, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_on_event(view, QUICK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                                      SWITCH_IN_NONE_ANIMATION,
                                      GUI_EVENT_TOUCH_CLICKED);
             return;
