@@ -26,6 +26,8 @@
 
 int main(int argc, char **argv)
 {
+    setvbuf(stdout, NULL, _IONBF,
+            0);// add for vstudio debug console output issue,vscode plugin used to debug
     (void)argc;
     (void)argv;
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", \
