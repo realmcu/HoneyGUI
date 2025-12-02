@@ -54,7 +54,7 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     case 0:
         {
             current_watchface_type = WATCHFACE_BIG_NUM;
-            gui_view_switch_direct(current_view, gui_view_descriptor_get("watchface_view"),
+            gui_view_switch_direct(current_view, "watchface_view",
                                    SWITCH_OUT_ANIMATION_ZOOM,
                                    SWITCH_IN_ANIMATION_ZOOM);
         }
@@ -62,7 +62,7 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     case 1:
         {
             current_watchface_type = WATCHFACE_SPORT;
-            gui_view_switch_direct(current_view, gui_view_descriptor_get("watchface_view"),
+            gui_view_switch_direct(current_view, "watchface_view",
                                    SWITCH_OUT_ANIMATION_ZOOM,
                                    SWITCH_IN_ANIMATION_ZOOM);
         }
@@ -70,7 +70,7 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     case 2:
         {
             current_watchface_type = WATCHFACE_VIDEO;
-            gui_view_switch_direct(current_view, gui_view_descriptor_get("watchface_view"),
+            gui_view_switch_direct(current_view, "watchface_view",
                                    SWITCH_OUT_ANIMATION_ZOOM,
                                    SWITCH_IN_ANIMATION_ZOOM);
         }

@@ -91,7 +91,7 @@ static int gui_view_create_during_init(void)
     {
         if (descriptor_list[i]->keep == 1)
         {
-            gui_view_create((void *)gui_obj_get_fake_root(), descriptor_list[i], 0, 0, 0, 0);
+            gui_view_create((void *)gui_obj_get_fake_root(), descriptor_list[i]->name, 0, 0, 0, 0);
             gui_log("Pre-create '%s' view, File: %s, Function: %s\n", descriptor_list[i]->name, __FILE__,
                     __func__);
         }

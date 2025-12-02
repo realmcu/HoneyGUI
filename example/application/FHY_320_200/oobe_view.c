@@ -62,7 +62,7 @@ static void click_button(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     gui_view_set_animate_step(current_view, 10);
-    gui_view_switch_direct(current_view, support_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(current_view, support_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 

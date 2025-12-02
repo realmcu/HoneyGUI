@@ -211,14 +211,14 @@ static void create_indicator(gui_obj_t *parent)
 
 static void quick_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, inform_center_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, inform_center_view->name, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    // gui_view_switch_on_event(view, wallpaper_view, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+    // gui_view_switch_on_event(view, wallpaper_view->name, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
     //                          SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
     //                          GUI_EVENT_TOUCH_MOVE_RIGHT);
 

@@ -94,14 +94,14 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
 static void note_timer_cb(void *p)
 {
     gui_obj_stop_timer(p);
-    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(current_view, detail_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 

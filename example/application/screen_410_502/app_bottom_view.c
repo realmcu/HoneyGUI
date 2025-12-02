@@ -475,7 +475,7 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void bottom_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 

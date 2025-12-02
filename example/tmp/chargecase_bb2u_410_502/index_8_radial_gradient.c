@@ -120,11 +120,11 @@ static void radial_gradient_switch_in(gui_view_t *view)
                                       0, 480, 480, render, buffer);
     gui_img_t *img = gui_img_create_from_mem(view, 0, buffer, 0, 0, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("inner_shadow_view"),
+    gui_view_switch_on_event(view, "inner_shadow_view",
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("multiple_layer_animation_view"),
+    gui_view_switch_on_event(view, "multiple_layer_animation_view",
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);

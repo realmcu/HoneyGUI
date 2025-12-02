@@ -97,7 +97,7 @@ static void switch_call_view(void *msg)
     if (view_c)
     {
         gui_view_set_animate_step(view_c, 400);
-        gui_view_switch_direct(view_c, &descriptor, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(view_c, descriptor.name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }
@@ -107,7 +107,7 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, quick_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, quick_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 

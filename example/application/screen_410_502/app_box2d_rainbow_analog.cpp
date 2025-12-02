@@ -494,7 +494,7 @@ extern "C" {
     {
         gui_obj_t *obj = GUI_BASE(view);
         // gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
-        gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);
         app_rainbow_analog::ui_design(obj);

@@ -553,7 +553,7 @@ static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
     clear_menu(current_view);
 
     menu_style = (menu_style + 1) % 2;
-    gui_view_create(parent, &descriptor, 0, 0, 0, 0);
+    gui_view_create(parent, descriptor.name, 0, 0, 0, 0);
 }
 
 static void list_timer_cb(void *obj)
@@ -629,7 +629,7 @@ static void canvas_timer_cb(void *p)
 static void app_menu_design(gui_view_t *view)
 {
     gui_win_t *win = gui_win_create(view, "win_app_menu", 0, 0, 0, 0);
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 

@@ -10,7 +10,7 @@ static void app_rect_design(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
     gui_view_set_animate_step(view, 500);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("rect_round_view"),
+    gui_view_switch_on_event(view, "rect_round_view",
                              SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

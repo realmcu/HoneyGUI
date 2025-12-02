@@ -94,11 +94,11 @@ static void click_switch_widget_cb(void *obj, gui_event_t e, void *param)
 }
 static void gif_apng_support_switch_in(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, gui_view_descriptor_get("blur_glow_effect_view"),
+    gui_view_switch_on_event(view, "blur_glow_effect_view",
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("video_support_view"),
+    gui_view_switch_on_event(view, "video_support_view",
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);

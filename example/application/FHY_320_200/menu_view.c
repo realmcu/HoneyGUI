@@ -122,7 +122,7 @@ static void press_button_audio(void *obj)
     }
     else if (tp->released && pressed_audio)
     {
-        gui_view_switch_direct(current_view, audio_menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+        gui_view_switch_direct(current_view, audio_menu_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         pressed_audio = false;
     }
@@ -158,7 +158,7 @@ static void press_button_tools(void *obj)
     }
     else if (tp->released && pressed_tools)
     {
-        gui_view_switch_direct(current_view, tools_menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+        gui_view_switch_direct(current_view, tools_menu_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         pressed_tools = false;
     }
@@ -194,7 +194,7 @@ static void press_button_settings(void *obj)
     }
     else if (tp->released && pressed_settings)
     {
-        gui_view_switch_direct(current_view, settings_menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+        gui_view_switch_direct(current_view, settings_menu_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         pressed_settings = false;
     }
@@ -203,7 +203,7 @@ static void press_button_settings(void *obj)
 static void menu_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
-    gui_view_switch_on_event(view, quick_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, quick_view->name, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 

@@ -209,7 +209,7 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, detail_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
@@ -460,7 +460,7 @@ static void resetting_timer_cb(void *obj)
     cnt++;
     if (f_status.factory_reset_done)
     {
-        gui_view_switch_direct(current_view, quick_view, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(current_view, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
     if (cnt > cnt_max)
@@ -473,7 +473,7 @@ static void resetting_timer_cb(void *obj)
 static void resetting_design(gui_obj_t *parent)
 {
     gui_view_set_animate_step((void *)parent, 400);
-    gui_view_switch_on_event((void *)parent, quick_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_on_event((void *)parent, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED); //test
 
@@ -536,7 +536,7 @@ static void factory_reset_design(gui_obj_t *parent)
 
 static void product_tips_design(gui_obj_t *parent)
 {
-    gui_view_switch_on_event((void *)parent, quick_view, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
+    gui_view_switch_on_event((void *)parent, quick_view->name, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION, GUI_EVENT_TOUCH_MOVE_LEFT);
     gui_color_t img_color;
     if (theme_bg_white)

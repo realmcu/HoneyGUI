@@ -266,7 +266,7 @@ static int app_init(void)
 #endif
     win_map = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
-    gui_view_create(win_view, start_view, 0, 0, 0, 0);
+    gui_view_create(win_view, start_view->name, 0, 0, 0, 0);
     return 0;
 }
 GUI_INIT_APP_EXPORT(app_init);

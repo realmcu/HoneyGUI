@@ -63,7 +63,7 @@ static void switch_ota_view(void *msg)
     if (view_c)
     {
         gui_view_set_animate_step(view_c, 10);
-        gui_view_switch_direct(view_c, &descriptor, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(view_c, descriptor.name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
 }
@@ -71,7 +71,7 @@ static void switch_ota_view(void *msg)
 static void exit_wait(void *p)
 {
     GUI_UNUSED(p);
-    gui_view_switch_direct(current_view, oobe_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(current_view, oobe_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 

@@ -54,7 +54,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void app_qrcode_design(gui_view_t *view)
 {
 
-    gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+    gui_view_switch_on_event(view, heartrate_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 

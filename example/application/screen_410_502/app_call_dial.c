@@ -264,10 +264,10 @@ static void number_tab_design(char *number, int x, int y)
 static void app_call_dail_design(gui_view_t *view)
 {
     // view layout
-    gui_view_switch_on_event(view, recorder_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+    gui_view_switch_on_event(view, recorder_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, heartrate_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 

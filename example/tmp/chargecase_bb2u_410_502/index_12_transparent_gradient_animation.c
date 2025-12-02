@@ -101,11 +101,11 @@ static void switch_widget_play_watchface3(void *p)
 static void transparent_gradient_animation_switch_in(gui_view_t *view)
 {
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("vector_graphic_view"),
+    gui_view_switch_on_event(view, "vector_graphic_view",
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("smooth_gradient_image_view"),
+    gui_view_switch_on_event(view, "smooth_gradient_image_view",
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);

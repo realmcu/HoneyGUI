@@ -135,7 +135,7 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void top_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+    gui_view_switch_on_event(view, "watchface_view",
                              SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_STILL_USE_BLUR,
                              GUI_EVENT_TOUCH_MOVE_UP);

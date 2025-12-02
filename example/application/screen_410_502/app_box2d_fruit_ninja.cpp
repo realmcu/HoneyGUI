@@ -699,7 +699,7 @@ extern "C" {
     static void app_fruit_ninja_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
-        gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);
         app_fruit_ninja::fruit_ninja_design(obj);

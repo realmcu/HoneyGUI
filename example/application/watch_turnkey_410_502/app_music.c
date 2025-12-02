@@ -59,7 +59,7 @@ static void time_update_cb(void *p)
 static void music_ctr_press_cb(void *p)
 {
     GUI_UNUSED(p);
-    gui_view_switch_direct(current_view, gui_view_descriptor_get("music_ctr_view"),
+    gui_view_switch_direct(current_view, "music_ctr_view",
                            SWITCH_IN_ANIMATION_FADE, SWITCH_OUT_ANIMATION_FADE);
 }
 static void music_homeapge_press_cb(void *p)
@@ -170,21 +170,21 @@ static void music_view_design(gui_view_t *view)
         gui_view_set_animate_step(current_view, 60);
         swtich_in = SWITCH_IN_FROM_TOP_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
-        gui_view_switch_on_event(current_view, gui_view_descriptor_get("bottom_view"),
+        gui_view_switch_on_event(current_view, "bottom_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);
     }
     if (strcmp(obj_name, "menu_view") == 0)
     {
-        gui_view_switch_on_event(current_view, gui_view_descriptor_get("menu_view"),
+        gui_view_switch_on_event(current_view, "menu_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);
     }
     else
     {
-        gui_view_switch_on_event(current_view, gui_view_descriptor_get("watchface_view"),
+        gui_view_switch_on_event(current_view, "watchface_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);

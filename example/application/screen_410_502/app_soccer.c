@@ -120,7 +120,7 @@ static void soccer_app(gui_view_t *view)
     gui_soccer_t *soccer = gui_soccer_create(obj, "soccer", gui_soccer_array, 0, 0);
     gui_soccer_set_center(soccer, dc->screen_width / 2, dc->screen_height / 2);
 
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 

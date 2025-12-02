@@ -816,7 +816,7 @@ static void dashboard_exit_animation(void *p)
     {
         cnt = 0;
         gui_view_set_animate_step(current_view, 800);
-        gui_view_switch_direct(current_view, start_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, start_view->name, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
         speed_val = 0;
         power_val = 0;

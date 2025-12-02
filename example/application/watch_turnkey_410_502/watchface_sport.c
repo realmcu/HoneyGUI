@@ -183,7 +183,7 @@ static void img_heart_press_cb(void *p)
     {
         return;
     }
-    gui_view_switch_direct(gui_view_get_current(), gui_view_descriptor_get("heartrate_view"),
+    gui_view_switch_direct(gui_view_get_current(), "heartrate_view",
                            SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
@@ -194,7 +194,7 @@ static void img_weather_press_cb(void *p)
     {
         return;
     }
-    gui_view_switch_direct(gui_view_get_current(), gui_view_descriptor_get("weather_view"),
+    gui_view_switch_direct(gui_view_get_current(), "weather_view",
                            SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT,
                            SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT);
 }

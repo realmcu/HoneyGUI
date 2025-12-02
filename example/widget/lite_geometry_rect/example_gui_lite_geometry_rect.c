@@ -20,7 +20,7 @@ void rect_click_demo(void)
 }
 static void app_rect_round_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, gui_view_descriptor_get("rect_view"), SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, "rect_view", SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
     gui_view_set_animate_step(view, 500);
@@ -43,7 +43,7 @@ static void app_rect_round_design(gui_view_t *view)
 }
 static int geometry_rect_demo_init(void)
 {
-    gui_view_create(gui_obj_get_root(), gui_view_descriptor_get(RECT_VIEW_NAME), 0, 0, 0, 0);
+    gui_view_create(gui_obj_get_root(), RECT_VIEW_NAME, 0, 0, 0, 0);
 
     return 0;
 }

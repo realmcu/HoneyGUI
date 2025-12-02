@@ -89,7 +89,7 @@ static void app_ui_view_image_design(gui_view_t *view)
     // touch_info_t *tp = tp_get_info();
     // gui_obj_t *obj = GUI_BASE(view);
     // gui_obj_create_timer(obj, 10, true, return_timer_cb);
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
@@ -133,7 +133,7 @@ static void app_ui_view_image_design(gui_view_t *view)
     }
     gui_img_set_mode(image, IMG_SRC_OVER_MODE);
     gui_view_set_animate_step(view, 1000);
-    gui_view_switch_on_event(view, prism_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_on_event(view, prism_view->name, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_OUT_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 }

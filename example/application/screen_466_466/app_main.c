@@ -301,25 +301,25 @@ static char ip_string_buffer[16] = {0};
 static int ip_string_buffer_index = 0;
 static void jump_to_camera_view(void)
 {
-    gui_view_switch_direct(image_466_466_view_keyboard, &gui_view_descriptor_image_466_466_camera,
+    gui_view_switch_direct(image_466_466_view_keyboard, gui_view_descriptor_image_466_466_camera.name,
                            SWITCH_OUT_ANIMATION_MOVE_TO_LEFT, SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT
                           );
-    // gui_view_switch_direct(image_466_466_view, &gui_view_descriptor_image_466_466_camera,
+    // gui_view_switch_direct(image_466_466_view, gui_view_descriptor_image_466_466_camera.name,
     //                        SWITCH_OUT_ANIMATION_MOVE_TO_LEFT, SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 static void jump_to_ota_view(void)
 {
-    gui_view_switch_direct(image_466_466_view_keyboard, &gui_view_descriptor_image_466_466_ota,
+    gui_view_switch_direct(image_466_466_view_keyboard, gui_view_descriptor_image_466_466_ota.name,
                            SWITCH_OUT_ANIMATION_MOVE_TO_LEFT, SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 static void jump_to_about_view(void)
 {
-    gui_view_switch_direct(image_466_466_view, &gui_view_descriptor_image_466_466_about,
+    gui_view_switch_direct(image_466_466_view, gui_view_descriptor_image_466_466_about.name,
                            SWITCH_OUT_ANIMATION_MOVE_TO_LEFT, SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 static void jump_to_keyboard_view(void)
 {
-    gui_view_switch_direct(image_466_466_view, &gui_view_descriptor_image_466_466_keyboard,
+    gui_view_switch_direct(image_466_466_view, gui_view_descriptor_image_466_466_keyboard.name,
                            SWITCH_OUT_ANIMATION_MOVE_TO_LEFT, SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 static void jump_to_keyboard_view_camera(void)
@@ -400,7 +400,7 @@ static const __attribute__((aligned(8))) unsigned char video_logo_image[] =
 };
 static void view_switch_in_camera(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
+    gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
@@ -542,7 +542,7 @@ static void view_switch_out_camera(gui_view_t *view)
 }
 static void view_switch_in_ota(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
+    gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
@@ -579,7 +579,7 @@ static void view_switch_in_about(gui_view_t *view)
     bb2u = "bb2u";
     wifi = "wifi";
 #endif
-    gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
+    gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
@@ -690,7 +690,7 @@ static void view_switch_in_keyboard(gui_view_t *view)
     ip4_input_index = 0;
     // memset(ip_string_buffer, 0, sizeof(ip_string_buffer));
     ip_string_buffer_index = 0;
-    gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
+    gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
@@ -1424,7 +1424,7 @@ static void view_switch_in(gui_view_t *view)
     // extern void wifi_setting_enter_cb(void);
     // wifi_setting_enter_cb();
 #endif
-    gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466_watchface,
+    gui_view_switch_on_event(view, gui_view_descriptor_image_466_466_watchface.name,
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
@@ -1502,7 +1502,7 @@ static void view_switch_in(gui_view_t *view)
 }
 static void view_switch_in_watchface(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
+    gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);

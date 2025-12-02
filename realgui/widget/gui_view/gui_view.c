@@ -335,7 +335,7 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
     // }
 
     gui_view_t *next_view_rec = g_NextView;
-    g_NextView = gui_view_create(obj->parent, on_event->descriptor, 0, 0, 0, 0);
+    g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
     if (g_NextView != next_view_rec) {gui_view_not_show(next_view_rec);}
 
     g_NextView->current_transition_style = on_event->switch_in_style;
@@ -361,7 +361,7 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t e,
 {
     gui_view_not_show(g_NextView);
 
-    g_NextView = gui_view_create(obj->parent, on_event->descriptor, 0, 0, 0, 0);
+    g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
 
     g_NextView->current_transition_style = on_event->switch_in_style;
     g_CurrentView->current_transition_style = on_event->switch_out_style;
@@ -621,13 +621,20 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
  *                           Public Functions
  *============================================================================*/
 gui_view_t *gui_view_create(void       *parent,
-                            const gui_view_descriptor_t *descriptor,
+                            const char *name,
                             int16_t     x,
                             int16_t     y,
                             int16_t     w,
                             int16_t     h)
 {
-    GUI_ASSERT(descriptor != NULL);
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(name);
+
+    if (descriptor == NULL)
+    {
+        gui_log("View '%s' not registered\n", name);
+        GUI_ASSERT(0);
+        return NULL;
+    }
 
     if (*descriptor->pView) // don't recreate view whether keep set or not
     {
@@ -697,11 +704,20 @@ gui_view_t *gui_view_create(void       *parent,
 }
 
 void gui_view_switch_on_event(gui_view_t *_this,
-                              const gui_view_descriptor_t *descriptor,
+                              const char *target_view_name,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
                               gui_event_t event)
 {
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(target_view_name);
+
+    if (descriptor == NULL)
+    {
+        gui_log("View '%s' not registered\n", target_view_name);
+        GUI_ASSERT(0);
+        return;
+    }
+
     bool update_event_dec = false; //update same event or new event flag
     bool update_on_event = false; //update same event or new event flag
 
@@ -782,12 +798,22 @@ void gui_view_switch_on_event(gui_view_t *_this,
     }
 }
 
-void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *descriptor,
+void gui_view_switch_direct(gui_view_t *_this, const char *target_view_name,
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style)
 {
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(target_view_name);
+
+    if (descriptor == NULL)
+    {
+        gui_log("View '%s' not registered\n", target_view_name);
+        GUI_ASSERT(0);
+        return;
+    }
+
     if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor) { return; }
-    gui_view_switch_on_event(_this, descriptor, switch_out_style, switch_in_style, GUI_EVENT_INVALID);
+    gui_view_switch_on_event(_this, target_view_name, switch_out_style, switch_in_style,
+                             GUI_EVENT_INVALID);
 }
 
 void gui_view_set_animate_step(gui_view_t *_this, uint16_t step)

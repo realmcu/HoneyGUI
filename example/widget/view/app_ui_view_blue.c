@@ -25,9 +25,9 @@ static void img_cb(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(gui_view_get("blue_view"), gui_view_descriptor_get("white_view"),
+    gui_view_switch_direct(gui_view_get("blue_view"), "white_view",
                            SWITCH_OUT_NONE_ANIMATION,
-                           SWITCH_OUT_NONE_ANIMATION);
+                           SWITCH_IN_NONE_ANIMATION);
 }
 
 static void switch_out_cb(gui_view_t *view)
@@ -42,24 +42,24 @@ static void switch_in_cb(gui_view_t *view)
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_blue, 200, 200, 0, 0);
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("yellow_view"), SWITCH_OUT_TO_RIGHT_USE_CUBE,
+    gui_view_switch_on_event(view, "yellow_view", SWITCH_OUT_TO_RIGHT_USE_CUBE,
                              SWITCH_IN_FROM_LEFT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("white_view"), SWITCH_OUT_TO_LEFT_USE_CUBE,
+    gui_view_switch_on_event(view, "white_view", SWITCH_OUT_TO_LEFT_USE_CUBE,
                              SWITCH_IN_FROM_RIGHT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("yellow_view"),
+    gui_view_switch_on_event(view, "yellow_view",
                              SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_CENTER_ZOOM_FADE,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("lime_view"), SWITCH_OUT_STILL_USE_BLUR,
+    gui_view_switch_on_event(view, "lime_view", SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("white_view"), SWITCH_OUT_ANIMATION_ZOOM,
+    gui_view_switch_on_event(view, "white_view", SWITCH_OUT_ANIMATION_ZOOM,
                              SWITCH_IN_ANIMATION_ZOOM,
                              GUI_EVENT_TOUCH_CLICKED);
 
@@ -69,7 +69,7 @@ static void switch_in_cb(gui_view_t *view)
 
 static int app_init(void)
 {
-    gui_view_create(gui_obj_get_root(), gui_view_descriptor_get(CURRENT_VIEW_NAME), 0, 0, 0, 0);
+    gui_view_create(gui_obj_get_root(), CURRENT_VIEW_NAME, 0, 0, 0, 0);
     return 0;
 }
 

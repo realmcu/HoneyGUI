@@ -813,7 +813,7 @@ static void time_update_cb(void *obj)
 
 static void stopwatch_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, gui_view_descriptor_get("menu_view"),
+    gui_view_switch_on_event(view, "menu_view",
                              SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

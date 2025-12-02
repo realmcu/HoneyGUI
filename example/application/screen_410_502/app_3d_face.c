@@ -89,7 +89,7 @@ static void face_global_cb(l3_model_base_t *this)
 static void face_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 

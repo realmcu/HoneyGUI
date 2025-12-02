@@ -101,7 +101,7 @@ static void click_button_message(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
 
-    gui_view_switch_direct(current_view, notification_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(current_view, notification_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
@@ -167,7 +167,7 @@ static void click_button_flashlight(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     gui_view_set_animate_step(gui_view_get_current(), 400);
-    gui_view_switch_direct(gui_view_get_current(), flashlight_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), flashlight_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
@@ -187,7 +187,7 @@ static void click_button_timer(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
 
-    gui_view_switch_direct(current_view, timer_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(current_view, timer_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
@@ -196,7 +196,7 @@ static void click_button_call(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, call_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(current_view, call_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
@@ -207,7 +207,7 @@ static void click_button_2_info_center(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
 
     detail_page_design_func = page_information_center_customize_design;
-    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(current_view, detail_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
@@ -596,7 +596,7 @@ static void call_design(gui_obj_t *parent)
 static void inform_center_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(current_view, 10);
-    gui_view_switch_on_event(view, quick_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+    gui_view_switch_on_event(view, quick_view->name, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 

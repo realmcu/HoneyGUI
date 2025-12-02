@@ -226,7 +226,7 @@ static void switch_cb(void *obj, gui_event_t e, void *param)
 
 static void control_board_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
     // draw background

@@ -190,39 +190,39 @@ static void switch_app_cb(void *obj)
     const char *obj_name = ((gui_obj_t *)obj)->name;
     if (strcmp(obj_name, "note_weather") == 0)
     {
-        gui_view_switch_direct(current_view, gui_view_descriptor_get("weather_view"),
+        gui_view_switch_direct(current_view, "weather_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "note_ac") == 0)
     {
-        gui_view_switch_direct(current_view, gui_view_descriptor_get("activity_view"),
+        gui_view_switch_direct(current_view, "activity_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "MUSIC") == 0)
     {
         gui_view_set_animate_step(current_view, 60);
-        gui_view_switch_direct(current_view, gui_view_descriptor_get("music_view"),
+        gui_view_switch_direct(current_view, "music_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "BATTERY") == 0)
     {
         gui_view_set_animate_step(current_view, 60);
-        gui_view_switch_direct(current_view, gui_view_descriptor_get("battery_view"),
+        gui_view_switch_direct(current_view, "battery_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "MESSAGE") == 0)
     {
-        // gui_view_switch_direct(current_view, gui_view_descriptor_get("app_message_view"), SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+        // gui_view_switch_direct(current_view, "app_message_view", SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
         //                        SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "APP_MENU") == 0)
     {
         gui_view_set_animate_step(current_view, 100);
-        gui_view_switch_direct(current_view, gui_view_descriptor_get("menu_view"),
+        gui_view_switch_direct(current_view, "menu_view",
                                SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
@@ -514,7 +514,7 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void bottom_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+    gui_view_switch_on_event(view, "watchface_view",
                              SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
                              GUI_EVENT_TOUCH_MOVE_DOWN);

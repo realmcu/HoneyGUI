@@ -338,16 +338,16 @@ static void win_cb(void *param)
 static void watchface_design(gui_view_t *view)
 {
     /* view layout */
-    gui_view_switch_on_event(view, app_bottom_view, SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, app_bottom_view->name, SWITCH_INIT_STATE,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, app_top_view, SWITCH_OUT_STILL_USE_BLUR,
+    gui_view_switch_on_event(view, app_top_view->name, SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
-    gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, activity_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_view_switch_on_event(view, app_control_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+    gui_view_switch_on_event(view, app_control_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 

@@ -122,11 +122,11 @@ static void vector_graphic_switch_in(gui_view_t *view)
 
 
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("transparent_gradient_animation_view"),
+    gui_view_switch_on_event(view, "transparent_gradient_animation_view",
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("fps_show_view"),
+    gui_view_switch_on_event(view, "fps_show_view",
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
@@ -150,7 +150,7 @@ static int chargecase_demo_entry(void)
 {
 
     gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
-    gui_view_create(win, gui_view_descriptor_get("vector_graphic_view"), 0, 0, 0, 0);
+    gui_view_create(win, "vector_graphic_view", 0, 0, 0, 0);
     fps_create(gui_obj_get_root());
     return 0;
 }

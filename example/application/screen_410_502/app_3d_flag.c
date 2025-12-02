@@ -94,7 +94,7 @@ static void flag_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
     gui_view_set_animate_step(view, 1000);
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_KB_SHORT_CLICKED);
 

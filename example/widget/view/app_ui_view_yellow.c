@@ -23,26 +23,26 @@ static void app_ui_view_yellow_design(gui_view_t *view)
     gui_img_create_from_mem(view, "img", (void *)_actiger_yellow, 0, 0, 0,
                             0);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("white_view"),
+    gui_view_switch_on_event(view, "white_view",
                              SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("blue_view"), SWITCH_OUT_TO_LEFT_USE_CUBE,
+    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_TO_LEFT_USE_CUBE,
                              SWITCH_IN_FROM_RIGHT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("white_view"),
+    gui_view_switch_on_event(view, "white_view",
                              SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("blue_view"),
+    gui_view_switch_on_event(view, "blue_view",
                              SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("blue_view"), SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_BOUNCE_FROM_RIGHT,
                              GUI_EVENT_TOUCH_CLICKED);
 

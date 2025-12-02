@@ -522,7 +522,7 @@ static l3_4x4_matrix_t fish_face_cb(l3_model_base_t *this, size_t face_index/*fa
 static void app_ui_wave_nums_design(gui_view_t *view)
 {
     srand((uint32_t)gui_ms_get());
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 

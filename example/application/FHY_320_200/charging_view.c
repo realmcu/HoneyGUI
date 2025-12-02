@@ -67,7 +67,7 @@ static void switch_charging_view(void *msg)
     if (view_c)
     {
         gui_view_set_animate_step(view_c, 400);
-        gui_view_switch_direct(view_c, &descriptor, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(view_c, descriptor.name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }
@@ -143,7 +143,7 @@ static void entrance_animation(void *p)
 static void charging_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 400);
-    gui_view_switch_on_event(view, wallpaper_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_on_event(view, wallpaper_view->name, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 

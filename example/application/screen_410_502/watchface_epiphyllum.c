@@ -137,7 +137,7 @@ static void flower_change_cb(void *obj, gui_event_t e, void *param)
 
 static void create_watchface_flower(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 #ifdef FLOWER_MJPG

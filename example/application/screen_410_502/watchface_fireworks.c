@@ -321,7 +321,7 @@ static void app_ui_fireworks_design(gui_view_t *view)
     srand((uint32_t)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
     // gui_obj_create_timer(obj, 10, true, return_timer_cb);
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 

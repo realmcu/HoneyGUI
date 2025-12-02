@@ -300,16 +300,16 @@ static void clear_mem(gui_view_t *view)
 
 static void app_main_watch_ui_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, bottom_view, SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, bottom_view->name, SWITCH_INIT_STATE,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, top_view, SWITCH_OUT_STILL_USE_BLUR,
+    gui_view_switch_on_event(view, top_view->name, SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
-    gui_view_switch_on_event(view, watchface_select_view, SWITCH_OUT_ANIMATION_ZOOM,
+    gui_view_switch_on_event(view, watchface_select_view->name, SWITCH_OUT_ANIMATION_ZOOM,
                              SWITCH_IN_ANIMATION_ZOOM,
                              GUI_EVENT_TOUCH_LONG);
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
@@ -353,7 +353,7 @@ static int app_init(void)
     gui_obj_start_timer(GUI_BASE(win));
     win_cb(NULL);
 
-    gui_view_create(win, &descriptor, 0, 0, 0, 0);
+    gui_view_create(win, descriptor.name, 0, 0, 0, 0);
 
     return 0;
 }

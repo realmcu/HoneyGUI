@@ -60,11 +60,11 @@ static void timer_cb(void *p)
 static void wallpaper_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 400);
-    gui_view_switch_on_event(view, quick_view, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
+    gui_view_switch_on_event(view, quick_view->name, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, charging_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_on_event(view, charging_view->name, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION, GUI_EVENT_TOUCH_CLICKED);
 
     gui_obj_t *parent = GUI_BASE(view);

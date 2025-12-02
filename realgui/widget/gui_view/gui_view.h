@@ -175,7 +175,7 @@ typedef struct gui_view_on_event
 /**
  * @brief Create a view widget.
  * @param parent The father widget it nested in.
- * @param descriptor Pointer to a descriptor that defines the new view to switch to.
+ * @param name View name that can be used to find the target view descriptor.
  * @param x The X-axis coordinate relative to parent widget.
  * @param y The Y-axis coordinate relative to parent widget.
  * @param w Width.
@@ -183,7 +183,7 @@ typedef struct gui_view_on_event
  * @return Return the widget object pointer.
  */
 gui_view_t *gui_view_create(void       *parent,
-                            const gui_view_descriptor_t *descriptor,
+                            const char *name,
                             int16_t     x,
                             int16_t     y,
                             int16_t     w,
@@ -211,18 +211,18 @@ gui_view_t *gui_view_get(const char *name);
  * @brief Switches the current GUI view to a new view based on the specified event.
  *
  * This function handles the transition between GUI views. It takes the current
- * view context and switches it to a new view as described by the `descriptor`.
+ * view context and switches it to a new view as described by the target view name.
  * The transition is triggered by a specified event and can be customized with
  * different switch styles for the outgoing and incoming views.
  *
  * @param _this Pointer to the current GUI view context that is being manipulated.
- * @param descriptor Pointer to a descriptor that defines the new view to switch to.
+ * @param target_view_name Target view name that can be used to find the target view descriptor.
  * @param switch_out_style Style applied to the outgoing view during the switch.
  * @param switch_in_style Style applied to the incoming view during the switch.
  * @param event The event that triggers the view switch.
  */
 void gui_view_switch_on_event(gui_view_t *_this,
-                              const gui_view_descriptor_t *descriptor,
+                              const char *target_view_name,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
                               gui_event_t event);
@@ -231,16 +231,16 @@ void gui_view_switch_on_event(gui_view_t *_this,
  * @brief Switches directly the current GUI view to a new view through animation.
  *
  * This function handles the transition between GUI views. It takes the current
- * view context and switches it to a new view as described by the `descriptor`.
+ * view context and switches it to a new view as described by the target view name.
  * The transition animation can be customized with different animation switch styles for
  * the outgoing and incoming views.
  *
  * @param _this Pointer to the current GUI view context that is being manipulated.
- * @param descriptor Pointer to a descriptor that defines the new view to switch to.
+ * @param target_view_name Target view name that can be used to find the target view descriptor.
  * @param switch_out_style Style applied to the outgoing view during the switch.
  * @param switch_in_style Style applied to the incoming view during the switch.
  */
-void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *descriptor,
+void gui_view_switch_direct(gui_view_t *_this, const char *target_view_name,
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style);
 

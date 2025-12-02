@@ -304,10 +304,10 @@ static void activity_design(gui_view_t *view)
                                           img_data);
         gui_img_refresh_size(img);
         gui_obj_create_timer(obj, 10, true, enter_timer_cb);
-        gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+        gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                                  SWITCH_IN_FROM_LEFT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_view_switch_on_event(view, recorder_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+        gui_view_switch_on_event(view, recorder_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
                                  SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_LEFT);
     }
@@ -316,7 +316,7 @@ static void activity_design(gui_view_t *view)
         count = 0;
         gui_obj_create_timer(GUI_BASE(img), 10, true, activity_timer_cb);
 
-        gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);
     }

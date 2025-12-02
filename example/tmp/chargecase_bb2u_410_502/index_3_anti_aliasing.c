@@ -5,11 +5,11 @@ static void anti_aliasing_switch_in(gui_view_t *view)
 {
     GUI_UNUSED(view);
     gui_log("anti_aliasing_view switch in\n");
-    gui_view_switch_on_event(view, gui_view_descriptor_get("video_support_view"),
+    gui_view_switch_on_event(view, "video_support_view",
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("fps_show_view"),
+    gui_view_switch_on_event(view, "fps_show_view",
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);

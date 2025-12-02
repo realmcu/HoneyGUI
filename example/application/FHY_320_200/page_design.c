@@ -224,7 +224,7 @@ static void toggle_move(void *p)
             {
                 gui_view_t *current_view = gui_view_get_current();
                 gui_view_set_animate_step(current_view, 10);
-                gui_view_switch_direct(current_view, auracast_view,
+                gui_view_switch_direct(current_view, auracast_view->name,
                                        SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                        SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
             }
@@ -1303,7 +1303,7 @@ static void click_button_page_spatial_sound_with_head_tracking(void *obj, gui_ev
         {
             gui_view_t *current_view = gui_view_get_current();
             gui_view_set_animate_step(current_view, 10);
-            gui_view_switch_direct(current_view, spatial_sound_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+            gui_view_switch_direct(current_view, spatial_sound_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                    SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
         }
         return;
@@ -1366,7 +1366,7 @@ static void click_wallpaper_page_lock_screen(void *obj, gui_event_t e, void *par
     GUI_UNUSED(param);
     switch_from_lock_screen = true;
     gui_view_set_animate_step(gui_view_get_current(), 400);
-    gui_view_switch_direct(gui_view_get_current(), lock_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), lock_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
@@ -1589,7 +1589,7 @@ static void click_button_page_timer(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     f_status.timer = 0;
-    gui_view_switch_direct(gui_view_get_current(), timer_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(gui_view_get_current(), timer_view->name, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
@@ -1600,7 +1600,7 @@ static void click_button_page_flashlight(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
     f_status.timer = 0;
     gui_view_set_animate_step(gui_view_get_current(), 400);
-    gui_view_switch_direct(gui_view_get_current(), flashlight_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), flashlight_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
@@ -1627,7 +1627,7 @@ static void click_button_page_case_button_customize(void *obj, gui_event_t e, vo
         gui_obj_move(bg_note, 0, GUI_BASE(obj)->y + 60);
         gui_obj_hidden(bg_note, false);
 
-        gui_view_switch_direct(gui_view_get_current(), button_customize_view,
+        gui_view_switch_direct(gui_view_get_current(), button_customize_view->name,
                                SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
     }
@@ -1968,7 +1968,8 @@ static void click_button_page_support(void *obj, gui_event_t e, void *param)
         support_reset = true;
     }
     gui_obj_hidden(bg, false);
-    gui_view_switch_direct(gui_view_get_current(), support_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    gui_view_switch_direct(gui_view_get_current(), support_view->name,
+                           SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 

@@ -80,12 +80,12 @@ static void video_support_switch_in(gui_view_t *view)
                          GUI_EVENT_TOUCH_RELEASED,
                          NULL);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("gif_apng_support_view"),
+    gui_view_switch_on_event(view, "gif_apng_support_view",
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("anti_aliasing_view"),
+    gui_view_switch_on_event(view, "anti_aliasing_view",
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);

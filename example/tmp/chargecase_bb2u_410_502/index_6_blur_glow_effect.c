@@ -116,11 +116,11 @@ static void blur_glow_effect_switch_in(gui_view_t *view)
 
 
 
-    gui_view_switch_on_event(view, gui_view_descriptor_get("gif_apng_support_view"),
+    gui_view_switch_on_event(view, "gif_apng_support_view",
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("inner_shadow_view"),
+    gui_view_switch_on_event(view, "inner_shadow_view",
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);

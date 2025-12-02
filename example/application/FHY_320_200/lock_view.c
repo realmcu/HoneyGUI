@@ -83,7 +83,7 @@ static void pressing_tab(void *obj)
         const int16_t step = 20;
         if (x >= TAB_MAX_POS_X)
         {
-            gui_view_switch_direct(current_view, quick_view, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_direct(current_view, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_ANIMATION_FADE);
             gui_obj_stop_timer(GUI_BASE(img));
             return;
@@ -170,7 +170,7 @@ static void lock_view_design(gui_view_t *view)
         theme_bg_white = theme_bg_rec;
         if (!f_status.unlock_slider)
         {
-            gui_view_switch_on_event(view, quick_view, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_on_event(view, quick_view->name, SWITCH_OUT_NONE_ANIMATION,
                                      SWITCH_IN_NONE_ANIMATION,
                                      GUI_EVENT_TOUCH_CLICKED);
             return;

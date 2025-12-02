@@ -107,13 +107,13 @@ static void draw_battery_arc(NVGcontext *vg)
 // static void battery_press_cb(void *p)
 // {
 //     GUI_UNUSED(p);
-//     gui_view_switch_direct(current_view, gui_view_descriptor_get("_view"),
+//     gui_view_switch_direct(current_view, "_view",
 //                            SWITCH_IN_ANIMATION_FADE, SWITCH_OUT_ANIMATION_FADE);
 // }
 static void battery_return_press_cb(void *p)
 {
     GUI_UNUSED(p);
-    gui_view_switch_direct(current_view, gui_view_descriptor_get("bottom_view"),
+    gui_view_switch_direct(current_view, "bottom_view",
                            SWITCH_IN_ANIMATION_FADE, SWITCH_OUT_ANIMATION_FADE);
 }
 static void battery_design(gui_view_t *view)
@@ -122,7 +122,7 @@ static void battery_design(gui_view_t *view)
     if (strcmp(obj_name, "bottom_view") == 0)
     {
         gui_view_set_animate_step(current_view, 60);
-        gui_view_switch_on_event(current_view, gui_view_descriptor_get("bottom_view"),
+        gui_view_switch_on_event(current_view, "bottom_view",
                                  SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);

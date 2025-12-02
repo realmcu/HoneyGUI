@@ -497,7 +497,7 @@ static void create_clear_note(void *parent)
 
 static void top_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+    gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_STILL_USE_BLUR,
                              GUI_EVENT_TOUCH_MOVE_UP);
     gui_view_set_opacity(view, 200);

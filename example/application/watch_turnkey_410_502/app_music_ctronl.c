@@ -70,7 +70,7 @@ static void music_next_press_cb(void *p)
 static void music_return_press_cb(void *p)
 {
     GUI_UNUSED(p);
-    gui_view_switch_direct(current_view, gui_view_descriptor_get("music_view"),
+    gui_view_switch_direct(current_view, "music_view",
                            SWITCH_IN_ANIMATION_FADE, SWITCH_OUT_ANIMATION_FADE);
 }
 static void music_ctr_press_cb(void *p)

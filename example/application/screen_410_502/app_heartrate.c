@@ -412,10 +412,10 @@ static void heartrate_design(gui_view_t *view)
     const char *name = GUI_BASE(gui_view_get_current())->name;
     if (strcmp(name, "call_dial_view") == 0 || strcmp(name, "qrcode_view") == 0)
     {
-        gui_view_switch_on_event(view, call_dial_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+        gui_view_switch_on_event(view, call_dial_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                                  SWITCH_IN_FROM_LEFT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_view_switch_on_event(view, qrcode_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+        gui_view_switch_on_event(view, qrcode_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
                                  SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_LEFT);
         return;
@@ -428,7 +428,7 @@ static void heartrate_design(gui_view_t *view)
     {
         pre_view = watchface_view;
     }
-    gui_view_switch_on_event(view, pre_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, pre_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
