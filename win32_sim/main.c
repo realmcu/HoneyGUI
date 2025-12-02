@@ -18,6 +18,9 @@
 #include "unistd.h"
 #include "time.h"
 
+
+
+
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__
 #define PROJECT_NAME                   "HoneyGUI Simulator"
@@ -28,6 +31,13 @@ int main(int argc, char **argv)
 {
     setvbuf(stdout, NULL, _IONBF,
             0);// add for vstudio debug console output issue,vscode plugin used to debug
+
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+    {
+        printf("current working directory: %s\n", cwd);
+    }
+
     (void)argc;
     (void)argv;
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", \
