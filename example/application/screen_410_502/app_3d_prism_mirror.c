@@ -281,7 +281,7 @@ static void prism_view_switch_to_other_view()
 {
     if (image_view && face_flags_rotation >= 0 && face_flags_rotation < face_nums)
     {
-        gui_view_switch_direct(current_view, image_view, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(current_view, image_view->name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }

@@ -693,7 +693,7 @@ static void fruit_ninja_design(gui_obj_t *obj)
 extern "C" {
     static void return_cb()
     {
-        gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
     static void app_fruit_ninja_design(gui_view_t *view)

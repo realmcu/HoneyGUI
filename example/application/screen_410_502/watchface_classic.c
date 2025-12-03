@@ -42,12 +42,12 @@ static gui_text_t *weather_date_text[4] = {0};
 static bool weather_syn_flag = true; // synchronize data update of weather card and temp arc
 static char content_cur[5] = {0};
 static char content_range[15] = {0};
-static char temp_cur_content[3] = {0};
-static char temp_low_content[3] = {0};
-static char temp_high_content[3] = {0};
+static char temp_cur_content[8] = {0};
+static char temp_low_content[8] = {0};
+static char temp_high_content[8] = {0};
 
 static gui_img_t *compass_pointer = NULL;
-static char degree_content[6] = "0°";
+static char degree_content[12] = "0°";
 static char orien_content[3] = "N";
 
 static uint8_t *img_data_temperature = NULL;
@@ -604,7 +604,7 @@ static void switch_heartrate(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(gui_view_get_current(), heartrate_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), heartrate_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -621,7 +621,7 @@ static void switch_menu(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 

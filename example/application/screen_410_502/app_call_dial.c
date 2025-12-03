@@ -66,7 +66,7 @@ static gui_win_t *win_call_dail = NULL;
 
 static char dial_number[DIAL_BUFFER_LENGTH] = {0};
 static char *dial_number_display = NULL;
-static uint8_t index = 0;
+static uint8_t dial_index = 0;
 
 static uint8_t *img_data = NULL;
 /*============================================================================*
@@ -216,12 +216,12 @@ static void click_number_tab_cb(void *o, gui_event_t e, void *param)
     (void)param;
     gui_obj_t *obj = GUI_BASE(o);
 
-    if (index < DIAL_BUFFER_LENGTH - 1)
+    if (dial_index < DIAL_BUFFER_LENGTH - 1)
     {
-        dial_number[index++] = obj->name[0]; // obj->name is the number character
-        dial_number[index] = '\0';
+        dial_number[dial_index++] = obj->name[0]; // obj->name is the number character
+        dial_number[dial_index] = '\0';
     }
-    if (index > DIAL_LENGTH && index < DIAL_BUFFER_LENGTH - 1)
+    if (dial_index > DIAL_LENGTH && dial_index < DIAL_BUFFER_LENGTH - 1)
     {
         dial_number_display++;
     }
@@ -234,15 +234,15 @@ static void click_back_cb(void *o, gui_event_t e, void *param)
     (void)o;
     (void)e;
     (void)param;
-    if (index > 0)
+    if (dial_index > 0)
     {
-        dial_number[--index] = '\0';
+        dial_number[--dial_index] = '\0';
     }
     else
     {
         return; // No number to delete
     }
-    if (index > DIAL_LENGTH && index < DIAL_BUFFER_LENGTH - 1)
+    if (dial_index > DIAL_LENGTH && dial_index < DIAL_BUFFER_LENGTH - 1)
     {
         dial_number_display--;
     }
@@ -280,8 +280,8 @@ static void app_call_dail_design(gui_view_t *view)
     gui_text_mode_set(text, CENTER);
     gui_text_rendermode_set(text, 2);
 
-    index = 0;
-    dial_number[index] = '\0';
+    dial_index = 0;
+    dial_number[dial_index] = '\0';
     dial_number_display = dial_number;
     text = gui_text_create(win_call_dail, "dial_number", 0, 80, SCREEN_WIDTH, 50);
     gui_text_set(text, dial_number_display, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,

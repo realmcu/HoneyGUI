@@ -186,7 +186,7 @@ static void kb_button_cb(void *param)
             {
                 // Press once to enter menu
                 press_his = 0;
-                gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
+                gui_view_switch_direct(gui_view_get_current(), menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                        SWITCH_IN_ANIMATION_FADE);
             }
         }
@@ -330,7 +330,7 @@ static void win_cb(void *param)
         *call_incoming_flag = false;
         gui_view_t *current_view = gui_view_get_current();
         gui_view_set_animate_step(current_view, 1000);
-        gui_view_switch_direct(current_view, call_incoming_view, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(current_view, call_incoming_view->name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }
@@ -414,7 +414,7 @@ static void app_main_watch_ui_design(void)
     json_refreash();
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_main_watch_win", 0, 0, 0, 0);
-    gui_view_create(win, labubu_digital_view, 0, 0, 0, 0); // watch turn on animation
+    gui_view_create(win, labubu_digital_view->name, 0, 0, 0, 0); // watch turn on animation
     fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     gui_obj_start_timer(GUI_BASE(win));

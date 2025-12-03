@@ -237,22 +237,22 @@ static void switch_app_cb(void *obj)
     const char *obj_name = ((gui_obj_t *)obj)->name;
     if (strcmp(obj_name, "RING") == 0)
     {
-        gui_view_switch_direct(current_view, box2d_ring_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, box2d_ring_view->name, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "FJ") == 0)
     {
-        gui_view_switch_direct(current_view, fruit_ninja_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, fruit_ninja_view->name, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "HR") == 0)
     {
-        gui_view_switch_direct(current_view, heartrate_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, heartrate_view->name, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "app_menu") == 0)
     {
-        gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
 }

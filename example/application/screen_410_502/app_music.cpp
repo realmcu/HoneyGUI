@@ -119,9 +119,9 @@ extern "C" {
         {"Hello", 210.f, "03:30"},
         {"Attentions", 280.f, "04:40"}
     };
-    char artist_name[20] = {0};
-    char music_name[20] = {0};
-    char album_name[20] = {0};
+    char artist_name[32] = {0};
+    char music_name[32] = {0};
+    char album_name[32] = {0};
     char music_time_array[6] = {0};
     char play_time_array[6] = "00:00";
     uint8_t music_num = 0;
@@ -1076,7 +1076,7 @@ extern "C"
 {
     static void return_cb()
     {
-        gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
 

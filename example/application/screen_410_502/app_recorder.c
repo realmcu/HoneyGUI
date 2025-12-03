@@ -18,7 +18,7 @@
  *============================================================================*/
 typedef struct record_information
 {
-    char name[8];
+    char name[16];
     uint16_t time;
 } record_infor_t;
 
@@ -61,7 +61,7 @@ static uint8_t play_index = 0;
 static uint32_t play_time = 0;
 static char play_time_str[10] = "00:00:00";
 static char file_time_str[10] = "00:00:00";
-static char play_file_name[10] = {0};
+static char play_file_name[20] = {0};
 static record_infor_t record_infor[RECORD_NUM_MAX] =
 {
     {"File_1", 230},

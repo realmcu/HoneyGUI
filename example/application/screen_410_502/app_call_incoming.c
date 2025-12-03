@@ -135,7 +135,7 @@ static void click_call_end_cb(void *obj, gui_event_t e, void *param)
 
     if (current_view)
     {
-        gui_view_switch_direct(current_view, last_view, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(current_view, last_view->name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
     else
