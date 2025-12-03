@@ -16,12 +16,13 @@ except ImportError:
     sys.exit(1)
 
 
-# GUI_FormatType enum values
+# GUI_FormatType enum values (must match draw_img.h)
 FORMAT_RGB565 = 0
 FORMAT_ARGB8565 = 1
 FORMAT_RGB888 = 3
 FORMAT_ARGB8888 = 4
-FORMAT_A8 = 5  # Alpha channel only (8-bit grayscale)
+FORMAT_ALPHAMASK = 9  # Alpha channel only (8-bit grayscale)
+FORMAT_A8 = FORMAT_ALPHAMASK  # Alias
 
 
 def rgb_to_rgb565(r, g, b):
@@ -100,8 +101,8 @@ def convert_image(input_path: Path, output_path: Path, fmt: str = "auto") -> boo
     elif fmt == "argb8565":
         for r, g, b, a in pixels:
             val = rgb_to_rgb565(r, g, b)
-            pixel_data.append(a)
-            pixel_data.extend(struct.pack('<H', val))
+            pixel_data.extend(struct.pack('<H', val))  # RGB565 first
+            pixel_data.append(a)  # Alpha last
     
     elif fmt == "a8":
         # Extract alpha channel only (8-bit grayscale)

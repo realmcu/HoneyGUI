@@ -48,10 +48,10 @@ Examples:
     rle_group = parser.add_argument_group('RLE options')
     rle_group.add_argument('--rle-level', type=int, default=1, choices=[1, 2],
                           help='RLE compression level (default: 1)')
-    rle_group.add_argument('--rle-run1', type=int, default=3, choices=[0, 1, 2, 3],
-                          help='RLE 1st stage run length (default: 3)')
-    rle_group.add_argument('--rle-run2', type=int, default=3, choices=[0, 1, 2, 3],
-                          help='RLE 2nd stage run length (default: 3)')
+    rle_group.add_argument('--rle-run1', type=int, default=1, choices=[0, 1, 2, 3],
+                          help='RLE 1st stage run length size (default: 1)')
+    rle_group.add_argument('--rle-run2', type=int, default=0, choices=[0, 1, 2, 3],
+                          help='RLE 2nd stage run length size (default: 0)')
     
     # YUV options
     yuv_group = parser.add_argument_group('YUV options')

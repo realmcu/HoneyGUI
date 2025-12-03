@@ -89,9 +89,18 @@ class ImageConverter:
                 )
                 f.write(imdc_header.pack())
                 
-                # Write line offset table
+                # Calculate offsets relative to imdc_file_t start
+                # imdc_file_t starts at offset 8 (after gui_rgb_data_head_t)
+                # Compressed data starts after: imdc_header(12) + offset_table(h*4)
+                # So offset is relative to imdc_file_t, which means:
+                # offset = 12 + h*4 + relative_offset_in_compressed_data
+                imdc_offset = 12 + h * 4
+                
+                # Write line offset table (relative to imdc_file_t start)
                 for offset in line_offsets:
-                    f.write(struct.pack('<I', offset))
+                    # offset relative to imdc_file_t start
+                    relative_offset = imdc_offset + offset
+                    f.write(struct.pack('<I', relative_offset))
                 
                 # Write compressed data
                 f.write(compressed_data)

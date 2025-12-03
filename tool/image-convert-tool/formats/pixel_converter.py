@@ -40,8 +40,8 @@ def convert_pixels(pixels, fmt):
     elif fmt == FORMAT_ARGB8565:
         for r, g, b, a in pixels:
             val = rgb_to_rgb565(r, g, b)
-            pixel_data.append(a)
-            pixel_data.extend(struct.pack('<H', val))
+            pixel_data.extend(struct.pack('<H', val))  # RGB565 first
+            pixel_data.append(a)  # Alpha last
     
     elif fmt == FORMAT_A8:
         # Extract alpha channel only

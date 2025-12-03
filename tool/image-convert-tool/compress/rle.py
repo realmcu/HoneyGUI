@@ -16,12 +16,16 @@ from formats.format_types import *
 class RLECompression(CompressionAlgorithm):
     """RLE compression algorithm"""
     
-    def __init__(self, run_length_1=3, run_length_2=3, level=1):
+    def __init__(self, run_length_1=1, run_length_2=0, level=1):
         """
         Args:
-            run_length_1: 1阶 RLE Run Length (0-3, 实际最小重复次数 = run_length_1 + 1)
-            run_length_2: 2阶 RLE Run Length (0-3)
+            run_length_1: 1阶 RLE Run Length Size (0-3)
+                         对应algorithm_type的bit[3:2]
+            run_length_2: 2阶 RLE Run Length Size (0-3)
+                         对应algorithm_type的bit[5:4]
             level: RLE level (1 or 2)
+        
+        Note: 默认值 run_length_1=1, run_length_2=0 对应 algorithm_type=0x04
         """
         self.run_length_1 = run_length_1 & 0x03
         self.run_length_2 = run_length_2 & 0x03
