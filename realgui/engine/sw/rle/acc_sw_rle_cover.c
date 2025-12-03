@@ -35,7 +35,7 @@ void rle_cover_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
         return;
     }
 
-    uint32_t image_off = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    uint32_t image_off = sizeof(gui_rgb_data_head_t) + (uintptr_t)(image->data);
 
     imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
     uint8_t line_buf[BYTE_PIXEL_RGB565 * source_w];

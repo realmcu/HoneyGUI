@@ -609,7 +609,7 @@ static void l3_render_triangle_half(l3_draw_tria_img_t *image,
         float toverz0 = t0 * inv_z0, toverz1 = t1 * inv_z1, toverz2 = t2 * inv_z2;
 
         l3_img_head_t *src_head = (l3_img_head_t *)image->fill_data;
-        uint32_t image_addr = sizeof(l3_img_head_t) + (uint32_t)(uintptr_t)(image->fill_data);
+        uint32_t image_addr = sizeof(l3_img_head_t) + (uintptr_t)(image->fill_data);
 
         if (image->fill_type == L3_FILL_IMAGE_RGB565)
         {

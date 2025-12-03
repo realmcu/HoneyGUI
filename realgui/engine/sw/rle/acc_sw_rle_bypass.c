@@ -71,7 +71,7 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
         return;
     }
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uintptr_t)(image->data);
     imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
 
     gui_matrix_t *inverse = &image->inverse;

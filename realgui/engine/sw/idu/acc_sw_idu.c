@@ -129,8 +129,8 @@ static void decode_RLE_16bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
     {
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
-            line_addr = (uint32_t)(uintptr_t)in + addr_set[line];
-            next_addr = (uint32_t)(uintptr_t)in + addr_set[line + 1];
+            line_addr = (uintptr_t)in + addr_set[line];
+            next_addr = (uintptr_t)in + addr_set[line + 1];
             decode_RLE_line_16(in + addr_set[line], out, in + addr_set[line + 1]);
             out += range->target_stride;
         }
@@ -143,8 +143,8 @@ static void decode_RLE_16bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
         uint32_t line_length = width * 2;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
-            line_addr = (uint32_t)(uintptr_t)in + addr_set[line];
-            next_addr = (uint32_t)(uintptr_t)in + addr_set[line + 1];
+            line_addr = (uintptr_t)in + addr_set[line];
+            next_addr = (uintptr_t)in + addr_set[line + 1];
             decode_RLE_line_16(in + addr_set[line], line_buffer, in + addr_set[line + 1]);
             memcpy(out, line_buffer + line_offset, line_length);
             out += range->target_stride;
@@ -162,8 +162,8 @@ static void decode_RLE_24bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
     {
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
-            line_addr = (uint32_t)(uintptr_t)in + addr_set[line];
-            next_addr = (uint32_t)(uintptr_t)in + addr_set[line + 1];
+            line_addr = (uintptr_t)in + addr_set[line];
+            next_addr = (uintptr_t)in + addr_set[line + 1];
             decode_RLE_line_24(in + addr_set[line], out, in + addr_set[line + 1]);
             out += range->target_stride;
         }
@@ -176,8 +176,8 @@ static void decode_RLE_24bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
         uint32_t line_length = width * 3;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
-            line_addr = (uint32_t)(uintptr_t)in + addr_set[line];
-            next_addr = (uint32_t)(uintptr_t)in + addr_set[line + 1];
+            line_addr = (uintptr_t)in + addr_set[line];
+            next_addr = (uintptr_t)in + addr_set[line + 1];
             decode_RLE_line_24(in + addr_set[line], line_buffer, in + addr_set[line + 1]);
             memcpy(out, line_buffer + line_offset, line_length);
             out += range->target_stride;
@@ -195,8 +195,8 @@ static void decode_RLE_32bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
     {
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
-            line_addr = (uint32_t)(uintptr_t)in + addr_set[line];
-            next_addr = (uint32_t)(uintptr_t)in + addr_set[line + 1];
+            line_addr = (uintptr_t)in + addr_set[line];
+            next_addr = (uintptr_t)in + addr_set[line + 1];
             decode_RLE_line_32(in + addr_set[line], out, in + addr_set[line + 1]);
             out += range->target_stride;
         }
@@ -209,8 +209,8 @@ static void decode_RLE_32bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
         uint32_t line_length = width * 4;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
-            line_addr = (uint32_t)(uintptr_t)in + addr_set[line];
-            next_addr = (uint32_t)(uintptr_t)in + addr_set[line + 1];
+            line_addr = (uintptr_t)in + addr_set[line];
+            next_addr = (uintptr_t)in + addr_set[line + 1];
             decode_RLE_line_32(in + addr_set[line], line_buffer, in + addr_set[line + 1]);
             memcpy(out, line_buffer + line_offset, line_length);
             out += range->target_stride;

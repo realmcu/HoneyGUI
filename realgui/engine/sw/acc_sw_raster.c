@@ -26,7 +26,7 @@ typedef struct
 {
     uint8_t *writebuf;
     int write_off;
-    uint32_t image_base;
+    uintptr_t image_base;
     uint32_t image_off;
     char input_type;
     uint8_t dc_bytes_per_pixel;
@@ -45,7 +45,7 @@ typedef struct
 
 static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
                                  uint8_t *source_alpha,
-                                 uint32_t image_base, uint32_t image_off, char input_type, uint8_t *palette_data,
+                                 uintptr_t image_base, uint32_t image_off, char input_type, uint8_t *palette_data,
                                  uint8_t *palette_index, uint32_t color_mix)
 {
     switch (input_type)
@@ -294,7 +294,7 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 {
     static int x_record = -1;
     static int y_record = -1;
-    static uint32_t line = 0;
+    static uintptr_t line = 0;
     static int location = 0;
     static draw_img_t *image_record = NULL;
     gui_img_file_t *file = (gui_img_file_t *)image->data;
@@ -306,7 +306,7 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
         y_record = y;
         image_record = image;
         location = 0;
-        line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
+        line = (uintptr_t)compressed + compressed->compressed_addr[y];
     }
     x_record = x;
     switch (input_type)
@@ -400,7 +400,7 @@ void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
                                    , 0, 0, 0
 #endif
                                  };
-    params.image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    params.image_base = sizeof(gui_rgb_data_head_t) + (uintptr_t)(image->data);
     params.palette_index = ((gui_palette_file_t *)head)->palette_index;
     params.palette_data = ((gui_palette_file_t *)head)->palette_data;
     params.color_mix = image->fg_color_set;
@@ -426,7 +426,7 @@ void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             if (use_rle)
             {
                 gui_get_rle_pixel(image, x, y, rle_pixel);
-                params.image_base = (uint32_t)(uintptr_t)rle_pixel;
+                params.image_base = (uintptr_t)rle_pixel;
             }
             else
             {

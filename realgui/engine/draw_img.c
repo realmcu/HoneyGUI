@@ -46,7 +46,7 @@ gui_rgb_data_head_t draw_img_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE sr
     }
     else if (src_mode == IMG_SRC_FTL)
     {
-        uint32_t base = (uint32_t)(uintptr_t)img->data;
+        uint32_t base = (uintptr_t)img->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
     }
     else if (src_mode == IMG_SRC_MEMADDR)
@@ -222,7 +222,7 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     else if (src_mode == IMG_SRC_FTL)
     {
         gui_rgb_data_head_t head;
-        uint32_t base = (uint32_t)(uintptr_t)image->data;
+        uint32_t base = (uintptr_t)image->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         uint8_t *data = NULL;
         if (head.compress == true)

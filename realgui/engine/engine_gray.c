@@ -38,7 +38,7 @@ void engine_gray16_blit_to_dc(engine_gray_t *gray16, struct gui_dispdev *dc, gui
         return;
     }
 
-    uint32_t source_data = (uint32_t)(uintptr_t)(gray16->data);
+    uint32_t source_data = (uintptr_t)(gray16->data);
     uint8_t *writebuf = dc->frame_buf;
 
     int16_t source_w = gray16->w;
@@ -80,7 +80,7 @@ void engine_gray256_blit_to_dc(engine_gray_t *gray256, struct gui_dispdev *dc, g
         return;
     }
 
-    uint32_t source_data = (uint32_t)(uintptr_t)(gray256->data);
+    uint32_t source_data = (uintptr_t)(gray256->data);
     uint8_t *writebuf = dc->frame_buf;
 
     int16_t source_w = gray256->w;

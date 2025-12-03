@@ -65,7 +65,7 @@ void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_r
                 int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
 
                 gui_get_rle_pixel(image, x, y, rle_pixel);
-                params.image_base = (uint32_t)(uintptr_t)rle_pixel;
+                params.image_base = (uintptr_t)rle_pixel;
                 params.write_off = write_off;
 
                 do_raster_pixel(&params);
@@ -77,7 +77,7 @@ void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_r
         int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;
         if (!l3_draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end)) { return; }
 
-        uint32_t image_base = sizeof(l3_img_head_t) + (uint32_t)(uintptr_t)(image->data);
+        uint32_t image_base = sizeof(l3_img_head_t) + (uintptr_t)(image->data);
 
         char input_type = head->type;
         int16_t source_w = image->img_w, source_h = image->img_h;

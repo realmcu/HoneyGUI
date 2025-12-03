@@ -28,7 +28,7 @@
 
 void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
                           uint8_t *source_alpha,
-                          uint32_t image_base, uint32_t image_off, char input_type)
+                          uintptr_t image_base, uint32_t image_off, char input_type)
 {
     switch (input_type)
     {
@@ -204,7 +204,7 @@ void gui_get_rle_pixel(l3_draw_rect_img_t *image, int x, int y, uint8_t *pixel)/
     l3_img_head_t *head = image->data;
     char input_type = head->type;
     l3_imdc_file_t *compressed = (l3_imdc_file_t *)(&(file->data.imdc_file));
-    uint32_t line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
+    uint32_t line = (uintptr_t)compressed + compressed->compressed_addr[y];
     int location = 0;
     switch (input_type)
     {

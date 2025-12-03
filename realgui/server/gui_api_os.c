@@ -260,8 +260,8 @@ void *gui_realloc(void *ptr_old, size_t n)
     {
         if (
             (os_api->lower_mem_size != 0) && \
-            ((uint32_t)(uintptr_t)ptr_old >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
-            ((uint32_t)(uintptr_t)ptr_old <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
+            ((uintptr_t)ptr_old >= (uintptr_t)os_api->lower_mem_addr) && \
+            ((uintptr_t)ptr_old <= (uintptr_t)os_api->lower_mem_addr +
              (uint32_t)os_api->lower_mem_size)
         )
         {
@@ -291,13 +291,13 @@ void gui_free(void *rmem)
 {
 
     if ((rmem != NULL) && \
-        ((uint32_t)(uintptr_t)rmem >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
-        ((uint32_t)(uintptr_t)rmem <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
+        ((uintptr_t)rmem >= (uintptr_t)os_api->lower_mem_addr) && \
+        ((uintptr_t)rmem <= (uintptr_t)os_api->lower_mem_addr +
          (uint32_t)os_api->lower_mem_size)
        )
     {
-        GUI_ASSERT((uint32_t)(uintptr_t)os_api->lower_mem_addr != 0);
-        GUI_ASSERT((uint32_t)(uintptr_t)os_api->lower_mem_size != 0);
+        GUI_ASSERT((uintptr_t)os_api->lower_mem_addr != 0);
+        GUI_ASSERT((uintptr_t)os_api->lower_mem_size != 0);
         gui_lower_free(rmem);
         return;
     }

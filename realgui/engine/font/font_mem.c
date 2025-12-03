@@ -46,8 +46,8 @@ void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
     uint8_t font_index;
-    uint32_t table_offset;
-    uint32_t dot_offset;
+    uintptr_t table_offset;
+    uintptr_t dot_offset;
     if (text == NULL)
     {
         return;
@@ -72,7 +72,7 @@ void gui_font_get_dot_info(gui_text_t *text)
         font = (GUI_FONT_HEAD_BMP *)text->path;
         if (font != NULL)
         {
-            table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
+            table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
             dot_offset = table_offset + font->index_area_size;
         }
     }
@@ -80,7 +80,7 @@ void gui_font_get_dot_info(gui_text_t *text)
     {
         font_index = get_fontlib_by_name(text->path);
         font = (GUI_FONT_HEAD_BMP *)font_lib_tab[font_index].data;
-        table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
+        table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
     }
     GUI_ASSERT(font != 0)
@@ -1233,8 +1233,8 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
 {
     GUI_FONT_HEAD_BMP *font = (GUI_FONT_HEAD_BMP *)font_bin_addr;
     uint32_t string_len = strlen(content);
-    uint32_t table_offset = (uint32_t)(uintptr_t)((uint8_t *)font_bin_addr + font->head_length);
-    uint32_t dot_offset = table_offset + font->index_area_size;
+    uintptr_t table_offset = (uintptr_t)((uint8_t *)font_bin_addr + font->head_length);
+    uintptr_t dot_offset = table_offset + font->index_area_size;
 
     uint8_t aliened_font_size = font->font_size;
     if (font->font_size % 8 != 0)
