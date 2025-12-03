@@ -35,7 +35,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  text rect struct start */
+/** @brief  Text rect struct start */
 typedef struct gui_text_rect
 {
     int16_t x1;
@@ -47,9 +47,10 @@ typedef struct gui_text_rect
     int16_t yboundtop;
     int16_t yboundbottom;
 } gui_text_rect_t;
-/** @brief  text rect struct end */
+/** @brief  Text rect struct end */
 
-/** @brief  mem char struct start */
+
+/** @brief  Memory char struct start */
 typedef struct
 {
     uint32_t unicode;
@@ -64,9 +65,10 @@ typedef struct
     uint8_t *buf;
     void *emoji_img;
 } mem_char_t;
-/** @brief  mem char struct end */
+/** @brief  Memory char struct end */
 
-/** @brief  text encoding format enum */
+
+/** @brief  Text encoding format enum */
 typedef enum
 {
     UTF_8                = 0,       //UTF: Unicode Transformation Format
