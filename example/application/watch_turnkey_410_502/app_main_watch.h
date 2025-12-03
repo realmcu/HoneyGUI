@@ -74,6 +74,9 @@ extern watchface_type_t current_watchface_type;
 // Generate a pseudo-random number
 uint16_t xorshift16(void);
 
+/* Send message to regenerate current_view asynchronously */
+void msg_2_regenerate_current_view(void);
+
 #ifdef __cplusplus
 }
 #endif

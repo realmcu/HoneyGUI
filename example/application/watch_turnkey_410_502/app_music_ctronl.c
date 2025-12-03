@@ -51,7 +51,7 @@ static void time_update_cb(void *p)
     else
     {
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", current_view);
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", gui_view_get_current());
             gui_text_content_set((gui_text_t *)t_time, time_str, strlen(time_str));
         }
 
@@ -70,7 +70,7 @@ static void music_next_press_cb(void *p)
 static void music_return_press_cb(void *p)
 {
     GUI_UNUSED(p);
-    gui_view_switch_direct(current_view, "music_view",
+    gui_view_switch_direct(gui_view_get_current(), "music_view",
                            SWITCH_IN_ANIMATION_FADE, SWITCH_OUT_ANIMATION_FADE);
 }
 static void music_ctr_press_cb(void *p)

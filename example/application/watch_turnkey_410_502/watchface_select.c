@@ -54,7 +54,7 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     case 0:
         {
             current_watchface_type = WATCHFACE_BIG_NUM;
-            gui_view_switch_direct(current_view, "watchface_view",
+            gui_view_switch_direct(gui_view_get_current(), "watchface_view",
                                    SWITCH_OUT_ANIMATION_ZOOM,
                                    SWITCH_IN_ANIMATION_ZOOM);
         }
@@ -62,7 +62,7 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     case 1:
         {
             current_watchface_type = WATCHFACE_SPORT;
-            gui_view_switch_direct(current_view, "watchface_view",
+            gui_view_switch_direct(gui_view_get_current(), "watchface_view",
                                    SWITCH_OUT_ANIMATION_ZOOM,
                                    SWITCH_IN_ANIMATION_ZOOM);
         }
@@ -70,7 +70,7 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     case 2:
         {
             current_watchface_type = WATCHFACE_VIDEO;
-            gui_view_switch_direct(current_view, "watchface_view",
+            gui_view_switch_direct(gui_view_get_current(), "watchface_view",
                                    SWITCH_OUT_ANIMATION_ZOOM,
                                    SWITCH_IN_ANIMATION_ZOOM);
         }
@@ -120,7 +120,8 @@ static void watchface_select_design(gui_view_t *view)
                            false);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, 5);
+    gui_list_set_auto_align(list, true);
     gui_list_set_out_scope(list, 50);
-    list->total_length += 100;
+    list->total_length += 100; //for auto align
     gui_list_set_offset(list, -((uint8_t)current_watchface_type) * (length + space));
 }

@@ -40,8 +40,6 @@ typedef enum
 #define ICON_RESET_X    14
 #define ICON_RESET_Y    14
 
-#define TP_LIMIT    250
-
 #define COLOR_START  GUI_COLOR_ARGB8888(0xFF, 0x65, 0xDC, 0x7B) //65DC7B
 #define COLOR_STOP   GUI_COLOR_ARGB8888(0xFF, 0xFE, 0x37, 0x2C) //FE372C
 #define COLOR_RESET  GUI_COLOR_ARGB8888(0xFF, 0xB7, 0xB7, 0xB7) //B7B7B7
@@ -107,28 +105,6 @@ static int8_t page_index = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void regenerate_current_view(void *msg)
-{
-    GUI_UNUSED(msg);
-
-    gui_view_t *current_view = gui_view_get_current();
-    const struct gui_view_descriptor *descriptor = current_view->descriptor;
-    gui_obj_t *parent = current_view->base.parent;
-    gui_obj_tree_free(GUI_BASE(current_view));
-
-    gui_view_create(parent, descriptor, 0, 0, 0, 0);
-}
-
-static void msg_2_regenerate_current_view(void)
-{
-    gui_msg_t msg =
-    {
-        .event = GUI_EVENT_USER_DEFINE,
-        .cb = regenerate_current_view,
-    };
-    gui_send_msg_to_server(&msg);
-}
-
 static void clear_mem(gui_view_t *view)
 {
     GUI_UNUSED(view);
@@ -207,7 +183,7 @@ static void update_page_2_lap(gui_obj_t *parent)
     gui_img_t *circle = gui_img_create_from_mem(win, 0, PAGE_INDEX_ICON_BIN, 247, 20, 0, 0);
     gui_img_a8_recolor((void *)circle, COLOR_STOP);
     gui_img_t *separator = gui_img_create_from_mem(win, 0, img_data_rect, 0, 0, 0, 0);
-    gui_img_set_mode(separator, IMG_BYPASS_MODE);
+    gui_img_set_mode(separator, IMG_COVER_MODE);
     gui_text_t *t_lap = gui_text_create(win, 0, 0, 0, 100, 50);
     gui_text_set(t_lap, (void *)lap_str_array[index], GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen((void *)lap_str_array[index]), 22);
@@ -605,7 +581,7 @@ static void page_1_design(gui_obj_t *parent)
     }
 
     gui_img_t *img_line = gui_img_create_from_mem(parent, 0, img_data_line, 47, 309, 0, 0);
-    gui_img_set_mode(img_line, IMG_BYPASS_MODE);
+    gui_img_set_mode(img_line, IMG_COVER_MODE);
     gui_obj_create_timer((void *)img_line, 50, -1, update_line_cb);
     gui_obj_start_timer((void *)img_line);
 
@@ -660,6 +636,7 @@ static void page_1_design(gui_obj_t *parent)
             sprintf(base_str, "%ds", sec);
             count_base = sec * 1000;
         }
+        gui_text_content_set((void *)t_base, base_str, strlen(base_str));
     }
     else
     {
@@ -709,7 +686,7 @@ static void page_2_design(gui_obj_t *parent)
                 gui_img_a8_recolor((void *)circle, COLOR_START);
             }
             gui_img_t *separator = gui_img_create_from_mem(win, 0, img_data_rect, 0, 0, 0, 0);
-            gui_img_set_mode(separator, IMG_BYPASS_MODE);
+            gui_img_set_mode(separator, IMG_COVER_MODE);
 
             gui_text_t *t_lap = gui_text_create(win, 0, 0, 0, 100, 50);
             gui_text_set(t_lap, (void *)lap_str_array[i], GUI_FONT_SRC_TTF, font_color,
@@ -846,13 +823,13 @@ static void stopwatch_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(view, 0, 0, 0, 390, 42);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_RIGHT);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);
 
-    gui_img_t *bg_l = gui_img_create_from_mem(view, "l", STOPWATCH_BUTTON_BG_BIN, 18, 414, 0, 0);
-    gui_img_t *bg_r = gui_img_create_from_mem(view, "r", STOPWATCH_BUTTON_BG_BIN, 320, 414, 0, 0);
+    gui_img_t *bg_l = gui_img_create_from_mem(view, 0, STOPWATCH_BUTTON_BG_BIN, 18, 414, 0, 0);
+    gui_img_t *bg_r = gui_img_create_from_mem(view, 0, STOPWATCH_BUTTON_BG_BIN, 320, 414, 0, 0);
     gui_img_t *icon_l = gui_img_create_from_mem(bg_l, 0, STOPWATCH_BUTTON_MARK_BIN, ICON_MARK_X,
                                                 ICON_MARK_Y, 0, 0);
     gui_img_t *icon_r = gui_img_create_from_mem(bg_r, 0, STOPWATCH_BUTTON_START_BIN, ICON_START_X,
@@ -865,4 +842,3 @@ static void stopwatch_design(gui_view_t *view)
     gui_obj_add_event_cb((void *)bg_l, click_button_l, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb((void *)bg_r, click_button_r, GUI_EVENT_TOUCH_CLICKED, NULL);
 }
-

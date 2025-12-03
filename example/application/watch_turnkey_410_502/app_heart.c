@@ -696,7 +696,7 @@ static void note_design(gui_obj_t *obj, void *p)
 static void heartrate_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    const char *obj_name = gui_view_get_current()->descriptor->name;
+    const char *obj_name = current_view->descriptor->name;
     VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
     VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
     if (strcmp(obj_name, "bottom_view") == 0)

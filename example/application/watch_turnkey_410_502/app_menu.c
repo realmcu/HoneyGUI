@@ -102,7 +102,7 @@ static void switch_app_activity(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(current_view, "activity_view",
+    gui_view_switch_direct(gui_view_get_current(), "activity_view",
                            SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
@@ -112,7 +112,7 @@ static void switch_app_heart_rate(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(current_view, "heartrate_view",
+    gui_view_switch_direct(gui_view_get_current(), "heartrate_view",
                            SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
@@ -121,7 +121,7 @@ static void switch_app_weather(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(current_view, "weather_view",
+    gui_view_switch_direct(gui_view_get_current(), "weather_view",
                            SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
@@ -130,7 +130,7 @@ static void switch_app_reminders(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "reminders_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "reminders_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_message(void *obj, gui_event_t e, void *param)
@@ -138,7 +138,7 @@ static void switch_app_message(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "message_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "message_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_phone(void *obj, gui_event_t e, void *param)
@@ -146,7 +146,7 @@ static void switch_app_phone(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "phone_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "phone_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_noise(void *obj, gui_event_t e, void *param)
@@ -154,7 +154,7 @@ static void switch_app_noise(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "noise_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "noise_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_music(void *obj, gui_event_t e, void *param)
@@ -162,7 +162,7 @@ static void switch_app_music(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(current_view, "music_view",
+    gui_view_switch_direct(gui_view_get_current(), "music_view",
                            SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -171,7 +171,7 @@ static void switch_app_map(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "map_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "map_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_stopwatch(void *obj, gui_event_t e, void *param)
@@ -179,7 +179,7 @@ static void switch_app_stopwatch(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(current_view, "stopwatch_view",
+    gui_view_switch_direct(gui_view_get_current(), "stopwatch_view",
                            SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -188,7 +188,7 @@ static void switch_app_timers(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "timers_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "timers_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_alarm_clock(void *obj, gui_event_t e, void *param)
@@ -196,7 +196,7 @@ static void switch_app_alarm_clock(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "alarm_clock_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "alarm_clock_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_audio_books(void *obj, gui_event_t e, void *param)
@@ -204,7 +204,7 @@ static void switch_app_audio_books(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "audio_books_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "audio_books_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_workout(void *obj, gui_event_t e, void *param)
@@ -212,7 +212,7 @@ static void switch_app_workout(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "workout_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "workout_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_calendar(void *obj, gui_event_t e, void *param)
@@ -220,7 +220,7 @@ static void switch_app_calendar(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "calendar_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "calendar_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_compass(void *obj, gui_event_t e, void *param)
@@ -228,7 +228,7 @@ static void switch_app_compass(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "compass_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "compass_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_home(void *obj, gui_event_t e, void *param)
@@ -236,7 +236,7 @@ static void switch_app_home(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "home_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "home_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_contacts(void *obj, gui_event_t e, void *param)
@@ -244,7 +244,7 @@ static void switch_app_contacts(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "contacts_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "contacts_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_cycle_tracking(void *obj, gui_event_t e, void *param)
@@ -252,7 +252,7 @@ static void switch_app_cycle_tracking(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "cycle_tracking_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "cycle_tracking_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_mail(void *obj, gui_event_t e, void *param)
@@ -260,7 +260,7 @@ static void switch_app_mail(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "mail_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "mail_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_now_playing(void *obj, gui_event_t e, void *param)
@@ -268,7 +268,7 @@ static void switch_app_now_playing(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "now_playing_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "now_playing_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_news(void *obj, gui_event_t e, void *param)
@@ -276,7 +276,7 @@ static void switch_app_news(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "news_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "news_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_photo(void *obj, gui_event_t e, void *param)
@@ -284,7 +284,7 @@ static void switch_app_photo(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "photo_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "photo_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_podcasts(void *obj, gui_event_t e, void *param)
@@ -292,7 +292,7 @@ static void switch_app_podcasts(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "podcasts_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "podcasts_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_sleep(void *obj, gui_event_t e, void *param)
@@ -300,7 +300,7 @@ static void switch_app_sleep(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "sleep_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "sleep_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_stocks(void *obj, gui_event_t e, void *param)
@@ -308,7 +308,7 @@ static void switch_app_stocks(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "stocks_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "stocks_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_world_clock(void *obj, gui_event_t e, void *param)
@@ -316,7 +316,7 @@ static void switch_app_world_clock(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "world_clock_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "world_clock_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_store(void *obj, gui_event_t e, void *param)
@@ -324,7 +324,7 @@ static void switch_app_store(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, "store_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "store_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
 {
@@ -333,9 +333,9 @@ static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
     (void)param;
     if (gui_view_get_next() != NULL) { return; }
 
-    gui_obj_t *parent = GUI_BASE(current_view)->parent;
-    gui_obj_tree_free(GUI_BASE(current_view));
-    clear_menu(current_view);
+    gui_obj_t *parent = GUI_BASE(gui_view_get_current())->parent;
+    gui_obj_tree_free(GUI_BASE(gui_view_get_current()));
+    clear_menu(gui_view_get_current());
 
     menu_style = (menu_style + 1) % 2;
     gui_view_create(parent, "menu_view", 0, 0, 0, 0);

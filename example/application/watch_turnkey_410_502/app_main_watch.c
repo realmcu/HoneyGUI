@@ -13,6 +13,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
 #include "app_main_watch.h"
+#include "gui_message.h"
 
 /*============================================================================*
  *                           Types
@@ -88,7 +89,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    test_view = gui_view_descriptor_get("stopwatch_view");
+    test_view = gui_view_descriptor_get("timers_view");
     menu_view = gui_view_descriptor_get("menu_view");
     watchface_select_view = gui_view_descriptor_get("watchface_select_view");
     bottom_view = gui_view_descriptor_get("bottom_view");
@@ -150,14 +151,17 @@ static void fps_create(void *parent)
     gui_text_rendermode_set(low_mem, 2);
 }
 
-/* Generate a pseudo-random number */
-uint16_t xorshift16(void)
+/* Regenerate current_view*/
+static void regenerate_current_view(void *msg)
 {
-    static uint16_t seed = 12345;
-    seed ^= seed << 6;
-    seed ^= seed >> 9;
-    seed ^= seed << 2;
-    return seed;
+    GUI_UNUSED(msg);
+
+    gui_view_t *current_view = gui_view_get_current();
+    const gui_view_descriptor_t *descriptor = current_view->descriptor;
+    gui_obj_t *parent = current_view->base.parent;
+    gui_obj_tree_free(GUI_BASE(current_view));
+
+    gui_view_create(parent, descriptor->name, 0, 0, 0, 0);
 }
 
 static void json_refreash(void)
@@ -359,3 +363,26 @@ static int app_init(void)
 }
 GUI_INIT_APP_EXPORT(app_init);
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+/* Send message to regenerate current_view asynchronously */
+void msg_2_regenerate_current_view(void)
+{
+    gui_msg_t msg =
+    {
+        .event = GUI_EVENT_USER_DEFINE,
+        .cb = regenerate_current_view,
+    };
+    gui_send_msg_to_server(&msg);
+}
+
+/* Generate a pseudo-random number */
+uint16_t xorshift16(void)
+{
+    static uint16_t seed = 12345;
+    seed ^= seed << 6;
+    seed ^= seed >> 9;
+    seed ^= seed << 2;
+    return seed;
+}

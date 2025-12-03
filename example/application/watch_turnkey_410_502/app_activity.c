@@ -365,7 +365,7 @@ static void activity_design(gui_view_t *view)
     }
     if (strcmp(obj_name, "menu_view") == 0)
     {
-        gui_view_switch_on_event(current_view, "menu_view",
+        gui_view_switch_on_event(gui_view_get_current(), "menu_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);
