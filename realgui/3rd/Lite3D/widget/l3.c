@@ -87,9 +87,9 @@ l3_model_base_t *l3_create_model_ftl(void            *desc_addr,
                                      int16_t          h)
 {
     l3_desc_file_head_t file_head;
-    memcpy(&file_head, desc_addr, sizeof(l3_desc_file_head_t));
+    l3_ftl_read((uintptr_t)desc_addr, (uint8_t *)&file_head, sizeof(l3_desc_file_head_t));
     uint8_t *data = (uint8_t *)l3_malloc(file_head.file_size);
-    memcpy(data, desc_addr, file_head.file_size);
+    l3_ftl_read((uintptr_t)desc_addr, data, file_head.file_size);
 
     switch (file_head.model_type)
     {

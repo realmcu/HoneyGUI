@@ -484,6 +484,7 @@ void l3_calculator_4x4_matrix(l3_4x4_matrix_t *matrix, \
 
 void *l3_malloc(size_t size);
 void l3_free(void *ptr);
+int l3_ftl_read(uintptr_t addr, uint8_t *buf, uint32_t len);
 uint32_t l3_get_time_ms(void);
 
 #ifdef __cplusplus

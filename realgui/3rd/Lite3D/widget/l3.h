@@ -217,6 +217,7 @@ char *l3_version(void);
 
 extern void *(*l3_malloc_imp)(size_t size);
 extern void (*l3_free_imp)(void *ptr);
+extern int (*l3_ftl_read_imp)(uintptr_t addr, uint8_t *buf, uint32_t len);
 extern uint32_t (*l3_get_time_ms_imp)(void);
 extern void (*l3_draw_tria_to_canvas_imp)(l3_draw_tria_img_t *image,
                                           l3_draw_rect_img_t *combined_image, float *zbuffer);
