@@ -1,0 +1,42 @@
+"""
+HoneyGUI Image Format Types
+定义所有图片格式和压缩算法的常量
+"""
+
+# GUI_FormatType enum values
+FORMAT_RGB565 = 0
+FORMAT_ARGB8565 = 1
+FORMAT_RGB888 = 3
+FORMAT_ARGB8888 = 4
+FORMAT_A8 = 5
+
+# Compression algorithm types
+COMPRESS_NONE = 0
+COMPRESS_RLE = 0
+COMPRESS_FASTLZ = 1
+COMPRESS_YUV_FASTLZ = 2
+COMPRESS_YUV = 3
+
+# Pixel bytes mapping
+PIXEL_BYTES_2 = 0  # RGB565, ARGB8565
+PIXEL_BYTES_3 = 1  # RGB888
+PIXEL_BYTES_4 = 2  # ARGB8888
+PIXEL_BYTES_1 = 3  # A8, GRAY
+
+# Format to pixel bytes mapping
+FORMAT_TO_PIXEL_BYTES = {
+    FORMAT_RGB565: PIXEL_BYTES_2,
+    FORMAT_ARGB8565: PIXEL_BYTES_2,
+    FORMAT_RGB888: PIXEL_BYTES_3,
+    FORMAT_ARGB8888: PIXEL_BYTES_4,
+    FORMAT_A8: PIXEL_BYTES_1,
+}
+
+# Format to bytes per pixel (actual)
+FORMAT_TO_BPP = {
+    FORMAT_RGB565: 2,
+    FORMAT_ARGB8565: 3,
+    FORMAT_RGB888: 3,
+    FORMAT_ARGB8888: 4,
+    FORMAT_A8: 1,
+}

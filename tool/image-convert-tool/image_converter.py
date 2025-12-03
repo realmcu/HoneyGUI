@@ -21,6 +21,7 @@ FORMAT_RGB565 = 0
 FORMAT_ARGB8565 = 1
 FORMAT_RGB888 = 3
 FORMAT_ARGB8888 = 4
+FORMAT_A8 = 5  # Alpha channel only (8-bit grayscale)
 
 
 def rgb_to_rgb565(r, g, b):
@@ -35,7 +36,7 @@ def convert_image(input_path: Path, output_path: Path, fmt: str = "auto") -> boo
     Args:
         input_path: Source image path (PNG/JPG)
         output_path: Output bin file path
-        fmt: Output format - "rgb565", "rgb888", "argb8888", or "auto"
+        fmt: Output format - "rgb565", "rgb888", "argb8888", "a8", or "auto"
     
     Returns:
         True on success
@@ -48,7 +49,12 @@ def convert_image(input_path: Path, output_path: Path, fmt: str = "auto") -> boo
         fmt = "argb8888" if has_alpha else "rgb565"
     
     # Convert to appropriate mode
-    if fmt in ("argb8888", "argb8565"):
+    if fmt == "a8":
+        # Extract alpha channel only
+        if not has_alpha:
+            raise ValueError("Image has no alpha channel for A8 format")
+        img = img.convert("RGBA")
+    elif fmt in ("argb8888", "argb8565"):
         img = img.convert("RGBA")
     else:
         img = img.convert("RGB")
@@ -69,6 +75,7 @@ def convert_image(input_path: Path, output_path: Path, fmt: str = "auto") -> boo
         "rgb888": FORMAT_RGB888,
         "argb8888": FORMAT_ARGB8888,
         "argb8565": FORMAT_ARGB8565,
+        "a8": FORMAT_A8,
     }
     pixel_type = type_map[fmt]
     
@@ -96,6 +103,11 @@ def convert_image(input_path: Path, output_path: Path, fmt: str = "auto") -> boo
             pixel_data.append(a)
             pixel_data.extend(struct.pack('<H', val))
     
+    elif fmt == "a8":
+        # Extract alpha channel only (8-bit grayscale)
+        for r, g, b, a in pixels:
+            pixel_data.append(a)
+    
     # Write output
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, 'wb') as f:
@@ -110,7 +122,7 @@ def main():
     parser.add_argument('-i', '--input', required=True, help='Input image path')
     parser.add_argument('-o', '--output', required=True, help='Output bin path')
     parser.add_argument('-f', '--format', default='auto',
-                        choices=['auto', 'rgb565', 'rgb888', 'argb8888', 'argb8565'],
+                        choices=['auto', 'rgb565', 'rgb888', 'argb8888', 'argb8565', 'a8'],
                         help='Output pixel format (default: auto)')
     
     args = parser.parse_args()
