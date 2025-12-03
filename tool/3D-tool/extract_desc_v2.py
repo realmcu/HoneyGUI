@@ -1,0 +1,878 @@
+#!/usr/bin/env python3
+"""
+Python version of extract_desc_v2.exe
+Extracts 3D model descriptions from OBJ and GLTF files
+
+Dependencies:
+    pip install numpy pygltflib tinyobjloader
+"""
+
+import sys
+import os
+import struct
+import subprocess
+from pathlib import Path
+from typing import Optional, List, Tuple, Dict
+import io
+
+# Try to import required libraries
+try:
+    import numpy as np
+except ImportError:
+    print("Error: numpy not installed. Install with: pip install numpy")
+    sys.exit(1)
+
+try:
+    import tinyobjloader
+except ImportError:
+    print("Warning: tinyobjloader not installed. OBJ support disabled.")
+    print("Install with: pip install tinyobjloader")
+    tinyobjloader = None
+
+try:
+    from pygltflib import GLTF2, BufferFormat
+except ImportError:
+    print("Warning: pygltflib not installed. GLTF support disabled.")
+    print("Install with: pip install pygltflib")
+    GLTF2 = None
+
+
+TOOL_VERSION = 2
+
+
+class ModelType:
+    OBJ = 0
+    GLTF = 1
+    UNKNOWN = 2
+
+
+def get_model_type(filename: str) -> int:
+    """Determine model type from file extension"""
+    ext = Path(filename).suffix.lower()
+    if ext == '.obj':
+        return ModelType.OBJ
+    elif ext == '.gltf':
+        return ModelType.GLTF
+    return ModelType.UNKNOWN
+
+
+def get_img_file(filename: str) -> Optional[str]:
+    """Convert image filename to .txt filename"""
+    path = Path(filename)
+    return str(path.with_suffix('.txt'))
+
+
+def read_array_from_file(filename: str) -> Optional[bytes]:
+    """Read C array from txt file and convert to bytes"""
+    try:
+        with open(filename, 'r') as f:
+            content = f.read()
+        
+        # Find array content between { and }
+        start = content.find('{')
+        end = content.find('}')
+        if start == -1 or end == -1:
+            print(f"Failed to find array in {filename}")
+            return None
+        
+        array_str = content[start+1:end]
+        
+        # Parse hex values
+        values = []
+        for token in array_str.replace(',', ' ').split():
+            token = token.strip()
+            if token:
+                try:
+                    values.append(int(token, 16))
+                except ValueError:
+                    continue
+        
+        return bytes(values)
+    
+    except Exception as e:
+        print(f"Failed to read array from {filename}: {e}")
+        return None
+
+
+def binary_to_txt_array(binary_filename: str, txt_filename: str):
+    """Convert binary file to C array format txt file"""
+    try:
+        with open(binary_filename, 'rb') as f:
+            data = f.read()
+        
+        # Generate array name from filename
+        base_name = Path(binary_filename).stem
+        array_name = f"_ac{base_name}"
+        
+        with open(txt_filename, 'w') as f:
+            f.write(f"__attribute__((aligned(4))) static const unsigned char {array_name}[{len(data)}] = {{")
+            
+            for i, byte in enumerate(data):
+                if i % 40 == 0:
+                    f.write("\n    ")
+                if i == len(data) - 1:
+                    f.write(f"0x{byte:02x}")
+                else:
+                    f.write(f"0x{byte:02x}, ")
+            
+            f.write("\n};\n")
+        
+        print(f"Convert binary file to txt array file successfully!")
+    
+    except Exception as e:
+        print(f"Failed to convert binary to txt: {e}")
+
+
+def extract_obj_desc(obj_filename: str, bin_filename: str, txt_filename: str):
+    """Extract OBJ model description using tinyobjloader"""
+    print(f"Extracting OBJ model: {obj_filename}")
+    
+    if tinyobjloader is None:
+        print("Error: tinyobjloader not installed. Install with: pip install tinyobjloader")
+        return
+    
+    # Load OBJ file
+    reader = tinyobjloader.ObjReader()
+    ret = reader.ParseFromFile(obj_filename)
+    
+    if not ret:
+        print(f"Error: Failed to parse OBJ file: {obj_filename}")
+        if reader.Error():
+            print(f"Error message: {reader.Error()}")
+        return
+    
+    if reader.Warning():
+        print(f"Warning: {reader.Warning()}")
+    
+    attrib = reader.GetAttrib()
+    shapes = reader.GetShapes()
+    materials = reader.GetMaterials()
+    
+    print(f"Loaded OBJ file:")
+    print(f"  Vertices: {len(attrib.vertices) // 3}")
+    print(f"  Normals: {len(attrib.normals) // 3}")
+    print(f"  Texcoords: {len(attrib.texcoords) // 2}")
+    print(f"  Shapes: {len(shapes)}")
+    print(f"  Materials: {len(materials)}")
+    
+    # Determine face type
+    all_rectangle = True
+    all_triangle = True
+    total_faces = 0
+    
+    for shape in shapes:
+        for num_verts in shape.mesh.num_face_vertices:
+            total_faces += 1
+            if num_verts != 4:
+                all_rectangle = False
+            if num_verts != 3:
+                all_triangle = False
+    
+    if all_rectangle:
+        face_type = 0
+    elif all_triangle:
+        face_type = 1
+    else:
+        face_type = 2
+    
+    # Load textures
+    textures = []
+    texture_sizes = []
+    obj_dir = os.path.dirname(obj_filename)
+    
+    for mat in materials:
+        diffuse_texname = getattr(mat, 'diffuse_texname', None)
+        if diffuse_texname:
+            tex_path = os.path.join(obj_dir, diffuse_texname)
+            txt_path = get_img_file(tex_path)
+            
+            if os.path.exists(txt_path):
+                print(f"Loading texture: {txt_path}")
+                tex_data = read_array_from_file(txt_path)
+                if tex_data:
+                    textures.append(tex_data)
+                    texture_sizes.append(len(tex_data))
+                else:
+                    textures.append(b'')
+                    texture_sizes.append(0)
+            else:
+                textures.append(b'')
+                texture_sizes.append(0)
+        else:
+            textures.append(b'')
+            texture_sizes.append(0)
+    
+    # Write binary file
+    with open(bin_filename, 'wb') as f:
+        # File header (l3_desc_file_head_t) - 16 bytes total
+        f.write(struct.pack('<H', 0x3344))  # magic (2 bytes)
+        f.write(struct.pack('<B', ModelType.OBJ))  # model_type (1 byte)
+        f.write(struct.pack('<B', TOOL_VERSION))  # version (1 byte)
+        f.write(struct.pack('<I', 0))  # file_size (4 bytes, will update later)
+        f.write(struct.pack('<B', face_type))  # face_type (1 byte)
+        f.write(struct.pack('<B', 16))  # payload_offset (1 byte)
+        f.write(struct.pack('<6B', *[0]*6))  # extension (6 bytes)
+        
+        # Attribute data
+        num_vertices = len(attrib.vertices) // 3
+        num_normals = len(attrib.normals) // 3
+        num_texcoords = len(attrib.texcoords) // 2
+        
+        # Count total faces and indices
+        num_faces = 0
+        for shape in shapes:
+            num_faces += len(shape.mesh.indices)
+        
+        f.write(struct.pack('<I', num_vertices))
+        f.write(struct.pack('<I', num_normals))
+        f.write(struct.pack('<I', num_texcoords))
+        f.write(struct.pack('<I', num_faces))
+        f.write(struct.pack('<I', total_faces))
+        f.write(struct.pack('<i', 0))  # pad0
+        
+        # Write vertices
+        for i in range(0, len(attrib.vertices), 3):
+            f.write(struct.pack('<fff', attrib.vertices[i], attrib.vertices[i+1], attrib.vertices[i+2]))
+        
+        # Write normals
+        for i in range(0, len(attrib.normals), 3):
+            f.write(struct.pack('<fff', attrib.normals[i], attrib.normals[i+1], attrib.normals[i+2]))
+        
+        # Write texcoords
+        for i in range(0, len(attrib.texcoords), 2):
+            f.write(struct.pack('<ff', attrib.texcoords[i], attrib.texcoords[i+1]))
+        
+        # Write faces (indices)
+        for shape in shapes:
+            for idx in shape.mesh.indices:
+                f.write(struct.pack('<iii', idx.vertex_index, idx.texcoord_index, idx.normal_index))
+        
+        # Write face_num_verts
+        for shape in shapes:
+            for num_verts in shape.mesh.num_face_vertices:
+                f.write(struct.pack('<i', num_verts))
+        
+        # Write material_ids
+        for shape in shapes:
+            for mat_id in shape.mesh.material_ids:
+                f.write(struct.pack('<i', mat_id))
+        
+        # Write shapes
+        f.write(struct.pack('<I', len(shapes)))
+        face_offset = 0
+        for shape in shapes:
+            # length should be the number of faces, not indices
+            length = len(shape.mesh.num_face_vertices)
+            f.write(struct.pack('<II', face_offset, length))
+            face_offset += length
+        
+        # Write materials
+        f.write(struct.pack('<I', len(materials)))
+        for mat in materials:
+            # Use getattr with default values for missing attributes
+            ambient = getattr(mat, 'ambient', [0.0, 0.0, 0.0])
+            diffuse = getattr(mat, 'diffuse', [1.0, 1.0, 1.0])
+            specular = getattr(mat, 'specular', [0.0, 0.0, 0.0])
+            transmittance = getattr(mat, 'transmittance', [0.0, 0.0, 0.0])
+            emission = getattr(mat, 'emission', [0.0, 0.0, 0.0])
+            shininess = getattr(mat, 'shininess', 0.0)
+            ior = getattr(mat, 'ior', 1.0)
+            dissolve = getattr(mat, 'dissolve', 1.0)
+            illum = getattr(mat, 'illum', 1)
+            
+            f.write(struct.pack('<fff', ambient[0], ambient[1], ambient[2]))
+            f.write(struct.pack('<fff', diffuse[0], diffuse[1], diffuse[2]))
+            f.write(struct.pack('<fff', specular[0], specular[1], specular[2]))
+            f.write(struct.pack('<fff', transmittance[0], transmittance[1], transmittance[2]))
+            f.write(struct.pack('<fff', emission[0], emission[1], emission[2]))
+            f.write(struct.pack('<f', shininess))
+            f.write(struct.pack('<f', ior))
+            f.write(struct.pack('<f', dissolve))
+            f.write(struct.pack('<i', illum))
+        
+        # Write texture sizes
+        for size in texture_sizes:
+            f.write(struct.pack('<I', size))
+        
+        # Write texture data
+        for tex_data in textures:
+            if tex_data:
+                f.write(tex_data)
+        
+        # Update file size (at offset 4: after magic(2) + model_type(1) + version(1))
+        file_size = f.tell()
+        f.seek(4)
+        f.write(struct.pack('<I', file_size))
+    
+    print(f"Write description to bin file successfully!")
+    print(f"Final file size: {file_size} bytes")
+    binary_to_txt_array(bin_filename, txt_filename)
+
+
+def extract_gltf_desc(gltf_filename: str, bin_filename: str, txt_filename: str):
+    """Extract GLTF model description using pygltflib"""
+    print(f"Extracting GLTF model: {gltf_filename}")
+    
+    if GLTF2 is None:
+        print("Error: pygltflib not installed. Install with: pip install pygltflib")
+        return
+    
+    try:
+        # Load GLTF file
+        gltf = GLTF2().load(gltf_filename)
+        gltf.convert_buffers(BufferFormat.DATAURI)  # Convert to data URIs for easier access
+        
+        # Helper function to get accessor data
+        def get_accessor_data(accessor_idx):
+            if accessor_idx is None:
+                return None
+            accessor = gltf.accessors[accessor_idx]
+            bufferView = gltf.bufferViews[accessor.bufferView]
+            buffer = gltf.buffers[bufferView.buffer]
+            
+            # Get buffer data
+            data = gltf.get_data_from_buffer_uri(buffer.uri)
+            
+            # Extract the relevant portion
+            start = bufferView.byteOffset + accessor.byteOffset
+            end = start + accessor.count * get_component_size(accessor.componentType) * get_type_size(accessor.type)
+            
+            return data[start:end]
+        
+        def get_component_size(component_type):
+            sizes = {5120: 1, 5121: 1, 5122: 2, 5123: 2, 5125: 4, 5126: 4}
+            return sizes.get(component_type, 4)
+        
+        def get_type_size(accessor_type):
+            sizes = {'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4, 'MAT4': 16}
+            return sizes.get(accessor_type, 1)
+        
+        def parse_accessor_data(data, accessor):
+            if data is None:
+                return None
+            
+            component_type = accessor.componentType
+            type_name = accessor.type
+            count = accessor.count
+            
+            # Determine numpy dtype
+            dtype_map = {
+                5120: np.int8, 5121: np.uint8, 5122: np.int16,
+                5123: np.uint16, 5125: np.uint32, 5126: np.float32
+            }
+            dtype = dtype_map.get(component_type, np.float32)
+            
+            # Parse data
+            arr = np.frombuffer(data, dtype=dtype)
+            
+            # Reshape based on type
+            type_size = get_type_size(type_name)
+            if type_size > 1:
+                arr = arr.reshape((count, type_size))
+            
+            return arr
+        
+        # Count statistics
+        scene_root_count = len(gltf.scenes[0].nodes) if gltf.scenes else 0
+        node_count = len(gltf.nodes) if gltf.nodes else 0
+        mesh_count = len(gltf.meshes) if gltf.meshes else 0
+        material_count = len(gltf.materials) if gltf.materials else 0
+        skin_count = len(gltf.skins) if gltf.skins else 0
+        
+        primitive_count = 0
+        if gltf.meshes:
+            for mesh in gltf.meshes:
+                primitive_count += len(mesh.primitives)
+        
+        channel_count = 0
+        sampler_count = 0
+        if gltf.animations and len(gltf.animations) > 0:
+            anim = gltf.animations[-1]
+            channel_count = len(anim.channels) if anim.channels else 0
+            sampler_count = len(anim.samplers) if anim.samplers else 0
+        
+        # Load textures
+        gltf_dir = os.path.dirname(gltf_filename)
+        textures_data = []
+        texture_count = 0
+        
+        if gltf.materials:
+            for mat in gltf.materials:
+                if mat.pbrMetallicRoughness and mat.pbrMetallicRoughness.baseColorTexture is not None:
+                    tex_idx = mat.pbrMetallicRoughness.baseColorTexture.index
+                    if tex_idx < len(gltf.textures):
+                        texture = gltf.textures[tex_idx]
+                        if texture.source is not None and texture.source < len(gltf.images):
+                            image = gltf.images[texture.source]
+                            if image.uri:
+                                tex_path = os.path.join(gltf_dir, image.uri)
+                                txt_path = get_img_file(tex_path)
+                                
+                                if os.path.exists(txt_path):
+                                    print(f"Loading texture: {txt_path}")
+                                    tex_data = read_array_from_file(txt_path)
+                                    if tex_data:
+                                        textures_data.append(tex_data)
+                                        texture_count += 1
+                                        continue
+                    textures_data.append(b'')
+                else:
+                    textures_data.append(b'')
+        
+        # Create data blob
+        blob = io.BytesIO()
+        
+        # Process nodes and collect children offsets
+        node_children_offsets = []
+        for node in gltf.nodes:
+            if node.children:
+                offset = blob.tell()
+                for child_idx in node.children:
+                    blob.write(struct.pack('<i', child_idx))
+                node_children_offsets.append(offset)
+            else:
+                node_children_offsets.append(0xFFFFFFFF)
+        
+        # Process primitives and collect triangle data
+        primitive_data = []
+        total_triangle_count = 0
+        
+        for mesh in gltf.meshes:
+            for prim in mesh.primitives:
+                # Get attribute accessors
+                pos_data = None
+                norm_data = None
+                uv_data = None
+                joints_data = None
+                weights_data = None
+                
+                if 'POSITION' in prim.attributes.__dict__:
+                    pos_accessor_idx = prim.attributes.POSITION
+                    pos_raw = get_accessor_data(pos_accessor_idx)
+                    pos_data = parse_accessor_data(pos_raw, gltf.accessors[pos_accessor_idx])
+                
+                if 'NORMAL' in prim.attributes.__dict__:
+                    norm_accessor_idx = prim.attributes.NORMAL
+                    norm_raw = get_accessor_data(norm_accessor_idx)
+                    norm_data = parse_accessor_data(norm_raw, gltf.accessors[norm_accessor_idx])
+                
+                if 'TEXCOORD_0' in prim.attributes.__dict__:
+                    uv_accessor_idx = prim.attributes.TEXCOORD_0
+                    uv_raw = get_accessor_data(uv_accessor_idx)
+                    uv_data = parse_accessor_data(uv_raw, gltf.accessors[uv_accessor_idx])
+                
+                if 'JOINTS_0' in prim.attributes.__dict__:
+                    joints_accessor_idx = prim.attributes.JOINTS_0
+                    joints_raw = get_accessor_data(joints_accessor_idx)
+                    joints_data = parse_accessor_data(joints_raw, gltf.accessors[joints_accessor_idx])
+                
+                if 'WEIGHTS_0' in prim.attributes.__dict__:
+                    weights_accessor_idx = prim.attributes.WEIGHTS_0
+                    weights_raw = get_accessor_data(weights_accessor_idx)
+                    weights_data = parse_accessor_data(weights_raw, gltf.accessors[weights_accessor_idx])
+                
+                # Get indices
+                if prim.indices is not None:
+                    indices_raw = get_accessor_data(prim.indices)
+                    indices = parse_accessor_data(indices_raw, gltf.accessors[prim.indices])
+                    
+                    # Build triangles
+                    triangle_count = len(indices) // 3
+                    total_triangle_count += triangle_count
+                    
+                    triangles_offset = blob.tell()
+                    
+                    for tri_idx in range(triangle_count):
+                        for vert_idx in range(3):
+                            idx = indices[tri_idx * 3 + vert_idx]
+                            
+                            # Position
+                            if pos_data is not None:
+                                blob.write(struct.pack('<fff', *pos_data[idx]))
+                            else:
+                                blob.write(struct.pack('<fff', 0, 0, 0))
+                            
+                            # Normal
+                            if norm_data is not None:
+                                blob.write(struct.pack('<fff', *norm_data[idx]))
+                            else:
+                                blob.write(struct.pack('<fff', 0, 0, 0))
+                            
+                            # Texcoord
+                            if uv_data is not None:
+                                blob.write(struct.pack('<ff', *uv_data[idx]))
+                            else:
+                                blob.write(struct.pack('<ff', 0, 0))
+                            
+                            # Joints
+                            if joints_data is not None:
+                                blob.write(struct.pack('<HHHH', *joints_data[idx].astype(np.uint16)))
+                            else:
+                                blob.write(struct.pack('<HHHH', 0, 0, 0, 0))
+                            
+                            # Weights
+                            if weights_data is not None:
+                                blob.write(struct.pack('<ffff', *weights_data[idx]))
+                            else:
+                                blob.write(struct.pack('<ffff', 0, 0, 0, 0))
+                    
+                    primitive_data.append({
+                        'material_index': prim.material if prim.material is not None else -1,
+                        'triangle_count': triangle_count,
+                        'triangles_offset': triangles_offset
+                    })
+                else:
+                    primitive_data.append({
+                        'material_index': -1,
+                        'triangle_count': 0,
+                        'triangles_offset': 0xFFFFFFFF
+                    })
+        
+        # Process skins
+        skin_data = []
+        for skin in gltf.skins if gltf.skins else []:
+            joints_offset = blob.tell()
+            for joint_idx in skin.joints:
+                blob.write(struct.pack('<I', joint_idx))
+            
+            # Inverse bind matrices
+            ibm_offset = 0xFFFFFFFF
+            if skin.inverseBindMatrices is not None:
+                ibm_raw = get_accessor_data(skin.inverseBindMatrices)
+                ibm_data = parse_accessor_data(ibm_raw, gltf.accessors[skin.inverseBindMatrices])
+                ibm_offset = blob.tell()
+                
+                # Transpose matrices (column-major to row-major)
+                for mat in ibm_data:
+                    mat_4x4 = mat.reshape((4, 4))
+                    mat_transposed = mat_4x4.T
+                    blob.write(mat_transposed.astype(np.float32).tobytes())
+            
+            skin_data.append({
+                'joints_count': len(skin.joints),
+                'joints_offset': joints_offset,
+                'ibm_offset': ibm_offset
+            })
+        
+        # Process animations
+        animation_data = {'channels': [], 'samplers': []}
+        if gltf.animations and len(gltf.animations) > 0:
+            anim = gltf.animations[-1]
+            
+            # Channels
+            for channel in anim.channels if anim.channels else []:
+                path_map = {'translation': 0, 'rotation': 1, 'scale': 2}
+                animation_data['channels'].append({
+                    'sampler_index': channel.sampler,
+                    'target_node_index': channel.target.node,
+                    'target_path': path_map.get(channel.target.path, 0)
+                })
+            
+            # Samplers
+            for sampler in anim.samplers if anim.samplers else []:
+                # Input (time)
+                input_raw = get_accessor_data(sampler.input)
+                input_data = parse_accessor_data(input_raw, gltf.accessors[sampler.input])
+                input_offset = blob.tell()
+                blob.write(input_data.astype(np.float32).tobytes())
+                
+                # Output (values)
+                output_raw = get_accessor_data(sampler.output)
+                output_accessor = gltf.accessors[sampler.output]
+                output_data = parse_accessor_data(output_raw, output_accessor)
+                output_offset = blob.tell()
+                blob.write(output_data.astype(np.float32).tobytes())
+                
+                interp_map = {'LINEAR': 0, 'STEP': 1, 'CUBICSPLINE': 2}
+                type_map = {'VEC3': 0, 'VEC4': 1}
+                
+                animation_data['samplers'].append({
+                    'input_offset': input_offset,
+                    'input_count': len(input_data),
+                    'output_offset': output_offset,
+                    'output_count': len(output_data),
+                    'interpolation': interp_map.get(sampler.interpolation, 0),
+                    'output_type': type_map.get(output_accessor.type, 0)
+                })
+        
+        # Process textures in blob
+        texture_offsets = []
+        for tex_data in textures_data:
+            if tex_data:
+                offset = blob.tell()
+                blob.write(tex_data)
+                texture_offsets.append((offset, len(tex_data)))
+            else:
+                texture_offsets.append((0xFFFFFFFF, 0))
+        
+        blob_data = blob.getvalue()
+        
+        # Write binary file
+        with open(bin_filename, 'wb') as f:
+            # File header (l3_desc_file_head_t) - 16 bytes total
+            f.write(struct.pack('<H', 0x3344))  # magic (2 bytes)
+            f.write(struct.pack('<B', ModelType.GLTF))  # model_type (1 byte)
+            f.write(struct.pack('<B', TOOL_VERSION))  # version (1 byte)
+            f.write(struct.pack('<I', 0))  # file_size (4 bytes, update later)
+            f.write(struct.pack('<B', 1))  # face_type (1 byte)
+            f.write(struct.pack('<B', 16))  # payload_offset (1 byte)
+            f.write(struct.pack('<6B', *[0]*6))  # extension (6 bytes)
+            
+            header_start = f.tell()
+            
+            # g3m_header_t
+            f.write(struct.pack('<I', scene_root_count))
+            f.write(struct.pack('<I', node_count))
+            f.write(struct.pack('<I', mesh_count))
+            f.write(struct.pack('<I', primitive_count))
+            f.write(struct.pack('<I', skin_count))
+            f.write(struct.pack('<I', channel_count))
+            f.write(struct.pack('<I', sampler_count))
+            f.write(struct.pack('<I', material_count))
+            f.write(struct.pack('<I', texture_count))
+            
+            # Calculate offsets
+            current_offset = f.tell() + 10 * 4 + 2 * 4  # header + offsets + blob info
+            
+            scene_roots_offset = current_offset
+            current_offset += scene_root_count * 4
+            
+            nodes_offset = current_offset
+            current_offset += node_count * 52  # sizeof(g3m_node_on_disk_t)
+            
+            meshes_offset = current_offset
+            current_offset += mesh_count * 8  # sizeof(g3m_mesh_on_disk_t)
+            
+            primitives_offset = current_offset
+            current_offset += primitive_count * 12  # sizeof(g3m_primitive_on_disk_t)
+            
+            skins_offset = current_offset
+            current_offset += skin_count * 12  # sizeof(g3m_skin_on_disk_t)
+            
+            channels_offset = current_offset
+            current_offset += channel_count * 12  # sizeof(g3m_channel_on_disk_t)
+            
+            samplers_offset = current_offset
+            current_offset += sampler_count * 24  # sizeof(g3m_sampler_on_disk_t)
+            
+            materials_offset = current_offset
+            current_offset += material_count * 8  # sizeof(g3m_material_on_disk_t)
+            
+            textures_offset = current_offset
+            current_offset += texture_count * 8  # sizeof(g3m_texture_on_disk_t)
+            
+            data_blob_offset = current_offset
+            data_blob_size = len(blob_data)
+            
+            # Write offsets
+            f.write(struct.pack('<I', scene_roots_offset))
+            f.write(struct.pack('<I', nodes_offset))
+            f.write(struct.pack('<I', meshes_offset))
+            f.write(struct.pack('<I', primitives_offset))
+            f.write(struct.pack('<I', skins_offset))
+            f.write(struct.pack('<I', channels_offset))
+            f.write(struct.pack('<I', samplers_offset))
+            f.write(struct.pack('<I', materials_offset))
+            f.write(struct.pack('<I', textures_offset))
+            f.write(struct.pack('<I', data_blob_offset))
+            f.write(struct.pack('<I', data_blob_size))
+            
+            # Write scene roots
+            if gltf.scenes:
+                for node_idx in gltf.scenes[0].nodes:
+                    f.write(struct.pack('<i', node_idx))
+            
+            # Write nodes
+            for i, node in enumerate(gltf.nodes):
+                # Translation
+                trans = node.translation if node.translation else [0, 0, 0]
+                f.write(struct.pack('<fff', *trans))
+                
+                # Rotation (quaternion)
+                rot = node.rotation if node.rotation else [0, 0, 0, 1]
+                f.write(struct.pack('<ffff', *rot))
+                
+                # Scale
+                scale = node.scale if node.scale else [1, 1, 1]
+                f.write(struct.pack('<fff', *scale))
+                
+                # Mesh index
+                f.write(struct.pack('<i', node.mesh if node.mesh is not None else -1))
+                
+                # Parent index (need to calculate)
+                parent_idx = -1
+                for j, n in enumerate(gltf.nodes):
+                    if n.children and i in n.children:
+                        parent_idx = j
+                        break
+                f.write(struct.pack('<i', parent_idx))
+                
+                # Children
+                children_count = len(node.children) if node.children else 0
+                f.write(struct.pack('<I', children_count))
+                f.write(struct.pack('<I', node_children_offsets[i]))
+                
+                # Skin index
+                f.write(struct.pack('<i', node.skin if node.skin is not None else -1))
+            
+            # Write meshes
+            prim_idx = 0
+            for mesh in gltf.meshes:
+                f.write(struct.pack('<I', prim_idx))
+                f.write(struct.pack('<I', len(mesh.primitives)))
+                prim_idx += len(mesh.primitives)
+            
+            # Write primitives
+            for prim in primitive_data:
+                f.write(struct.pack('<i', prim['material_index']))
+                f.write(struct.pack('<I', prim['triangles_offset']))
+                f.write(struct.pack('<I', prim['triangle_count']))
+            
+            # Write skins
+            for skin in skin_data:
+                f.write(struct.pack('<I', skin['ibm_offset']))
+                f.write(struct.pack('<I', skin['joints_offset']))
+                f.write(struct.pack('<I', skin['joints_count']))
+            
+            # Write channels
+            for channel in animation_data['channels']:
+                f.write(struct.pack('<I', channel['sampler_index']))
+                f.write(struct.pack('<I', channel['target_node_index']))
+                f.write(struct.pack('<I', channel['target_path']))
+            
+            # Write samplers
+            for sampler in animation_data['samplers']:
+                f.write(struct.pack('<I', sampler['input_offset']))
+                f.write(struct.pack('<I', sampler['input_count']))
+                f.write(struct.pack('<I', sampler['output_offset']))
+                f.write(struct.pack('<I', sampler['output_count']))
+                f.write(struct.pack('<I', sampler['interpolation']))
+                f.write(struct.pack('<I', sampler['output_type']))
+            
+            # Write materials
+            tex_idx = 0
+            for mat in gltf.materials if gltf.materials else []:
+                if mat.pbrMetallicRoughness:
+                    color = mat.pbrMetallicRoughness.baseColorFactor
+                    if color:
+                        f.write(struct.pack('<BBBB', 
+                            int(color[0] * 255), int(color[1] * 255),
+                            int(color[2] * 255), int(color[3] * 255)))
+                    else:
+                        f.write(struct.pack('<BBBB', 255, 255, 255, 255))
+                    
+                    if mat.pbrMetallicRoughness.baseColorTexture is not None:
+                        f.write(struct.pack('<i', tex_idx))
+                        tex_idx += 1
+                    else:
+                        f.write(struct.pack('<i', -1))
+                else:
+                    f.write(struct.pack('<BBBB', 255, 255, 255, 255))
+                    f.write(struct.pack('<i', -1))
+            
+            # Write textures
+            for offset, size in texture_offsets[:texture_count]:
+                f.write(struct.pack('<I', offset))
+                f.write(struct.pack('<I', size))
+            
+            # Write blob
+            f.write(blob_data)
+            
+            # Update file size (at offset 4: after magic(2) + model_type(1) + version(1))
+            file_size = f.tell()
+            f.seek(4)
+            f.write(struct.pack('<I', file_size))
+        
+        print(f"Successfully saved model to {bin_filename}")
+        print(f"----------------------------------")
+        print(f"Scene Root Count:    {scene_root_count}")
+        print(f"Node Count:          {node_count}")
+        print(f"Mesh Count:          {mesh_count}")
+        print(f"Primitive Count:     {primitive_count}")
+        print(f"Skin Count:          {skin_count}")
+        print(f"Channel Count:       {channel_count}")
+        print(f"Sampler Count:       {sampler_count}")
+        print(f"Material Count:      {material_count}")
+        print(f"Texture Count:       {texture_count}")
+        print(f"Triangle Count:      {total_triangle_count}")
+        print(f"Data Blob Size:      {data_blob_size} bytes")
+        print(f"Final file size:     {file_size} bytes")
+        print(f"----------------------------------")
+        
+        binary_to_txt_array(bin_filename, txt_filename)
+    
+    except Exception as e:
+        import traceback
+        print(f"Error processing GLTF file: {e}")
+        traceback.print_exc()
+        create_minimal_gltf_binary(bin_filename)
+        binary_to_txt_array(bin_filename, txt_filename)
+
+
+def create_minimal_gltf_binary(bin_filename: str):
+    """Create a minimal GLTF binary file"""
+    with open(bin_filename, 'wb') as f:
+        # File header (l3_desc_file_head_t) - 16 bytes total
+        f.write(struct.pack('<H', 0x3344))  # magic (2 bytes)
+        f.write(struct.pack('<B', ModelType.GLTF))  # model_type (1 byte)
+        f.write(struct.pack('<B', TOOL_VERSION))  # version (1 byte)
+        f.write(struct.pack('<I', 0))  # file_size (4 bytes)
+        f.write(struct.pack('<B', 1))  # face_type (1 byte)
+        f.write(struct.pack('<B', 16))  # payload_offset (1 byte)
+        f.write(struct.pack('<6B', *[0]*6))  # extension (6 bytes)
+        
+        # Empty g3m_header_t
+        for _ in range(19):  # 9 counts + 10 offsets
+            f.write(struct.pack('<I', 0))
+        
+        # Update file size (at offset 4: after magic(2) + model_type(1) + version(1))
+        file_size = f.tell()
+        f.seek(4)
+        f.write(struct.pack('<I', file_size))
+
+
+def main():
+    # Run png2c.py first
+    try:
+        result = subprocess.run(['python', 'png2c.py'], 
+                              cwd=os.path.dirname(__file__) or '.',
+                              capture_output=True)
+        if result.returncode != 0:
+            print("Warning: Failed to run png2c.py")
+    except Exception as e:
+        print(f"Warning: Could not run png2c.py: {e}")
+    
+    if len(sys.argv) < 2:
+        print("Usage: python extract_desc_v2.py <model_file.obj|model_file.gltf>")
+        sys.exit(1)
+    
+    filename = sys.argv[1]
+    
+    if not os.path.exists(filename):
+        print(f"Error: File not found: {filename}")
+        sys.exit(1)
+    
+    model_type = get_model_type(filename)
+    if model_type == ModelType.UNKNOWN:
+        print(f"Error: Unknown model type for file: {filename}")
+        sys.exit(1)
+    
+    # Generate output filenames
+    prefix = Path(filename).stem
+    
+    if model_type == ModelType.OBJ:
+        bin_filename = f"desc_{prefix}.bin"
+        txt_filename = f"desc_{prefix}.txt"
+        extract_obj_desc(filename, bin_filename, txt_filename)
+    elif model_type == ModelType.GLTF:
+        bin_filename = f"gltf_desc_{prefix}.bin"
+        txt_filename = f"gltf_desc_{prefix}.txt"
+        extract_gltf_desc(filename, bin_filename, txt_filename)
+    
+    print(f"\nGenerated files:")
+    print(f"  - {bin_filename}")
+    print(f"  - {txt_filename}")
+
+
+if __name__ == '__main__':
+    main()

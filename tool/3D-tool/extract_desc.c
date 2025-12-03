@@ -36,6 +36,7 @@ static L3_MODEL_TYPE get_model_type(const char *filename)
 static void extract_obj_desc(const char *obj_filename, char *bin_filename, char *txt_filename)
 {
     tinyobj_description_t *desc = malloc(sizeof(tinyobj_description_t));
+    memset(desc, 0, sizeof(tinyobj_description_t));
 
     tinyobj_parse_obj(&desc->attrib, &desc->shapes, &desc->num_shapes, &desc->materials,
                       &desc->num_materials, obj_filename, loadFile, NULL, 0);
