@@ -65,9 +65,9 @@ struct gui_fs
 /* gui_ftl struct define start */
 struct gui_ftl
 {
-    int (*read)(uint32_t addr, uint8_t *buf, uint32_t len);
-    int (*write)(uint32_t addr, const uint8_t *buf, uint32_t len);
-    int (*erase)(uint32_t addr, uint32_t len);
+    int (*read)(uintptr_t addr, uint8_t *buf, size_t len);
+    int (*write)(uintptr_t addr, const uint8_t *buf, size_t len);
+    int (*erase)(uintptr_t addr, size_t len);
 };
 /* gui_ftl struct define end */
 

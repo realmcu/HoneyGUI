@@ -49,7 +49,7 @@ void gui_ftl_info_register(struct gui_ftl *info)
     ftl = info;
 }
 
-int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)
+int gui_ftl_read(uintptr_t addr, uint8_t *buf, size_t len)
 {
     if (ftl->read)
     {
@@ -61,7 +61,7 @@ int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)
         return 0;
     }
 }
-int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len)
+int gui_ftl_write(uintptr_t addr, const uint8_t *buf, size_t len)
 {
     if (ftl->write)
     {
@@ -73,7 +73,7 @@ int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len)
         return 0;
     }
 }
-int gui_ftl_erase(uint32_t addr, uint32_t len)
+int gui_ftl_erase(uintptr_t addr, size_t len)
 {
     if (ftl->erase)
     {

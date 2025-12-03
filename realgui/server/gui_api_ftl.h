@@ -50,7 +50,7 @@ extern "C" {
  * @param len Number of bytes to read.
  * @return int
  */
-int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len);
+int gui_ftl_read(uintptr_t addr, uint8_t *buf, size_t len);
 
 /**
  * @brief Write to the flash translation layer
@@ -60,7 +60,7 @@ int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len);
  * @param len The number of bytes to write.
  * @return int
  */
-int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len);
+int gui_ftl_write(uintptr_t addr, const uint8_t *buf, size_t len);
 
 /**
  * @brief Erase a section of the flash translation layer
@@ -69,7 +69,7 @@ int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len);
  * @param len The number of bytes to erase.
  * @return int
  */
-int gui_ftl_erase(uint32_t addr, uint32_t len);
+int gui_ftl_erase(uintptr_t addr, size_t len);
 
 #ifdef __cplusplus
 }

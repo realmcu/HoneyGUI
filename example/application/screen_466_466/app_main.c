@@ -926,7 +926,7 @@ static void press_setting_cb_key(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     // gui_obj_t *o = GUI_BASE(obj);
-    int index = (int)(uintptr_t)param;
+    size_t index = (size_t)param;
     gui_img_set_image_data((gui_img_t *)obj,
                            (void *)FILE_POINTER(key_highlight_array[index]));
     IMPORT_GUI_TOUCHPAD
@@ -1202,7 +1202,7 @@ static void release_setting_cb_key(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     // gui_obj_t *o = GUI_BASE(obj);
-    int index = (int)(uintptr_t)param;
+    size_t index = (size_t)param;
     gui_img_set_image_data((gui_img_t *)obj,
                            (void *)FILE_POINTER(key_array[index]));
 

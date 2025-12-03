@@ -108,7 +108,7 @@ gui_inline void gui_list_remove(gui_node_list_t *n)
  * struct type.
  */
 #define gui_list_entry(node, type, member) \
-    ((type *)((char *)(node) - (unsigned long)(uintptr_t)(&((type *)0)->member)))
+    ((type *)((char *)(node) - (uintptr_t)(&((type *)0)->member)))
 
 /**
  * gui_list_for_each - iterate over a list

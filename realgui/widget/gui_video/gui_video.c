@@ -540,7 +540,7 @@ static int video_src_init_avi(gui_video_t  *this)
             memset(list_type, 0, sizeof(list_type));
             memset(&main_hdr, 0, sizeof(main_hdr));
             pos = 4;
-            file_size = *(uint32_t *)(img_data + pos);
+            memcpy(&file_size, img_data + pos, sizeof(uint32_t));
             pos += 4;
             /* Format AVI */
             pos += 4;
@@ -550,7 +550,7 @@ static int video_src_init_avi(gui_video_t  *this)
                 uint32_t size = 0;
                 memcpy(sig, (img_data + pos), 4);
                 pos += 4;
-                size = *(uint32_t *)(img_data + pos);
+                memcpy(&size, img_data + pos, sizeof(uint32_t));
                 pos += 4;
                 if (memcmp(sig, "JUNK", 4) == 0)
                 {
@@ -598,7 +598,7 @@ static int video_src_init_avi(gui_video_t  *this)
             {
                 return -1;
             }
-            idx1_size = *(uint32_t *)(img_data + pos);
+            memcpy(&idx1_size, img_data + pos, sizeof(uint32_t));
             pos += 4;
             idx1_data = img_data + pos;
 

@@ -266,7 +266,7 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
     }
     else if (_this->storage_type == IMG_SRC_FTL)
     {
-        uint32_t base = (uintptr_t)_this->data;
+        uintptr_t base = (uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
     }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
@@ -520,7 +520,7 @@ uint16_t gui_img_get_width(gui_img_t *_this)
     else if (_this->storage_type == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
-        uint32_t base = (uintptr_t)_this->data;
+        uintptr_t base = (uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.w;
     }
@@ -553,7 +553,7 @@ uint16_t gui_img_get_height(gui_img_t *_this)
     else if (_this->storage_type == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
-        uint32_t base = (uintptr_t)_this->data;
+        uintptr_t base = (uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.h;
     }

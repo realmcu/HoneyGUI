@@ -461,7 +461,7 @@ static void gui_soccer_draw_cb_ftl(gui_obj_t *obj)
 
 
                     gui_rgb_data_head_t head;
-                    uint32_t base = (uintptr_t)image->data;
+                    uintptr_t base = (uintptr_t)image->data;
                     gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
                     uint8_t *data = NULL;
                     if (head.compress == true)
