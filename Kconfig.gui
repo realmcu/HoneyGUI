@@ -172,12 +172,6 @@ endchoice
 menu "HoneyGUI Feature Configuration"
 
 
-config REALTEK_BUILD_CJSON
-    bool "Enable cJSON"
-    default y
-    help
-      RTK GUI Enable cJSON library
-
 config REALTEK_BUILD_WEB
     bool "Enable Web"
     default n

@@ -78,11 +78,7 @@
 #endif
 
 #ifndef NAN
-#ifdef _WIN32
-#define NAN sqrt(-1.0)
-#else
 #define NAN 0.0/0.0
-#endif
 #endif
 
 typedef struct
@@ -796,16 +792,15 @@ fail:
 /* Parse the input text into an unescaped cinput, and populate item. */
 static cJSON_bool parse_string(cJSON *const item, parse_buffer *const input_buffer)
 {
+    if (input_buffer == NULL)
+    {
+        return false;
+    }
 
     const unsigned char *input_pointer = buffer_at_offset(input_buffer) + 1;
     const unsigned char *input_end = buffer_at_offset(input_buffer) + 1;
     unsigned char *output_pointer = NULL;
     unsigned char *output = NULL;
-
-    if (!input_buffer)
-    {
-        goto fail;
-    }
 
     /* not a string */
     if (buffer_at_offset(input_buffer)[0] != '\"')
@@ -915,13 +910,13 @@ static cJSON_bool parse_string(cJSON *const item, parse_buffer *const input_buff
     return true;
 
 fail:
-    if (output != NULL)
+    if ((output != NULL) && (input_buffer != NULL))
     {
         input_buffer->hooks.deallocate(output);
         output = NULL;
     }
 
-    if (input_pointer != NULL)
+    if ((input_buffer != NULL) && (input_pointer != NULL))
     {
         input_buffer->offset = (size_t)(input_pointer - input_buffer->content);
     }
