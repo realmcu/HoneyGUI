@@ -34,6 +34,9 @@ if sys.platform == 'win32':
 else:
     env = Environment(tools=['default'], PROGSUFFIX='', **env_params)
 
+# Define HoneyGUI simulator macro for PC simulation environment
+env.Append(CPPDEFINES=['_HONEYGUI_SIMULATOR_'])
+
 RTK_GUI_ENGINE = os.path.join(PROJECT_ROOT, 'realgui')
 GUI_EXAMPLE = os.path.join(PROJECT_ROOT, 'example')
 GUI_SIM_LIBS = os.path.join(PROJECT_ROOT, 'lib/sim')

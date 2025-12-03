@@ -28,7 +28,7 @@
 /*============================================================================*
  *                                  C Interface
  *============================================================================*/
-#ifndef __WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 /* overload new & delete */
 void *lx_platform_malloc(size_t size)
 {

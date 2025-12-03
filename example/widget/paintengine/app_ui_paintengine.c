@@ -62,7 +62,7 @@ static void px_main(gui_px_t *this)
     PX_IO_Data io;
     PX_Object *pObject;
 
-#if defined _WIN32
+#if defined _HONEYGUI_SIMULATOR_
     io = PX_LoadFileToIOData("win32_sim/assets/bunny.obj");
 #else
     io = PX_LoadFileToIOData("/win32_sim/assets/bunny.obj");

@@ -53,6 +53,9 @@ set(GUI_TARGET_NAME gui)
 
 add_executable(${GUI_TARGET_NAME} main.c)
 
+# Define HoneyGUI simulator macro for PC simulation environment
+target_compile_definitions(${GUI_TARGET_NAME} PRIVATE _HONEYGUI_SIMULATOR_)
+
 # Add SDL2 include directories
 target_include_directories(${GUI_TARGET_NAME} PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/../lib/sim/SDL2-2.26.0-STATIC/include

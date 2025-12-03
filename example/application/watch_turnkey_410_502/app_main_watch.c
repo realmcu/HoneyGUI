@@ -57,7 +57,7 @@ bool menu_style = 0;
 char *cjson_content = NULL;
 uint8_t json_refresh_flag = 0;
 struct tm *timeinfo;
-#ifndef __WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 static struct tm watch_time;
 #endif
 char time_str[] = "00:00";
@@ -71,7 +71,7 @@ static char widget_count_string[20];
 static char mem_string[20];
 static char low_mem_string[20];
 
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 unsigned char *resource_root = NULL;
 #endif
 
@@ -236,7 +236,7 @@ static void json_refreash(void)
 static void win_cb(void *param)
 {
     (void)param;
-#if defined __WIN32
+#if defined _HONEYGUI_SIMULATOR_
     time_t rawtime;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
@@ -343,7 +343,7 @@ extern const unsigned char _binary_root_0x704D1400_bin_size[];
 
 static int app_init(void)
 {
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     resource_root = (unsigned char *)_binary_root_0x704D1400_bin_start;
 #endif
 

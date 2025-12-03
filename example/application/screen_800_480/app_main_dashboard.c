@@ -12,7 +12,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
 #include "app_main_dashboard.h"
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 #include "shell.h"
 #endif
 
@@ -44,7 +44,7 @@ static const gui_view_descriptor_t *dashboard_view = NULL;
 // static char mem_string[20];
 // static char low_mem_string[20];
 
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 uint8_t *resource_root = NULL;
 
 static gui_dashboard_t dashboard_info =
@@ -139,7 +139,7 @@ static void fps_create(void *parent)
 }
 #endif
 
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 void dashboard_info_update(int argc, char *argv[])
 {
     if (get_dashboard_info() == NULL) { return; }
@@ -259,7 +259,7 @@ extern const unsigned char _binary_root_0x4400000_bin_size[];
 
 static int app_init(void)
 {
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     resource_root = (uint8_t *)_binary_root_0x4400000_bin_start;
 
     gui_dashboard_info_register(&dashboard_info);

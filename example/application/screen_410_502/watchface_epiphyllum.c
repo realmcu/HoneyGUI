@@ -85,7 +85,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void time_update_cb(void *p)
 {
     (void)p;
-#ifdef __WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     time_t rawtime;
     struct tm *timeinfo;
     time(&rawtime);

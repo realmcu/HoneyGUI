@@ -46,7 +46,7 @@ static void auto_test_app_entry(gui_app_t *app)
     gui_log("auto_test_app start \n");
 }
 
-#if defined _WIN32
+#if defined _HONEYGUI_SIMULATOR_
 uint8_t resource_root[1024 * 1024 * 20];
 #endif
 static int fd;

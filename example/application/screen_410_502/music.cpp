@@ -1,4 +1,4 @@
-#if defined(_WIN32) && defined(MINIMP3_IMPLEMENTATION)
+#if defined(_HONEYGUI_SIMULATOR_) && defined(MINIMP3_IMPLEMENTATION)
 #include <iostream>
 #include <thread>
 #include <mutex>

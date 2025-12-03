@@ -92,7 +92,7 @@ static void vector_graphic_switch_in_timer(void *p)
 }
 static int resource(void)
 {
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     extern const unsigned char _binary_root_0x00950000_bin_start[];
     resource_root = (unsigned char *)_binary_root_0x00950000_bin_start;
 #else

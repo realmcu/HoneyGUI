@@ -467,7 +467,7 @@ static void time_update_cb(void *p)
 {
     (void)p;
     // int millisecond = 0;
-#ifdef __WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     time_t rawtime;
     struct tm *timeinfo;
     time(&rawtime);

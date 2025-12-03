@@ -28,7 +28,7 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 unsigned char *resource_root = NULL;
 char *wifi_get_bat_level(void)
 {
@@ -337,7 +337,7 @@ static void jump_to_keyboard_view_ota(void)
 static void reset(void)
 {
     gui_log("reset called\n");
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_reset_enter_cb(void);
     wifi_reset_enter_cb();
 #endif
@@ -355,7 +355,7 @@ static button_t buttons_about[] =
     {295 - 1, 70, 2, 0, 0},
 
 };
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 #define FILE_POINTER(ADDRESS) (uint8_t *)(resource_root + ADDRESS)
 #else
 #define FILE_POINTER(ADDRESS) (const uint8_t *)(0x704D1400 + ADDRESS)
@@ -428,7 +428,7 @@ static void view_switch_in_camera(gui_view_t *view)
     extern char *get_ip4_string(void);
     char *ip_addr = get_ip4_string();
     GUI_UNUSED(ip_addr);
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     //wifi_camera_enter_cb(ip_addr);
     void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
     wifi_gui_msg_handler(0, ip_addr);
@@ -528,14 +528,14 @@ void update_video_image(uint8_t *jpeg_disp_image)
 static void view_switch_out_camera(gui_view_t *view)
 {
     GUI_UNUSED(view);
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     // void wifi_camera_exit_cb(void);
     // wifi_camera_exit_cb();
     void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
     wifi_gui_msg_handler(1, NULL);
 #endif
 
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_setting_enter_cb(void);
     wifi_setting_enter_cb();
 #endif
@@ -556,13 +556,13 @@ static void view_switch_in_ota(gui_view_t *view)
     extern char *get_ip4_string(void);
     char *ip_addr = get_ip4_string();
     GUI_UNUSED(ip_addr);
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     wifi_ota_enter_cb(ip_addr);
 #endif
 }
 static void view_switch_out_ota(gui_view_t *view)
 {
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_setting_enter_cb(void);
     wifi_setting_enter_cb();
 #endif
@@ -571,7 +571,7 @@ static void view_switch_out_ota(gui_view_t *view)
 static void view_switch_in_about(gui_view_t *view)
 {
     char *bd_addr, *bb2u, *wifi;
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_about_enter_cb(char **bd_addr, char **bb2u, char **wifi);
     wifi_about_enter_cb(&bd_addr, &bb2u, &wifi);
 #else
@@ -1338,7 +1338,7 @@ static void release_setting_cb_about(void *obj, gui_event_t e, void *param)
 static int app_init(void)
 {
     gui_set_bg_color(gui_color_css("#f1f2f1"));
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     resource_root = (unsigned char *)_binary_HoneyGUI_APP_root_0x00950000_bin_start;
 #endif
     gui_log("UI APP version check");
@@ -1395,7 +1395,7 @@ static int app_init(void)
     // char *ip_addr = "192.168.137.1";//get_ip4_string();
     // wifi_camera_enter_cb(ip_addr);
 
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     {
         gui_win_t *win = gui_win_create(gui_obj_get_root(),
                                         0,
@@ -1420,7 +1420,7 @@ static void battery_update_callback(void *p)
 }
 static void view_switch_in(gui_view_t *view)
 {
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     // extern void wifi_setting_enter_cb(void);
     // wifi_setting_enter_cb();
 #endif

@@ -976,7 +976,7 @@ static void update_inform(void *p)
     (void)p;
     static uint8_t cnt = 0;
     cnt++;
-#if defined __WIN32
+#if defined _HONEYGUI_SIMULATOR_
     time_t rawtime;
     time(&rawtime);
     timeinfo = localtime(&rawtime);

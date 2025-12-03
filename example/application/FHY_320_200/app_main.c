@@ -32,7 +32,7 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 unsigned char *resource_root = NULL;
 #endif
 
@@ -153,7 +153,7 @@ static void time_update_cb(void *param)
         sprintf(calltime_str, "%02d:%02d", calltime_val / 60, calltime_val % 60);
     }
 
-#if defined __WIN32
+#if defined _HONEYGUI_SIMULATOR_
     time_t rawtime;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
@@ -236,7 +236,7 @@ extern const unsigned char _binary_root_0x00950000_bin_size[];
 
 static int app_init(void)
 {
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     resource_root = (unsigned char *)_binary_root_0x00950000_bin_start;
 #endif
     theme_bg_white = false;

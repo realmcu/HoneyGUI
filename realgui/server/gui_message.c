@@ -40,7 +40,7 @@ void gui_recv_msg_to_server(void)
     {
         gui_server_msg_handler(&msg);
     }
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     if ((gui_ms_get() - reset_time) > keep_active_time)
     {
         gui_sleep_cb();

@@ -373,7 +373,7 @@ void draw_clock_hand(NVGcontext *vg, float length, float width, int angleInDegre
     nvgStroke(vg);
 }
 
-#ifndef __WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 extern "C" {
     extern struct tm *timeinfo;
 }
@@ -381,7 +381,7 @@ extern "C" {
 
 void nvg_create_clock_cb(NVGcontext *vg)
 {
-#ifdef __WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     time_t rawtime;
     struct tm *timeinfo;
     time(&rawtime);

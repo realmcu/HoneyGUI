@@ -1,4 +1,4 @@
-#if defined _WIN32
+#if defined _HONEYGUI_SIMULATOR_
 extern unsigned char *resource_root;
 
 #define   FIRE_00000_BIN                          (void *)(resource_root + 0x00000178)

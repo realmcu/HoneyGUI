@@ -81,7 +81,7 @@ static void gui_server_entry(void *parameter)
 
         gui_fb_disp(gui_obj_get_root(), true);
 
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
         gui_thread_mdelay(17);
 #endif
         gui_recv_msg_to_server();

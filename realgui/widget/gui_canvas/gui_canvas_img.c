@@ -83,7 +83,7 @@ static void widget_nanovg_canvas_img_draw_cb(gui_obj_t *obj)
     if (this->nanovg_canvas_cb != NULL && mpCanvasImg->bpImageBuff && !mpCanvasImg->bImageActive)
     {
 #ifdef CHECK_REFRESH
-#ifndef __WIN32
+#ifndef _HONEYGUI_SIMULATOR_
         start_us = sys_timestamp_get_us();
 #endif
 #endif
@@ -157,7 +157,7 @@ static void widget_nanovg_canvas_img_draw_cb(gui_obj_t *obj)
         mpCanvasImg->bpImageCtr->base.not_show = false;
         mpCanvasImg->bImageActive = true;
 #ifdef CHECK_REFRESH
-#ifndef __WIN32
+#ifndef _HONEYGUI_SIMULATOR_
         end_us = sys_timestamp_get_us();
         end_us -= start_us;
         gui_log("draw_time: %d.%d ms", end_us / 1000, end_us % 1000);

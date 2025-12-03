@@ -226,7 +226,7 @@ void time_update_cb(void *p)
     time_t rawtime;
     struct tm timeinfo;
 
-#ifdef __WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     struct tm *tmp;
     time(&rawtime);
     tmp = localtime(&rawtime);

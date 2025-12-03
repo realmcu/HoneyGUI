@@ -136,28 +136,12 @@ gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
 
 /**
- * @brief get widget in tree by type.
- *
- * @param root tree.
- * @param type widget type.
- * @param output widget.
- * @return void.
- */
-void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
-
-/**
  * @brief print name by bfs order.
  *
  * @param root tree.
  */
 void gui_obj_tree_print_bfs(gui_obj_t *root);
 
-/**
- * @brief tree print Mermaid.
- *
- * @param obj Pointer to the GUI object root.
- */
-void gui_obj_tree_print_mmd(gui_obj_t *obj);
 
 
 

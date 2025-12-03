@@ -166,12 +166,12 @@ static void test(gui_app_t *app)
     }
 }
 
-#if defined _WIN32
+#if defined _HONEYGUI_SIMULATOR_
 uint8_t resource_root[1024 * 1024 * 20];
 #endif
 static int watch_app_init(void)
 {
-#if defined _WIN32
+#if defined _HONEYGUI_SIMULATOR_
     int fd;
     fd = open("./realgui/example/test/root_image/root(0x4400000).bin", 0);
     if (fd > 0)

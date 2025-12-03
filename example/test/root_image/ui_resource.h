@@ -1,4 +1,4 @@
-#if defined _WIN32
+#if defined _HONEYGUI_SIMULATOR_
 extern unsigned char resource_root[1024 * 1024 * 20];
 
 #define   ARIALBD_SIZE16_BITS4_FONT_BIN           (void *)(resource_root + 0x000000f8)

@@ -29,7 +29,7 @@
  *                           Function Declaration
  *============================================================================*/
 static void watchface_design(gui_view_t *view);
-#ifdef __WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 char *read_file(const char *file_path);
 #endif
 static void inform_generate_cb(void);
@@ -61,7 +61,7 @@ bool menu_style = 0;
 char *cjson_content = NULL;
 uint8_t json_refresh_flag = 0;
 struct tm *timeinfo;
-#ifndef __WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 static struct tm watch_time;
 #endif
 
@@ -71,7 +71,7 @@ static char widget_count_string[20];
 static char mem_string[20];
 static char low_mem_string[20];
 
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 unsigned char *resource_root = NULL;
 const char *filename =
     "./example/application/screen_410_502/root_image/web/peripheral_simulation/json/simulation_data.json";
@@ -208,7 +208,7 @@ uint16_t xorshift16(void)
     return seed;
 }
 
-// #ifndef __WIN32
+// #ifndef _HONEYGUI_SIMULATOR_
 static void json_refreash(void)
 {
     uint16_t degree = xorshift16() % 359;
@@ -282,7 +282,7 @@ static void json_refreash(void)
 static void win_cb(void *param)
 {
     (void)param;
-#if defined __WIN32
+#if defined _HONEYGUI_SIMULATOR_
     time_t rawtime;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
@@ -399,7 +399,7 @@ static void app_main_watch_ui_design(void)
 {
     gui_log("app_main_watch_ui_design\n");
 
-#if defined __WIN32
+#if defined _HONEYGUI_SIMULATOR_
     // cjson_content = read_file(filename);
     // if (!cjson_content)
     // {
@@ -427,7 +427,7 @@ extern const unsigned char _binary_root_0x704D1400_bin_size[];
 
 static int app_init(void)
 {
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     resource_root = (unsigned char *)_binary_root_0x704D1400_bin_start;
 #ifdef MINIMP3_IMPLEMENTATION
     extern void win32_load_music(void *p);
@@ -462,7 +462,7 @@ GUI_INIT_APP_EXPORT(app_init);
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-#if defined __WIN32
+#if defined _HONEYGUI_SIMULATOR_
 // Read CJSON to string
 char *read_file(const char *file_path)
 {

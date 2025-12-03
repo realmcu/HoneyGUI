@@ -11,11 +11,11 @@
 #include "font_stb.h"
 #include "gui_components_init.h"
 #include "app_launcher.h"
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 #include "os_mem.h"
-#endif // !_WIN32
+#endif // !_HONEYGUI_SIMULATOR_
 
-#if defined _WIN32
+#if defined _HONEYGUI_SIMULATOR_
 unsigned char *resource_root = NULL;
 extern const unsigned char _binary_root_0x859000_bin_start[];
 extern const unsigned char _binary_root_0x859000_bin_end[];
@@ -84,7 +84,7 @@ static void app_launcher_ui_design(void)
 
 static int app_init(void)
 {
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     resource_root = (unsigned char *)_binary_root_0x859000_bin_start;
 #endif
     app_launcher_ui_design();

@@ -15,7 +15,7 @@
 #include "glass_1.c"
 #include "glass_1_2.c"
 
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
 extern const unsigned char _binary_bg_bin_start[];
 extern const unsigned char _binary_bg_bin_end[];
 extern const unsigned char _binary_bg_bin_size[];
@@ -26,7 +26,7 @@ extern const unsigned char _binary_bg_bin_size[];
 /* gui glass widget example start*/
 static int app_init(void)
 {
-#ifdef _WIN32
+#ifdef _HONEYGUI_SIMULATOR_
     unsigned char *resource_root = (unsigned char *)_binary_bg_bin_start;
 #else
     unsigned char *resource_root = (unsigned char *)BG_ADDR;

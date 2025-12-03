@@ -265,7 +265,7 @@ static void font_load(gui_text_t *text, gui_text_rect_t *rect)
 
     if (scroll_need_update)
     {
-#if !defined(__WIN32) && !defined(_WIN32) && !defined(__linux__)
+#if !defined(_HONEYGUI_SIMULATOR_) && !defined(__linux__)
         gui_font_scroll_update();
 #endif
         scroll_need_update = false;
@@ -348,7 +348,7 @@ static void font_draw(gui_text_t *text, gui_text_rect_t *rect)
     //         font.string_mem.string_len, font.string_mem.align);
     // gui_log("input zs %d, ze %d, buf %p \n", zs, ze, buf);
 
-#if !defined(__WIN32) && !defined(_WIN32) && !defined(__linux__)
+#if !defined(_HONEYGUI_SIMULATOR_) && !defined(__linux__)
     // Only call on embedded platform, not on simulator
     uint8_t res = rtl_gui_show_string_transparency(&font, 0, 0, zs, ze, buf);
     (void)res;
@@ -392,7 +392,7 @@ GUI_INIT_APP_EXPORT(custom_font_rendering_init);
  *============================================================================*/
 
 /*lib debug*/
-#if !defined(__WIN32) && !defined(_WIN32) && !defined(__linux__)
+#if !defined(_HONEYGUI_SIMULATOR_) && !defined(__linux__)
 #include "trace.h"  // Only for embedded platform, not needed for simulation
 // void dump_font_align_info(uint32_t line, uint8_t dirty, uint8_t align, int16_t delta_ys,
 //                           int16_t string_width, int16_t icon_height)
