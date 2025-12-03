@@ -682,15 +682,15 @@ uint16_t gui_glass_get_width(gui_glass_t *_this)
     {
         struct gui_rgb_data_head head;
         head.w = 0;
-        int fd = gui_fs_open(_this->data,  0);
+        int fd = gui_open(_this->data,  0);
 
         if (fd <= 0)
         {
             gui_log("open file fail:%s !\n", (char *)_this->data);
         }
 
-        gui_fs_read(fd, &head, sizeof(head));
-        gui_fs_close(fd);
+        gui_read(fd, &head, sizeof(head));
+        gui_close(fd);
         return head.w;
     }
     else if (_this->storage_type == IMG_SRC_FTL)
@@ -715,15 +715,15 @@ uint16_t gui_glass_get_height(gui_glass_t *_this)
     {
         struct gui_rgb_data_head head;
         head.h = 0;
-        int fd = gui_fs_open(_this->data,  0);
+        int fd = gui_open(_this->data,  0);
 
         if (fd <= 0)
         {
             gui_log("open file fail:%s !\n", (char *)_this->data);
         }
 
-        gui_fs_read(fd, &head, sizeof(head));
-        gui_fs_close(fd);
+        gui_read(fd, &head, sizeof(head));
+        gui_close(fd);
         return head.h;
     }
     else if (_this->storage_type == IMG_SRC_FTL)

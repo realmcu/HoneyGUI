@@ -1,12 +1,17 @@
 {
     "editor.fontSize": 14,
     "files.associations": {
+        "*.hgd": "json",
         "sdl.h": "c",
         "sdl_test_common.h": "c",
         "sdl_test_font.h": "c",
         "sdl_thread.h": "c",
         "pthread.h": "c",
         "draw_img.h": "c",
-        "*.txt": "c"
+        "*.txt": "c",
+        "gui_api_os.h": "c",
+        "gui_api_fs.h": "c",
+        "chrono": "c",
+        "typeinfo": "c"
     }
 }

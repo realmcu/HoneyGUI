@@ -328,12 +328,12 @@ static void gui_video_draw(gui_obj_t *obj)
             const char *fn = this->data;
             int fp;
 
-            fp = gui_fs_open(fn, 0);
+            fp = gui_open(fn, 0);
             if (fp > 0)
             {
-                gui_fs_lseek(fp, array[this->frame_cur], 0);
-                gui_fs_read(fp, img_data, img_sz);
-                gui_fs_close(fp);
+                gui_lseek(fp, array[this->frame_cur], 0);
+                gui_read(fp, img_data, img_sz);
+                gui_close(fp);
             }
             else
             {
@@ -682,10 +682,10 @@ static int video_src_init_mjpg(gui_video_t  *this)
         int fp;
         uint8_t *buff = NULL;
 
-        fp = gui_fs_open(fn, 0);
+        fp = gui_open(fn, 0);
         if (fp > 0)
         {
-            sz_file = gui_fs_lseek(fp, 0, 2); // end
+            sz_file = gui_lseek(fp, 0, 2); // end
         }
         if (sz_file <= 0)
         {
@@ -708,8 +708,8 @@ static int video_src_init_mjpg(gui_video_t  *this)
             cur_start += cur_rd ;
             cur_rd = (sz_file - cur_start < VIDEO_INIT_LOAD_BUFF_SZ) ? (sz_file - cur_start) :
                      VIDEO_INIT_LOAD_BUFF_SZ;
-            gui_fs_lseek(fp, cur_start, 0);
-            gui_fs_read(fp, buff, cur_rd);
+            gui_lseek(fp, cur_start, 0);
+            gui_read(fp, buff, cur_rd);
             if (cur_start < cur_rd)
             {
                 // first time to get size
@@ -751,7 +751,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     {
                         gui_log("array malloc error!\n");
                         gui_free(buff);
-                        gui_fs_close(fp);
+                        gui_close(fp);
                         return -1;
                     }
                     array[slice_cnt - 1] = offset;
@@ -765,7 +765,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
             memset(buff, 0, cur_rd);
         }
         gui_free(buff);
-        gui_fs_close(fp);
+        gui_close(fp);
         this->array = (uint8_t **)array;
         this->num_frame = slice_cnt;
     }
@@ -894,7 +894,7 @@ static int gui_video_src_init(gui_video_t  *this)
     if (this->storage_type == IMG_SRC_FILESYS)
     {
         char *file = this->data;
-        int fp = gui_fs_open(file, 0);
+        int fp = gui_open(file, 0);
         int rdlen = 0;
         GUI_UNUSED(rdlen);
         if (fp <= 0)
@@ -902,10 +902,10 @@ static int gui_video_src_init(gui_video_t  *this)
             gui_log("Error: open file failed\n");
             return -1;
         }
-        gui_fs_lseek(fp, 0, 0);
+        gui_lseek(fp, 0, 0);
 
-        rdlen = gui_fs_read(fp, header, sizeof(header));
-        gui_fs_close(fp);
+        rdlen = gui_read(fp, header, sizeof(header));
+        gui_close(fp);
     }
     else if (this->storage_type == IMG_SRC_MEMADDR)
     {

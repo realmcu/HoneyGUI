@@ -36,13 +36,13 @@ gui_rgb_data_head_t draw_img_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE sr
 
     if (src_mode == IMG_SRC_FILESYS)
     {
-        int fd = gui_fs_open(img->data,  0);
+        int fd = gui_open(img->data,  0);
         if (fd <= 0)
         {
             gui_log("open file fail:%s !\n", (char *)img->data);
         }
-        gui_fs_read(fd, &head, sizeof(head));
-        gui_fs_close(fd);
+        gui_read(fd, &head, sizeof(head));
+        gui_close(fd);
     }
     else if (src_mode == IMG_SRC_FTL)
     {
@@ -209,12 +209,12 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     }
     if (src_mode == IMG_SRC_FILESYS)
     {
-        int fd = gui_fs_open((const char *)image->data,  0);
-        uint32_t size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+        int fd = gui_open((const char *)image->data,  0);
+        uint32_t size = gui_lseek(fd, 0, SEEK_END) - gui_lseek(fd, 0, SEEK_SET);
         uint8_t *data = (uint8_t *)gui_malloc(size);
         GUI_ASSERT(data != NULL);
-        gui_fs_read(fd, data, size);
-        gui_fs_close(fd);
+        gui_read(fd, data, size);
+        gui_close(fd);
         image->data = data;
 
         return;

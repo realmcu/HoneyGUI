@@ -42,18 +42,16 @@ extern "C" {
  *                         Functions
  *============================================================================*/
 
-int gui_fs_open(const char *file, int flags);
-int gui_fs_close(int d);
-int gui_fs_read(int fd, void *buf, size_t len);
-int gui_fs_write(int fd, const void *buf, size_t len);
-int gui_fs_lseek(int fd, int offset, int whence);
-int gui_fs_closedir(gui_fs_dir *d);
-int gui_fs_ioctl(int fd, int cmd);
-gui_fs_dir *gui_fs_opendir(const char *name);
-struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d);
+int gui_open(const char *file, int flags);
+int gui_close(int d);
+int gui_read(int fd, void *buf, size_t len);
+int gui_write(int fd, const void *buf, size_t len);
+int gui_lseek(int fd, int offset, int whence);
+int gui_closedir(gui_dir_t *d);
+int gui_ioctl(int fd, int cmd);
+gui_dir_t *gui_opendir(const char *name);
+struct gui_fs_dirent *gui_readdir(gui_dir_t *d);
 void *gui_get_file_address(const char *file);
-
-char *gui_strdup(const char *s);
 
 #ifdef __cplusplus
 }

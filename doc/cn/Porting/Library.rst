@@ -72,8 +72,7 @@ Armcc 编译
     E:\HoneyGUI\lib\armcc>cd temp
     E:\HoneyGUI\lib\armcc\temp>cmake --build .
     [  1%] Building C object CMakeFiles/gui.dir/E_/HoneyGUI/realgui/3rd/cJSON/cJSON.o
-    [  2%] Building C object CMakeFiles/gui.dir/E_/HoneyGUI/realgui/3rd/ezXML/ezxml.o
-    [  3%] Building C object CMakeFiles/gui.dir/E_/HoneyGUI/realgui/3rd/nanovg/base/nanovg.o
+    [  2%] Building C object CMakeFiles/gui.dir/E_/HoneyGUI/realgui/3rd/nanovg/base/nanovg.o
     ...
     [100%] Linking C static library gui.lib
     [100%] Built target gui

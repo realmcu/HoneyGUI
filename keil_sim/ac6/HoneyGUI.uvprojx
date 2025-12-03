@@ -464,13 +464,6 @@
           </Files>
           <Files>
             <File>
-              <FileName>ezxml.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\3rd\ezXML\ezxml.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
               <FileName>gifdec.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\3rd\gifdec\gifdec.c</FilePath>

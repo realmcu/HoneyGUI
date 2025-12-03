@@ -75,7 +75,7 @@ static int port_ftruncate(int fd, off_t length)
 
 #endif
 /* directory api port*/
-static int port_closedir(gui_fs_dir *d)
+static int port_closedir(gui_dir_t *d)
 {
 
     int r = closedir((DIR *)(d->dir));
@@ -94,7 +94,7 @@ static int port_closedir(gui_fs_dir *d)
     return r;
 }
 
-static gui_fs_dir *port_opendir(const char *name)
+static gui_dir_t *port_opendir(const char *name)
 {
 
     DIR *dir = opendir(name);
@@ -103,13 +103,13 @@ static gui_fs_dir *port_opendir(const char *name)
         return 0;
     }
 
-    gui_fs_dir *fs_dir = malloc(sizeof(gui_fs_dir));
-    memset(fs_dir, 0, sizeof(gui_fs_dir));
+    gui_dir_t *fs_dir = malloc(sizeof(gui_dir_t));
+    memset(fs_dir, 0, sizeof(gui_dir_t));
     fs_dir->dir = dir;
     return fs_dir;
 }
 
-static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
+static struct gui_fs_dirent *port_readdir(gui_dir_t *d)
 {
     struct dirent *dirent = readdir((DIR *)(d->dir));
     if (!dirent)
@@ -144,7 +144,7 @@ static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
     return fs_dirent;
 }
 
-void port_fstat(int fildes, gui_fs_stat_t *buf)
+void port_fstat(int fildes, gui_fstat_t *buf)
 {
     struct stat st;
 
@@ -170,9 +170,9 @@ static struct gui_fs fs_api =
     .write     = (int (*)(int, const void *, size_t))write,
     .lseek     = (int (*)(int, int, int))lseek,
     /* directory api port*/
-    .opendir   = (gui_fs_dir * (*)(const char *name))port_opendir,
-    .closedir  = (int (*)(gui_fs_dir * d))port_closedir,
-    .readdir   = (struct gui_fs_dirent * (*)(gui_fs_dir * d))port_readdir,
+    .opendir   = (gui_dir_t *(*)(const char *name))port_opendir,
+    .closedir  = (int (*)(gui_dir_t *d))port_closedir,
+    .readdir   = (struct gui_fs_dirent * (*)(gui_dir_t *d))port_readdir,
     .fstat     = port_fstat,
 
 };

@@ -23,15 +23,6 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined __WIN32
-
-
-//#define GUI_ROOT_FOLDER "realgui\\example\\screen_480_480\\root\\"
-extern char *defaultPath;
-#define GUI_ROOT_FOLDER defaultPath
-#else
-#define GUI_ROOT_FOLDER "/"
-#endif
 
 typedef struct gui_fs_dirent
 {
@@ -40,20 +31,20 @@ typedef struct gui_fs_dirent
     uint16_t d_reclen;        /* length of this record */
     char *d_name;         /* The null-terminated file name */
     void *dirent;
-} gui_fs_dirent_t;
+} gui_dirent_t;
 
-typedef struct
+typedef struct gui_fs_dir
 {
     void *dir;
-    gui_fs_dirent_t *dirent;
-} gui_fs_dir;
+    gui_dirent_t *dirent;
+} gui_dir_t;
 
 
 typedef struct gui_fs_stat
 {
     void *information;//by howie
     uint32_t  st_size;
-} gui_fs_stat_t;
+} gui_fstat_t;
 /* gui_fs struct define start */
 struct gui_fs
 {
@@ -63,11 +54,11 @@ struct gui_fs
     int (*write)(int fd, const void *buf, size_t len);
     int (*lseek)(int fd, int offset, int whence);
     /* directory api*/
-    gui_fs_dir *(*opendir)(const char *name);
-    struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
-    int (*closedir)(gui_fs_dir *d);
+    gui_dir_t *(*opendir)(const char *name);
+    struct gui_fs_dirent *(*readdir)(gui_dir_t *d);
+    int (*closedir)(gui_dir_t *d);
     int (*ioctl)(int fildes, int cmd, ...);
-    void (*fstat)(int fildes, gui_fs_stat_t *buf);
+    void (*fstat)(int fildes, gui_fstat_t *buf);
 };
 /* gui_fs struct define end */
 

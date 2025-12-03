@@ -66,7 +66,7 @@ static long mem_lseek(gd_GIF *gif, long offset, int whence)
 static size_t port_read(int fd, void *buf, size_t len)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_fs_read(fd, buf, len);
+    return gui_read(fd, buf, len);
 #else
     return read(fd, buf, len);
 #endif
@@ -75,7 +75,7 @@ static size_t port_read(int fd, void *buf, size_t len)
 static int port_lseek(int fd, int offset, int whence)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_fs_lseek(fd, offset, whence);
+    return gui_lseek(fd, offset, whence);
 #else
     return lseek(fd, offset, whence);
 #endif
@@ -83,7 +83,7 @@ static int port_lseek(int fd, int offset, int whence)
 static int port_open(const char *file, int flags)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_fs_open(file, flags);
+    return gui_open(file, flags);
 #else
     return open(file, flags);
 #endif
@@ -92,7 +92,7 @@ static int port_open(const char *file, int flags)
 static int port_close(int fd)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_fs_close(fd);
+    return gui_close(fd);
 #else
     return close(fd);
 #endif
