@@ -112,13 +112,6 @@ static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-#ifdef ENABLE_FONT_FREETYPE
-    case GUI_FONT_SRC_FT:
-        {
-            gui_font_ft_load(text, rect);
-        }
-        break;
-#endif
     case GUI_FONT_SRC_TTF:
         {
             gui_font_ttf_load(text, rect);
@@ -171,13 +164,6 @@ static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-#ifdef ENABLE_FONT_FREETYPE
-    case GUI_FONT_SRC_FT:
-        {
-            gui_font_ft_draw(text, rect);
-        }
-        break;
-#endif
     case GUI_FONT_SRC_TTF:
         {
             gui_font_ttf_draw(text, rect);
@@ -223,13 +209,6 @@ static void gui_text_font_unload(gui_text_t *text)
         }
         break;
 
-#ifdef ENABLE_FONT_FREETYPE
-    case GUI_FONT_SRC_FT:
-        {
-            gui_font_ft_unload(text);
-        }
-        break;
-#endif
     case GUI_FONT_SRC_TTF:
         {
             gui_font_ttf_unload(text);
@@ -277,12 +256,6 @@ static void gui_text_font_destroy(gui_text_t *text)
     case GUI_FONT_SRC_MAT:
         {
             gui_font_mat_destroy(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_FT:
-        {
-
         }
         break;
 

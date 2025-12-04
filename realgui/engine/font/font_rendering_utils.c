@@ -26,8 +26,15 @@
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-static const uint8_t alpha_list_2bpp[4] = {0, 0x55, 0xaa, 0xff};
+// static const uint8_t alpha_list_2bpp[4] = {0, 0x55, 0xaa, 0xff};
 static const uint8_t alpha_list_4bpp[16] = {0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+
+/*============================================================================*
+ *                           Private Variables
+ *============================================================================*/
+// Pre-multiplied alpha lookup tables for 2/4 bit fonts
+static uint8_t alpha_premul_2bpp[4];
+static uint8_t alpha_premul_4bpp[16];
 /*============================================================================*
  *                            Macros
  *============================================================================*/
@@ -51,12 +58,31 @@ static const uint8_t alpha_list_4bpp[16] = {0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x6
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+
+static inline void init_alpha_premul_2bpp(uint8_t font_alpha)
+{
+    // 2-bit font: 4 levels (0, 0x55, 0xaa, 0xff)
+    alpha_premul_2bpp[0] = 0;
+    alpha_premul_2bpp[1] = _UI_UDIV255(0x55 * font_alpha);
+    alpha_premul_2bpp[2] = _UI_UDIV255(0xaa * font_alpha);
+    alpha_premul_2bpp[3] = font_alpha;
+}
+static inline void init_alpha_premul_4bpp(uint8_t font_alpha)
+{
+    // 4-bit font: 16 levels (0x00, 0x11, 0x22, ..., 0xff)
+    for (int i = 0; i < 16; i++)
+    {
+        alpha_premul_4bpp[i] = _UI_UDIV255(alpha_list_4bpp[i] * font_alpha);
+    }
+}
+
 #if FONT_RENDERING_TURBO
 static void font_render_1bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *glyph)
 {
     uint8_t *dots = glyph->data;
     uint16_t *writebuf = (uint16_t *)font->target_buf;
     const uint16_t color_output = rgba2565(font->color);
+    const uint8_t font_alpha = font->color.color.rgba.a;
     const uint8_t ppb = 8;
     const int x_start = font->clip_rect.x1;
     const int y_start = font->clip_rect.y1;
@@ -67,9 +93,6 @@ static void font_render_1bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
     const int dots_stride = glyph->stride / ppb;
     const int glyph_x = glyph->pos_x;
     const int glyph_y = glyph->pos_y;
-
-    int write_off = (y_start - font->target_rect.y1) * write_stride;
-    int dots_off = (y_start - glyph_y) * dots_stride;
 
     int left_offset = 0, right_offset = 0;
     uint32_t x_start_right = x_start;
@@ -85,60 +108,128 @@ static void font_render_1bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
         x_start_right = _UI_MIN((x_start + left_offset), x_end);
     }
 
-    for (int i = y_start; i < y_end; i++)
+    int write_off = (y_start - font->target_rect.y1) * write_stride;
+    int dots_off = (y_start - glyph_y) * dots_stride;
+
+    if (font_alpha == 0xff)
     {
-        uint8_t *current_byte = &dots[dots_off];
-
-        for (uint32_t j = x_start; j < x_start_right; j++)
+        for (int i = y_start; i < y_end; i++)
         {
-            const uint32_t byte_pos = (j - glyph_x) / ppb;
-            const uint8_t bit_pos = (j - glyph_x) % ppb;
-            if (dots[dots_off + byte_pos] & (1 << bit_pos))
+            uint8_t *current_byte = &dots[dots_off];
+
+            for (uint32_t j = x_start; j < x_start_right; j++)
             {
-                writebuf[write_off + j - font->target_rect.x1] = color_output;
+                const uint32_t byte_pos = (j - glyph_x) / ppb;
+                const uint8_t bit_pos = (j - glyph_x) % ppb;
+                if (dots[dots_off + byte_pos] & (1 << bit_pos))
+                {
+                    writebuf[write_off + j - font->target_rect.x1] = color_output;
+                }
             }
+
+            const int middle_start = x_start + left_offset;
+            const int middle_end = x_end - right_offset;
+            const int pixel_offset = middle_start - glyph_x;
+            uint8_t *temp_p = current_byte + (pixel_offset / ppb);
+
+            for (int j = middle_start; j < middle_end; j += ppb, temp_p++)
+            {
+                const uint8_t byte = *temp_p;
+                if (!byte) { continue; }
+
+                const int base_offset = write_off + j - font->target_rect.x1;
+
+                if (byte & 0x0F)
+                {
+                    if (byte & 0x01) { writebuf[base_offset + 0] = color_output; }
+                    if (byte & 0x02) { writebuf[base_offset + 1] = color_output; }
+                    if (byte & 0x04) { writebuf[base_offset + 2] = color_output; }
+                    if (byte & 0x08) { writebuf[base_offset + 3] = color_output; }
+                }
+                if (byte & 0xF0)
+                {
+                    if (byte & 0x10) { writebuf[base_offset + 4] = color_output; }
+                    if (byte & 0x20) { writebuf[base_offset + 5] = color_output; }
+                    if (byte & 0x40) { writebuf[base_offset + 6] = color_output; }
+                    if (byte & 0x80) { writebuf[base_offset + 7] = color_output; }
+                }
+            }
+
+            for (int j = x_end - right_offset; j < x_end; j++)
+            {
+                const uint32_t byte_pos = (j - glyph_x) / ppb;
+                const uint8_t bit_pos = (j - glyph_x) % ppb;
+                if (dots[dots_off + byte_pos] & (1 << bit_pos))
+                {
+                    writebuf[write_off + j - font->target_rect.x1] = color_output;
+                }
+            }
+
+            write_off += write_stride;
+            dots_off += dots_stride;
         }
-
-        const int middle_start = x_start + left_offset;
-        const int middle_end = x_end - right_offset;
-        const int pixel_offset = middle_start - glyph_x;
-        uint8_t *temp_p = current_byte + (pixel_offset / ppb);
-
-        for (int j = middle_start; j < middle_end; j += ppb, temp_p++)
+    }
+    else
+    {
+        for (int i = y_start; i < y_end; i++)
         {
-            const uint8_t byte = *temp_p;
-            if (!byte) { continue; }
+            uint8_t *current_byte = &dots[dots_off];
 
-            const int base_offset = write_off + j - font->target_rect.x1;
+            for (uint32_t j = x_start; j < x_start_right; j++)
+            {
+                const uint32_t byte_pos = (j - glyph_x) / ppb;
+                const uint8_t bit_pos = (j - glyph_x) % ppb;
+                if (dots[dots_off + byte_pos] & (1 << bit_pos))
+                {
+                    uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
+                                                                                      font_alpha);
+                }
+            }
 
-            if (byte & 0x0F)
+            const int middle_start = x_start + left_offset;
+            const int middle_end = x_end - right_offset;
+            const int pixel_offset = middle_start - glyph_x;
+            uint8_t *temp_p = current_byte + (pixel_offset / ppb);
+
+            for (int j = middle_start; j < middle_end; j += ppb, temp_p++)
             {
-                if (byte & 0x01) { writebuf[base_offset + 0] = color_output; }
-                if (byte & 0x02) { writebuf[base_offset + 1] = color_output; }
-                if (byte & 0x04) { writebuf[base_offset + 2] = color_output; }
-                if (byte & 0x08) { writebuf[base_offset + 3] = color_output; }
+                const uint8_t byte = *temp_p;
+                if (!byte) { continue; }
+
+                const int base_offset = write_off + j - font->target_rect.x1;
+
+                if (byte & 0x0F)
+                {
+                    if (byte & 0x01) { uint16_t cb = writebuf[base_offset + 0]; writebuf[base_offset + 0] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                    if (byte & 0x02) { uint16_t cb = writebuf[base_offset + 1]; writebuf[base_offset + 1] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                    if (byte & 0x04) { uint16_t cb = writebuf[base_offset + 2]; writebuf[base_offset + 2] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                    if (byte & 0x08) { uint16_t cb = writebuf[base_offset + 3]; writebuf[base_offset + 3] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                }
+                if (byte & 0xF0)
+                {
+                    if (byte & 0x10) { uint16_t cb = writebuf[base_offset + 4]; writebuf[base_offset + 4] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                    if (byte & 0x20) { uint16_t cb = writebuf[base_offset + 5]; writebuf[base_offset + 5] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                    if (byte & 0x40) { uint16_t cb = writebuf[base_offset + 6]; writebuf[base_offset + 6] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                    if (byte & 0x80) { uint16_t cb = writebuf[base_offset + 7]; writebuf[base_offset + 7] = alphaBlendRGB565(color_output, cb, font_alpha); }
+                }
             }
-            if (byte & 0xF0)
+
+            for (int j = x_end - right_offset; j < x_end; j++)
             {
-                if (byte & 0x10) { writebuf[base_offset + 4] = color_output; }
-                if (byte & 0x20) { writebuf[base_offset + 5] = color_output; }
-                if (byte & 0x40) { writebuf[base_offset + 6] = color_output; }
-                if (byte & 0x80) { writebuf[base_offset + 7] = color_output; }
+                const uint32_t byte_pos = (j - glyph_x) / ppb;
+                const uint8_t bit_pos = (j - glyph_x) % ppb;
+                if (dots[dots_off + byte_pos] & (1 << bit_pos))
+                {
+                    uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
+                                                                                      font_alpha);
+                }
             }
+
+            write_off += write_stride;
+            dots_off += dots_stride;
         }
-
-        for (int j = x_end - right_offset; j < x_end; j++)
-        {
-            const uint32_t byte_pos = (j - glyph_x) / ppb;
-            const uint8_t bit_pos = (j - glyph_x) % ppb;
-            if (dots[dots_off + byte_pos] & (1 << bit_pos))
-            {
-                writebuf[write_off + j - font->target_rect.x1] = color_output;
-            }
-        }
-
-        write_off += write_stride;
-        dots_off += dots_stride;
     }
 }
 #elif FONT_RENDERING_STABLE
@@ -147,18 +238,40 @@ static void font_render_1bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
     uint8_t *dots = glyph->data;
     uint16_t *writebuf = (uint16_t *)font->target_buf;
     uint16_t color_output = rgba2565(font->color);
+    uint8_t font_alpha = font->color.color.rgba.a;
     uint8_t ppb = 8; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 2;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+
+    if (font_alpha == 0xff)
     {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
         {
-            if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
             {
-                writebuf[write_off + j - font->target_rect.x1] = color_output;
+                if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+                {
+                    writebuf[write_off + j - font->target_rect.x1] = color_output;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+        {
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+            {
+                if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+                {
+                    uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
+                                                                                      font_alpha);
+                }
             }
         }
     }
@@ -171,10 +284,10 @@ static void font_render_1bpp_to_ARGB8565_stable(draw_font_t *font, font_glyph_t 
     uint16_t color_output = rgba2565(font->color);
     uint8_t color_outputh = color_output >> 8;
     uint8_t color_outputl = color_output & 0xff;
-
     uint8_t ppb = 8; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
@@ -198,18 +311,47 @@ static void font_render_1bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
     color_output[0] = font->color.color.rgba.b;
     color_output[1] = font->color.color.rgba.g;
     color_output[2] = font->color.color.rgba.r;
+    uint8_t font_alpha = font->color.color.rgba.a;
     uint8_t ppb = 8; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+
+    if (font_alpha == 0xff)
     {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
         {
-            if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
             {
-                memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color_output, 3);
+                if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+                {
+                    memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color_output, 3);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+        {
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+            {
+                if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+                {
+                    uint8_t color_back[3];
+                    memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
+                    uint8_t color[3];
+                    color[0] = _UI_UDIV255(color_output[0] * font_alpha) + _UI_UDIV255(color_back[0] *
+                                                                                       (255 - font_alpha));
+                    color[1] = _UI_UDIV255(color_output[1] * font_alpha) + _UI_UDIV255(color_back[1] *
+                                                                                       (255 - font_alpha));
+                    color[2] = _UI_UDIV255(color_output[2] * font_alpha) + _UI_UDIV255(color_back[2] *
+                                                                                       (255 - font_alpha));
+                    memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color, 3);
+                }
             }
         }
     }
@@ -219,19 +361,41 @@ static void font_render_1bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
 {
     uint8_t *dots = glyph->data;
     uint32_t *writebuf = (uint32_t *)font->target_buf;
-    uint32_t color_output = font->color.color.argb_full;
+    uint8_t font_alpha = font->color.color.rgba.a;
     uint8_t ppb = 8; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 4;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+
+    if (font_alpha == 0xff)
     {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        uint32_t color_output = font->color.color.argb_full;
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
         {
-            if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
             {
-                writebuf[write_off + j - font->target_rect.x1] = color_output;
+                if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+                {
+                    writebuf[write_off + j - font->target_rect.x1] = color_output;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+        {
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+            {
+                if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+                {
+                    uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back,
+                                                                                    font_alpha);
+                }
             }
         }
     }
@@ -253,6 +417,7 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
 
     int write_off = (y_start - font->target_rect.y1) * write_stride;
     int dots_off = (y_start - glyph->pos_y) * dots_stride;
+    init_alpha_premul_2bpp(font->color.color.rgba.a);
 
     int left_offset = 0, right_offset = 0, byte = 0;
     uint16_t color_back;
@@ -281,12 +446,12 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
 
         for (int j = x_start; j < x_start + left_offset; j++)
         {
-            uint8_t alpha = dots[(i - glyph->pos_y) * (glyph->stride / ppb) + (j - glyph->pos_x) / ppb] >>
-                            ((j - glyph->pos_x) % ppb * 2);
-            if (alpha != 0)
+            uint8_t alpha_idx = dots[(i - glyph->pos_y) * (glyph->stride / ppb) + (j - glyph->pos_x) / ppb] >>
+                                ((j - glyph->pos_x) % ppb * 2);
+            alpha_idx &= 0x03;
+            if (alpha_idx != 0)
             {
-                alpha = alpha & 0x03;
-                alpha = alpha * 85;
+                uint8_t alpha = alpha_premul_2bpp[alpha_idx];
                 color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
             }
@@ -299,61 +464,61 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
                 if (alpha & 0x03)
                 {
                     alpha_2bit = alpha & 0x03;
-                    if (alpha_2bit == 0x03)
+                    uint8_t alpha_val = alpha_premul_2bpp[alpha_2bit];
+                    if (alpha_val == 0xff)
                     {
                         writebuf[write_off + j - font->target_rect.x1] = color_output;
                     }
                     else
                     {
-                        alpha_2bit *= 85;
                         color_back = writebuf[write_off + j - font->target_rect.x1];
                         writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
-                                                                                          alpha_2bit);
+                                                                                          alpha_val);
                     }
                 }
                 if (alpha & 0x0C)
                 {
                     alpha_2bit = (alpha >> 2) & 0x03;
-                    if (alpha_2bit == 0x03)
+                    uint8_t alpha_val = alpha_premul_2bpp[alpha_2bit];
+                    if (alpha_val == 0xff)
                     {
                         writebuf[write_off + j + 1 - font->target_rect.x1] = color_output;
                     }
                     else
                     {
-                        alpha_2bit *= 85;
                         color_back = writebuf[write_off + j + 1 - font->target_rect.x1];
                         writebuf[write_off + j + 1 - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
-                                                                                              alpha_2bit);
+                                                                                              alpha_val);
                     }
                 }
                 if (alpha & 0x30)
                 {
                     alpha_2bit = (alpha >> 4) & 0x03;
-                    if (alpha_2bit == 0x03)
+                    uint8_t alpha_val = alpha_premul_2bpp[alpha_2bit];
+                    if (alpha_val == 0xff)
                     {
                         writebuf[write_off + j + 2 - font->target_rect.x1] = color_output;
                     }
                     else
                     {
-                        alpha_2bit *= 85;
                         color_back = writebuf[write_off + j + 2 - font->target_rect.x1];
                         writebuf[write_off + j + 2 - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
-                                                                                              alpha_2bit);
+                                                                                              alpha_val);
                     }
                 }
                 if (alpha & 0xC0)
                 {
                     alpha_2bit = (alpha >> 6) & 0x03;
-                    if (alpha_2bit == 0x03)
+                    uint8_t alpha_val = alpha_premul_2bpp[alpha_2bit];
+                    if (alpha_val == 0xff)
                     {
                         writebuf[write_off + j + 3 - font->target_rect.x1] = color_output;
                     }
                     else
                     {
-                        alpha_2bit *= 85;
                         color_back = writebuf[write_off + j + 3 - font->target_rect.x1];
                         writebuf[write_off + j + 3 - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
-                                                                                              alpha_2bit);
+                                                                                              alpha_val);
                     }
                 }
             }
@@ -362,17 +527,17 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
         }
         for (int j = x_end - right_offset; j < x_end; j++)
         {
-            uint8_t alpha = dots[(i - glyph->pos_y) * (glyph->stride / ppb) + (j - glyph->pos_x) / ppb] >>
-                            ((j - glyph->pos_x) % ppb * 2);
-            if (alpha != 0)
+            uint8_t alpha_idx = dots[(i - glyph->pos_y) * (glyph->stride / ppb) + (j - glyph->pos_x) / ppb] >>
+                                ((j - glyph->pos_x) % ppb * 2);
+            alpha_idx &= 0x03;
+            if (alpha_idx != 0)
             {
-                alpha = alpha & 0x03;
-                alpha = alpha * 85;
+                uint8_t alpha = alpha_premul_2bpp[alpha_idx];
                 color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
             }
         }
-        write_off += font->target_rect.x2 - font->target_rect.x1 + 1;
+        write_off += write_stride;
         dots_off += (glyph->stride / ppb);
     }
 }
@@ -385,17 +550,19 @@ static void font_render_2bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
     uint8_t ppb = 4; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 2;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_2bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
-            alpha &= 0x03;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
+            alpha_idx &= 0x03;
+            if (alpha_idx)
             {
-                alpha = alpha_list_2bpp[alpha];
+                uint8_t alpha = alpha_premul_2bpp[alpha_idx];
                 uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
             }
@@ -414,17 +581,19 @@ static void font_render_2bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
     uint8_t ppb = 4; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_2bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
-            alpha &= 0x03;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
+            alpha_idx &= 0x03;
+            if (alpha_idx)
             {
-                alpha = alpha_list_2bpp[alpha];
+                uint8_t alpha = alpha_premul_2bpp[alpha_idx];
                 uint8_t color_back[3];
                 memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
                 uint8_t color[3];
@@ -448,17 +617,19 @@ static void font_render_2bpp_to_ARGB8565_stable(draw_font_t *font, font_glyph_t 
     uint8_t ppb = 4; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_2bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
-            alpha &= 0x03;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
+            alpha_idx &= 0x03;
+            if (alpha_idx)
             {
-                alpha = alpha_list_2bpp[alpha];
+                uint8_t alpha = alpha_premul_2bpp[alpha_idx];
                 writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 2] = alpha;
                 writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 1] = color_outputh;
                 writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 0] = color_outputl;
@@ -474,17 +645,19 @@ static void font_render_2bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
     uint8_t ppb = 4; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 4;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_2bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
-            alpha &= 0x03;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
+            alpha_idx &= 0x03;
+            if (alpha_idx)
             {
-                alpha = alpha_list_2bpp[alpha];
+                uint8_t alpha = alpha_premul_2bpp[alpha_idx];
                 uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back, alpha);
             }
@@ -500,17 +673,19 @@ static void font_render_4bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
     uint8_t ppb = 2; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 2;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_4bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
-            alpha &= 0x0f;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
+            alpha_idx &= 0x0f;
+            if (alpha_idx)
             {
-                alpha = alpha_list_4bpp[alpha];
+                uint8_t alpha = alpha_premul_4bpp[alpha_idx];
                 uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
             }
@@ -529,17 +704,19 @@ static void font_render_4bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
     uint8_t ppb = 2; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_4bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
-            alpha &= 0x0f;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
+            alpha_idx &= 0x0f;
+            if (alpha_idx)
             {
-                alpha = alpha_list_4bpp[alpha];
+                uint8_t alpha = alpha_premul_4bpp[alpha_idx];
                 uint8_t color_back[3];
                 memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
                 uint8_t color[3];
@@ -563,17 +740,19 @@ static void font_render_4bpp_to_ARGB8565_stable(draw_font_t *font, font_glyph_t 
     uint8_t ppb = 2; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_4bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
-            alpha &= 0x0f;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
+            alpha_idx &= 0x0f;
+            if (alpha_idx)
             {
-                alpha = alpha_list_4bpp[alpha];
+                uint8_t alpha = alpha_premul_4bpp[alpha_idx];
                 writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 2] = alpha;
                 writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 1] = color_outputh;
                 writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 0] = color_outputl;
@@ -589,17 +768,19 @@ static void font_render_4bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
     uint8_t ppb = 2; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 4;
     uint32_t dots_stride = glyph->stride / ppb;
+    init_alpha_premul_4bpp(font->color.color.rgba.a);
+
     for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
         for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
-            alpha &= 0x0f;
-            if (alpha)
+            uint8_t alpha_idx = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 4);
+            alpha_idx &= 0x0f;
+            if (alpha_idx)
             {
-                alpha = alpha_list_4bpp[alpha];
+                uint8_t alpha = alpha_premul_4bpp[alpha_idx];
                 uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back, alpha);
             }
@@ -712,21 +893,43 @@ static void font_render_8bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
     uint8_t *dots = glyph->data;
     uint16_t *writebuf = (uint16_t *)font->target_buf;
     uint16_t color_output = rgba2565(font->color);
+    uint8_t font_alpha = font->color.color.rgba.a;
     uint8_t ppb = 1; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 2;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+
+    if (font_alpha == 0xff)
     {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
-            if (alpha)
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
             {
-                // alpha = _UI_UDIV255(font->color.color.rgba.a * alpha);
-                uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
-                writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
+                if (alpha)
+                {
+                    uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+        {
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+            {
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
+                if (alpha)
+                {
+                    alpha = _UI_UDIV255(font_alpha * alpha);
+                    uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
+                }
             }
         }
     }
@@ -740,21 +943,45 @@ static void font_render_8bpp_to_ARGB8565_stable(draw_font_t *font, font_glyph_t 
     uint16_t color_output = rgba2565(font->color);
     uint8_t color_outputh = color_output >> 8;
     uint8_t color_outputl = color_output & 0xff;
+    uint8_t font_alpha = font->color.color.rgba.a;
     uint8_t ppb = 1; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+
+    if (font_alpha == 0xff)
     {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
-            if (alpha)
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
             {
-                writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 2] = alpha;
-                writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 1] = color_outputh;
-                writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 0] = color_outputl;
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
+                if (alpha)
+                {
+                    writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 2] = alpha;
+                    writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 1] = color_outputh;
+                    writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 0] = color_outputl;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+        {
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+            {
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
+                if (alpha)
+                {
+                    alpha = _UI_UDIV255(font_alpha * alpha);
+                    writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 2] = alpha;
+                    writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 1] = color_outputh;
+                    writebuf[write_off + j * 3 - font->target_rect.x1 * 3 + 0] = color_outputl;
+                }
             }
         }
     }
@@ -768,26 +995,53 @@ static void font_render_8bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
     color_output[0] = font->color.color.rgba.b;
     color_output[1] = font->color.color.rgba.g;
     color_output[2] = font->color.color.rgba.r;
+    uint8_t font_alpha = font->color.color.rgba.a;
     uint8_t ppb = 1; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride;
     uint32_t dots_stride = glyph->stride / ppb;
 
-    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    if (font_alpha == 0xff)
     {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x)  / ppb];
-            if (alpha)
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
             {
-                uint8_t color_back[3];
-                memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
-                uint8_t color[3];
-                color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
-                color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
-                color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
-                memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color, 3);
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x)  / ppb];
+                if (alpha)
+                {
+                    uint8_t color_back[3];
+                    memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
+                    uint8_t color[3];
+                    color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
+                    color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
+                    color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
+                    memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color, 3);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+        {
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+            {
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x)  / ppb];
+                if (alpha)
+                {
+                    alpha = _UI_UDIV255(font_alpha * alpha);
+                    uint8_t color_back[3];
+                    memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
+                    uint8_t color[3];
+                    color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
+                    color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
+                    color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
+                    memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color, 3);
+                }
             }
         }
     }
@@ -797,20 +1051,43 @@ static void font_render_8bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
 {
     uint8_t *dots = glyph->data;
     uint32_t *writebuf = (uint32_t *)font->target_buf;
+    uint8_t font_alpha = font->color.color.rgba.a;
     uint8_t ppb = 1; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 4;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+
+    if (font_alpha == 0xff)
     {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
         {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
-            if (alpha)
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
             {
-                uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
-                writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back, alpha);
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
+                if (alpha)
+                {
+                    uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back, alpha);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+        {
+            int write_off = (i - font->target_rect.y1) * write_stride;
+            int dots_off = (i - glyph->pos_y) * dots_stride;
+            for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+            {
+                uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
+                if (alpha)
+                {
+                    alpha = _UI_UDIV255(font_alpha * alpha);
+                    uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back, alpha);
+                }
             }
         }
     }

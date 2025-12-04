@@ -82,8 +82,8 @@ static void ui_text_font(gui_view_t *view)
     gui_color_t color[FONT_NUM];
     color[0] = APP_COLOR_WHITE;
     color[1] = APP_COLOR_RED;
-    color[2] = APP_COLOR_GREEN;
-    color[3] = APP_COLOR_BLUE;
+    color[2] = gui_rgba(0, UINT8_MAX, 0, 0xC0);
+    color[3] = gui_rgba(0, 0, UINT8_MAX, 0x80);
     gui_text_t *text1[FONT_NUM];
     gui_text_t *text2[FONT_NUM];
     gui_text_t *text4[FONT_NUM];

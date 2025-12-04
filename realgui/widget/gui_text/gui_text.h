@@ -81,13 +81,14 @@ typedef enum
 /** @brief Font type enum. */
 typedef enum
 {
-    GUI_FONT_SRC_BMP = 0,
-    GUI_FONT_SRC_STB = 1,
-    GUI_FONT_SRC_IMG = 2,
-    GUI_FONT_SRC_MAT = 3,
-    GUI_FONT_SRC_FT  = 4,
-    GUI_FONT_SRC_TTF = 5,
-    GUI_FONT_SRC_CUS = 6,
+    GUI_FONT_SRC_BMP = 0x00,
+    GUI_FONT_SRC_IMG = 0x01,
+    GUI_FONT_SRC_MAT = 0x02,
+
+    GUI_FONT_SRC_TTF = 0x10,
+    GUI_FONT_SRC_STB = 0x11,
+
+    GUI_FONT_SRC_CUS = 0x20,
 } FONT_SRC_TYPE;
 
 typedef enum
