@@ -96,7 +96,7 @@ static int resource(void)
     extern const unsigned char _binary_root_0x00950000_bin_start[];
     resource_root = (unsigned char *)_binary_root_0x00950000_bin_start;
 #else
-    resource_root = 0x704D1400;
+    resource_root = (void *)0x704D1400;
 #endif
     return 0;
 }

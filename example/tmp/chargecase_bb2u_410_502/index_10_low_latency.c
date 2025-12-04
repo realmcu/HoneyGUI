@@ -14,24 +14,24 @@ static float current_rot_angle = 0.0f;
 static void update_face_animation(void *param)
 {
     (void)param;
+    current_rot_angle += ANIMATION_SPEED;
+    // float diff = target_rot_angle - current_rot_angle;
 
-    float diff = target_rot_angle - current_rot_angle;
-
-    if (fabsf(diff) < MIN_ANGLE_DIFFERENCE)
-    {
-        current_rot_angle = target_rot_angle;
-    }
-    else
-    {
-        if (diff > 0)
-        {
-            current_rot_angle += ANIMATION_SPEED;
-        }
-        else
-        {
-            current_rot_angle -= ANIMATION_SPEED;
-        }
-    }
+    // if (fabsf(diff) < MIN_ANGLE_DIFFERENCE)
+    // {
+    //     current_rot_angle = target_rot_angle;
+    // }
+    // else
+    // {
+    //     if (diff > 0)
+    //     {
+    //         current_rot_angle += ANIMATION_SPEED;
+    //     }
+    //     else
+    //     {
+    //         current_rot_angle -= ANIMATION_SPEED;
+    //     }
+    // }
 
 }
 
