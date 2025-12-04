@@ -1,24 +1,50 @@
+/**
+ * @file gui_port_filesystem.c
+ * @brief Filesystem port for win32 simulator using VFS
+ */
 
 #include "guidef.h"
 #include "gui_port.h"
+#include "gui_vfs.h"
+#include "gui_vfs_generic.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+//#include <fcntl.h>
+//#include <unistd.h>
 
 
-
-static struct gui_fs fs_api =
+/* POSIX adapter structure */
+static const gui_fs_adapter_t posix_adapter =
 {
-    .closedir  = NULL,
-    .close     = NULL,
-    .lseek     = NULL,
-    .open      = NULL,
-    .opendir   = NULL,
-    .read      = NULL,
-    .readdir   = NULL,
-    .write     = NULL,
+    .fs_open = NULL,
+    .fs_close = NULL,
+    .fs_read = NULL,
+    .fs_write = NULL,
+    .fs_seek = NULL,
+    .fs_tell = NULL,
+    .fs_opendir = NULL,   /* Not needed for basic file operations */
+    .fs_readdir = NULL,
+    .fs_closedir = NULL,
+    .fs_stat = NULL,
 };
-extern void gui_fs_info_register(struct gui_fs *info);
+
+/**
+ * @brief Initialize filesystem port for win32 simulator
+ *
+ * This function initializes VFS and mounts:
+ * - /sd: PC filesystem (./sdcard) using POSIX backend
+ * - /data: Current directory using generic adapter
+ */
 void gui_port_fs_init(void)
 {
-    GUI_UNUSED(fs_api);
-    gui_fs_info_register(&fs_api);
+    /* Initialize VFS */
+    gui_vfs_init();
+
+    // Mount ROMFS
+    gui_vfs_mount_romfs("/rom", 0x00, 0);
+
+    /* Mount current directory using generic adapter (as example) */
+    gui_vfs_mount_generic("/vfs_adapter", ".", &posix_adapter);
 }

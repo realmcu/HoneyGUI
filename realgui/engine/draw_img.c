@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include "acc_api.h"
+#include "gui_vfs.h"
 
 void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
 void (* draw_img_acc_end_cb)(struct draw_img *image) = NULL;
@@ -36,13 +37,13 @@ gui_rgb_data_head_t draw_img_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE sr
 
     if (src_mode == IMG_SRC_FILESYS)
     {
-        int fd = gui_open(img->data,  0);
-        if (fd <= 0)
+        gui_vfs_file_t *file = gui_vfs_open(img->data, GUI_VFS_READ);
+        if (!file)
         {
             gui_log("open file fail:%s !\n", (char *)img->data);
         }
-        gui_read(fd, &head, sizeof(head));
-        gui_close(fd);
+        gui_vfs_read(file, &head, sizeof(head));
+        gui_vfs_close(file);
     }
     else if (src_mode == IMG_SRC_FTL)
     {
@@ -209,12 +210,9 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     }
     if (src_mode == IMG_SRC_FILESYS)
     {
-        int fd = gui_open((const char *)image->data,  0);
-        uint32_t size = gui_lseek(fd, 0, SEEK_END) - gui_lseek(fd, 0, SEEK_SET);
-        uint8_t *data = (uint8_t *)gui_malloc(size);
+        size_t size;
+        uint8_t *data = (uint8_t *)gui_vfs_load_file((const char *)image->data, &size);
         GUI_ASSERT(data != NULL);
-        gui_read(fd, data, size);
-        gui_close(fd);
         image->data = data;
 
         return;

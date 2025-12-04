@@ -12,6 +12,7 @@
         "gui_api_os.h": "c",
         "gui_api_fs.h": "c",
         "chrono": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "gui_api.h": "c"
     }
 }

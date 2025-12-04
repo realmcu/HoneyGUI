@@ -1,11 +1,16 @@
+/**
+ * @file gui_port_filesystem.c
+ * @brief Filesystem port for win32 simulator using VFS
+ */
 
 #include "guidef.h"
 #include "gui_port.h"
-#include <pthread.h>
+#include "gui_vfs.h"
+#include "gui_vfs_generic.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
-#include <sys/stat.h>
+#include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -13,172 +18,83 @@
 #define O_BINARY 0
 #endif
 
-#if 0
-/* file api port*/
-static int port_open(const char *file, int flags, ...)
-{
+/* POSIX adapter for VFS */
 
+static void *posix_adapter_open(const char *path, int flags)
+{
+    int posix_flags = O_BINARY;
+
+    if (flags & 0x01) { posix_flags |= O_RDONLY; }
+    if (flags & 0x02) { posix_flags |= O_WRONLY; }
+    if (flags & 0x04) { posix_flags |= O_CREAT; }
+    if (flags & 0x08) { posix_flags |= O_APPEND; }
+
+    int fd = open(path, posix_flags, 0666);
+    if (fd < 0) { return NULL; }
+
+    return (void *)(intptr_t)fd;
 }
 
-static int port_close(int d)
+static int posix_adapter_close(void *file)
 {
-
+    int fd = (int)(intptr_t)file;
+    return close(fd);
 }
 
-static int port_read(int fd, void *buf, size_t len)
+static int posix_adapter_read(void *file, void *buf, size_t size)
 {
-
+    int fd = (int)(intptr_t)file;
+    return read(fd, buf, size);
 }
 
-static int port_write(int fd, const void *buf, size_t len)
+static int posix_adapter_write(void *file, const void *buf, size_t size)
 {
-
+    int fd = (int)(intptr_t)file;
+    return write(fd, buf, size);
 }
 
-static off_t port_lseek(int fd, off_t offset, int whence)
+static int posix_adapter_seek(void *file, int offset, int whence)
 {
-
-}
-static int port_rename(const char *from, const char *to)
-{
-
-}
-static int port_unlink(const char *pathname)
-{
-
-}
-static int port_stat(const char *file, struct stat *buf)
-{
-
-}
-static int port_fstat(int fildes, struct stat *buf)
-{
-
-}
-static int port_fsync(int fildes)
-{
-
-}
-static int port_fcntl(int fildes, int cmd, ...)
-{
-
-}
-static int port_ioctl(int fildes, int cmd, ...)
-{
-
-}
-static int port_ftruncate(int fd, off_t length)
-{
-
+    int fd = (int)(intptr_t)file;
+    return lseek(fd, offset, whence);
 }
 
-
-#endif
-/* directory api port*/
-static int port_closedir(gui_dir_t *d)
+static int posix_adapter_tell(void *file)
 {
-
-    int r = closedir((DIR *)(d->dir));
-    if (d->dirent)
-    {
-        if (d->dirent->d_name)
-        {
-            free(d->dirent->d_name);
-            d->dirent->d_name = 0;
-        }
-
-        free(d->dirent);
-        d->dirent = 0;
-    }
-    free(d);
-    return r;
+    int fd = (int)(intptr_t)file;
+    return lseek(fd, 0, SEEK_CUR);
 }
 
-static gui_dir_t *port_opendir(const char *name)
+/* POSIX adapter structure */
+static const gui_fs_adapter_t posix_adapter =
 {
-
-    DIR *dir = opendir(name);
-    if (!dir)
-    {
-        return 0;
-    }
-
-    gui_dir_t *fs_dir = malloc(sizeof(gui_dir_t));
-    memset(fs_dir, 0, sizeof(gui_dir_t));
-    fs_dir->dir = dir;
-    return fs_dir;
-}
-
-static struct gui_fs_dirent *port_readdir(gui_dir_t *d)
-{
-    struct dirent *dirent = readdir((DIR *)(d->dir));
-    if (!dirent)
-    {
-        return 0;
-    }
-
-    struct gui_fs_dirent *fs_dirent = malloc(sizeof(struct gui_fs_dirent));
-    memset(fs_dirent, 0, sizeof(struct gui_fs_dirent));
-    if (d->dirent)
-    {
-        if (d->dirent->d_name)
-        {
-            free(d->dirent->d_name);
-            d->dirent->d_name = 0;
-        }
-        free(d->dirent);
-        d->dirent = 0;
-    }
-    d->dirent = fs_dirent;
-    int d_name_length = strlen(dirent->d_name) + 1;
-    fs_dirent->d_name = malloc(d_name_length);
-    memcpy(fs_dirent->d_name, dirent->d_name,  d_name_length);
-#ifdef _WIN32
-    fs_dirent->d_namlen = dirent->d_namlen;
-#else
-    fs_dirent->d_namlen = d_name_length - 1;
-#endif
-    fs_dirent->d_reclen = dirent->d_reclen;
-    fs_dirent->d_type = dirent->d_ino;
-    fs_dirent->dirent = dirent;
-    return fs_dirent;
-}
-
-void port_fstat(int fildes, gui_fstat_t *buf)
-{
-    struct stat st;
-
-    if (fstat(fildes, &st) != 0)
-    {
-        buf->st_size = (uint32_t) - 1;
-        return;
-    }
-
-    buf->st_size = (uint32_t)st.st_size;
-}
-static int port_open(const char *file, int flags, ...)
-{
-    return open(file, flags | O_BINARY);
-}
-
-static struct gui_fs fs_api =
-{
-    /* file api port*/
-    .open      = port_open,
-    .close     = close,
-    .read      = (int (*)(int, void *, size_t))read,
-    .write     = (int (*)(int, const void *, size_t))write,
-    .lseek     = (int (*)(int, int, int))lseek,
-    /* directory api port*/
-    .opendir   = (gui_dir_t *(*)(const char *name))port_opendir,
-    .closedir  = (int (*)(gui_dir_t *d))port_closedir,
-    .readdir   = (struct gui_fs_dirent * (*)(gui_dir_t *d))port_readdir,
-    .fstat     = port_fstat,
-
+    .fs_open = posix_adapter_open,
+    .fs_close = posix_adapter_close,
+    .fs_read = posix_adapter_read,
+    .fs_write = posix_adapter_write,
+    .fs_seek = posix_adapter_seek,
+    .fs_tell = posix_adapter_tell,
+    .fs_opendir = NULL,   /* Not needed for basic file operations */
+    .fs_readdir = NULL,
+    .fs_closedir = NULL,
+    .fs_stat = NULL,
 };
 
-extern void gui_fs_info_register(struct gui_fs *info);
+/**
+ * @brief Initialize filesystem port for win32 simulator
+ *
+ * This function initializes VFS and mounts:
+ * - /sd: PC filesystem (./sdcard) using POSIX backend
+ * - /data: Current directory using generic adapter
+ */
 void gui_port_fs_init(void)
 {
-    gui_fs_info_register(&fs_api);
+    /* Initialize VFS */
+    gui_vfs_init();
+
+    /* Mount PC filesystem for SD card simulation using POSIX backend */
+    gui_vfs_mount_posix("/", ".");
+
+    /* Mount current directory using generic adapter (as example) */
+    gui_vfs_mount_generic("/vfs_adapter", ".", &posix_adapter);
 }

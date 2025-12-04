@@ -1,1 +1,1 @@
-python _bin_mkromfs_0xa00000.py --binary --addr 0xa00000 root root(0xa00000).bin
+python ../../../../tool/mkromfs/mkromfs_for_honeygui.py --binary --addr 0xa00000 root root(0xa00000).bin

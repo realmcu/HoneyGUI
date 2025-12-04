@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #ifdef ENABLE_HONEYGUI
+#include "gui_vfs.h"
 #include "gui_api.h"
 #endif
 
@@ -66,7 +68,7 @@ static long mem_lseek(gd_GIF *gif, long offset, int whence)
 static size_t port_read(int fd, void *buf, size_t len)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_read(fd, buf, len);
+    return gui_vfs_read((gui_vfs_file_t *)(intptr_t)fd, buf, len);
 #else
     return read(fd, buf, len);
 #endif
@@ -75,7 +77,9 @@ static size_t port_read(int fd, void *buf, size_t len)
 static int port_lseek(int fd, int offset, int whence)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_lseek(fd, offset, whence);
+    gui_vfs_seek_t vfs_whence = (whence == SEEK_SET) ? GUI_VFS_SEEK_SET :
+                                (whence == SEEK_CUR) ? GUI_VFS_SEEK_CUR : GUI_VFS_SEEK_END;
+    return gui_vfs_seek((gui_vfs_file_t *)(intptr_t)fd, offset, vfs_whence);
 #else
     return lseek(fd, offset, whence);
 #endif
@@ -83,7 +87,8 @@ static int port_lseek(int fd, int offset, int whence)
 static int port_open(const char *file, int flags)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_open(file, flags);
+    gui_vfs_file_t *f = gui_vfs_open(file, (gui_vfs_mode_t)flags);
+    return (int)(intptr_t)f;
 #else
     return open(file, flags);
 #endif
@@ -92,7 +97,7 @@ static int port_open(const char *file, int flags)
 static int port_close(int fd)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_close(fd);
+    return gui_vfs_close((gui_vfs_file_t *)(intptr_t)fd);
 #else
     return close(fd);
 #endif

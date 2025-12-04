@@ -18,6 +18,7 @@
 #include "draw_font.h"
 #include "font_mem.h"
 #include "font_rendering_utils.h"
+#include "gui_vfs.h"
 
 MEM_FONT_LIB font_lib_tab[10];
 uint8_t get_fontlib_by_size(uint8_t font_size)
@@ -185,7 +186,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
                         if (multi_unicode_len != 0)
                         {
-                            chr[chr_i].dot_addr = gui_get_file_address(file_path);
+                            chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
                             if (chr[chr_i].dot_addr != NULL)
                             {
                                 chr[chr_i].char_w = text->font_height;
@@ -306,7 +307,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
                         if (multi_unicode_len != 0)
                         {
-                            chr[chr_i].dot_addr = gui_get_file_address(file_path);
+                            chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
                             if (chr[chr_i].dot_addr != NULL)
                             {
                                 chr[chr_i].char_w = text->font_height;
@@ -383,7 +384,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                             // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
                             if (multi_unicode_len != 0)
                             {
-                                chr[chr_i].dot_addr = gui_get_file_address(file_path);
+                                chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
                                 if (chr[chr_i].dot_addr != NULL)
                                 {
                                     chr[chr_i].char_w = text->font_height;

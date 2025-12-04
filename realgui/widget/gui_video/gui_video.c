@@ -24,6 +24,7 @@
 #include "acc_api.h"
 #include "math.h"
 #include "gui_h264bsd.h"
+#include "gui_vfs.h"
 
 /*============================================================================*
  *                           Types
@@ -326,14 +327,14 @@ static void gui_video_draw(gui_obj_t *obj)
             img_data = (uint8_t *)((((uintptr_t)img_data_raw + 7) >> 3) << 3);
 
             const char *fn = this->data;
-            int fp;
+            gui_vfs_file_t *fp;
 
-            fp = gui_open(fn, 0);
-            if (fp > 0)
+            fp = gui_vfs_open(fn, GUI_VFS_READ);
+            if (fp != NULL)
             {
-                gui_lseek(fp, array[this->frame_cur], 0);
-                gui_read(fp, img_data, img_sz);
-                gui_close(fp);
+                gui_vfs_seek(fp, array[this->frame_cur], GUI_VFS_SEEK_SET);
+                gui_vfs_read(fp, img_data, img_sz);
+                gui_vfs_close(fp);
             }
             else
             {
@@ -679,13 +680,13 @@ static int video_src_init_mjpg(gui_video_t  *this)
     {
         uint32_t *array = NULL;
         const char *fn = this->data;
-        int fp;
+        gui_vfs_file_t *fp;
         uint8_t *buff = NULL;
 
-        fp = gui_open(fn, 0);
-        if (fp > 0)
+        fp = gui_vfs_open(fn, GUI_VFS_READ);
+        if (fp != NULL)
         {
-            sz_file = gui_lseek(fp, 0, 2); // end
+            sz_file = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_END); // end
         }
         if (sz_file <= 0)
         {
@@ -708,8 +709,8 @@ static int video_src_init_mjpg(gui_video_t  *this)
             cur_start += cur_rd ;
             cur_rd = (sz_file - cur_start < VIDEO_INIT_LOAD_BUFF_SZ) ? (sz_file - cur_start) :
                      VIDEO_INIT_LOAD_BUFF_SZ;
-            gui_lseek(fp, cur_start, 0);
-            gui_read(fp, buff, cur_rd);
+            gui_vfs_seek(fp, cur_start, GUI_VFS_SEEK_SET);
+            gui_vfs_read(fp, buff, cur_rd);
             if (cur_start < cur_rd)
             {
                 // first time to get size
@@ -751,7 +752,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     {
                         gui_log("array malloc error!\n");
                         gui_free(buff);
-                        gui_close(fp);
+                        gui_vfs_close(fp);
                         return -1;
                     }
                     array[slice_cnt - 1] = offset;
@@ -765,7 +766,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
             memset(buff, 0, cur_rd);
         }
         gui_free(buff);
-        gui_close(fp);
+        gui_vfs_close(fp);
         this->array = (uint8_t **)array;
         this->num_frame = slice_cnt;
     }
@@ -894,18 +895,18 @@ static int gui_video_src_init(gui_video_t  *this)
     if (this->storage_type == IMG_SRC_FILESYS)
     {
         char *file = this->data;
-        int fp = gui_open(file, 0);
+        gui_vfs_file_t *fp = gui_vfs_open(file, GUI_VFS_READ);
         int rdlen = 0;
         GUI_UNUSED(rdlen);
-        if (fp <= 0)
+        if (fp == NULL)
         {
             gui_log("Error: open file failed\n");
             return -1;
         }
-        gui_lseek(fp, 0, 0);
+        gui_vfs_seek(fp, 0, GUI_VFS_SEEK_SET);
 
-        rdlen = gui_read(fp, header, sizeof(header));
-        gui_close(fp);
+        rdlen = gui_vfs_read(fp, header, sizeof(header));
+        gui_vfs_close(fp);
     }
     else if (this->storage_type == IMG_SRC_MEMADDR)
     {

@@ -34,7 +34,6 @@ extern "C" {
 #include "gui_api_acc.h"
 #include "gui_api_color.h"
 #include "gui_api_dc.h"
-#include "gui_api_fs.h"
 #include "gui_api_ftl.h"
 #include "gui_api_indev.h"
 #include "gui_api_os.h"
