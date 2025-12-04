@@ -81,58 +81,63 @@ install(TARGETS ${GUI_TARGET_NAME}
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
 
-install(
-	DIRECTORY "../../realgui"
-	DESTINATION "include"
-	REGEX ".*\\.(h|hpp)$"
-	REGEX "SConscript$" EXCLUDE
-	REGEX "LICENSE$" EXCLUDE
-	REGEX ".*\\.(c|cpp|txt|o|a|lib|gitignore)$" EXCLUDE
-	REGEX ".*/.*widget/gui_todo_widget" EXCLUDE
-	REGEX ".*/(3rd|misc|SaaA|test)" EXCLUDE
-)
+function(install_headers_flat source_dir)
+    file(GLOB_RECURSE HEADERS 
+        "${source_dir}/*.h"
+        "${source_dir}/*.hpp"
+    )
+    
+    set(FILTERED_HEADERS)
+    foreach(header ${HEADERS})
+        if(NOT header MATCHES "SConscript$" AND
+           NOT header MATCHES "\\.(c|cpp|txt|o|a|lib)$")
+            list(APPEND FILTERED_HEADERS ${header})
+        endif()
+    endforeach()
+    
+    if(FILTERED_HEADERS)
+        install(FILES ${FILTERED_HEADERS} DESTINATION "include")
+    endif()
+endfunction()
 
-install(
-	DIRECTORY "../../realgui/3rd/box2d/include/box2d"
-	DESTINATION "include"
-	REGEX ".*\\.(h|hpp)$"
-	REGEX "SConscript$" EXCLUDE
-	REGEX ".*\\.(c|cpp|txt|o|a|lib)$" EXCLUDE
+file(GLOB_RECURSE REALGUI_HEADERS 
+    "../../realgui/*.h"
+    "../../realgui/*.hpp"
 )
+set(FILTERED_REALGUI_HEADERS)
+foreach(header ${REALGUI_HEADERS})
+    if(NOT header MATCHES "SConscript$" AND
+       NOT header MATCHES "LICENSE$" AND
+       NOT header MATCHES "\\.(c|cpp|txt|o|a|lib|gitignore)$" AND
+       NOT header MATCHES ".*/(3rd|misc|SaaA|test)/.*" AND
+       NOT header MATCHES ".*widget/gui_todo_widget")
+        list(APPEND FILTERED_REALGUI_HEADERS ${header})
+    endif()
+endforeach()
+install(FILES ${FILTERED_REALGUI_HEADERS} DESTINATION "include")
 
-if(CONFIG_REALTEK_BUILD_LITE3D)
-install(
-	DIRECTORY "../../realgui/3rd/Lite3D/widget"
-	DESTINATION "include/Lite3D"
-	REGEX ".*\\.(h|hpp)$"
-	REGEX "SConscript$" EXCLUDE
-	REGEX ".*\\.(c|cpp|txt|o|a|lib)$" EXCLUDE
-)
+if(CONFIG_REALTEK_BUILD_GUI_BOX2D)
+	install_headers_flat("../../realgui/3rd/box2d/include/box2d")
 endif()
 
-install(
-	DIRECTORY "../../realgui/3rd/cJSON"
-	DESTINATION "include"
-	REGEX ".*\\.(h|hpp)$"
-	REGEX "SConscript$" EXCLUDE
-	REGEX ".*\\.(c|cpp|txt|o|a|lib)$" EXCLUDE
-)
+if(CONFIG_REALTEK_BUILD_LITE3D)
+    install_headers_flat("../../realgui/3rd/Lite3D/widget")
+endif()
 
-install(
-	DIRECTORY "../../realgui/3rd/gifdec"
-	DESTINATION "include"
-	REGEX ".*\\.(h|hpp)$"
-	REGEX "SConscript$" EXCLUDE
-	REGEX ".*\\.(c|cpp|txt|o|a|lib)$" EXCLUDE
-)
+install_headers_flat("../../realgui/3rd/gifdec")
 
-install(
-	DIRECTORY "../../realgui/3rd/nanovg/base"
-	DESTINATION "include/nanovg"
-	REGEX ".*\\.(h|hpp)$"
-	REGEX "SConscript$" EXCLUDE
-	REGEX "fontstash.h$" EXCLUDE
-	REGEX ".*\\.(c|cpp|txt|o|a|lib)$" EXCLUDE
+file(GLOB_RECURSE NANOVG_HEADERS 
+    "../../realgui/3rd/nanovg/base/*.h"
+    "../../realgui/3rd/nanovg/base/*.hpp"
 )
+set(FILTERED_NANOVG_HEADERS)
+foreach(header ${NANOVG_HEADERS})
+    if(NOT header MATCHES "SConscript$" AND
+       NOT header MATCHES "fontstash.h$" AND
+       NOT header MATCHES "\\.(c|cpp|txt|o|a|lib)$")
+        list(APPEND FILTERED_NANOVG_HEADERS ${header})
+    endif()
+endforeach()
+install(FILES ${FILTERED_NANOVG_HEADERS} DESTINATION "include")
 
 install(FILES ${SRC_FILES} DESTINATION src)
