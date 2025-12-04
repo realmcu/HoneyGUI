@@ -4,7 +4,7 @@ Adaptive Compression
 """
 from .base import CompressionAlgorithm
 from .rle import RLECompression
-from .fastlz import FastLzCompression, HAS_FASTLZ
+from .fastlz import FastLzCompression, HAS_RTK_FASTLZ as HAS_FASTLZ
 
 
 class AdaptiveCompression(CompressionAlgorithm):

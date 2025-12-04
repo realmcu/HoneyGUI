@@ -37,7 +37,7 @@ class RGBDataHeader:
         )
         
         return struct.pack('<BBhhBB',
-            flags,
+            flags & 0xFF,
             self.type & 0xFF,
             self.width,
             self.height,

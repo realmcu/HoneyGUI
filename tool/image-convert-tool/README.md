@@ -257,7 +257,7 @@ python image_converter_new.py -i icon.png -o alpha.bin -f a8
 python image_converter_new.py -i icon.png -o icon.bin -f argb8888 -c rle
 
 # 2. 照片
-python image_converter_new.py -i photo.jpg -o photo.bin -f rgb565 -c yuv-fastlz --yuv-mode yuv422
+python image_converter_new.py -i photo.jpg -o photo.bin -f rgb888 -c yuv-fastlz --yuv-mode yuv422
 
 # 3. 不确定类型，自动选择
 python image_converter_new.py -i image.png -o image.bin -c adaptive
@@ -296,9 +296,12 @@ image-convert-tool/
 python test_compress.py
 
 # 测试特定算法
-python image_converter_new.py -i test.png -o test_rle.bin -c rle
-python image_converter_new.py -i test.png -o test_fastlz.bin -c fastlz
-python image_converter_new.py -i test.png -o test_adaptive.bin -c adaptive
+python image_converter_new.py -i input.png -o input.bin -c rle
+python image_converter_new.py -i input.png -o output.bin -c fastlz
+python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv444 --blur-bits 1
+python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv422 --blur-bits 1
+python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv411 --blur-bits 1
+python image_converter_new.py -i input.png -o input.bin -c adaptive
 ```
 
 ## 集成示例

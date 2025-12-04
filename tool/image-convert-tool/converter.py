@@ -91,16 +91,22 @@ class ImageConverter:
                 
                 # Calculate offsets relative to imdc_file_t start
                 # imdc_file_t starts at offset 8 (after gui_rgb_data_head_t)
-                # Compressed data starts after: imdc_header(12) + offset_table(h*4)
+                # Compressed data starts after: imdc_header(12) + offset_table((h+1)*4)
+                # Note: We need h+1 offsets (one per line + one end marker)
                 # So offset is relative to imdc_file_t, which means:
-                # offset = 12 + h*4 + relative_offset_in_compressed_data
-                imdc_offset = 12 + h * 4
+                # offset = 12 + (h+1)*4 + relative_offset_in_compressed_data
+                imdc_offset = 12 + (h + 1) * 4
                 
                 # Write line offset table (relative to imdc_file_t start)
+                # Write h offsets for each line
                 for offset in line_offsets:
                     # offset relative to imdc_file_t start
                     relative_offset = imdc_offset + offset
                     f.write(struct.pack('<I', relative_offset))
+                
+                # Write the final offset (end of compressed data)
+                end_offset = imdc_offset + len(compressed_data)
+                f.write(struct.pack('<I', end_offset))
                 
                 # Write compressed data
                 f.write(compressed_data)

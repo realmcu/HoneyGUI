@@ -11,8 +11,9 @@ import struct
 from .base import CompressionAlgorithm
 from formats.format_types import COMPRESS_YUV, COMPRESS_YUV_FASTLZ
 
+# Only use RTK FastLz (standard fastlz removed)
 try:
-    import fastlz
+    import rtk_fastlz
     HAS_FASTLZ = True
 except ImportError:
     HAS_FASTLZ = False
@@ -57,14 +58,29 @@ class YUVCompression(CompressionAlgorithm):
             
             # Optional FastLz compression
             if self.use_fastlz:
-                compressed_line = fastlz.compress(bytes(blurred_data))
+                compressed_line = rtk_fastlz.compress(bytes(blurred_data))
                 compressed_data.extend(compressed_line)
             else:
                 compressed_data.extend(blurred_data)
         
+        # Map sample_mode to feature_1 value
+        sample_mode_map = {
+            'yuv444': 0,
+            'yuv422': 1,
+            'yuv411': 2
+        }
+        
+        # Map blur_bits to feature_2 value
+        blur_bits_map = {
+            0: 0,
+            1: 1,
+            2: 2,
+            4: 3
+        }
+        
         return compressed_data, line_offsets, {
-            'feature_1': 0,
-            'feature_2': 0
+            'feature_1': sample_mode_map.get(self.sample_mode, 0),
+            'feature_2': blur_bits_map.get(self.blur_bits, 0)
         }
     
     def _rgb_to_yuv_line(self, data, width, pixel_bytes):
@@ -155,14 +171,48 @@ class YUVCompression(CompressionAlgorithm):
         return result
     
     def _apply_blur(self, data, width):
-        """Apply blur by discarding low bits (bit packing)"""
+        """Apply blur by discarding low bits and bit packing
+        
+        Blur works by:
+        1. Masking off the low bits (blur_bits)
+        2. Packing the remaining high bits together
+        
+        For example, with 1-bit blur:
+        - Original: 8 bits per byte
+        - After blur: 7 bits per byte
+        - Pack 8 bytes into 7 bytes
+        """
         if self.blur_bits == 0:
             return data
         
-        # Simple implementation: mask low bits
-        # TODO: Implement proper bit packing as in acc_sw_idu.c
-        mask = 0xFF << self.blur_bits
-        return bytearray(b & mask for b in data)
+        # Calculate bits remaining after blur
+        bits_per_byte = 8 - self.blur_bits
+        
+        # Bit packing: pack multiple values into fewer bytes
+        result = bytearray()
+        bit_buffer = 0
+        bits_in_buffer = 0
+        
+        for byte_val in data:
+            # Shift right to discard low bits
+            value = byte_val >> self.blur_bits
+            
+            # Add to bit buffer
+            bit_buffer = (bit_buffer << bits_per_byte) | value
+            bits_in_buffer += bits_per_byte
+            
+            # Output complete bytes
+            while bits_in_buffer >= 8:
+                bits_in_buffer -= 8
+                output_byte = (bit_buffer >> bits_in_buffer) & 0xFF
+                result.append(output_byte)
+        
+        # Output remaining bits if any
+        if bits_in_buffer > 0:
+            output_byte = (bit_buffer << (8 - bits_in_buffer)) & 0xFF
+            result.append(output_byte)
+        
+        return result
     
     def get_algorithm_type(self):
         return COMPRESS_YUV_FASTLZ if self.use_fastlz else COMPRESS_YUV
