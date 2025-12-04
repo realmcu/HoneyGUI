@@ -1,6 +1,6 @@
 /**
 *****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file font_ttf.c
   * @brief realui ttf engine
@@ -10,7 +10,7 @@
   * @version v1.0
   ***************************************************************************************
     * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
   */
 

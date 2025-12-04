@@ -1,3 +1,19 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file font_mem_img.c
+  * @brief realui memory font image engine
+  * @details realui memory font image engine
+  * @author luke_sun@realsil.com.cn
+  * @date 2024/05/21
+  * @version v1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
 #include <string.h>
 #include "font_mem_img.h"
 #include "font_rendering_utils.h"

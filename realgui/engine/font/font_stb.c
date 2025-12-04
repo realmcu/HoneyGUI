@@ -1,6 +1,6 @@
 /**
 *****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file font_stb.c
   * @brief stb truetype engine
@@ -10,7 +10,7 @@
   * @version v1.1
   ***************************************************************************************
     * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
   */
 

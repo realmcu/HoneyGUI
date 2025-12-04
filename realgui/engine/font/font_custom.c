@@ -1,6 +1,6 @@
 /**
 *****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file font_custom.c
   * @brief realui custom font engine

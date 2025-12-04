@@ -1,6 +1,6 @@
 /**
 *****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2020, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file tp_algo.h
   * @brief touch panel algorithm
@@ -10,7 +10,7 @@
   * @version
   ***************************************************************************************
     * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2020 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
   */
 

@@ -1,6 +1,21 @@
-/*
- * File      : font_mem.h
- */
+/**
+ \internal
+*****************************************************************************************
+*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file font_mem_matrix.h
+  * @brief memory font matrix engine header file
+  * @details memory font matrix engine header file
+  * @author luke_sun@realsil.com.cn
+  * @date 2024/05/21
+  * @version v1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+ \endinternal
+  */
+
 #ifndef __FONT_MEM_MATRIX_H__
 #define __FONT_MEM_MATRIX_H__
 #ifdef __cplusplus

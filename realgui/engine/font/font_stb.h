@@ -1,7 +1,7 @@
 /**
  \internal
 *****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file font_stb.h
   * @brief stb font engine header file
@@ -11,7 +11,7 @@
   * @version v1.1
   ***************************************************************************************
     * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
  \endinternal
   */

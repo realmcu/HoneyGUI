@@ -1,7 +1,7 @@
 /**
  \internal
 *****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file l3_tria.h
   * @brief 3D widget for objects composed of triangle mesh
@@ -11,7 +11,7 @@
   * @version 1.0
   ***************************************************************************************
     * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
  \endinternal
   */
