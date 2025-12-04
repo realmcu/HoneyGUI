@@ -485,6 +485,14 @@ static void gui_page_update_boundary(gui_obj_t *obj)
     {
         this->release = false;
         obj->y = this->start_y + this->bottom_offset - (obj->h - (int)this->default_h);
+        if (this->align_hight > 0)
+        {
+            int mod = obj->y % this->align_hight;
+            if (mod != 0)
+            {
+                obj->y = obj->y - mod;
+            }
+        }
         gui_obj_enable_event(obj, GUI_EVENT_7);
     }
 }
@@ -2016,4 +2024,26 @@ void gui_page_set_only_top_slide(gui_page_t *this, bool flag)
 {
     this->top_slide_only = flag;
 }
+/**
+ * @brief This function specifies the extra distance the page can be moved beyond the top boundary.
+ * Useful for allowing a "bounce" or overscroll effect when the user scrolls past the top.
+ *
+ * @param this Pointer to the gui_page_t structure.
+ * @param offset The extra offset allowed after reaching the top.
+ */
+void gui_page_offset_extra_top(gui_page_t *this, int offset)
+{
+    this->top_offset = offset;
+}
 
+/**
+ * @brief This function specifies the extra distance the page can be moved beyond the bottom boundary.
+ * Useful for allowing a "bounce" or overscroll effect when the user scrolls past the bottom.
+ *
+ * @param this Pointer to the gui_page_t structure.
+ * @param offset The extra offset allowed after reaching the bottom.
+ */
+void gui_page_offset_extra_bottom(gui_page_t *this, int offset)
+{
+    this->bottom_offset = -offset;
+}

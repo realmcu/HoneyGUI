@@ -258,7 +258,23 @@ void gui_page_center_alignment(gui_page_t *page, int align_height);
  * @param flag True: only top slide; false: all slide.
  */
 void gui_page_set_only_top_slide(gui_page_t *page, bool flag);
+/**
+ * @brief This function specifies the extra distance the page can be moved beyond the top boundary.
+ * Useful for allowing a "bounce" or overscroll effect when the user scrolls past the top.
+ *
+ * @param this Pointer to the gui_page_t structure.
+ * @param offset The extra offset allowed after reaching the top.
+ */
+void gui_page_offset_extra_top(gui_page_t *this, int offset);
 
+/**
+ * @brief This function specifies the extra distance the page can be moved beyond the bottom boundary.
+ * Useful for allowing a "bounce" or overscroll effect when the user scrolls past the bottom.
+ *
+ * @param this Pointer to the gui_page_t structure.
+ * @param offset The extra offset allowed after reaching the bottom.
+ */
+void gui_page_offset_extra_bottom(gui_page_t *this, int offset);
 #ifdef __cplusplus
 }
 #endif

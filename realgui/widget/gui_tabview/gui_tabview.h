@@ -78,6 +78,7 @@ typedef struct gui_tabview
     int8_t tab_cnt_down;
     gui_tabview_tab_id_t cur_id;
     gui_tabview_tab_id_t last_id;
+    gui_tabview_tab_id_t next_id;
     gui_jump_t jump;
     T_SLIDE_STYLE style;
     int16_t release_x;

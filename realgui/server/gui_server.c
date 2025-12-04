@@ -266,7 +266,7 @@ int gui_server_init(void)
     gui_log("GUI build Date: %s\n", VERSION_BUILD_DATE);
     gui_log("GUI repo Status: %s\n", VERSION_REPO_STATUS);
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    gui_log("ENABLE RVD \n");
+    gui_log("ENABLE jerryscript \n");
     extern void js_init(void);
     js_init();
 #endif

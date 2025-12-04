@@ -37,6 +37,8 @@ static bool current_net = 1;
 static bool wifi_to_list = 0;
 static int8_t net_config_window_index = 0;
 static int8_t net_config_animation_index = 0;
+static const gui_color_t white = {.color.rgba.a = 255, .color.rgba.r = 255, .color.rgba.g = 255, .color.rgba.b = 255};
+static const gui_color_t black = {.color.rgba.a = 255, .color.rgba.r = 0, .color.rgba.g = 0, .color.rgba.b = 0};
 #endif
 #if defined _WIN32
 void win32_key_gui_msg_cb(void *p);
@@ -59,10 +61,45 @@ void *get_app_launcher_frontend(void)
 {
     return &app_launcher_frontend;
 }
+#include "gui_canvas_rect.h"
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_ani_ota)
+{
+    gui_canvas_rect_t *rect = (gui_canvas_rect_t *)p;
+    float progress = animate->progress_percent;
+    int x = 10;
+    gui_canvas_rect_set_size(rect, (int)((gui_get_screen_width() - 2 * x) * progress),
+                             rect->base.h);
+}
+gui_animate_callback_t rvd_app_ota_window_animate_callback = win_ani_ota;
+#define APP_OTA OTA
+GUI_APP_DEFINE_NAME(APP_OTA) // cppcheck-suppress unknownMacro
+GUI_APP_ENTRY(APP_OTA)
+{
+    gui_log("app_ota_ui_design\n");
+    gui_win_t *win = gui_win_create(&app->screen, 0, 0, 0,
+                                    gui_get_screen_width(), gui_get_screen_height());
+    int x = 10;
+    int width = gui_get_screen_width() - 2 * x;
+    int height = 50;
+
+    int y = (gui_get_screen_height() - height) / 2;
+    gui_canvas_rect_t *rect = gui_canvas_rect_create(&app->screen, 0, x, y, width, height, gui_rgb(255,
+                                                     255, 255));
+    gui_win_set_animate(win, 1000, -1, rvd_app_ota_window_animate_callback, rect);
+    gui_update_screen_force(true);
+}
+
+void rvd_switch_to_OTA_screen(void)
+{
+    extern void *get_app_xml(void);
+    gui_app_switch(get_app_xml(), GUI_APP_HANDLE(APP_OTA));
+    gui_log("rvd_switch_to_OTA_screen");
+}
 extern void *get_app_xml(void);
 #include "draw_font.h"
 // #define ENABLE_APP_AUTOSTART
 gui_grid_t *g;
+static bool ota_triggered = false;
 void button_cb(gui_button_t *b)
 {
     gui_img_set_opacity((void *)b->img, 100);
@@ -320,6 +357,7 @@ void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
     }
     gui_fs_closedir(dir);
 }
+
 static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_frontend_ui_design\n");
@@ -332,6 +370,9 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
     gui_app_append(app);
     gui_fb_change();
 }
+
+
+
 #if defined _WIN32
 #ifdef ENABLE_MONKEY_TEST
 #include "test_cmd.h"
@@ -998,11 +1039,11 @@ int rvd_click_button()
         const char *widget_name_array[] = {"combobox0", "button0"};
         click_widgets(widget_name_array);
     }
-    else if (tabview->cur_id.x == 5 && tabview->cur_id.y == 0)
-    {
-        GUI_WIDGET_POINTER_BY_NAME(win, "win32");
-        gui_win_click_force(GUI_CAST win);
-    }
+    // else if (tabview->cur_id.x == 5 && tabview->cur_id.y == 0)
+    // {
+    //     GUI_WIDGET_POINTER_BY_NAME(win, "win32");
+    //     gui_win_click_force(GUI_CAST win);
+    // }
     else if (tabview->cur_id.x == 2 && tabview->cur_id.y == 0)
     {
 
@@ -1596,8 +1637,9 @@ int rvd_hover_down_button()
             else
             {
                 current_net = 1;
-                GUI_WIDGET_POINTER_BY_NAME(win, "win31")// cppcheck-suppress unknownMacro
+                GUI_WIDGET_POINTER_BY_NAME(win, "win32")// cppcheck-suppress unknownMacro
                 gui_win_click_force(GUI_CAST win);
+
             }
         }
         else
@@ -2067,11 +2109,6 @@ void rvd_tab_next(void)
 void rvd_tab_right(void)
 {
     GUI_WIDGET_POINTER_BY_TYPE_SOFT(tabview, TABVIEW, (void *)((gui_current_app())));
-    if (tabview == NULL)
-    {
-        return;
-    }
-
     gui_tabview_t *tv = GUI_CAST tabview;
     tv->force_right = 1;
 
@@ -2079,11 +2116,6 @@ void rvd_tab_right(void)
 void rvd_tab_left(void)
 {
     GUI_WIDGET_POINTER_BY_TYPE_SOFT(tabview, TABVIEW, (void *)((gui_current_app())));
-    if (tabview == NULL)
-    {
-        return;
-    }
-
     gui_tabview_t *tv = GUI_CAST tabview;
     tv->force_left = 1;
 
@@ -2260,20 +2292,16 @@ int rvd_get_button_count_root(gui_obj_t *root)
     gui_log("rvd_get_button_count%d\n", button_count);
     return button_count;
 }
-static void set_texts_opacity_in_window(gui_obj_t *window)
+static void set_texts_opacity_in_window(gui_obj_t *window, int opacity_value)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_obj_t *object = window;
-    gui_list_for_each_safe(node, tmp, &object->child_list)
+    GUI_WIDGET_FOREACH(window)
+    gui_obj_t *obj = _obj_foreach;
+    if (obj->type == TEXTBOX)
     {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->type == TEXTBOX)
-        {
-            gui_text_t *textbox = (void *)obj;
-            textbox->scale_img->opacity_value = window->opacity_value;
-        }
+        gui_text_t *textbox = (void *)obj;
+        textbox->color.color.rgba.a = opacity_value;
     }
+    GUI_WIDGET_FOREACH_END
 }
 
 static void set_imgs_opacity_in_window(gui_obj_t *window, int opacity_value)
@@ -2304,6 +2332,7 @@ static void set_text_convert_to_img_in_root(gui_obj_t *root)
         {
             gui_text_convert_to_img((void *)obj, ARGB8565);
             //obj->w = 100;
+            // GUI_TYPE(gui_text_t, obj) ->font_type = GUI_FONT_SRC_MAT;
         }
         set_text_convert_to_img_in_root(obj);
     }
@@ -2352,434 +2381,252 @@ static int gui_page_tree_get_win_gap(gui_obj_t *page,
 }
 #ifdef APP_C3
 
-#define PAGE_SCALE (0.2f)
-#define PAGE_MOVE_H (120.0f)
-#define PAGE_MOVE_V (75.0f)
-#define PAGE_SCALE_MIN (0.3F)
-#define PAGE_SCALE_REVERSE (75.0f)
-#define PAGE_SCALE_OPACITY(scale) (scale*scale*scale)
-static void deal_win_in_page(gui_page_t *page)
+
+
+/**
+ * @brief Handles 3D scroll effect for windows in a page with dynamic scaling, opacity, and positioning
+ *
+ * This function creates a focused list effect where:
+ * - Windows near the center are larger and fully opaque
+ * - Windows far from center are smaller, more transparent, and pulled toward center
+ * - Center window text is highlighted in black, others in white
+ *
+ * @param page Pointer to the page containing windows to animate
+ *
+ * @note This function is called continuously during page scrolling animation
+ * @note Performance optimized with static gap caching and early visibility checks
+ */
+
+static void deal_win_in_page_factors(gui_page_t *page,
+                                     float scale_factor,
+                                     float move_vectical_factor,
+                                     float scale_minium,
+                                     float scale_reverse,
+                                     uint8_t opacity_curve_factor,
+                                     uint8_t move_vectical_curve_factor,
+                                     bool text_color_reverse_flag,
+                                     gui_color_t text_color,
+                                     gui_color_t text_color_reverse
+                                    )
 {
-    gui_list_t *node = NULL;
-    gui_obj_t *object = (void *)page;
+
     int window_index = 0;
     extern int gui_page_tree_get_win_gap(gui_obj_t *page,
                                          gui_obj_t **top_radio_window);
     gui_obj_t *top_window = NULL;
+
+    // Cache the gap between windows (calculated only once for performance)
     static int gap = 0;
     if (gap == 0)
     {
         gap = gui_page_tree_get_win_gap((void *)page, &top_window);
     }
 
-//gui_log("gap:%d\n", gap);
-    gui_list_for_each(node, &object->child_list)
+    // Iterate through all child objects in the page
+    GUI_WIDGET_FOREACH((void *)page)
+    gui_obj_t *obj = _obj_foreach;
+    if (obj->type == WINDOW)
     {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->type == WINDOW)
+        // Calculate window's original Y position in the list
+        int ay = window_index * gap;
+        window_index++;
+
+        // Check if window is within visible screen area (with buffer for smooth transitions)
+        if (ay + page->base.y >= (float)(0 - obj->h) &&
+            ay + page->base.y < (float)gui_get_screen_height())
         {
-            int ay = window_index * gap;
-            window_index++;
-            //gui_log("ay:%d, page_y:%d\n", ay, page->base.y);
-            //gui_log("objh:%d\n", obj->h);
-            //gui_log("screen_h:%d\n", gui_get_screen_height());
-            if (ay + page->base.y >= (float)(0 - obj->h) &&
-                ay + page->base.y < (float)gui_get_screen_height())
+            // Calculate scale based on distance from center point (Y=75)
+            // Formula: scale = 1 - 0.2 * |distance_from_center| / 75
+            // Result: scale ranges from 1.0 (at center) to ~0.3 (far from center)
+            float scale = (1 - scale_factor * _UI_ABS(((float)(ay + page->base.y + (float)(obj->h / 2)) -
+                                                       (float)(scale_reverse)) / (float)(scale_reverse)));
+
+            // Highlight center window text in black, others in white
+            // Center region is defined as within ±gap/2 from Y=75
+            if (text_color_reverse_flag)
             {
-                float scale = (1 - PAGE_SCALE * _UI_ABS(((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                                                         (float)(PAGE_SCALE_REVERSE)) / (float)(PAGE_SCALE_REVERSE)));
-                // gui_log("%f\n",((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                //                                          (float)(75)) );
-                // if (scale > 0.9f) { scale = 0.9f; }
                 if (((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                     (float)(PAGE_SCALE_REVERSE)) > -gap / 2
+                     (float)(scale_reverse)) > -gap / 2
 
                     && ((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                        (float)(PAGE_SCALE_REVERSE)) < gap / 2)
+                        (float)(scale_reverse)) < gap / 2)
                 {
-
-                    //GUI_WIDGET_POINTER_BY_TYPE(text, TEXTBOX, obj);
+                    // Window is in center region - set text to black for emphasis
                     gui_obj_t **text_array = NULL;
                     int length = 0;
                     gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
                     for (size_t i = 0; i < length; i++)
                     {
                         gui_text_t *text = (void *)text_array[i];
-                        gui_text_t *text_p = GUI_CAST text;
-//gui_log("scale :%s\n", text_p->content);
-
-                        gui_text_set_color(GUI_CAST text, gui_color_css("black"));
+                        gui_text_set_color(GUI_CAST text, text_color_reverse);
                         gui_text_convert_to_img((void *)text, ARGB8565);
                     }
                     gui_free(text_array);
                 }
                 else
                 {
+                    // Window is outside center region - set text to white
                     gui_obj_t **text_array = NULL;
                     int length = 0;
                     gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
                     for (size_t i = 0; i < length; i++)
                     {
                         gui_text_t *text = (void *)text_array[i];
-                        gui_text_t *text_p = GUI_CAST text;
-//gui_log("scale :%s\n", text_p->content);
-
-                        gui_text_set_color(GUI_CAST text, gui_color_css("white"));
+                        gui_text_set_color(GUI_CAST text, text_color);
                         gui_text_convert_to_img((void *)text, ARGB8565);
                     }
                     gui_free(text_array);
-
-
-
                 }
 
-
-                if (scale < PAGE_SCALE_MIN)
-                {
-                    gui_obj_hidden(obj, 1);
-                    continue;
-                }
-                else
-                {
-                    gui_obj_hidden(obj, 0);
-                }
-
-                GUI_TYPE(gui_win_t, obj)->scale = scale;
-                GUI_TYPE(gui_win_t, obj)->scale_y = scale;
-                obj->opacity_value = 255 * PAGE_SCALE_OPACITY(scale);
-
-                //set_texts_opacity_in_window(obj);
-                set_imgs_opacity_in_window(obj, obj->opacity_value);
-                int obj_y = 0;
-                if (((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                     (float)(PAGE_SCALE_REVERSE)) > 0)
-                {
-                    obj_y = ay - (int)(PAGE_MOVE_V * (1 - scale) * (1 - scale));
-                }
-                else
-                {
-                    obj_y = ay + (int)(PAGE_MOVE_V * (1 - scale) * (1 - scale));
-                }
-                //gui_log("scale:%f, opacity:%d\n", scale, obj->opacity_value);
-                //gui_log("ay:%d, obj_y:%d,gap:%d\n", ay, obj_y,gap);
-                gui_obj_move(obj, obj->x, obj_y);
-                //obj->not_show = false;
             }
             else
             {
-                obj->not_show = true;
+                gui_obj_t **text_array = NULL;
+                int length = 0;
+                gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
+                for (size_t i = 0; i < length; i++)
+                {
+                    gui_text_t *text = (void *)text_array[i];
+                    gui_text_t *text_p = GUI_CAST text;
+//gui_log("scale :%s\n", text_p->content);
+
+                    {
+                        gui_text_set_color(GUI_CAST text, text_color);
+                        gui_text_convert_to_img((void *)text, ARGB8565);
+                    }
+                    gui_free(text_array);
+                }
             }
-            if (ay + page->base.y < 0)
+
+
+            // Hide windows that are too small (optimization)
+            if (scale < scale_minium)
             {
-                gui_obj_hidden(obj, true);
-            }
-            else if (ay + page->base.y > page->default_h - obj->h)
-            {
-                gui_obj_hidden(obj, true);
+                gui_obj_hidden(obj, 1);
+                continue;
             }
             else
             {
-                gui_obj_hidden(obj, false);
+                gui_obj_hidden(obj, 0);
             }
-            // gui_log("ay:%d,%d,%d,%d\n", ay + page->base.y, obj->y, obj->h, page->default_h);
+
+            // Apply scale transformation (both X and Y axes)
+            GUI_TYPE(gui_win_t, obj)->scale = scale;
+            GUI_TYPE(gui_win_t, obj)->scale_y = scale;
+
+            // Apply cubic opacity for smooth fade effect
+            // Formula: opacity = 255 * scale³
+            // This creates faster fade-out for distant windows
+            float scale_curved = 1.0f;
+            for (size_t i = 0; i < opacity_curve_factor; i++)
+            {
+                scale_curved *= scale;
+            }
+            obj->opacity_value = (uint8_t)(255.0f * scale_curved);
+
+            // Apply opacity to all images within the window
+            set_imgs_opacity_in_window(obj, obj->opacity_value);
+
+            // Calculate vertical offset to create focus effect
+            // Windows are pulled toward center (Y=75) based on their distance
+            // Formula: offset = 75 * (1 - scale)²
+            float move_curve = 1.0f;
+            for (size_t i = 0; i < move_vectical_curve_factor; i++)
+            {
+                move_curve *= (1 - scale);
+            }
+            int obj_y = 0;
+            if (((float)(ay + page->base.y + (float)(obj->h / 2)) -
+                 (float)(scale_reverse)) > 0)
+            {
+                // Window is below center - pull upward (subtract offset)
+                obj_y = ay - (int)(move_vectical_factor * move_curve);
+            }
+            else
+            {
+                // Window is above center - pull downward (add offset)
+                obj_y = ay + (int)(move_vectical_factor * move_curve);
+            }
+
+            // Apply the calculated position
+            gui_obj_move(obj, obj->x, obj_y);
         }
-    }
-}
-static void deal_win_in_page3(gui_page_t *page, bool reverse_color)
-{
-    gui_list_t *node = NULL;
-    gui_obj_t *object = (void *)page;
-    int window_index = 0;
-    extern int gui_page_tree_get_win_gap(gui_obj_t *page,
-                                         gui_obj_t **top_radio_window);
-    gui_obj_t *top_window = NULL;
-    static int gap = 0;
-    if (gap == 0)
-    {
-        gap = gui_page_tree_get_win_gap((void *)page, &top_window);
-    }
-
-//gui_log("gap:%d\n", gap);
-    gui_list_for_each(node, &object->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->type == WINDOW)
+        else
         {
-            int ay = window_index * gap;
-            window_index++;
-            //gui_log("ay:%d, page_y:%d\n", ay, page->base.y);
-            //gui_log("objh:%d\n", obj->h);
-            //gui_log("screen_h:%d\n", gui_get_screen_height());
-            if (ay + page->base.y >= (float)(0 - obj->h) &&
-                ay + page->base.y < (float)gui_get_screen_height())
-            {
-                float scale = (1 - PAGE_SCALE * _UI_ABS(((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                                                         (float)(PAGE_SCALE_REVERSE)) / (float)(PAGE_SCALE_REVERSE)));
-                // gui_log("%f\n",((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                //                                          (float)(75)) );
-                // if (scale > 0.9f) { scale = 0.9f; }
-                if (reverse_color)
-                {
-                    if (((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                         (float)(PAGE_SCALE_REVERSE)) > -gap / 2
-
-                        && ((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                            (float)(PAGE_SCALE_REVERSE)) < gap / 2)
-                    {
-
-                        //GUI_WIDGET_POINTER_BY_TYPE(text, TEXTBOX, obj);
-                        gui_obj_t **text_array = NULL;
-                        int length = 0;
-                        gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
-                        for (size_t i = 0; i < length; i++)
-                        {
-                            gui_text_t *text = (void *)text_array[i];
-                            gui_text_t *text_p = GUI_CAST text;
-//gui_log("scale :%s\n", text_p->content);
-
-                            {
-                                gui_text_set_color(GUI_CAST text, gui_color_css("black"));
-                                gui_text_convert_to_img((void *)text, ARGB8565);
-                            }
-                            gui_free(text_array);
-                        }
-
-
-                    }
-                    else
-                    {
-                        gui_obj_t **text_array = NULL;
-                        int length = 0;
-                        gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
-                        for (size_t i = 0; i < length; i++)
-                        {
-                            gui_text_t *text = (void *)text_array[i];
-                            gui_text_t *text_p = GUI_CAST text;
-//gui_log("scale :%s\n", text_p->content);
-
-                            {
-                                gui_text_set_color(GUI_CAST text, gui_color_css("white"));
-                                gui_text_convert_to_img((void *)text, ARGB8565);
-                            }
-                            gui_free(text_array);
-                        }
-
-
-
-
-                    }
-
-                }
-                else
-                {
-                    {
-                        gui_obj_t **text_array = NULL;
-                        int length = 0;
-                        gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
-                        for (size_t i = 0; i < length; i++)
-                        {
-                            gui_text_t *text = (void *)text_array[i];
-                            gui_text_t *text_p = GUI_CAST text;
-//gui_log("scale :%s\n", text_p->content);
-
-                            {
-                                gui_text_set_color(GUI_CAST text, gui_color_css("white"));
-                                gui_text_convert_to_img((void *)text, ARGB8565);
-                            }
-                            gui_free(text_array);
-                        }
-
-
-
-
-                    }
-                }
-
-                if (scale < PAGE_SCALE_MIN)
-                {
-                    gui_obj_hidden(obj, 1);
-                    continue;
-                }
-                else
-                {
-                    gui_obj_hidden(obj, 0);
-                }
-
-                GUI_TYPE(gui_win_t, obj)->scale = scale;
-                GUI_TYPE(gui_win_t, obj)->scale_y = scale;
-                obj->opacity_value = 255 * PAGE_SCALE_OPACITY(scale);
-                //set_texts_opacity_in_window(obj);
-                set_imgs_opacity_in_window(obj, obj->opacity_value);
-                int obj_y = 0;
-                if (((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                     (float)(PAGE_SCALE_REVERSE)) > 0)
-                {
-                    obj_y = ay - (int)(PAGE_MOVE_V * (1 - scale) * (1 - scale));
-                }
-                else
-                {
-                    obj_y = ay + (int)(PAGE_MOVE_V * (1 - scale) * (1 - scale));
-                }
-                //gui_log("scale:%f, opacity:%d\n", scale, obj->opacity_value);
-                //gui_log("ay:%d, obj_y:%d,gap:%d\n", ay, obj_y,gap);
-                gui_obj_move(obj, obj->x, obj_y);
-                //obj->not_show = false;
-            }
-            else
-            {
-                gui_obj_hidden(obj, true);
-            }
-            if (ay + page->base.y < 0)
-            {
-                gui_obj_hidden(obj, true);
-            }
-            else if (ay + page->base.y > page->default_h - obj->h)
-            {
-                gui_obj_hidden(obj, true);
-            }
-            else
-            {
-                gui_obj_hidden(obj, false);
-            }
-
-
-
-            // gui_log("ay:%d,%d\n", ay + page->base.y, obj->y);
+            // Window is outside visible area - mark as not shown
+            obj->not_show = true;
         }
-    }
-}
-#define PAGE_SCALE_REVERSE2 (75.0f+50.0f*2.0f)
-#define PAGE_SCALE2 (0.5f)
-static void deal_win_in_page2(gui_page_t *page)
-{
-    gui_list_t *node = NULL;
-    gui_obj_t *object = (void *)page;
-    int window_index = 0;
-    extern int gui_page_tree_get_win_gap(gui_obj_t *page,
-                                         gui_obj_t **top_radio_window);
-    gui_obj_t *top_window = NULL;
-    static int gap = 0;
-    if (gap == 0)
-    {
-        gap = gui_page_tree_get_win_gap((void *)page, &top_window);
-    }
 
-//gui_log("gap:%d\n", gap);
-    gui_list_for_each(node, &object->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->type == WINDOW)
+        // Hide windows that are completely outside page bounds
+        if (ay + page->base.y < 0)
         {
-            int ay = window_index * gap;
-            window_index++;
-            //gui_log("ay:%d, page_y:%d\n", ay, page->base.y);
-            //gui_log("objh:%d\n", obj->h);
-            //gui_log("screen_h:%d\n", gui_get_screen_height());
-            if (ay + page->base.y >= (float)(0 - obj->h) &&
-                ay + page->base.y < (float)gui_get_screen_height())
-            {
-                float scale = (1 - PAGE_SCALE2 * _UI_ABS(((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                                                          (float)(PAGE_SCALE_REVERSE2)) / (float)(PAGE_SCALE_REVERSE2)));
-                // gui_log("%f\n",((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                //                                          (float)(75)) );
-                // if (scale > 0.9f) { scale = 0.9f; }
-                if (((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                     (float)(PAGE_SCALE_REVERSE2)) > -gap / 2
-
-                    && ((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                        (float)(PAGE_SCALE_REVERSE2)) < gap / 2)
-                {
-
-                    //GUI_WIDGET_POINTER_BY_TYPE(text, TEXTBOX, obj);
-                    gui_obj_t **text_array = NULL;
-                    int length = 0;
-                    gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
-                    for (size_t i = 0; i < length; i++)
-                    {
-                        gui_text_t *text = (void *)text_array[i];
-                        gui_text_t *text_p = GUI_CAST text;
-//gui_log("scale :%s\n", text_p->content);
-
-                        gui_text_set_color(GUI_CAST text, gui_color_css("black"));
-                        gui_text_convert_to_img((void *)text, ARGB8565);
-                    }
-                    gui_free(text_array);
-                }
-                else
-                {
-                    gui_obj_t **text_array = NULL;
-                    int length = 0;
-                    gui_obj_tree_get_widget_array_by_type(GUI_CAST obj, TEXTBOX, &text_array, &length);
-                    for (size_t i = 0; i < length; i++)
-                    {
-                        gui_text_t *text = (void *)text_array[i];
-                        gui_text_t *text_p = GUI_CAST text;
-//
-
-                        gui_text_set_color(GUI_CAST text, gui_color_css("white"));
-                        gui_text_convert_to_img((void *)text, ARGB8565);
-                    }
-                    gui_free(text_array);
-
-
-
-                }
-
-
-                if (scale < PAGE_SCALE_MIN)
-                {
-                    gui_obj_hidden(obj, 1);
-                    continue;
-                }
-                else
-                {
-                    gui_obj_hidden(obj, 0);
-                }
-
-                GUI_TYPE(gui_win_t, obj)->scale = scale;
-                GUI_TYPE(gui_win_t, obj)->scale_y = scale;
-                obj->opacity_value = 255 * PAGE_SCALE_OPACITY(scale);
-                //set_texts_opacity_in_window(obj);
-                gui_log("scale :%s %f\n", obj->name, scale);
-                set_imgs_opacity_in_window(obj, obj->opacity_value);
-                int obj_y = 0;
-                if (((float)(ay + page->base.y + (float)(obj->h / 2)) -
-                     (float)(PAGE_SCALE_REVERSE2)) > 0)
-                {
-                    obj_y = ay - (int)(PAGE_MOVE_V * (1 - scale) * (1 - scale));
-                }
-                else
-                {
-                    obj_y = ay + (int)(PAGE_MOVE_V * (1 - scale) * (1 - scale));
-                }
-                //gui_log("scale:%f, opacity:%d\n", scale, obj->opacity_value);
-                //gui_log("ay:%d, obj_y:%d,gap:%d\n", ay, obj_y,gap);
-                gui_obj_move(obj, obj->x, obj_y);
-                //obj->not_show = false;
-            }
-            else
-            {
-                obj->not_show = true;
-            }
-            if (ay + page->base.y < 0)
-            {
-                gui_obj_hidden(obj, true);
-            }
-            else if (ay + page->base.y > page->default_h - obj->h)
-            {
-                gui_obj_hidden(obj, true);
-            }
-            else
-            {
-                gui_obj_hidden(obj, false);
-            }
+            gui_obj_hidden(obj, true);
         }
+        else if (ay + page->base.y > page->default_h - obj->h)
+        {
+            gui_obj_hidden(obj, true);
+        }
+        else
+        {
+            gui_obj_hidden(obj, false);
+        }
+        // gui_log("ay:%d,%d,%d,%d\n", ay + page->base.y, obj->y, obj->h, page->default_h);
     }
+    GUI_WIDGET_FOREACH_END
 }
 
+/**
+ * @brief Parameters for 3D page/window animation effects.
+ *
+ * This struct defines the factors used to control scaling, movement, opacity, and curve intensity
+ * for 3D list/window scroll effects in the UI. Adjust these values to tune the animation style.
+ */
+typedef struct rvd_page_3d_factors
+{
+    float scale_factor;                // Intensity of scaling (0.0-1.0)
+    float move_vectical_factor;        // Vertical movement distance for focus effect
+    float scale_minium;                // Minimum scale threshold (windows smaller than this are hidden)
+    float scale_reverse;               // Center point for scaling (Y coordinate where scale = 1.0)
+    uint8_t opacity_curve_factor;      // Curve intensity for opacity (higher = faster fade)
+    uint8_t move_vectical_curve_factor;// Curve intensity for vertical movement
+    bool text_color_reverse_flag;   // Flag to reverse text color based on position
+    gui_color_t text_color;           // Text color for non-focused windows
+    gui_color_t text_color_reverse;   // Text color for focused window
+} rvd_page_3d_factors_t;
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(page_callback)
 {
-    deal_win_in_page(this_widget);
+    if (p && p != this_widget)
+    {
+
+        rvd_page_3d_factors_t *factors = (rvd_page_3d_factors_t *)p;
+
+        deal_win_in_page_factors(this_widget,
+                                 factors->scale_factor,
+                                 factors->move_vectical_factor,
+                                 factors->scale_minium,
+                                 factors->scale_reverse,
+                                 factors->opacity_curve_factor,
+                                 factors->move_vectical_curve_factor,
+                                 factors->text_color_reverse_flag,
+                                 factors->text_color,
+                                 factors->text_color_reverse);
+        return;;
+    }
+    else
+    {
+
+        deal_win_in_page_factors(this_widget,
+                                 0.2f,
+                                 75.0f,
+                                 0.3f,
+                                 75.0f,
+                                 3,
+                                 2,
+                                 true,
+                                 gui_color_css("white"),
+                                 gui_color_css("black")
+                                );
+    }
 }
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(page_callback3)
 {
@@ -2817,15 +2664,43 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(page_callback3)
     }
 
 
+    if (p && p != this_widget)
+    {
+
+        rvd_page_3d_factors_t *factors = (rvd_page_3d_factors_t *)p;
+
+        deal_win_in_page_factors(this_widget,
+                                 factors->scale_factor,
+                                 factors->move_vectical_factor,
+                                 factors->scale_minium,
+                                 factors->scale_reverse,
+                                 factors->opacity_curve_factor,
+                                 factors->move_vectical_curve_factor,
+                                 reverse,
+                                 factors->text_color,
+                                 factors->text_color_reverse);
+        return;;
+    }
+    else
+    {
+
+        deal_win_in_page_factors(this_widget,
+                                 0.2f,
+                                 75.0f,
+                                 0.3f,
+                                 75.0f,
+                                 3,
+                                 2,
+                                 true,
+                                 gui_color_css("white"),
+                                 gui_color_css("black")
+                                );
+    }
 
 
 
-    deal_win_in_page3(this_widget, reverse);
 }
-static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(page_callback2)
-{
-    deal_win_in_page2(this_widget);
-}
+
 static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(wincb)
 {
     gui_log("wincb:%s", GUI_BASE(obj)->name);
@@ -3000,7 +2875,19 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_ani_cb_fade_reverse)
     }
     if (animate->end_frame)
     {
-        gui_page_set_animate(GUI_CAST this_widget, 1000, -1, page_callback, this_widget);
+        static rvd_page_3d_factors_t page0_factors =
+        {
+            .scale_factor = 0.2f,
+            .move_vectical_factor = 75.0f,
+            .scale_minium = 0.3f,
+            .scale_reverse = 75.0f,
+            .opacity_curve_factor = 3,
+            .move_vectical_curve_factor = 2,
+            .text_color_reverse_flag = true,
+            .text_color = white,
+            .text_color_reverse = black,
+        };
+        gui_page_set_animate(GUI_CAST this_widget, 1000, -1, page_callback, &page0_factors);
     }
 
 }
@@ -3137,7 +3024,20 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(wincb1)
             if (pages[i]->not_show)
             {
                 gui_obj_hidden(pages[i], 0);
-                gui_page_set_animate((gui_page_t *)pages[i], 1000, -1, page_callback2, pages[i]);
+                static rvd_page_3d_factors_t page0_factors =
+                {
+                    .scale_factor = 0.5f,
+                    .move_vectical_factor = 75.0f,
+                    .scale_minium = 0.3f,
+                    .scale_reverse = 75.0f + 50.0f * 2.0f,
+                    .opacity_curve_factor = 3,
+                    .move_vectical_curve_factor = 2,
+                    .text_color_reverse_flag = true,
+                    .text_color = white,
+                    .text_color_reverse = black,
+                };
+
+                gui_page_set_animate((gui_page_t *)pages[i], 1000, -1, page_callback, &page0_factors);
                 {
                     gui_obj_t *page = pages[i];
                     {
@@ -3373,7 +3273,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(wincb6)
 
 static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(wincb32)
 {
-    if (current_net == 0)
+    if (current_net == 1)
     {
         wifi_to_list = 1;
     }
@@ -3429,39 +3329,151 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_text_highlight_ani)
     gui_free(win_array);
 
 }
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(tabview_callback)
+{
+    gui_log("tabview_callback:%s", GUI_BASE(obj)->name);
+    // GUI_WIDGET_FOREACH(obj)
+    // {
+    //     gui_log("child:%s,type:%d", obj->name, obj->type);
+    //     if (obj->type == TAB)
+    //     {
+
+    //     }
+    // }
+    // GUI_WIDGET_FOREACH_END
+
+}
+/**
+ * @brief Asynchronously dispatches a function and its parameter to the GUI server.
+ *
+ * This function packages a user-defined function and its parameter into a GUI message,
+ * then sends it to the GUI server for asynchronous execution. It also logs the dispatch
+ * for debugging purposes.
+ *
+ * @param function Pointer to the user-defined callback function to be executed.
+ * @param parameter Pointer to the parameter to be passed to the callback function.
+ */
+void rvd_function_async(void *function, void *parameter)
+{
+    // Create GUI message with user-defined event
+    gui_msg_t msg =
+    {
+        .event = GUI_EVENT_USER_DEFINE,
+        .payload = parameter,
+        .cb = function,
+    };
+    // Send message to GUI server
+    extern bool gui_send_msg_to_server(gui_msg_t *msg);
+    gui_send_msg_to_server(&msg);
+    // Log message dispatch for debugging
+    gui_log("gui_send_msg_to_server %x\n", function);
+}
+
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_ota_timer)
+{
+    if (ota_triggered)
+    {
+        static bool ota = 0;
+        if (ota == 0)
+        {
+            gui_log("OTA rvd_switch_to_OTA_screen");
+            ota = 1;
+            rvd_function_async(rvd_switch_to_OTA_screen, 0);
+
+        }
+    }
+}
+gui_animate_callback_t rvd_window_ota_switch_timer_cb = win_ota_timer;
+
 static void C3_init(void)
 {
+    GUI_WIDGET_POINTER_BY_NAME(tabview, "tabview0");// cppcheck-suppress unknownMacro
+    gui_tabview_tab_change((GUI_CAST tabview), tabview_callback, 0);
+
+    const int page_window_height = 50;
     {
         GUI_WIDGET_POINTER_BY_NAME(page0, "page0");// cppcheck-suppress unknownMacro
         set_text_convert_to_img_in_root((void *)page0);
-        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, page0);
-        GUI_TYPE(gui_page_t, page0)->top_offset = 50;
-        GUI_TYPE(gui_page_t, page0)->bottom_offset = -150;
-        gui_page_center_alignment((void *)page0, 50);
+        static rvd_page_3d_factors_t page0_factors =
+        {
+            .scale_factor = 0.2f,
+            .move_vectical_factor = 75.0f,
+            .scale_minium = 0.3f,
+            .scale_reverse = 75.0f,
+            .opacity_curve_factor = 3,
+            .move_vectical_curve_factor = 2,
+            .text_color_reverse_flag = true,
+            .text_color = white,
+            .text_color_reverse = black,
+        };
+        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, &page0_factors);
+        gui_page_offset_extra_top(GUI_TYPE(gui_page_t, page0), page_window_height);
+        gui_page_offset_extra_bottom(GUI_TYPE(gui_page_t, page0), page_window_height * 3);
+        gui_page_center_alignment((void *)page0, page_window_height);
+        gui_page_set_offset(GUI_CAST page0, page_window_height);
     }
     {
         GUI_WIDGET_POINTER_BY_NAME(page0, "page1");// cppcheck-suppress unknownMacro
         set_text_convert_to_img_in_root((void *)page0);
-        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, page0);
-        GUI_TYPE(gui_page_t, page0)->top_offset = 50;
-        GUI_TYPE(gui_page_t, page0)->bottom_offset = -100;
-        gui_page_center_alignment((void *)page0, 50);
+        static rvd_page_3d_factors_t page0_factors =
+        {
+            .scale_factor = 0.2f,
+            .move_vectical_factor = 75.0f,
+            .scale_minium = 0.3f,
+            .scale_reverse = 75.0f,
+            .opacity_curve_factor = 3,
+            .move_vectical_curve_factor = 2,
+            .text_color_reverse_flag = true,
+            .text_color = white,
+            .text_color_reverse = black,
+        };
+        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, &page0_factors);
+        gui_page_offset_extra_top(GUI_TYPE(gui_page_t, page0), page_window_height);
+        gui_page_offset_extra_bottom(GUI_TYPE(gui_page_t, page0), page_window_height * 2);
+        gui_page_center_alignment((void *)page0, page_window_height);
+        gui_page_set_offset(GUI_CAST page0, page_window_height);
     }
     {
         GUI_WIDGET_POINTER_BY_NAME(page0, "page2");// cppcheck-suppress unknownMacro
         set_text_convert_to_img_in_root((void *)page0);
-        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, page0);
-        GUI_TYPE(gui_page_t, page0)->top_offset = 50;
-        GUI_TYPE(gui_page_t, page0)->bottom_offset = -100;
-        gui_page_center_alignment((void *)page0, 50);
+        static rvd_page_3d_factors_t page0_factors =
+        {
+            .scale_factor = 0.2f,
+            .move_vectical_factor = 75.0f,
+            .scale_minium = 0.3f,
+            .scale_reverse = 75.0f,
+            .opacity_curve_factor = 3,
+            .move_vectical_curve_factor = 2,
+            .text_color_reverse_flag = true,
+            .text_color = white,
+            .text_color_reverse = black,
+        };
+        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, &page0_factors);
+        gui_page_offset_extra_top(GUI_TYPE(gui_page_t, page0), page_window_height);
+        gui_page_offset_extra_bottom(GUI_TYPE(gui_page_t, page0), page_window_height * 2);
+        gui_page_center_alignment((void *)page0, page_window_height);
+        gui_page_set_offset(GUI_CAST page0, page_window_height);
     }
     {
         GUI_WIDGET_POINTER_BY_NAME(page0, "page3");// cppcheck-suppress unknownMacro
         set_text_convert_to_img_in_root((void *)page0);
-        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback2, page0);
-        GUI_TYPE(gui_page_t, page0)->top_offset = 50 * 3;
-        GUI_TYPE(gui_page_t, page0)->bottom_offset = -150;
-        gui_page_center_alignment((void *)page0, 50);
+        static rvd_page_3d_factors_t page0_factors =
+        {
+            .scale_factor = 0.5f,
+            .move_vectical_factor = 75.0f,
+            .scale_minium = 0.3f,
+            .scale_reverse = 75.0f + 50.0f * 2.0f,
+            .opacity_curve_factor = 3,
+            .move_vectical_curve_factor = 2,
+            .text_color_reverse_flag = true,
+            .text_color = white,
+            .text_color_reverse = black,
+        };
+        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, &page0_factors);
+        gui_page_offset_extra_top(GUI_TYPE(gui_page_t, page0), page_window_height * 3);
+        gui_page_offset_extra_bottom(GUI_TYPE(gui_page_t, page0), page_window_height * 3);
+        gui_page_center_alignment((void *)page0, page_window_height);
+        gui_page_set_offset(GUI_CAST page0, page_window_height);
     }
     {
         char *win_name_array[] = { "win0", "win1", "win2", "win3", "win4", "win5" };
@@ -3530,10 +3542,23 @@ static void C3_init(void)
     {
         GUI_WIDGET_POINTER_BY_NAME(page0, "page4");// cppcheck-suppress unknownMacro
         set_text_convert_to_img_in_root((void *)page0);
-        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback3, page0);
-        GUI_TYPE(gui_page_t, page0)->top_offset = 50;
-        GUI_TYPE(gui_page_t, page0)->bottom_offset = -100;
-        gui_page_center_alignment((void *)page0, 50);
+        static rvd_page_3d_factors_t page0_factors =
+        {
+            .scale_factor = 0.2f,
+            .move_vectical_factor = 75.0f,
+            .scale_minium = 0.3f,
+            .scale_reverse = 75.0f,
+            .opacity_curve_factor = 3,
+            .move_vectical_curve_factor = 2,
+            .text_color_reverse_flag = true,
+            .text_color = white,
+            .text_color_reverse = black,
+        };
+        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback3, &page0_factors);
+        gui_page_offset_extra_top(GUI_TYPE(gui_page_t, page0), page_window_height);
+        gui_page_offset_extra_bottom(GUI_TYPE(gui_page_t, page0), page_window_height * 2);
+        gui_page_center_alignment((void *)page0, page_window_height);
+        gui_page_set_offset(GUI_CAST page0, page_window_height);
     }
     {
         GUI_WIDGET_POINTER_BY_NAME(win, "win32")
@@ -3546,13 +3571,81 @@ static void C3_init(void)
     {
         GUI_WIDGET_POINTER_BY_NAME(page0, "page5");// cppcheck-suppress unknownMacro
         set_text_convert_to_img_in_root((void *)page0);
-        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, page0);
-        GUI_TYPE(gui_page_t, page0)->top_offset = 50;
-        GUI_TYPE(gui_page_t, page0)->bottom_offset = -50;
-        gui_page_center_alignment((void *)page0, 50);
+        static rvd_page_3d_factors_t page0_factors =
+        {
+            .scale_factor = 0.2f,
+            .move_vectical_factor = 75.0f,
+            .scale_minium = 0.3f,
+            .scale_reverse = 75.0f,
+            .opacity_curve_factor = 3,
+            .move_vectical_curve_factor = 2,
+            .text_color_reverse_flag = true,
+            .text_color = white,
+            .text_color_reverse = black,
+        };
+        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, &page0_factors);
+        gui_page_offset_extra_top(GUI_TYPE(gui_page_t, page0), page_window_height);
+        gui_page_offset_extra_bottom(GUI_TYPE(gui_page_t, page0), page_window_height);
+        GUI_TYPE(gui_page_t, page0)->bottom_offset = -page_window_height;
+        gui_page_center_alignment((void *)page0, page_window_height);
+        gui_page_set_offset(GUI_CAST page0, page_window_height);
     }
+    gui_win_t *win_ota = gui_win_create((void *)get_current_rvd_app(), 0, 10, 10, 200, 100);
+    gui_win_set_animate(win_ota, 10000, -1, rvd_window_ota_switch_timer_cb, NULL);
 }
 
+static void update_page(void)
+{
+    GUI_WIDGET_POINTER_BY_NAME(obj, "page1");
+    gui_obj_child_free((void *)obj);
+
+    const char *win_string_array1[] = {"aaaaa", "bbbbb", "ccccc", "ddddd", "eeeee", "fffff", "ggggg", "hhhhh",
+                                       "iiiii", "jjjjj", "kkkkk", "lllll", "mmmmm", "nnnnn", "ooooo", "ppppp", "qqqqq", "rrrrr",
+                                       "sssss", "ttttt", "uuuuu", "vvvvv", "wwwww", "xxxxx", "yyyyy", "zzzzz"
+                                      };
+
+    const char *win_string_array2[] = {"1111111", "2222222", "3333333", "4444444", "5555555", "6666666", "7777777",
+                                       "8888888", "9999999", "0000000",
+                                      };
+
+    const char **win_string_array = win_string_array1;
+    static int array_index = 1;
+    int array_size = 0;
+    if (array_index == 0)
+    {
+        win_string_array = win_string_array1;
+        array_size = GUI_ARRAY_SIZE(win_string_array1);
+        array_index = 1;
+    }
+    else
+    {
+        win_string_array = win_string_array2;
+        array_size = GUI_ARRAY_SIZE(win_string_array2);
+        array_index = 0;
+    }
+
+
+    for (int i = 0; i < array_size ; i++)
+    {
+        int height = 50;
+        int width = 200;
+        int y = i * height + 0;
+        gui_win_t *win = gui_win_create((void *)obj, 0, 0, y, width, height);
+        {
+            int height = 31;
+            int font_size = 18;
+            void *font = gui_get_file_address("app/rcu/resource/font/NotoSansSC-Medium_size18_bits4_font.bin");
+            gui_text_t *t = gui_text_create(win, 0, 0, 0, width, height);
+            gui_text_set(t, (void *)win_string_array[i], GUI_FONT_SRC_BMP, gui_color_css("white"),
+                         strlen(win_string_array[i]),
+                         font_size);
+            gui_text_type_set(t, (void *)font, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, CENTER);
+        }
+    }
+
+
+}
 #endif
 int rvd_hover_button_sync(int index, int button_count)
 {
@@ -3860,6 +3953,36 @@ static void rvd_override_radio(gui_obj_t *root)
         rvd_override_radio(obj);
     }
 }
+static void update_page(void)
+{
+    GUI_WIDGET_POINTER_BY_NAME(obj1, "tab11")
+    gui_tabview_t *tabview = (void *)obj1;
+    GUI_WIDGET_POINTER_BY_NAME(obj2, "page0")
+    gui_page_t *page1 = (void *)obj2;
+    static const char *device_list[50] = {"SONY", "NOKIA", "SAMSUNG", "APPLE",
+                                          "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG"
+                                         };
+    static bool device_update_flag = false;
+    device_update_flag = true;
+    if (device_update_flag)
+    {
+        int device_list_count = 0 ;
+        for (size_t i = 0; i < 50; i++)
+        {
+            if (device_list[i] == NULL)
+            {
+                break;
+            }
+            else
+            {
+                device_list_count++;
+            }
+
+        }
+
+        rvd_update_page_radio_list(page1, device_list, device_list_count);
+    }
+}
 #endif
 #ifdef APP_C5
 #define PAGE_SCALE (0.7f)
@@ -3975,10 +4098,26 @@ int rvd_tab_first(void)
 #endif
     return GUI_ERROR;
 }
+void rvd_update(void)
+{
+#ifdef  APP_C2
+    update_page();
+#endif
+#ifdef  APP_C3
+    update_page();
+#endif
+}
 void rvd_ImageMovie_stop(gui_obj_t *obj)
 {
     GUI_WIDGET_TYPE_TRY_EXCEPT(obj, IMAGE_FROM_MEM) // cppcheck-suppress unknownMacro
     gui_obj_stop_animate(GUI_TYPE(gui_img_t, obj)->animate);
+
+
+}
+void rvd_ImageMovie_restart(gui_obj_t *obj)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(obj, IMAGE_FROM_MEM) // cppcheck-suppress unknownMacro
+    gui_obj_restart_animate(GUI_TYPE(gui_img_t, obj)->animate);
 
 
 }
@@ -4165,34 +4304,24 @@ void win32_key_gui_msg_cb(void *p)
 
     case /*PC KEY R */ 114:
         {
+            rvd_update();
+
             break;
-            GUI_WIDGET_POINTER_BY_NAME(obj1, "tab11")
-            gui_tabview_t *tabview = (void *)obj1;
-            GUI_WIDGET_POINTER_BY_NAME(obj2, "page0")
-            gui_page_t *page1 = (void *)obj2;
-            static const char *device_list[50] = {"SONY", "NOKIA", "SAMSUNG", "APPLE",
-                                                  "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG"
-                                                 };
-            static bool device_update_flag = false;
-            device_update_flag = true;
-            if (device_update_flag)
-            {
-                int device_list_count = 0 ;
-                for (size_t i = 0; i < 50; i++)
-                {
-                    if (device_list[i] == NULL)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        device_list_count++;
-                    }
 
-                }
+        }
+    case /*PC KEY O */ 111:
+        {
+            // gui_app_switch(get_app_xml(), GUI_APP_HANDLE(APP_OTA));
+            rvd_switch_to_OTA_screen();
+            break;
 
-                rvd_update_page_radio_list(page1, device_list, device_list_count);
-            }
+        }
+    case /*PC KEY U */ 117:
+        {
+            ota_triggered = true;
+
+            break;
+
         }
         break;
     default:

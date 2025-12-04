@@ -250,9 +250,34 @@ typedef int gui_error_t;
 #define GUI_STRINGS_EQUAL(string1, string2) (!strcmp(string1, string2))
 #define GUI_ANIMATION_CALLBACK(function_name) void function_name(void *p, void *this_widget, gui_animate_t *animate)
 
+/**
+ * @def GUI_WIDGET_FOREACH(root_widget)
+ * @brief Iterates safely over all child widgets of the specified root widget.
+ *
+ * This macro initializes iteration variables and uses a safe list traversal to
+ * visit each child object in the root widget's child list. For each child, it checks
+ * the object's magic number for validity. If an invalid object is encountered,
+ * diagnostic information is logged and the iteration is terminated.
+ *
+ * @param root_widget Pointer to the root widget whose children will be iterated.
+ *
+ * @note Uses gui_list_for_each_safe for safe traversal in case of modifications during iteration.
+ * @warning If a child object's magic number does not match GUI_MAGIC_NUMBER, iteration stops.
+ */
+#define GUI_WIDGET_FOREACH(root_widget)  {gui_list_t *_node = NULL;\
+        gui_list_t *_tmp = NULL;\
+        gui_obj_t *_object = (gui_obj_t *)root_widget;\
+        gui_list_for_each_safe(_node, _tmp, &_object->child_list)\
+        {\
+            gui_obj_t *_obj_foreach = gui_list_entry(_node, gui_obj_t, brother_list);\
+            if (_obj_foreach->magic != GUI_MAGIC_NUMBER)\
+            {\
+                gui_log("list NULL @line:%d, @%p", __LINE__, _object);\
+                gui_log("@name:%s, @type:%d\n", _object->name, _object->type);\
+                break;\
+            }
 
-
-
+#define GUI_WIDGET_FOREACH_END  }}
 #ifdef __cplusplus
 }
 #endif

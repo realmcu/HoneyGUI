@@ -120,6 +120,19 @@ static void gui_tabview_prepare(gui_obj_t *obj)
 
     if (this->force_right)
     {
+        if (animation_progress == 0.0f)
+        {
+            gui_fb_change();
+            gui_tabview_push_history_id(this, this->cur_id);
+            gui_obj_enable_event(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
+            this->next_id.x = this->cur_id.x + 1;
+            if (this->next_id.x > this->tab_cnt_right)
+            {
+                this->next_id.x = this->tab_cnt_left;
+            }
+            gui_log("TABVIEW_EVENT_TAB_CHANGE x:%d y:%d\n", this->next_id.x, this->next_id.y);
+        }
+
         animation_progress += 5.0f / obj->w;
         float t = animation_progress;
         float eased_t = 1.0f - (1.0f - t) * (1.0f - t);
@@ -141,6 +154,18 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     }
     if (this->force_left)
     {
+        if (animation_progress == 0.0f)
+        {
+            gui_fb_change();
+            gui_tabview_push_history_id(this, this->cur_id);
+            gui_obj_enable_event(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
+            this->next_id.x = this->cur_id.x - 1;
+            if (this->next_id.x < this->tab_cnt_left)
+            {
+                this->next_id.x = this->tab_cnt_right;
+            }
+            gui_log("TABVIEW_EVENT_TAB_CHANGE x:%d y:%d\n", this->next_id.x, this->next_id.y);
+        }
         animation_progress += 5.0f / obj->w;
         float t = animation_progress;
         float eased_t = 1.0f - (1.0f - t) * (1.0f - t);

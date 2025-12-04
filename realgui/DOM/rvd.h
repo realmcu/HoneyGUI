@@ -351,7 +351,23 @@ int radio_group_get_array(gui_obj_t *root,
  */
 int rvd_tab_first(void);
 
+void rvd_update(void);
 
+
+/**
+ * @brief Forces the tab view to move to the left.
+ *
+ * This function retrieves the current application's tab view widget and sets
+ * the `force_left` flag to 1, indicating that the tab should move to the left.
+ */
+void rvd_tab_left(void);
+/**
+* @brief Forces the tab view to move to the right.
+*
+* This function retrieves the current application's tab view widget and sets
+* the `force_right` flag to 1, indicating that the tab should move to the right.
+*/
+void rvd_tab_right(void);
 
 /**
  * @brief Stops the animation of an image movie widget.
@@ -474,4 +490,51 @@ int rvd_ImageMovie_frame_count(gui_obj_t *obj);
  * @see rvd_ImageMovie_frame_count()
  */
 void rvd_ImageMovie_start(gui_obj_t *obj);
+
+/**
+ * @brief Switches to the OTA (Over-The-Air) upgrade screen.
+ *
+ * This function switches the current GUI application to the OTA upgrade interface,
+ * which displays the firmware update progress. It is typically called when an OTA
+ * update process begins.
+ *
+ *
+ * @par Usage example
+ * @code
+ *      // When OTA upgrade starts, switch to OTA screen
+ *      rvd_switch_to_OTA_screen();
+ * @endcode
+ */
+void rvd_switch_to_OTA_screen(void);
+/**
+ * @brief Callback function for OTA switching timer.
+ *
+ * This variable assigns the OTA timer window animation callback function
+ * to the type gui_animate_callback_t.
+ *
+ * When OTA starts, this callback triggers switching to the OTA APP page.
+ *
+ * @see win_ota_timer
+ */
+extern gui_animate_callback_t rvd_window_ota_switch_timer_cb;
+
+/**
+ * @brief Animation callback for OTA window.
+ *
+ * This variable assigns the animation callback function for the OTA (Over-The-Air) window.
+ * The callback function, win_ani_ota, is responsible for handling animation events
+ * within the OTA window in the GUI application.
+ */
+extern gui_animate_callback_t rvd_app_ota_window_animate_callback;
+/**
+ * @brief Asynchronously dispatches a function and its parameter to the GUI server.
+ *
+ * This function packages a user-defined function and its parameter into a GUI message,
+ * then sends it to the GUI server for asynchronous execution. It also logs the dispatch
+ * for debugging purposes.
+ *
+ * @param function Pointer to the user-defined callback function to be executed.
+ * @param parameter Pointer to the parameter to be passed to the callback function.
+ */
+void rvd_function_async(void *function, void *parameter);
 #endif /* _RVD_H_ */
