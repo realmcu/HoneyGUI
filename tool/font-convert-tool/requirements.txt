@@ -1,0 +1,15 @@
+# Font rendering and processing
+freetype-py>=2.3.0
+fonttools>=4.38.0
+Pillow>=9.0.0
+numpy>=1.21.0
+
+# Testing
+pytest>=7.0.0
+hypothesis>=6.0.0
+pytest-cov>=4.0.0
+
+# Development
+black>=22.0.0
+flake8>=5.0.0
+mypy>=0.990

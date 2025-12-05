@@ -1,0 +1,11 @@
+{
+  "font": "C:/Windows/Fonts/arial.ttf",
+  "fontSize": 16,
+  "renderMode": 8,
+  "outputFormat": 1,
+  "outputFolder": "./output",
+  "customRanges": [
+    [32, 126]
+  ],
+  "_comment": "Vector font with ASCII characters for scalable rendering"
+}

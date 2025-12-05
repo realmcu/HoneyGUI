@@ -1,0 +1,55 @@
+{
+  "_comment": "Font Converter - Full Configuration Example",
+  "_comment_fontFile": "Path to TrueType font file (.ttf)",
+  "fontFile": "HarmonyOS.ttf",
+  
+  "_comment_fontSize": "Font size in pixels (e.g., 16, 24, 32, 48)",
+  "fontSize": 32,
+  
+  "_comment_renderMode": "Bit depth: 1 (monochrome), 2 (4-gray), 4 (16-gray), 8 (256-gray)",
+  "renderMode": 2,
+  
+  "_comment_outputFormat": "Output format: 'bitmap' or 'vector' (vector not yet implemented)",
+  "outputFormat": "bitmap",
+  
+  "_comment_outputFolder": "Output directory path (relative or absolute)",
+  "outputFolder": "output",
+  
+  "_comment_codepages": "List of CodePage files to include (optional)",
+  "codepages": [
+    "CP437.txt",
+    "CP1252.txt"
+  ],
+  
+  "_comment_mappings": "List of character mapping files (optional)",
+  "mappings": [],
+  
+  "_comment_symbols": "List of symbol files (optional)",
+  "symbols": [],
+  
+  "_comment_customRanges": "Custom Unicode ranges [[start, end], ...] (optional)",
+  "customRanges": [
+    [0x0020, 0x007E]
+  ],
+  
+  "_comment_bold": "Apply bold effect (default: false)",
+  "bold": false,
+  
+  "_comment_italic": "Apply italic effect (default: false)",
+  "italic": false,
+  
+  "_comment_rotation": "Rotation angle: 0, 90, 180, or 270 degrees (default: 0)",
+  "rotation": 0,
+  
+  "_comment_gamma": "Gamma correction value, 0.1-3.0 (default: 1.0, no correction)",
+  "gamma": 1.0,
+  
+  "_comment_crop": "Enable character cropping to reduce file size (default: false)",
+  "crop": true,
+  
+  "_comment_indexMethod": "Index method: 0 (address mode, faster) or 1 (offset mode, smaller) (default: 0)",
+  "indexMethod": 0,
+  
+  "_comment_rvd": "Reverse vertical direction mode (default: false)",
+  "rvd": false
+}
