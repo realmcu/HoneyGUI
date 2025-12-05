@@ -301,6 +301,7 @@ python image_converter_new.py -i input.png -o output.bin -c fastlz
 python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv444 --blur-bits 1
 python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv422 --blur-bits 1
 python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv411 --blur-bits 1
+python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv-fastlz --yuv-mode yuv422 --blur-bits 1
 python image_converter_new.py -i input.png -o input.bin -c adaptive
 ```
 
