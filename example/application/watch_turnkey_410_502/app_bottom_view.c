@@ -36,6 +36,7 @@ GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, bottom_view_design, clear_bottom_vie
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+static gui_view_t *current_view = NULL;
 const char *month[12] =
 {
     "JAN",
@@ -107,22 +108,22 @@ static void time_update_cb(void)
     else
     {
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "time_s", gui_view_get_current());
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "time_s", current_view);
             gui_text_content_set((gui_text_t *)obj, time_str, strlen(time_str));
         }
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "date_s", gui_view_get_current());
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "date_s", current_view);
             sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
             gui_text_content_set((gui_text_t *)obj, date_timecard_content, strlen(date_timecard_content));
         }
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "date_b", gui_view_get_current());
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "date_b", current_view);
             sprintf(date_content, "%s\n%s\n%d", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
                     timeinfo->tm_mday);
             gui_text_content_set((gui_text_t *)obj, date_content, strlen(date_content));
         }
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", gui_view_get_current());
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", current_view);
             gui_text_content_set((gui_text_t *)t_time, time_str, strlen(time_str));
         }
 
@@ -171,8 +172,8 @@ static void timer_cb(void *obj)
     }
 
     // control timecard display
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_timecard, __WIN0_NAME, gui_view_get_current());
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas_timecard, __WIN1_NAME, gui_view_get_current());
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_timecard, __WIN0_NAME, current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas_timecard, __WIN1_NAME, current_view);
     if (list->offset < 93)
     {
         img_timecard->not_show = 1;
@@ -193,39 +194,39 @@ static void switch_app_cb(void *obj)
     const char *obj_name = ((gui_obj_t *)obj)->name;
     if (strcmp(obj_name, "note_weather") == 0)
     {
-        gui_view_switch_direct(gui_view_get_current(), "weather_view",
+        gui_view_switch_direct(current_view, "weather_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "note_ac") == 0)
     {
-        gui_view_switch_direct(gui_view_get_current(), "activity_view",
+        gui_view_switch_direct(current_view, "activity_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "MUSIC") == 0)
     {
-        gui_view_set_animate_step(gui_view_get_current(), 60);
-        gui_view_switch_direct(gui_view_get_current(), "music_view",
+        gui_view_set_animate_step(current_view, 60);
+        gui_view_switch_direct(current_view, "music_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "BATTERY") == 0)
     {
-        gui_view_set_animate_step(gui_view_get_current(), 60);
-        gui_view_switch_direct(gui_view_get_current(), "battery_view",
+        gui_view_set_animate_step(current_view, 60);
+        gui_view_switch_direct(current_view, "battery_view",
                                SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "MESSAGE") == 0)
     {
-        // gui_view_switch_direct(gui_view_get_current(), "app_message_view", SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+        // gui_view_switch_direct(current_view, "app_message_view", SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
         //                        SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "APP_MENU") == 0)
     {
-        gui_view_set_animate_step(gui_view_get_current(), 100);
-        gui_view_switch_direct(gui_view_get_current(), "menu_view",
+        gui_view_set_animate_step(current_view, 100);
+        gui_view_switch_direct(current_view, "menu_view",
                                SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
@@ -304,7 +305,7 @@ static void update_activity_arcs(void *obj)
     int calories = steps_to_calories(move_steps);
 
     // Update move arc (outer ring) - starts from -90° (top), goes clockwise
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_move, "arc_move", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_move, "arc_move", current_view);
     if (arc_move)
     {
         float progress = (float)calories / 500.0f;
@@ -314,7 +315,7 @@ static void update_activity_arcs(void *obj)
     }
 
     // Update exercise arc (middle ring)
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_ex, "arc_ex", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_ex, "arc_ex", current_view);
     if (arc_ex)
     {
         float progress = (float)ex_minutes / 60.0f;
@@ -324,7 +325,7 @@ static void update_activity_arcs(void *obj)
     }
 
     // Update stand arc (inner ring)
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_stand, "arc_stand", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_stand, "arc_stand", current_view);
     if (arc_stand)
     {
         float progress = (float)stand_hours / 6.0f;
@@ -335,17 +336,17 @@ static void update_activity_arcs(void *obj)
 
     // Update text labels
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", current_view);
         sprintf(move_content, "%d/500 kcol",  calories);
         gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
     }
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(ex_text, "ac_ex", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(ex_text, "ac_ex", current_view);
         sprintf(ex_content, "%d/60 min", ex_minutes);
         gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
     }
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "ac_stand", gui_view_descriptor_get(CURRENT_VIEW_NAME));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "ac_stand", current_view);
         sprintf(stand_content, "%d/6 h", stand_hours);
         gui_text_content_set((gui_text_t *)stand_text, stand_content, strlen(stand_content));
     }
@@ -366,7 +367,7 @@ static void update_battery_arc(void *obj)
 
     // Update battery arc
     GUI_WIDGET_POINTER_BY_NAME_ROOT(arc_battery, "arc_battery",
-                                    gui_view_descriptor_get(CURRENT_VIEW_NAME));
+                                    current_view);
     if (arc_battery)
     {
         float progress = (float)battery_level / 100.0f;
@@ -567,6 +568,7 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void bottom_view_design(gui_view_t *view)
 {
+    current_view = view;
     gui_view_switch_on_event(view, "watchface_view",
                              SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,

@@ -13,6 +13,7 @@
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_list.h"
+#include "gui_view_instance.h"
 
 /*============================================================================*
  *                            Macros
@@ -42,6 +43,7 @@ extern void resting_heartrate_design(gui_obj_t *obj);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, heartrate_design, clear_heartrate_cache);
 static gui_img_t *img_heart = NULL;
 extern uint8_t activeIndex;
 static char time_text_content[10];
@@ -69,34 +71,11 @@ static gui_text_t *text_heart_rate = NULL;
 static gui_text_t *text_status = NULL;
 
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = heartrate_design,
-    .on_switch_out = clear_heartrate_cache,
-};
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_heartrate_cache(gui_view_t *view)
 {
@@ -695,6 +674,7 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void heartrate_design(gui_view_t *view)
 {
+    current_view = view;
     gui_obj_t *obj = GUI_BASE(view);
     const char *obj_name = current_view->descriptor->name;
     VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
@@ -704,7 +684,7 @@ static void heartrate_design(gui_view_t *view)
         swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
     }
-    if (strcmp(obj_name, "menu_view") == 0)
+    else if (strcmp(obj_name, "menu_view") == 0)
     {
         gui_view_switch_on_event(current_view, "menu_view",
                                  swtich_out,
@@ -713,7 +693,7 @@ static void heartrate_design(gui_view_t *view)
     }
     else
     {
-        gui_view_switch_on_event(view, "watchface_view",
+        gui_view_switch_on_event(current_view, "watchface_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);

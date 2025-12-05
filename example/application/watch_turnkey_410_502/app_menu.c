@@ -212,7 +212,8 @@ static void switch_app_workout(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(gui_view_get_current(), "workout_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    gui_view_switch_direct(gui_view_get_current(), "workout_view", SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_calendar(void *obj, gui_event_t e, void *param)

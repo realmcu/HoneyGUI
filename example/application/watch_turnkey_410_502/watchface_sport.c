@@ -36,7 +36,7 @@ static char *ex_content = NULL;
 static char *stand_content = NULL;
 
 gui_text_t *move_text = NULL;
-
+static gui_view_t *current_view = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -151,10 +151,11 @@ static void arc_activity_cb(NVGcontext *vg)
             nvgStrokeColor(vg, nvgRGB(117, 230, 229));
             nvgStroke(vg);
             {
+                GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", current_view);
                 sprintf(move_content, "%d",  calories);
                 gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
 
-                gui_obj_t *ex_text = gui_list_entry(move_text->base.brother_list.next, gui_obj_t, brother_list);
+                gui_obj_t *ex_text = gui_list_entry(move_text->brother_list.next, gui_obj_t, brother_list);
                 sprintf(ex_content, "%d", ex->valueint);
                 gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
 
@@ -204,6 +205,7 @@ static void img_weather_press_cb(void *p)
  *============================================================================*/
 void create_watchface_sport(gui_view_t *view)
 {
+    current_view = view;
     watchface_clear_mem = clear_watchface_sport_view;
 
     gui_obj_t *parent = GUI_BASE(view);

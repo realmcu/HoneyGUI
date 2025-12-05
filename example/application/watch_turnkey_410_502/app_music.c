@@ -36,6 +36,7 @@ static void music_view_design(gui_view_t *view);
  *============================================================================*/
 static gui_list_t *list;
 static int16_t list_offset_his = 0;
+static gui_view_t *current_view = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -50,7 +51,7 @@ static void time_update_cb(void *p)
     else
     {
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", gui_view_get_current());
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", current_view);
             gui_text_content_set((gui_text_t *)t_time, time_str, strlen(time_str));
         }
 
@@ -59,7 +60,7 @@ static void time_update_cb(void *p)
 static void music_ctr_press_cb(void *p)
 {
     GUI_UNUSED(p);
-    gui_view_switch_direct(gui_view_get_current(), "music_ctr_view",
+    gui_view_switch_direct(current_view, "music_ctr_view",
                            SWITCH_IN_ANIMATION_FADE, SWITCH_OUT_ANIMATION_FADE);
 }
 static void music_homeapge_press_cb(void *p)
@@ -86,14 +87,14 @@ static void note_design(gui_obj_t *obj, void *p)
     if (index == 0)
     {
         rect_bg->base.not_show = true;
-        gui_text_t *sport_text = gui_text_create(gui_view_get_current(), "ac_text1", SCREEN_WIDTH / 2 - 40,
+        gui_text_t *sport_text = gui_text_create(current_view, "ac_text1", SCREEN_WIDTH / 2 - 40,
                                                  60, 0, 0);
         gui_text_set(sport_text, "Music", GUI_FONT_SRC_TTF, gui_rgb(231, 31, 69),
                      strlen("Music"), 40);
         gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(sport_text, LEFT);
 
-        gui_img_t *music_ctr = gui_img_create_from_mem(gui_view_get_current(), "music", MUSIC_CTR_ICON_BIN,
+        gui_img_t *music_ctr = gui_img_create_from_mem(current_view, "music", MUSIC_CTR_ICON_BIN,
                                                        300,
                                                        30, 0, 0);
         gui_obj_add_event_cb(GUI_BASE(music_ctr), (gui_event_cb_t)music_ctr_press_cb,
@@ -164,29 +165,30 @@ static void list_timer_cb(void *obj)
 }
 static void music_view_design(gui_view_t *view)
 {
+    current_view = view;
     const char *obj_name = gui_view_get_current()->descriptor->name;
     VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
     VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
     if (strcmp(obj_name, "bottom_view") == 0)
     {
-        gui_view_set_animate_step(gui_view_get_current(), 60);
+        gui_view_set_animate_step(current_view, 60);
         swtich_in = SWITCH_IN_FROM_TOP_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
-        gui_view_switch_on_event(gui_view_get_current(), "bottom_view",
+        gui_view_switch_on_event(current_view, "bottom_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);
     }
-    if (strcmp(obj_name, "menu_view") == 0)
+    else if (strcmp(obj_name, "menu_view") == 0)
     {
-        gui_view_switch_on_event(gui_view_get_current(), "menu_view",
+        gui_view_switch_on_event(current_view, "menu_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);
     }
     else
     {
-        gui_view_switch_on_event(gui_view_get_current(), "watchface_view",
+        gui_view_switch_on_event(current_view, "watchface_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);

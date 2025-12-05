@@ -44,6 +44,7 @@ extern void activity_stand_design(gui_obj_t *obj);
  *                            Variables
  *============================================================================*/
 GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, activity_design, clear_activity);
+static gui_view_t *current_view = NULL;
 
 extern char *cjson_content;
 static uint8_t *img_ring_data = NULL;
@@ -354,18 +355,23 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void activity_design(gui_view_t *view)
 {
+    current_view = view;
     gui_obj_t *obj = GUI_BASE(view);
-    const char *obj_name = gui_view_get_current()->descriptor->name;
+    const char *obj_name = view->descriptor->name;
     VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
     VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
     if (strcmp(obj_name, "bottom_view") == 0)
     {
-        swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
+        swtich_in = SWITCH_IN_FROM_TOP_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
+        gui_view_switch_on_event(current_view, "bottom_view",
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
     }
-    if (strcmp(obj_name, "menu_view") == 0)
+    else if (strcmp(obj_name, "menu_view") == 0)
     {
-        gui_view_switch_on_event(gui_view_get_current(), "menu_view",
+        gui_view_switch_on_event(view, "menu_view",
                                  swtich_out,
                                  swtich_in,
                                  GUI_EVENT_KB_SHORT_CLICKED);

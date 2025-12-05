@@ -11,7 +11,6 @@
 #include "gui_video.h"
 #include "gui_text.h"
 #include "app_main_watch.h"
-#include "gui_view_instance.h"
 
 /*============================================================================*
  *                            Macros
