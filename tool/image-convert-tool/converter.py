@@ -109,7 +109,13 @@ class ImageConverter:
                 f.write(struct.pack('<I', end_offset))
                 
                 # Write compressed data
-                f.write(compressed_data)
+                # Note: For FastLz, the first 8 bytes (metadata) overlap with
+                # the last 8 bytes of the offset table, so skip them
+                from compress.fastlz import FastLzCompression
+                if isinstance(compress, FastLzCompression):
+                    f.write(compressed_data[8:])
+                else:
+                    f.write(compressed_data)
             else:
                 # Write uncompressed data
                 f.write(pixel_data)
