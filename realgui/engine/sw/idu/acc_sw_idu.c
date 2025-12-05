@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file acc_sw_rle.c
+  * @file acc_sw_idu.c
   * @brief Picture software decoding library
   * @details input:rgba/rgb/rgb565;output:rgba/rgb565
   * @author wenjing_jiang@realsil.com.cn
@@ -16,11 +16,11 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <draw_img.h>
+#include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
 #include "acc_sw_idu.h"
-#include "math.h"
+#include <math.h>
 #include <stdbool.h>
 #include <string.h>
 

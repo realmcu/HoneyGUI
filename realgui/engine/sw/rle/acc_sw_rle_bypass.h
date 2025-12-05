@@ -11,9 +11,9 @@
 #ifndef __ACC_SW_RLE_BYPASS_H__
 #define __ACC_SW_RLE_BYPASS_H__
 
-#include <guidef.h>
-#include <draw_img.h>
-#include <draw_path.h>
+#include "guidef.h"
+#include "draw_img.h"
+#include "draw_path.h"
 
 
 #ifdef __cplusplus

@@ -19,8 +19,8 @@ extern "C" {
 #include <stdio.h>
 #include <unistd.h>
 #include "gui_server.h"
-#include "unistd.h"
-#include "time.h"
+#include <unistd.h>
+#include <time.h>
 #include "gui_components_init.h"
 #include "shell.h"
 

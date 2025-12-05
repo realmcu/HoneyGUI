@@ -28,10 +28,10 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <draw_img.h>
-#include <gui_matrix.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "draw_img.h"
+#include "gui_matrix.h"
 #include "gui_obj.h"
 
 /*============================================================================*

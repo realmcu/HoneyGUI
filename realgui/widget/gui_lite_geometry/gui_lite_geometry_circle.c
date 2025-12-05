@@ -6,7 +6,7 @@
   * @brief lite geometry circle widget
   * @details lite geometry circle widget is used to draw circle shapes on the screen
   * @author
-* @date 2025/12/03
+  * @date 2025/12/03
   * @version 2.0
   ***************************************************************************************
     * @attention
@@ -17,6 +17,12 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include <string.h>
+#include <math.h>
+#include "guidef.h"
+#include "gui_fb.h"
+#include "acc_api.h"
+#include "tp_algo.h"
 #include "gui_lite_geometry_circle.h"
 
 /*============================================================================*
@@ -146,7 +152,6 @@ static draw_img_t *create_vertical_arc_strip(gui_lite_circle_t *this, gui_obj_t 
     int arc_width = this->radius - inner_half;
     if (arc_width < 1) { arc_width = 1; }
 
-    // arc height = inner_size
     int arc_height = inner_size;
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));

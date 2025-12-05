@@ -10,7 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "math.h"
+#include <math.h>
 
 #define SHM_DATA_SECTION
 

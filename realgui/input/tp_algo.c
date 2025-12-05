@@ -5,11 +5,11 @@
 
 #ifndef RTK_TP_ALGO_V2
 //#include <string.h>
-#include <gui_server.h>
-#include <guidef.h>
-#include <gui_api.h>
+#include "gui_server.h"
+#include "guidef.h"
+#include "gui_api.h"
 #include <stdlib.h>
-#include <tp_algo.h>
+#include "tp_algo.h"
 
 
 #ifdef ENABLE_MONKEY_TEST

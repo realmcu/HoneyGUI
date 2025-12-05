@@ -1,11 +1,11 @@
 #ifndef LITE_GEOMETRY_H
 #define LITE_GEOMETRY_H
-#include "string.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "stdint.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <math.h>
-#include "stdbool.h"
+#include <stdbool.h>
 
 #include "lite_geometry_math.h"
 

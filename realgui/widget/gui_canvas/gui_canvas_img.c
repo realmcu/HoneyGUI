@@ -17,10 +17,10 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
+#include "guidef.h"
 #include <string.h>
-#include <gui_matrix.h>
-#include <gui_obj.h>
+#include "gui_matrix.h"
+#include "gui_obj.h"
 #include <nanovg.h>
 #include "gui_canvas_img.h"
 

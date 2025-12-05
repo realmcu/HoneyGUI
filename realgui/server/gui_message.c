@@ -8,11 +8,11 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include <guidef.h>
-#include <draw_img.h>
-#include <gui_fb.h>
-#include <gui_server.h>
-#include <gui_obj.h>
+#include "guidef.h"
+#include "draw_img.h"
+#include "gui_fb.h"
+#include "gui_server.h"
+#include "gui_obj.h"
 #include <string.h>
 
 

@@ -16,7 +16,7 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <draw_img.h>
+#include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
 #include "acc_sw_define.h"

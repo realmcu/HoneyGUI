@@ -11,7 +11,7 @@
 #ifndef __RGB565_2_RGB565_H__
 #define __RGB565_2_RGB565_H__
 
-#include <draw_img.h>
+#include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
 

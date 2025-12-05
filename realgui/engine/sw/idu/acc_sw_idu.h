@@ -11,9 +11,9 @@
 #ifndef __ACC_SW_RLE_H__
 #define __ACC_SW_RLE_H__
 
-#include <guidef.h>
-#include <draw_img.h>
-#include <draw_path.h>
+#include "guidef.h"
+#include "draw_img.h"
+#include "draw_path.h"
 #include "gui_api_color.h"
 
 
@@ -82,6 +82,12 @@ typedef struct
 } gui_sw_idu_range_t;
 
 void gui_sw_idu_decode(void *in, gui_rect_t *rect, void *out, uint32_t stride);
+
+// Wrapper functions for acc_engine integration
+void *gui_sw_idu_load(void *input);
+void gui_sw_idu_free(void *decoded);
+void gui_sw_idu_register(struct acc_engine *acc);
+
 #ifdef __cplusplus
 }
 #endif

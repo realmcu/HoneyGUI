@@ -5,8 +5,8 @@
 #define __GUI_MESSAGE_H__
 
 
-#include <guidef.h>
-#include <gui_obj.h>
+#include "guidef.h"
+#include "gui_obj.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

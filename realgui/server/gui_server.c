@@ -8,14 +8,14 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include <guidef.h>
-#include <draw_img.h>
-#include <gui_fb.h>
-#include <gui_server.h>
-#include <gui_obj.h>
-#include <tp_algo.h>
-#include <kb_algo.h>
-#include <wheel_algo.h>
+#include "guidef.h"
+#include "draw_img.h"
+#include "gui_fb.h"
+#include "gui_server.h"
+#include "gui_obj.h"
+#include "tp_algo.h"
+#include "kb_algo.h"
+#include "wheel_algo.h"
 #include <string.h>
 #include "gui_win.h"
 #include "gui_components_init.h"

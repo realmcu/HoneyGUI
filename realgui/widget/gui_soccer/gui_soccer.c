@@ -17,12 +17,12 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
+#include "guidef.h"
 #include <string.h>
-#include <gui_obj.h>
-#include <draw_img.h>
-#include <acc_api.h>
-#include <gui_matrix.h>
+#include "gui_obj.h"
+#include "draw_img.h"
+#include "acc_api.h"
+#include "gui_matrix.h"
 #include "gui_soccer.h"
 #include "tp_algo.h"
 #include <math.h>

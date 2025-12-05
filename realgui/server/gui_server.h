@@ -5,9 +5,9 @@
 #define __GUI_SERVER_H__
 
 
-#include <guidef.h>
-#include <gui_obj.h>
-#include <gui_message.h>
+#include "guidef.h"
+#include "gui_obj.h"
+#include "gui_message.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

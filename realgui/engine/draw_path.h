@@ -4,8 +4,8 @@
 #ifndef __DRAW_PATH_H__
 #define __DRAW_PATH_H__
 
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 
 
 #ifdef __cplusplus

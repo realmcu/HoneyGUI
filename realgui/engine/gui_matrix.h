@@ -4,7 +4,7 @@
 #ifndef __GUI_MATRIX_H__
 #define __GUI_MATRIX_H__
 
-#include <guidef.h>
+#include "guidef.h"
 #include "def_type.h"
 
 #ifdef __cplusplus

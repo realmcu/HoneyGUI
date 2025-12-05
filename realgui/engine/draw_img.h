@@ -4,9 +4,9 @@
 #ifndef __DRAW_IMAGE_H__
 #define __DRAW_IMAGE_H__
 
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_matrix.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "gui_matrix.h"
 
 
 #ifdef __cplusplus

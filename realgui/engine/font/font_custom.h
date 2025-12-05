@@ -28,9 +28,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <draw_font.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "draw_font.h"
 #include "gui_text.h"
 #include "font_rendering_utils.h"
 

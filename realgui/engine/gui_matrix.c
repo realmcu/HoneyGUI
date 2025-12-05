@@ -3,9 +3,9 @@
  * This file is part of GUI Engine
  */
 
-#include <guidef.h>
+#include "guidef.h"
 #include <string.h>
-#include <gui_matrix.h>
+#include "gui_matrix.h"
 #include <math.h>
 
 #define MAX(a,b) (a > b ? a : b)

@@ -3,11 +3,11 @@
  * File      : kb_algo.c
  */
 //#include <string.h>
-#include <gui_server.h>
-#include <guidef.h>
-#include <gui_api.h>
+#include "gui_server.h"
+#include "guidef.h"
+#include "gui_api.h"
 //#include <stdlib.h>
-#include <kb_algo.h>
+#include "kb_algo.h"
 
 
 //#define RTK_KB_DEBUG

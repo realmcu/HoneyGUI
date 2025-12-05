@@ -17,14 +17,14 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
+#include "guidef.h"
 #include "gui_canvas_arc.h"
 #include <string.h>
-#include <gui_obj.h>
+#include "gui_obj.h"
 #include "acc_api.h"
-#include <tp_algo.h>
+#include "tp_algo.h"
 #include "nanovg.h"
-#include "math.h"
+#include <math.h>
 
 /*============================================================================*
  *                           Types

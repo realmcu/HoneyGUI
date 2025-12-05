@@ -22,7 +22,7 @@
 #include "gui_obj.h"
 #include "gui_video.h"
 #include "acc_api.h"
-#include "math.h"
+#include <math.h>
 #include "gui_h264bsd.h"
 #include "gui_vfs.h"
 

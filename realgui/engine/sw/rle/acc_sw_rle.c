@@ -16,15 +16,15 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <draw_img.h>
+#include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
 #include "acc_sw_rle.h"
-#include <acc_sw_raster.h>
+#include "acc_sw_raster.h"
 #include "acc_sw_rle_bypass.h"
 #include "acc_sw_rle_cover.h"
 #include "acc_sw_rle_filter.h"
-#include "math.h"
+#include <math.h>
 
 
 

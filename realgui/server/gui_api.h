@@ -30,7 +30,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <guidef.h>
+#include "guidef.h"
 #include "gui_api_acc.h"
 #include "gui_api_color.h"
 #include "gui_api_dc.h"

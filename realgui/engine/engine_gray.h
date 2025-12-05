@@ -4,10 +4,10 @@
 #ifndef __ENGINE_GRAY_H__
 #define __ENGINE_GRAY_H__
 
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_matrix.h>
-#include <draw_img.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "gui_matrix.h"
+#include "draw_img.h"
 
 
 #ifdef __cplusplus
