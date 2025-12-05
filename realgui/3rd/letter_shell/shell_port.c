@@ -9,11 +9,13 @@
  *
  */
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__linux__)
 
 #include <sys/time.h>
 #include <stdio.h>
+#include <string.h>
 #include <dirent.h>
+#include <unistd.h>
 #include "shell.h"
 #include "shell_port.h"
 #include "shell_fs.h"
@@ -46,6 +48,7 @@ signed short userShellWrite(char *data, unsigned short len)
     {
         putchar(*data++);
     }
+    fflush(stdout);
     return len;
 }
 
@@ -77,8 +80,8 @@ size_t userShellListDir(char *path, char *buffer, size_t maxLen)
 {
     DIR *dir;
     struct dirent *ptr;
-    // int i;
     dir = opendir(path);
+    if (!dir) { return 0; }
     memset(buffer, 0, maxLen);
     while ((ptr = readdir(dir)) != NULL)
     {
@@ -152,32 +155,6 @@ SHELL_EXPORT_CMD(
     io, func, test);
 
 #endif
-#else
 
-#include "shell.h"
-#include "shell_ext.h"
-#include "shell_port.h"
-
-Shell shell_user;
-char shellBuffer[512];
-void *shell_task_handle;
-
-unsigned int userGetTick()
-{
-    return 0;
-}
-
-static short userShellWrite(char *data, unsigned short len)
-{
-    (void)data;
-    (void)len;
-    return 0;
-}
-
-void userShellInit(void)
-{
-    shell_user.write = userShellWrite;
-    shellInit(&shell_user, shellBuffer, 512);
-}
 #endif
 
