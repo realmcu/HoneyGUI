@@ -183,12 +183,12 @@ uint32_t gui_video_get_frame_time(gui_video_t *this);
 void gui_video_set_scale(gui_video_t *this, float scale_x, float scale_y);
 
 /**
- * @brief   Set the playback state of a video widget.
+ * @brief Set the playback state of a video widget.
  *
- * @param[in] this    Pointer to the video widget (must be valid).
- * @param[in] state   Target state, as defined by GUI_VIDEO_STATE (e.g., Play, Pause, Stop).
+ * @param this Pointer to the video widget (must be valid).
+ * @param state Target state, as defined by GUI_VIDEO_STATE (e.g., Play, Pause, Stop).
  *
- * @note   When set state Play at state Stop, widget will play from the beginning.
+ * @note When set state Play at state Stop, widget will play from the beginning.
  */
 void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state);
 
@@ -196,9 +196,8 @@ void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state);
 /**
  * @brief Set the repeat (loop) count for video playback.
  *
- * Parameters:
- *   this - Pointer to the video widget (must be valid).
- *   cnt  - Number of times to repeat playback after the first run:
+ * @param this Pointer to the video widget (must be valid).
+ * @param cnt Number of times to repeat playback after the first run:
  *          - cnt > 0: Play the video cnt additional times (total plays = 1 + cnt).
  *          - cnt = 0: Do not repeat (play once).
  *          - GUI_VIDEO_REPEAT_INFINITE: Repeat indefinitely (infinite loop).
@@ -220,15 +219,15 @@ void gui_video_refresh_type(gui_video_t *this);
 /**
  * @brief Create a video widget from an FTL source(cannot be accessed directly) and attach it to a parent container.
  *
- * Parameters:
- *   parent - Pointer to the parent GUI object (must be valid).
- *   name   - Widget name/identifier.
- *   addr   - Pointer to the FTL source handle or buffer.
- *   x, y   - Top-left position relative to the parent.
- *   w, h   - Width and height in pixels (will be overwritten by the video file).
+ * @param parent Pointer to the parent GUI object (must be valid).
+ * @param name Widget name/identifier.
+ * @param addr Pointer to the FTL source handle or buffer.
+ * @param x Top-left x position relative to the parent.
+ * @param y Top-left y position relative to the parent.
+ * @param w Width in pixels (will be overwritten by the video file).
+ * @param h Height in pixels (will be overwritten by the video file).
  *
- * Returns:
- *   Pointer to gui_video_t on success; NULL on failure.
+ * @return Pointer to gui_video_t on success; NULL on failure.
  *
  */
 gui_video_t *gui_video_create_from_ftl(void           *parent,
@@ -242,15 +241,15 @@ gui_video_t *gui_video_create_from_ftl(void           *parent,
 /**
  * @brief Create a video widget from a memory buffer and attach it to a parent container.
  *
- * Parameters:
- *   parent - Pointer to the parent GUI object (must be valid).
- *   name   - Widget name/identifier.
- *   addr   - Pointer to the memory buffer containing video data.
- *   x, y   - Top-left position relative to the parent.
- *   w, h   - Width and height in pixels.(width and height will be overwritten by video file)
+ * @param parent Pointer to the parent GUI object (must be valid).
+ * @param name Widget name/identifier.
+ * @param addr Pointer to the memory buffer containing video data.
+ * @param x Top-left x position relative to the parent.
+ * @param y Top-left y position relative to the parent.
+ * @param w Width in pixels (will be overwritten by video file).
+ * @param h Height in pixels (will be overwritten by video file).
  *
- * Returns:
- *   Pointer to gui_video_t on success; NULL on failure.
+ * @return Pointer to gui_video_t on success; NULL on failure.
  *
  */
 gui_video_t *gui_video_create_from_mem(void           *parent,

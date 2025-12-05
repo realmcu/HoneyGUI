@@ -73,7 +73,7 @@ typedef struct
  * @brief Initialize the character binary file and store the font and
  * corresponding information in the font list.
  *
- * @param font_bin_addr The binary file address of this font type.
+ * @param font_bin_addr Binary file address of this font type.
  * @return Font library index.
  */
 uint8_t gui_font_mem_init(uint8_t *font_bin_addr);

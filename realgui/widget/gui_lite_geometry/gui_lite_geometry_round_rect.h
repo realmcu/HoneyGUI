@@ -67,8 +67,8 @@ typedef struct
  * @brief Create a new lite round rect widget.
  * @param parent Parent widget or NULL for root widget.
  * @param name Widget name or NULL for default name.
- * @param x Center X coordinate relative to widget.
- * @param y Center Y coordinate relative to widget.
+ * @param x X coordinate relative to widget.
+ * @param y Y coordinate relative to widget.
  * @param w Round rect width.
  * @param h Round rect height.
  * @param radius Round rect radius.
@@ -82,8 +82,8 @@ gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name
 /**
  * @brief Set the style of the lite round rect widget.
  * @param this Pointer to the lite round rect widget.
- * @param x Center X coordinate relative to widget.
- * @param y Center Y coordinate relative to widget.
+ * @param x X coordinate relative to widget.
+ * @param y Y coordinate relative to widget.
  * @param w Round rect width.
  * @param h Round rect height.
  * @param radius Round rect radius.
@@ -96,8 +96,8 @@ void gui_lite_round_rect_set_style(gui_lite_round_rect_t *this,
 /**
  * @brief Set the position of the lite round rect widget.
  * @param this Pointer to the lite round rect widget.
- * @param x Center X coordinate relative to widget.
- * @param y Center Y coordinate relative to widget.
+ * @param x X coordinate relative to widget.
+ * @param y Y coordinate relative to widget.
  */
 void gui_lite_round_rect_set_position(gui_lite_round_rect_t *this, int x, int y);
 

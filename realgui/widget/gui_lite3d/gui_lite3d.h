@@ -68,11 +68,11 @@ typedef struct gui_lite3d
  * @param parent Parent widget.
  * @param name Widget name.
  * @param model Lite3D model.
- * @param x The X-axis coordinate relative to parent widget.
- * @param y The Y-axis coordinate relative to parent widget.
+ * @param x X-axis coordinate relative to parent widget.
+ * @param y Y-axis coordinate relative to parent widget.
  * @param w Width.
  * @param h Height.
- * @return The widget object pointer.
+ * @return Widget object pointer.
  */
 gui_lite3d_t *gui_lite3d_create(void                  *parent,
                                 const char            *name,

@@ -174,13 +174,13 @@ typedef struct gui_view_on_event
 
 /**
  * @brief Create a view widget.
- * @param parent The father widget it nested in.
+ * @param parent Father widget it nested in.
  * @param name View name that can be used to find the target view descriptor.
- * @param x The X-axis coordinate relative to parent widget.
- * @param y The Y-axis coordinate relative to parent widget.
+ * @param x X-axis coordinate relative to parent widget.
+ * @param y Y-axis coordinate relative to parent widget.
  * @param w Width.
  * @param h Height.
- * @return Return the widget object pointer.
+ * @return Widget object pointer.
  */
 gui_view_t *gui_view_create(void       *parent,
                             const char *name,
@@ -198,12 +198,14 @@ void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor);
 /**
  * @brief Get target view's descriptor by name.
  * @param name View descriptor's name that can be used to find the target view.
+ * @return Pointer to the view descriptor.
  */
 const gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
 
 /**
  * @brief Get target view by name.
  * @param name View descriptor's name that can be used to find the target view.
+ * @return Pointer to the view.
  */
 gui_view_t *gui_view_get(const char *name);
 
@@ -219,7 +221,7 @@ gui_view_t *gui_view_get(const char *name);
  * @param target_view_name Target view name that can be used to find the target view descriptor.
  * @param switch_out_style Style applied to the outgoing view during the switch.
  * @param switch_in_style Style applied to the incoming view during the switch.
- * @param event The event that triggers the view switch.
+ * @param event Event that triggers the view switch.
  */
 void gui_view_switch_on_event(gui_view_t *_this,
                               const char *target_view_name,
@@ -261,14 +263,14 @@ void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity);
 /**
  * @brief Get current view pointer.
  *
- * @return Return current view pointer.
+ * @return Current view pointer.
  */
 gui_view_t *gui_view_get_current(void);
 
 /**
  * @brief Get next view pointer.
  *
- * @return Return next view pointer.
+ * @return Next view pointer.
  */
 gui_view_t *gui_view_get_next(void);
 

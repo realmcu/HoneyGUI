@@ -35,7 +35,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  Text rect struct start */
+/* Text rect struct start */
 typedef struct gui_text_rect
 {
     int16_t x1;
@@ -47,10 +47,10 @@ typedef struct gui_text_rect
     int16_t yboundtop;
     int16_t yboundbottom;
 } gui_text_rect_t;
-/** @brief  Text rect struct end */
+/* Text rect struct end */
 
 
-/** @brief  Memory char struct start */
+/* Memory char struct start */
 typedef struct
 {
     uint32_t unicode;
@@ -65,7 +65,7 @@ typedef struct
     uint8_t *buf;
     void *emoji_img;
 } mem_char_t;
-/** @brief  Memory char struct end */
+/* Memory char struct end */
 
 
 /** @brief  Text encoding format enum */
@@ -136,11 +136,11 @@ typedef struct
 /**
  * @brief Converts content from a specified charset to Unicode code points.
  *
- * @param charset_type The charset type of the content.
+ * @param charset_type Charset type of the content.
  * @param content Input content to be converted.
  * @param len Length of the input content in bytes.
  * @param p_buf_ptr Pointer to the buffer that will hold the Unicode code points.
- * @return The length of the Unicode code points array.
+ * @return Length of the Unicode code points array.
  */
 uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len,
                                     uint32_t **p_buf_ptr);
@@ -148,19 +148,19 @@ uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content,
 /**
  * @brief Get the len by char num object
  *
- * @param utf8
- * @param char_num
- * @return uint32_t
+ * @param utf8 UTF8 string pointer.
+ * @param char_num Number of characters.
+ * @return Length of the UTF8 string in bytes.
  */
 uint32_t get_len_by_char_num(uint8_t *utf8, uint32_t char_num);
 
 /**
  * @brief Function to generate file path based on a given Unicode sequence
  *
- * @param unicode_buf
- * @param len
- * @param file_path
- * @return int
+ * @param unicode_buf Unicode buffer to generate file path from.
+ * @param len Length of the Unicode buffer.
+ * @param file_path Output file path buffer.
+ * @return Length of the generated file path.
  */
 uint32_t generate_emoji_file_path_from_unicode(const uint32_t *unicode_buf, uint32_t len,
                                                char *file_path);

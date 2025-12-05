@@ -24,8 +24,6 @@ Core Features
      - API 
    * - Create Widget
      - :cpp:any:`gui_lite_arc_create`  
-   * - Set Style
-     - :cpp:any:`gui_lite_arc_set_style`
    * - Set Position
      - :cpp:any:`gui_lite_arc_set_position` 
    * - Set Radius

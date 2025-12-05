@@ -69,16 +69,16 @@ typedef struct
  *============================================================================*/
 
 /**
- * @brief Create a gray scale widget
+ * @brief Create a gray scale widget.
  *
- * @param parent Parent object pointer
- * @param name Widget name
- * @param data User data pointer
- * @param x X coordinate
- * @param y Y coordinate
- * @param w Width
- * @param h Height
- * @return gui_gray_t* Pointer to the created gray scale widget
+ * @param parent Parent object pointer.
+ * @param name Widget name.
+ * @param data User data pointer.
+ * @param x X coordinate.
+ * @param y Y coordinate.
+ * @param w Width.
+ * @param h Height.
+ * @return Pointer to the created gray scale widget.
  */
 gui_gray_t *gui_gray_create(void       *parent,
                             const char *name,
@@ -89,12 +89,12 @@ gui_gray_t *gui_gray_create(void       *parent,
                             int16_t     h);
 
 /**
- * @brief Set the gray level of the widget
- * @param this Gray scale widget pointer
- * @param name Widget name
- * @param data User data pointer
- * @param x X coordinate
- * @param y Y coordinate
+ * @brief Set the gray level of the widget.
+ * @param this Gray scale widget pointer.
+ * @param name Widget name.
+ * @param data User data pointer.
+ * @param x X coordinate.
+ * @param y Y coordinate.
  */
 void gui_gray_set_attribute(gui_gray_t  *this,
                             const char *name,
@@ -102,10 +102,10 @@ void gui_gray_set_attribute(gui_gray_t  *this,
                             int16_t     x,
                             int16_t     y);
 /**
- * @brief Set the gray level of the widget
+ * @brief Set the gray level of the widget.
  *
- * @param gray Gray scale widget pointer
- * @param level Gray level (0-255), 0 for black, 255 for white
+ * @param gray Gray scale widget pointer.
+ * @param level Gray level (0-255), 0 for black, 255 for white.
  */
 void gui_gray_set_level(gui_gray_t *gray, uint8_t level);
 

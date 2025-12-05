@@ -59,8 +59,8 @@ The purpose of the font library parsing code is to populate the ``chr`` structur
 
 .. literalinclude:: ../../../realgui/engine/draw_font.h
    :language: c
-   :start-after: /** @brief  mem char struct start */
-   :end-before: /** @brief  mem char struct end */
+   :start-after: /* Memory char struct start */
+   :end-before: /* Memory char struct end */
 
 Each member has the following meanings:
 
@@ -106,8 +106,8 @@ The ``rect`` struct array is structured as follows:
 
 .. literalinclude:: ../../../realgui/engine/draw_font.h
    :language: c
-   :start-after: /** @brief  text rect struct start */
-   :end-before: /** @brief  text rect struct end */
+   :start-after: /* Text rect struct start */
+   :end-before: /* Text rect struct end */
 
 The ``rect`` is the display range of the widget passed from the widget layer. In this structure,
 ``x1`` and ``x2`` represent the X-coordinates of the left and right borders, respectively,

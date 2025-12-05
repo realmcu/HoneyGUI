@@ -287,16 +287,6 @@ static void render_arc_to_buffer(gui_lite_arc_t *this)
  *                           Public Functions
  *============================================================================*/
 
-/**
- * @brief Create arc geometry widget
- * @param parent Parent widget
- * @param name Widget name
- * @param x X coordinate
- * @param y Y coordinate
- * @param w Width
- * @param h Height
- * @return gui_lite_arc_t* Created widget pointer
- */
 gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name, int x, int y, int radius,
                                     float start_angle, float end_angle,
                                     float line_width, gui_color_t color)
@@ -359,12 +349,6 @@ gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name, int x, int y
 }
 
 
-/**
- * @brief Move arc geometry
- * @param this Pointer to the arc widget
- * @param x New center X coordinate relative to widget
- * @param y New center Y coordinate relative to widget
- */
 void gui_lite_arc_set_position(gui_lite_arc_t *this, int x, int y)
 {
     GUI_ASSERT(this != NULL);

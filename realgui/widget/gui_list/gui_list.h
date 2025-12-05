@@ -130,16 +130,19 @@ typedef struct gui_list_note
 
 /**
  * @brief Create a list widget.
- * @param parent The father widget it nested in.
- * @param name The name of the widget.
- * @param x The X-axis coordinate relative to parent widget.
- * @param y The Y-axis coordinate relative to parent widget.
+ * @param parent Father widget it nested in.
+ * @param name Name of the widget.
+ * @param x X-axis coordinate relative to parent widget.
+ * @param y Y-axis coordinate relative to parent widget.
  * @param w Width.
  * @param h Height.
- * @param note_length The length of each note.
- * @param space The space of each note.
- * @param dir The direction of the list.
- * @return Return the widget object pointer.
+ * @param note_length Length of each note.
+ * @param space Space of each note.
+ * @param dir Direction of the list.
+ * @param note_design Note design callback function.
+ * @param design_param Design parameter.
+ * @param create_bar Whether to create a bar.
+ * @return Widget object pointer.
  */
 gui_list_t *gui_list_create(void       *parent,
                             const char *name,
@@ -157,65 +160,70 @@ gui_list_t *gui_list_create(void       *parent,
 /**
  * @brief Set list moving style.
  * @param list Pointer to the list widget.
- * @param style The moving style of the list.
+ * @param style Moving style of the list.
  */
 void gui_list_set_style(gui_list_t *list, LIST_STYLE style);
 
 /**
  * @brief Set list deceleration factor, which defaults to 0.05.
  * @param list Pointer to the list widget.
- * @param factor The deceleration factor.
+ * @param factor Deceleration factor.
  */
 void gui_list_set_factor(gui_list_t *list, float factor);
 
 /**
  * @brief Set list offset, can be used to change list initial position.
  * @param list Pointer to the list widget.
- * @param offset The list offset.
+ * @param offset List offset.
  */
 void gui_list_set_offset(gui_list_t *list, int16_t offset);
 
 /**
  * @brief Set list bar color.
  * @param list Pointer to the list widget.
- * @param color The list bar color.
+ * @param color List bar color.
  */
 void gui_list_set_bar_color(gui_list_t *list, gui_color_t color);
 
 /**
  * @brief Set note number of list.
  * @param list Pointer to the list widget.
- * @param num The specific number, must be a nonnegative number.
+ * @param num Specific number, must be a nonnegative number.
  */
 void gui_list_set_note_num(gui_list_t *list, uint16_t num);
 
 /**
  * @brief Set card stack location, only valid when list style is LIST_CARD.
- * @param location The distance from stack location to the screen bottom of right.
+ * @param list Pointer to the list widget.
+ * @param location Distance from stack location to the screen bottom of right.
  */
 void gui_list_set_card_stack_location(gui_list_t *list, int16_t location);
 
 /**
  * @brief Set out scope of list, which is the distance that can be slightly exceeded when scrolling.
- * @param out_scope The out scope of list.
+ * @param list Pointer to the list widget.
+ * @param out_scope Out scope of list.
  */
 void gui_list_set_out_scope(gui_list_t *list, int16_t out_scope);
 
 /**
  * @brief Set auto align of list, which is used to automatically align notes when the list stops moving.
- * @param auto_align true: enable auto align, false: disable auto align.
+ * @param list Pointer to the list widget.
+ * @param auto_align True: enable auto align, false: disable auto align.
  */
 void gui_list_set_auto_align(gui_list_t *list, bool auto_align);
 
 /**
  * @brief Set inertia of list, which is used to enable inertia effect while tp released.
- * @param inertia Default is true. true: enable inertia, false: disable inertia.
+ * @param list Pointer to the list widget.
+ * @param inertia Default is true. True: enable inertia, false: disable inertia.
  */
 void gui_list_set_inertia(gui_list_t *list, bool inertia);
 
 /**
  * @brief Set loop of list, which is used to enable loop effect. Only valid when list total length is greater than list width or height. Don't enable loop when list style is LIST_CARD.
- * @param loop Default is false. true: enable loop, false: disable loop.
+ * @param list Pointer to the list widget.
+ * @param loop Default is false. True: enable loop, false: disable loop.
  */
 void gui_list_enable_loop(gui_list_t *list, bool loop);
 

@@ -45,8 +45,8 @@ extern "C" {
  *============================================================================*/
 
 /**
-  * @brief free the widget tree recursively,from the root to the leaves.Preorder traversal.
-  * @param obj the root of the widget tree.
+  * @brief Free the widget tree recursively, from the root to the leaves. Preorder traversal.
+  * @param obj Root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
@@ -61,8 +61,8 @@ void gui_obj_tree_free(void *obj);
 
 
 /**
-  * @brief free the widget tree asynchronously.
-  * @param obj the root of the widget tree.
+  * @brief Free the widget tree asynchronously.
+  * @param obj Root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
@@ -76,14 +76,14 @@ void gui_obj_tree_free(void *obj);
 void gui_obj_tree_free_async(void *obj);
 
 /**
-  * @brief free the widget tree recursively, without the root. Preorder traversal.
-  * @param obj the root of the widget tree.
+  * @brief Free the widget tree recursively, without the root. Preorder traversal.
+  * @param object Root of the widget tree.
   */
 void gui_obj_child_free(gui_obj_t *object);
 
 /**
-  * @brief print the widget tree recursively,from the root to the leaves.Preorder traversal.
-  * @param obj the root of the widget tree.
+  * @brief Print the widget tree recursively, from the root to the leaves. Preorder traversal.
+  * @param obj Root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
@@ -97,48 +97,48 @@ void gui_obj_child_free(gui_obj_t *object);
 void gui_obj_tree_print(gui_obj_t *obj);
 
 /**
-  * @brief get count of one type on tree.
-  * @param obj the root of the widget tree.
-  * @param type widget type.
-  * @param count count result.
+  * @brief Get count of one type on tree.
+  * @param obj Root of the widget tree.
+  * @param type Widget type.
+  * @param count Count result.
   */
 void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count);
 
 /**
-  * @brief show or hide the widget.
-  * @param obj the root of the widget tree.
-  * @param enable true for show, false for hide.
+  * @brief Show or hide the widget.
+  * @param obj Root of the widget tree.
+  * @param enable True for show, false for hide.
   */
 void gui_obj_tree_show(gui_obj_t *obj, bool enable);
 
 /**
-  * @brief show the root of this_widget tree.
-  * @param obj the root of the widget tree.
-  * @return gui_obj_t*.
+  * @brief Show the root of this_widget tree.
+  * @param obj Root of the widget tree.
+  * @return Pointer to the root object.
   */
 gui_obj_t *gui_obj_tree_get_root(gui_obj_t *obj);
 
 /**
-  * @brief get child type.
-  * @param obj the root of the widget tree.
-  * @param child_type type of obj widget.
-  * @return gui_obj_t*.
+  * @brief Get child type.
+  * @param obj Root of the widget tree.
+  * @param child_type Type of obj widget.
+  * @return Pointer to the child object.
   */
 gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 
 /**
- * @brief get widget in tree by name.
+ * @brief Get widget in tree by name.
  *
- * @param obj tree.
- * @param name widget name.
- * @param output widget.
+ * @param obj Tree.
+ * @param name Widget name.
+ * @param output Widget.
  */
 void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
 
 /**
- * @brief print name by bfs order.
+ * @brief Print name by bfs order.
  *
- * @param root tree.
+ * @param root Tree.
  */
 void gui_obj_tree_print_bfs(gui_obj_t *root);
 

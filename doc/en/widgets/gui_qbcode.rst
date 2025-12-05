@@ -13,8 +13,8 @@ To create a qbcode widget, you can use the function :cpp:any:`gui_qbcode_create`
 
 .. literalinclude:: ../../../realgui/widget/gui_qbcode/gui_qbcode.h
    :language: c
-   :start-after: /** @brief  T_QBCODE_ENCODE_TYPE structure. */
-   :end-before: /** @brief  T_QBCODE_DISPLAY_TYPE structure. */
+   :start-after: /* T_QBCODE_ENCODE_TYPE structure start */
+   :end-before: /* T_QBCODE_ENCODE_TYPE structure end */
 
 
 Set Size and Border

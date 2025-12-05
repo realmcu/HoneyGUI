@@ -55,8 +55,8 @@
 
 .. literalinclude:: ../../../realgui/engine/draw_font.h
    :language: c
-   :start-after: /** @brief  mem char struct start */
-   :end-before: /** @brief  mem char struct end */
+   :start-after: /* Memory char struct start */
+   :end-before: /* Memory char struct end */
 
 每个成员的含义如下：
 
@@ -99,8 +99,8 @@
 
 .. literalinclude:: ../../../realgui/engine/draw_font.h
    :language: c
-   :start-after: /** @brief  text rect struct start */
-   :end-before: /** @brief  text rect struct end */
+   :start-after: /* Text rect struct start */
+   :end-before: /* Text rect struct end */
 
 ``rect`` 为控件层传入的控件显示范围，其中 ``x1`` 和 ``x2`` 分别代表左边框和右边框的 X 坐标， ``y1`` 和 ``y2`` 分别代表上边框和下边框的 Y 坐标，其数值是内部控件计算生成，依赖控件创建时的位置和大小。
 

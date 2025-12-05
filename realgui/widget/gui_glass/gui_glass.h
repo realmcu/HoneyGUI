@@ -87,30 +87,30 @@ typedef struct gui_glass
 /**
  * @brief Load the width of glass in pixel.
  *
- * @param this The glass widget pointer.
- * @return uint16_t Width of glass.
+ * @param _this Glass widget pointer.
+ * @return Width of glass.
  */
 uint16_t gui_glass_get_width(gui_glass_t *_this);
 
 /**
  * @brief Load the height of glass in pixel.
  *
- * @param this The glass widget pointer.
- * @return uint16_t Height of glass.
+ * @param _this Glass widget pointer.
+ * @return Height of glass.
  */
 uint16_t gui_glass_get_height(gui_glass_t *_this);
 
 /**
  * @brief Refresh the size of glass.
  *
- * @param this The glass widget pointer.
+ * @param _this Glass widget pointer.
  */
 void gui_glass_refresh_size(gui_glass_t *_this);
 
 /**
  * @brief Refresh the source data of glass.
  *
- * @param this The glass widget pointer.
+ * @param _this Glass widget pointer.
  */
 void gui_glass_refresh_draw_data(gui_glass_t  *_this);
 
@@ -134,7 +134,7 @@ void gui_glass_set_attribute(gui_glass_t  *_this,
 /**
  * @brief Translate (move) the glass.
  *
- * @param this The glass widget pointer.
+ * @param _this Glass widget pointer.
  * @param t_x New X-axis coordinate.
  * @param t_y New Y-axis coordinate.
  */
@@ -142,16 +142,16 @@ void gui_glass_translate(gui_glass_t *_this, float t_x, float t_y);
 
 
 /**
- * @brief Create an glass widget from memory address.
- * @note Create an glass widget and set attribute.
- * @param parent The father widget it nested in.
+ * @brief Create a glass widget from memory address.
+ * @note Create a glass widget and set attribute.
+ * @param parent Father widget it nested in.
  * @param name Widget name.
- * @param addr The bin file address.
- * @param x The X-axis coordinate of the widget.
- * @param y The Y-axis coordinate of the widget.
- * @param w The width of the widget.
- * @param h The height of the widget.
- * @return The widget object pointer.
+ * @param addr Bin file address.
+ * @param x X-axis coordinate of the widget.
+ * @param y Y-axis coordinate of the widget.
+ * @param w Width of the widget.
+ * @param h Height of the widget.
+ * @return Widget object pointer.
  */
 gui_glass_t *gui_glass_create_from_mem(void       *parent,
                                        const char *name,
@@ -162,16 +162,16 @@ gui_glass_t *gui_glass_create_from_mem(void       *parent,
                                        int16_t     h);
 
 /**
- * @brief Create an glass widget from memory address.
- * @note Create an glass widget and set attribute.
- * @param parent The father widget it nested in.
+ * @brief Create a glass widget from memory address.
+ * @note Create a glass widget and set attribute.
+ * @param parent Father widget it nested in.
  * @param name Widget name.
  * @param ftl Not xip address, use ftl address.
- * @param x The X-axis coordinate of the widget.
- * @param y The Y-axis coordinate of the widget.
- * @param w The width of the widget.
- * @param h The height of the widget.
- * @return Return the widget object pointer.
+ * @param x X-axis coordinate of the widget.
+ * @param y Y-axis coordinate of the widget.
+ * @param w Width of the widget.
+ * @param h Height of the widget.
+ * @return Widget object pointer.
  */
 gui_glass_t *gui_glass_create_from_ftl(void       *parent,
                                        const char *name,
@@ -182,16 +182,16 @@ gui_glass_t *gui_glass_create_from_ftl(void       *parent,
                                        int16_t     h);
 
 /**
- * @brief Create an glass widget from filesystem.
+ * @brief Create a glass widget from filesystem.
  *
- * @param parent The father widget it nested in.
+ * @param parent Father widget it nested in.
  * @param name Widget name.
  * @param file Glass file path.
- * @param x The X-axis coordinate of the widget.
- * @param y The Y-axis coordinate of the widget.
- * @param w The width of the widget.
- * @param h The height of the widget.
- * @return gui_glass_t*.
+ * @param x X-axis coordinate of the widget.
+ * @param y Y-axis coordinate of the widget.
+ * @param w Width of the widget.
+ * @param h Height of the widget.
+ * @return Pointer to the created glass widget.
  */
 gui_glass_t *gui_glass_create_from_fs(void       *parent,
                                       const char *name,
@@ -205,7 +205,7 @@ gui_glass_t *gui_glass_create_from_fs(void       *parent,
 /**
  * @brief Get the translation in X direction.
  *
- * @param this The glass widget pointer.
+ * @param _this Glass widget pointer.
  * @return Translation in X direction.
  */
 float gui_glass_get_t_x(gui_glass_t *_this);
@@ -213,7 +213,7 @@ float gui_glass_get_t_x(gui_glass_t *_this);
 /**
  * @brief Get the translation in Y direction.
  *
- * @param this The glass widget pointer.
+ * @param _this Glass widget pointer.
  * @return Translation in Y direction.
  */
 float gui_glass_get_t_y(gui_glass_t *_this);
@@ -226,8 +226,8 @@ float gui_glass_get_t_y(gui_glass_t *_this);
  * The glass data might correspond to various formats, and the format
  * should be compatible with the handling of `gui_glass_t`.
  *
- * @param widget          The pointer to the glass widget (`gui_glass_t`) for which the glass data is to be set.
- * @param glass_data_pointer  The pointer to the glass data to be set to the widget.
+ * @param _this Pointer to the glass widget (`gui_glass_t`) for which the glass data is to be set.
+ * @param glass_data_pointer Pointer to the glass data to be set to the widget.
  *                            The data should persist as long as the widget needs it or until it is explicitly updated.
  */
 void gui_glass_set_data(gui_glass_t *_this, const uint8_t *glass_data_pointer);
@@ -237,23 +237,23 @@ void gui_glass_set_data(gui_glass_t *_this, const uint8_t *glass_data_pointer);
  *
  * This function returns the current glass data that is set in the specified glass widget.
  *
- * @param widget The pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
+ * @param _this Pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
  *
- * @return A pointer to the glass data currently set in the widget. If no glass data is set, the result may be `NULL`.
+ * @return Pointer to the glass data currently set in the widget. If no glass data is set, the result may be `NULL`.
  */
 const uint8_t *gui_glass_get_data(gui_glass_t *_this);
 
 /**
  * @brief Enable long pressing event on glass widget.
  *
- * @param widget The pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
+ * @param _this Pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
  */
 void gui_glass_enable_pressing_envent(gui_glass_t *_this);
 
 /**
  * @brief Enable click event on glass widget.
  *
- * @param widget The pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
+ * @param _this Pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
  */
 void gui_glass_enable_click_envent(gui_glass_t *_this);
 

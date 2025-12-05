@@ -75,11 +75,11 @@ struct gui_menu_cellular_gesture_parameter
 
 /**
  * @brief Create a menu_cellular widget.
- * @param parent The father widget it nested in.
+ * @param parent Father widget it nested in.
  * @param icon_size Size of icon.
- * @param icon_array The icons' image data address array.
+ * @param icon_array Icons' image data address array.
  * @param array_size Size of array.
- * @return The menu_cellular pointer.
+ * @return Menu_cellular pointer.
  */
 gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
                                               int       icon_size,
@@ -87,15 +87,15 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
                                               int       array_size);
 /**
  * @brief Config offset.
- * @param menu_cellular The menu_cellular pointer.
- * @param offset_x The X-axis offset.
- * @param offset_y The Y-axis offset.
+ * @param menu_cellular Menu_cellular pointer.
+ * @param offset_x X-axis offset.
+ * @param offset_y Y-axis offset.
  */
 void gui_menu_cellular_offset(gui_menu_cellular_t *menu_cellular, int offset_x, int offset_y);
 
 /**
  * @brief Add click events on images based on the cellular menu.
- * @param menu_cellular The menu_cellular pointer.
+ * @param menu_cellular Menu_cellular pointer.
  * @param para_array Array of gesture parameters corresponding to the click event.
  * @param array_length Length of the gesture parameters array.
  */

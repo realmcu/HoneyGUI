@@ -50,11 +50,11 @@ extern "C" {
 
 
 /**
-  * @brief create event widget.
-  * @param obj pointer to the GUI object.
-  * @param event_cb switching events.
-  * @param filter how to trigger events.
-  * @param user_data data to be transmitted.
+  * @brief Create event widget.
+  * @param obj Pointer to the GUI object.
+  * @param event_cb Switching events.
+  * @param filter How to trigger events.
+  * @param user_data Data to be transmitted.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(void *parent)
@@ -71,9 +71,9 @@ void gui_obj_add_event_cb(void           *obj,
                           void           *user_data);
 
 /**
-  * @brief this_widget API only for Widget, not for Application.
+  * @brief This API only for Widget, not for Application.
   * @param obj Pointer to the GUI object.
-  * @param event_code switching events.
+  * @param event_code Switching events.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_obj_t *obj)
@@ -86,7 +86,8 @@ void gui_obj_add_event_cb(void           *obj,
 void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code);
 
 /**
- * @brief this_widget API only for Widget, not for Application.
+ * @brief This API only for Widget, not for Application.
+ * @param enable_event Enable or disable event dispatch.
  */
 void gui_obj_event_dispatch(bool enable_event);
 

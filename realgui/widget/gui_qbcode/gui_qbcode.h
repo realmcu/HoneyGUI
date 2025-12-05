@@ -37,13 +37,14 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  T_QBCODE_ENCODE_TYPE structure. */
+/* T_QBCODE_ENCODE_TYPE structure start */
 typedef enum
 {
     QRCODE_ENCODE_TEXT,
     QRCODE_ENCODE_BINARY,
     BARCODE_ENCODE_TEXT,
 } T_QBCODE_ENCODE_TYPE;
+/* T_QBCODE_ENCODE_TYPE structure end */
 
 /** @brief  T_QBCODE_DISPLAY_TYPE structure. */
 typedef enum
@@ -92,15 +93,15 @@ typedef struct gui_qbcode
 /**
  * @brief Create a qrcode widget.
  *
- * @param parent The father widget.
- * @param filename This qrcode widget's name.
- * @param x The X-axis coordinate relative to parent widget.
- * @param y The Y-axis coordinate relative to parent widget.
+ * @param parent Father widget.
+ * @param name Qrcode widget's name.
+ * @param x X-axis coordinate relative to parent widget.
+ * @param y Y-axis coordinate relative to parent widget.
  * @param w Qrcode image display width including border.
  * @param h Qrcode image display height including border.
  * @param type QRCODE_DISPLAY_SECTION (gui in real-time) or QRCODE_DISPLAY_IMAGE(save in psRAM by default) or BARCODE_DISPLAY_SECTION or BARCODE_DISPLAY_IMAGE.
  * @param encodeType QRCODE_ENCODE_TEXT or QRCODE_ENCODE_BINARY or BARCODE_ENCODE_TEXT supported.
- * @return gui_qbcode_t* Success, NULL failed.
+ * @return Pointer to created qbcode widget on success, NULL on failure.
  * @note This function just creates a qrcode object, qbcode data and param should be configured by gui_qbcode_config() API.
  */
 
@@ -116,11 +117,10 @@ gui_qbcode_t *gui_qbcode_create(void                  *parent,
 /**
  * @brief Config qbcode data and border param for a qbcode object.
  *
- * @param qbcode A qbcode object pointer.
+ * @param qbcode Qbcode object pointer.
  * @param data Input data encoded for qbcode.
  * @param data_len Input data length for encode data.
  * @param border_size Qrcode border size, can be 1, 2, 3... by qbcode size, default white color border.
- * @return Null.
  */
 void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, uint8_t border_size);
 

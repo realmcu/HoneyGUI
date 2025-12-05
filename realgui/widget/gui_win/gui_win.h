@@ -71,14 +71,14 @@ typedef struct gui_win
  *============================================================================*/
 
 /**
- * @brief create a window widget.
- * @param parent the father widget the window nested in.
- * @param filename the window widget name.
- * @param x the X-axis coordinate.
- * @param x the Y-axis coordinate.
- * @param w the width.
- * @param h the height.
- * @return return the widget object pointer
+ * @brief Create a window widget.
+ * @param parent Father widget the window nested in.
+ * @param name Window widget name.
+ * @param x X-axis coordinate.
+ * @param y Y-axis coordinate.
+ * @param w Width.
+ * @param h Height.
+ * @return Widget object pointer.
  *
  */
 gui_win_t *gui_win_create(void       *parent,
@@ -89,114 +89,114 @@ gui_win_t *gui_win_create(void       *parent,
                           int16_t     h);
 
 /**
- * @brief register a callback function for the left slide event of the win widget.
+ * @brief Register a callback function for the left slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_left(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the right slide event of the win widget.
+ * @brief Register a callback function for the right slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_right(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the up slide event of the win widget.
+ * @brief Register a callback function for the up slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_up(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the down slide event of the win widget.
+ * @brief Register a callback function for the down slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_down(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the press event of the win widget.
+ * @brief Register a callback function for the press event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_press(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
- * @brief register a callback function for the release event of the win widget.
+ * @brief Register a callback function for the release event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func (void *obj, gui_event_t e, void *param).
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func (void *obj, gui_event_t e, void *param).
+ * @param parameter Callback parameter.
  */
 void gui_win_release(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
- * @brief register a callback function for a long press event of the win widget.
+ * @brief Register a callback function for a long press event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_long(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for a click event of the win widget.
+ * @brief Register a callback function for a click event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func (void *obj, gui_event_t e, void *param).
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func (void *obj, gui_event_t e, void *param).
+ * @param parameter Callback parameter.
  */
 void gui_win_click(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
- * @brief set the hold_tp state.
+ * @brief Set the hold_tp state.
  *
- * @param _this win pointer.
- * @param hold_tp a boolean value to set the state to true or false.
+ * @param _this Win pointer.
+ * @param hold_tp Boolean value to set the state to true or false.
  */
 void gui_win_hold_tp(gui_win_t *_this, bool hold_tp);
 
 /**
- * @brief set the scale rate for the window both horizontally and vertically.
+ * @brief Set the scale rate for the window both horizontally and vertically.
  *
- * @param win pointer to the window structure.
- * @param scale_rate_horizontal the horizontal scale rate.
- * @param scale_rate_vertical the vertical scale rate.
+ * @param win Pointer to the window structure.
+ * @param scale_rate_horizontal Horizontal scale rate.
+ * @param scale_rate_vertical Vertical scale rate.
  */
 void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical);
 
 /**
- * @brief enable or disable the scope for the window.
+ * @brief Enable or disable the scope for the window.
  *
- * @param win pointer to the window structure.
- * @param enable a boolean value to enable or disable the scope.
+ * @param win Pointer to the window structure.
+ * @param enable Boolean value to enable or disable the scope.
  */
 void gui_win_set_scope(gui_win_t *win, bool enable);
 
 /**
- * @brief set the opacity value for the window.
+ * @brief Set the opacity value for the window.
  *
- * @param win pointer to the window structure.
- * @param opacity_value the desired opacity value to set.
+ * @param win Pointer to the window structure.
+ * @param opacity_value Desired opacity value to set.
  */
 void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value);
 
 /**
- * @brief window widget prepare.
+ * @brief Window widget prepare.
  *
- * @param obj pointer.
+ * @param obj Pointer.
  */
 void gui_win_prepare(gui_obj_t *obj);
 
@@ -206,8 +206,8 @@ void gui_win_prepare(gui_obj_t *obj);
  * This function repositions a GUI window to the specified (x, y) coordinates on the screen.
  *
  * @param win Pointer to the GUI window that needs to be moved.
- * @param x The new x-coordinate for the window.
- * @param y The new y-coordinate for the window.
+ * @param x New x-coordinate for the window.
+ * @param y New y-coordinate for the window.
  */
 void gui_win_move(gui_win_t *win, int x, int y);
 
@@ -217,7 +217,7 @@ void gui_win_move(gui_win_t *win, int x, int y);
  * This function returns the current x-coordinate of the specified GUI window.
  *
  * @param win Pointer to the GUI window.
- * @return The current x-coordinate of the window.
+ * @return Current x-coordinate of the window.
  */
 int gui_win_get_x(gui_win_t *win);
 
@@ -227,29 +227,29 @@ int gui_win_get_x(gui_win_t *win);
  * This function returns the current y-coordinate of the specified GUI window.
  *
  * @param win Pointer to the GUI window.
- * @return The current y-coordinate of the window.
+ * @return Current y-coordinate of the window.
  */
 int gui_win_get_y(gui_win_t *win);
 
 /**
- * @brief Compensate the GUI window's touch event coordinates
+ * @brief Compensate the GUI window's touch event coordinates.
  * @param win Pointer to the GUI window.
- * @param x The x-coordinate to compensate.
- * @param y The y-coordinate to compensate.
+ * @param x X-coordinate to compensate.
+ * @param y Y-coordinate to compensate.
  */
 void gui_win_compensate(gui_win_t *win, int x, int y);
 
 /**
- * @brief Enable GUI window's blur effect
+ * @brief Enable GUI window's blur effect.
  * @param win Pointer to the GUI window.
- * @param use_blur true to enable blur effect, false to disable.
+ * @param enable True to enable blur effect, false to disable.
  */
 void gui_win_enable_blur(gui_win_t *win, bool enable);
 
 /**
  * @brief Set the blur degree for the GUI window.
  * @param win Pointer to the GUI window.
- * @param degree The blur degree value (0-255) and default value is 225.
+ * @param degree Blur degree value (0-255) and default value is 225.
  */
 void gui_win_set_blur_degree(gui_win_t *win, uint8_t degree);
 

@@ -24,8 +24,6 @@
      - API 
    * - 创建控件
      - :cpp:any:`gui_lite_arc_create`  
-   * - 设置属性
-     - :cpp:any:`gui_lite_arc_set_style`
    * - 设置位置
      - :cpp:any:`gui_lite_arc_set_position` 
    * - 设置半径
