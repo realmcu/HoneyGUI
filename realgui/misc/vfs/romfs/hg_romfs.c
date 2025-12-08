@@ -256,7 +256,7 @@ static int romfs_open(struct romfs_fd *file)
     return 0;
 }
 
-int hg_open(const char *file, int flags, ...)
+intptr_t hg_open(const char *file, int flags, ...)
 {
     int result;
     struct romfs_fd *fd;
@@ -279,15 +279,13 @@ int hg_open(const char *file, int flags, ...)
         return -1;
     }
 
-    int f = (int)(intptr_t)fd;
-
-    return f;
+    return (intptr_t)fd;
 }
 
-int hg_close(int fd)
+int hg_close(intptr_t fd)
 {
     int result;
-    struct romfs_fd *d = (struct romfs_fd *)(intptr_t)fd;
+    struct romfs_fd *d = (struct romfs_fd *)fd;
 
     if (d == NULL)
     {
@@ -307,10 +305,10 @@ int hg_close(int fd)
     return 0;
 }
 
-int hg_read(int fd, void *buf, size_t len)
+int hg_read(intptr_t fd, void *buf, size_t len)
 {
     int result;
-    struct romfs_fd *d = (struct romfs_fd *)(intptr_t)fd;
+    struct romfs_fd *d = (struct romfs_fd *)fd;
 
     /* get the fd */
     if (d == NULL)
@@ -329,10 +327,10 @@ int hg_read(int fd, void *buf, size_t len)
     return result;
 }
 
-off_t hg_lseek(int fd, off_t offset, int whence)
+off_t hg_lseek(intptr_t fd, off_t offset, int whence)
 {
     int result;
-    struct romfs_fd *d = (struct romfs_fd *)(intptr_t)fd;
+    struct romfs_fd *d = (struct romfs_fd *)fd;
 
     if (d == NULL)
     {
@@ -398,7 +396,7 @@ int hg_closedir(HG_DIR *d)
  */
 HG_DIR *hg_opendir(const char *name)
 {
-    int fd;
+    intptr_t fd;
     HG_DIR *t;
 
     t = NULL;
@@ -485,9 +483,9 @@ static int dfs_romfs_getdents(struct romfs_fd *file, struct hg_dirent *dirp, uin
  * @return NULL on on this file descriptor or the file descriptor structure
  * pointer.
  */
-static struct romfs_fd *fd_get(int fd)
+static struct romfs_fd *fd_get(intptr_t fd)
 {
-    return (void *)(intptr_t)fd;
+    return (void *)fd;
 }
 static int dfs_romfs_ioctl(struct romfs_fd *file, int cmd, void *args)
 {
@@ -570,14 +568,14 @@ struct hg_dirent *hg_readdir(HG_DIR *d)
  *
  * @return the actual written data buffer length.
  */
-int hg_write(int fd, const void *buf, size_t len)
+int hg_write(intptr_t fd, const void *buf, size_t len)
 {
     (void)fd;
     (void)buf;
     (void)len;
     return 0;
 }
-static int hg_fcntl(int fildes, int cmd, ...)
+static int hg_fcntl(intptr_t fildes, int cmd, ...)
 {
     int ret = -1;
     struct romfs_fd *d;
@@ -616,7 +614,7 @@ static int hg_fcntl(int fildes, int cmd, ...)
  * @return 0 on successful completion. Otherwise, -1 shall be returned and errno
  * set to indicate the error.
  */
-int hg_ioctl(int fildes, int cmd, ...)
+int hg_ioctl(intptr_t fildes, int cmd, ...)
 {
     void *arg;
     va_list ap;
@@ -636,7 +634,7 @@ int hg_ioctl(int fildes, int cmd, ...)
  *
  * @return 0 on successful, -1 on failed.
  */
-int hg_fstat(int fildes, struct hg_stat *buf)
+int hg_fstat(intptr_t fildes, struct hg_stat *buf)
 {
     struct romfs_fd *d;
 

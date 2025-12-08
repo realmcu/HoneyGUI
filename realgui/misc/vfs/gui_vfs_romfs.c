@@ -34,21 +34,35 @@ static void *romfs_vfs_open(const char *path, gui_vfs_mode_t mode, void *user_da
     /* ROMFS is read-only */
     if (mode != GUI_VFS_READ) { return NULL; }
 
-    /* Use hg_open from hg_romfs */
-    int fd = hg_open(path, 0);
-    if (fd < 0) { return NULL; }
+    /* Add leading slash if missing */
+    char *full_path = NULL;
+    if (path[0] != '/')
+    {
+        full_path = (char *)malloc(strlen(path) + 2);
+        if (!full_path) { return NULL; }
+        full_path[0] = '/';
+        strcpy(full_path + 1, path);
+        path = full_path;
+    }
 
-    return (void *)(intptr_t)fd;
+    /* Use hg_open from hg_romfs */
+    intptr_t fd = hg_open(path, 0);
+
+    if (full_path) { free(full_path); }
+
+    if (fd == -1) { return NULL; }
+
+    return (void *)fd;
 }
 
 static int romfs_vfs_close(void *file)
 {
-    return hg_close((int)(intptr_t)file);
+    return hg_close((intptr_t)file);
 }
 
 static int romfs_vfs_read(void *file, void *buf, size_t size)
 {
-    return hg_read((int)(intptr_t)file, buf, size);
+    return hg_read((intptr_t)file, buf, size);
 }
 
 static int romfs_vfs_write(void *file, const void *buf, size_t size)
@@ -59,24 +73,24 @@ static int romfs_vfs_write(void *file, const void *buf, size_t size)
 
 static int romfs_vfs_seek(void *file, int offset, gui_vfs_seek_t whence)
 {
-    return hg_lseek((int)(intptr_t)file, offset, whence);
+    return hg_lseek((intptr_t)file, offset, whence);
 }
 
 static int romfs_vfs_tell(void *file)
 {
-    return hg_lseek((int)(intptr_t)file, 0, GUI_VFS_SEEK_CUR);
+    return hg_lseek((intptr_t)file, 0, GUI_VFS_SEEK_CUR);
 }
 
 static const void *romfs_vfs_get_addr(void *file, size_t *size)
 {
     /* Use hg_ioctl to get direct address (XIP) */
-    void *addr = (void *)(intptr_t)hg_ioctl((int)(intptr_t)file, F_GETADDR, 0);
+    void *addr = (void *)(intptr_t)hg_ioctl((intptr_t)file, F_GETADDR, 0);
     if (addr && size)
     {
         /* Get file size */
-        int pos = hg_lseek((int)(intptr_t)file, 0, GUI_VFS_SEEK_CUR);
-        *size = hg_lseek((int)(intptr_t)file, 0, GUI_VFS_SEEK_END);
-        hg_lseek((int)(intptr_t)file, pos, GUI_VFS_SEEK_SET);
+        int pos = hg_lseek((intptr_t)file, 0, GUI_VFS_SEEK_CUR);
+        *size = hg_lseek((intptr_t)file, 0, GUI_VFS_SEEK_END);
+        hg_lseek((intptr_t)file, pos, GUI_VFS_SEEK_SET);
     }
     return addr;
 }
@@ -84,7 +98,31 @@ static const void *romfs_vfs_get_addr(void *file, size_t *size)
 static void *romfs_vfs_opendir(const char *path, void *user_data)
 {
     (void)user_data;
-    return hg_opendir(path);
+
+    /* Add leading slash if missing or empty */
+    char *full_path = NULL;
+    if (!path || path[0] == '\0' || path[0] != '/')
+    {
+        size_t len = path ? strlen(path) : 0;
+        full_path = (char *)malloc(len + 2);
+        if (!full_path) { return NULL; }
+        full_path[0] = '/';
+        if (len > 0)
+        {
+            strcpy(full_path + 1, path);
+        }
+        else
+        {
+            full_path[1] = '\0';
+        }
+        path = full_path;
+    }
+
+    void *dir = hg_opendir(path);
+
+    if (full_path) { free(full_path); }
+
+    return dir;
 }
 
 static int romfs_vfs_readdir(void *dir, gui_vfs_stat_t *stat)

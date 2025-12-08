@@ -17,6 +17,9 @@ static uint32_t sdl_driver_pixel_bits = 32;
 SDL_Surface *windowSurface = NULL;
 SDL_Surface *customSurface = NULL;
 
+static float scale_x = 1.0f;
+static float scale_y = 1.0f;
+
 static pthread_mutex_t sdl_init_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t sdl_init_cond = PTHREAD_COND_INITIALIZER;
 static bool sdl_initialized = false;
@@ -71,7 +74,8 @@ void *sdl_driver_thread(void *arg)
     sprintf(str, "RTKIOT GUI Simulator %u x %u", sdl_driver_width, sdl_driver_height);
 
     SDL_Window *window = SDL_CreateWindow(str, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                          sdl_driver_width, sdl_driver_height, 0);
+                                          sdl_driver_width, sdl_driver_height,
+                                          SDL_WINDOW_RESIZABLE);
 
 
     windowSurface = SDL_GetWindowSurface(window);
@@ -114,15 +118,23 @@ void *sdl_driver_thread(void *arg)
                     SDL_PeepEvents(&next, 1, SDL_GETEVENT, SDL_USEREVENT_LCD_UPDATE, SDL_USEREVENT_LCD_UPDATE);
                 }
 
-                SDL_BlitSurface(customSurface, NULL, windowSurface, NULL);
+                if (scale_x != 1.0f || scale_y != 1.0f)
+                {
+                    SDL_Rect dstRect = {0, 0, windowSurface->w, windowSurface->h};
+                    SDL_BlitScaled(customSurface, NULL, windowSurface, &dstRect);
+                }
+                else
+                {
+                    SDL_BlitSurface(customSurface, NULL, windowSurface, NULL);
+                }
                 SDL_UpdateWindowSurface(window);
                 break;
 #endif
             }
         case SDL_MOUSEMOTION:
             // gui_log("mouse move:(%d,%d)\n", event.button.x, event.button.y);
-            tp_port_data.x_coordinate = event.button.x;
-            tp_port_data.y_coordinate = event.button.y;
+            tp_port_data.x_coordinate = (int)(event.button.x / scale_x);
+            tp_port_data.y_coordinate = (int)(event.button.y / scale_y);
             break;
         case SDL_MOUSEBUTTONDOWN:
             {
@@ -130,8 +142,8 @@ void *sdl_driver_thread(void *arg)
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
                 tp_port_data.event = GUI_TOUCH_EVENT_DOWN;
-                tp_port_data.x_coordinate = event.button.x;
-                tp_port_data.y_coordinate = event.button.y;
+                tp_port_data.x_coordinate = (int)(event.button.x / scale_x);
+                tp_port_data.y_coordinate = (int)(event.button.y / scale_y);
                 if (event.button.button == SDL_BUTTON_MIDDLE)
                 {
                     wheel_port_data.event = GUI_WHEEL_BUTTON_DOWN;
@@ -144,8 +156,8 @@ void *sdl_driver_thread(void *arg)
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
                 tp_port_data.event = GUI_TOUCH_EVENT_UP;
-                tp_port_data.x_coordinate = event.button.x;
-                tp_port_data.y_coordinate = event.button.y;
+                tp_port_data.x_coordinate = (int)(event.button.x / scale_x);
+                tp_port_data.y_coordinate = (int)(event.button.y / scale_y);
                 if (event.button.button == SDL_BUTTON_MIDDLE)
                 {
                     wheel_port_data.event = GUI_WHEEL_BUTTON_UP;
@@ -181,6 +193,31 @@ void *sdl_driver_thread(void *arg)
                 const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
                 strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
                 kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
+            }
+            break;
+        case SDL_WINDOWEVENT:
+            {
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED ||
+                    event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                {
+                    int new_width = event.window.data1;
+                    int new_height = event.window.data2;
+
+                    windowSurface = SDL_GetWindowSurface(window);
+                    scale_x = (float)new_width / sdl_driver_width;
+                    scale_y = (float)new_height / sdl_driver_height;
+
+                    if (scale_x != 1.0f || scale_y != 1.0f)
+                    {
+                        SDL_Rect dstRect = {0, 0, windowSurface->w, windowSurface->h};
+                        SDL_BlitScaled(customSurface, NULL, windowSurface, &dstRect);
+                    }
+                    else
+                    {
+                        SDL_BlitSurface(customSurface, NULL, windowSurface, NULL);
+                    }
+                    SDL_UpdateWindowSurface(window);
+                }
             }
             break;
         case SDL_QUIT:

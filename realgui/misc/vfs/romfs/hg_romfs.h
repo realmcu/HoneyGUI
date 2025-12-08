@@ -54,7 +54,7 @@ struct romfs_dirent
 
 typedef struct
 {
-    int fd;
+    intptr_t fd;
     char buf[512];
     int num;
     int cur;
@@ -79,13 +79,13 @@ void hg_romfs_mount(void *addr);
 extern const struct romfs_dirent hg_romfs_root;
 
 /* File operations */
-int hg_open(const char *file, int flags, ...);
-int hg_close(int fd);
-off_t hg_lseek(int fd, off_t offset, int whence);
-int hg_read(int fd, void *buf, size_t len);
-int hg_write(int fd, const void *buf, size_t len);
-int hg_ioctl(int fildes, int cmd, ...);
-int hg_fstat(int fildes, struct hg_stat *buf);
+intptr_t hg_open(const char *file, int flags, ...);
+int hg_close(intptr_t fd);
+off_t hg_lseek(intptr_t fd, off_t offset, int whence);
+int hg_read(intptr_t fd, void *buf, size_t len);
+int hg_write(intptr_t fd, const void *buf, size_t len);
+int hg_ioctl(intptr_t fildes, int cmd, ...);
+int hg_fstat(intptr_t fildes, struct hg_stat *buf);
 
 /* Directory operations */
 HG_DIR *hg_opendir(const char *name);
