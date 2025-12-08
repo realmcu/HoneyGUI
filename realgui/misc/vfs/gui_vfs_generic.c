@@ -184,10 +184,10 @@ int gui_vfs_mount_generic(const char *prefix, const char *root_path,
 
     if (g_generic_backend)
     {
-        free(g_generic_backend);
+        gui_free(g_generic_backend);
     }
 
-    g_generic_backend = (generic_backend_t *)malloc(sizeof(generic_backend_t));
+    g_generic_backend = (generic_backend_t *)gui_malloc(sizeof(generic_backend_t));
     if (!g_generic_backend)
     {
         gui_log("[VFS] Generic mount failed: out of memory\n");
@@ -224,7 +224,7 @@ int gui_vfs_mount_generic(const char *prefix, const char *root_path,
 
 static void *fatfs_adapter_open(const char *path, int flags)
 {
-    FIL *fp = malloc(sizeof(FIL));
+    FIL *fp = gui_malloc(sizeof(FIL));
     if (!fp) { return NULL; }
 
     BYTE mode = 0;
@@ -235,7 +235,7 @@ static void *fatfs_adapter_open(const char *path, int flags)
 
     if (f_open(fp, path, mode) != FR_OK)
     {
-        free(fp);
+        gui_free(fp);
         return NULL;
     }
     return fp;
@@ -245,7 +245,7 @@ static int fatfs_adapter_close(void *file)
 {
     FIL *fp = (FIL *)file;
     f_close(fp);
-    free(fp);
+    gui_free(fp);
     return 0;
 }
 
@@ -276,7 +276,7 @@ void mount_fatfs_example(void)
 static lfs_t g_lfs;
 static void *littlefs_adapter_open(const char *path, int flags)
 {
-    lfs_file_t *file = malloc(sizeof(lfs_file_t));
+    lfs_file_t *file = gui_malloc(sizeof(lfs_file_t));
     if (!file) { return NULL; }
 
     int lfs_flags = 0;
@@ -287,7 +287,7 @@ static void *littlefs_adapter_open(const char *path, int flags)
 
     if (lfs_file_open(&g_lfs, file, path, lfs_flags) < 0)
     {
-        free(file);
+        gui_free(file);
         return NULL;
     }
     return file;

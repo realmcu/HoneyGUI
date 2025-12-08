@@ -180,7 +180,7 @@ static const gui_vfs_ops_t posix_ops =
  */
 int gui_vfs_mount_posix(const char *prefix, const char *root_path)
 {
-    posix_backend_t *backend = (posix_backend_t *)malloc(sizeof(posix_backend_t));
+    posix_backend_t *backend = (posix_backend_t *)gui_malloc(sizeof(posix_backend_t));
     if (!backend)
     {
         gui_log("[VFS] POSIX mount failed: out of memory\n");

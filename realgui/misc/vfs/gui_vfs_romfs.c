@@ -38,7 +38,7 @@ static void *romfs_vfs_open(const char *path, gui_vfs_mode_t mode, void *user_da
     char *full_path = NULL;
     if (path[0] != '/')
     {
-        full_path = (char *)malloc(strlen(path) + 2);
+        full_path = (char *)gui_malloc(strlen(path) + 2);
         if (!full_path) { return NULL; }
         full_path[0] = '/';
         strcpy(full_path + 1, path);
@@ -48,7 +48,7 @@ static void *romfs_vfs_open(const char *path, gui_vfs_mode_t mode, void *user_da
     /* Use hg_open from hg_romfs */
     intptr_t fd = hg_open(path, 0);
 
-    if (full_path) { free(full_path); }
+    if (full_path) { gui_free(full_path); }
 
     if (fd == -1) { return NULL; }
 
@@ -104,7 +104,7 @@ static void *romfs_vfs_opendir(const char *path, void *user_data)
     if (!path || path[0] == '\0' || path[0] != '/')
     {
         size_t len = path ? strlen(path) : 0;
-        full_path = (char *)malloc(len + 2);
+        full_path = (char *)gui_malloc(len + 2);
         if (!full_path) { return NULL; }
         full_path[0] = '/';
         if (len > 0)
@@ -120,7 +120,7 @@ static void *romfs_vfs_opendir(const char *path, void *user_data)
 
     void *dir = hg_opendir(path);
 
-    if (full_path) { free(full_path); }
+    if (full_path) { gui_free(full_path); }
 
     return dir;
 }
@@ -133,7 +133,7 @@ static int romfs_vfs_readdir(void *dir, gui_vfs_stat_t *stat)
     strncpy(stat->name, entry->d_name, sizeof(stat->name) - 1);
     stat->name[sizeof(stat->name) - 1] = '\0';
     stat->type = (entry->d_type == DT_DIR) ? GUI_VFS_TYPE_DIR : GUI_VFS_TYPE_FILE;
-    stat->size = 0;  /* hg_dirent doesn't have size field */
+    stat->size = entry->d_size;
 
     return 0;
 }
@@ -179,10 +179,10 @@ int gui_vfs_mount_romfs(const char *prefix, const void *base_addr, uint32_t base
 {
     if (g_romfs_backend)
     {
-        free(g_romfs_backend);
+        gui_free(g_romfs_backend);
     }
 
-    g_romfs_backend = (romfs_backend_t *)malloc(sizeof(romfs_backend_t));
+    g_romfs_backend = (romfs_backend_t *)gui_malloc(sizeof(romfs_backend_t));
     if (!g_romfs_backend)
     {
         gui_log("[VFS] ROMFS mount failed: out of memory\n");

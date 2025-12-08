@@ -458,10 +458,12 @@ static int dfs_romfs_getdents(struct romfs_fd *file, struct hg_dirent *dirp, uin
         if (sub_dirent->type == ROMFS_DIRENT_DIR)
         {
             d->d_type = DT_DIR;
+            d->d_size = 0;  /* Directory has no size */
         }
         else
         {
             d->d_type = DT_REG;
+            d->d_size = sub_dirent->size;  /* File size from romfs_dirent */
         }
 
         d->d_namlen = strlen(name);
@@ -487,12 +489,12 @@ static struct romfs_fd *fd_get(intptr_t fd)
 {
     return (void *)fd;
 }
-static int dfs_romfs_ioctl(struct romfs_fd *file, int cmd, void *args)
+static intptr_t dfs_romfs_ioctl(struct romfs_fd *file, int cmd, void *args)
 {
     (void)args;  /* Unused parameter */
     switch (cmd)
     {
-    case 0:
+    case F_GETADDR:
         {
             struct romfs_dirent *dirent;
 
@@ -503,7 +505,7 @@ static int dfs_romfs_ioctl(struct romfs_fd *file, int cmd, void *args)
                 return -EIO;
             }
 
-            return (int)(intptr_t) & (dirent->data[file->pos]);
+            return (intptr_t) & (dirent->data[file->pos]);
 
         }
     }
@@ -575,9 +577,9 @@ int hg_write(intptr_t fd, const void *buf, size_t len)
     (void)len;
     return 0;
 }
-static int hg_fcntl(intptr_t fildes, int cmd, ...)
+static intptr_t hg_fcntl(intptr_t fildes, int cmd, ...)
 {
-    int ret = -1;
+    intptr_t ret = -1;
     struct romfs_fd *d;
 
     /* get the fd */
@@ -614,7 +616,7 @@ static int hg_fcntl(intptr_t fildes, int cmd, ...)
  * @return 0 on successful completion. Otherwise, -1 shall be returned and errno
  * set to indicate the error.
  */
-int hg_ioctl(intptr_t fildes, int cmd, ...)
+intptr_t hg_ioctl(intptr_t fildes, int cmd, ...)
 {
     void *arg;
     va_list ap;

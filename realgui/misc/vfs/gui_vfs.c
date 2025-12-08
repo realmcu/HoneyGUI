@@ -54,7 +54,7 @@ int gui_vfs_mount(const char *prefix, const gui_vfs_ops_t *ops, void *user_data)
     }
 
     /* Create new mount point */
-    gui_vfs_mount_t *mount = (gui_vfs_mount_t *)malloc(sizeof(gui_vfs_mount_t));
+    gui_vfs_mount_t *mount = (gui_vfs_mount_t *)gui_malloc(sizeof(gui_vfs_mount_t));
     if (!mount)
     {
         gui_log("[VFS] Mount failed: out of memory\n");
@@ -82,7 +82,7 @@ int gui_vfs_unmount(const char *prefix)
         {
             gui_vfs_mount_t *m = *pp;
             *pp = m->next;
-            free(m);
+            gui_free(m);
             gui_log("[VFS] Unmounted: %s\n", prefix);
             return 0;
         }
@@ -132,7 +132,7 @@ gui_vfs_file_t *gui_vfs_open(const char *path, gui_vfs_mode_t mode)
     gui_vfs_mount_t *mount = find_mount(path, &rel_path);
     if (!mount || !mount->ops->open) { return NULL; }
 
-    gui_vfs_file_t *file = (gui_vfs_file_t *)malloc(sizeof(gui_vfs_file_t));
+    gui_vfs_file_t *file = (gui_vfs_file_t *)gui_malloc(sizeof(gui_vfs_file_t));
     if (!file) { return NULL; }
 
     file->ops = mount->ops;
@@ -141,7 +141,7 @@ gui_vfs_file_t *gui_vfs_open(const char *path, gui_vfs_mode_t mode)
 
     if (!file->backend_handle)
     {
-        free(file);
+        gui_free(file);
         return NULL;
     }
 
@@ -153,7 +153,7 @@ int gui_vfs_close(gui_vfs_file_t *file)
     if (!file || !file->ops->close) { return -1; }
 
     int ret = file->ops->close(file->backend_handle);
-    free(file);
+    gui_free(file);
     return ret;
 }
 
@@ -195,7 +195,7 @@ gui_vfs_dir_t *gui_vfs_opendir(const char *path)
     gui_vfs_mount_t *mount = find_mount(path, &rel_path);
     if (!mount || !mount->ops->opendir) { return NULL; }
 
-    gui_vfs_dir_t *dir = (gui_vfs_dir_t *)malloc(sizeof(gui_vfs_dir_t));
+    gui_vfs_dir_t *dir = (gui_vfs_dir_t *)gui_malloc(sizeof(gui_vfs_dir_t));
     if (!dir) { return NULL; }
 
     dir->ops = mount->ops;
@@ -204,7 +204,7 @@ gui_vfs_dir_t *gui_vfs_opendir(const char *path)
 
     if (!dir->backend_handle)
     {
-        free(dir);
+        gui_free(dir);
         return NULL;
     }
 
@@ -222,7 +222,7 @@ int gui_vfs_closedir(gui_vfs_dir_t *dir)
     if (!dir || !dir->ops->closedir) { return -1; }
 
     int ret = dir->ops->closedir(dir->backend_handle);
-    free(dir);
+    gui_free(dir);
     return ret;
 }
 
@@ -247,7 +247,7 @@ void *gui_vfs_load_file(const char *path, size_t *size)
     if (addr)
     {
         /* XIP supported, but we need to copy for consistency */
-        void *buf = malloc(*size);
+        void *buf = gui_malloc(*size);
         if (buf)
         {
             memcpy(buf, addr, *size);
@@ -268,7 +268,7 @@ void *gui_vfs_load_file(const char *path, size_t *size)
     }
 
     /* Allocate and read */
-    void *buf = malloc(file_size);
+    void *buf = gui_malloc(file_size);
     if (!buf)
     {
         gui_vfs_close(file);
@@ -280,7 +280,7 @@ void *gui_vfs_load_file(const char *path, size_t *size)
 
     if (read_size != file_size)
     {
-        free(buf);
+        gui_free(buf);
         return NULL;
     }
 

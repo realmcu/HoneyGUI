@@ -25,6 +25,8 @@
 #define SEEK_CUR 1
 #define SEEK_END 2
 
+#define F_GETADDR 100  /* Custom fcntl command to get file address */
+
 #define ROMFS_DIRENT_FILE   0x00
 #define ROMFS_DIRENT_DIR    0x01
 
@@ -65,6 +67,7 @@ struct hg_dirent
     uint8_t d_type;
     uint8_t d_namlen;
     uint16_t d_reclen;
+    uint32_t d_size;
     char d_name[100];
 };
 
@@ -83,7 +86,7 @@ int hg_close(intptr_t fd);
 off_t hg_lseek(intptr_t fd, off_t offset, int whence);
 int hg_read(intptr_t fd, void *buf, size_t len);
 int hg_write(intptr_t fd, const void *buf, size_t len);
-int hg_ioctl(intptr_t fildes, int cmd, ...);
+intptr_t hg_ioctl(intptr_t fildes, int cmd, ...);
 int hg_fstat(intptr_t fildes, struct hg_stat *buf);
 
 /* Directory operations */
