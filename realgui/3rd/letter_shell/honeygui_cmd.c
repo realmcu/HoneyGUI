@@ -43,7 +43,7 @@ static void cmd_vls(int argc, char *argv[])
 }
 SHELL_EXPORT_CMD(
     SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN),
-    vls, cmd_vls, list vfs directory\r\nvls [path]);
+    vls, cmd_vls, list VFS directory\r\nvls [path]);
 
 /**
  * @brief Display file info
@@ -71,6 +71,45 @@ static void cmd_stat(int argc, char *argv[])
 SHELL_EXPORT_CMD(
     SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN),
     stat, cmd_stat, display file info\r\nstat <path>);
+
+/**
+ * @brief Copy file or directory
+ */
+static void cmd_cp(int argc, char *argv[])
+{
+    if (argc < 3)
+    {
+        gui_log("Usage: cp <source> <dest>\n");
+        return;
+    }
+
+    gui_vfs_stat_t stat;
+    if (gui_vfs_stat(argv[1], &stat) == 0 && stat.type == GUI_VFS_TYPE_DIR)
+    {
+        if (gui_vfs_copy_dir(argv[1], argv[2]) == 0)
+        {
+            gui_log("cp: copied directory '%s' to '%s'\n", argv[1], argv[2]);
+        }
+        else
+        {
+            gui_log("cp: failed to copy directory '%s'\n", argv[1]);
+        }
+    }
+    else
+    {
+        if (gui_vfs_copy_file(argv[1], argv[2]) == 0)
+        {
+            gui_log("cp: copied '%s' to '%s'\n", argv[1], argv[2]);
+        }
+        else
+        {
+            gui_log("cp: failed to copy '%s'\n", argv[1]);
+        }
+    }
+}
+SHELL_EXPORT_CMD(
+    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN),
+    cp, cmd_cp, copy file or directory\r\ncp <source> <dest>);
 
 /**
  * @brief Display HoneyGUI version

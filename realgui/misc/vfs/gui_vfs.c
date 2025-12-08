@@ -308,3 +308,132 @@ const void *gui_vfs_get_file_address(const char *path)
 
     return addr;
 }
+
+int gui_vfs_copy_file(const char *src_path, const char *dst_path)
+{
+    if (!src_path || !dst_path)
+    {
+        gui_log("[VFS] Copy failed: invalid path\n");
+        return -1;
+    }
+
+    gui_vfs_file_t *src = gui_vfs_open(src_path, GUI_VFS_READ);
+    if (!src)
+    {
+        gui_log("[VFS] Copy failed: cannot open %s\n", src_path);
+        return -1;
+    }
+
+    /* Try XIP for zero-copy */
+    size_t size;
+    const void *addr = gui_vfs_get_addr(src, &size);
+    if (addr)
+    {
+        gui_vfs_file_t *dst = gui_vfs_open(dst_path, (gui_vfs_mode_t)(GUI_VFS_WRITE | GUI_VFS_CREATE));
+        if (!dst)
+        {
+            gui_vfs_close(src);
+            gui_log("[VFS] Copy failed: cannot create %s\n", dst_path);
+            return -1;
+        }
+
+        int written = gui_vfs_write(dst, addr, size);
+        gui_vfs_close(dst);
+        gui_vfs_close(src);
+
+        if (written != (int)size)
+        {
+            gui_log("[VFS] Copy failed: write error\n");
+            return -1;
+        }
+
+        gui_log("[VFS] Copied %s -> %s (%zu bytes, XIP)\n", src_path, dst_path, size);
+        return 0;
+    }
+
+    /* Fallback: buffered copy */
+    gui_vfs_seek(src, 0, GUI_VFS_SEEK_END);
+    int file_size = gui_vfs_tell(src);
+    gui_vfs_seek(src, 0, GUI_VFS_SEEK_SET);
+
+    if (file_size <= 0)
+    {
+        gui_vfs_close(src);
+        return -1;
+    }
+
+    gui_vfs_file_t *dst = gui_vfs_open(dst_path, (gui_vfs_mode_t)(GUI_VFS_WRITE | GUI_VFS_CREATE));
+    if (!dst)
+    {
+        gui_vfs_close(src);
+        gui_log("[VFS] Copy failed: cannot create %s\n", dst_path);
+        return -1;
+    }
+
+    uint8_t buffer[512];
+    int total = 0;
+
+    while (total < file_size)
+    {
+        int to_read = (file_size - total > 512) ? 512 : (file_size - total);
+        int read_size = gui_vfs_read(src, buffer, to_read);
+        if (read_size <= 0) { break; }
+
+        int written = gui_vfs_write(dst, buffer, read_size);
+        if (written != read_size)
+        {
+            gui_vfs_close(src);
+            gui_vfs_close(dst);
+            gui_log("[VFS] Copy failed: write error\n");
+            return -1;
+        }
+
+        total += read_size;
+    }
+
+    gui_vfs_close(src);
+    gui_vfs_close(dst);
+
+    gui_log("[VFS] Copied %s -> %s (%d bytes)\n", src_path, dst_path, total);
+    return (total == file_size) ? 0 : -1;
+}
+
+int gui_vfs_copy_dir(const char *src_path, const char *dst_path)
+{
+    if (!src_path || !dst_path)
+    {
+        gui_log("[VFS] Copy dir failed: invalid path\n");
+        return -1;
+    }
+
+    gui_vfs_dir_t *dir = gui_vfs_opendir(src_path);
+    if (!dir)
+    {
+        gui_log("[VFS] Copy dir failed: cannot open %s\n", src_path);
+        return -1;
+    }
+
+    gui_vfs_stat_t stat;
+    int count = 0;
+
+    while (gui_vfs_readdir(dir, &stat) == 0)
+    {
+        char src_file[512];
+        char dst_file[512];
+
+        snprintf(src_file, sizeof(src_file), "%s/%s", src_path, stat.name);
+        snprintf(dst_file, sizeof(dst_file), "%s/%s", dst_path, stat.name);
+
+        if (stat.type == GUI_VFS_TYPE_FILE)
+        {
+            if (gui_vfs_copy_file(src_file, dst_file) == 0)
+            {
+                count++;
+            }
+        }
+    }
+
+    gui_vfs_closedir(dir);
+    gui_log("[VFS] Copied directory %s -> %s (%d files)\n", src_path, dst_path, count);
+    return 0;
+}

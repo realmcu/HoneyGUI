@@ -4,6 +4,7 @@
 
 HoneyGUI VFS provides a unified file access interface supporting multiple backends:
 - **ROMFS** - Internal resources with XIP (eXecute In Place) zero-copy support
+- **RAMFS** - RAM-based filesystem with read/write and XIP support
 - **POSIX** - Standard filesystem for PC simulator
 - **Generic Adapter** - Support for FATFS, LittleFS, SPIFFS, and custom filesystems
 
@@ -103,45 +104,20 @@ That's it! The last parameter is just `&your_adapter_variable`.
 ### PC Simulator
 
 ```c
-#include "gui_vfs.h"
-
 void app_init(void) {
     gui_vfs_init();
     
-    /* Mount internal ROMFS */
-    extern unsigned char *resource_root;
     gui_vfs_mount_romfs("/rom", resource_root, 0);
-    
-    /* Mount PC filesystem - relative path */
+    gui_vfs_mount_ramfs("/ram", gui_malloc(1024*1024), 1024*1024);
     gui_vfs_mount_posix("/sd", "./sdcard");
-    
-    /* Mount PC filesystem - absolute path */
-    gui_vfs_mount_posix("/data", "C:/Users/Public/Documents");
-    
-    /* Mount PC filesystem - current directory */
-    gui_vfs_mount_posix("/", ".");
 }
 
 /* Usage */
-void load_image(void) {
-    size_t size;
-    
-    /* Load from ROMFS */
-    void *logo = gui_vfs_load_file("/rom/logo.png", &size);
-    
-    /* Load from relative path */
-    void *photo = gui_vfs_load_file("/sd/photo.jpg", &size);
-    
-    /* Load from absolute path */
-    void *doc = gui_vfs_load_file("/data/config.txt", &size);
-    
-    /* Load from current directory */
-    void *local = gui_vfs_load_file("/test.png", &size);
-    
-    if (logo) free(logo);
-    if (photo) free(photo);
-    if (doc) free(doc);
-    if (local) free(local);
+void load_and_cache(void) {
+    /* Copy SD to RAM for fast XIP access */
+    gui_vfs_copy_file("/sd/photo.jpg", "/ram/photo.jpg");
+    const void *addr = gui_vfs_get_file_address("/ram/photo.jpg");
+    display_image(addr);
 }
 ```
 
@@ -151,26 +127,17 @@ void load_image(void) {
 void app_init(void) {
     gui_vfs_init();
     
-    /* Mount internal ROMFS with XIP */
-    extern unsigned char resource_root[];
     gui_vfs_mount_romfs("/rom", resource_root, 0x704D1400);
-    
-    /* Mount FATFS using generic adapter */
+    gui_vfs_mount_ramfs("/ram", gui_malloc(512*1024), 512*1024);
     gui_vfs_mount_generic("/sd", "0:", &fatfs_adapter);
-    
-    /* Mount LittleFS using generic adapter */
-    gui_vfs_mount_generic("/flash", "", &littlefs_adapter);
 }
 
-/* XIP zero-copy access */
+/* XIP access */
 void load_font(void) {
     gui_vfs_file_t *file = gui_vfs_open("/rom/font.ttf", GUI_VFS_READ);
     size_t size;
     const void *addr = gui_vfs_get_addr(file, &size);
-    if (addr) {
-        /* Direct access, no copy needed */
-        use_font(addr, size);
-    }
+    if (addr) use_font(addr, size);
     gui_vfs_close(file);
 }
 ```
@@ -185,6 +152,9 @@ void gui_vfs_init(void);
 
 /* Mount ROMFS */
 int gui_vfs_mount_romfs(const char *prefix, const void *base_addr, uint32_t base_offset);
+
+/* Mount RAMFS */
+int gui_vfs_mount_ramfs(const char *prefix, void *base_addr, size_t size);
 
 /* Mount POSIX filesystem */
 int gui_vfs_mount_posix(const char *prefix, const char *root_path);
@@ -218,7 +188,7 @@ int gui_vfs_seek(gui_vfs_file_t *file, int offset, gui_vfs_seek_t whence);
 /* Get current position */
 int gui_vfs_tell(gui_vfs_file_t *file);
 
-/* Get direct address (XIP support, ROMFS only) */
+/* Get direct address (XIP support, ROMFS and RAMFS) */
 const void* gui_vfs_get_addr(gui_vfs_file_t *file, size_t *size);
 ```
 
@@ -246,6 +216,12 @@ void* gui_vfs_load_file(const char *path, size_t *size);
 
 /* Get mount point prefix for a path */
 const char* gui_vfs_get_mount_prefix(const char *path);
+
+/* Copy file between filesystems */
+int gui_vfs_copy_file(const char *src_path, const char *dst_path);
+
+/* Copy directory recursively */
+int gui_vfs_copy_dir(const char *src_path, const char *dst_path);
 ```
 
 ### File Access Modes
@@ -377,19 +353,16 @@ gui_vfs_mount_generic("/flash", "", &littlefs_adapter);
 
 ## Usage Examples
 
-### Multiple Filesystems
+### Copy and Cache Resources
 
 ```c
-/* Mount multiple filesystems */
-gui_vfs_init();
-gui_vfs_mount_romfs("/rom", resource_root, 0x704D1400);
-gui_vfs_mount_generic("/sd", "0:", &fatfs_adapter);
-gui_vfs_mount_generic("/flash", "", &littlefs_adapter);
+/* Copy from SD to RAM for fast XIP access */
+gui_vfs_copy_file("/sd/logo.png", "/ram/logo.png");
+gui_vfs_copy_dir("/sd/fonts", "/ram/fonts");
 
-/* Unified access */
-void *font = gui_vfs_load_file("/rom/font.ttf", &size);
-void *photo = gui_vfs_load_file("/sd/photo.jpg", &size);
-void *config = gui_vfs_load_file("/flash/config.json", &size);
+/* Zero-copy access */
+const void *logo = gui_vfs_get_file_address("/ram/logo.png");
+display_logo(logo);
 ```
 
 ### Platform-Independent Code
@@ -397,90 +370,23 @@ void *config = gui_vfs_load_file("/flash/config.json", &size);
 ```c
 void app_init(void) {
     gui_vfs_init();
-    
 #ifdef _HONEYGUI_SIMULATOR_
-    /* PC simulator */
     gui_vfs_mount_posix("/rom", "./resources");
-    gui_vfs_mount_posix("/sd", "./sdcard");
 #else
-    /* Embedded system */
     gui_vfs_mount_romfs("/rom", resource_root, 0x704D1400);
-    gui_vfs_mount_generic("/sd", "0:", &fatfs_adapter);
 #endif
-    
-    /* Application code remains the same */
     load_resources();
-}
-```
-
-### Check Filesystem Type
-
-```c
-bool is_romfs_file(const char *path) {
-    const char *prefix = gui_vfs_get_mount_prefix(path);
-    return (prefix && strcmp(prefix, "/rom") == 0);
-}
-
-void load_resource(const char *path) {
-    if (is_romfs_file(path)) {
-        /* Use XIP zero-copy */
-        gui_vfs_file_t *file = gui_vfs_open(path, GUI_VFS_READ);
-        size_t size;
-        const void *addr = gui_vfs_get_addr(file, &size);
-        if (addr) {
-            use_data_directly(addr, size);
-        }
-        gui_vfs_close(file);
-    } else {
-        /* Load into memory */
-        size_t size;
-        void *data = gui_vfs_load_file(path, &size);
-        if (data) {
-            use_data(data, size);
-            free(data);
-        }
-    }
-}
-```
-
-### Smart Loading
-
-```c
-void* smart_load_file(const char *path, size_t *size, bool *need_free) {
-    gui_vfs_file_t *file = gui_vfs_open(path, GUI_VFS_READ);
-    if (!file) return NULL;
-    
-    /* Try XIP first */
-    const void *addr = gui_vfs_get_addr(file, size);
-    if (addr) {
-        /* ROMFS - zero-copy */
-        *need_free = false;
-        gui_vfs_close(file);
-        return (void *)addr;
-    }
-    
-    /* Other FS - need to load */
-    gui_vfs_close(file);
-    void *data = gui_vfs_load_file(path, size);
-    *need_free = true;
-    return data;
-}
-
-/* Usage */
-size_t size;
-bool need_free;
-void *data = smart_load_file("/rom/image.png", &size, &need_free);
-if (data) {
-    use_image(data, size);
-    if (need_free) {
-        free(data);
-    }
 }
 ```
 
 ## Notes
 
 - Path format: Unix-style `/rom/image.png`
-- XIP support: Only available for ROMFS via `gui_vfs_get_addr()`
+- XIP support: Available for ROMFS and RAMFS via `gui_vfs_get_addr()`
+- RAMFS: Read/write filesystem in RAM, supports XIP for zero-copy access
 - Memory management: `gui_vfs_load_file()` returns allocated memory that must be freed
 - Mount order: Earlier mounts have higher priority for path matching
+
+## See Also
+
+- [RAMFS_README.md](RAMFS_README.md) - Detailed RAMFS documentation

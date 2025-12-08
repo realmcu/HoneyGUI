@@ -135,6 +135,15 @@ int gui_vfs_mount_romfs(const char *prefix, const void *base_addr, uint32_t base
 int gui_vfs_mount_posix(const char *prefix, const char *root_path);
 
 /**
+ * @brief Mount RAM filesystem
+ * @param prefix Mount point prefix
+ * @param base_addr Base address of RAM region
+ * @param size Size of RAM region
+ * @return 0 on success, -1 on error
+ */
+int gui_vfs_mount_ramfs(const char *prefix, void *base_addr, size_t size);
+
+/**
  * @brief Mount filesystem using generic adapter
  * @param prefix Mount point prefix
  * @param root_path Root directory path
@@ -252,6 +261,22 @@ const char *gui_vfs_get_mount_prefix(const char *path);
  * @return Pointer to file data, or NULL if not supported or file not found
  */
 const void *gui_vfs_get_file_address(const char *path);
+
+/**
+ * @brief Copy file from one path to another
+ * @param src_path Source file path
+ * @param dst_path Destination file path
+ * @return 0 on success, -1 on error
+ */
+int gui_vfs_copy_file(const char *src_path, const char *dst_path);
+
+/**
+ * @brief Copy directory recursively
+ * @param src_path Source directory path
+ * @param dst_path Destination directory path
+ * @return 0 on success, -1 on error
+ */
+int gui_vfs_copy_dir(const char *src_path, const char *dst_path);
 
 #ifdef __cplusplus
 }
