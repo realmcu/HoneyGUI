@@ -755,7 +755,7 @@ JPG
 ^^^^^^^^^
 This configuration re-encodes images into the JPEG format. You can adjust the image sampling ratio and quality settings to reduce the file size. JPEG is a lossy compression format that achieves a good balance between display quality and file size. Please note that images converted to JPEG will lose any transparency (alpha channel) information.
 
-.. figure:: https://foruda.gitee.com/images/1753864922836242088/290c1bd8_9218678.png
+.. figure:: https://foruda.gitee.com/images/1765162484284729238/8b18ba3d_9218678.png
    :align: center
    :width: 408
 

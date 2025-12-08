@@ -814,9 +814,9 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
 2. 若作为 C 数组格式导入
 
- - a. 打开LVGL图片转换在线工具并上传要转换的压缩文件，请参考 :ref:`LVGL 在线转换工具`
- - b. 在 :guilabel:`Color format` 选项中，务必选择 **CF_RAW**
- - c. 将转换后的图片文件导出为C文件格式，例如 :file:`logo_lvgl_rle.c`
+ a. 打开LVGL图片转换在线工具并上传要转换的压缩文件，请参考 :ref:`LVGL 在线转换工具`
+ b. 在 :guilabel:`Color format` 选项中，务必选择 **CF_RAW**
+ c. 将转换后的图片文件导出为C文件格式，例如 :file:`logo_lvgl_rle.c`
 
     **注意1：转换结果文件的存放路径:** 将转换后的 C 文件存放在以下参考路径：
     :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets\\`
@@ -836,7 +836,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
         .data = logo_lvgl_rle_map,
         };
 
- - d. 在项目中声明图片后即可作为图片源使用
+ d. 在项目中声明图片后即可作为图片源使用
 
    .. code-block:: c
 
@@ -852,7 +852,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
 3. 若作为文件导入,以文件地址的方式访问图片资源
 
- - a. 构建 ``lv_img_dsc_t`` ，例如：
+ a. 构建 ``lv_img_dsc_t`` ，例如：
 
    .. code-block:: c
 
@@ -872,7 +872,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
    **注意：图像描述符中的色彩格式设置为 cf = LV_IMG_CF_RAW**
 
- - b. 图片资源访问，控件创建：
+ b. 图片资源访问，控件创建：
 
    .. code-block:: c
 

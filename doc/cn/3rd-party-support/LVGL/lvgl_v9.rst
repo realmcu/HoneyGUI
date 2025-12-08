@@ -748,7 +748,7 @@ JPG
 将图片重新编码转换为 JPEG 格式，配置图片采样比和图片质量以压缩图片体积。 JPEG 格式是一种能很好地平衡显示画质和文件大小的有损压缩，转换为 JPEG 的图片将丢失透明度信息。
 
 
-.. figure:: https://foruda.gitee.com/images/1753864922836242088/290c1bd8_9218678.png
+.. figure:: https://foruda.gitee.com/images/1765162484284729238/8b18ba3d_9218678.png
    :align: center
    :width: 408
 
