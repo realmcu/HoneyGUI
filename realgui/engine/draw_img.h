@@ -54,6 +54,18 @@ typedef enum
     GRAY2        = 0x21,   /* 2 bpp grayscale (4 levels) */
     GRAY4        = 0x22,   /* 4 bpp grayscale (16 levels) */
     GRAY8        = GRAY,   /* 8 bpp grayscale (256 levels) */
+    A8           = 0x30,   /* 8 bpp alpha (256 levels) */
+    A4           = 0x31,   /* 4 bpp alpha (16 levels) */
+    A2           = 0x32,   /* 2 bpp alpha (4 levels) */
+    A1           = 0x33,   /* 1 bpp alpha (2 levels) */
+    X8           = 0x34,   /* 8 bpp X (256 levels) */
+    X4           = 0x35,   /* 4 bpp X (16 levels) */
+    X2           = 0x36,   /* 2 bpp X (4 levels) */
+    X1           = 0x37,   /* 1 bpp X (2 levels) */
+    I8           = 0x38,   /* 8 bpp indexed (256 levels) */
+    I4           = 0x39,   /* 4 bpp indexed (16 levels) */
+    I2           = 0x3a,   /* 2 bpp indexed (4 levels) */
+    I1           = 0x3b,   /* 1 bpp indexed (2 levels) */
 } GUI_FormatType;
 
 /* BLEND_MODE_TYPE structure start*/
