@@ -1,1 +1,1 @@
-python ../../../../tool/mkromfs/mkromfs_for_honeygui.py --binary --addr 0x704D1400 root_rgb888 root_0x704D1400.bin
+python ../../../../tool/mkromfs/mkromfs_for_honeygui.py -i root_rgb888 -o root_0x704D1400.bin -b -a 0x704D1400

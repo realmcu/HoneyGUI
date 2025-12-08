@@ -13,12 +13,12 @@ ALIGNMENT_4 = 4
 ALIGNMENT_64 = 64
 
 parser = argparse.ArgumentParser()
-parser.add_argument('rootdir', type=str, help='the path to rootfs or binary file to extract')
-parser.add_argument('output', type=argparse.FileType('wb'), nargs='?', help='output file name')
-parser.add_argument('--dump', action='store_true', help='dump the fs hierarchy')
-parser.add_argument('--binary', action='store_true', help='output binary file')
-parser.add_argument('--addr', default='0', help='set the base address of the binary file, default to 0.')
-parser.add_argument('--extract', action='store_true', help='extract files from binary romfs')
+parser.add_argument('-i', '--input', dest='rootdir', type=str, required=True, help='input directory or binary file')
+parser.add_argument('-o', '--output', type=str, help='output file name')
+parser.add_argument('-d', '--dump', action='store_true', help='dump the fs hierarchy')
+parser.add_argument('-b', '--binary', action='store_true', help='output binary file')
+parser.add_argument('-a', '--addr', default='0', help='set the base address of the binary file, default to 0.')
+parser.add_argument('-e', '--extract', action='store_true', help='extract files from binary romfs')
 parser.add_argument('--output-dir', type=str, default='extracted_romfs', help='output directory for extracted files')
 
 
@@ -397,6 +397,9 @@ if __name__ == '__main__':
         sys.exit(0)
 
     # Build mode
+    # Save absolute path of output file before changing directory
+    output_file = os.path.abspath(args.output) if args.output else None
+    
     os.chdir(args.rootdir)
 
     tree = Folder('romfs_root')
@@ -412,23 +415,20 @@ if __name__ == '__main__':
     if args.binary:
         data, header_content = get_bin_data(tree, base_addr)
         # Binary data needs binary output
-        output = args.output
-        if not output:
+        if output_file:
+            with open(output_file, 'wb') as f:
+                f.write(data)
+        else:
             output = sys.stdout.buffer if hasattr(sys.stdout, 'buffer') else sys.stdout
-        output.write(data)
+            output.write(data)
     else:
         data = get_c_data(tree)
         # C code is text, needs text output
-        output = args.output
-        if not output:
-            output = sys.stdout
-        if hasattr(output, 'write'):
-            if isinstance(data, bytes):
-                output.write(data.decode('utf-8'))
-            else:
-                output.write(data)
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write(data)
         else:
-            output.write(data.encode('utf-8'))
+            sys.stdout.write(data)
     
     if header_content:
         header_path = os.path.join(os.path.dirname(os.getcwd()), 'ui_resource.h')
