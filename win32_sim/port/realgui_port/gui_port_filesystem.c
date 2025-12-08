@@ -84,7 +84,6 @@ static const gui_fs_adapter_t posix_adapter =
  * @brief Initialize filesystem port for win32 simulator
  *
  * This function initializes VFS and mounts:
- * - /: ROMFS filesystem (compiled-in resources as root)
  * - /pc: POSIX filesystem (host filesystem, virtual mount point)
  * - /vfs_adapter: Generic adapter example (host filesystem)
  */
@@ -92,10 +91,6 @@ void gui_port_fs_init(void)
 {
     /* Initialize VFS */
     gui_vfs_init();
-
-    /* Mount ROMFS as root filesystem */
-    extern const struct romfs_dirent hg_romfs_root;
-    gui_vfs_mount_romfs("/", &hg_romfs_root, 0);
 
     /* Mount POSIX filesystem to /pc (virtual mount point) */
     gui_vfs_mount_posix("/pc", ".");

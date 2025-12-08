@@ -76,7 +76,6 @@ struct hg_stat
 
 /* HoneyGUI ROMFS Public API */
 void hg_romfs_mount(void *addr);
-extern const struct romfs_dirent hg_romfs_root;
 
 /* File operations */
 intptr_t hg_open(const char *file, int flags, ...);

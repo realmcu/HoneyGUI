@@ -26,34 +26,41 @@
 
 ```bash
 # 基本用法
-python mkromfs_for_honeygui.py --binary --addr 0x704D1400 root root_0x704D1400.bin
+python mkromfs_for_honeygui.py -i root -o root_0x704D1400.bin --binary --addr 0x704D1400
 
 # 参数说明：
+# -i root           : 源目录路径（必需）
+# -o xxx.bin        : 输出文件名（必需）
 # --binary          : 生成二进制格式（不加则生成 C 代码）
 # --addr 0x704D1400 : 指定基地址（十六进制）
-# root              : 源目录路径
-# root_0x704D1400.bin : 输出文件名
 ```
 
 ### 生成 C 代码格式
 
 ```bash
-python mkromfs_for_honeygui.py root romfs.c
+# 基本用法
+python mkromfs_for_honeygui.py -i root -o hg_romfs.c
+
+# 根变量名自动生成：
+# -o hg_romfs.c  → 生成变量 hg_romfs_root
+# -o my_fs.c     → 生成变量 my_fs_root
+# -o root-fs.c   → 生成变量 root_fs_root（非法字符转为下划线）
 ```
 
 ### 解压文件系统
 
 ```bash
 # 基本用法（自动检测基地址）
-python mkromfs_for_honeygui.py --extract root_0x704D1400.bin
+python mkromfs_for_honeygui.py -i root_0x704D1400.bin --extract
 
 # 指定输出目录
-python mkromfs_for_honeygui.py --extract root_0x704D1400.bin --output-dir extracted_files
+python mkromfs_for_honeygui.py -i root_0x704D1400.bin --extract --output-dir extracted_files
 
 # 手动指定基地址（可选）
-python mkromfs_for_honeygui.py --extract --addr 0x704D1400 root_0x704D1400.bin
+python mkromfs_for_honeygui.py -i root_0x704D1400.bin --extract --addr 0x704D1400
 
 # 参数说明：
+# -i xxx.bin        : 输入二进制文件（必需）
 # --extract         : 启用解压模式
 # --addr 0x704D1400 : 基地址（可选，工具会自动检测）
 # --output-dir      : 输出目录（默认为 extracted_romfs）
@@ -62,7 +69,7 @@ python mkromfs_for_honeygui.py --extract --addr 0x704D1400 root_0x704D1400.bin
 ### 查看文件系统结构
 
 ```bash
-python mkromfs_for_honeygui.py --dump root
+python mkromfs_for_honeygui.py -i root -o dummy --dump
 ```
 
 ## 文件系统特性
@@ -154,7 +161,7 @@ root/
     └── arial.ttf
 
 # 生成文件系统
-python mkromfs_for_honeygui.py --binary --addr 0x4400000 root root_0x4400000.bin
+python mkromfs_for_honeygui.py -i root -o root_0x4400000.bin --binary --addr 0x4400000
 
 # 生成的 ui_resource.h 包含：
 # LOGO_PNG, ICON_BIN, ARIAL_TTF
@@ -178,7 +185,7 @@ void load_image(void) {
 
 ```bash
 # 解压文件系统（自动检测基地址）
-python mkromfs_for_honeygui.py --extract root_0x4400000.bin --output-dir verify
+python mkromfs_for_honeygui.py -i root_0x4400000.bin --extract --output-dir verify
 
 # 对比原始文件
 diff -r root verify
@@ -186,24 +193,33 @@ diff -r root verify
 
 ## 注意事项
 
-1. **基地址自动检测**
+1. **必需参数**
+   - 构建模式（生成 C 或二进制）：`-i` 和 `-o` 参数**必须提供**
+   - 解压模式：仅需 `-i` 参数
+
+2. **根变量名生成规则**
+   - C 代码模式下，根据 `-o` 文件名自动生成根变量名
+   - 规则：去掉路径和扩展名，转为合法 C 标识符，后缀 `_root`
+   - 示例：`-o hg_romfs.c` → `hg_romfs_root`
+
+3. **基地址自动检测**
    - 解压时通常**不需要**指定 `--addr` 参数
    - 工具会自动从二进制文件中检测基地址
    - 仅在自动检测失败时才需要手动指定
 
-2. **文件名限制**
+4. **文件名限制**
    - 避免使用特殊字符
    - 建议使用字母、数字、下划线和点
 
-3. **路径要求**
-   - 生成模式：`rootdir` 必须是目录
-   - 解压模式：`rootdir` 必须是二进制文件
+5. **路径要求**
+   - 生成模式：`-i` 参数必须是目录
+   - 解压模式：`-i` 参数必须是二进制文件
 
-4. **头文件生成**
+6. **头文件生成**
    - 仅在 `--binary` 模式下生成 `ui_resource.h`
    - 头文件位置固定为源目录的上一级
 
-5. **Python 版本**
+7. **Python 版本**
    - 需要 Python 3.x
    - 已在 Python 3.9+ 测试通过
 
