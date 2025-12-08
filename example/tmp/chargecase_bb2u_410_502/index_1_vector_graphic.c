@@ -17,6 +17,14 @@ typedef struct
 
 static AnimState anim = {0};
 
+static uint8_t draw_type = 0;
+static bool redraw = false;
+
+static float w = 200;
+static float h = 200;
+static NVGcolor col1;
+static NVGcolor col2;
+
 
 static void update_animation(float dt)
 {
@@ -35,52 +43,67 @@ static void update_animation(float dt)
 }
 static void render(NVGcontext *vg)
 {
-    float dt = 0.01f;
-    if (dt <= 0) { dt = 0.016f; }
+    if (draw_type == 0)
+    {
+        float dt = 0.01f;
 
-    update_animation(dt);
+        update_animation(dt);
 
-    float base_x = 150.0f + anim.offset_x;
-    float base_y = 150.0f + anim.offset_y;
-    float w = 200.0f * anim.scale;
-    float h = 180.0f * anim.scale;
+        float center_x = 200.0f;  // 400/2
+        float center_y = 200.0f;  // 400/2
 
-    nvgSave(vg);
+        nvgSave(vg);
 
-    nvgTranslate(vg, base_x + w / 2, base_y + h / 2);
-#define    NVG_DEG_TO_RAD(angle) ((angle) * M_PI_F / 180.0f)
-    nvgRotate(vg, NVG_DEG_TO_RAD(anim.angle));
-    nvgTranslate(vg, -w / 2, -h / 2);
+        nvgTranslate(vg, center_x, center_y);
 
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, 0, 0, w, h, anim.corner_radius);
+        float rect_w = w * anim.scale;
+        float rect_h = h * anim.scale;
 
-    nvgStrokeWidth(vg, 8.0f * anim.scale);
-    NVGcolor stroke_col = nvgRGB(255, 0, 0);
-    stroke_col.a = anim.alpha;
-    nvgStrokeColor(vg, stroke_col);
-    nvgStroke(vg);
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, -rect_w / 2, -rect_h / 2, rect_w, rect_h, anim.corner_radius);
 
-    float hue = fmodf(anim.time * 40.0f, 360.0f);
-    NVGcolor col1 = nvgHSLA(hue / 360.0f, 0.8f, 0.6f, (unsigned char)(255 * anim.alpha));
-    NVGcolor col2 = nvgHSLA((hue + 90) / 360.0f, 0.8f, 0.6f, (unsigned char)(255 * anim.alpha));
+        nvgStrokeWidth(vg, 8.0f * anim.scale);
+        NVGcolor stroke_col = nvgRGB(255, 0, 0);
+        stroke_col.a = anim.alpha;
+        nvgStrokeColor(vg, stroke_col);
+        nvgStroke(vg);
 
-    NVGpaint gradient = nvgLinearGradient(vg, 0, 0, w, h, col1, col2);
-    nvgFillPaint(vg, gradient);
-    nvgFill(vg);
+        // float hue = fmodf(anim.time * 40.0f, 360.0f);
+        // NVGcolor col1 = nvgHSLA(hue / 360.0f, 0.8f, 0.6f, (unsigned char)(255 * anim.alpha));
+        // NVGcolor col2 = nvgHSLA((hue + 90) / 360.0f, 0.8f, 0.6f, (unsigned char)(255 * anim.alpha));
 
-    nvgRestore(vg);
+        NVGpaint gradient = nvgLinearGradient(vg, -rect_w / 2, -rect_h / 2, rect_w / 2, rect_h / 2, col1,
+                                              col2);
+        nvgFillPaint(vg, gradient);
+        nvgFill(vg);
+
+        nvgRestore(vg);
+    }
+    else if (draw_type == 1)
+    {
+        nvgSave(vg);
+
+        nvgTranslate(vg, 200, 200);
+
+        nvgBeginPath(vg);
+        nvgEllipse(vg, 0, 0, w / 2, h / 2);
+
+        NVGpaint ellipse_gradient = nvgLinearGradient(vg, -w / 2, 0, w / 2, 0,
+                                                      col1,
+                                                      col2);
+        nvgFillPaint(vg, ellipse_gradient);
+        nvgFill(vg);
+
+        nvgStrokeWidth(vg, 6.0f);
+        nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+        nvgStroke(vg);
+
+        nvgRestore(vg);
+    }
 }
-static void canvas_rect_cb(gui_canvas_t *canvas)
-{
 
-    NVGcontext *vg = canvas->vg;
-    render(vg);
-    canvas->render = 1;
-}
-
-#define CANVAS_W 480
-#define CANVAS_H 480
+#define CANVAS_W 400
+#define CANVAS_H 400
 #define CANVAS_BUFFER_LENGTH CANVAS_W*CANVAS_H*4
 static uint8_t *buffer = 0;
 static void vector_graphic_switch_in_timer(void *p)
@@ -88,7 +111,7 @@ static void vector_graphic_switch_in_timer(void *p)
     GUI_UNUSED(p); gui_log("111\n");
     memset(buffer, 0,  CANVAS_BUFFER_LENGTH);
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
-                                      0, 480, 480, render, buffer);
+                                      0, 400, 400, render, buffer);
 }
 static int resource(void)
 {
@@ -100,25 +123,37 @@ static int resource(void)
 #endif
     return 0;
 }
+static void img_cb(void *obj)
+{
+    GUI_UNUSED(obj);
+    if (!redraw) { return; }
+    uint32_t size = CANVAS_W * CANVAS_H * 4 + sizeof(gui_rgb_data_head_t);
+    memset(buffer, 0,  size);
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+                                      0, 400, 400, render, buffer);
+    redraw = 0;
+}
 static void vector_graphic_switch_in(gui_view_t *view)
 {
-
-
     GUI_UNUSED(view);
     gui_log("vector_graphic_view switch in\n");
     // gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, CANVAS_W, CANVAS_H);
     // gui_canvas_set_canvas_cb(canvas, canvas_rect_cb111);
+    col1 = nvgRGB(255, 0, 0);
+    col2 = nvgRGB(0, 0, 255);
 
-    buffer = gui_lower_malloc(CANVAS_W * CANVAS_H * 4);
-    memset(buffer, 0,  CANVAS_BUFFER_LENGTH);
+    uint32_t size = CANVAS_W * CANVAS_H * 4 + sizeof(gui_rgb_data_head_t);
+    if (!buffer)
+    {
+        buffer = gui_lower_malloc(size);
+        memset(buffer, 0,  size);
+    }
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
                                       0, 480, 480, render, buffer);
     gui_img_t *img = gui_img_create_from_mem(view, 0, buffer, 0, 0, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-//gui_obj_create_timer(img, 10, 1, vector_graphic_switch_in_timer);
-
-
-
+    gui_obj_create_timer((void *)img, 10, 1, img_cb);
+    gui_obj_start_timer((void *)img);
 
 
 
@@ -142,6 +177,54 @@ static void vector_graphic_switch_out(gui_view_t *view)
     }
 
 }
+
+
+#include "shell.h"
+void draw_info_update(int argc, char *argv[])
+{
+    GUI_UNUSED(argc);
+    int i = 1;
+    while (i <= argc - 1)
+    {
+        if (!strcmp(argv[i], "rect"))
+        {
+            draw_type = 0;
+            redraw = 1;
+        }
+        else if (!strcmp(argv[i], "ellipse"))
+        {
+            draw_type = 1;
+            redraw = 1;
+        }
+        else if (!strcmp(argv[i], "col1"))
+        {
+            col1.r = atoi(argv[++i]);
+            redraw = 1;
+        }
+        else if (!strcmp(argv[i], "col2"))
+        {
+            col2.g = atoi(argv[++i]);
+            redraw = 1;
+        }
+        else if (!strcmp(argv[i], "w"))
+        {
+            w = atof(argv[++i]);
+            redraw = 1;
+        }
+        else if (!strcmp(argv[i], "h"))
+        {
+            h = atof(argv[++i]);
+            redraw = 1;
+        }
+        ++i;
+    }
+
+}
+SHELL_EXPORT_CMD(
+    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN) | SHELL_CMD_DISABLE_RETURN,
+    draw, draw_info_update, test);
+
+
 #include "gui_win.h"
 GUI_VIEW_INSTANCE("vector_graphic_view", 1, vector_graphic_switch_in, vector_graphic_switch_out);
 unsigned char *resource_root = 0;
@@ -151,9 +234,10 @@ static int chargecase_demo_entry(void)
 
     gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     gui_view_create(win, "vector_graphic_view", 0, 0, 0, 0);
+    // gui_view_create(win, "inner_shadow_view", 0, 0, 0, 0);
+    // gui_view_create(win, "fps_show_view", 0, 0, 0, 0);
     fps_create(gui_obj_get_root());
     return 0;
 }
 GUI_INIT_VIEW_DESCRIPTOR_REGISTER(resource);
 GUI_INIT_APP_EXPORT(chargecase_demo_entry);
-
