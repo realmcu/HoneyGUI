@@ -1,20 +1,7 @@
 /* gui lite geometry arc example start */
 #include "gui_components_init.h"
 #include "gui_lite_geometry_arc.h"
-gui_lite_arc_t *arc = NULL;
-void circle_timer_cb(void *arg)
-{
-    gui_lite_arc_set_position(arg, 100, 100);
-    gui_fb_change();
-}
 
-void arc_test_click_demo(void)
-{
-    arc = gui_lite_arc_create(gui_obj_get_root(), "arc", 200, 200, 100, 0, 90, 20, gui_rgba(255, 0, 0,
-                              255));
-    gui_lite_arc_set_style(arc, 200, 200, 100, 0, 90, 20, gui_rgba(255, 0, 0, 255));
-    gui_lite_arc_on_click(arc, circle_timer_cb, NULL);
-}
 static void create_activity_rings(float center_x, float center_y)
 {
     // bg track color
