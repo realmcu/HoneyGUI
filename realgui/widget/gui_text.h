@@ -43,38 +43,44 @@ extern "C" {
 typedef enum
 {
     /* TOP */
-    LEFT               = 0x00,
-    CENTER             = 0x01,
-    RIGHT              = 0x02,
-    MULTI_LEFT         = 0x03,
-    MULTI_CENTER       = 0x04,
-    MULTI_RIGHT        = 0x05,
+    LEFT                 = 0x00,
+    CENTER               = 0x01,
+    RIGHT                = 0x02,
+    MULTI_LEFT           = 0x03,
+    MULTI_CENTER         = 0x04,
+    MULTI_RIGHT          = 0x05,
     /* MID */
-    MID_LEFT           = 0x10,
-    MID_CENTER         = 0x11,
-    MID_RIGHT          = 0x12,
+    MID_LEFT             = 0x10,
+    MID_CENTER           = 0x11,
+    MID_RIGHT            = 0x12,
+    MULTI_MID_LEFT       = 0x13,
+    MULTI_MID_CENTER     = 0x14,
+    MULTI_MID_RIGHT      = 0x15,
     /* SCROLL */
-    SCROLL_X           = 0x30,
-    SCROLL_Y           = 0x31,
-    SCROLL_Y_REVERSE   = 0x32,
-    SCROLL_X_REVERSE   = 0x33,
+    SCROLL_X             = 0x30,
+    SCROLL_X_REVERSE     = 0x31,
+    SCROLL_X_MID         = 0X32,
+    SCROLL_X_MID_REVERSE = 0x33,
+
+    SCROLL_Y             = 0x38,
+    SCROLL_Y_REVERSE     = 0x39,
     /* VERTICAL LEFT
     &  CLOCKWISE*/
-    VERTICAL_LEFT_TOP  = 0x40,
-    VERTICAL_LEFT_MID  = 0x41,
-    VERTICAL_LEFT_BOT  = 0x42,
+    VERTICAL_LEFT_TOP    = 0x40,
+    VERTICAL_LEFT_MID    = 0x41,
+    VERTICAL_LEFT_BOT    = 0x42,
     /* VERTICAL RIGHT
     &  COUNTERCLOCKWISE*/
-    VERTICAL_RIGHT_TOP = 0x50,
-    VERTICAL_RIGHT_MID = 0x51,
-    VERTICAL_RIGHT_BOT = 0x52,
+    VERTICAL_RIGHT_TOP   = 0x50,
+    VERTICAL_RIGHT_MID   = 0x51,
+    VERTICAL_RIGHT_BOT   = 0x52,
     /* RTL */
-    RTL_RIGHT          = 0x60,
-    RTL_CENTER         = 0x61,
-    RTL_LEFT           = 0x62,
-    RTL_MULTI_RIGHT    = 0x63,
-    RTL_MULTI_CENTER   = 0x64,
-    RTL_MULTI_LEFT     = 0x65,
+    RTL_RIGHT            = 0x60,
+    RTL_CENTER           = 0x61,
+    RTL_LEFT             = 0x62,
+    RTL_MULTI_RIGHT      = 0x63,
+    RTL_MULTI_CENTER     = 0x64,
+    RTL_MULTI_LEFT       = 0x65,
 } TEXT_MODE;
 /* TEXT_MODE end */
 

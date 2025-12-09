@@ -2183,6 +2183,7 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 if (GUI_STRINGS_EQUAL(lineMode, "single") &&
                     GUI_STRINGS_EQUAL(alignH, "left") &&
                     GUI_STRINGS_EQUAL(scroll, "none") &&
+                    GUI_STRINGS_EQUAL(alignV, "top") &&
                     rotation == 0)
                 {
                     style = LEFT;
@@ -2190,6 +2191,7 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
                          GUI_STRINGS_EQUAL(alignH, "center") &&
                          GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
                          rotation == 0)
                 {
                     style = CENTER;
@@ -2197,9 +2199,34 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
                          GUI_STRINGS_EQUAL(alignH, "right") &&
                          GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
                          rotation == 0)
                 {
                     style = RIGHT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         GUI_STRINGS_EQUAL(alignH, "left") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "center") &&
+                         rotation == 0)
+                {
+                    style = MID_LEFT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         GUI_STRINGS_EQUAL(alignH, "right") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "center") &&
+                         rotation == 0)
+                {
+                    style = MID_RIGHT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         GUI_STRINGS_EQUAL(alignH, "center") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "center") &&
+                         rotation == 0)
+                {
+                    style = MID_CENTER;
                 }
                 else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
                          GUI_STRINGS_EQUAL(alignH, "left") &&
@@ -2231,7 +2258,7 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                          GUI_STRINGS_EQUAL(alignV, "center") &&
                          rotation == 0)
                 {
-                    style = MID_LEFT;
+                    style = MULTI_MID_LEFT;
                 }
                 else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
                          GUI_STRINGS_EQUAL(alignH, "right") &&
@@ -2239,7 +2266,7 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                          GUI_STRINGS_EQUAL(alignV, "center") &&
                          rotation == 0)
                 {
-                    style = MID_RIGHT;
+                    style = MULTI_MID_RIGHT;
                 }
                 else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
                          GUI_STRINGS_EQUAL(alignH, "center") &&
@@ -2247,12 +2274,20 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                          GUI_STRINGS_EQUAL(alignV, "center") &&
                          rotation == 0)
                 {
-                    style = MID_CENTER;
+                    style = MULTI_MID_CENTER;
                 }
                 else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
                          //  GUI_STRINGS_EQUAL(alignH, "right")&&
                          GUI_STRINGS_EQUAL(scroll, "horizontal") &&
-                         //   GUI_STRINGS_EQUAL(alignV, "center")&&
+                         GUI_STRINGS_EQUAL(alignV, "center") &&
+                         rotation == 0)
+                {
+                    style = SCROLL_X_MID;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         //  GUI_STRINGS_EQUAL(alignH, "right")&&
+                         GUI_STRINGS_EQUAL(scroll, "horizontal") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
                          rotation == 0)
                 {
                     style = SCROLL_X;

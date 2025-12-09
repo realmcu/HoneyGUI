@@ -457,6 +457,63 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
         }
 #endif
     }
+    else if (dc_bytes_per_pixel == 3)
+    {
+        uint8_t *writebuf = (uint8_t *)dc->frame_buf;
+        uint8_t color_output[3];
+        color_output[0] = text->color.color.rgba.b;
+        color_output[1] = text->color.color.rgba.g;
+        color_output[2] = text->color.color.rgba.r;
+        uint8_t font_alpha = text->color.color.rgba.a;
+        uint32_t section_width = dc->section.x2 - dc->section.x1 + 1;
+        uint32_t dots_stride = font_w;
+
+        if (font_alpha == 0xff)
+        {
+            for (uint32_t i = y_start; i < y_end; i++)
+            {
+                int write_off = (i - dc->section.y1) * section_width;
+                int dots_off = (i - font_y) * dots_stride;
+                for (uint32_t j = x_start; j < x_end; j++)
+                {
+                    uint8_t alpha = dots[dots_off + j - font_x];
+                    if (alpha != 0)
+                    {
+                        uint8_t color_back[3];
+                        memcpy(color_back, &writebuf[(write_off + j - dc->section.x1) * 3], 3);
+                        uint8_t color[3];
+                        color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
+                        color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
+                        color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
+                        memcpy(&writebuf[(write_off + j - dc->section.x1) * 3], color, 3);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (uint32_t i = y_start; i < y_end; i++)
+            {
+                int write_off = (i - dc->section.y1) * section_width;
+                int dots_off = (i - font_y) * dots_stride;
+                for (uint32_t j = x_start; j < x_end; j++)
+                {
+                    uint8_t alpha = dots[dots_off + j - font_x];
+                    if (alpha != 0)
+                    {
+                        alpha = _UI_UDIV255(font_alpha * alpha);
+                        uint8_t color_back[3];
+                        memcpy(color_back, &writebuf[(write_off + j - dc->section.x1) * 3], 3);
+                        uint8_t color[3];
+                        color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
+                        color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
+                        color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
+                        memcpy(&writebuf[(write_off + j - dc->section.x1) * 3], color, 3);
+                    }
+                }
+            }
+        }
+    }
 }
 
 uint32_t getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
