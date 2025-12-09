@@ -293,7 +293,10 @@ static int app_init(void)
     // custom_font_rendering_demo();
 
     /* gui text font rendering test */
-    // text_font_test();
+    // text_font_rendering_test();
+
+    /* gui text font layout test */
+    // text_font_layout_test();
 
     /* gui text multi language test */
     // text_multi_language_test();

@@ -37,6 +37,10 @@ extern "C" {
 #include "gui_text.h"
 #include "gui_view.h"
 #include "gui_scroll_text.h"
+
+#include "gui_api_dc.h"
+#include "gui_api_os.h"
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -48,6 +52,9 @@ extern "C" {
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+
+/*For layout test*/
+#define LAYOUT_USE_VECTOR_FONT  0
 
 /*============================================================================*
  *                            Variables
@@ -69,7 +76,8 @@ extern void *fontharmonysc;
  *                           Functions
  *============================================================================*/
 
-void text_font_test(void);
+void text_font_rendering_test(void);
+void text_font_layout_test(void);
 void text_multi_language_test(void);
 void text_font_scroll_function_test(void);
 void text_font_source_mode_test(void);

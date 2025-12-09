@@ -316,7 +316,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     draw_rect.yboundtop = draw_rect.y1;
     draw_rect.yboundbottom = draw_rect.y2;
 
-    if (text->base.mode == SCROLL_X)
+    if (text->base.mode == SCROLL_X || text->base.mode == SCROLL_X_MID)
     {
         offset = text->base.char_width_sum;
         if (offset > obj->w)
@@ -329,7 +329,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
         }
     }
-    else if (text->base.mode == SCROLL_X_REVERSE)
+    else if (text->base.mode == SCROLL_X_REVERSE || text->base.mode == SCROLL_X_MID_REVERSE)
     {
         offset = text->base.char_width_sum;
         if (offset > obj->w)
