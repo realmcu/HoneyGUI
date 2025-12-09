@@ -13,15 +13,19 @@
 #include "pikachu_gltf/gltf_desc_Pikachu_resize.txt"
 
 static float rot_angle = 0.0f;
-
+const float DEFAULT_RADIUS = 10.0f;
+const float DEFAULT_DEPTH = 1.0f;
+const float DEFAULT_DURATION = 0.6f;
 static void update_pikachu_animation(void *param)
 {
-    GUI_UNUSED(param);
+    gui_lite3d_t *lite3d_pikachu = (gui_lite3d_t *)param;
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)
     {
         rot_angle += tp->deltaX / 5.0f;
+        l3_model_trigger_deformation(lite3d_pikachu->model, tp->x, tp->y, DEFAULT_RADIUS, DEFAULT_DEPTH,
+                                     DEFAULT_DURATION);
     }
 }
 

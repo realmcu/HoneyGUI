@@ -300,47 +300,106 @@ static void l3_draw_single_tria(l3_gltf_model_t *_this, l3_gltf_primitive_t *pri
     }
 }
 
+static void l3_test_ray_hit_on_triangle(l3_gltf_model_t *_this, l3_gltf_triangle_t *tria,
+                                        l3_4x4_matrix_t *model_to_world, l3_3d_point_t *ray_origin,
+                                        l3_3d_point_t *ray_dir, float *closest_t)
+{
+    // Transform triangle vertices to world space
+    l3_3d_point_t world_v[3];
+    for (int i = 0; i < 3; ++i)
+    {
+        l3_4d_point_t v = {tria->vertices[i].pos.x, tria->vertices[i].pos.y,
+                           tria->vertices[i].pos.z, 1.0f
+                          };
+        v = l3_4x4_matrix_mul_4d_point(model_to_world, v);
+        world_v[i].x = v.x;
+        world_v[i].y = v.y;
+        world_v[i].z = v.z;
+    }
+
+    // Test ray-triangle intersection
+    float t;
+    l3_3d_point_t hit_point;
+    if (l3_ray_triangle_intersect(ray_origin, ray_dir, &world_v[0], &world_v[1], &world_v[2],
+                                  &t, &hit_point))
+    {
+        // Found a closer hit
+        if (t < *closest_t)
+        {
+            l3_deformation_state_t *def = &_this->base.deformation;
+            *closest_t = t;
+            def->has_hit = true;
+            def->impact_center = hit_point;
+
+            // Calculate triangle normal
+            l3_3d_point_t edge1, edge2;
+            edge1.x = world_v[1].x - world_v[0].x;
+            edge1.y = world_v[1].y - world_v[0].y;
+            edge1.z = world_v[1].z - world_v[0].z;
+
+            edge2.x = world_v[2].x - world_v[0].x;
+            edge2.y = world_v[2].y - world_v[0].y;
+            edge2.z = world_v[2].z - world_v[0].z;
+
+            // Use ray direction as deformation direction (from camera toward object)
+            def->impact_normal.x = ray_dir->x;
+            def->impact_normal.y = ray_dir->y;
+            def->impact_normal.z = ray_dir->z;
+        }
+    }
+}
+
 static void render_primitive_no_skin(l3_gltf_model_t *_this, l3_gltf_primitive_t *prim,
-                                     l3_4x4_matrix_t *mv_matrix)
+                                     l3_4x4_matrix_t *mv_matrix, l3_4x4_matrix_t *model_to_world,
+                                     l3_3d_point_t *ray_origin, l3_3d_point_t *ray_dir,
+                                     float *closest_t, bool do_hit_test)
 {
     for (unsigned int i = 0; i < prim->triangle_count; ++i)
     {
         l3_tria_face_t face;
         l3_gltf_triangle_t *tria = &prim->triangles[i];
 
+        // Perform hit test if needed
+        if (do_hit_test)
         {
-            l3_gltf_complete_vertex_t *v0 = &tria->vertices[0];
-            l3_4d_point_t local_position = {v0->pos.x, v0->pos.y, v0->pos.z, 1.0f};
-            face.transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(mv_matrix, local_position);
-            face.transform_vertex[0].u = v0->texcoord.u;
-            face.transform_vertex[0].v = v0->texcoord.v;
+            l3_test_ray_hit_on_triangle(_this, tria, model_to_world, ray_origin, ray_dir, closest_t);
         }
+
+        for (int v_idx = 0; v_idx < 3; ++v_idx)
         {
-            l3_gltf_complete_vertex_t *v1 = &tria->vertices[1];
-            l3_4d_point_t local_position = {v1->pos.x, v1->pos.y, v1->pos.z, 1.0f};
-            face.transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(mv_matrix, local_position);
-            face.transform_vertex[1].u = v1->texcoord.u;
-            face.transform_vertex[1].v = v1->texcoord.v;
-        }
-        {
-            l3_gltf_complete_vertex_t *v2 = &tria->vertices[2];
-            l3_4d_point_t local_position = {v2->pos.x, v2->pos.y, v2->pos.z, 1.0f};
-            face.transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(mv_matrix, local_position);
-            face.transform_vertex[2].u = v2->texcoord.u;
-            face.transform_vertex[2].v = v2->texcoord.v;
+            l3_gltf_complete_vertex_t *v = &tria->vertices[v_idx];
+
+            // Apply deformation in model space
+            l3_3d_point_t deformed_pos = {v->pos.x, v->pos.y, v->pos.z};
+            l3_apply_deformation_to_model_vertex(&_this->base.deformation, &deformed_pos, model_to_world);
+
+            l3_4d_point_t local_position = {deformed_pos.x, deformed_pos.y, deformed_pos.z, 1.0f};
+            face.transform_vertex[v_idx].position = l3_4x4_matrix_mul_4d_point(mv_matrix, local_position);
+            face.transform_vertex[v_idx].u = v->texcoord.u;
+            face.transform_vertex[v_idx].v = v->texcoord.v;
         }
 
         l3_tria_scene(&face, &_this->base.camera);
         l3_draw_single_tria(_this, prim, &face);
     }
 }
+
 static void render_primitive_with_skin(l3_gltf_model_t *_this, l3_gltf_primitive_t *prim,
-                                       l3_4x4_matrix_t *view_matrix, l3_gltf_skin_t *skin)
+                                       l3_4x4_matrix_t *view_matrix, l3_gltf_skin_t *skin,
+                                       l3_4x4_matrix_t *model_to_world,
+                                       l3_3d_point_t *ray_origin, l3_3d_point_t *ray_dir,
+                                       float *closest_t, bool do_hit_test)
 {
     for (unsigned int i = 0; i < prim->triangle_count; ++i)
     {
         l3_tria_face_t face;
         l3_gltf_triangle_t *tria = &prim->triangles[i];
+
+        // Perform hit test if needed (on skinned triangles)
+        if (do_hit_test)
+        {
+            l3_test_ray_hit_on_triangle(_this, tria, model_to_world, ray_origin, ray_dir, closest_t);
+        }
 
         for (int v_idx = 0; v_idx < 3; ++v_idx)
         {
@@ -348,7 +407,7 @@ static void render_primitive_with_skin(l3_gltf_model_t *_this, l3_gltf_primitive
             l3_4d_point_t bind_pose_position = {v->pos.x, v->pos.y, v->pos.z, 1.0f};
             l3_4d_point_t view_space_position;
 
-            l3_4d_point_t skinned_model_space_pos = {0.0f, 0.0f, 0.0f, 1.0f};  // Model space position
+            l3_4d_point_t skinned_model_space_pos = {0.0f, 0.0f, 0.0f, 1.0f};
             for (int j = 0; j < 4; ++j)
             {
                 float weight = v->weights[j];
@@ -365,6 +424,16 @@ static void render_primitive_with_skin(l3_gltf_model_t *_this, l3_gltf_primitive
                 skinned_model_space_pos.z += posed_position.z * weight;
             }
 
+            // Apply deformation in model space
+            l3_3d_point_t deformed_pos = {skinned_model_space_pos.x, skinned_model_space_pos.y,
+                                          skinned_model_space_pos.z
+                                         };
+            l3_apply_deformation_to_model_vertex(&_this->base.deformation, &deformed_pos, model_to_world);
+
+            skinned_model_space_pos.x = deformed_pos.x;
+            skinned_model_space_pos.y = deformed_pos.y;
+            skinned_model_space_pos.z = deformed_pos.z;
+
             // Model space position ==> View space position
             view_space_position = l3_4x4_matrix_mul_4d_point(view_matrix, skinned_model_space_pos);
 
@@ -380,7 +449,9 @@ static void render_primitive_with_skin(l3_gltf_model_t *_this, l3_gltf_primitive
 }
 
 static void render_node_recursive(l3_gltf_model_t *_this, int node_index,
-                                  l3_4x4_matrix_t *view_matrix)
+                                  l3_4x4_matrix_t *view_matrix,
+                                  l3_3d_point_t *ray_origin, l3_3d_point_t *ray_dir,
+                                  float *closest_t, bool do_hit_test)
 {
     if (node_index < 0 || (unsigned int)node_index >= _this->desc->node_count) { return; }
 
@@ -399,12 +470,21 @@ static void render_node_recursive(l3_gltf_model_t *_this, int node_index,
 
         l3_4x4_matrix_t model_matrix;
         l3_4x4_matrix_mul(view_matrix, &node->global_transform, &model_matrix);
+
+        // Calculate model-to-world transform only if needed for deformation or hit testing
+        l3_4x4_matrix_t model_to_world;
+        if (do_hit_test || _this->base.deformation.is_active)
+        {
+            l3_4x4_matrix_mul(&_this->base.world, &node->global_transform, &model_to_world);
+        }
+
         if (skin != NULL)
         {
             for (size_t i = 0; i < mesh->primitive_count; ++i)
             {
                 l3_gltf_primitive_t *primitive = &mesh->primitives[i];
-                render_primitive_with_skin(_this, primitive, &model_matrix, skin);
+                render_primitive_with_skin(_this, primitive, &model_matrix, skin, &model_to_world,
+                                           ray_origin, ray_dir, closest_t, do_hit_test);
             }
         }
         else
@@ -412,7 +492,8 @@ static void render_node_recursive(l3_gltf_model_t *_this, int node_index,
             for (size_t i = 0; i < mesh->primitive_count; ++i)
             {
                 l3_gltf_primitive_t *primitive = &mesh->primitives[i];
-                render_primitive_no_skin(_this, primitive, &model_matrix);
+                render_primitive_no_skin(_this, primitive, &model_matrix, &model_to_world,
+                                         ray_origin, ray_dir, closest_t, do_hit_test);
             }
         }
     }
@@ -421,7 +502,8 @@ static void render_node_recursive(l3_gltf_model_t *_this, int node_index,
     for (unsigned int i = 0; i < node->num_children; ++i)
     {
         int child_index = node->children_indices[i];
-        render_node_recursive(_this, child_index, view_matrix);
+        render_node_recursive(_this, child_index, view_matrix, ray_origin, ray_dir,
+                              closest_t, do_hit_test);
     }
 }
 
@@ -456,14 +538,86 @@ void l3_gltf_prepare(l3_gltf_model_t *_this)
         memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 4);
     }
 
+    // Calculate delta time (used for both animation and deformation)
+    uint32_t current_time_ms = l3_get_time_ms();
+    float dt = (_this->last_time_ms > 0) ? ((current_time_ms - _this->last_time_ms) / 1000.0f) : 0.0f;
+    _this->last_time_ms = current_time_ms;
+
     // Update animation
     if (_this->desc->animation != NULL)
     {
-        // Calculate delta time
-        uint32_t current_time_ms = l3_get_time_ms();
-        float dt = (_this->last_time_ms > 0) ? ((current_time_ms - _this->last_time_ms) / 1000.0f) : 0.0f;
-        _this->last_time_ms = current_time_ms;
         l3_gltf_update_animation(_this, dt);
+    }
+
+    // Update deformation animation
+    if (_this->base.deformation.is_active)
+    {
+        _this->base.deformation.current_time += dt;
+
+        // Check if animation is complete
+        if (_this->base.deformation.current_time >= _this->base.deformation.duration)
+        {
+            _this->base.deformation.is_active = false;
+            _this->base.deformation.has_hit = false;
+        }
+    }
+
+    // Check if we need to perform hit testing
+    bool do_hit_test = false;
+    l3_3d_point_t ray_origin = {0};
+    l3_3d_point_t ray_dir = {0};
+    float closest_t = 1e10f;
+
+    if (_this->base.deformation.impact_center.z < 0.0f)  // Flag for hit test needed
+    {
+        do_hit_test = true;
+
+        // Get screen coordinates from temporary storage
+        int16_t screen_x = (int16_t)_this->base.deformation.impact_center.x;
+        int16_t screen_y = (int16_t)_this->base.deformation.impact_center.y;
+
+        // Convert screen to NDC
+        float ndc_x = (2.0f * screen_x) / _this->base.viewPortWidth - 1.0f;
+        float ndc_y = (2.0f * screen_y) / _this->base.viewPortHeight - 1.0f;
+
+        // Calculate ray in view space
+        l3_camera_t *cam = &_this->base.camera;
+        float aspect = cam->aspect_ratio;
+        float tan_fov = cam->d;
+
+        l3_3d_point_t ray_dir_view;
+        ray_dir_view.x = ndc_x * aspect * tan_fov;
+        ray_dir_view.y = ndc_y * tan_fov;
+        ray_dir_view.z = 1.0f;
+
+        // Normalize
+        float len = sqrtf(ray_dir_view.x * ray_dir_view.x +
+                          ray_dir_view.y * ray_dir_view.y +
+                          ray_dir_view.z * ray_dir_view.z);
+        ray_dir_view.x /= len;
+        ray_dir_view.y /= len;
+        ray_dir_view.z /= len;
+
+        // Ray origin in world space
+        ray_origin.x = cam->position.x;
+        ray_origin.y = cam->position.y;
+        ray_origin.z = cam->position.z;
+
+        // Transform ray direction to world space using camera matrix
+        l3_4x4_matrix_t *mat_cam = &cam->mat_cam;
+        float u_x = mat_cam->u.e._11, u_y = mat_cam->u.e._12, u_z = mat_cam->u.e._13;
+        float v_x = mat_cam->u.e._21, v_y = mat_cam->u.e._22, v_z = mat_cam->u.e._23;
+        float n_x = mat_cam->u.e._31, n_y = mat_cam->u.e._32, n_z = mat_cam->u.e._33;
+
+        ray_dir.x = u_x * ray_dir_view.x + v_x * ray_dir_view.y + n_x * ray_dir_view.z;
+        ray_dir.y = u_y * ray_dir_view.x + v_y * ray_dir_view.y + n_y * ray_dir_view.z;
+        ray_dir.z = u_z * ray_dir_view.x + v_z * ray_dir_view.y + n_z * ray_dir_view.z;
+
+        // Normalize world ray
+        len = sqrtf(ray_dir.x * ray_dir.x + ray_dir.y * ray_dir.y + ray_dir.z * ray_dir.z);
+        ray_dir.x /= len;
+        ray_dir.y /= len;
+        ray_dir.z /= len;
     }
 
     // Start recursive rendering from the root node of all scenes.
@@ -477,7 +631,15 @@ void l3_gltf_prepare(l3_gltf_model_t *_this)
             l3_4x4_matrix_compose_trs(&node->global_transform, node->translation, node->rotation, node->scale);
         }
 
-        render_node_recursive(_this, root_node_index, &view_matrix);
+        render_node_recursive(_this, root_node_index, &view_matrix,
+                              &ray_origin, &ray_dir, &closest_t, do_hit_test);
+    }
+
+    // If hit test was performed and we found a hit, activate deformation
+    if (do_hit_test && _this->base.deformation.has_hit)
+    {
+        _this->base.deformation.is_active = true;
+        _this->base.deformation.current_time = 0.0f;
     }
 
     _this->base.combined_img->img_w = width;

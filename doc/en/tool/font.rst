@@ -75,8 +75,8 @@ FontConfig.json Parameter Description
    +--------------+--------------------------------------------------------------------------------------------------------------------------+
    | italic       | Specifies whether the converted characters are slanted.                                                                  |
    +--------------+--------------------------------------------------------------------------------------------------------------------------+
-   | scanMode     | Specifies how the converted character data is saved. If the value is "H", the fonts are saved by row;                    |
-   |              | if the value is "V", the fonts are saved by column.                                                                      |
+   | scanMode     | Specifies how the converted character data is saved. If the value is 'H', the fonts are saved by row;                    |
+   |              | if the value is 'V', the fonts are saved by column.                                                                      |
    +--------------+--------------------------------------------------------------------------------------------------------------------------+
    | fontSize     | Specifies the converted character size.                                                                                  |
    +--------------+--------------------------------------------------------------------------------------------------------------------------+

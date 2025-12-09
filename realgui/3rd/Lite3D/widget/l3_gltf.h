@@ -411,6 +411,19 @@ void l3_free_gltf_model(l3_model_base_t *base);
  */
 bool l3_gltf_model_on_click(l3_model_base_t *base, int16_t x, int16_t y);
 
+/**
+ * @brief Trigger deformation effect on the model at the specified screen coordinates.
+ *
+ * @param base Pointer to the 3D base model.
+ * @param screen_x X-coordinate of the click.
+ * @param screen_y Y-coordinate of the click.
+ * @param radius Radius of the deformation effect.
+ * @param depth Maximum depth of the deformation.
+ * @param duration Duration of the deformation animation.
+ */
+void l3_gltf_trigger_deformation(l3_model_base_t *base, int16_t screen_x, int16_t screen_y,
+                                 float radius, float depth, float duration);
+
 #ifdef __cplusplus
 }
 #endif

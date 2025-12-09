@@ -41,6 +41,7 @@ static const l3_model_ops_t gltf_model_ops =
     .set_target_canvas = l3_gltf_set_target_canvas,
     .set_face_image = NULL,
     .on_click = l3_gltf_model_on_click,
+    .trigger_deformation = l3_gltf_trigger_deformation,
 };
 /*============================================================================*
  *                           Private Functions
@@ -388,6 +389,10 @@ l3_gltf_model_t *l3_create_gltf_model(void                 *desc_addr,
     head->h = h;
     head->type = LITE_RGB565;
 
+    // Initialize deformation state
+    memset(&this->base.deformation, 0, sizeof(l3_deformation_state_t));
+    this->base.deformation.is_active = false;
+
     return this;
 }
 
@@ -525,4 +530,28 @@ bool l3_gltf_model_on_click(l3_model_base_t *base, int16_t x, int16_t y)
         }
     }
     return false;
+}
+
+void l3_gltf_trigger_deformation(l3_model_base_t *base, int16_t screen_x, int16_t screen_y,
+                                 float radius, float depth, float duration)
+{
+    if (l3_gltf_model_on_click(base, screen_x, screen_y) == false)
+    {
+        return;
+    }
+
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+
+    // Mark that we need to find the hit point during next render
+    _this->base.deformation.has_hit = false;
+    _this->base.deformation.is_active = false;  // Will be activated after finding hit point
+    _this->base.deformation.current_time = 0.0f;
+    _this->base.deformation.duration = duration;
+    _this->base.deformation.impact_radius = radius;
+    _this->base.deformation.max_depth = depth;
+
+    // Store screen coordinates for hit testing during render
+    _this->base.deformation.impact_center.x = (float)screen_x;
+    _this->base.deformation.impact_center.y = (float)screen_y;
+    _this->base.deformation.impact_center.z = -1.0f;  // Flag to indicate we need hit test
 }

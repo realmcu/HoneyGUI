@@ -884,6 +884,148 @@ bool l3_calulate_draw_img_target_area(l3_draw_rect_img_t *img, l3_rect_t *rect)
     return true;
 }
 
+// Ray-triangle intersection test (Möller–Trumbore algorithm)
+bool l3_ray_triangle_intersect(l3_3d_point_t *ray_origin, l3_3d_point_t *ray_dir,
+                               l3_3d_point_t *v0, l3_3d_point_t *v1, l3_3d_point_t *v2,
+                               float *t_out, l3_3d_point_t *hit_point)
+{
+    const float EPSILON = 0.0000001f;
+
+    // Edge vectors
+    l3_3d_point_t edge1, edge2, h, s, q;
+    edge1.x = v1->x - v0->x;
+    edge1.y = v1->y - v0->y;
+    edge1.z = v1->z - v0->z;
+
+    edge2.x = v2->x - v0->x;
+    edge2.y = v2->y - v0->y;
+    edge2.z = v2->z - v0->z;
+
+    // Cross product: ray_dir x edge2
+    h.x = ray_dir->y * edge2.z - ray_dir->z * edge2.y;
+    h.y = ray_dir->z * edge2.x - ray_dir->x * edge2.z;
+    h.z = ray_dir->x * edge2.y - ray_dir->y * edge2.x;
+
+    float a = edge1.x * h.x + edge1.y * h.y + edge1.z * h.z;
+
+    if (a > -EPSILON && a < EPSILON)
+    {
+        return false;  // Ray is parallel to triangle
+    }
+
+    float f = 1.0f / a;
+
+    s.x = ray_origin->x - v0->x;
+    s.y = ray_origin->y - v0->y;
+    s.z = ray_origin->z - v0->z;
+
+    float u = f * (s.x * h.x + s.y * h.y + s.z * h.z);
+
+    if (u < 0.0f || u > 1.0f)
+    {
+        return false;
+    }
+
+    // Cross product: s x edge1
+    q.x = s.y * edge1.z - s.z * edge1.y;
+    q.y = s.z * edge1.x - s.x * edge1.z;
+    q.z = s.x * edge1.y - s.y * edge1.x;
+
+    float v = f * (ray_dir->x * q.x + ray_dir->y * q.y + ray_dir->z * q.z);
+
+    if (v < 0.0f || u + v > 1.0f)
+    {
+        return false;
+    }
+
+    float t = f * (edge2.x * q.x + edge2.y * q.y + edge2.z * q.z);
+
+    if (t > EPSILON)
+    {
+        *t_out = t;
+        hit_point->x = ray_origin->x + ray_dir->x * t;
+        hit_point->y = ray_origin->y + ray_dir->y * t;
+        hit_point->z = ray_origin->z + ray_dir->z * t;
+        return true;
+    }
+
+    return false;
+}
+
+// Apply deformation effect to a vertex in model space
+void l3_apply_deformation_to_model_vertex(l3_deformation_state_t *deformation,
+                                          l3_3d_point_t *model_pos,
+                                          l3_4x4_matrix_t *model_to_world)
+{
+    if (!deformation->is_active || !deformation->has_hit)
+    {
+        return;
+    }
+
+    // Transform vertex to world space
+    l3_4d_point_t world_pos_4d = {model_pos->x, model_pos->y, model_pos->z, 1.0f};
+    world_pos_4d = l3_4x4_matrix_mul_4d_point(model_to_world, world_pos_4d);
+
+    l3_3d_point_t world_pos = {world_pos_4d.x, world_pos_4d.y, world_pos_4d.z};
+
+    // Calculate distance from vertex to impact center
+    float dx = world_pos.x - deformation->impact_center.x;
+    float dy = world_pos.y - deformation->impact_center.y;
+    float dz = world_pos.z - deformation->impact_center.z;
+    float distance = sqrtf(dx * dx + dy * dy + dz * dz);
+
+    // Only affect vertices within the radius
+    if (distance > deformation->impact_radius)
+    {
+        return;
+    }
+
+    // Calculate animation progress
+    float progress = deformation->current_time / deformation->duration;
+    float intensity;
+
+    // Ease-out-back effect for spring-like bounce
+    if (progress < 0.5f)
+    {
+        // Compress phase (0 -> 0.5)
+        float t = progress * 2.0f;
+        intensity = t * t * (3.0f - 2.0f * t); // Smoothstep
+    }
+    else
+    {
+        // Rebound phase (0.5 -> 1.0)
+        float t = (progress - 0.5f) * 2.0f;
+        intensity = 1.0f - t * t * (3.0f - 2.0f * t); // Inverse smoothstep
+    }
+
+    // Calculate falloff based on distance
+    float falloff = 1.0f - (distance / deformation->impact_radius);
+    falloff = falloff * falloff; // Quadratic falloff
+
+    // Calculate displacement along normal direction
+    // Positive displacement = push inward (along ray direction, increasing Z)
+    float displacement = deformation->max_depth * intensity * falloff;
+
+    // Transform impact normal from world space to model space
+    l3_3d_point_t model_normal;
+    model_normal.x = model_to_world->u.e._11 * deformation->impact_normal.x +
+                     model_to_world->u.e._21 * deformation->impact_normal.y +
+                     model_to_world->u.e._31 * deformation->impact_normal.z;
+    model_normal.y = model_to_world->u.e._12 * deformation->impact_normal.x +
+                     model_to_world->u.e._22 * deformation->impact_normal.y +
+                     model_to_world->u.e._32 * deformation->impact_normal.z;
+    model_normal.z = model_to_world->u.e._13 * deformation->impact_normal.x +
+                     model_to_world->u.e._23 * deformation->impact_normal.y +
+                     model_to_world->u.e._33 * deformation->impact_normal.z;
+
+    // Apply displacement in model space
+    model_pos->x += model_normal.x * displacement;
+    model_pos->y += model_normal.y * displacement;
+    model_pos->z += model_normal.z * displacement;
+}
+
+
+
 void *(*l3_malloc_imp)(size_t size) = NULL;
 void (*l3_free_imp)(void *ptr) = NULL;
 int (*l3_ftl_read_imp)(uintptr_t addr, uint8_t *buf, uint32_t len) = NULL;

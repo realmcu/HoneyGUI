@@ -75,6 +75,7 @@ struct l3_model_base
     L3_DRAW_TYPE draw_type;
 
     void *raw_data_from_ftl;
+    l3_deformation_state_t deformation;
 
 };
 
@@ -90,6 +91,8 @@ struct l3_model_ops
                               uint16_t bit_depth, uint8_t *canvas);
     void (*set_face_image)(l3_model_base_t *this, uint8_t face_index, void *image_addr);
     bool (*on_click)(l3_model_base_t *this, int16_t x, int16_t y);
+    void (*trigger_deformation)(l3_model_base_t *this, int16_t screen_x, int16_t screen_y,
+                                float radius, float depth, float duration);
 
 };
 
@@ -207,6 +210,19 @@ void l3_set_face_image(l3_model_base_t *_this, uint8_t face_index, void *image_a
  * @return True if the model is clicked, false otherwise.
  */
 bool l3_model_on_click(l3_model_base_t *_this, int x, int y);
+
+/**
+ * @brief Trigger deformation effect at the clicked position.
+ *
+ * @param _this Pointer to the 3D base model.
+ * @param screen_x Screen X-coordinate of the click.
+ * @param screen_y Screen Y-coordinate of the click.
+ * @param radius Effect radius in screen space.
+ * @param depth Maximum deformation depth.
+ * @param duration Animation duration in seconds.
+ */
+void l3_model_trigger_deformation(l3_model_base_t *_this, int16_t screen_x, int16_t screen_y,
+                                  float radius, float depth, float duration);
 
 /**
  * @brief Get the version of the Lite 3D library.

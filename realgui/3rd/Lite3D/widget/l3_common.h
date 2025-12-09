@@ -390,7 +390,18 @@ typedef struct l3_canvas
 } l3_canvas_t;
 
 
-
+typedef struct
+{
+    bool is_active;
+    float current_time;                // current animation time (s)
+    float duration;                    // total animation duration (s)
+    l3_3d_point_t impact_center;       // Click on the world coordinate of the position
+    l3_3d_point_t
+    impact_normal;       // Normal vector at the intersection point (deformation direction)
+    bool has_hit;
+    float impact_radius;
+    float max_depth;
+} l3_deformation_state_t;
 
 /*============================================================================*
  *                            Functions
@@ -481,7 +492,13 @@ void l3_calculator_4x4_matrix(l3_4x4_matrix_t *matrix, \
                               l3_4d_point_t point, l3_4d_vector_t vector, float degrees, \
                               float scale);
 
+bool l3_ray_triangle_intersect(l3_3d_point_t *ray_origin, l3_3d_point_t *ray_dir,
+                               l3_3d_point_t *v0, l3_3d_point_t *v1, l3_3d_point_t *v2,
+                               float *t_out, l3_3d_point_t *hit_point);
 
+void l3_apply_deformation_to_model_vertex(l3_deformation_state_t *deformation,
+                                          l3_3d_point_t *model_pos,
+                                          l3_4x4_matrix_t *model_to_world);
 void *l3_malloc(size_t size);
 void l3_free(void *ptr);
 int l3_ftl_read(uintptr_t addr, uint8_t *buf, uint32_t len);
