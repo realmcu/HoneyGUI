@@ -46,7 +46,7 @@ static gui_win_t *workout_start_remind = NULL;
 static gui_img_t *workout_start_item = NULL;
 // example: example_workout_time_text
 static gui_text_t *workout_time_text = NULL;
-static uint32_t workout_milliseconds = 0;
+uint32_t workout_milliseconds = 0;
 static char workout_time_str[20] = "00:00:00";
 
 
@@ -55,6 +55,8 @@ static char heart_rate_str[20] = "0";
 static char distance_str[20] = "0.00";
 
 static int8_t page_index = 0;
+bool is_workout_stopped = false;
+uint32_t stopped_workout_milliseconds = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -393,21 +395,46 @@ static void workout_start_design(gui_view_t *view)
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
 
     // reset static variables for countdown
-    countdown_value = 3;
-    is_countdown_finished = false;
     countdown_arc = NULL;
     countdown_text = NULL;
     list = NULL;
     workout_time_text = NULL;
-    workout_milliseconds = 0;
-    sprintf(workout_time_str, "00:00:00");
 
-    // reset workout data
-    current_workout_data.calories = 0;
-    current_workout_data.heart_rate = 0;
-    current_workout_data.distance = 0.0f;
-    current_workout_data.steps = 0;
-    current_workout_data.duration = 0;
+    if (!is_workout_stopped && stopped_workout_milliseconds == 0)
+    {
+        countdown_value = 3;
+        is_countdown_finished = false;
+        workout_milliseconds = 0;
+        sprintf(workout_time_str, "00:00:00");
+
+        // reset workout data
+        current_workout_data.calories = 0;
+        current_workout_data.heart_rate = 0;
+        current_workout_data.distance = 0.0f;
+        current_workout_data.steps = 0;
+        current_workout_data.duration = 0;
+    }
+    else if (!is_workout_stopped && stopped_workout_milliseconds > 0)
+    {
+        is_countdown_finished = true;
+        workout_milliseconds = stopped_workout_milliseconds;
+        stopped_workout_milliseconds = 0;
+
+        uint32_t minutes = workout_milliseconds / 60000;
+        uint32_t seconds = (workout_milliseconds % 60000) / 1000;
+        uint32_t centiseconds = (workout_milliseconds % 1000) / 10;
+        sprintf(workout_time_str, "%02u:%02u:%02u", minutes, seconds, centiseconds);
+    }
+    else if (is_workout_stopped)
+    {
+        is_countdown_finished = true;
+        workout_milliseconds = stopped_workout_milliseconds;
+
+        uint32_t minutes = workout_milliseconds / 60000;
+        uint32_t seconds = (workout_milliseconds % 60000) / 1000;
+        uint32_t centiseconds = (workout_milliseconds % 1000) / 10;
+        sprintf(workout_time_str, "%02u:%02u:%02u", minutes, seconds, centiseconds);
+    }
 
     // gui_view_switch_on_event(current_view, "workout_start_meida_view",
     //                          SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
@@ -422,21 +449,22 @@ static void workout_start_design(gui_view_t *view)
                              SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
-
     // create countdown arc(initially full circle)
-    countdown_arc = gui_lite_arc_create(parent, "countdown_arc",
-                                        SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-                                        150, 270, 630, 20, gui_rgb(185, 251, 79));
+    if (!is_countdown_finished)
+    {
+        countdown_arc = gui_lite_arc_create(parent, "countdown_arc",
+                                            SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                                            150, 270, 630, 20, gui_rgb(185, 251, 79));
 
-    // create countdown text(initially hidden)
-    countdown_text = gui_text_create(parent, "countdown_text",
-                                     SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 - 55,
-                                     0, 0);
-    sprintf(countdown_str, "%d", countdown_value);
-    gui_text_set(countdown_text, countdown_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
-                 strlen(countdown_str), 110);
-    gui_text_type_set(countdown_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(countdown_text, LEFT);
+        countdown_text = gui_text_create(parent, "countdown_text",
+                                         SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 - 55,
+                                         0, 0);
+        sprintf(countdown_str, "%d", countdown_value);
+        gui_text_set(countdown_text, countdown_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
+                     strlen(countdown_str), 110);
+        gui_text_type_set(countdown_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(countdown_text, LEFT);
+    }
 
     {
         workout_start_remind = gui_win_create(parent, "workout_start_remind", 0, 0, SCREEN_WIDTH, 200);
@@ -478,11 +506,10 @@ static void workout_start_design(gui_view_t *view)
             gui_img_scale(workout_start_item, 0.3, 0.3);
         }
 
-        // create exercise time text(initially hidden)
+        // create exercise time text
         workout_time_text = gui_text_create(workout_start_remind, "workout_time_text",
                                             30, 90,
                                             0, 0);
-        sprintf(workout_time_str, "00:00:00");
         gui_text_set(workout_time_text, workout_time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 233, 0),
                      strlen(workout_time_str), 85);
         gui_text_type_set(workout_time_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
@@ -496,11 +523,14 @@ static void workout_start_design(gui_view_t *view)
         gui_text_mode_set(t_time, MID_RIGHT);
         gui_text_rendermode_set(t_time, 2);
         gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);
-        // exercise time update timer(10ms)
-        gui_obj_create_timer(GUI_BASE(workout_time_text), 10, true, workout_time_update_cb);
 
-        // create workout data update timer(100ms)
-        gui_obj_create_timer(GUI_BASE(workout_start_remind), 100, true, update_workout_data_cb);
+        if (!is_workout_stopped)
+        {
+            // exercise time update timer(10ms)
+            gui_obj_create_timer(GUI_BASE(workout_time_text), 10, true, workout_time_update_cb);
+            // create workout data update timer(100ms)
+            gui_obj_create_timer(GUI_BASE(workout_start_remind), 100, true, update_workout_data_cb);
+        }
 
         //
         list = gui_list_create(workout_start_remind, 0, 0, 0, 0, 0, SCREEN_HEIGHT, 0,
@@ -515,8 +545,14 @@ static void workout_start_design(gui_view_t *view)
             gui_list_set_offset(list, -(page_index * SCREEN_HEIGHT));
         }
 
-        gui_obj_show(GUI_BASE(workout_start_remind), false);
+        if (is_countdown_finished)
+        {
+            gui_obj_show(GUI_BASE(workout_start_remind), true);
+        }
+        else
+        {
+            gui_obj_show(GUI_BASE(workout_start_remind), false);
+            gui_obj_create_timer(parent, 1000, true, countdown_timer_cb);
+        }
     }
-    gui_obj_create_timer(parent, 1000, true, countdown_timer_cb);
-
 }
