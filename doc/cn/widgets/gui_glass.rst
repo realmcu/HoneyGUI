@@ -27,6 +27,8 @@
 玻璃效果图像生成器使用说明
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+GlassTool: :download:`GlassTool <../GlassTool.zip>`
+
 软件概述
 ^^^^^^^^
 

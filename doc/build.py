@@ -32,7 +32,7 @@ def download_tools(language_path):
   tool_jira_id = "BTSOCGUI-213"
   print("Release build, need downd tools from {}".format(tool_jira_id))
   download_tool_list = list()
-  for file_name in ["ImageConverter", "Font Convert Tool", "RVisualDesigner"]:
+  for file_name in ["ImageConverter", "Font Convert Tool", "RVisualDesigner", "GlassTool"]:
     tool_list = Jira().find_packages_from_jira(tool_jira_id, file_name)
     if not tool_list:
       sys.exit("Cannot find {} in {}".format(file_name, tool_jira_id))
@@ -41,9 +41,11 @@ def download_tools(language_path):
   return download_tool_list
 
 def add_download_link(download_tool_list, language_path):
-  if len(download_tool_list) != 3:
+  if len(download_tool_list) != 4:
     sys.exit("Invalid tool list: {}".format(download_tool_list))
   print("Start add download link")
+  
+  # Add download link to tool/index.rst
   index_file = os.path.join(language_path, "tool/index.rst")
   if not os.path.exists(index_file):
     sys.exit("Cannot find index file: {}".format(index_file))
@@ -61,6 +63,16 @@ RVisualDesigner Tool: :download:`RVisualDesigner Tool <../{}>`
     stream = re.sub(r'(.. Add tool downlod link here)', lambda objs: objs.group(1) + "\r\n" + download_link, stream, count=0, flags=re.M)
   with open(index_file, mode='w+', newline='', errors='surrogateescape') as fd:
     fd.write(stream)
+  
+  # Add download link to widgets/gui_glass.rst
+  glass_file = os.path.join(language_path, "widgets/gui_glass.rst")
+  if os.path.exists(glass_file):
+    with open(glass_file, mode='r', newline='', errors='surrogateescape') as fd:
+      stream = fd.read()
+      # Replace the placeholder download link with actual file
+      stream = stream.replace('GlassTool.zip', download_tool_list[3])
+    with open(glass_file, mode='w+', newline='', errors='surrogateescape') as fd:
+      fd.write(stream)
 
 def record_doc_generate_time(index_path):
   nighty_date = time.strftime("%Y-%m-%d", time.localtime())

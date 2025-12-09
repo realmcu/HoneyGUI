@@ -28,6 +28,8 @@ Where distortion represents the thickness (refractive index) of each point on th
 Glass Effect Image Generator User Manual
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+GlassTool: :download:`GlassTool <../GlassTool.zip>`
+
 Software Overview
 ^^^^^^^^^^^^^^^^^
 

@@ -40,13 +40,13 @@
           :width: 100%
           :align: center
 
-          Qrcode
+          二维码
 
      - .. figure:: https://foruda.gitee.com/images/1753435473847626594/f6192e1b_10737458.png
           :width: 100%
           :align: center
 
-          Barcode
+          条形码
 
 
 API
