@@ -6,14 +6,11 @@ List
 
 The list widget is a container for any number of list note, horizontally or vertically. And each note, which is dynamic created for saving memory and CPU usage, can have other widgets added to it, such as text widgets, image widgets, etc. Users can swipe up, down, left, or right to access other widgets added to the list note.
 
-.. raw:: html
+.. figure:: https://foruda.gitee.com/images/1745465574757113257/5e8ee605_10737458.gif
+   :align: center
+   :width: 400
 
-   <br>
-   <div style="text-align: center">
-      <img src="https://foruda.gitee.com/images/1745465574757113257/5e8ee605_10737458.gif" width= "400" />
-      <p style="margin: 5px 0 0 0; text-align: center;">Vertical Classic List</p>
-   </div>
-   <br>
+   Vertical Classic List
 
 
 Usage
@@ -88,38 +85,44 @@ Example
    :end-before: /* gui list widget example end*/
 
 
-.. raw:: html
+.. list-table::
+   :widths: 33 33 33
 
-   <br>
-   <div style="display: flex; justify-content: space-between;">
-      <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745398396237626690/156a4565_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Circle Style</p>
-      </div>
-      <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1750920685777460993/280f951c_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Card Style</p>
-      </div>
-      <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Horizontal Zoom Style</p>
-      </div>
-   </div>
-   <div style="display: flex; justify-content: space-between;">
-      <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745819904731135543/290c9d96_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Fan Style</p>
-      </div>
-      <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1750916286131886532/8af671b7_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Helix Style</p>
-      </div>
-      <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745890329636631265/cef196cd_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Curl Style</p>
-      </div>
-   </div>
-   <br>
+   * - .. figure:: https://foruda.gitee.com/images/1745398396237626690/156a4565_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Circle Style
+
+     - .. figure:: https://foruda.gitee.com/images/1750920685777460993/280f951c_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Card Style
+
+     - .. figure:: https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif
+          :width: 100%
+          :align: center
+
+          Horizontal Zoom Style
+
+   * - .. figure:: https://foruda.gitee.com/images/1745819904731135543/290c9d96_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Fan Style
+
+     - .. figure:: https://foruda.gitee.com/images/1750916286131886532/8af671b7_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Helix Style
+
+     - .. figure:: https://foruda.gitee.com/images/1745890329636631265/cef196cd_10737458.gif
+          :width: 100%
+          :align: center
+          
+          Vertical Curl Style
 
 API
 -----

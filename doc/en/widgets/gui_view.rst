@@ -6,17 +6,17 @@ View
 
 The view widget is a kind of container that makes switching more convenient. Any new view widget can be created in real time in response to an event(clicking and sliding in all four directions...) and multiple switching effects can be selected. During the switching process, there will be two views in the memory, and after the switching is completed, the undisplayed view will be automatically cleaned up, which can effectively reduce the memory consumption.
 
-.. raw:: html
+.. figure:: https://foruda.gitee.com/images/1753407359429529327/73931f5b_10737458.jpeg
+   :align: center
+   :width: 1000
+   
+   View Flowchart
 
-   <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407375843378492/f91f9615_10737458.jpeg" width= "1000" /></div>
-   <p style="margin: 5px 0 0 0; text-align: center;">View Flowchart</p>
-   <br>
-
-   <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif" width= "400" /></div>
-   <p style="margin: 5px 0 0 0; text-align: center;">View Switching Diagram</p>
-   <br>
+.. figure:: https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif
+   :align: center
+   :width: 400
+   
+   View Switching Diagram
 
 
 Usage
@@ -105,12 +105,11 @@ Below are four separate C files, each containing a descriptor for the view and t
    :start-after: /* view lime start*/
    :end-before: /* view lime end*/
 
-
-.. raw:: html
-
-   <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407801497338482/48e631cd_10737458.gif" width= "400" /></div>
-   <br>
+.. figure:: https://foruda.gitee.com/images/1753407801497338482/48e631cd_10737458.gif
+   :align: center
+   :width: 400
+   
+   View Example
 
 API
 -----

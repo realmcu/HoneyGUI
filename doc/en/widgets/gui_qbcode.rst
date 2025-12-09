@@ -23,7 +23,7 @@ Use the function :cpp:any:`gui_qbcode_config` to set the size and border of qbco
 
 Qrcode Encode Notes
 ~~~~~~~~~~~~~~~~~~~~
-The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15. You can modify the version according to the `document <https://www.qrcode.com/zh/about/version.html>`_ .
+The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15. You can modify the version according to the `document <https://www.qrcode.com/en/about/version.html>`_ .
 
 Example
 --------
@@ -34,22 +34,20 @@ Example
    :end-before: /* gui qbcode widget example end*/
 
 
-.. raw:: html
+.. list-table::
+   :widths: 50 50
 
-   <br>
-   <div style="display: flex; justify-content: space-between;">
-      <div style="width: 40%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1753435459893270800/0b7b33c4_10737458.png" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Qrcode</p>
-      </div>
-      <div style="width: 40%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1753435473847626594/f6192e1b_10737458.png" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">Barcode</p>
-      </div>
-   </div>
-   <br>
+   * - .. figure:: https://foruda.gitee.com/images/1753435459893270800/0b7b33c4_10737458.png
+          :width: 100%
+          :align: center
 
+          Qrcode
 
+     - .. figure:: https://foruda.gitee.com/images/1753435473847626594/f6192e1b_10737458.png
+          :width: 100%
+          :align: center
+
+          Barcode
 
 API
 -----

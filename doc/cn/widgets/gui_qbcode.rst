@@ -33,21 +33,20 @@
    :start-after: /* gui qbcode widget example start*/
    :end-before: /* gui qbcode widget example end*/
 
+.. list-table::
+   :widths: 50 50
 
-.. raw:: html
+   * - .. figure:: https://foruda.gitee.com/images/1753435459893270800/0b7b33c4_10737458.png
+          :width: 100%
+          :align: center
 
-   <br>
-   <div style="display: flex; justify-content: space-between;">
-      <div style="width: 40%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1753435459893270800/0b7b33c4_10737458.png" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">二维码</p>
-      </div>
-      <div style="width: 40%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1753435473847626594/f6192e1b_10737458.png" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">条形码</p>
-      </div>
-   </div>
-   <br>
+          Qrcode
+
+     - .. figure:: https://foruda.gitee.com/images/1753435473847626594/f6192e1b_10737458.png
+          :width: 100%
+          :align: center
+
+          Barcode
 
 
 API

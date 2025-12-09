@@ -6,17 +6,18 @@
 
 视图控件 (View) 是一种切换更为便利的容器控件，通过事件响应（点击以及四个方向的滑动等）可以实时创建任一视图控件并可选择多种切换效果。切换过程中内存中会存在两个 view ，切换完成后会自动清理未显示的 view ，可以有效降低内存消耗。
 
-.. raw:: html
+.. figure:: https://foruda.gitee.com/images/1753407359429529327/73931f5b_10737458.jpeg
+   :align: center
+   :width: 1000
+   
+   View 流程图
 
-   <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407359429529327/73931f5b_10737458.jpeg" width= "1000" /></div>
-   <p style="margin: 5px 0 0 0; text-align: center;">View 流程图</p>
-   <br>
+.. figure:: https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif
+   :align: center
+   :width: 400
+   
+   View 切换示意图
 
-   <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif" width= "400" /></div>
-   <p style="margin: 5px 0 0 0; text-align: center;">View 切换示意图</p>
-   <br>
 
 用法
 -----
@@ -105,12 +106,11 @@
    :start-after: /* view lime start*/
    :end-before: /* view lime end*/
 
-
-.. raw:: html
-
-   <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407801497338482/48e631cd_10737458.gif" width= "400" /></div>
-   <br>
+.. figure:: https://foruda.gitee.com/images/1753407801497338482/48e631cd_10737458.gif
+   :align: center
+   :width: 400
+   
+   View 示例
 
 API
 -----
