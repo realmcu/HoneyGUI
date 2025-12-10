@@ -23,6 +23,6 @@ else:  # Linux/WSL - use system SDL2
     env.Append(CPPPATH = include)
 
 
-group = DefineGroup('rtk_gui', src, depend = [''])
+objs = DefineGroup('rtk_gui', src, depend = [''])
 
-Return('group')
+Return('objs')

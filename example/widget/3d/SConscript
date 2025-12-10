@@ -7,7 +7,7 @@ CPPPATH = [cwd]
 src = Split("""
 """)
 
-group = []
+objs = []
 CPPDEFINES = []
 CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
@@ -32,4 +32,4 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_ROBOT_GLTF_3D'):
     src += ['app_ui_realgui_3d_robot_gltf.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 
-Return('group')
+Return('objs')

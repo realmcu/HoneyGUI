@@ -32,6 +32,6 @@ if GetDepend('CONFIG_REALTEK_BUILD_GUI_240_240_DEMO'):
             print(additional_objs)
             src = Flatten(src + additional_objs)
 
-group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_240_240_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+objs = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_240_240_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-Return('group')
+Return('objs')

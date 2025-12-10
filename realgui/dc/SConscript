@@ -9,6 +9,6 @@ src = Glob('*.c')
 
 CPPPATH = [cwd]
 
-group = DefineGroup('realgui/dc', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
+objs = DefineGroup('realgui/dc', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
-Return('group')
+Return('objs')

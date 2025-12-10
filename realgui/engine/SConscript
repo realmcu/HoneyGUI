@@ -7,13 +7,13 @@ list = os.listdir(cwd)
 src = Glob('*.c')
 CPPPATH = [cwd]
 
-group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
+objs = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 if GetDepend('CONFIG_REALTEK_HONEYGUI'):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):
             if not os.path.isfile(os.path.join(path, 'SConstruct')):
-                group = group + SConscript(os.path.join(d, 'SConscript'))
+                objs = objs + SConscript(os.path.join(d, 'SConscript'))
 
-Return('group')
+Return('objs')

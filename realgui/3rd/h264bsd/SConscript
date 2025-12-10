@@ -27,7 +27,7 @@ path += [cwd,
 print(path)
 
 
-group = DefineGroup('realgui/3rd/h264bsd', src, depend = [], CPPPATH = path)
+objs = DefineGroup('realgui/3rd/h264bsd', src, depend = [], CPPPATH = path)
 
 
-Return('group')
+Return('objs')

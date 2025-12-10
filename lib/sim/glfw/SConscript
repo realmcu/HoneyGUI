@@ -17,6 +17,6 @@ else:  # Linux/WSL - use system glfw or skip if not needed
     pass
 
 
-group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
+objs = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
 
-Return('group')
+Return('objs')

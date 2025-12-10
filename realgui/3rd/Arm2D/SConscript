@@ -17,6 +17,6 @@ path = [cwd,
         cwd + '/platform/math/dsp', 
         cwd + '/Library/Source']
 
-group = DefineGroup('realgui/3rd/arm2d', src, depend = ['CONFIG_REALTEK_BUILD_GUI_USE_ARM2D'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+objs = DefineGroup('realgui/3rd/arm2d', src, depend = ['CONFIG_REALTEK_BUILD_GUI_USE_ARM2D'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
 
-Return('group')
+Return('objs')

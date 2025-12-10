@@ -11,7 +11,7 @@ CPPPATH += [cwd + '\\root_image']
 src = Split("""
 """)
 
-group = []
+objs = []
 
 CPPDEFINES = []
 
@@ -34,6 +34,6 @@ if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_GLASS_EFFECT_WIDGET'):
             print(additional_objs)
             src = Flatten(src + additional_objs)
 
-group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-Return('group')
+Return('objs')

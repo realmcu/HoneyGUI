@@ -554,19 +554,19 @@ static void nsvg__xformMultiply(float *t, float *s)
 
 static void nsvg__xformInverse(float *inv, float *t)
 {
-    double invdet, det = (double)t[0] * t[3] - (double)t[2] * t[1];
-    if (det > -1e-6 && det < 1e-6)
+    float invdet, det = t[0] * t[3] - t[2] * t[1];
+    if (det > -1e-6f && det < 1e-6f)
     {
         nsvg__xformIdentity(t);
         return;
     }
-    invdet = 1.0 / det;
-    inv[0] = (float)(t[3] * invdet);
-    inv[2] = (float)(-t[2] * invdet);
-    inv[4] = (float)(((double)t[2] * t[5] - (double)t[3] * t[4]) * invdet);
-    inv[1] = (float)(-t[1] * invdet);
-    inv[3] = (float)(t[0] * invdet);
-    inv[5] = (float)(((double)t[1] * t[4] - (double)t[0] * t[5]) * invdet);
+    invdet = 1.0f / det;
+    inv[0] = t[3] * invdet;
+    inv[2] = -t[2] * invdet;
+    inv[4] = (t[2] * t[5] - t[3] * t[4]) * invdet;
+    inv[1] = -t[1] * invdet;
+    inv[3] = t[0] * invdet;
+    inv[5] = (t[1] * t[4] - t[0] * t[5]) * invdet;
 }
 
 static void nsvg__xformPremultiply(float *t, float *s)
@@ -589,7 +589,7 @@ static void nsvg__xformVec(float *dx, float *dy, float x, float y, float *t)
     *dy = x * t[1] + y * t[3];
 }
 
-#define NSVG_EPSILON (1e-12)
+#define NSVG_EPSILON (1e-12f)
 
 static int nsvg__ptInBounds(float *pt, float *bounds)
 {
@@ -597,16 +597,16 @@ static int nsvg__ptInBounds(float *pt, float *bounds)
 }
 
 
-static double nsvg__evalBezier(double t, double p0, double p1, double p2, double p3)
+static float nsvg__evalBezier(float t, float p0, float p1, float p2, float p3)
 {
-    double it = 1.0 - t;
-    return it * it * it * p0 + 3.0 * it * it * t * p1 + 3.0 * it * t * t * p2 + t * t * t * p3;
+    float it = 1.0f - t;
+    return it * it * it * p0 + 3.0f * it * it * t * p1 + 3.0f * it * t * t * p2 + t * t * t * p3;
 }
 
 static void nsvg__curveBounds(float *bounds, float *curve)
 {
     int i, j, count;
-    double roots[2], a, b, c, b2ac, t, v;
+    float roots[2], a, b, c, b2ac, t, v;
     float *v0 = &curve[0];
     float *v1 = &curve[2];
     float *v2 = &curve[4];
@@ -632,12 +632,12 @@ static void nsvg__curveBounds(float *bounds, float *curve)
         b = 6.0f * v0[i] - 12.0f * v1[i] + 6.0f * v2[i];
         c = 3.0f * v1[i] - 3.0f * v0[i];
         count = 0;
-        if (fabs(a) < NSVG_EPSILON)
+        if (fabsf(a) < NSVG_EPSILON)
         {
-            if (fabs(b) > NSVG_EPSILON)
+            if (fabsf(b) > NSVG_EPSILON)
             {
                 t = -c / b;
-                if (t > NSVG_EPSILON && t < 1.0 - NSVG_EPSILON)
+                if (t > NSVG_EPSILON && t < 1.0f - NSVG_EPSILON)
                 {
                     roots[count++] = t;
                 }
@@ -648,13 +648,13 @@ static void nsvg__curveBounds(float *bounds, float *curve)
             b2ac = b * b - 4.0f * c * a;
             if (b2ac > NSVG_EPSILON)
             {
-                t = (-b + sqrt(b2ac)) / (2.0f * a);
-                if (t > NSVG_EPSILON && t < 1.0 - NSVG_EPSILON)
+                t = (-b + sqrtf(b2ac)) / (2.0f * a);
+                if (t > NSVG_EPSILON && t < 1.0f - NSVG_EPSILON)
                 {
                     roots[count++] = t;
                 }
-                t = (-b - sqrt(b2ac)) / (2.0f * a);
-                if (t > NSVG_EPSILON && t < 1.0 - NSVG_EPSILON)
+                t = (-b - sqrtf(b2ac)) / (2.0f * a);
+                if (t > NSVG_EPSILON && t < 1.0f - NSVG_EPSILON)
                 {
                     roots[count++] = t;
                 }
@@ -663,8 +663,8 @@ static void nsvg__curveBounds(float *bounds, float *curve)
         for (j = 0; j < count; j++)
         {
             v = nsvg__evalBezier(roots[j], v0[i], v1[i], v2[i], v3[i]);
-            bounds[0 + i] = nsvg__minf(bounds[0 + i], (float)v);
-            bounds[2 + i] = nsvg__maxf(bounds[2 + i], (float)v);
+            bounds[0 + i] = nsvg__minf(bounds[0 + i], v);
+            bounds[2 + i] = nsvg__maxf(bounds[2 + i], v);
         }
     }
 }
@@ -1213,11 +1213,11 @@ error:
 }
 
 // We roll our own string to float because the std library one uses locale and messes things up.
-static double nsvg__atof(const char *s)
+static float nsvg__atof(const char *s)
 {
     char *cur = (char *)s;
     char *end = NULL;
-    double res = 0.0, sign = 1.0;
+    float res = 0.0f, sign = 1.0f;
     long long intPart = 0, fracPart = 0;
     char hasIntPart = 0, hasFracPart = 0;
 
@@ -1239,7 +1239,7 @@ static double nsvg__atof(const char *s)
         intPart = strtoll(cur, &end, 10);
         if (cur != end)
         {
-            res = (double)intPart;
+            res = (float)intPart;
             hasIntPart = 1;
             cur = end;
         }
@@ -1255,7 +1255,7 @@ static double nsvg__atof(const char *s)
             fracPart = strtoll(cur, &end, 10);
             if (cur != end)
             {
-                res += (double)fracPart / pow(10.0, (double)(end - cur));
+                res += (float)fracPart / powf(10.0f, (float)(end - cur));
                 hasFracPart = 1;
                 cur = end;
             }
@@ -1265,7 +1265,7 @@ static double nsvg__atof(const char *s)
     // A valid number should have integer or fractional part.
     if (!hasIntPart && !hasFracPart)
     {
-        return 0.0;
+        return 0.0f;
     }
 
     // Parse optional exponent
@@ -1276,7 +1276,7 @@ static double nsvg__atof(const char *s)
         expPart = strtol(cur, &end, 10); // Parse digit sequence with sign
         if (cur != end)
         {
-            res *= pow(10.0, (double)expPart);
+            res *= powf(10.0f, (float)expPart);
         }
     }
 
@@ -1778,7 +1778,7 @@ static int nsvg__parseTranslate(float *xform, const char *str)
     float t[6];
     int na = 0;
     int len = nsvg__parseTransformArgs(str, args, 2, &na);
-    if (na == 1) { args[1] = 0.0; }
+    if (na == 1) { args[1] = 0.0f; }
 
     nsvg__xformSetTranslation(t, args[0], args[1]);
     memcpy(xform, t, sizeof(float) * 6);
@@ -2919,10 +2919,10 @@ static void nsvg__parseEllipse(NSVGparser *p, const char **attr)
 
 static void nsvg__parseLine(NSVGparser *p, const char **attr)
 {
-    float x1 = 0.0;
-    float y1 = 0.0;
-    float x2 = 0.0;
-    float y2 = 0.0;
+    float x1 = 0.0f;
+    float y1 = 0.0f;
+    float x2 = 0.0f;
+    float y2 = 0.0f;
     int i;
 
     for (i = 0; attr[i]; i += 2)
@@ -3358,7 +3358,7 @@ static void nsvg__imageBounds(NSVGparser *p, float *bounds)
     shape = p->image->shapes;
     if (shape == NULL)
     {
-        bounds[0] = bounds[1] = bounds[2] = bounds[3] = 0.0;
+        bounds[0] = bounds[1] = bounds[2] = bounds[3] = 0.0f;
         return;
     }
     bounds[0] = shape->bounds[0];

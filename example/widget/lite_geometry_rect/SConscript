@@ -8,7 +8,7 @@ CPPPATH = [cwd]
 src = Split("""
 """)
 
-group = []
+objs = []
 CPPDEFINES = ['DRV_LCD_WIDTH=480']
 CPPDEFINES += ['DRV_LCD_HIGHT=480']
 CPPDEFINES += ['DRV_PIXEL_BITS=16']
@@ -18,5 +18,5 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_LITE_RECT'):
     src += ['rect_view.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
     
-Return('group')
+Return('objs')
 

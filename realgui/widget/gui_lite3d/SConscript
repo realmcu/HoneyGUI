@@ -12,6 +12,6 @@ if GetDepend('CONFIG_REALTEK_BUILD_LITE3D'):
     inc = [cwd]
 
 
-group = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH = inc)
+objs = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH = inc)
 
-Return('group')
+Return('objs')
