@@ -208,6 +208,17 @@ config REALTEK_BUILD_MONKEY_TEST
     help
       RTK GUI Enable Monkey Test Log
 
+config REALTEK_H264_DECODER
+            bool "Enable REALTEK_H264_DECODER support"
+            default n
+
+        if REALTEK_H264_DECODER
+
+            config REALTEK_H264BSD
+                bool "Enable REALTEK H264BSD"
+
+        endif
+        
 config REALTEK_BUILD_GUI_BOX2D
     bool "Enable Box2D"
     default n
