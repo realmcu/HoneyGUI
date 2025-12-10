@@ -58,12 +58,11 @@ Set Text
 To add some texts or characters to a text widget and set text attributes with :cpp:any:`gui_text_set`.
 
 .. note::
-    The text length must be less than or equal to the set character length, and the text font size must match the size of the loaded font file.
+    The text length must be less than or equal to the set character length. For bitmap fonts, the text font size must match the size of the loaded font file; for vector fonts, the font size can be set dynamically.
 
 Font Type
 ^^^^^^^^^^
-The text widget support type setting. This function can be used to set the type. The type is a bin/ttf file address
-:cpp:any:`gui_text_type_set`.
+The text widget supports font type setting. Developers can call :cpp:any:`gui_text_type_set` to set the font source. You can set the address of font files and specify the font source mode.
 
 Text Content
 ^^^^^^^^^^^^^
@@ -80,17 +79,51 @@ By using this function :cpp:any:`gui_text_convert_to_img`, the text in the text 
 .. note::
     Because the content and font size information of the text widget is needed, it should be called after set text. If the content, font size, position, and other attributes of the text have been modified, you need to reuse this interface for conversion.
 
+Text Color
+^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_color_set` to set the text color.
+
+Font Size
+^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_size_set` to set the font size. For vector fonts using FreeType, width and height can be set separately; for bitmap fonts, only the height parameter is effective as the font size.
+
+Word Wrap
+^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_wordwrap_set` to enable or disable automatic word wrapping for English words.
+
+Letter and Line Spacing
+^^^^^^^^^^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_extra_letter_spacing_set` to set extra letter spacing, and :cpp:any:`gui_text_extra_line_spacing_set` to set extra line spacing.
+
+Matrix Transformation
+^^^^^^^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_set_matrix` to set a transformation matrix for the text widget, enabling effects like rotation and scaling. Using :cpp:any:`gui_text_use_matrix_by_img` enables image-based matrix rendering, suitable for complex transformations.
+
+Minimum Scale
+^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_set_min_scale` to set the minimum scale ratio for text.
+
+Font Render Mode
+^^^^^^^^^^^^^^^^^
+For vector fonts, developers can use the function :cpp:any:`gui_text_rendermode_set` to set the rasterization render mode (1/2/4/8).
+
+Emoji Support
+^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_emoji_set` to set the path and size of emoji image files. Requires use with a file system.
+
 Text Input
 ^^^^^^^^^^^
 Text widget supports the input setting. You can use this function to set input :cpp:any:`gui_text_input_set`.
 
 Text Modes
 ^^^^^^^^^^^
-The text control currently supports 21 types of layout modes, including the following categories:
+The text control currently supports 30 types of layout modes, including the following categories:
 
  + Single-line layout modes (3 types): Suitable for scenarios displaying only one line of text, such as single-line centered, left-aligned, right-aligned, etc.
- + Multi-line layout modes (6 types): Used for displaying multiple lines of text, supporting various arrangements like multi-line centered, multi-line left-aligned, multi-line right-aligned, etc.
- + Scrolling layout modes (4 types): Ideal for displaying content that exceeds the display area by scrolling, such as horizontal auto-scrolling, vertical scrolling, etc.
+ + Multi-line layout modes (3 types): Used for displaying multiple lines of text, supporting various arrangements like multi-line centered, multi-line left-aligned, multi-line right-aligned, etc.
+ + Single-line middle layout modes (3 types): Single-line text vertically centered, supporting left-aligned, centered, and right-aligned.
+ + Multi-line middle layout modes (3 types): Multi-line text vertically centered, supporting left-aligned, centered, and right-aligned.
+ + Scrolling layout modes (6 types): Ideal for displaying content that exceeds the display area by scrolling, including horizontal scrolling (top and middle) and vertical scrolling.
  + Vertical layout modes (6 types): Supports vertical text display from top to bottom, and can also be used as a general layout method for rotated text, including top alignment, middle alignment, and bottom alignment.
  + RTL (right-to-left) layout modes (6 types): Designed for languages written from right to left, such as Arabic and Hebrew, supporting corresponding layout modes.
 
@@ -118,17 +151,27 @@ All type setting modes are as follows.
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
    | `MULTI_RIGHT`        | Multi-line    | Right            | Top                           | Text widget              |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
-   | `MID_LEFT`           | Multi-line    | Left             | Mid                           | Text widget              |
+   | `MID_LEFT`           | Single-line   | Left             | Mid                           | Text widget              |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
-   | `MID_CENTER`         | Multi-line    | Center           | Mid                           | Text widget              |
+   | `MID_CENTER`         | Single-line   | Center           | Mid                           | Text widget              |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
-   | `MID_RIGHT`          | Multi-line    | Right            | Mid                           | Text widget              |
+   | `MID_RIGHT`          | Single-line   | Right            | Mid                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_MID_LEFT`     | Multi-line    | Left             | Mid                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_MID_CENTER`   | Multi-line    | Center           | Mid                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_MID_RIGHT`    | Multi-line    | Right            | Mid                           | Text widget              |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
    | `SCROLL_X`           | Single-line   | Right to Left    | Top                           | Scroll text widget       |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
-   | `SCROLL_Y`           | Multi-line    | Left             | Bottom to Top                 | Scroll text widget       |
+   | `SCROLL_X_REVERSE`   | Single-line   | Left to Right    | Top                           | Scroll text widget       |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
-   | `SCROLL_X_REVERSE`   | Multi-line    | Left to Right    | Top                           | Scroll text widget       |
+   | `SCROLL_X_MID`       | Single-line   | Right to Left    | Mid                           | Scroll text widget       |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_X_MID_REVERSE`| Single-line  | Left to Right    | Mid                           | Scroll text widget       |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_Y`           | Multi-line    | Left             | Bottom to Top                 | Scroll text widget       |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+
    | `SCROLL_Y_REVERSE`   | Multi-line    | Right            | Top to Bottom                 | Scroll text widget       |
    +----------------------+---------------+------------------+-------------------------------+--------------------------+

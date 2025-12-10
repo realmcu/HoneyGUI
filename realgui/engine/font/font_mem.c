@@ -222,19 +222,12 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else if (text->font_mode == FONT_SRC_FTL)
                     {
-                        uint32_t read_size_max = font->font_size * font->font_size * render_mode / 8 + 4;
-                        uint8_t *dot_buf_max = gui_malloc(read_size_max);
-                        if (dot_buf_max == NULL)
-                        {
-                            GUI_ASSERT(NULL != NULL);
-                            return;
-                        }
+                        uint8_t header[4];
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 4, header, 4);
 
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 4, dot_buf_max, read_size_max);
-
-                        chr[chr_i].char_y = *dot_buf_max;
-                        chr[chr_i].char_w = *(dot_buf_max + 2);
-                        chr[chr_i].char_h = *(dot_buf_max + 3);
+                        chr[chr_i].char_y = header[0];
+                        chr[chr_i].char_w = header[2];
+                        chr[chr_i].char_h = header[3];
 
                         chr[chr_i].char_h = chr[chr_i].char_h - chr[chr_i].char_y;
                         line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
@@ -242,13 +235,7 @@ void gui_font_get_dot_info(gui_text_t *text)
 
                         uint32_t dot_size = line_byte * chr[chr_i].char_h;
                         uint8_t *dot_buf = gui_malloc(dot_size);
-                        if (dot_buf == NULL)
-                        {
-                            GUI_ASSERT(NULL != NULL);
-                            return;
-                        }
-                        memcpy(dot_buf, dot_buf_max + 4, dot_size);
-                        gui_free(dot_buf_max);
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
 
                         chr[chr_i].dot_addr = dot_buf;
                     }
@@ -338,10 +325,13 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else if (text->font_mode == FONT_SRC_FTL)
                     {
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, &chr[chr_i].char_w, 1);
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 1, &chr[chr_i].char_h, 1);
-                        uint8_t *dot_buf = gui_malloc(text->font_height * text->font_height);
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, text->font_height * text->font_height);
+                        uint8_t header[2];
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
+                        chr[chr_i].char_w = (int16_t)header[0];
+                        chr[chr_i].char_h = (int16_t)header[1];
+                        uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
+                        uint8_t *dot_buf = gui_malloc(dot_size);
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
                         chr[chr_i].dot_addr = dot_buf;
                     }
                 }
@@ -418,10 +408,13 @@ void gui_font_get_dot_info(gui_text_t *text)
                                 }
                                 else if (text->font_mode == FONT_SRC_FTL)
                                 {
-                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, &chr[chr_i].char_w, 1);
-                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 1, &chr[chr_i].char_h, 1);
-                                    uint8_t *dot_buf = gui_malloc(text->font_height * text->font_height);
-                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, text->font_height * text->font_height);
+                                    uint8_t header[2];
+                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
+                                    chr[chr_i].char_w = (int16_t)header[0];
+                                    chr[chr_i].char_h = (int16_t)header[1];
+                                    uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
+                                    uint8_t *dot_buf = gui_malloc(dot_size);
+                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
                                     chr[chr_i].dot_addr = dot_buf;
                                     break;
                                 }
