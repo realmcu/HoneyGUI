@@ -120,11 +120,6 @@ config REALTEK_BUILD_REAL_BOX2D
     help
       RTK GUI Box2D Demo
 
-config REALTEK_BUILD_REAL_LITEGFX_DEMO
-    bool "LiteGFX Demo"
-    help
-      RTK GUI LiteGFX Demo
-
 config REALTEK_BUILD_GUI_410_502_DEMO
     bool "GUI Demo 410x502"
     help
@@ -176,30 +171,11 @@ endchoice
 
 menu "HoneyGUI Feature Configuration"
 
-
-config REALTEK_BUILD_WEB
-    bool "Enable Web"
-    default n
-    help
-      RTK GUI Enable web support
-
 config REALTEK_BUILD_PINYIN
     bool "Enable Keyboard and Pinyin"
     default y
     help
       RTK GUI Enable KeyBoard And Pinyin input
-
-config REALTEK_BUILD_U8G2
-    bool "Enable u8g2"
-    default n
-    help
-      RTK GUI Enable u8g2 library
-
-config REALTEK_BUILD_LITE_GFX
-    bool "Enable LiteGFX"
-    default n
-    help
-      RTK GUI Enable LiteGFX library
 
 config REALTEK_BUILD_LETTER_SHELL
     bool "Enable LetterShell"
@@ -229,12 +205,6 @@ config REALTEK_BUILD_GUI_BOX2D
     default n
     help
       RTK GUI BOX2D physics engine
-
-config REALTEK_BUILD_GUI_XML_DOM
-    bool "Enable XML DOM"
-    default n
-    help
-      RTK GUI XML_DOM parser
 
 config REALTEK_BUILD_LITE3D
     bool "Enable Lite3D library"

@@ -239,6 +239,28 @@ gui_video_t *gui_video_create_from_ftl(void           *parent,
                                        int16_t         h);
 
 /**
+ * @brief Create a video widget from a file system and attach it to a parent container.
+ *
+ * @param parent Pointer to the parent GUI object (must be valid).
+ * @param name Widget name/identifier.
+ * @param addr Pointer to the file path string.
+ * @param x Top-left x position relative to the parent.
+ * @param y Top-left y position relative to the parent.
+ * @param w Width in pixels (will be overwritten by video file).
+ * @param h Height in pixels (will be overwritten by video file).
+ *
+ * @return Pointer to gui_video_t on success; NULL on failure.
+ *
+ */
+gui_video_t *gui_video_create_from_fs(void           *parent,
+                                      const char     *name,
+                                      void           *addr,
+                                      int16_t         x,
+                                      int16_t         y,
+                                      int16_t         w,
+                                      int16_t         h);
+
+/**
  * @brief Create a video widget from a memory buffer and attach it to a parent container.
  *
  * @param parent Pointer to the parent GUI object (must be valid).
