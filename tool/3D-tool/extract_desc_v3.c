@@ -15,7 +15,7 @@
 #include "../../realgui/3rd/cgltf/cgltf.h"
 
 
-uint8_t tool_version = 2;
+uint8_t tool_version = 3;
 
 static L3_MODEL_TYPE get_model_type(const char *filename)
 {
@@ -123,13 +123,49 @@ static void extract_gltf_desc(const char *gltf_filename, char *bin_filename, cha
     free(gltf_desc);
 }
 
+static void convert_textures_interactive(void)
+{
+    printf("Do you want to convert PNG textures to bin format? [Y/n]: ");
+    char choice[10];
+    if (fgets(choice, sizeof(choice), stdin) != NULL)
+    {
+        // Default to 'y' if just Enter is pressed
+        if (choice[0] == '\n' || choice[0] == 'y' || choice[0] == 'Y')
+        {
+            printf("\nConverting textures...\n");
+
+            // Call the Python conversion script directly (simpler and cross-platform)
+            char cmd[512];
+#if defined(_WIN32)
+            snprintf(cmd, sizeof(cmd), "python convert_textures.py");
+#else
+            snprintf(cmd, sizeof(cmd), "python3 convert_textures.py");
+#endif
+
+            int result = system(cmd);
+
+            if (result == -1 || result != 0)
+            {
+                fprintf(stderr, "Warning: Texture conversion may have failed\n");
+                fprintf(stderr, "Please check convert_textures.py is in the current directory\n");
+            }
+        }
+        else
+        {
+            printf("Skipping texture conversion...\n");
+        }
+    }
+    printf("\n");
+}
+
 int main(int argc, char **argv)
 {
-    int result = system("python png2c.py");
-    if (result == -1)
-    {
-        fprintf(stderr, "Failed to run png2c.py\n");
-    }
+    printf("========================================\n");
+    printf("HoneyGUI 3D Model Descriptor Generator\n");
+    printf("========================================\n\n");
+
+    // Check for PNG files and ask user
+    convert_textures_interactive();
 
     const char *filename = argv[1];
     L3_MODEL_TYPE model_type = get_model_type(filename);
