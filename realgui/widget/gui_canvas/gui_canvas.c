@@ -54,6 +54,8 @@ static void gui_canvas_prepare(gui_canvas_t *this)
     GUI_UNUSED(this);
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_enable_event(root, GUI_EVENT_TOUCH_CLICKED);
+    gui_obj_enable_event(root, GUI_EVENT_TOUCH_PRESSED);
 
     uint32_t cx = dc->fb_width / 2;
     uint32_t cy = dc->fb_height / 2;
