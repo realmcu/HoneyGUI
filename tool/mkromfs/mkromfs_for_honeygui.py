@@ -56,7 +56,7 @@ class File(object):
 
     @property
     def c_name(self):
-        return '_' + self._name.replace('.', '_')
+        return '_' + self._name.replace('.', '_').replace('-', '_')
 
     @property
     def bin_name(self):
@@ -202,7 +202,7 @@ class Folder(object):
                 
                 # Store resource definitions
                 offset = data_addr - resource_defines['base_addr']
-                macro_name = str(c._name).replace('.', '_').upper()
+                macro_name = str(c._name).replace('.', '_').replace('-', '_').upper()
                 resource_defines['if_defs'].append(
                     f"#define   {macro_name:<40}(void *)(resource_root + 0x{offset:08x})"
                 )
