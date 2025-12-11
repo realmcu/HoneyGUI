@@ -6,7 +6,6 @@ Introduction to LVGL
 ==========================
 - `LVGL Official Website <https://lvgl.io/>`_
 - `LVGL Online Documentation <https://docs.lvgl.io/9.4/index.html>`_
-- `LVGL Introduction <https://docs.lvgl.io/9.4/introduction/index.html>`_
 
 LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library in C language, providing all the necessary tools to create embedded GUIs with easy-to-use graphical elements, attractive visual effects, and low memory usage.
 
@@ -133,14 +132,14 @@ Below are the directories and files related to LVGL:
 Actual Device Porting
 ==========================
 
-LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `LVGL Integration and Drivers <https://docs.lvgl.io/9.4/integration/index.html>`_ and `LVGL Main Modules <https://docs.lvgl.io/9.4/main-modules/index.html>`_.
+LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `Integrating LVGL <https://docs.lvgl.io/9.4/details/integration/index.html>`_ and `LVGL Main Modules <https://docs.lvgl.io/9.4/details/main-modules/index.html>`_.
 
 .. note::
     The following examples do not include the specific implementation of hardware device drivers, but simply demonstrate how to connect the drivers to LVGL's interfaces. Developers can complete the driver functions within the same :term:`API` framework as the example driver to connect to the driver layer interface, and then reuse the porting interfaces of the example project.
 
 Display
 -----------------------------
-- Documentation: `LVGL Display (lv_display) <https://docs.lvgl.io/9.4/main-modules/display/index.html>`_, `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.4/main-modules/display/setup.html>`_
+- Documentation: `LVGL Display (lv_display) <https://docs.lvgl.io/9.4/details/main-modules/display/index.html>`_, `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.4/details/main-modules/display/setup.html>`_
 
 After developers complete the debugging of display device driver functions, the device can communicate normally with the display device and show colors. This section introduces how to connect the driver to LVGL's display interface to display LVGL's UI.
 
@@ -200,13 +199,13 @@ Based on actual development needs, different memory resources, and rendering mod
 
 Input Devices
 -----------------------------
-- Documentation: `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_
+- Documentation: `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/details/main-modules/indev/index.html>`_
 
 Once developers have completed the debugging of the input device driver functionality, the device can communicate normally with the input device. This section introduces how to interface the driver with LVGL's input interface to interact with LVGL's UI.
 
 LVGL's input interface is implemented in the file :file:`lv_port_indev.c`, and input device parameters are configured in the initialization function ``void lv_port_indev_init(void)``, such as selecting the device type, configuring the data read callback function, and pointer binding.
 
-For detailed input device porting methods and precautions, please refer to the documentation `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_ .
+For detailed input device porting methods and precautions, please refer to the documentation `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/details/main-modules/indev/index.html>`_ .
 
 - In the initialization function ``void lv_port_indev_init(void)``, select and register the corresponding type of input device, such as **Touchpad** for touch screen devices, and implement the corresponding interface.
 
@@ -283,7 +282,7 @@ For detailed input device porting methods and precautions, please refer to the d
 File System
 -----------------------------
 
- - Documentation: `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.4/main-modules/fs.html>`_
+ - Documentation: `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.4/details/main-modules/fs.html>`_
 
 LVGL Benchmark Test
 ==========================
@@ -371,7 +370,7 @@ LVGL Native Demo
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_
 
-It is recommended that developers read and understand the `LVGL Introduction <https://docs.lvgl.io/9.4/introduction/index.html>`_ and `LVGL Widget Basics <https://docs.lvgl.io/9.4/common-widget-features/index.html>`_ sections before starting development to grasp the design concepts and logic of LVGL.
+It is recommended that developers read and understand the `LVGL Introduction <https://docs.lvgl.io/9.4/intro/introduction/index.html>`_ and `LVGL Widget Basics <https://docs.lvgl.io/9.4/details/widgets/base_widget.html>`_ sections before starting development to grasp the design concepts and logic of LVGL.
 
 LVGL offers a wealth of demos and examples to help developers become familiar with the use of various controls and features.
 
@@ -645,9 +644,9 @@ LVGL Image Converter
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - Online Image Converter: `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
-- Documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_
+- Documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/details/main-modules/image.html>`_
 
-The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.4/main-modules/images/adding_images.html#online-converter>`_:
+The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.4/details/main-modules/image.html#online-converter>`_:
 
 1. Select the LVGL Version: Choose ``LVGL v9``
 2. Upload Image Files: Select one or more local image files for batch conversion.
@@ -655,10 +654,10 @@ The LVGL Online Image Converter is a website provided by the LVGL development te
    The output C files will have the same name as the input files, and the variable name describing the image will also match the input file name. Therefore, avoid using Chinese characters or any illegal characters in the file names.
 3. Choose Output Color Format:
 
-   For an explanation of color formats, refer to  `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.4/main-modules/images/color_formats.html>`_.
+   For an explanation of color formats, refer to  `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.4/details/main-modules/image.html#color-formats>`_.
 4. Click :guilabel:`Convert` to obtain the output file
 
-The document `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_ provides a detailed introduction on using image resources and the image converter tool in LVGL, as well as simple usage examples.
+The document `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/details/main-modules/image.html>`_ provides a detailed introduction on using image resources and the image converter tool in LVGL, as well as simple usage examples.
 
 
 The online image converter for LVGL v9 only supports output in C file format and a limited selection of color formats. If you need features such as image compression, bin file output, or other color formats, please use the  `Python Image Converter <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_.
@@ -726,7 +725,7 @@ LVGL
 
 This conversion feature is fully supported by the native LVGL conversion script. The tool only accepts :term:`PNG` images as input files and can output both C files and bin files, supporting multiple color formats.
 When outputting image resources in the bin file format, the data in the bin file is stored as ``12 Byte lv_img_header_t + data``, where the ``lv_img_header_t`` contains information such as the ``color format``, ``width``, and ``height``.
-For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
+For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/details/main-modules/image.html>`_
 
 
 .. figure:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
@@ -801,7 +800,7 @@ LVGL Online Conversion Tool
 
 - Online Conversion Tool: `LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
 
-- Documentation: `LVGL Font (lv_font) <https://docs.lvgl.io/9.4/main-modules/fonts/index.html>`_
+- Documentation: `LVGL Font (lv_font) <https://docs.lvgl.io/9.4/details/main-modules/font.html>`_
 
 Please refer to `LVGL Frequently Asked Questions - How to use the font converter? <https://lvgl.io/tools/fontconverter>`_ for usage steps:
 

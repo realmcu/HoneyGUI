@@ -6,7 +6,6 @@ LVGL 简介
 ==========================
 - `LVGL 官网 <https://lvgl.io/>`_
 - `LVGL 在线文档 <https://docs.lvgl.io/9.4/index.html>`_
-- `LVGL 简介 <https://docs.lvgl.io/9.4/introduction/index.html>`_
 
 LVGL (Light and Versatile Graphics Library) 是一个免费且开源的 C 语言图形库，提供了一切所需的工具，以创建嵌入式 :term:`GUI` ，具有易于使用的图形元素、美观的视觉效果和低内存占用。
 
@@ -134,7 +133,7 @@ LVGL 结构
 实机移植
 ==========================
 
-LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 :term:`GPU` 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Integration and Drivers <https://docs.lvgl.io/9.3/details/integration/index.html>`_ 以及 `LVGL Main Modules <https://docs.lvgl.io/9.3/details/main-modules/index.html>`_ 。
+LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 :term:`GPU` 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `Integrating LVGL <https://docs.lvgl.io/9.4/details/integration/index.html>`_ 以及 `LVGL Main Modules <https://docs.lvgl.io/9.4/details/main-modules/index.html>`_ 。
 
 
 .. note::
@@ -143,7 +142,7 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 显示
 -----------------------------
-- 文档说明： `LVGL Display (lv_display) <https://docs.lvgl.io/9.4/main-modules/display/index.html>`_ 以及 `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.4/main-modules/display/setup.html>`_
+- 文档说明： `LVGL Display (lv_display) <https://docs.lvgl.io/9.4/details/main-modules/display/index.html>`_ 以及 `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.4/details/main-modules/display/setup.html>`_
 
 在开发者完成显示设备的驱动功能调试后，设备能够与显示设备正常通信并显示色彩。本小节介绍如何将驱动与 LVGL 的显示接口进行对接以展现 LVGL 的 UI 界面。
 
@@ -203,13 +202,13 @@ LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的
 
 输入设备
 -----------------------------
-- 文档说明： `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_
+- 文档说明： `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/details/main-modules/indev/index.html>`_
 
 在开发者完成输入设备的驱动功能调试后，设备能够与输入设备正常通信。本小节介绍如何将驱动与 LVGL 的输入接口进行对接以与 LVGL 的 UI 界面进行交互。
 
 LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备参数在初始化函数 ``void lv_port_indev_init(void)`` 中进行配置，如选择设备类型，配置数据读取回调函数，以及指针绑定等。
 
-详尽的输入设备移植方法和注意事项请参阅文档 `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/main-modules/indev/index.html>`_。
+详尽的输入设备移植方法和注意事项请参阅文档 `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.4/details/main-modules/indev/index.html>`_。
 
 - 在初始化函数 ``void lv_port_indev_init(void)`` 中选择注册对应类型的输入设备，如触屏设备则选择 **Touchpad** ， 并选择对应的接口进行实现。
 
@@ -286,7 +285,7 @@ LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备�
 文件系统
 -----------------------------
 
-- 文档说明： `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.4/main-modules/fs.html>`_
+- 文档说明： `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.4/details/main-modules/fs.html>`_
 
 LVGL Benchmark 测试
 ==========================
@@ -374,7 +373,7 @@ LVGL 原生 Demo
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_
 
-建议开发者开发前先行阅读理解 `LVGL Introduction <https://docs.lvgl.io/9.4/introduction/index.html>`_ 和 `LVGL Widget Basics <https://docs.lvgl.io/9.4/common-widget-features/index.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
+建议开发者开发前先行阅读理解 `LVGL Introduction <https://docs.lvgl.io/9.4/intro/introduction/index.html>`_ 和 `LVGL Base Widget (lv_obj) <https://docs.lvgl.io/9.4/details/widgets/base_widget.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
 
 LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控件和特性的使用。
 
@@ -651,9 +650,9 @@ LVGL 在线图片转换工具
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - 在线转换工具： `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
-- 文档说明： `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_
+- 文档说明： `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/details/main-modules/image.html>`_
 
-LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持上传本地的图片文件，转换输出标准 C 文件，其中以变量方式描述了图片信息。使用步骤请参考 `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.4/main-modules/images/adding_images.html#online-converter>`_：
+LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持上传本地的图片文件，转换输出标准 C 文件，其中以变量方式描述了图片信息。使用步骤请参考 `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.4/details/main-modules/image.html#online-converter>`_ ：
 
 1. 选择 LVGL 版本 ``LVGL v9``
 2. 选取本地图片文件，支持多选批量转换
@@ -661,10 +660,10 @@ LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持
    输出 C 文件将与输入文件同名，图片描述变量也会与输入文件同名，因此输入文件名应避免使用中文或其他非法字符。
 3. 选择输出文件的颜色格式
 
-   颜色格式的说明请参考 `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.4/main-modules/images/color_formats.html>`_
+   颜色格式的说明请参考 `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.4/details/main-modules/image.html#color-formats>`_
 4. 点击 :guilabel:`Convert` 获取输出文件
 
-在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
+在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/details/main-modules/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
 
 LVGL v9 的在线图片转换工具仅支持输出 C 文件格式和有限的颜色格式输出，如需图片压缩、bin 文件和其他的颜色格式输出，请使用 `python 转换脚本 <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_。
@@ -719,7 +718,7 @@ Media Convert Tool 在转换生成 bin 文件的同时，还将生成一份资�
 LVGL
 ^^^^^^^^^
 
-该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 :term:`PNG` 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时， bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/main-modules/images/index.html#>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
+该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 :term:`PNG` 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时， bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.4/details/main-modules/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
 .. figure:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
    :align: center
@@ -796,7 +795,7 @@ LVGL 在线转换工具
 
 - 在线转换工具：`LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
 
-- 文档说明：`LVGL Font (lv_font) <https://docs.lvgl.io/9.4/main-modules/fonts/index.html>`_
+- 文档说明：`LVGL Font (lv_font) <https://docs.lvgl.io/9.4/details/main-modules/font.html>`_
 
 使用步骤请参考  `LVGL Frequently Asked Questions - How to use the font converter? <https://lvgl.io/tools/fontconverter>`_ ：
 
