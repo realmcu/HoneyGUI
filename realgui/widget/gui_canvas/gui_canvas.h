@@ -99,6 +99,7 @@ void gui_canvas_set_canvas_cb(gui_canvas_t *this_widget, void (*cb)(gui_canvas_t
 #define GUI_CANVAS_OUTPUT_JPG 2
 #define GUI_CANVAS_OUTPUT_RGBA 3
 #define GUI_CANVAS_OUTPUT_RGB565 4
+#define GUI_CANVAS_OUTPUT_RGBA_NOMIX 5
 
 typedef void (*gui_canvas_render_function)(NVGcontext *vg);
 

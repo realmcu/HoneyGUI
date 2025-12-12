@@ -236,6 +236,7 @@ void *gui_canvas_render_to_image_buffer(int format, bool compression, int image_
         }
         break;
     case GUI_CANVAS_OUTPUT_RGBA:
+    case GUI_CANVAS_OUTPUT_RGBA_NOMIX:
         {
             output_data = target_buffer;
             buffer = output_data + sizeof(gui_rgb_data_head_t);
@@ -269,7 +270,8 @@ void *gui_canvas_render_to_image_buffer(int format, bool compression, int image_
                                          uint8_t *data);
         extern void nvgDeleteAGGE(NVGcontext * ctx);
         vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
-                           (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
+                           (pixel_length) == 2 ? NVG_TEXTURE_BGR565 :
+                           (format == GUI_CANVAS_OUTPUT_RGBA_NOMIX) ? NVG_TEXTURE_BGRA_NOMIX : NVG_TEXTURE_BGRA, buffer);
         nvgBeginFrame(vg, image_width, image_height, 1);
 
         nvgResetTransform(vg);

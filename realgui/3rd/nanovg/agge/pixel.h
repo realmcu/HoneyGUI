@@ -50,6 +50,20 @@ struct pixel32_bgra
     }
 };
 
+struct pixel32_bgra_nomix
+{
+    uint8_t b;
+    uint8_t g;
+    uint8_t r;
+    uint8_t a;
+    pixel32_bgra_nomix() : b(0), g(0), r(0), a(0)
+    {
+    }
+    pixel32_bgra_nomix(uint8_t rr, uint8_t gg, uint8_t bb, uint8_t aa) : b(bb), g(gg), r(rr), a(aa)
+    {
+    }
+};
+
 struct pixel32_argb
 {
     uint8_t a;
@@ -256,5 +270,15 @@ inline void pixel_blend(pixel32_bgra &t, const agge::pixel32_rgba &s, uint8_t a)
             t.a = (s.a * a + t.a * m_a) >> 8;
         }
     }
+}
+
+
+template <>
+inline void pixel_blend(pixel32_bgra_nomix &t, const agge::pixel32_rgba &s, uint8_t a)
+{
+    t.r = s.r;
+    t.g = s.g;
+    t.b = s.b;
+    t.a = (s.a * a + t.a * (0xff - a)) >> 8;
 }
 }  // namespace agge

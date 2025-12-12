@@ -40,6 +40,12 @@ struct pixel_bpp<pixel32_bgra>
 };
 
 template <>
+struct pixel_bpp<pixel32_bgra_nomix>
+{
+    static const bits_per_pixel bpp = bpp32;
+};
+
+template <>
 struct pixel_bpp<pixel32_argb>
 {
     static const bits_per_pixel bpp = bpp32;

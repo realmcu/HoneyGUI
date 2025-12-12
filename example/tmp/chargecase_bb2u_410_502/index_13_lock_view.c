@@ -199,18 +199,18 @@ void lock_view_design(gui_view_t *view)
         uint32_t size = 90 * 90 * 4 + sizeof(gui_rgb_data_head_t);
         press_bg = gui_malloc(size);
         memset(press_bg, 0, size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA_NOMIX,
                                           0, 90, 90, render_press, press_bg);
 
         pressing_bg = gui_malloc(size);
         memset(pressing_bg, 0, size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA_NOMIX,
                                           0, 90, 90, render_pressing, pressing_bg);
 
         size = 80 * 288 * 4 + sizeof(gui_rgb_data_head_t);
         bar_bg = gui_malloc(size);
         memset(bar_bg, 0, size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA_NOMIX,
                                           0, 80, 288, render_bar_bg, bar_bg);
     }
     gui_img_t *bg = gui_img_create_from_mem(parent, "bg", bar_bg,
