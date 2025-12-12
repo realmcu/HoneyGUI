@@ -141,8 +141,10 @@ typedef struct NSVGpaint
 
 typedef struct NSVGpath
 {
-    float *pts;                 // Cubic bezier points: x0,y0, [cpx1,cpx1,cpx2,cpy2,x1,y1], ...
-    int npts;                   // Total number of bezier points.
+    float *pts;                 // Mixed storage: line=1 point, bezier=3 points
+    uint8_t *types;             // Segment types: 0=line, 1=bezier
+    int nsegs;                  // Number of segments
+    int npts;                   // Total number of points
     char closed;                // Flag indicating if shapes should be treated as closed.
     float bounds[4];            // Tight bounding box of the shape [minx,miny,maxx,maxy].
     struct NSVGpath *next;      // Pointer to next path, or NULL if last element.
@@ -483,8 +485,11 @@ typedef struct NSVGparser
     NSVGattrib attr[NSVG_MAX_ATTR];
     int attrHead;
     float *pts;
+    uint8_t *types;
     int npts;
+    int nsegs;
     int cpts;
+    int csegs;
     NSVGpath *plist;
     NSVGimage *image;
     NSVGgradientData *gradients;
@@ -717,6 +722,10 @@ static void nsvg__deletePaths(NSVGpath *path)
         {
             gui_free(path->pts);
         }
+        if (path->types != NULL)
+        {
+            gui_free(path->types);
+        }
         gui_free(path);
         path = next;
     }
@@ -750,6 +759,7 @@ static void nsvg__deleteParser(NSVGparser *p)
         nsvg__deleteGradientData(p->gradients);
         nsvgDelete(p->image);
         gui_free(p->pts);
+        gui_free(p->types);
         gui_free(p);
     }
 }
@@ -757,6 +767,7 @@ static void nsvg__deleteParser(NSVGparser *p)
 static void nsvg__resetPath(NSVGparser *p)
 {
     p->npts = 0;
+    p->nsegs = 0;
 }
 
 static void nsvg__addPoint(NSVGparser *p, float x, float y)
@@ -770,6 +781,18 @@ static void nsvg__addPoint(NSVGparser *p, float x, float y)
     p->pts[p->npts * 2 + 0] = x;
     p->pts[p->npts * 2 + 1] = y;
     p->npts++;
+}
+
+static void nsvg__addSegment(NSVGparser *p, uint8_t type)
+{
+    if (p->nsegs + 1 > p->csegs)
+    {
+        p->csegs = p->csegs ? p->csegs * 2 : 8;
+        p->types = (uint8_t *)gui_realloc(p->types, p->csegs * sizeof(uint8_t));
+        if (!p->types) { return; }
+    }
+    p->types[p->nsegs] = type;
+    p->nsegs++;
 }
 
 static void nsvg__moveTo(NSVGparser *p, float x, float y)
@@ -787,16 +810,10 @@ static void nsvg__moveTo(NSVGparser *p, float x, float y)
 
 static void nsvg__lineTo(NSVGparser *p, float x, float y)
 {
-    float px, py, dx, dy;
     if (p->npts > 0)
     {
-        px = p->pts[(p->npts - 1) * 2 + 0];
-        py = p->pts[(p->npts - 1) * 2 + 1];
-        dx = x - px;
-        dy = y - py;
-        nsvg__addPoint(p, px + dx / 3.0f, py + dy / 3.0f);
-        nsvg__addPoint(p, x - dx / 3.0f, y - dy / 3.0f);
         nsvg__addPoint(p, x, y);
+        nsvg__addSegment(p, 0);  // 0 = line
     }
 }
 
@@ -808,6 +825,7 @@ static void nsvg__cubicBezTo(NSVGparser *p, float cpx1, float cpy1, float cpx2, 
         nsvg__addPoint(p, cpx1, cpy1);
         nsvg__addPoint(p, cpx2, cpy2);
         nsvg__addPoint(p, x, y);
+        nsvg__addSegment(p, 1);  // 1 = bezier
     }
 }
 
@@ -1144,9 +1162,9 @@ static void nsvg__addPath(NSVGparser *p, char closed)
     NSVGpath *path = NULL;
     float bounds[4];
     float *curve;
-    int i;
+    int i, idx;
 
-    if (p->npts < 4)
+    if (p->npts < 2 || p->nsegs < 1)
     {
         return;
     }
@@ -1156,20 +1174,17 @@ static void nsvg__addPath(NSVGparser *p, char closed)
         nsvg__lineTo(p, p->pts[0], p->pts[1]);
     }
 
-    // Expect 1 + N*3 points (N = number of cubic bezier segments).
-    if ((p->npts % 3) != 1)
-    {
-        return;
-    }
-
     path = (NSVGpath *)gui_malloc(sizeof(NSVGpath));
     if (path == NULL) { goto error; }
     memset(path, 0, sizeof(NSVGpath));
 
     path->pts = (float *)gui_malloc(p->npts * 2 * sizeof(float));
     if (path->pts == NULL) { goto error; }
+    path->types = (uint8_t *)gui_malloc(p->nsegs * sizeof(uint8_t));
+    if (path->types == NULL) { goto error; }
     path->closed = closed;
     path->npts = p->npts;
+    path->nsegs = p->nsegs;
 
     // Transform path.
     for (i = 0; i < p->npts; ++i)
@@ -1178,11 +1193,32 @@ static void nsvg__addPath(NSVGparser *p, char closed)
                          attr->xform);
     }
 
+    // Copy segment types
+    memcpy(path->types, p->types, p->nsegs * sizeof(uint8_t));
+
     // Find bounds
-    for (i = 0; i < path->npts - 1; i += 3)
+    idx = 1;  // Start from first point after moveTo
+    for (i = 0; i < path->nsegs; i++)
     {
-        curve = &path->pts[i * 2];
-        nsvg__curveBounds(bounds, curve);
+        if (path->types[i] == 0)  // Line
+        {
+            float x0 = path->pts[(idx - 1) * 2];
+            float y0 = path->pts[(idx - 1) * 2 + 1];
+            float x1 = path->pts[idx * 2];
+            float y1 = path->pts[idx * 2 + 1];
+            bounds[0] = nsvg__minf(x0, x1);
+            bounds[1] = nsvg__minf(y0, y1);
+            bounds[2] = nsvg__maxf(x0, x1);
+            bounds[3] = nsvg__maxf(y0, y1);
+            idx += 1;
+        }
+        else  // Bezier
+        {
+            curve = &path->pts[(idx - 1) * 2];
+            nsvg__curveBounds(bounds, curve);
+            idx += 3;
+        }
+
         if (i == 0)
         {
             path->bounds[0] = bounds[0];
@@ -1208,6 +1244,7 @@ error:
     if (path != NULL)
     {
         if (path->pts != NULL) { gui_free(path->pts); }
+        if (path->types != NULL) { gui_free(path->types); }
         gui_free(path);
     }
 }

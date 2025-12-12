@@ -29,10 +29,6 @@ typedef struct gui_svg
 {
     gui_obj_t base;
     void *svg_data;
-    void *rasterizer;
-    void *image_data;
-    uint16_t img_w;
-    uint16_t img_h;
     float scale;
     uint8_t opacity_value;
     uint8_t from_file : 1;

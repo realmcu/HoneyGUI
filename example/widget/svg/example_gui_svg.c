@@ -31,7 +31,7 @@ static int app_init(void)
 
     gui_svg_t *svg2 = gui_svg_create_from_mem(gui_obj_get_root(), "svg_rect",
                                               (void *)svg_rect, sizeof(svg_rect) - 1,
-                                              180, 10);
+                                              100, 0);
     gui_svg_set_scale(svg2, 2.0f);
 
     gui_svg_t *svg3 = gui_svg_create_from_mem(gui_obj_get_root(), "svg_star",

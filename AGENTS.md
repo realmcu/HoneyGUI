@@ -1,5 +1,9 @@
 # HoneyGUI Development Guidelines
 
+## General Rules
+
+**IMPORTANT**: Do not create or modify Markdown (.md) documentation files unless explicitly requested by the user.
+
 ## Git Commit Rules
 
 ### Commit Message Format

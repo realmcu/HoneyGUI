@@ -4,10 +4,10 @@
 *****************************************************************************************
   * @file gui_svg.c
   * @brief SVG widget implementation.
-  * @details SVG widget is used to display SVG images on the screen.
+  * @details SVG widget is used to display SVG images on the screen using NanoVG.
   * @author
-  * @date 2024/12/09
-  * @version 1.0
+  * @date 2024/12/11
+  * @version 2.0
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2023 Realtek Semiconductor Corporation</center></h2>
@@ -22,13 +22,79 @@
 
 #define NANOSVG_IMPLEMENTATION
 #include "nanosvg.h"
-#define NANOSVGRAST_IMPLEMENTATION
-#include "nanosvgrast.h"
+#include "nanovg.h"
+
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride,
+                                 enum NVGtexture format, uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
+
+static void render_svg_shape(NVGcontext *vg, NSVGshape *shape, float scale, uint8_t opacity)
+{
+    for (NSVGpath *path = shape->paths; path != NULL; path = path->next)
+    {
+        nvgBeginPath(vg);
+
+        if (path->npts > 0 && path->nsegs > 0)
+        {
+            nvgMoveTo(vg, path->pts[0] * scale, path->pts[1] * scale);
+
+            int idx = 1;  // Start from first point after moveTo
+            for (int i = 0; i < path->nsegs; i++)
+            {
+                if (path->types[i] == 0)  // Line
+                {
+                    float *p = &path->pts[idx * 2];
+                    nvgLineTo(vg, p[0] * scale, p[1] * scale);
+                    idx += 1;
+                }
+                else  // Bezier
+                {
+                    float *p = &path->pts[idx * 2];
+                    nvgBezierTo(vg, p[0] * scale, p[1] * scale,
+                                p[2] * scale, p[3] * scale,
+                                p[4] * scale, p[5] * scale);
+                    idx += 3;
+                }
+            }
+        }
+
+        if (path->closed)
+        {
+            nvgClosePath(vg);
+        }
+
+        if (shape->fill.type != NSVG_PAINT_NONE)
+        {
+            NVGcolor color;
+            if (shape->fill.type == NSVG_PAINT_COLOR)
+            {
+                unsigned int c = shape->fill.d.color;
+                color = nvgRGBA((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF,
+                                (((c >> 24) & 0xFF) * opacity) / 255);
+                nvgFillColor(vg, color);
+                nvgFill(vg);
+            }
+        }
+
+        if (shape->stroke.type != NSVG_PAINT_NONE)
+        {
+            NVGcolor color;
+            if (shape->stroke.type == NSVG_PAINT_COLOR)
+            {
+                unsigned int c = shape->stroke.d.color;
+                color = nvgRGBA((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF,
+                                (((c >> 24) & 0xFF) * opacity) / 255);
+                nvgStrokeColor(vg, color);
+                nvgStrokeWidth(vg, shape->strokeWidth * scale);
+                nvgStroke(vg);
+            }
+        }
+    }
+}
 
 static void gui_svg_prepare(gui_obj_t *obj)
 {
-    gui_svg_t *_this = (gui_svg_t *)obj;
-    GUI_UNUSED(_this);
+    GUI_UNUSED(obj);
 }
 
 static void gui_svg_draw(gui_obj_t *obj)
@@ -36,121 +102,35 @@ static void gui_svg_draw(gui_obj_t *obj)
     gui_svg_t *_this = (gui_svg_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
-    if (_this->image_data == NULL || _this->svg_data == NULL)
+    if (_this->svg_data == NULL)
     {
         return;
     }
 
     NSVGimage *svg = (NSVGimage *)_this->svg_data;
-    NSVGrasterizer *rast = (NSVGrasterizer *)_this->rasterizer;
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height,
+                                   dc->fb_width * (dc->bit_depth >> 3),
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA,
+                                   dc->frame_buf);
 
-    if (rast == NULL)
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+
+    nvgScissor(vg, 0, 0, dc->fb_width, dc->fb_height);
+    nvgResetTransform(vg);
+    nvgTranslate(vg, 0, -(float)dc->fb_height * (float)dc->section_count);
+    nvgScale(vg, _this->scale, _this->scale);
+    nvgTransformxyz(vg,
+                    obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
+                    obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2],
+                    obj->matrix->m[2][0], obj->matrix->m[2][1], obj->matrix->m[2][2]);
+
+    for (NSVGshape *shape = svg->shapes; shape != NULL; shape = shape->next)
     {
-        return;
+        render_svg_shape(vg, shape, 1.0f, _this->opacity_value);
     }
 
-    int w = (int)(svg->width * _this->scale);
-    int h = (int)(svg->height * _this->scale);
-
-    if (w != _this->img_w || h != _this->img_h)
-    {
-        _this->img_w = w;
-        _this->img_h = h;
-        if (_this->image_data)
-        {
-            gui_free(_this->image_data);
-        }
-        _this->image_data = gui_malloc(w * h * 4);
-        if (_this->image_data == NULL)
-        {
-            return;
-        }
-        memset(_this->image_data, 0, w * h * 4);
-        nsvgRasterize(rast, svg, 0, 0, _this->scale, _this->image_data, w, h, w * 4);
-    }
-
-    int x_start = obj->x + obj->parent->x;
-    int y_start = obj->y + obj->parent->y;
-
-    uint8_t *src = (uint8_t *)_this->image_data;
-    uint8_t dc_bytes = dc->bit_depth >> 3;
-
-    for (int y = 0; y < h; y++)
-    {
-        int screen_y = y_start + y;
-        if (screen_y < 0 || screen_y >= dc->fb_height)
-        {
-            continue;
-        }
-        if (screen_y < dc->section.y1 || screen_y > dc->section.y2)
-        {
-            continue;
-        }
-
-        for (int x = 0; x < w; x++)
-        {
-            int screen_x = x_start + x;
-            if (screen_x < 0 || screen_x >= dc->fb_width)
-            {
-                continue;
-            }
-
-            uint8_t *pixel = src + (y * w + x) * 4;
-            uint8_t r = pixel[0];
-            uint8_t g = pixel[1];
-            uint8_t b = pixel[2];
-            uint8_t a = pixel[3];
-
-            if (a == 0)
-            {
-                continue;
-            }
-
-            a = (a * _this->opacity_value) / 255;
-
-            int fb_offset = (screen_y - dc->section.y1) * dc->fb_width + screen_x;
-
-            if (dc_bytes == 2)
-            {
-                uint16_t *fb = (uint16_t *)dc->frame_buf;
-                uint16_t color = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
-                if (a == 255)
-                {
-                    fb[fb_offset] = color;
-                }
-                else
-                {
-                    uint16_t bg = fb[fb_offset];
-                    uint8_t bg_r = ((bg >> 11) & 0x1F) << 3;
-                    uint8_t bg_g = ((bg >> 5) & 0x3F) << 2;
-                    uint8_t bg_b = (bg & 0x1F) << 3;
-                    r = (r * a + bg_r * (255 - a)) / 255;
-                    g = (g * a + bg_g * (255 - a)) / 255;
-                    b = (b * a + bg_b * (255 - a)) / 255;
-                    fb[fb_offset] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
-                }
-            }
-            else if (dc_bytes == 4)
-            {
-                uint32_t *fb = (uint32_t *)dc->frame_buf;
-                if (a == 255)
-                {
-                    fb[fb_offset] = (0xFFU << 24) | (r << 16) | (g << 8) | b;
-                }
-                else
-                {
-                    uint32_t bg = fb[fb_offset];
-                    uint8_t bg_r = (bg >> 16) & 0xFF;
-                    uint8_t bg_g = (bg >> 8) & 0xFF;
-                    uint8_t bg_b = bg & 0xFF;
-                    r = (r * a + bg_r * (255 - a)) / 255;
-                    g = (g * a + bg_g * (255 - a)) / 255;
-                    b = (b * a + bg_b * (255 - a)) / 255;
-                    fb[fb_offset] = (0xFFU << 24) | (r << 16) | (g << 8) | b;
-                }
-            }
-        }
-    }
+    nvgEndFrame(vg);
+    nvgDeleteAGGE(vg);
 }
 
 static void gui_svg_end(gui_obj_t *obj)
@@ -166,16 +146,6 @@ static void gui_svg_destroy(gui_obj_t *obj)
     {
         nsvgDelete((NSVGimage *)_this->svg_data);
         _this->svg_data = NULL;
-    }
-    if (_this->rasterizer)
-    {
-        nsvgDeleteRasterizer((NSVGrasterizer *)_this->rasterizer);
-        _this->rasterizer = NULL;
-    }
-    if (_this->image_data)
-    {
-        gui_free(_this->image_data);
-        _this->image_data = NULL;
     }
 }
 
@@ -249,7 +219,6 @@ gui_svg_t *gui_svg_create_from_mem(void       *parent,
         NSVGimage *svg = (NSVGimage *)_this->svg_data;
         GET_BASE(_this)->w = (int16_t)svg->width;
         GET_BASE(_this)->h = (int16_t)svg->height;
-        _this->rasterizer = nsvgCreateRasterizer();
     }
 
     gui_list_init(&GET_BASE(_this)->child_list);
@@ -281,7 +250,6 @@ gui_svg_t *gui_svg_create_from_file(void       *parent,
         NSVGimage *svg = (NSVGimage *)_this->svg_data;
         GET_BASE(_this)->w = (int16_t)svg->width;
         GET_BASE(_this)->h = (int16_t)svg->height;
-        _this->rasterizer = nsvgCreateRasterizer();
     }
 
     gui_list_init(&GET_BASE(_this)->child_list);
