@@ -56,7 +56,10 @@ class File(object):
 
     @property
     def c_name(self):
-        return '_' + self._name.replace('.', '_').replace('-', '_')
+        """Convert filename to valid C identifier.
+        Replace special chars with underscore, prefix 'f_' if starts with digit."""
+        name = ''.join(c if c.isalnum() else '_' for c in self._name)
+        return '_' + name if name and not name[0].isdigit() else '_f_' + name
 
     @property
     def bin_name(self):
@@ -202,7 +205,9 @@ class Folder(object):
                 
                 # Store resource definitions
                 offset = data_addr - resource_defines['base_addr']
-                macro_name = str(c._name).replace('.', '_').replace('-', '_').upper()
+                # Convert filename to valid C macro: replace special chars, prefix 'F_' if starts with digit
+                name = ''.join(c if c.isalnum() else '_' for c in str(c._name))
+                macro_name = (name if name and not name[0].isdigit() else 'F_' + name).upper()
                 resource_defines['if_defs'].append(
                     f"#define   {macro_name:<40}(void *)(resource_root + 0x{offset:08x})"
                 )
