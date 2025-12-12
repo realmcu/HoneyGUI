@@ -5,12 +5,14 @@
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
+#include "font_mem.h"
 #include "time.h"
 #include "tp_algo.h"
 #include "app_main_dashboard.h"
 #include "gui_view.h"
 #include "gui_canvas.h"
-
+#include "app_message_adapter.h"
+#include "app_phone_adapter.h"
 
 /*============================================================================*
  *                            Macros
@@ -96,7 +98,22 @@ static void update_inform(void *p);
 static void dashboard_exit_animation(void *p);
 static void win_speed_animation(void *p);
 static void win_power_animation(void *p);
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+typedef enum
+{
+    PHONE_STATUS_NONE = 0,
+    PHONE_STATUS_ONGOING,
+    PHONE_STATUS_ACCEPT,
+} phone_status_t;
 
+typedef struct
+{
+    uint8_t phone_number[11];
+    uint8_t phone_number_len;
+    phone_status_t status;
+} phone_data_t;
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -1159,6 +1176,10 @@ static void update_inform(void *p)
 
 static void dashboard_design(gui_view_t *view)
 {
+    gui_font_mem_init(HARMONYOS_SIZE28_BITS1_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE32_BITS1_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE56_BITS1_FONT_BIN);
+
     gui_obj_t *parent = GUI_BASE(view);
     gui_obj_create_timer(parent, 10, true, dashboard_entrance_animation);
 
@@ -1241,6 +1262,8 @@ static void dashboard_design(gui_view_t *view)
     gui_obj_add_event_cb(off_icon, release_icon, GUI_EVENT_TOUCH_RELEASED, NULL);
 
     gui_img_t *bt = gui_img_create_from_mem(win_common, "bt", BT_BIN, 294, 52, 0, 0);
+    gui_img_a8_recolor(bt, 0xFFFFFFFF);
+
     gui_img_t *wifi = gui_img_create_from_mem(win_common, "wifi", WIFI_BIN, 478, 52, 0, 0);
     gui_obj_hidden(GUI_BASE(bt), true);
     gui_obj_hidden(GUI_BASE(wifi), true);
@@ -1260,4 +1283,6 @@ static void dashboard_design(gui_view_t *view)
                             DAIL_LED4_Y, 0, 0);
     gui_img_create_from_mem(win_common, "led5", LED5_OFF_BIN, DAIL_LED5_X,
                             DAIL_LED5_Y, 0, 0);
+    app_phone_popup_create(parent);
+    gui_message_popup_create(parent);
 }
