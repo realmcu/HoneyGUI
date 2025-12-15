@@ -16,6 +16,7 @@ static float rot_angle = 0.0f;
 const float DEFAULT_RADIUS = 10.0f;
 const float DEFAULT_DEPTH = 1.0f;
 const float DEFAULT_DURATION = 0.6f;
+
 static void update_pikachu_animation(void *param)
 {
     gui_lite3d_t *lite3d_pikachu = (gui_lite3d_t *)param;
@@ -35,7 +36,7 @@ static void pikachu_global_cb(l3_model_base_t *this)
                              32767,
                              90, this->viewPortWidth, this->viewPortHeight);
 
-    l3_world_initialize(&this->world, 0, 10, 28, 90, -30 + rot_angle, 0, 5);
+    l3_world_initialize(&this->world, 0, 10, 28, 0, -30 + rot_angle, 0, 5);
 }
 
 

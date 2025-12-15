@@ -87,7 +87,7 @@ static void flag_global_cb(l3_model_base_t *this)
                              32767,
                              90, this->viewPortWidth, this->viewPortHeight);
 
-    l3_world_initialize(&this->world, -5, 0, 18, 90, rot_angle, 0, 5);
+    l3_world_initialize(&this->world, -5, 0, 18, 0, rot_angle, 0, 5);
 }
 
 static void flag_app(gui_view_t *view)

@@ -600,9 +600,7 @@ def extract_gltf_desc(gltf_filename: str, bin_filename: str, txt_filename: str):
             f.write(struct.pack('<B', 16))  # payload_offset (1 byte)
             f.write(struct.pack('<6B', *[0]*6))  # extension (6 bytes)
             
-            header_start = f.tell()
-            
-            # g3m_header_t
+            # g3m_header_t - counts (9 fields)
             f.write(struct.pack('<I', scene_root_count))
             f.write(struct.pack('<I', node_count))
             f.write(struct.pack('<I', mesh_count))
@@ -614,13 +612,13 @@ def extract_gltf_desc(gltf_filename: str, bin_filename: str, txt_filename: str):
             f.write(struct.pack('<I', texture_count))
             
             # Calculate offsets
-            current_offset = f.tell() + 10 * 4 + 2 * 4  # header + offsets + blob info
+            current_offset = 16 + 80 # header + g3m_header_t
             
             scene_roots_offset = current_offset
             current_offset += scene_root_count * 4
             
             nodes_offset = current_offset
-            current_offset += node_count * 52  # sizeof(g3m_node_on_disk_t)
+            current_offset += node_count * 60  # sizeof(g3m_node_on_disk_t)
             
             meshes_offset = current_offset
             current_offset += mesh_count * 8  # sizeof(g3m_mesh_on_disk_t)
