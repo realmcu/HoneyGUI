@@ -28,6 +28,7 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+
 #ifdef _HONEYGUI_SIMULATOR_
 unsigned char *resource_root = NULL;
 char *wifi_get_bat_level(void)
@@ -73,129 +74,6 @@ static uint32_t switch_array[] =
     FRAME_0093_BIN,
     FRAME_0097_BIN,
     FRAME_0103_BIN,
-};
-static uint32_t watchface_array[] =
-{
-    WATCHFACE_FRAME_0000_BIN,
-    WATCHFACE_FRAME_0001_BIN,
-    WATCHFACE_FRAME_0002_BIN,
-    WATCHFACE_FRAME_0003_BIN,
-    WATCHFACE_FRAME_0004_BIN,
-    WATCHFACE_FRAME_0005_BIN,
-    WATCHFACE_FRAME_0006_BIN,
-    WATCHFACE_FRAME_0007_BIN,
-    WATCHFACE_FRAME_0008_BIN,
-    WATCHFACE_FRAME_0009_BIN,
-    WATCHFACE_FRAME_0010_BIN,
-    WATCHFACE_FRAME_0011_BIN,
-    WATCHFACE_FRAME_0012_BIN,
-    WATCHFACE_FRAME_0013_BIN,
-    WATCHFACE_FRAME_0014_BIN,
-    WATCHFACE_FRAME_0015_BIN,
-    WATCHFACE_FRAME_0016_BIN,
-    WATCHFACE_FRAME_0017_BIN,
-    WATCHFACE_FRAME_0018_BIN,
-    WATCHFACE_FRAME_0019_BIN,
-    WATCHFACE_FRAME_0020_BIN,
-    WATCHFACE_FRAME_0021_BIN,
-    WATCHFACE_FRAME_0022_BIN,
-    WATCHFACE_FRAME_0023_BIN,
-    WATCHFACE_FRAME_0024_BIN,
-    WATCHFACE_FRAME_0025_BIN,
-    WATCHFACE_FRAME_0026_BIN,
-    WATCHFACE_FRAME_0027_BIN,
-    WATCHFACE_FRAME_0028_BIN,
-    WATCHFACE_FRAME_0029_BIN,
-    WATCHFACE_FRAME_0030_BIN,
-    WATCHFACE_FRAME_0031_BIN,
-    WATCHFACE_FRAME_0032_BIN,
-    WATCHFACE_FRAME_0033_BIN,
-    WATCHFACE_FRAME_0034_BIN,
-    WATCHFACE_FRAME_0035_BIN,
-    WATCHFACE_FRAME_0036_BIN,
-    WATCHFACE_FRAME_0037_BIN,
-    WATCHFACE_FRAME_0038_BIN,
-    WATCHFACE_FRAME_0039_BIN,
-    WATCHFACE_FRAME_0040_BIN,
-    WATCHFACE_FRAME_0041_BIN,
-    WATCHFACE_FRAME_0042_BIN,
-    WATCHFACE_FRAME_0043_BIN,
-    WATCHFACE_FRAME_0044_BIN,
-    WATCHFACE_FRAME_0045_BIN,
-    WATCHFACE_FRAME_0046_BIN,
-    WATCHFACE_FRAME_0047_BIN,
-    WATCHFACE_FRAME_0048_BIN,
-    WATCHFACE_FRAME_0049_BIN,
-    WATCHFACE_FRAME_0050_BIN,
-    WATCHFACE_FRAME_0051_BIN,
-    WATCHFACE_FRAME_0052_BIN,
-    WATCHFACE_FRAME_0053_BIN,
-    WATCHFACE_FRAME_0054_BIN,
-    WATCHFACE_FRAME_0055_BIN,
-    WATCHFACE_FRAME_0056_BIN,
-    WATCHFACE_FRAME_0057_BIN,
-    WATCHFACE_FRAME_0058_BIN,
-    WATCHFACE_FRAME_0059_BIN,
-    WATCHFACE_FRAME_0060_BIN,
-    WATCHFACE_FRAME_0061_BIN,
-    WATCHFACE_FRAME_0062_BIN,
-    WATCHFACE_FRAME_0063_BIN,
-    WATCHFACE_FRAME_0064_BIN,
-    WATCHFACE_FRAME_0065_BIN,
-    WATCHFACE_FRAME_0066_BIN,
-    WATCHFACE_FRAME_0067_BIN,
-    WATCHFACE_FRAME_0068_BIN,
-    WATCHFACE_FRAME_0069_BIN,
-    WATCHFACE_FRAME_0070_BIN,
-    WATCHFACE_FRAME_0071_BIN,
-    WATCHFACE_FRAME_0072_BIN,
-    WATCHFACE_FRAME_0073_BIN,
-    WATCHFACE_FRAME_0074_BIN,
-    WATCHFACE_FRAME_0075_BIN,
-    WATCHFACE_FRAME_0076_BIN,
-    WATCHFACE_FRAME_0077_BIN,
-    WATCHFACE_FRAME_0078_BIN,
-    WATCHFACE_FRAME_0079_BIN,
-    WATCHFACE_FRAME_0080_BIN,
-    WATCHFACE_FRAME_0081_BIN,
-    WATCHFACE_FRAME_0082_BIN,
-    WATCHFACE_FRAME_0083_BIN,
-    WATCHFACE_FRAME_0084_BIN,
-    WATCHFACE_FRAME_0085_BIN,
-    WATCHFACE_FRAME_0086_BIN,
-    WATCHFACE_FRAME_0087_BIN,
-    WATCHFACE_FRAME_0088_BIN,
-    WATCHFACE_FRAME_0089_BIN,
-    WATCHFACE_FRAME_0090_BIN,
-    WATCHFACE_FRAME_0091_BIN,
-    WATCHFACE_FRAME_0092_BIN,
-    WATCHFACE_FRAME_0093_BIN,
-    WATCHFACE_FRAME_0094_BIN,
-    WATCHFACE_FRAME_0095_BIN,
-    WATCHFACE_FRAME_0096_BIN,
-    WATCHFACE_FRAME_0097_BIN,
-    WATCHFACE_FRAME_0098_BIN,
-    WATCHFACE_FRAME_0099_BIN,
-    WATCHFACE_FRAME_0100_BIN,
-    WATCHFACE_FRAME_0101_BIN,
-    WATCHFACE_FRAME_0102_BIN,
-    WATCHFACE_FRAME_0103_BIN,
-    WATCHFACE_FRAME_0104_BIN,
-    WATCHFACE_FRAME_0105_BIN,
-    WATCHFACE_FRAME_0106_BIN,
-    WATCHFACE_FRAME_0107_BIN,
-    WATCHFACE_FRAME_0108_BIN,
-    WATCHFACE_FRAME_0109_BIN,
-    WATCHFACE_FRAME_0110_BIN,
-    WATCHFACE_FRAME_0111_BIN,
-    WATCHFACE_FRAME_0112_BIN,
-    WATCHFACE_FRAME_0113_BIN,
-    WATCHFACE_FRAME_0114_BIN,
-    WATCHFACE_FRAME_0115_BIN,
-    WATCHFACE_FRAME_0116_BIN,
-    WATCHFACE_FRAME_0117_BIN,
-    WATCHFACE_FRAME_0118_BIN,
-    WATCHFACE_FRAME_0119_BIN,
 };
 static gui_img_t *mask_top;
 static gui_img_t *mask_middle;
@@ -275,6 +153,11 @@ static void release_setting_cb_about(void *obj, gui_event_t e, void *param);
 static void release_setting_cb_key_win(void *obj, gui_event_t e, void *param);
 static void press_setting_cb_key_win(void *obj, gui_event_t e, void *param);
 static void press_setting_cb_key_win_timer(void *p);
+static gui_img_t *view_switch_in_watchfaceimg1 = NULL;
+static gui_img_t *view_switch_in_watchfaceimg2 = NULL;
+static gui_img_t *view_switch_in_watchfaceimg3 = NULL;
+static gui_img_t *view_switch_in_watchfaceimg4 = NULL;
+static gui_img_t *view_switch_in_watchfaceimg0 = NULL;
 static gui_obj_t *key_obj_array[12];
 #define WIFI_ENTER_IMAGE_NAME "enter_wifi_image"
 static char before_keyboard = 0;
@@ -435,6 +318,12 @@ static void view_switch_in_camera(gui_view_t *view)
 #endif
 }
 
+/* Forward declarations for wifi status handlers */
+void wifi_status_ssid_connected(void);
+void wifi_status_server_connected(void);
+void wifi_status_ssid_connect_fail(void);
+void wifi_status_server_connect_fail(void);
+
 void wifi_gui_status_callback(void *msg)
 {
     uint16_t status = ((gui_msg_t *)msg)->sub_event;
@@ -444,22 +333,18 @@ void wifi_gui_status_callback(void *msg)
     {
     case 0:
         /* code */
-        void wifi_status_ssid_connected(void);
         wifi_status_ssid_connected();
         break;
     case 1:
         /* code */
-        void wifi_status_ssid_connected(void);
         wifi_status_ssid_connected();
         break;
     case 2:
         /* code */
-        void wifi_status_server_connected(void);
         wifi_status_server_connected();
         break;
     case 3:
         /* code */
-        void wifi_status_server_connect_fail(void);
         wifi_status_server_connect_fail();
         break;
 
@@ -785,27 +670,77 @@ static void switch_widget_play(void *p)
         gui_log("switch index:%d\n", index);
     }
 }
+static uint32_t watchface_digit_array[] =
+{
+    DIGIT_0_0_BIN,
+    DIGIT_1_1_BIN,
+    DIGIT_2_2_BIN,
+    DIGIT_3_3_BIN,
+    DIGIT_4_4_BIN,
+    DIGIT_5_5_BIN,
+    DIGIT_6_6_BIN,
+    DIGIT_7_7_BIN,
+    DIGIT_8_8_BIN,
+    DIGIT_9_9_BIN,
+};
+
+
+#if defined(_WIN32) || defined(WIN32)
+#include <time.h>
+/* Provide a localtime_r-compatible wrapper for Windows using localtime_s */
+static struct tm *localtime_r_compat(const time_t *timep, struct tm *result)
+{
+    memset(result, 0, sizeof(*result));
+    return (localtime_s(result, timep) == 0) ? result : NULL;
+}
+#define localtime_r localtime_r_compat
+#endif
 
 static void switch_widget_play_watchface(void *p)
 {
-    GUI_UNUSED(watchface_array);
-    gui_obj_t *obj = (gui_obj_t *)p;
-    GUI_UNUSED(obj);
-    uint64_t ms_cur = gui_ms_get();
-    static uint64_t ms_start = 0;
+    int watchface_hour = 10;
+    int watchface_minute = 34;
+#if defined(_WIN32) || defined(WIN32)
 
-    uint64_t dur = ms_cur - ms_start;
-    int array_size = ARRAY_SIZE(watchface_array);
-    int index = (array_size - 1) * dur / WATCHFACE_DUR_MS;
-    index = index % array_size;
 
+    time_t now = time(NULL);
+    if (now != (time_t) - 1)
     {
-
-        gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (void *)FILE_POINTER(watchface_array[index]));
-        //  gui_img_refresh_size(img);
-        gui_log("switch index:%d\n", index);
+        struct tm local_tm = {0};
+        if (localtime_r(&now, &local_tm) != NULL)
+        {
+            watchface_hour   = local_tm.tm_hour;
+            watchface_minute = local_tm.tm_min;
+        }
     }
+#endif
+    int index_hour_tens = watchface_hour / 10;
+    int index_hour_units = watchface_hour % 10;
+    int index_min_tens = watchface_minute / 10;
+    int index_min_units = watchface_minute % 10;
+    GUI_UNUSED(p);
+
+    gui_img_set_image_data(view_switch_in_watchfaceimg1,
+                           (void *)FILE_POINTER(watchface_digit_array[index_hour_tens]));
+    gui_img_set_image_data(view_switch_in_watchfaceimg2,
+                           (void *)FILE_POINTER(watchface_digit_array[index_hour_units]));
+    gui_img_set_image_data(view_switch_in_watchfaceimg3,
+                           (void *)FILE_POINTER(watchface_digit_array[index_min_tens]));
+    gui_img_set_image_data(view_switch_in_watchfaceimg4,
+                           (void *)FILE_POINTER(watchface_digit_array[index_min_units]));
+    static bool watchface_visible = true;
+    if (watchface_visible)
+    {
+        watchface_visible = false;
+        gui_obj_hidden((void *)view_switch_in_watchfaceimg0, true);
+    }
+    else
+    {
+        watchface_visible = true;
+        gui_obj_hidden((void *)view_switch_in_watchfaceimg0, false);
+    }
+
+
 }
 static int setting_y;
 static void press_setting_cb_timer(void *p)
@@ -1383,9 +1318,17 @@ static int app_init(void)
         GUI_UNUSED(gui_view_descriptor_image_466_466_keyboard);
         GUI_UNUSED(gui_view_descriptor_image_466_466_ota);
         GUI_UNUSED(gui_view_descriptor_image_466_466_camera);
+
+        gui_view_descriptor_register(&gui_view_descriptor_image_466_466_watchface);
+        gui_view_descriptor_register(&gui_view_descriptor_image_466_466);
+        gui_view_descriptor_register(&gui_view_descriptor_image_466_466_keyboard);
+        gui_view_descriptor_register(&gui_view_descriptor_image_466_466_ota);
+        gui_view_descriptor_register(&gui_view_descriptor_image_466_466_camera);
+        gui_view_descriptor_register(&gui_view_descriptor_image_466_466_about);
         image_466_466_view_watchface = gui_view_create(win,
-                                                       &gui_view_descriptor_image_466_466_watchface,
+                                                       gui_view_descriptor_image_466_466_watchface.name,
                                                        0, 0, 0, 0);
+
 
         // img = gui_img_create_from_mem(win,  "video_logo_image", (void *)video_logo_image, 466/2-410/2, 466/2-240/2, 0, 0);
     }
@@ -1510,8 +1453,46 @@ static void view_switch_in_watchface(gui_view_t *view)
     {
         gui_img_t *img =
             gui_img_create_from_mem(view,
-                                    0, (void *)FILE_POINTER(WATCHFACE_FRAME_0000_BIN), 0, 0, 0, 0);
+                                    0, (void *)FILE_POINTER(RECT_BIN), 0, 0, 0, 0);
         gui_img_set_mode(img, IMG_BYPASS_MODE);
-        gui_obj_create_timer((void *)img, 10, true, switch_widget_play_watchface);
+
+    }
+    {
+        {
+            gui_img_t *img =
+                gui_img_create_from_mem(view,
+                                        0, (void *)FILE_POINTER(DIGIT_10___BIN), (466 - 100) / 2, (466 - 100) / 2, 0, 0);
+            gui_img_set_mode(img, IMG_BYPASS_MODE);
+            view_switch_in_watchfaceimg0 = img;
+        }
+        {
+            gui_img_t *img =
+                gui_img_create_from_mem(view,
+                                        0, (void *)FILE_POINTER(DIGIT_0_0_BIN), 0, (466 - 100) / 2, 0, 0);
+            gui_img_set_mode(img, IMG_BYPASS_MODE);
+            view_switch_in_watchfaceimg1 = img;
+        }
+        {
+            gui_img_t *img =
+                gui_img_create_from_mem(view,
+                                        0, (void *)FILE_POINTER(DIGIT_1_1_BIN), 100, (466 - 100) / 2, 0, 0);
+            gui_img_set_mode(img, IMG_BYPASS_MODE);
+            view_switch_in_watchfaceimg2 = img;
+        }
+        {
+            gui_img_t *img =
+                gui_img_create_from_mem(view,
+                                        0, (void *)FILE_POINTER(DIGIT_2_2_BIN), 466 - 100 * 2, (466 - 100) / 2, 0, 0);
+            gui_img_set_mode(img, IMG_BYPASS_MODE);
+            view_switch_in_watchfaceimg3 = img;
+        }
+        {
+            gui_img_t *img =
+                gui_img_create_from_mem(view,
+                                        0, (void *)FILE_POINTER(DIGIT_3_3_BIN), 466 - 100 * 1, (466 - 100) / 2, 0, 0);
+            gui_img_set_mode(img, IMG_BYPASS_MODE);
+            view_switch_in_watchfaceimg4 = img;
+        }
+        gui_obj_create_timer((void *)view_switch_in_watchfaceimg0, 500, true, switch_widget_play_watchface);
     }
 }
