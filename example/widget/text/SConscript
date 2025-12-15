@@ -15,7 +15,7 @@ CPPDEFINES += ['DRV_PIXEL_BITS=16']
 if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_TEXT_WIDGET'):
     src += Glob('*.c')
 
-    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('objs')
 

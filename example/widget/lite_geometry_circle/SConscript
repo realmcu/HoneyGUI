@@ -15,7 +15,7 @@ CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE'):
     src += ['example_gui_lite_geometry_circle.c']
-    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
     
 Return('objs')
 
