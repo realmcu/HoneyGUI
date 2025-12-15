@@ -98,12 +98,12 @@ Before a 3D model can be rendered, it needs to be converted into a binary format
    
    Find the following tools in the HoneyGUI installation directory:
 
-     - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
      - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
+     - ``your_HoneyGUI_dir\tool\image-convert-tool\image_converter_new.py``
 
-2. **Prepare the Model Directory**
+2. **Prepare the Model Files**
    
-   Place the ``extract_desc.exe`` and ``png2c.py`` tools in the same directory as your model files.
+   Copy your model files to the ``tool\3D-tool`` directory.
 
       - For OBJ models, ensure the directory contains:
 
@@ -119,21 +119,26 @@ Before a 3D model can be rendered, it needs to be converted into a binary format
 
 3. **Generate Descriptor File**
    
-   Open a command line terminal, navigate to the model's directory, and use ``extract_desc.exe`` to process the model file. The tool will automatically detect the file type and perform the corresponding actions.
+   Open a command line terminal in the ``tool\3D-tool`` directory and run:
    
    - Processing OBJ Model
 
-      Run the command: :kbd:`extract_desc.exe xxx.obj`. This command will automatically invoke :file:`png2c.py` to convert all PNG textures into C-language binary arrays.
+      Run the command: :kbd:`extract_desc_v3.exe your_model.obj` or use the Python version :kbd:`python extract_desc_v3.py your_model.obj` .
+      
+      The tool will ask if you want to convert textures:
+      
+      - Press Enter or type ``Y`` - Automatically convert all PNG textures to bin format
+      - Type ``N`` - Skip conversion (already converted or no textures needed)
 
-      .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
+      .. figure:: https://foruda.gitee.com/images/1765767298921057824/1cafcec4_13408154.png
          :width: 800px
          :align: center
 
          Script Processing
    
-      After execution, :file:`desc_xxx.txt` and :file:`desc_xxx.bin` files will be generated. These files contain the parsed obj, mtl data, and the embedded texture data.
+      After execution, :file:`desc_xxx.txt` and :file:`desc_xxx.bin` files will be generated. These files contain the parsed obj, mtl data, and the embedded texture data in binary format.
 
-      .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
+      .. figure:: https://foruda.gitee.com/images/1765768566599235890/a974e84c_13408154.png
          :width: 800px
          :align: center
 
@@ -141,7 +146,7 @@ Before a 3D model can be rendered, it needs to be converted into a binary format
 
    - Processing GLTF Model
 
-      Run the command: :kbd:`extract_desc.exe xxx.gltf`. This command will also automatically process all referenced texture images.
+      Run the command: :kbd:`extract_desc_v3.exe xxx.gltf` or :kbd:`python extract_desc_v3.py your_model.obj`. This command will also automatically process all referenced texture images.
 
       After execution, :file:`gltf_desc_xxx.txt` and :file:`gltf_desc_xxx.bin` files will be generated. These files contain the parsed gltf, bin data, and the embedded texture data.
 

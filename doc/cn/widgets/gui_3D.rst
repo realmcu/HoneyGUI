@@ -100,12 +100,12 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
 
    在 HoneyGUI 安装目录下找到以下工具：
 
-      - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
       - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
+      - ``your_HoneyGUI_dir\tool\image-convert-tool\image_converter_new.py``
 
-2. **准备模型目录**
+2. **准备模型文件**
 
-   将上述 ``extract_desc.exe`` 和 ``png2c.py`` 工具与模型文件放在同一个目录下。
+   将模型文件复制到 ``tool\3D-tool`` 目录下。
 
    - 对于 OBJ 模型，请确保目录内包含：
 
@@ -121,21 +121,26 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
 
 3. **生成描述文件**
 
-   打开命令行终端，进入模型所在目录，使用 ``extract_desc.exe`` 处理模型文件，该工具会自动识别文件类型并执行相应操作。
+   在 ``tool\3D-tool`` 目录下打开命令行终端并运行：
    
    - 处理 OBJ 模型
 
-      运行命令: :kbd:`extract_desc.exe xxx.obj`，该命令会自动调用 :file:`png2c.py` 将所有 PNG 纹理转换为C语言的二进制数组。
+      运行命令: :kbd:`extract_desc_v3.exe your_model.obj` 或者使用 Python 版本 :kbd:`python extract_desc_v3.py your_model.obj` 。
+      
+      工具会询问是否转换纹理：
+      
+      - 按回车或输入 ``Y`` - 自动将所有 PNG 纹理转换为 bin 格式
+      - 输入 ``N`` - 跳过转换（已转换或无需纹理）
 
-      .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
+      .. figure:: https://foruda.gitee.com/images/1765767298921057824/1cafcec4_13408154.png
          :width: 800px
          :align: center
 
          脚本处理
       
-      执行后会生成 :file:`desc_xxx.txt` 和 :file:`desc_xxx.bin` 文件，其中包含了解析后的 obj、mtl 数据以及内嵌的纹理数据。
+      执行后会生成 :file:`desc_xxx.txt` 和 :file:`desc_xxx.bin` 文件，其中包含了解析后的 obj、mtl 数据以及内嵌的二进制格式纹理数据。
    
-      .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
+      .. figure:: https://foruda.gitee.com/images/1765768566599235890/a974e84c_13408154.png
          :width: 800px
          :align: center
 
@@ -143,7 +148,7 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
 
    - 处理 GLTF 模型
 
-      运行命令: :kbd:`extract_desc.exe xxx.gltf`，该命令也会自动处理所有引用的纹理图片。
+      运行命令: :kbd:`extract_desc.exe xxx.gltf` 或者 :kbd:`python extract_desc_v3.py your_model.obj`，该命令也会自动处理所有引用的纹理图片。
 
       执行后会生成 :file:`gltf_desc_xxx.txt` 和 :file:`gltf_desc_xxx.bin` 文件，其中包含了解析后的 gltf、bin 数据以及内嵌的纹理数据。
 

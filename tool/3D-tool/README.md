@@ -10,8 +10,8 @@ Copy your model files to the `3D-tool` directory:
 
 ```
 tool/3D-tool/
-├── extract_desc.exe          (tool)
-├── extract_desc_v2.py        (tool)
+├── extract_desc_v3.exe       (tool)
+├── extract_desc_v3.py        (tool)
 ├── your_model.obj            ← Your model
 ├── your_model.mtl            ← Your model
 ├── texture1.png              ← Your textures
@@ -70,9 +70,41 @@ tool/3D-tool/
 - **Textures:** PNG (auto-converted to optimal format)
 - **Output:** Binary descriptor + texture binaries
 
+## Manual Texture Conversion
+
+If you need to convert textures separately, use one of these methods:
+
+### Method 1: Python Script
+```bash
+python convert_textures.py
+```
+
+Options:
+```bash
+python convert_textures.py -d ./textures    # Convert textures in specific directory
+python convert_textures.py -f RGB565        # Force specific format
+```
+
+### Method 2: Manual Command
+```bash
+# Convert single file
+python ../image-convert-tool/image_converter_new.py -i texture.png -o texture.bin -f auto
+
+# Convert all PNG files (Linux/Mac)
+for file in *.png; do
+    python ../image-convert-tool/image_converter_new.py -i "$file" -o "${file%.png}.bin" -f auto
+done
+
+# Convert all PNG files (Windows PowerShell)
+Get-ChildItem *.png | ForEach-Object {
+    python ..\image-convert-tool\image_converter_new.py -i $_.Name -o "$($_.BaseName).bin" -f auto
+}
+```
+
 ## Notes
 
 - All files must be in the `3D-tool` directory
 - Textures are auto-detected as ARGB8888 or RGB565
 - The tool uses `../image-convert-tool/image_converter_new.py` for conversion
 - Binary format is compatible with existing HoneyGUI applications
+- Texture conversion is optional - the tool will prompt you when needed
