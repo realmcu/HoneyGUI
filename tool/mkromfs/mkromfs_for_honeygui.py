@@ -32,10 +32,11 @@ def pad_to_alignment(data, alignment):
 
 def pad_string_to_alignment(string, alignment):
     """Pad string to specified alignment with null bytes."""
-    remainder = len(string) % alignment
+    data = string.encode('utf-8') if isinstance(string, str) else string
+    remainder = len(data) % alignment
     if remainder != 0:
-        return string + '\0' * (alignment - remainder)
-    return string
+        return data + b'\0' * (alignment - remainder)
+    return data
 
 
 class File(object):
@@ -191,7 +192,7 @@ class Folder(object):
             else:
                 assert False, 'Unknown instance:%s' % str(c)
 
-            name = bytes(c.bin_name, 'utf8')
+            name = c.bin_name
             name_addr = virtual_length
             virtual_length += len(name)
 
@@ -206,8 +207,8 @@ class Folder(object):
                 # Store resource definitions
                 offset = data_addr - resource_defines['base_addr']
                 # Convert filename to valid C macro: replace special chars, prefix 'F_' if starts with digit
-                name = ''.join(c if c.isalnum() else '_' for c in str(c._name))
-                macro_name = (name if name and not name[0].isdigit() else 'F_' + name).upper()
+                macro_base = ''.join(ch if ch.isalnum() else '_' for ch in str(c._name))
+                macro_name = (macro_base if macro_base and not macro_base[0].isdigit() else 'F_' + macro_base).upper()
                 resource_defines['if_defs'].append(
                     f"#define   {macro_name:<40}(void *)(resource_root + 0x{offset:08x})"
                 )
@@ -215,7 +216,7 @@ class Folder(object):
                     f"#define   {macro_name:<40}(void *)(0x{data_addr:08x})"
                 )
                 
-                data = add_data + c.bin_data(virtual_length)
+                data = add_data + c.bin_data(data_addr)
             else:
                 data = c.bin_data(virtual_length, resource_defines)
             
@@ -229,7 +230,7 @@ class Folder(object):
             )))
             payload_list.extend((name, data))
 
-        return bytes().join(dirent_list) + bytes().join(payload_list)
+        return b''.join(dirent_list) + b''.join(payload_list)
 
 
 def get_c_data(tree, root_name):
