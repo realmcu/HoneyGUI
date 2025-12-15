@@ -65,6 +65,9 @@ extern void *font32b4;
 extern void *font32b8;
 extern void *font32vb4;
 
+extern void *font32b4index1;
+extern void *font32vb4index1;
+
 extern void *fontnoto;
 extern void *fontnotoarabic;
 extern void *fontnotojp;

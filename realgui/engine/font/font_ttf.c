@@ -316,67 +316,102 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
     font_glyph_render(&render_font, &glyph);
 }
 
-uint32_t getGlyphOffsetFromMemory(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint8_t *table_ptr)
+uint32_t font_index_bsearch_ttf(uint8_t *index_table,
+                                uint32_t index_area_size,
+                                uint32_t unicode)
+{
+    if (index_area_size == 0 || index_table == NULL)
+    {
+        return 0;
+    }
+
+    uint32_t entry_size = sizeof(uint16_t) + sizeof(uint32_t);  /* 6 bytes per entry */
+    uint32_t count = index_area_size / entry_size;
+
+    if (count == 0)
+    {
+        return 0;
+    }
+
+    int32_t left = 0;
+    int32_t right = (int32_t)count - 1;
+
+    while (left <= right)
+    {
+        int32_t mid = left + (right - left) / 2;
+        uint8_t *entry_ptr = index_table + mid * entry_size;
+        uint16_t mid_unicode = *(uint16_t *)entry_ptr;
+
+        if (mid_unicode == unicode)
+        {
+            return *(uint32_t *)(entry_ptr + sizeof(uint16_t));
+        }
+        else if (mid_unicode < unicode)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return 0;  /* Not found */
+}
+
+/**
+ * @brief Unified function to get glyph offset from TTF font
+ *
+ * This function merges the functionality of getGlyphOffsetFromMemory and getGlyphOffsetFromFtl.
+ * For index_method=1, it uses binary search for O(log n) lookup performance.
+ *
+ * @param unicode Target Unicode code point
+ * @param ttfbin TTF font header
+ * @param table_ptr Pointer to the index table
+ * @param font_mode Font source mode (FONT_SRC_MEMADDR or FONT_SRC_FTL)
+ * @param preloaded_index_table For FTL mode with index_method=1, caller should provide
+ *                              preloaded index table; NULL for other cases
+ * @return uint32_t Glyph offset if found, 0 if not found
+ */
+static uint32_t getGlyphOffset(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint8_t *table_ptr,
+                               FONT_SRC_MODE font_mode, uint8_t *preloaded_index_table)
 {
     if (ttfbin->index_method == 0)
     {
-        uint8_t *ptr = table_ptr;
-        uint32_t glyphOffset = *((uint32_t *)ptr + unicode);
-        if (glyphOffset != 0xffffffff)
+        /* Direct offset calculation mode */
+        if (font_mode == FONT_SRC_MEMADDR)
         {
-            return glyphOffset;
+            uint32_t glyphOffset = *((uint32_t *)table_ptr + unicode);
+            if (glyphOffset != 0xffffffff)
+            {
+                return glyphOffset;
+            }
         }
-    }
-    else
-    {
-        uint8_t *ptr = table_ptr;
-        uint32_t indexEntries = ttfbin->index_area_size / (sizeof(uint16_t) + sizeof(uint32_t));
-        for (uint32_t i = 0; i < indexEntries; ++i)
+        else if (font_mode == FONT_SRC_FTL)
         {
-            uint16_t currentUnicode = *(uint16_t *)ptr;
-            ptr += sizeof(uint16_t);
-
-            uint32_t glyphOffset = *(uint32_t *)ptr;
-            ptr += sizeof(uint32_t);
-
-            if (currentUnicode == unicode)
+            uint32_t glyphOffset = 0;
+            gui_ftl_read((uintptr_t)table_ptr + unicode * sizeof(uint32_t),
+                         (uint8_t *)&glyphOffset, sizeof(uint32_t));
+            if (glyphOffset != 0xffffffff)
             {
                 return glyphOffset;
             }
         }
     }
-    return 0;
-}
-uint32_t getGlyphOffsetFromFtl(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint8_t *table_ptr)
-{
-    if (ttfbin->index_method == 0)
-    {
-        uint8_t *ptr = table_ptr;
-        uint32_t glyphOffset = 0;
-        gui_ftl_read((uintptr_t)ptr + unicode * sizeof(uint32_t), (uint8_t *)&glyphOffset,
-                     sizeof(uint32_t));
-        if (glyphOffset != 0xffffffff)
-        {
-            return glyphOffset;
-        }
-    }
     else
     {
-        uint8_t *ptr = table_ptr;
-        uint32_t indexEntries = ttfbin->index_area_size / (sizeof(uint16_t) + sizeof(uint32_t));
-        for (uint32_t i = 0; i < indexEntries; ++i)
+        /* Index search mode - use binary search */
+        if (font_mode == FONT_SRC_MEMADDR)
         {
-            uint16_t currentUnicode = 0;
-            gui_ftl_read((uintptr_t)ptr, (uint8_t *)&currentUnicode, sizeof(uint16_t));
-            ptr += sizeof(uint16_t);
-
-            uint32_t glyphOffset = 0;
-            gui_ftl_read((uintptr_t)ptr, (uint8_t *)&glyphOffset, sizeof(uint32_t));
-            ptr += sizeof(uint32_t);
-
-            if (currentUnicode == unicode)
+            /* Directly use memory index table for binary search */
+            return font_index_bsearch_ttf(table_ptr, ttfbin->index_area_size, unicode);
+        }
+        else if (font_mode == FONT_SRC_FTL)
+        {
+            /* Use preloaded index table for binary search */
+            if (preloaded_index_table != NULL)
             {
-                return glyphOffset;
+                return font_index_bsearch_ttf(preloaded_index_table, ttfbin->index_area_size, unicode);
             }
         }
     }
@@ -675,6 +710,17 @@ void gui_font_get_ttf_info(gui_text_t *text)
     float scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
 //    short advance = 0;
 
+    uint8_t *preloaded_index_table = NULL;
+    if (text->font_mode == FONT_SRC_FTL && ttfbin->index_method == 1 && ttfbin->index_area_size > 0)
+    {
+        preloaded_index_table = gui_malloc(ttfbin->index_area_size);
+        if (preloaded_index_table != NULL)
+        {
+            gui_ftl_read((uintptr_t)text->path + ttfbin->head_length,
+                         preloaded_index_table, ttfbin->index_area_size);
+        }
+    }
+
     for (uni_i = 0; uni_i < unicode_len; uni_i++)
     {
         if (unicode_buf[uni_i] == 0x0A)
@@ -705,16 +751,19 @@ void gui_font_get_ttf_info(gui_text_t *text)
         }
         else
         {
+            uint32_t ttfoffset = getGlyphOffset(unicode_buf[uni_i], ttfbin,
+                                                (uint8_t *)text->path + ttfbin->head_length,
+                                                text->font_mode, preloaded_index_table);
+            if (ttfoffset == 0)
+            {
+                gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
+                continue;
+            }
+
+            uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
+
             if (text->font_mode == FONT_SRC_MEMADDR)
             {
-                uint32_t ttfoffset = getGlyphOffsetFromMemory(unicode_buf[uni_i], ttfbin,
-                                                              (uint8_t *)text->path + ttfbin->head_length);
-                if (ttfoffset == 0)
-                {
-                    gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
-                    continue;
-                }
-                uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
                 FontGlyphData *glyphData = (FontGlyphData *)font_ptr;
 
                 chr[chr_i].unicode = unicode_buf[uni_i];
@@ -729,15 +778,6 @@ void gui_font_get_ttf_info(gui_text_t *text)
             }
             else if (text->font_mode == FONT_SRC_FTL)
             {
-                uint32_t ttfoffset = getGlyphOffsetFromFtl(unicode_buf[uni_i], ttfbin,
-                                                           (uint8_t *)text->path + ttfbin->head_length);
-                if (ttfoffset == 0)
-                {
-                    gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
-                    continue;
-                }
-                uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
-
                 FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
                 gui_ftl_read((uintptr_t)font_ptr, (uint8_t *)glyphData, sizeof(FontGlyphData));
 
@@ -783,6 +823,12 @@ void gui_font_get_ttf_info(gui_text_t *text)
     text->font_len = unicode_len;
     text->active_font_len = chr_i;
     gui_free(unicode_buf);
+
+    if (preloaded_index_table != NULL)
+    {
+        gui_free(preloaded_index_table);
+    }
+
     if (text->font_mode == FONT_SRC_FTL)
     {
         gui_free(ttfbin);

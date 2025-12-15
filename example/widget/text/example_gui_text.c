@@ -53,11 +53,15 @@ static size_t s_font_mem_offset = 0;
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+
 void *font32b1;
 void *font32b2;
 void *font32b4;
 void *font32b8;
 void *font32vb4;
+
+void *font32b4index1;
+void *font32vb4index1;
 
 void *fontnoto;
 void *fontnotoarabic;
@@ -136,6 +140,11 @@ static void font_file_init(void)
     font32b4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_font.bin", NULL);
     font32b8 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits8_font.bin", NULL);
     font32vb4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_vfont.bin", NULL);
+
+    font32b4index1 = load_file_to_memory("./example/assets/font/NotoSans_Regular_size32_bits4_font.bin",
+                                         NULL);
+    font32vb4index1 =
+        load_file_to_memory("./example/assets/font/NotoSans_Regular_size32_bits4_vfont.bin", NULL);
 
     fontnoto = load_file_to_memory("./example/assets/font/NotoSans_size32_bits2_font.bin", NULL);
     fontnotoarabic = load_file_to_memory("./example/assets/font/NotoSansArabic_size32_bits2_font.bin",

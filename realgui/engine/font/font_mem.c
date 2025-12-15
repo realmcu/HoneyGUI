@@ -59,6 +59,39 @@ uint8_t get_fontlib_by_name(uint8_t *font_file)
     return 0;
 }
 
+int32_t font_index_bsearch_bmp(uintptr_t table_offset, uint32_t index_area_size, uint32_t unicode)
+{
+    if (index_area_size == 0)
+    {
+        return -1;
+    }
+
+    uint32_t count = index_area_size / sizeof(uint16_t);
+    int32_t left = 0;
+    int32_t right = (int32_t)count - 1;
+
+    while (left <= right)
+    {
+        int32_t mid = left + (right - left) / 2;
+        uint16_t mid_unicode = *(uint16_t *)(uintptr_t)(table_offset + mid * sizeof(uint16_t));
+
+        if (mid_unicode == unicode)
+        {
+            return mid;
+        }
+        else if (mid_unicode < unicode)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return -1;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
@@ -350,7 +383,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].h = text->font_height;
                     chr[chr_i].char_w = text->font_height / 2;
                     chr[chr_i].char_h = text->font_height;
-                    uint32_t index = 0;
                     if (chr[chr_i].unicode == 0x0A)
                     {
                         line_flag ++;
@@ -395,30 +427,28 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else
                     {
-                        for (; index < index_area_size / 2; index ++)
+                        int32_t index = font_index_bsearch_bmp(table_offset, index_area_size, chr[chr_i].unicode);
+                        if (index < 0)
                         {
-                            if (chr[chr_i].unicode == *(uint16_t *)(uintptr_t)(table_offset + index * 2))
-                            {
-                                chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
-                                if (text->font_mode == FONT_SRC_MEMADDR)
-                                {
-                                    chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
-                                    chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
-                                    break;
-                                }
-                                else if (text->font_mode == FONT_SRC_FTL)
-                                {
-                                    uint8_t header[2];
-                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
-                                    chr[chr_i].char_w = (int16_t)header[0];
-                                    chr[chr_i].char_h = (int16_t)header[1];
-                                    uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
-                                    uint8_t *dot_buf = gui_malloc(dot_size);
-                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
-                                    chr[chr_i].dot_addr = dot_buf;
-                                    break;
-                                }
-                            }
+                            gui_log("Character %x not found in BMP-BIN file \n", chr[chr_i].unicode);
+                            continue;
+                        }
+                        chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
+                        if (text->font_mode == FONT_SRC_MEMADDR)
+                        {
+                            chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
+                            chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
+                        }
+                        else if (text->font_mode == FONT_SRC_FTL)
+                        {
+                            uint8_t header[2];
+                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
+                            chr[chr_i].char_w = (int16_t)header[0];
+                            chr[chr_i].char_h = (int16_t)header[1];
+                            uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
+                            uint8_t *dot_buf = gui_malloc(dot_size);
+                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
+                            chr[chr_i].dot_addr = dot_buf;
                         }
                     }
                     all_char_w += chr[chr_i].char_w;
@@ -1262,7 +1292,6 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
             for (uint32_t i = 0; i < unicode_len; i++)
             {
                 uint16_t char_w = 0;
-                uint32_t index = 0;
                 if (unicode_buffer[i] == 0x0A)
                 {
                     line_flag ++;
@@ -1274,13 +1303,11 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 }
                 else
                 {
-                    for (; index < font->index_area_size / 2; index ++)
+                    int32_t index = font_index_bsearch_bmp(table_offset, font->index_area_size, unicode_buffer[i]);
+                    if (index >= 0)
                     {
-                        if (unicode_buffer[i] == *(uint16_t *)(uintptr_t)(table_offset + index * 2))
-                        {
-                            uint8_t *dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
-                            char_w = (int16_t)(*(dot_addr - 2));
-                        }
+                        uint8_t *dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
+                        char_w = (int16_t)(*(dot_addr - 2));
                     }
                 }
                 all_char_w += char_w;
