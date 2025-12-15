@@ -13,6 +13,7 @@
 #include "gui_canvas.h"
 #include "app_message_adapter.h"
 #include "app_phone_adapter.h"
+#include "app_map.h"
 
 /*============================================================================*
  *                            Macros
@@ -1034,11 +1035,11 @@ static void update_inform(void *p)
 
         if (dashboard_info->bt_status)
         {
-            gui_obj_hidden(bt, false);
+            gui_img_a8_recolor((gui_img_t *)bt, 0xFF00FF00);
         }
         else
         {
-            gui_obj_hidden(bt, true);
+            gui_img_a8_recolor((gui_img_t *)bt, 0xFFFFFFFF);
         }
         if (dashboard_info->wifi_status)
         {
@@ -1265,7 +1266,6 @@ static void dashboard_design(gui_view_t *view)
     gui_img_a8_recolor(bt, 0xFFFFFFFF);
 
     gui_img_t *wifi = gui_img_create_from_mem(win_common, "wifi", WIFI_BIN, 478, 52, 0, 0);
-    gui_obj_hidden(GUI_BASE(bt), true);
     gui_obj_hidden(GUI_BASE(wifi), true);
 
     gui_img_create_from_mem(win_common, "led_turn_l", TURNLEFT_OFF_BIN, 20, 90, 0, 0);
@@ -1285,4 +1285,86 @@ static void dashboard_design(gui_view_t *view)
                             DAIL_LED5_Y, 0, 0);
     app_phone_popup_create(parent);
     gui_message_popup_create(parent);
+#ifdef _HONEYGUI_SIMULATOR_
+    // Start navigation test after entrance animation completes
+    extern void app_map_test_navigation(void);
+    app_map_test_navigation();
+#endif
+
+}
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+/**
+ * @brief Switch dashboard display mode (dail <-> digital)
+ * Called from external key event handler
+ */
+void app_dashboard_switch_display_mode(void)
+{
+    if (current_view == NULL)
+    {
+        gui_log("Dashboard view not initialized, ignoring switch request\n");
+        return;
+    }
+
+    if (animate_flag)
+    {
+        gui_log("Animation in progress, ignoring switch request\n");
+        return;
+    }
+
+    animate_flag = 1;
+    if (scene_flag == 1)
+    {
+        // Switch from dail to digital
+        dashboard_digital_design(GUI_BASE(win_dail)->parent);
+        exit_dashboard_dail();
+        switch_wait_cnt = SWITCH_TO_DIGITAL_DURATION;
+        gui_log("Switching from dail to digital mode\n");
+    }
+    else if (scene_flag == 2)
+    {
+        // Switch from digital to dail
+        dashboard_dail_design(GUI_BASE(win_digital)->parent);
+        exit_dashboard_digital();
+        switch_wait_cnt = SWITCH_TO_DAIL_DURATION;
+        gui_log("Switching from digital to dail mode\n");
+    }
+}
+
+/**
+ * @brief Exit dashboard and return to start view
+ * Called from external key event handler
+ */
+void app_dashboard_exit_to_start(void)
+{
+    if (current_view == NULL)
+    {
+        gui_log("Dashboard view not initialized, ignoring exit request\n");
+        return;
+    }
+
+    if (animate_flag || scene_flag == 0)
+    {
+        gui_log("Animation in progress or already exiting, ignoring exit request\n");
+        return;
+    }
+
+    if (scene_flag == 1)
+    {
+        exit_dashboard_dail();
+    }
+    else if (scene_flag == 2)
+    {
+        exit_dashboard_digital();
+    }
+
+    scene_flag = 0;
+    animate_flag = 1;
+    gui_obj_create_timer(GUI_BASE(current_view), 10, true, dashboard_exit_animation);
+    exit_map();
+
+    gui_log("Exiting dashboard to start view\n");
 }

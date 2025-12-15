@@ -8,11 +8,19 @@ extern "C" {
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 /*============================================================================*
  *                           Types
- *============================================================================*/typedef struct
-    gui_dashboard
+ *============================================================================*/
+typedef enum
+{
+    DASHBOARD_OTA_EVENT_START,
+    DASHBOARD_OTA_EVENT_DATA_CONTINUE,
+    DASHBOARD_OTA_EVENT_FINISH,
+    DASHBOARD_OTA_EVENT_ERROR,
+} dashboard_ota_event_t;
+typedef struct gui_dashboard
 {
     /* BT & WIFI status */
     uint32_t bt_status         : 1; // bluetooth status, 1: on, 0: off
@@ -38,6 +46,9 @@ extern "C" {
 
     /* Message notification status */
     uint32_t message_notify    : 1; // Message notification flag
+
+    /* Navigation status */
+    uint32_t navi_active       : 1; // Navigation active flag (NAVI_START=1, NAVI_IDLE/NAVI_PAUSE=0)
 
     uint16_t speed_val; // km/h
     uint16_t power_val; // kW
@@ -72,6 +83,11 @@ extern "C" {
 void gui_dashboard_info_register(gui_dashboard_t *info);
 
 gui_dashboard_t *get_dashboard_info(void);
+
+void gui_dashboard_ota_set_info(uint32_t total_num, uint32_t current_num,
+                                dashboard_ota_event_t ota_event);
+
+float gui_dashboard_ota_get_percentage(void);
 
 #ifdef __cplusplus
 }

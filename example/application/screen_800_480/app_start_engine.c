@@ -117,3 +117,24 @@ static void start_engine_design(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(gloom), 10, true, exit_animation);
     gui_obj_stop_timer(GUI_BASE(gloom));
 }
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+void app_dashboard_start_view_to_main(void)
+{
+    if (current_view == NULL)
+    {
+        gui_log("Error: start_view not initialized\n");
+        return;
+    }
+
+    // Show gloom animation and switch to dashboard view
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "gloom", current_view);
+    if (o != NULL)
+    {
+        gui_obj_start_timer(GUI_BASE(o));
+        gui_obj_hidden(o, false);
+    }
+    gui_log("Switching from start_view to dashboard_view\n");
+}

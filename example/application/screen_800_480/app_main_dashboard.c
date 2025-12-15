@@ -46,28 +46,28 @@ static const gui_view_descriptor_t *dashboard_view = NULL;
 
 #ifdef _HONEYGUI_SIMULATOR_
 uint8_t *resource_root = NULL;
+#endif
 
 static gui_dashboard_t dashboard_info =
 {
-    .bt_status = 1,
+    .bt_status = 0,
     .wifi_status = 0,
-    .led0_status = 1,
+    .led0_status = 0,
     .led1_status = 0,
-    .led2_status = 1,
+    .led2_status = 0,
     .led3_status = 0,
-    .led4_status = 1,
+    .led4_status = 0,
     .led5_status = 0,
     .led_turn_l_status = 0,
-    .led_turn_r_status = 1,
-    .speed_val = 88,
-    .power_val = 50,
-    .odo_val = 1234,
-    .soc_val = 75,
-    .temp_val = 30,
+    .led_turn_r_status = 0,
+    .navi_active = 0,
+    .speed_val = 0,
+    .power_val = 0,
+    .odo_val = 0,
+    .soc_val = 0,
+    .temp_val = 25,
     .location = "Suzhou",
-
 };
-#endif
 
 
 
@@ -252,18 +252,27 @@ SHELL_EXPORT_CMD(
     SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN) | SHELL_CMD_DISABLE_RETURN,
     cmd, dashboard_info_update, test);
 #endif
-
+#ifdef _HONEYGUI_SIMULATOR_
 extern const unsigned char _binary_root_0x4400000_bin_start[];
 extern const unsigned char _binary_root_0x4400000_bin_end[];
 extern const unsigned char _binary_root_0x4400000_bin_size[];
-
+#endif
 static int app_init(void)
 {
 #ifdef _HONEYGUI_SIMULATOR_
     resource_root = (uint8_t *)_binary_root_0x4400000_bin_start;
-
-    gui_dashboard_info_register(&dashboard_info);
+    // Set initial values for simulator testing
+    dashboard_info.bt_status = 1;
+    dashboard_info.speed_val = 88;
+    dashboard_info.power_val = 50;
+    dashboard_info.odo_val = 1234;
+    dashboard_info.soc_val = 75;
+    dashboard_info.temp_val = 30;
 #endif
+
+    // Register dashboard info for both simulator and hardware
+    gui_dashboard_info_register(&dashboard_info);
+
     win_map = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     gui_view_create(win_view, start_view->name, 0, 0, 0, 0);
