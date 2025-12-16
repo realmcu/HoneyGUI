@@ -19,7 +19,7 @@ Implementation
 
 Code
 ~~~~
-Function ``GUI_APP_ENTRY(APP_WATCHFACE_MARKET)`` is located in file ``realgui/example/screen_454_454/gui_menu/watchface_market.c``.
+Function ``app_init()`` is located in file ``realgui/example/screen_454_454/gui_menu/watchface_market.c``.
 
 Widgets Tree Design
 ~~~~~~~~~~~~~~~~~~~

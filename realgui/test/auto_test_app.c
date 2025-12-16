@@ -23,25 +23,7 @@
 #define COMPILE_DATE __DATE__
 #define COMPILE_TIME __TIME__
 
-static void auto_test_app_entry(gui_app_t *app);
-static gui_app_t app_auto_test =
-{
-    .screen =
-    {
-        .name = "auto_test",
-        .x    = 0,
-        .y    = 0,
-    },
-    .ui_design = auto_test_app_entry,
-    .active_ms = 1000 * 5,
-};
-
-gui_app_t *get_launcher_app(void)
-{
-    return &app_auto_test;
-}
-
-static void auto_test_app_entry(gui_app_t *app)
+static void auto_test_app_entry(void)
 {
     gui_log("auto_test_app start \n");
 }
@@ -91,7 +73,7 @@ static int auto_test_app_init(void)
 
     extern int gui_server_init(void);
     gui_server_init();
-    gui_app_startup(get_launcher_app());
+    auto_test_app_entry();
     return 0;
 }
 GUI_INIT_APP_EXPORT(auto_test_app_init);

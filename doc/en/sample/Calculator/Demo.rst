@@ -23,43 +23,18 @@ Two Steps
 1. Declare the app structure
 -----------------------------
 
-The app structure saves all the information of ui. Developers should initialize the app structure with the app name and ui design function.
+The app initialization function creates all the widgets required to form a complex ui. In this example, we add a window widget and draw the calculator ui. 
 
 .. code-block:: c
 
-    #include <gui_app.h>
-    static void app_calculator_ui_design(gui_app_t *app);
-
-    static gui_app_t calculator =
+    static int app_init(void)
     {
-        .screen =
-        {
-            .name = "calculator",
-        },
-        .ui_design = app_calculator_ui_design,
-    };
-
-    /*
-    * Public API to get app structure
-    */
-    gui_app_t *get_app_calculator(void)
-    {
-        return &calculator;
-    }
-
-
-2. Declare the app :func:`ui_design`  function
-------------------------------------------------
-
-The app ui design function adds all the widgets required to form a complex ui. In this example, we add a window widgets and draw the calculator ui. 
-
-.. code-block:: c
-
-    static void app_calculator_ui_design(gui_app_t *app)
-    {
-        gui_win_t *win = gui_win_create(&app->screen, "back_win", 0, 0, gui_get_screen_width(),
+        gui_win_t *win = gui_win_create(gui_obj_get_root(), "back_win", 0, 0, gui_get_screen_width(),
                                         gui_get_screen_height());
 
         gui_calculator_create(win, "calculator", 0, 0, 454, 454);
+        return 0;
     }
+
+    GUI_INIT_APP_EXPORT(app_init);
 

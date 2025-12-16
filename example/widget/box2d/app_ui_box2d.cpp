@@ -10,7 +10,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
 #include "tiger_blue.txt"
 #include "tiger_grey.txt"
 #include "tiger_laven.txt"
@@ -34,9 +33,9 @@
 static gui_canvas_round_rect_t *round_rect;
 
 // UI design function
-static void app_ui_design(gui_app_t *app)
+static void app_ui_design(void)
 {
-    round_rect = gui_canvas_round_rect_create(&(app->screen), "canva_rect", 100, 0, 50, 50, 7,
+    round_rect = gui_canvas_round_rect_create(gui_obj_get_root(), "canva_rect", 100, 0, 50, 50, 7,
                                               APP_COLOR_WHITE);
     return;
 }
@@ -100,23 +99,10 @@ static void box2d_loop(void *p)
     }
 }
 
-static gui_app_t rtk_gui_demo =
-{
-    .screen =
-    {
-        .name = "RealGUI_box2d_demo",
-        .x    = 0,
-        .y    = 0,
-    },
-    .active_ms = 1000 * 60 * 60,
-    .thread_entry = box2d_loop,
-    .ui_design = app_ui_design,
-};
-
 static int app_init(void)
 {
-    gui_server_init();
-    gui_app_startup(&rtk_gui_demo);
+    app_ui_design();
+    gui_thread_create("box2d", box2d_loop, NULL, 1024 * 10, 15);
     return 0;
 }
 

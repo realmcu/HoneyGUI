@@ -203,31 +203,6 @@ Sleep Management
 
 To reduce power consumption and increase the device's usage time, sleep (low power) mode is supported.
 
-- Refer to ``gui_app.h``
-
-  .. code-block:: c
-
-    typedef struct gui_app gui_app_t;
-    struct gui_app
-    {
-        gui_obj_t screen;               //!< Root node of the control tree
-        const char *xml;                //!< Control tree design file
-        uint32_t active_ms;             //!< Screen off delay
-        void *thread_id;                //!< Thread handle (optional)
-        void (* thread_entry)(void *this); //!< Thread entry function
-        void (* ctor)(void *this);      //!< Constructor
-        void (* dtor)(void *this);      //!< Destructor
-        void (* ui_design)(gui_app_t *); //!< UI creation entry function
-        bool lvgl;
-        bool arm2d;
-        bool close;
-        bool next;
-        bool close_sync;
-    };
-
-``active_ms`` is the standby time of the :term:`GUI` application, which can be defined as different values in different applications.
-Like other types of electronic devices, when the screen continuously displays an interface for the standby time, the device will enter sleep mode.
-In sleep mode, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
 In the chip manual, this low power state where peripherals can be turned off is called Deep Low Power State (DLPS). More information about DLPS can be found in the relevant SDK documentation.
 
 .. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a

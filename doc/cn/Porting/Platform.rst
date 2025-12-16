@@ -325,29 +325,7 @@
 
 为了降低功耗和增加设备的使用时间，支持睡眠（低功耗）模式。
 
-- 参考 ``gui_app.h``
-
-  .. code-block:: c
-
-     typedef struct gui_app gui_app_t;
-     struct gui_app
-     {
-         gui_obj_t screen;               //!< 控件树的根节点
-         const char *xml;                //!< 控件树的设计文件
-         uint32_t active_ms;             //!< 屏幕关闭延时
-         void *thread_id;                //!< 线程句柄（可选）
-         void (* thread_entry)(void *this); //!< 线程入口函数
-         void (* ctor)(void *this);      //!< 构造函数
-         void (* dtor)(void *this);      //!< 析构函数
-         void (* ui_design)(gui_app_t *); //!< UI创建入口函数
-         bool lvgl;
-         bool arm2d;
-         bool close;
-         bool next;
-         bool close_sync;
-     };
-
-``active_ms`` 是 :term:`GUI` 应用程序的待机时间，可以在不同的应用程序中定义为不同的值。与其他类型的电子设备一样，当屏幕持续显示一个界面的时间超过待机时间时，设备将进入睡眠模式。在睡眠状态下，通过触摸触摸板、按键或发送消息可以唤醒设备。在芯片手册中，这种外设可以关闭的低功耗状态被称为深度低功耗状态（DLPS）。关于 DLPS 的更多信息，可以在 SDK 的相关指导文档中找到。
+在芯片手册中，这种外设可以关闭的低功耗状态被称为深度低功耗状态（DLPS）。关于 DLPS 的更多信息，可以在 SDK 的相关指导文档中找到。
 
 .. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
 .. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca

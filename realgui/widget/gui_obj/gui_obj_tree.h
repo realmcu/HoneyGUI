@@ -49,9 +49,9 @@ extern "C" {
   * @param obj Root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
-  * static void app_main_task(gui_app_t *app)
+  * static void app_main_task(void)
   * {
-  *    gui_obj_tree_free(&app->screen);
+  *    gui_obj_tree_free(gui_obj_get_root());
   *
   * }
   *
@@ -65,9 +65,9 @@ void gui_obj_tree_free(void *obj);
   * @param obj Root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
-  * static void app_main_task(gui_app_t *app)
+  * static void app_main_task(void)
   * {
-  *    gui_obj_tree_free_async(&app->screen);
+  *    gui_obj_tree_free_async(gui_obj_get_root());
   *
   * }
   *
@@ -86,9 +86,9 @@ void gui_obj_child_free(gui_obj_t *object);
   * @param obj Root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
-  * static void app_main_task(gui_app_t *app)
+  * static void app_main_task(void)
   * {
-  *    gui_obj_tree_print(&app->screen);
+  *    gui_obj_tree_print(gui_obj_get_root());
   *
   * }
   *

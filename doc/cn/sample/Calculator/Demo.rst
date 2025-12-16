@@ -19,49 +19,22 @@
 操作步骤
 ==========================
 
-1. 声明 APP 的结构体
+1. 定义 APP 初始化函数
 -----------------------------
 
-
-APP 结构体保存了 UI 的所有信息，开发者应该使用 APP 名称和 UI 设计函数完成初始化。
-
-.. code-block:: c
-
-    #include <gui_app.h>
-    static void app_calculator_ui_design(gui_app_t *app);
-
-    static gui_app_t calculator =
-    {
-        .screen =
-        {
-            .name = "calculator",
-        },
-        .ui_design = app_calculator_ui_design,
-    };
-
-    /*
-    * Public API to get app structure
-    */
-    gui_app_t *get_app_calculator(void)
-    {
-        return &calculator;
-    }
-
-
-
-2. 定义 APP :func:`ui_design` 函数
-------------------------------------
-
-APP :func:`void ui_design(gui_app_t *app)` 函数包含了复杂 UI 的所有控件创建及其配置。在本示例 APP 中加入一个 "window" 控件，并将所有的 "button" 控件和 "text" 控件都其作为子控件完成整个 APP UI 设计。
+APP 初始化函数包含了复杂 UI 的所有控件创建及其配置。在本示例 APP 中加入一个 "window" 控件，并将所有的 "button" 控件和 "text" 控件都其作为子控件完成整个 APP UI 设计。
 
 .. code-block:: c
 
-    static void app_calculator_ui_design(gui_app_t *app)
+    static int app_init(void)
     {
-        gui_win_t *win = gui_win_create(&app->screen, "back_win", 0, 0, gui_get_screen_width(),
+        gui_win_t *win = gui_win_create(gui_obj_get_root(), "back_win", 0, 0, gui_get_screen_width(),
                                         gui_get_screen_height());
 
         gui_calculator_create(win, "calculator", 0, 0, 454, 454);
+        return 0;
     }
+
+    GUI_INIT_APP_EXPORT(app_init);
 
 

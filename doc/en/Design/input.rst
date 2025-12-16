@@ -100,7 +100,6 @@ At the application level, different callback functions can be bound to different
     void enter_homelist(void *obj, gui_event_t e)
     {
         gui_log("enter_tablist \n");
-        gui_app_switch(gui_current_app(), get_app_homelist());
     }
     void design_tab_home(void *parent)
     {

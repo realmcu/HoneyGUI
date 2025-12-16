@@ -6,7 +6,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
@@ -33,31 +32,15 @@ static void canvas_cb_black(gui_canvas_t *canvas)
 
 }
 
-static void app_nanovg_ui_design(gui_app_t *app)
+static void app_nanovg_ui_design(void)
 {
-
-    gui_canvas_t *canvas = gui_canvas_create(&(app->screen), "canvas", 0, 0, 0, 454, 454);
+    gui_canvas_t *canvas = gui_canvas_create(gui_obj_get_root(), "canvas", 0, 0, 0, 454, 454);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
-
 }
-
-static gui_app_t nanovg_demo =
-{
-    .screen =
-    {
-        .name = "nanovg_demo",
-        .x    = 0,
-        .y    = 0,
-    },
-    .ui_design = app_nanovg_ui_design,
-    .active_ms = 1000 * 60 * 60,
-};
-
 
 static int app_init(void)
 {
-    gui_server_init();
-    gui_app_startup(&nanovg_demo);
+    app_nanovg_ui_design();
     return 0;
 }
 

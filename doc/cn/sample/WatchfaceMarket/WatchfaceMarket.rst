@@ -19,7 +19,7 @@
 
 代码
 ~~~~
-函数  ``GUI_APP_ENTRY(APP_WATCHFACE_MARKET)`` 位于文件 ``realgui/example/screen_454_454/gui_menu/watchface_market.c`` 中。
+函数  ``app_init()`` 位于文件 ``realgui/example/screen_454_454/gui_menu/watchface_market.c`` 中。
 
 控件树设计
 ~~~~~~~~~~

@@ -44,7 +44,6 @@ Example
 
 .. code-block:: c
 
-   #include "gui_app.h"
    #include "gui_soccer.h"
    #include "ui_resource.h"
 
@@ -71,27 +70,7 @@ Example
       SOCCER_P0019_HOME_BIN,
       SOCCER_P0020_MORE_BIN,
    };
-   static void app_call_ui_design(gui_app_t *app);
-   static gui_app_t app_call =
-   {
-      .screen =
-      {
-         .name = "app_call",
-         .x    = 0,
-         .y    = 0,
-      },
-      .ui_design = app_call_ui_design,
-      .active_ms = 1000 * 5,
-   };
 
-   gui_app_t *get_call_app(void)
-   {
-      return &app_call;
-   }
-   static void app_call_ui_design(gui_app_t *app)
-   {
-      gui_img_create_from_mem(&(app->screen), "call", SOCCER_P0001_CALL_BIN, 100, 100, 100, 100);
-   }
    static void app_soccer_cb(void *obj, gui_event_t e, void *param)
    {
       gui_soccer_t *soccer = (gui_soccer_t *)obj;
@@ -99,21 +78,22 @@ Example
       switch (soccer->press_face)
       {
       case 0:
-         gui_switch_app(gui_current_app(), get_call_app());
+         // Handle soccer face click
          break;
       default:
          break;
       }
    }
-   GUI_APP_ENTRY(APP_SOCCER)
+
+   static int app_init(void)
    {
-      gui_soccer_t *soccer = gui_soccer_create(&(app->screen), "soccer", gui_soccer_array, 0, 0);
+      gui_soccer_t *soccer = gui_soccer_create(gui_obj_get_root(), "soccer", gui_soccer_array, 0, 0);
       gui_soccer_set_center(soccer, 227, 227);
       gui_soccer_on_click(soccer, app_soccer_cb, NULL);
-
-      gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                        sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+      return 0;
    }
+
+   GUI_INIT_APP_EXPORT(app_init);
 
 
 

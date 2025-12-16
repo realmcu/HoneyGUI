@@ -114,8 +114,7 @@ void test_img_RGB565_filter(void *msg)
 {
     test_case_name = "gui_test_case_img_001";
     AUTO_TEST_LOG("%s START !", test_case_name);
-    gui_app_t *app = gui_current_app();
-    gui_obj_t *screen = &app->screen;
+    gui_obj_t *screen = gui_obj_get_root();
     gui_obj_tree_free(screen);
     gui_img_t *img = gui_img_create_from_mem(screen, "img", _acimage565, 0, 0, 0, 0);
     gui_fb_change();

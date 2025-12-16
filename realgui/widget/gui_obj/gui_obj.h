@@ -133,7 +133,7 @@ gui_obj_t *gui_obj_create(void       *parent,
   * @param enable True for show, false for hide.
   * * <b>Example usage</b>
   * \code{.c}
-  * static void app_main_task(gui_app_t *app)
+  * static void app_main_task(void)
   * {
   *     gui_img_t *hour;
   *     gui_obj_show(hour,false);
