@@ -24,7 +24,6 @@ extern "C" {
 #include "gui_components_init.h"
 #include "shell.h"
 
-#include "gui_app.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_page.h"

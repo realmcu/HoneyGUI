@@ -146,10 +146,20 @@ static int romfs_vfs_closedir(void *dir)
 static int romfs_vfs_stat(const char *path, gui_vfs_stat_t *stat, void *user_data)
 {
     (void)user_data;
-    (void)path;
-    (void)stat;
-    /* Not implemented in hg_romfs */
-    return -1;
+
+    intptr_t fd = hg_open(path[0] == '/' ? path : path, 0);
+    if (fd == -1) { return -1; }
+
+    struct hg_stat hg_st;
+    int ret = hg_fstat(fd, &hg_st);
+    hg_close(fd);
+
+    if (ret == 0)
+    {
+        stat->size = hg_st.st_size;
+        stat->type = GUI_VFS_TYPE_FILE;
+    }
+    return ret;
 }
 
 /* ROMFS VFS operations table */

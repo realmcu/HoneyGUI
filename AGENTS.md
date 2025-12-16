@@ -2,7 +2,10 @@
 
 ## General Rules
 
-**IMPORTANT**: Do not create or modify Markdown (.md) documentation files unless explicitly requested by the user.
+**IMPORTANT**: 
+- Do NOT create or modify Markdown (.md) documentation files unless explicitly requested by the user.
+- Do NOT create README.md, QUICKSTART.md, or any other documentation files by default.
+- Only add documentation when the user specifically asks for it.
 
 ## Git Commit Rules
 
