@@ -48,6 +48,7 @@ typedef struct
  */
 int gui_h264bsd_rewind(void *gui_decoder);
 
+int gui_h264bsd_set_src(void *gui_decoder, uint8_t *fileData, long fileSize_totla);
 
 /**
  * Retrieve a decoded RGB frame from the decoder.

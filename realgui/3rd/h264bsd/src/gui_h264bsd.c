@@ -66,6 +66,7 @@ int gui_h264bsd_get_frame(void *gui_decoder, uint8_t *frame_buff, uint32_t buff_
     {
         gui_dec->len = gui_dec->fileSize_totla;
         gui_dec->byteStrm = gui_dec->file_data;
+        return H264BSD_ERR_EOF;
     }
 
 
@@ -81,6 +82,22 @@ int gui_h264bsd_rewind(void *gui_decoder)
         return H264BSD_ERR_NULL_PTR;
     }
 
+    gui_dec->len = gui_dec->fileSize_totla;
+    gui_dec->byteStrm = gui_dec->file_data;
+    return H264BSD_SUCCESS;
+}
+
+int gui_h264bsd_set_src(void *gui_decoder, uint8_t *fileData, long fileSize_totla)
+{
+    GUI_H264BSD_DECODER *gui_dec = gui_decoder;
+
+    if (!gui_dec || !gui_dec->decoder || !fileData)
+    {
+        return H264BSD_ERR_NULL_PTR;
+    }
+
+    gui_dec->fileSize_totla = fileSize_totla;
+    gui_dec->file_data = fileData;
     gui_dec->len = gui_dec->fileSize_totla;
     gui_dec->byteStrm = gui_dec->file_data;
     return H264BSD_SUCCESS;

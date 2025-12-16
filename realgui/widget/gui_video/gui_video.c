@@ -311,7 +311,7 @@ static void gui_video_draw(gui_obj_t *obj)
     }
 
 
-    if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
+    if (this->img_type == VIDEO_TYPE_MJPEG)
     {
         if (this->storage_type == IMG_SRC_FILESYS)
         {
@@ -406,10 +406,265 @@ static void gui_video_draw(gui_obj_t *obj)
         }
 
     }
+    else if (this->img_type == VIDEO_TYPE_AVI)
+    {
+        if (this->storage_type == IMG_SRC_FILESYS)
+        {
+            const char *fn = this->data;
+            gui_vfs_file_t *fp;
+
+            fp = gui_vfs_open(fn, GUI_VFS_READ);
+            if (!fp)
+            {
+                gui_log("gui_video_draw open error! \n");
+                return;
+            }
+
+
+            int32_t frame_cnt = -1;
+            for (uint32_t i = 0; i < this->chunk_num; i++)
+            {
+                AviMoviChunk_t *chunk = (AviMoviChunk_t *)this->array;
+                uint32_t chunk_sz = chunk[i].len;
+
+                if (chunk[i].type == CHUNK_VIDEO)
+                {
+                    frame_cnt++;
+                    if (frame_cnt == this->frame_cur)
+                    {
+                        // video frame
+                        if (chunk_sz)
+                        {
+                            this->frame_chunk_cur = i;
+                        }
+                        img_sz = chunk[this->frame_chunk_cur].len;
+                        // gui_log(" %d  %d, sz %d \n", this->frame_chunk_cur, chunk[this->frame_chunk_cur].data, img_sz);
+
+                        img_data_raw = (uint8_t *)gui_malloc(img_sz + 8);
+                        if (!img_data_raw)
+                        {
+                            gui_log("gui_video_draw malloc error! \n");
+                            gui_vfs_close(fp);
+                            return ;
+                        }
+                        img_data = (uint8_t *)((((uintptr_t)img_data_raw + 7) >> 3) << 3);
+
+
+                        gui_vfs_seek(fp, (uintptr_t)chunk[this->frame_chunk_cur].offset, GUI_VFS_SEEK_SET);
+                        gui_vfs_read(fp, img_data, img_sz);
+
+                        if ((*(uint16_t *)img_data != 0xd8ff || *(uint16_t *)(img_data + img_sz - 2) != 0xd9ff))
+                        {
+                            gui_log("gui_video_draw load error! \n");
+                            gui_vfs_close(fp);
+                            return;
+                        }
+                    }
+                    else if (frame_cnt > this->frame_cur)
+                    {
+                        break;
+                    }
+                }
+                else if (chunk[i].type == CHUNK_AUDIO)
+                {
+                    if (this->frame_cur == 0 || (frame_cnt == this->frame_cur))
+                    {
+                        // to audio
+                        // gui_log("audio chunk %d \n", i);
+                    }
+                }
+                else
+                {
+                    gui_log("avi: unknown chunk type\n");
+                    gui_vfs_close(fp);
+                    return;
+                }
+            }
+
+            gui_vfs_close(fp);
+
+        }
+        else if (this->storage_type == IMG_SRC_MEMADDR)
+        {
+            int32_t frame_cnt = -1;
+            for (uint32_t i = 0; i < this->chunk_num; i++)
+            {
+                AviMoviChunk_t *chunk = (AviMoviChunk_t *)this->array;
+                uint32_t chunk_sz = chunk[i].len;
+
+                if (chunk[i].type == CHUNK_VIDEO)
+                {
+                    frame_cnt++;
+                    if (frame_cnt == this->frame_cur)
+                    {
+                        // video frame
+                        if (chunk_sz)
+                        {
+                            this->frame_chunk_cur = i;
+                        }
+                        img_sz = chunk[this->frame_chunk_cur].len;
+                        // gui_log(" %d  %d, sz %d \n", this->frame_chunk_cur, chunk[this->frame_chunk_cur].offset, img_sz);
+
+                        img_data = (uint8_t *)this->data + chunk[this->frame_chunk_cur].offset;
+                    }
+                    else if (frame_cnt > this->frame_cur)
+                    {
+                        break;
+                    }
+                }
+                else if (chunk[i].type == CHUNK_AUDIO)
+                {
+                    if (this->frame_cur == 0 || (frame_cnt == this->frame_cur))
+                    {
+                        // to audio
+                        // gui_log("audio chunk %d \n", i);
+                    }
+                }
+                else
+                {
+                    gui_log("avi: unknown chunk type\n");
+                    return;
+                }
+            }
+
+        }
+        else if (this->storage_type == IMG_SRC_FTL)
+        {
+            uint32_t fp = (uintptr_t)this->data;
+
+            int32_t frame_cnt = -1;
+            for (uint32_t i = 0; i < this->chunk_num; i++)
+            {
+                AviMoviChunk_t *chunk = (AviMoviChunk_t *)this->array;
+                uint32_t chunk_sz = chunk[i].len;
+
+                if (chunk[i].type == CHUNK_VIDEO)
+                {
+                    frame_cnt++;
+                    if (frame_cnt == this->frame_cur)
+                    {
+                        // video frame
+                        if (chunk_sz)
+                        {
+                            this->frame_chunk_cur = i;
+                        }
+                        img_sz = chunk[this->frame_chunk_cur].len;
+                        // gui_log(" %d  %d, sz %d \n", this->frame_chunk_cur, chunk[this->frame_chunk_cur].offset, img_sz);
+
+                        img_data_raw = (uint8_t *)gui_malloc(img_sz + 8);
+                        if (!img_data_raw)
+                        {
+                            gui_log("gui_video_draw malloc error! \n");
+                            return ;
+                        }
+                        img_data = (uint8_t *)((((uintptr_t)img_data_raw + 7) >> 3) << 3);
+
+                        gui_ftl_read(fp + chunk[this->frame_chunk_cur].offset, img_data, img_sz);
+
+                        if ((*(uint16_t *)img_data != 0xd8ff || *(uint16_t *)(img_data + img_sz - 2) != 0xd9ff))
+                        {
+                            gui_log("gui_video_draw load error! \n");
+                            return;
+                        }
+                    }
+                    else if (frame_cnt > this->frame_cur)
+                    {
+                        break;
+                    }
+                }
+                else if (chunk[i].type == CHUNK_AUDIO)
+                {
+                    if (this->frame_cur == 0 || (frame_cnt == this->frame_cur))
+                    {
+                        // to audio
+                        // gui_log("audio chunk %d \n", i);
+                    }
+                }
+                else
+                {
+                    gui_log("avi: unknown chunk type\n");
+                    return;
+                }
+            }
+
+        }
+        // gui_log("%d off 0x%x, %d\n", this->frame_cur, img_data - (uint8_t *)this->data, img_sz);
+
+        int w = 0;
+        int h = 0;
+        int channel = 0;
+        frame_buff = gui_acc_jpeg_load(img_data, img_sz, &w, &h, &channel);
+        if (!frame_buff)
+        {
+            gui_log("decode video file failed");
+            return ;
+        }
+
+        this->frame_buff = frame_buff;
+        this->frame_buff_raw = frame_buff;
+
+        gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
+        pheader->type = this->header.type;
+        pheader->jpeg = false;
+
+        // gui_log("this frame_buff  0x%x\n", this->frame_buff);
+
+        if (this->storage_type == IMG_SRC_FILESYS || this->storage_type == IMG_SRC_FTL)
+        {
+            if (img_data_raw)
+            {
+                gui_free(img_data_raw);
+            }
+        }
+    }
     else if (this->img_type == VIDEO_TYPE_H264)
     {
         if (this->storage_type == IMG_SRC_FILESYS)
         {
+            const char *fn = this->data;
+            gui_vfs_file_t *fp;
+
+            fp = gui_vfs_open(fn, GUI_VFS_READ);
+            if (!fp)
+            {
+                gui_log("gui_video_draw open error! \n");
+                return;
+            }
+            gui_h264_header_t temp;
+            gui_h264_header_t *header = &temp;
+
+            gui_vfs_read(fp, header, sizeof(gui_h264_header_t));
+
+            if (!this->decoder)
+            {
+                this->decoder = gui_h264bsd_create_decoder((uint8_t *)this->array, header->size);
+            }
+            if (this->frame_cur == 0)
+            {
+                // reload
+                gui_vfs_read(fp, (void *)this->array, header->size);
+                gui_h264bsd_rewind(this->decoder);
+            }
+
+            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + header->w * header->h * 2);
+
+            if (!this->frame_buff_raw)
+            {
+                gui_log("gui_video_draw malloc h264 fb error! \n");
+            }
+            this->frame_buff = this->frame_buff_raw;
+            // gui_log("dec frame %d\n", this->frame_cur);
+            int ret = gui_h264bsd_get_frame(this->decoder, this->frame_buff + sizeof(gui_rgb_data_head_t),
+                                            header->w * header->h * 2);
+            if (ret)
+            {
+                gui_log("h264 dec ret: %d\n", ret);
+            }
+
+            gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
+            memcpy(pheader, &(this->header), sizeof(gui_rgb_data_head_t));
+
+            gui_vfs_close(fp);
         }
         else if (this->storage_type == IMG_SRC_MEMADDR)
         {
@@ -445,8 +700,44 @@ static void gui_video_draw(gui_obj_t *obj)
             gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
             memcpy(pheader, &(this->header), sizeof(gui_rgb_data_head_t));
         }
+        else if (this->storage_type == IMG_SRC_FTL)
+        {
+            uint32_t fp = (uintptr_t)this->data;
 
+            gui_h264_header_t temp;
+            gui_h264_header_t *header = &temp;
 
+            gui_ftl_read(fp, (uint8_t *)header, sizeof(gui_h264_header_t));
+
+            if (!this->decoder)
+            {
+                this->decoder = gui_h264bsd_create_decoder((uint8_t *)this->array, header->size);
+            }
+            if (this->frame_cur == 0)
+            {
+                // reload
+                gui_ftl_read(fp + sizeof(gui_h264_header_t), (uint8_t *)this->array, header->size);
+                gui_h264bsd_rewind(this->decoder);
+            }
+
+            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + header->w * header->h * 2);
+
+            if (!this->frame_buff_raw)
+            {
+                gui_log("gui_video_draw malloc h264 fb error! \n");
+            }
+            this->frame_buff = this->frame_buff_raw;
+            // gui_log("dec frame %d\n", this->frame_cur);
+            int ret = gui_h264bsd_get_frame(this->decoder, this->frame_buff + sizeof(gui_rgb_data_head_t),
+                                            header->w * header->h * 2);
+            if (ret)
+            {
+                gui_log("h264 dec ret: %d\n", ret);
+            }
+
+            gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
+            memcpy(pheader, &(this->header), sizeof(gui_rgb_data_head_t));
+        }
     }
 
     gui_img_set_image_data(this->img, this->frame_buff);
@@ -513,123 +804,780 @@ static void gui_video_prepare(gui_obj_t *obj)
 
 static int video_src_init_avi(gui_video_t  *this)
 {
-
     if (this->storage_type == IMG_SRC_FILESYS)
     {
+        gui_obj_t *obj = (gui_obj_t *)this;
+        uint32_t file_size = 0;
+
+        const char *fn = this->data;
+        gui_vfs_file_t *fp;
+
+        fp = gui_vfs_open(fn, GUI_VFS_READ);
+        if (fp > 0)
+        {
+            file_size = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_END); // end
+        }
+        if (file_size <= 0)
+        {
+            return -1;
+        }
+
+        // uint32_t pos = 0;
+        uint8_t sigver[5];
+
+        uint32_t list_size = 0;
+        uint32_t chunk_size = 0;
+
+        uint8_t list_type[5];
+        uint8_t id[5];
+
+        uint32_t hdrl_size = 0;
+        int hdrl_data_beacon = 0;
+        uint32_t stream_list_size = 0;
+        int stream_list_beacon = 0;
+        uint32_t movi_size = 0;
+        int movi_data_beacon = 0;
+        uint32_t idx1_size = 0;
+
+        memset((void *)sigver, 0, sizeof(sigver));
+        memset((void *)list_type, 0, sizeof(list_type));
+        memset((void *)id, 0, sizeof(id));
+
+
+        gui_vfs_seek(fp, 12, GUI_VFS_SEEK_SET); // start + 12B
+        /* LIST - hdrl */
+        gui_vfs_read(fp, sigver, 4);
+        if (memcmp(sigver, "LIST", 4) != 0)
+        {
+            gui_log("invalid format");
+            gui_vfs_close(fp);
+            return -1;
+        }
+        gui_vfs_read(fp, &hdrl_size, 4);
+        hdrl_data_beacon = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_CUR); // current
+
+        gui_vfs_read(fp, list_type, 4);
+        if (memcmp(list_type, "hdrl", 4) != 0)
+        {
+            gui_log("invalid list type %s", list_type);
+            gui_vfs_close(fp);
+            return -1;
+        }
+        /* AVI main header */
+        gui_vfs_read(fp, id, 4);
+        if (memcmp(id, "avih", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            gui_vfs_close(fp);
+            return -1;
+        }
+        gui_vfs_read(fp, &chunk_size, 4);
+        MainAVIHeader_t main_hdr;
+        gui_vfs_read(fp, &main_hdr, sizeof(MainAVIHeader_t));
+        gui_vfs_seek(fp, chunk_size - sizeof(MainAVIHeader_t), GUI_VFS_SEEK_CUR);
+
+
+        /*************   Video  ********************/
+        /* LIST - strl */
+        gui_vfs_read(fp, sigver, 4);
+        if (memcmp(sigver, "LIST", 4) != 0)
+        {
+            gui_log("invalid format");
+            gui_vfs_close(fp);
+            return -1;
+        }
+        gui_vfs_read(fp, &stream_list_size, 4);
+        stream_list_beacon = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_CUR); // current
+
+        gui_vfs_read(fp, list_type, 4);
+        if (memcmp(list_type, "strl", 4) != 0)
+        {
+            gui_log("invalid list type %s", list_type);
+            gui_vfs_close(fp);
+            return -1;
+        }
+
+        /* Stream header */
+        gui_vfs_read(fp, id, 4);
+        if (memcmp(id, "strh", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            gui_vfs_close(fp);
+            return -1;
+        }
+        gui_vfs_read(fp, &chunk_size, 4);
+
+        AVIStreamHeader_t video_stream_hdr;
+        gui_vfs_read(fp, &video_stream_hdr, sizeof(AVIStreamHeader_t));
+
+        /* Stream format */
+        memcpy(id, &video_stream_hdr.stream_format, 4);
+        if (memcmp(id, "strf", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            gui_vfs_close(fp);
+            return -1;
+        }
+        chunk_size = video_stream_hdr.length_format;
+
+        BitMapInfoHeader_t stream_format;
+        gui_vfs_read(fp, &stream_format, sizeof(BitMapInfoHeader_t));
+        if (memcmp((void *)&stream_format.compression, "MJPG", 4) != 0)
+        {
+            gui_log("invalid compression %s", (char *)&stream_format.compression);
+            gui_vfs_close(fp);
+            return -1;
+        }
+
+
+        do
+        {
+            /* Try audio stream list */
+            gui_vfs_seek(fp, stream_list_beacon, GUI_VFS_SEEK_SET);
+            gui_vfs_seek(fp, stream_list_size, GUI_VFS_SEEK_CUR);
+            /*************   Audio  ********************/
+            /* LIST - strl */
+            gui_vfs_read(fp, sigver, 4);
+            if (memcmp(sigver, "LIST", 4) != 0)
+            {
+                gui_log("Audio: invalid format %s", sigver);
+                break;
+            }
+            gui_vfs_read(fp, &list_size, 4);
+            gui_vfs_read(fp, list_type, 4);
+            if (memcmp(list_type, "strl", 4) != 0)
+            {
+                gui_log("invalid list type %s", list_type);
+                break;
+            }
+            /* Stream header */
+            gui_vfs_read(fp, id, 4);
+            if (memcmp(id, "strh", 4) != 0)
+            {
+                gui_log("invalid header %s", id);
+                break;
+            }
+            gui_vfs_read(fp, &chunk_size, 4);
+
+            AVIStreamHeader_t audio_stream_hdr;
+            gui_vfs_read(fp, &audio_stream_hdr, sizeof(AVIStreamHeader_t));
+            if (memcmp((void *)audio_stream_hdr.type, "auds", 4) != 0)
+            {
+                gui_log("Not audio list %s", (char *)audio_stream_hdr.type);
+                break;
+            }
+
+            /* Stream format */
+            memcpy(id, &audio_stream_hdr.stream_format, 4);
+            if (memcmp(id, "strf", 4) != 0)
+            {
+                gui_log("invalid header %s", id);
+                break;
+            }
+            chunk_size = audio_stream_hdr.length_format;
+
+            WaveFormateX_t audio_stream_format;
+            gui_vfs_read(fp, &audio_stream_format, sizeof(WaveFormateX_t));
+
+            // ad_audio_open(&audio_stream_hdr, &audio_stream_format);
+        }
+        while (0);
+
+
+        /* Find movi list */
+        uint32_t pos = gui_vfs_seek(fp, hdrl_data_beacon, GUI_VFS_SEEK_SET);
+        pos = gui_vfs_seek(fp, hdrl_size, GUI_VFS_SEEK_CUR);
+        while (pos < file_size)
+        {
+            uint32_t size = 0;
+            gui_vfs_read(fp, sigver, 4);
+            gui_vfs_read(fp, &size, 4);
+            if (memcmp(sigver, "JUNK", 4) == 0)
+            {
+                pos = gui_vfs_seek(fp, size, GUI_VFS_SEEK_CUR);
+            }
+            else if (memcmp(sigver, "LIST", 4) == 0)
+            {
+                gui_vfs_read(fp, list_type, 4);
+                if (memcmp(list_type, "movi", 4) != 0)
+                {
+                    pos = gui_vfs_seek(fp, size - 4, GUI_VFS_SEEK_CUR);
+                }
+                else
+                {
+                    pos = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_CUR);
+                    movi_size = size;
+                    movi_data_beacon = pos - 4;
+                    break;
+                }
+            }
+            pos = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_CUR);
+        }
+        if (pos >= file_size)
+        {
+            gui_log("movi not found");
+            gui_vfs_close(fp);
+            return -1;
+        }
+
+        pos = gui_vfs_seek(fp, movi_size - 4, GUI_VFS_SEEK_CUR);
+        /* idx1 */
+        gui_vfs_read(fp, sigver, 4);
+        if (memcmp(sigver, "idx1", 4) != 0)
+        {
+            gui_log("invalid format");
+            gui_vfs_close(fp);
+            return -1;
+        }
+        gui_vfs_read(fp, &idx1_size, 4);
+
+        obj->w  = main_hdr.width;
+        obj->h = main_hdr.height;
+        this->frame_time = main_hdr.usec_per_frame / 1000;
+        this->num_frame = main_hdr.total_frame;
+        gui_log("video w %d, h %d, frame time %d, frame %d", main_hdr.width, main_hdr.height,
+                this->frame_time, this->num_frame);
+        /*  slicing  */
+        uint32_t chunk_num = idx1_size / sizeof(IndexItem_t);
+        this->array = (uint8_t **)gui_malloc(chunk_num * sizeof(AviMoviChunk_t));
+        this->chunk_num = chunk_num;
+
+        uint32_t frame_cnt = 0;
+        for (uint32_t i = 0; i < chunk_num; i++)
+        {
+            IndexItem_t IndexItem;
+            gui_vfs_read(fp, &IndexItem, sizeof(IndexItem_t));
+            AviMoviChunk_t chunk;
+
+            chunk.offset = (movi_data_beacon + IndexItem.offset + 8);
+            chunk.len = IndexItem.size;
+            chunk.type = (IndexItem.chunk_ID == 0x63643030) ? CHUNK_VIDEO : (IndexItem.chunk_ID == 0x62773130) ?
+                         CHUNK_AUDIO : CHUNK_UNKNOWN;
+
+            memcpy((AviMoviChunk_t *)(this->array) + i, &chunk, sizeof(AviMoviChunk_t));
+            if (IndexItem.chunk_ID == 0x63643030) // "00dc"
+            {
+                gui_log("V frame %d, offset 0x%x, size %d\n", frame_cnt, IndexItem.offset, IndexItem.size);
+                frame_cnt++;
+            }
+            else if (IndexItem.chunk_ID == 0x62773130) // "01wb"  30 31 77 62
+            {
+                gui_log("A         , offset 0x%x, size %d\n",  IndexItem.offset, IndexItem.size);
+            }
+        }
+        gui_vfs_close(fp);
     }
     else if (this->storage_type == IMG_SRC_MEMADDR)
     {
         uint8_t *img_data = (uint8_t *)this->data;
         gui_obj_t *obj = (gui_obj_t *)this;
 
-        uint16_t w = 0, h = 0;
+        uint8_t sigver[5];
 
-        /* find movi & idx1 */
+        uint32_t list_size = 0;
+        uint32_t chunk_size = 0;
+
+        uint8_t list_type[5];
+        uint8_t id[5];
+
+        uint32_t hdrl_size = 0;
+        int hdrl_data_beacon = 0;
+        uint32_t stream_list_size = 0;
+        int stream_list_beacon = 0;
         uint32_t movi_size = 0;
-        uint8_t *movi_data = NULL;
+        int movi_data_beacon = 0;
         uint32_t idx1_size = 0;
-        uint8_t *idx1_data = NULL;
-        // avi_find_movi_idx(img_data, &movi_data, &movi_size, &idx1_data, &idx1_size);
+
+
+        uint32_t file_size;
+        uint32_t pos = 0;
+
+        memset((void *)sigver, 0, sizeof(sigver));
+        memset((void *)list_type, 0, sizeof(list_type));
+        memset((void *)id, 0, sizeof(id));
+
+        pos = 4;
+        file_size = *(uint32_t *)(img_data + pos) + 8; // + RIFF + 4B size
+        pos += 4;
+        /* Format AVI */
+        pos += 4;
+
+
+        /* LIST - hdrl */
+        memcpy(sigver, (img_data + pos), 4);
+        if (memcmp(sigver, "LIST", 4) != 0)
         {
-            uint8_t sig[5];
-            uint8_t list_type[5];
-            uint32_t file_size;
-            uint32_t pos = 0;
-            MainAVIHeader_t main_hdr;
+            gui_log("invalid format");
+            return -1;
+        }
+        pos += 4;
+        memcpy(&hdrl_size, (img_data + pos), 4);
+        pos += 4;
+        hdrl_data_beacon = pos; // current
 
-            memset(sig, 0, sizeof(sig));
-            memset(list_type, 0, sizeof(list_type));
-            memset(&main_hdr, 0, sizeof(main_hdr));
-            pos = 4;
-            memcpy(&file_size, img_data + pos, sizeof(uint32_t));
-            pos += 4;
-            /* Format AVI */
-            pos += 4;
+        memcpy(list_type, (img_data + pos), 4);
+        if (memcmp(list_type, "hdrl", 4) != 0)
+        {
+            gui_log("invalid list type %s", list_type);
+            return -1;
+        }
+        pos += 4;
+        /* AVI main header */
+        memcpy(id, (img_data + pos), 4);
+        if (memcmp(id, "avih", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            return -1;
+        }
+        pos += 4;
+        memcpy(&chunk_size, (img_data + pos), 4);
+        pos += 4;
+        MainAVIHeader_t main_hdr;
+        memcpy(&main_hdr, (img_data + pos), sizeof(MainAVIHeader_t));
+        pos += chunk_size;
 
-            while (pos < file_size)
+
+
+        /*************   Video  ********************/
+        /* LIST - strl */
+        memcpy(sigver, (img_data + pos), 4);
+        if (memcmp(sigver, "LIST", 4) != 0)
+        {
+            gui_log("invalid format");
+            return -1;
+        }
+        pos += 4;
+        memcpy(&stream_list_size, (img_data + pos), 4);
+        pos += 4;
+        stream_list_beacon = pos; // current
+
+        memcpy(list_type, (img_data + pos), 4);
+        if (memcmp(list_type, "strl", 4) != 0)
+        {
+            gui_log("invalid list type %s", list_type);
+            return -1;
+        }
+        pos += 4;
+
+        /* Stream header */
+        memcpy(id, (img_data + pos), 4);
+        if (memcmp(id, "strh", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            return -1;
+        }
+        pos += 4;
+        memcpy(&chunk_size, (img_data + pos), 4);
+        pos += 4;
+
+        AVIStreamHeader_t video_stream_hdr;
+        memcpy(&video_stream_hdr, (img_data + pos), sizeof(AVIStreamHeader_t));
+        pos += sizeof(AVIStreamHeader_t);
+
+        /* Stream format */
+        memcpy(id, &video_stream_hdr.stream_format, 4);
+        if (memcmp(id, "strf", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            return -1;
+        }
+        chunk_size = video_stream_hdr.length_format;
+
+        BitMapInfoHeader_t stream_format;
+        memcpy(&stream_format, (img_data + pos), sizeof(BitMapInfoHeader_t));
+        if (memcmp((void *)&stream_format.compression, "MJPG", 4) != 0)
+        {
+            gui_log("invalid compression %s", (char *)&stream_format.compression);
+            return -1;
+        }
+        pos += sizeof(BitMapInfoHeader_t);
+
+
+        do
+        {
+            /* Try audio stream list */
+            pos = stream_list_beacon + stream_list_size;
+            /*************   Audio  ********************/
+            /* LIST - strl */
+            memcpy(sigver, (img_data + pos), 4);
+            if (memcmp(sigver, "LIST", 4) != 0)
             {
-                uint32_t size = 0;
-                memcpy(sig, (img_data + pos), 4);
+                gui_log("Audio: invalid format %s", sigver);
+                break;
+            }
+            pos += 4;
+            memcpy(&list_size, (img_data + pos), 4);
+            pos += 4;
+            memcpy(list_type, (img_data + pos), 4);
+            if (memcmp(list_type, "strl", 4) != 0)
+            {
+                gui_log("invalid list type %s", list_type);
+                break;
+            }
+            pos += 4;
+            /* Stream header */
+            memcpy(id, (img_data + pos), 4);
+            if (memcmp(id, "strh", 4) != 0)
+            {
+                gui_log("invalid header %s", id);
+                break;
+            }
+            pos += 4;
+            memcpy(&chunk_size, (img_data + pos), 4);
+            pos += 4;
+
+            AVIStreamHeader_t audio_stream_hdr;
+            memcpy(&audio_stream_hdr, (img_data + pos), sizeof(AVIStreamHeader_t));
+            if (memcmp((void *)audio_stream_hdr.type, "auds", 4) != 0)
+            {
+                gui_log("Not audio list %s", (char *)audio_stream_hdr.type);
+                break;
+            }
+            pos += sizeof(AVIStreamHeader_t);
+
+            /* Stream format */
+            memcpy(id, &audio_stream_hdr.stream_format, 4);
+            if (memcmp(id, "strf", 4) != 0)
+            {
+                gui_log("invalid header %s", id);
+                break;
+            }
+            chunk_size = audio_stream_hdr.length_format;
+
+            WaveFormateX_t audio_stream_format;
+            memcpy(&audio_stream_format, (img_data + pos), sizeof(WaveFormateX_t));
+
+            // ad_audio_open(&audio_stream_hdr, &audio_stream_format);
+        }
+        while (0);
+
+
+        /* Find movi list */
+        pos = hdrl_data_beacon + hdrl_size;
+        while (pos < file_size)
+        {
+            uint32_t size = 0;
+            memcpy(sigver, (img_data + pos), 4);
+            pos += 4;
+            memcpy(&size, (img_data + pos), 4);
+            pos += 4;
+            if (memcmp(sigver, "JUNK", 4) == 0)
+            {
+                pos += size;
+            }
+            else if (memcmp(sigver, "LIST", 4) == 0)
+            {
+                memcpy(list_type, (img_data + pos), 4);
                 pos += 4;
-                memcpy(&size, img_data + pos, sizeof(uint32_t));
-                pos += 4;
-                if (memcmp(sig, "JUNK", 4) == 0)
+                if (memcmp(list_type, "movi", 4) != 0)
                 {
-                    pos += size;
+                    pos += size - 4;
                 }
-                else if (memcmp(sig, "LIST", 4) == 0)
+                else
                 {
-                    memcpy(list_type, (img_data + pos), 4);
-                    pos += 4;
-                    if (memcmp(list_type, "hdrl", 4) == 0)
-                    {
-                        uint8_t id[5];
-                        memset(id, 0, sizeof(id));
-                        memcpy(id, (img_data + pos), 4);
-                        pos += 4;
-                        if (memcmp(id, "avih", 4) == 0)
-                        {
-                            memcpy(&main_hdr, img_data + pos + 4, sizeof(MainAVIHeader_t));
-                        }
-                        pos += size - 8;
-                    }
-                    else if (memcmp(list_type, "movi", 4) == 0)
-                    {
-                        movi_size = size;
-                        movi_data = img_data + pos - 4;
-                        break;
-                    }
-                    else
-                    {
-                        pos += size - 4;
-                    }
+                    movi_size = size;
+                    movi_data_beacon = pos - 4;
+                    break;
                 }
             }
-            if (pos >= file_size)
-            {
-                return -1;
-            }
-
-
-            pos += movi_size - 4;
-            /* idx1 */
-            memcpy(sig, (img_data + pos), 4);
-            pos += 4;
-            if (memcmp(sig, "idx1", 4) != 0)
-            {
-                return -1;
-            }
-            memcpy(&idx1_size, img_data + pos, sizeof(uint32_t));
-            pos += 4;
-            idx1_data = img_data + pos;
-
-
-            this->frame_time = main_hdr.usec_per_frame / 1000;
-            this->num_frame = main_hdr.total_frame;
+        }
+        if (pos >= file_size)
+        {
+            gui_log("movi not found");
+            return -1;
         }
 
-        this->array = (uint8_t **)gui_malloc(this->num_frame * sizeof(uint8_t *) + 1);
-        IndexItem_t *idx = (IndexItem_t *)idx1_data;
+        pos += movi_size - 4;
+        /* idx1 */
+        memcpy(sigver, (img_data + pos), 4);
+        pos += 4;
+        if (memcmp(sigver, "idx1", 4) != 0)
+        {
+            gui_log("invalid format");
+            return -1;
+        }
+        memcpy(&idx1_size, (img_data + pos), 4);
+        pos += 4;
+
+
+        /* construct index */
+        obj->w  = main_hdr.width;
+        obj->h = main_hdr.height;
+        this->frame_time = main_hdr.usec_per_frame / 1000;
+        this->num_frame = main_hdr.total_frame;
+        gui_log("video w %d, h %d, frame time %d, frame %d", main_hdr.width, main_hdr.height,
+                this->frame_time, this->num_frame);
+        /*  slicing  */
         uint32_t chunk_num = idx1_size / sizeof(IndexItem_t);
+        this->array = (uint8_t **)gui_malloc(chunk_num * sizeof(AviMoviChunk_t));
+        this->chunk_num = chunk_num;
+
         uint32_t frame_cnt = 0;
         for (uint32_t i = 0; i < chunk_num; i++)
         {
-            if (idx->chunk_ID == 0x63643030) // "00dc"
+            IndexItem_t IndexItem;
+            memcpy(&IndexItem, (img_data + pos), sizeof(IndexItem_t));
+            pos += sizeof(IndexItem_t);
+            AviMoviChunk_t chunk;
+
+            chunk.offset = (movi_data_beacon + IndexItem.offset + 8);
+            chunk.len = IndexItem.size;
+            chunk.type = (IndexItem.chunk_ID == 0x63643030) ? CHUNK_VIDEO : (IndexItem.chunk_ID == 0x62773130) ?
+                         CHUNK_AUDIO : CHUNK_UNKNOWN;
+
+            memcpy((AviMoviChunk_t *)(this->array) + i, &chunk, sizeof(AviMoviChunk_t));
+            if (IndexItem.chunk_ID == 0x63643030) // "00dc"
             {
-                this->array[frame_cnt] = movi_data + idx->offset + 8;
-                gui_log("frame %d, offset 0x%x, size %d\n", frame_cnt, idx->offset, idx->size);
+                gui_log("V frame %d, offset 0x%x, size %d\n", frame_cnt, IndexItem.offset, IndexItem.size);
                 frame_cnt++;
-                if (frame_cnt == this->num_frame)
-                {
-                    this->array[frame_cnt] = movi_data + idx->offset + 8 + idx->size;
-                }
             }
-            idx ++;
+            else if (IndexItem.chunk_ID == 0x62773130) // "01wb"  30 31 77 62
+            {
+                gui_log("A         , offset 0x%x, size %d\n",  IndexItem.offset, IndexItem.size);
+            }
+        }
+    }
+    else if (this->storage_type == IMG_SRC_FTL)
+    {
+        uint32_t fp = (uintptr_t)this->data;
+        gui_obj_t *obj = (gui_obj_t *)this;
+        uint32_t file_size = 0;
+
+        uint32_t pos = 0;
+        uint8_t sigver[5];
+
+        uint32_t list_size = 0;
+        uint32_t chunk_size = 0;
+
+        uint8_t list_type[5];
+        uint8_t id[5];
+
+        uint32_t hdrl_size = 0;
+        int hdrl_data_beacon = 0;
+        uint32_t stream_list_size = 0;
+        int stream_list_beacon = 0;
+        uint32_t movi_size = 0;
+        int movi_data_beacon = 0;
+        uint32_t idx1_size = 0;
+
+#define AVI_FTL_READ(afp, det, sz)  {gui_ftl_read(((uintptr_t)afp+pos), (uint8_t*)det, sz); pos+=sz;}
+        memset((void *)sigver, 0, sizeof(sigver));
+        memset((void *)list_type, 0, sizeof(list_type));
+        memset((void *)id, 0, sizeof(id));
+
+
+        pos = 4;
+        AVI_FTL_READ(fp, &file_size, 4);
+        file_size += 8; // + RIFF + 4B size
+        /* Format AVI */
+        pos += 4;
+
+        /* LIST - hdrl */
+        AVI_FTL_READ(fp, sigver, 4);
+        if (memcmp(sigver, "LIST", 4) != 0)
+        {
+            gui_log("invalid format");
+            return -1;
+        }
+        AVI_FTL_READ(fp, &hdrl_size, 4);
+        hdrl_data_beacon = pos; // current
+
+        AVI_FTL_READ(fp, list_type, 4);
+        if (memcmp(list_type, "hdrl", 4) != 0)
+        {
+            gui_log("invalid list type %s", list_type);
+            return -1;
+        }
+        /* AVI main header */
+        AVI_FTL_READ(fp, id, 4);
+        if (memcmp(id, "avih", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            return -1;
+        }
+        AVI_FTL_READ(fp, &chunk_size, 4);
+        MainAVIHeader_t main_hdr;
+        AVI_FTL_READ(fp, &main_hdr, sizeof(MainAVIHeader_t));
+        pos += chunk_size - sizeof(MainAVIHeader_t);
+
+        /*************   Video  ********************/
+        /* LIST - strl */
+        AVI_FTL_READ(fp, sigver, 4);
+        if (memcmp(sigver, "LIST", 4) != 0)
+        {
+            gui_log("invalid format");
+            return -1;
+        }
+        AVI_FTL_READ(fp, &stream_list_size, 4);
+        stream_list_beacon = pos; // current
+
+        AVI_FTL_READ(fp, list_type, 4);
+        if (memcmp(list_type, "strl", 4) != 0)
+        {
+            gui_log("invalid list type %s", list_type);
+            return -1;
         }
 
-        get_jpeg_size(this->array[0], 2 * 1024, &w, &h);
-        obj->w = w;
-        obj->h = h;
+        /* Stream header */
+        AVI_FTL_READ(fp, id, 4);
+        if (memcmp(id, "strh", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            return -1;
+        }
+        AVI_FTL_READ(fp, &chunk_size, 4);
+
+        AVIStreamHeader_t video_stream_hdr;
+        AVI_FTL_READ(fp, &video_stream_hdr, sizeof(AVIStreamHeader_t));
+
+        /* Stream format */
+        memcpy(id, &video_stream_hdr.stream_format, 4);
+        if (memcmp(id, "strf", 4) != 0)
+        {
+            gui_log("invalid header %s", id);
+            return -1;
+        }
+        chunk_size = video_stream_hdr.length_format;
+
+        BitMapInfoHeader_t stream_format;
+        AVI_FTL_READ(fp, &stream_format, sizeof(BitMapInfoHeader_t));
+        if (memcmp((void *)&stream_format.compression, "MJPG", 4) != 0)
+        {
+            gui_log("invalid compression %s", (char *)&stream_format.compression);
+            return -1;
+        }
+
+
+        do
+        {
+            /* Try audio stream list */
+            pos = stream_list_beacon + stream_list_size;
+            /*************   Audio  ********************/
+            /* LIST - strl */
+            AVI_FTL_READ(fp, sigver, 4);
+            if (memcmp(sigver, "LIST", 4) != 0)
+            {
+                gui_log("Audio: invalid format %s", sigver);
+                break;
+            }
+            AVI_FTL_READ(fp, &list_size, 4);
+            AVI_FTL_READ(fp, list_type, 4);
+            if (memcmp(list_type, "strl", 4) != 0)
+            {
+                gui_log("invalid list type %s", list_type);
+                break;
+            }
+            /* Stream header */
+            AVI_FTL_READ(fp, id, 4);
+            if (memcmp(id, "strh", 4) != 0)
+            {
+                gui_log("invalid header %s", id);
+                break;
+            }
+            AVI_FTL_READ(fp, &chunk_size, 4);
+
+            AVIStreamHeader_t audio_stream_hdr;
+            AVI_FTL_READ(fp, &audio_stream_hdr, sizeof(AVIStreamHeader_t));
+            if (memcmp((void *)audio_stream_hdr.type, "auds", 4) != 0)
+            {
+                gui_log("Not audio list %s", (char *)audio_stream_hdr.type);
+                break;
+            }
+
+            /* Stream format */
+            memcpy(id, &audio_stream_hdr.stream_format, 4);
+            if (memcmp(id, "strf", 4) != 0)
+            {
+                gui_log("invalid header %s", id);
+                break;
+            }
+            chunk_size = audio_stream_hdr.length_format;
+
+            WaveFormateX_t audio_stream_format;
+            AVI_FTL_READ(fp, &audio_stream_format, sizeof(WaveFormateX_t));
+
+            // ad_audio_open(&audio_stream_hdr, &audio_stream_format);
+        }
+        while (0);
+
+
+        /* Find movi list */
+        pos = hdrl_data_beacon + hdrl_size;
+        while (pos < file_size)
+        {
+            uint32_t size = 0;
+            AVI_FTL_READ(fp, sigver, 4);
+            AVI_FTL_READ(fp, &size, 4);
+            if (memcmp(sigver, "JUNK", 4) == 0)
+            {
+                pos += size;
+            }
+            else if (memcmp(sigver, "LIST", 4) == 0)
+            {
+                AVI_FTL_READ(fp, list_type, 4);
+                if (memcmp(list_type, "movi", 4) != 0)
+                {
+                    pos += size - 4;
+                }
+                else
+                {
+                    movi_size = size;
+                    movi_data_beacon = pos - 4;
+                    break;
+                }
+            }
+        }
+        if (pos >= file_size)
+        {
+            gui_log("movi not found");
+            return -1;
+        }
+
+        pos += movi_size - 4;
+        /* idx1 */
+        AVI_FTL_READ(fp, sigver, 4);
+        if (memcmp(sigver, "idx1", 4) != 0)
+        {
+            gui_log("invalid format");
+            return -1;
+        }
+        AVI_FTL_READ(fp, &idx1_size, 4);
+
+
+        obj->w  = main_hdr.width;
+        obj->h = main_hdr.height;
+        this->frame_time = main_hdr.usec_per_frame / 1000;
+        this->num_frame = main_hdr.total_frame;
+        gui_log("video w %d, h %d, frame time %d, frame %d", main_hdr.width, main_hdr.height,
+                this->frame_time, this->num_frame);
+        /*  slicing  */
+        uint32_t chunk_num = idx1_size / sizeof(IndexItem_t);
+        this->array = (uint8_t **)gui_malloc(chunk_num * sizeof(AviMoviChunk_t));
+        this->chunk_num = chunk_num;
+
+        uint32_t frame_cnt = 0;
+        for (uint32_t i = 0; i < chunk_num; i++)
+        {
+            IndexItem_t IndexItem;
+            AVI_FTL_READ(fp, &IndexItem, sizeof(IndexItem_t));
+            AviMoviChunk_t chunk;
+
+            chunk.offset = (movi_data_beacon + IndexItem.offset + 8);
+            chunk.len = IndexItem.size;
+            chunk.type = (IndexItem.chunk_ID == 0x63643030) ? CHUNK_VIDEO : (IndexItem.chunk_ID == 0x62773130) ?
+                         CHUNK_AUDIO : CHUNK_UNKNOWN;
+
+            memcpy((AviMoviChunk_t *)(this->array) + i, &chunk, sizeof(AviMoviChunk_t));
+            if (IndexItem.chunk_ID == 0x63643030) // "00dc"
+            {
+                gui_log("V frame %d, offset 0x%x, size %d\n", frame_cnt, IndexItem.offset, IndexItem.size);
+                frame_cnt++;
+            }
+            else if (IndexItem.chunk_ID == 0x62773130) // "01wb"  30 31 77 62
+            {
+                gui_log("A         , offset 0x%x, size %d\n",  IndexItem.offset, IndexItem.size);
+            }
+        }
     }
     return 0;
 }
@@ -642,6 +1590,35 @@ static int video_src_init_h264(gui_video_t  *this)
 
     if (this->storage_type == IMG_SRC_FILESYS)
     {
+        gui_h264_header_t temp;
+        header = &temp;
+        const char *fn = this->data;
+        gui_vfs_file_t *fp;
+
+        fp = gui_vfs_open(fn, GUI_VFS_READ);
+        if (fp <= 0)
+        {
+            return -1;
+        }
+        gui_vfs_read(fp, header, sizeof(gui_h264_header_t));
+
+        obj->w = header->w;
+        obj->h = header->h;
+        this->num_frame = header->frame_num;
+        this->frame_time = header->frame_time;
+        this->array = (uint8_t **)gui_malloc(header->size);
+
+        if (!this->array)
+        {
+            gui_log("load h264 failed, malloc size %d\n", header->size);
+            return -1;
+        }
+        // load video to mem
+        gui_vfs_read(fp, (void *)this->array, header->size);
+        gui_log("h264 w %d h %d size %d n %d frame_time %d\n", obj->w, obj->h, header->size,
+                this->num_frame,
+                this->frame_time);
+        gui_vfs_close(fp);
     }
     else if (this->storage_type == IMG_SRC_MEMADDR)
     {
@@ -664,7 +1641,31 @@ static int video_src_init_h264(gui_video_t  *this)
                 this->num_frame,
                 this->frame_time);
     }
+    else if (this->storage_type == IMG_SRC_FTL)
+    {
+        gui_h264_header_t temp;
+        header = &temp;
+        uint32_t fp = (uintptr_t)this->data;
 
+        gui_ftl_read(fp, (uint8_t *)header, sizeof(gui_h264_header_t));
+
+        obj->w = header->w;
+        obj->h = header->h;
+        this->num_frame = header->frame_num;
+        this->frame_time = header->frame_time;
+        this->array = (uint8_t **)gui_malloc(header->size);
+
+        if (!this->array)
+        {
+            gui_log("load h264 failed, malloc size %d\n", header->size);
+            return -1;
+        }
+        // load video to mem
+        gui_ftl_read(fp + sizeof(gui_h264_header_t), (uint8_t *)this->array, header->size);
+        gui_log("h264 w %d h %d size %d n %d frame_time %d\n", obj->w, obj->h, header->size,
+                this->num_frame,
+                this->frame_time);
+    }
     return 0;
 }
 
@@ -704,11 +1705,10 @@ static int video_src_init_mjpg(gui_video_t  *this)
         gui_obj_t *obj = (gui_obj_t *)this;
         uint8_t scan_state = MJPEG_SCAN_INIT;
         uint32_t offset = 0;
-        while (cur_start + cur_rd < sz_file)
+        while (scan_state != MJPEG_SCAN_EOF)
         {
             cur_start += cur_rd ;
-            cur_rd = (sz_file - cur_start < VIDEO_INIT_LOAD_BUFF_SZ) ? (sz_file - cur_start) :
-                     VIDEO_INIT_LOAD_BUFF_SZ;
+            cur_rd = VIDEO_INIT_LOAD_BUFF_SZ;
             gui_vfs_seek(fp, cur_start, GUI_VFS_SEEK_SET);
             gui_vfs_read(fp, buff, cur_rd);
             if (cur_start < cur_rd)
@@ -721,7 +1721,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
             }
 
             uint8_t *pdata = buff;
-            while (pdata < buff + cur_rd)
+            while (pdata < buff + cur_rd - 1)
             {
                 if (*((uint16_t *)pdata) == MGPEG_SEG_SOI)
                 {
@@ -732,7 +1732,6 @@ static int video_src_init_mjpg(gui_video_t  *this)
                 {
                     scan_state = MJPEG_SCAN_END;
                     slice_cnt++;
-                    // TODO: fix realloc
                     if (!array)
                     {
                         gui_log("%s %d\n", __FUNCTION__, __LINE__);
@@ -757,9 +1756,21 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     }
                     array[slice_cnt - 1] = offset;
                     array[slice_cnt] = pdata + 2 - buff + cur_start;
-                    gui_log("%d -> %d ,sz %d\n", array[slice_cnt - 1], array[slice_cnt],
+                    gui_log("%d: %d -> %d ,sz %d\n", slice_cnt - 1, array[slice_cnt - 1], array[slice_cnt],
                             array[slice_cnt] - array[slice_cnt - 1]);
-                    scan_state = MJPEG_SCAN_INIT;
+                    pdata++; // +1 +1 -> EOI
+                    // scan_state = MJPEG_SCAN_INIT;
+                }
+                else if ((scan_state == MJPEG_SCAN_END) && (*((uint16_t *)pdata) != MGPEG_SEG_SOI))
+                {
+                    // case: 0xffd9 | 0xffd8 will get into the first "if"
+                    gui_log("mjpeg EOF\n");
+                    scan_state = MJPEG_SCAN_EOF;
+                }
+                else if (scan_state == MJPEG_SCAN_EOF)
+                {
+                    // case: 0xffd9 , 0xXXXX  ... |  should break
+                    break;
                 }
                 pdata++;
             }
@@ -825,7 +1836,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
             }
 
             uint8_t *pdata = buff;
-            while (pdata < buff + cur_rd)
+            while (pdata < buff + cur_rd - 1)
             {
                 if (*((uint16_t *)pdata) == MGPEG_SEG_SOI)
                 {

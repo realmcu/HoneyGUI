@@ -83,6 +83,13 @@ typedef enum
 
 } GUI_VIDEO_TYPE;
 
+typedef enum
+{
+    CHUNK_VIDEO = 0,
+    CHUNK_AUDIO,
+    CHUNK_UNKNOWN,
+
+} AVI_CHUNK_TYPE;
 #pragma pack(1)
 typedef struct
 {
@@ -109,6 +116,53 @@ typedef struct
     uint32_t height;
 } MainAVIHeader_t;
 
+typedef struct
+{
+    char type[4];               /* "vids", "auds" */
+    uint32_t handler;           /* Optionally, contains a FOURCC for a specific data handler. */
+    uint32_t flags;             /*  */
+    uint32_t priority;          /*  */
+    uint32_t initial_frames;    /*  */
+    uint32_t scale;             /*  */
+    uint32_t rate;              /*  */
+    uint32_t start;             /*  */
+    uint32_t length;            /*  */
+    uint32_t buffer_size;       /* This should be larger than the largest chunk, zero if unknown. */
+    uint32_t quality;           /* A value between 0 and 10,000. */
+    uint32_t sample_size;       /* The size of a sample; zero if varying, block align for audio. */
+    uint16_t frame[4];             /* The left, top, right, bottom coordinates in 16 bit values. */
+    uint32_t stream_format;     /* The letters "strf" indicate that this is a stream format. */
+    uint32_t length_format;     /* This size of the format. */
+} AVIStreamHeader_t;
+
+typedef struct
+{
+    uint32_t size;              /*  */
+    uint32_t width;             /*  */
+    uint32_t height;            /*  */
+    uint16_t planes;            /*  */
+    uint16_t bit_count;         /*  */
+    uint32_t compression;       /*  */
+    uint32_t image_size;        /*  */
+    uint32_t x_pels_per_meter;  /*  */
+    uint32_t y_pels_per_meter;  /*  */
+    uint32_t colors_used;       /*  */
+    uint32_t colors_important;  /*  */
+} BitMapInfoHeader_t;
+
+typedef struct
+{
+    uint16_t format_tag;        /*  85 (0x55), 'WAVE_FORMAT_MPEGLAYER3' */
+    uint16_t channels;          /*  The number of channels of audio data. */
+    uint32_t samples_per_sec;   /*  The number of samples per second. */
+    uint32_t ave_bytes_per_sec; /*  (Samples Per Sec)*(Block Align) */
+    uint16_t block_align;       /*  (Channels * BitsPerSample) / 8 */
+    uint16_t bits_per_sample;   /*  This should be 8 or 16 for PCM. */
+    uint16_t size_extra;        /*  The size of the extra information. */
+    // uint8_t junk[4];            /* Begins with the label "JUNK", size 1722 */
+
+} WaveFormateX_t;
+
 /* AVI idx1 */
 typedef struct
 {
@@ -125,6 +179,14 @@ typedef struct
 } IndexItem_t;
 
 #pragma pack()
+
+/* AVI chunk slice */
+typedef struct
+{
+    uint32_t offset;          /*  */
+    uint32_t len;
+    uint32_t type;           /*  */
+} AviMoviChunk_t;
 
 /** @brief  stb img widget information structure */
 typedef struct
@@ -148,7 +210,10 @@ typedef struct
     uint8_t img_type;
     uint8_t storage_type;
 
-    uint8_t state;
+    uint8_t state;             // video play status
+
+    uint32_t frame_chunk_cur;
+    uint32_t chunk_num;
 
 
     uint8_t rgb_type;           // to define RGB type of decoded img (not used yet)
