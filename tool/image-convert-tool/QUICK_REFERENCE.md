@@ -4,13 +4,13 @@
 
 ```bash
 # 最简单：自动选择最优压缩
-python image_converter_new.py -i input.png -o output.bin -c adaptive
+python image_converter.py -i input.png -o output.bin -c adaptive
 
 # UI 图标（推荐）
-python image_converter_new.py -i icon.png -o icon.bin -f argb8888 -c rle
+python image_converter.py -i icon.png -o icon.bin -f argb8888 -c rle
 
 # 照片（推荐）
-python image_converter_new.py -i photo.jpg -o photo.bin -f rgb565 -c yuv-fastlz --yuv-mode yuv422
+python image_converter.py -i photo.jpg -o photo.bin -f rgb565 -c yuv-fastlz --yuv-mode yuv422
 ```
 
 ## 压缩算法选择
@@ -48,10 +48,10 @@ python image_converter_new.py -i photo.jpg -o photo.bin -f rgb565 -c yuv-fastlz 
 
 ```bash
 # 转换所有 PNG
-for f in *.png; do python image_converter_new.py -i "$f" -o "${f%.png}.bin" -c adaptive; done
+for f in *.png; do python image_converter.py -i "$f" -o "${f%.png}.bin" -c adaptive; done
 
 # 转换所有图片
-for f in assets/*; do python image_converter_new.py -i "$f" -o "build/$(basename $f).bin" -c adaptive; done
+for f in assets/*; do python image_converter.py -i "$f" -o "build/$(basename $f).bin" -c adaptive; done
 ```
 
 ## 文件大小对比
@@ -76,5 +76,5 @@ pip list | grep -E "Pillow|fastlz"
 python test_compress.py
 
 # 查看帮助
-python image_converter_new.py --help
+python image_converter.py --help
 ```

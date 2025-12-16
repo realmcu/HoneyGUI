@@ -148,7 +148,7 @@ pip install fastlz
 
 **使用示例**:
 ```bash
-python image_converter_new.py -i input.png -o output.bin -c rle --rle-run1 3
+python image_converter.py -i input.png -o output.bin -c rle --rle-run1 3
 ```
 
 ### 2. FastLz 压缩
@@ -164,7 +164,7 @@ python image_converter_new.py -i input.png -o output.bin -c rle --rle-run1 3
 
 **使用示例**:
 ```bash
-python image_converter_new.py -i input.png -o output.bin -c fastlz
+python image_converter.py -i input.png -o output.bin -c fastlz
 ```
 
 ### 3. YUV 降采样 + Blur
@@ -184,10 +184,10 @@ python image_converter_new.py -i input.png -o output.bin -c fastlz
 **使用示例**:
 ```bash
 # YUV 降采样
-python image_converter_new.py -i photo.jpg -o photo.bin -c yuv --yuv-mode yuv422 --blur-bits 2
+python image_converter.py -i photo.jpg -o photo.bin -c yuv --yuv-mode yuv422 --blur-bits 2
 
 # YUV + FastLz
-python image_converter_new.py -i photo.jpg -o photo.bin -c yuv-fastlz --yuv-mode yuv422
+python image_converter.py -i photo.jpg -o photo.bin -c yuv-fastlz --yuv-mode yuv422
 ```
 
 ### 4. Adaptive 自适应压缩
@@ -196,7 +196,7 @@ python image_converter_new.py -i photo.jpg -o photo.bin -c yuv-fastlz --yuv-mode
 
 **使用示例**:
 ```bash
-python image_converter_new.py -i input.png -o output.bin -c adaptive
+python image_converter.py -i input.png -o output.bin -c adaptive
 ```
 
 ### 压缩效果对比
@@ -215,13 +215,13 @@ python image_converter_new.py -i input.png -o output.bin -c adaptive
 
 ```bash
 # 无压缩，自动检测格式
-python image_converter_new.py -i input.png -o output.bin
+python image_converter.py -i input.png -o output.bin
 
 # 指定像素格式
-python image_converter_new.py -i input.png -o output.bin -f rgb565
+python image_converter.py -i input.png -o output.bin -f rgb565
 
 # 提取 Alpha 通道
-python image_converter_new.py -i icon.png -o alpha.bin -f a8
+python image_converter.py -i icon.png -o alpha.bin -f a8
 ```
 
 ### 命令行参数
@@ -254,17 +254,17 @@ python image_converter_new.py -i icon.png -o alpha.bin -f a8
 
 ```bash
 # 1. UI 图标（纯色多）
-python image_converter_new.py -i icon.png -o icon.bin -f argb8888 -c rle
+python image_converter.py -i icon.png -o icon.bin -f argb8888 -c rle
 
 # 2. 照片
-python image_converter_new.py -i photo.jpg -o photo.bin -f rgb888 -c yuv-fastlz --yuv-mode yuv422
+python image_converter.py -i photo.jpg -o photo.bin -f rgb888 -c yuv-fastlz --yuv-mode yuv422
 
 # 3. 不确定类型，自动选择
-python image_converter_new.py -i image.png -o image.bin -c adaptive
+python image_converter.py -i image.png -o image.bin -c adaptive
 
 # 4. 批量转换
 for file in assets/*.png; do
-    python image_converter_new.py -i "$file" -o "${file%.png}.bin" -c adaptive
+    python image_converter.py -i "$file" -o "${file%.png}.bin" -c adaptive
 done
 ```
 
@@ -283,8 +283,7 @@ image-convert-tool/
 │   ├── yuv.py                 # YUV 压缩
 │   └── adaptive.py            # 自适应压缩
 ├── converter.py               # 主转换器
-├── image_converter.py         # 旧版（简化版）
-├── image_converter_new.py     # 新版（完整功能）
+├── image_converter.py         # 图像转换工具（完整功能）
 ├── test_compress.py           # 测试脚本
 └── README.md                  # 本文档
 ```
@@ -296,13 +295,13 @@ image-convert-tool/
 python test_compress.py
 
 # 测试特定算法
-python image_converter_new.py -i input.png -o input.bin -c rle
-python image_converter_new.py -i input.png -o output.bin -c fastlz
-python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv444 --blur-bits 1
-python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv422 --blur-bits 1
-python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv411 --blur-bits 1
-python image_converter_new.py -i input.png -o output.bin -f rgb888 -c yuv-fastlz --yuv-mode yuv422 --blur-bits 1
-python image_converter_new.py -i input.png -o input.bin -c adaptive
+python image_converter.py -i input.png -o input.bin -c rle
+python image_converter.py -i input.png -o output.bin -c fastlz
+python image_converter.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv444 --blur-bits 1
+python image_converter.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv422 --blur-bits 1
+python image_converter.py -i input.png -o output.bin -f rgb888 -c yuv --yuv-mode yuv411 --blur-bits 1
+python image_converter.py -i input.png -o output.bin -f rgb888 -c yuv-fastlz --yuv-mode yuv422 --blur-bits 1
+python image_converter.py -i input.png -o input.bin -c adaptive
 ```
 
 ## 集成示例
@@ -313,7 +312,7 @@ python image_converter_new.py -i input.png -o input.bin -c adaptive
 import { spawn } from 'child_process';
 import * as path from 'path';
 
-const script = path.join(sdkPath, 'tool', 'image-convert-tool', 'image_converter_new.py');
+const script = path.join(sdkPath, 'tool', 'image-convert-tool', 'image_converter.py');
 const proc = spawn('python3', [
     script,
     '-i', inputPath,
@@ -329,7 +328,7 @@ const proc = spawn('python3', [
 #!/bin/bash
 # convert_assets.sh
 
-TOOL="python3 image_converter_new.py"
+TOOL="python3 image_converter.py"
 ASSETS_DIR="assets"
 OUTPUT_DIR="build/assets"
 

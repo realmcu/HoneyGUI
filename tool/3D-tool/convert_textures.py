@@ -3,7 +3,7 @@
 Batch convert PNG textures to binary format for 3D models
 
 This script converts all PNG files in the current directory to .bin format
-using the image_converter_new.py tool.
+using the image_converter.py tool.
 """
 
 import os
@@ -13,21 +13,21 @@ from pathlib import Path
 
 
 def find_image_converter():
-    """Find the image_converter_new.py script"""
+    """Find the image_converter.py script"""
     # Try relative path from this script
     script_dir = Path(__file__).parent
-    converter_path = script_dir.parent / 'image-convert-tool' / 'image_converter_new.py'
+    converter_path = script_dir.parent / 'image-convert-tool' / 'image_converter.py'
     
     if converter_path.exists():
         return str(converter_path)
     
     # Try current directory
-    converter_path = Path('image_converter_new.py')
+    converter_path = Path('image_converter.py')
     if converter_path.exists():
         return str(converter_path)
     
     # Try image-convert-tool directory
-    converter_path = Path('../image-convert-tool/image_converter_new.py')
+    converter_path = Path('../image-convert-tool/image_converter.py')
     if converter_path.exists():
         return str(converter_path)
     
@@ -45,7 +45,7 @@ def convert_textures(directory='.', format_type='auto'):
     # Find converter script
     converter = find_image_converter()
     if not converter:
-        print("Error: image_converter_new.py not found!")
+        print("Error: image_converter.py not found!")
         print("Please ensure the image-convert-tool directory exists.")
         return False
     

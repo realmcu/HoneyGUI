@@ -101,7 +101,7 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
    在 HoneyGUI 安装目录下找到以下工具：
 
       - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
-      - ``your_HoneyGUI_dir\tool\image-convert-tool\image_converter_new.py``
+      - ``your_HoneyGUI_dir\tool\image-convert-tool\image_converter.py``
 
 2. **准备模型文件**
 

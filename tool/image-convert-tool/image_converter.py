@@ -1,130 +1,66 @@
 #!/usr/bin/env python3
 """
-HoneyGUI Image Converter
-Convert PNG/JPG images to HoneyGUI bin format.
+HoneyGUI Image Converter (Modular Version)
+Convert PNG/JPG/BMP images to HoneyGUI bin format with compression support.
 """
 
 import argparse
-import struct
 import sys
 from pathlib import Path
 
-try:
-    from PIL import Image
-except ImportError:
-    print("Error: Pillow not installed. Run: pip install Pillow")
-    sys.exit(1)
-
-
-# GUI_FormatType enum values (must match draw_img.h)
-FORMAT_RGB565 = 0
-FORMAT_ARGB8565 = 1
-FORMAT_RGB888 = 3
-FORMAT_ARGB8888 = 4
-FORMAT_ALPHAMASK = 9  # Alpha channel only (8-bit grayscale)
-FORMAT_A8 = FORMAT_ALPHAMASK  # Alias
-
-
-def rgb_to_rgb565(r, g, b):
-    """Convert RGB888 to RGB565."""
-    return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
-
-
-def convert_image(input_path: Path, output_path: Path, fmt: str = "auto") -> bool:
-    """
-    Convert image to HoneyGUI bin format.
-    
-    Args:
-        input_path: Source image path (PNG/JPG)
-        output_path: Output bin file path
-        fmt: Output format - "rgb565", "rgb888", "argb8888", "a8", or "auto"
-    
-    Returns:
-        True on success
-    """
-    img = Image.open(input_path)
-    has_alpha = img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info)
-    
-    # Auto-detect format
-    if fmt == "auto":
-        fmt = "argb8888" if has_alpha else "rgb565"
-    
-    # Convert to appropriate mode
-    if fmt == "a8":
-        # Extract alpha channel only
-        if not has_alpha:
-            raise ValueError("Image has no alpha channel for A8 format")
-        img = img.convert("RGBA")
-    elif fmt in ("argb8888", "argb8565"):
-        img = img.convert("RGBA")
-    else:
-        img = img.convert("RGB")
-    
-    w, h = img.size
-    pixels = list(img.getdata())
-    
-    # Build header (8 bytes)
-    # Byte 0: flags (all 0 for uncompressed)
-    # Byte 1: type
-    # Byte 2-3: width (little-endian)
-    # Byte 4-5: height (little-endian)
-    # Byte 6: version
-    # Byte 7: reserved
-    
-    type_map = {
-        "rgb565": FORMAT_RGB565,
-        "rgb888": FORMAT_RGB888,
-        "argb8888": FORMAT_ARGB8888,
-        "argb8565": FORMAT_ARGB8565,
-        "a8": FORMAT_A8,
-    }
-    pixel_type = type_map[fmt]
-    
-    header = struct.pack('<BBhhBB', 0, pixel_type, w, h, 0, 0)
-    
-    # Build pixel data
-    pixel_data = bytearray()
-    
-    if fmt == "rgb565":
-        for r, g, b in pixels:
-            val = rgb_to_rgb565(r, g, b)
-            pixel_data.extend(struct.pack('<H', val))
-    
-    elif fmt == "rgb888":
-        for r, g, b in pixels:
-            pixel_data.extend([b, g, r])  # BGR order
-    
-    elif fmt == "argb8888":
-        for r, g, b, a in pixels:
-            pixel_data.extend([b, g, r, a])  # BGRA order
-    
-    elif fmt == "argb8565":
-        for r, g, b, a in pixels:
-            val = rgb_to_rgb565(r, g, b)
-            pixel_data.extend(struct.pack('<H', val))  # RGB565 first
-            pixel_data.append(a)  # Alpha last
-    
-    elif fmt == "a8":
-        # Extract alpha channel only (8-bit grayscale)
-        for r, g, b, a in pixels:
-            pixel_data.append(a)
-    
-    # Write output
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'wb') as f:
-        f.write(header)
-        f.write(pixel_data)
-    
-    return True
+from converter import ImageConverter
+from compress import RLECompression, FastLzCompression, YUVCompression, AdaptiveCompression
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Convert images to HoneyGUI bin format')
+    parser = argparse.ArgumentParser(
+        description='Convert images to HoneyGUI bin format',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  # No compression
+  %(prog)s -i input.png -o output.bin -f auto
+  
+  # RLE compression
+  %(prog)s -i input.png -o output.bin -f rgb565 -c rle
+  
+  # FastLz compression
+  %(prog)s -i input.png -o output.bin -f argb8888 -c fastlz
+  
+  # YUV compression
+  %(prog)s -i photo.jpg -o photo.bin -c yuv --yuv-mode yuv422 --blur-bits 2
+  
+  # Adaptive (auto-select best)
+  %(prog)s -i input.png -o output.bin -c adaptive
+        '''
+    )
+    
     parser.add_argument('-i', '--input', required=True, help='Input image path')
     parser.add_argument('-o', '--output', required=True, help='Output bin path')
     parser.add_argument('-f', '--format', default='auto',
                         choices=['auto', 'rgb565', 'rgb888', 'argb8888', 'argb8565', 'a8'],
                         help='Output pixel format (default: auto)')
+    parser.add_argument('-c', '--compress', default='none',
+                        choices=['none', 'rle', 'fastlz', 'yuv', 'yuv-fastlz', 'adaptive'],
+                        help='Compression algorithm (default: none)')
+    
+    # RLE options
+    rle_group = parser.add_argument_group('RLE options')
+    rle_group.add_argument('--rle-level', type=int, default=1, choices=[1, 2],
+                          help='RLE compression level (default: 1)')
+    rle_group.add_argument('--rle-run1', type=int, default=1, choices=[0, 1, 2, 3],
+                          help='RLE 1st stage run length size (default: 1)')
+    rle_group.add_argument('--rle-run2', type=int, default=0, choices=[0, 1, 2, 3],
+                          help='RLE 2nd stage run length size (default: 0)')
+    
+    # YUV options
+    yuv_group = parser.add_argument_group('YUV options')
+    yuv_group.add_argument('--yuv-mode', default='yuv444',
+                          choices=['yuv444', 'yuv422', 'yuv411'],
+                          help='YUV sampling mode (default: yuv444)')
+    yuv_group.add_argument('--blur-bits', type=int, default=0,
+                          choices=[0, 1, 2, 4],
+                          help='Blur mode - discard low bits (default: 0)')
     
     args = parser.parse_args()
     
@@ -135,11 +71,54 @@ def main():
         print(f"Error: Input file not found: {input_path}")
         sys.exit(1)
     
+    # Setup compression
+    compressor = None
     try:
-        convert_image(input_path, output_path, args.format)
-        print(f"Converted: {input_path} -> {output_path}")
+        if args.compress == 'rle':
+            compressor = RLECompression(
+                run_length_1=args.rle_run1,
+                run_length_2=args.rle_run2,
+                level=args.rle_level
+            )
+        elif args.compress == 'fastlz':
+            compressor = FastLzCompression()
+        elif args.compress == 'yuv':
+            compressor = YUVCompression(
+                sample_mode=args.yuv_mode,
+                blur_bits=args.blur_bits,
+                use_fastlz=False
+            )
+        elif args.compress == 'yuv-fastlz':
+            compressor = YUVCompression(
+                sample_mode=args.yuv_mode,
+                blur_bits=args.blur_bits,
+                use_fastlz=True
+            )
+        elif args.compress == 'adaptive':
+            compressor = AdaptiveCompression(
+                rle_run_length_1=args.rle_run1,
+                rle_run_length_2=args.rle_run2
+            )
+    except ImportError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    
+    # Convert
+    try:
+        converter = ImageConverter()
+        converter.convert(input_path, output_path, args.format, compressor)
+        
+        compress_info = f" ({args.compress})" if compressor else ""
+        print(f"Converted: {input_path} -> {output_path}{compress_info}")
+        
+        # Show selected algorithm for adaptive
+        if args.compress == 'adaptive' and hasattr(compressor, 'selected_algorithm'):
+            print(f"  Selected algorithm: {compressor.selected_algorithm}")
+        
     except Exception as e:
         print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 

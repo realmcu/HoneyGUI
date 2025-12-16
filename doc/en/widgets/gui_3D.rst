@@ -99,7 +99,7 @@ Before a 3D model can be rendered, it needs to be converted into a binary format
    Find the following tools in the HoneyGUI installation directory:
 
      - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
-     - ``your_HoneyGUI_dir\tool\image-convert-tool\image_converter_new.py``
+     - ``your_HoneyGUI_dir\tool\image-convert-tool\image_converter.py``
 
 2. **Prepare the Model Files**
    

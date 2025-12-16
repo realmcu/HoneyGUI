@@ -831,7 +831,7 @@ def main():
             print("\nConverting textures...")
             try:
                 converter_path = os.path.join(os.path.dirname(__file__), '..', 
-                                             'image-convert-tool', 'image_converter_new.py')
+                                             'image-convert-tool', 'image_converter.py')
                 
                 if not os.path.exists(converter_path):
                     print(f"Warning: Image converter not found at {converter_path}")
