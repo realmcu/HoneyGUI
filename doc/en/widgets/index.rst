@@ -63,29 +63,3 @@ Widgets
     Geometry Rounded Rectangle <gui_lite_geometry_rect>
     Geometry Circle <gui_lite_geometry_circle>
 
-.. Window <gui_window>
-.. Simple Img <gui_simple_img>
-.. STB Img <gui_img_stb>
-.. Tabview <gui_tabview>
-.. Tab <gui_tab>
-.. Curtainview <gui_curtainview>
-.. Curtain <gui_curtain>
-.. Cardview <gui_cardview>
-.. Card <gui_card>
-.. Page <gui_page>
-.. Page List <gui_pagelist>
-.. Switch <gui_switch>
-.. Grid <gui_grid>
-.. Progressbar <gui_progressbar>
-.. Canvas <gui_canvas>
-.. Cube <gui_cube>
-.. Wheel List <gui_wheel_list>
-.. Perspective <gui_perspective>
-.. SVG <gui_svg>
-.. Watch Gradient Spot <gui_watch_gradient_spot>
-.. Watchface Gradient <gui_watchface_gradient>
-.. Return <gui_return>
-.. Multi Level <gui_multi_level>
-.. LiteGFX <gui_widget_litegfx>
-.. 2.5D Soccer <gui_soccer>
-.. Prism Mirror 3D Model <gui_prism_mirror3d>
