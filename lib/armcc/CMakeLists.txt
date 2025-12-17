@@ -109,7 +109,7 @@ foreach(header ${REALGUI_HEADERS})
     if(NOT header MATCHES "SConscript$" AND
        NOT header MATCHES "LICENSE$" AND
        NOT header MATCHES "\\.(c|cpp|txt|o|a|lib|gitignore)$" AND
-       NOT header MATCHES ".*/(3rd|misc|SaaA|test)/.*" AND
+       NOT header MATCHES ".*/(3rd|SaaA|test)/.*" AND
        NOT header MATCHES ".*widget/gui_todo_widget")
         list(APPEND FILTERED_REALGUI_HEADERS ${header})
     endif()
