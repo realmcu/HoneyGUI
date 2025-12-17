@@ -26,5 +26,7 @@
 void sdl_driver_init(uint32_t width, uint32_t height, uint32_t bpp);
 void sdl_driver_update_window(uint8_t *input, uint16_t xStart, uint16_t yStart, uint16_t w,
                               uint16_t h);
+void sdl_driver_set_canvas(int canvas_w, int canvas_h, int offset_x, int offset_y,
+                           int corner_radius, const char *frame_path);
 
 #endif /* SDL_DRIVER_H */

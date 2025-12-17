@@ -21,6 +21,7 @@ if GetDepend('CONFIG_REALTEK_BUILD_CHARGECASE_410_502_DEMO'):
     CPPDEFINES += ['DRV_LCD_WIDTH=410']
     CPPDEFINES += ['DRV_LCD_HEIGHT=502']
     CPPDEFINES += ['DRV_PIXEL_BITS=32']
+    CPPDEFINES += ['DRV_LCD_CORNER_RADIUS=50']
     if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
         from honeygui import *
         
