@@ -99,7 +99,10 @@ class Folder(object):
 
     @property
     def c_name(self):
-        return '_' + self._name
+        """Convert folder name to valid C identifier.
+        Replace special chars with underscore, prefix 'f_' if starts with digit."""
+        name = ''.join(c if c.isalnum() else '_' for c in self._name)
+        return '_' + name if name and not name[0].isdigit() else '_f_' + name
 
     @property
     def bin_name(self):
