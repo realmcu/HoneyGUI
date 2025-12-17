@@ -91,11 +91,13 @@ typedef struct button
 } button_t;
 static void view_switch_in(gui_view_t *view);
 static void view_switch_in_watchface(gui_view_t *view);
+static void view_switch_out_watchface(gui_view_t *view);
 static void view_switch_in_camera(gui_view_t *view);
 static void view_switch_out_camera(gui_view_t *view);
 static void view_switch_in_ota(gui_view_t *view);
 static void view_switch_out_ota(gui_view_t *view);
 static void view_switch_in_about(gui_view_t *view);
+static void view_switch_out_about(gui_view_t *view);
 static void view_switch_in_keyboard(gui_view_t *view);
 static void view_switch_out_keyboard(gui_view_t *view);
 static gui_view_t *image_466_466_view = NULL;
@@ -112,6 +114,7 @@ static gui_view_descriptor_t gui_view_descriptor_image_466_466_watchface =
     .name = "image_466_466_view_watchface",
     .pView = &image_466_466_view_watchface,
     .on_switch_in = view_switch_in_watchface,
+    .on_switch_out = view_switch_out_watchface,
 };
 static gui_view_t *image_466_466_view_keyboard = NULL;
 static gui_view_descriptor_t gui_view_descriptor_image_466_466_keyboard =
@@ -143,6 +146,7 @@ static gui_view_descriptor_t gui_view_descriptor_image_466_466_about =
     .name = "image_466_466_view_about",
     .pView = &image_466_466_view_about,
     .on_switch_in = view_switch_in_about,
+    .on_switch_out = view_switch_out_about,
 };
 static void press_setting_cb_key(void *obj, gui_event_t e, void *param);
 static void release_setting_cb_key(void *obj, gui_event_t e, void *param);
@@ -180,7 +184,7 @@ static uint32_t ip4_input_field_bin[] =
     DIGIT_8_BIN,
     DIGIT_9_BIN,
 };
-static char ip_string_buffer[16] = {0};
+static char ip_string_buffer[16] = {"192.168.137.1"};
 static int ip_string_buffer_index = 0;
 static void jump_to_camera_view(void)
 {
@@ -256,9 +260,8 @@ static void time_update_cb(void *param)
 }
 static void view_switch_in(gui_view_t *view);
 gui_img_t *video_image = NULL;
-gui_text_t *wifi_state_text = NULL;
 
-static const __attribute__((aligned(8))) unsigned char video_logo_image[] =
+const __attribute__((aligned(8))) unsigned char video_logo_image[] =
 {
     /*
         gui_jpeg_file_head_t *head = (gui_jpeg_file_head_t *)testImage1;
@@ -297,17 +300,6 @@ static void view_switch_in_camera(gui_view_t *view)
         gui_img_set_mode(video_image, IMG_BYPASS_MODE);
     }
 
-    {
-        wifi_state_text = gui_text_create(view, 0, 466 / 2 - 410 / 2, 466 / 2 + 240 / 2, 410, 240);
-        // const char *string = "3ABCD123ab c:;.'!@#$";
-        gui_text_set(wifi_state_text, (void *)"wifi connecting...", GUI_FONT_SRC_BMP,
-                     gui_color_css("darkgrey"), strlen("wifi connecting..."),
-                     24);
-        gui_text_type_set(wifi_state_text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
-                          FONT_SRC_MEMADDR);
-        gui_text_mode_set(wifi_state_text, CENTER);
-    }
-
     extern char *get_ip4_string(void);
     char *ip_addr = get_ip4_string();
     GUI_UNUSED(ip_addr);
@@ -318,87 +310,6 @@ static void view_switch_in_camera(gui_view_t *view)
 #endif
 }
 
-/* Forward declarations for wifi status handlers */
-void wifi_status_ssid_connected(void);
-void wifi_status_server_connected(void);
-void wifi_status_ssid_connect_fail(void);
-void wifi_status_server_connect_fail(void);
-
-void wifi_gui_status_callback(void *msg)
-{
-    uint16_t status = ((gui_msg_t *)msg)->sub_event;
-
-    gui_log("wifi_gui_status_callback: status=%d", status);
-    switch (status)
-    {
-    case 0:
-        /* code */
-        wifi_status_ssid_connected();
-        break;
-    case 1:
-        /* code */
-        wifi_status_ssid_connected();
-        break;
-    case 2:
-        /* code */
-        wifi_status_server_connected();
-        break;
-    case 3:
-        /* code */
-        wifi_status_server_connect_fail();
-        break;
-
-    default:
-        break;
-    }
-}
-void wifi_gui_status_msg_send(uint16_t status)
-{
-    gui_msg_t msg = {.event = GUI_EVENT_USER_DEFINE, .sub_event = status, .cb = wifi_gui_status_callback};
-    gui_send_msg_to_server(&msg);
-}
-
-void wifi_status_ssid_connected(void)
-{
-    gui_text_set(wifi_state_text, (void *)"wifi connected", GUI_FONT_SRC_BMP, gui_color_css("darkgrey"),
-                 strlen("wifi connected"),
-                 24);
-    gui_text_type_set(wifi_state_text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
-                      FONT_SRC_MEMADDR);
-    gui_text_mode_set(wifi_state_text, CENTER);
-}
-
-void wifi_status_server_connected(void)
-{
-    gui_text_set(wifi_state_text, (void *)"server connected", GUI_FONT_SRC_BMP,
-                 gui_color_css("darkgrey"), strlen("wifi connected"),
-                 24);
-    gui_text_type_set(wifi_state_text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
-                      FONT_SRC_MEMADDR);
-    gui_text_mode_set(wifi_state_text, CENTER);
-}
-
-void wifi_status_ssid_connect_fail(void)
-{
-    gui_text_set(wifi_state_text, (void *)"wifi connect failed", GUI_FONT_SRC_BMP,
-                 gui_color_css("#ff0000"), strlen("wifi connected"),
-                 24);
-    gui_text_type_set(wifi_state_text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
-                      FONT_SRC_MEMADDR);
-    gui_text_mode_set(wifi_state_text, CENTER);
-}
-
-void wifi_status_server_connect_fail(void)
-{
-    gui_text_set(wifi_state_text, (void *)"server connect fail", GUI_FONT_SRC_BMP,
-                 gui_color_css("#ff0000"), strlen("wifi connected"),
-                 24);
-    gui_text_type_set(wifi_state_text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
-                      FONT_SRC_MEMADDR);
-    gui_text_mode_set(wifi_state_text, CENTER);
-}
-
-
 
 void update_video_image(uint8_t *jpeg_disp_image)
 {
@@ -406,9 +317,16 @@ void update_video_image(uint8_t *jpeg_disp_image)
     gui_img_set_attribute(video_image, "jpeg_image", jpeg_disp_image, 0, 0);
 
     // gui_img_set_attribute(video_image, "jpeg_image", video_logo_image, 466 / 2 - 410 / 2, 466 / 2 - 240 / 2);
+    // Print first 20 bytes of jpeg_disp_image for debugging
+    // gui_log("JPEG first 20 bytes:");
+    // for (int i = 0; i < 20; i++)
+    // {
+    //     gui_log("%02x ", jpeg_disp_image[i]);
+    // }
+    // gui_log("\n");
+
     gui_fb_change();
 }
-
 
 static void view_switch_out_camera(gui_view_t *view)
 {
@@ -421,8 +339,8 @@ static void view_switch_out_camera(gui_view_t *view)
 #endif
 
 #ifndef _HONEYGUI_SIMULATOR_
-    extern void wifi_setting_enter_cb(void);
-    wifi_setting_enter_cb();
+    extern void wifi_gui_camera_exit_cb(void);
+    wifi_gui_camera_exit_cb();
 #endif
 }
 static void view_switch_in_ota(gui_view_t *view)
@@ -448,8 +366,16 @@ static void view_switch_in_ota(gui_view_t *view)
 static void view_switch_out_ota(gui_view_t *view)
 {
 #ifndef _HONEYGUI_SIMULATOR_
-    extern void wifi_setting_enter_cb(void);
-    wifi_setting_enter_cb();
+    extern void wifi_ota_exit_cb(void);
+    wifi_ota_exit_cb();
+#endif
+}
+
+static void view_switch_out_about(gui_view_t *view)
+{
+#ifndef _WIN32
+    extern void wifi_about_exit_cb(void);
+    wifi_about_exit_cb();
 #endif
 }
 #include "gui_text.h"
@@ -570,6 +496,13 @@ static void view_switch_out_keyboard(gui_view_t *view)
 }
 static void view_switch_in_keyboard(gui_view_t *view)
 {
+#ifndef _WIN32
+    // void wifi_camera_exit_cb(void);
+    // wifi_camera_exit_cb();
+    void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
+    wifi_gui_msg_handler(2, NULL);
+#endif
+
     input_ip4_x = 0;
     memset(ip4_input_field, 0, sizeof(ip4_input_field));
     ip4_input_index = 0;
@@ -627,7 +560,7 @@ static void view_switch_in_keyboard(gui_view_t *view)
                 input_ip4(str);
             }
         }
-        if (password_flag)
+        if (0)//(password_flag)
         {
             gui_img_t *enter_img = NULL;
             gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
@@ -1449,6 +1382,7 @@ static void view_switch_in_watchface(gui_view_t *view)
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
+    gui_set_keep_active_time(10000);
     GUI_UNUSED(view);
     {
         gui_img_t *img =
@@ -1495,4 +1429,14 @@ static void view_switch_in_watchface(gui_view_t *view)
         }
         gui_obj_create_timer((void *)view_switch_in_watchfaceimg0, 500, true, switch_widget_play_watchface);
     }
+}
+
+static void view_switch_out_watchface(gui_view_t *view)
+{
+    GUI_UNUSED(view);
+
+#ifndef _WIN32
+    extern void wifi_setting_enter_cb(void);
+    wifi_setting_enter_cb();
+#endif
 }
