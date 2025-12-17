@@ -21,7 +21,7 @@ def create_parser() -> argparse.ArgumentParser:
   python -m video_converter -i input.mp4 -o output.mjpeg -f mjpeg
   
   # 转换为 AVI-MJPEG，指定帧率和质量
-  python -m video_converter -i input.mp4 -o output.avi -f avi_mjpeg -r 25 -q 90
+  python -m video_converter -i input.mp4 -o output.avi -f avi_mjpeg -r 25 -q 1
   
   # 转换为 H264
   python -m video_converter -i input.mp4 -o output.h264 -f h264 -r 30 -q 23
@@ -57,8 +57,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-q", "--quality",
         type=int,
-        default=85,
-        help="编码质量: MJPEG/AVI 为 1-100，H264 为 CRF 值 0-51（默认: 85）"
+        default=1,
+        help="编码质量: MJPEG/AVI 为 1-31（1最高质量），H264 为 CRF 值 0-51（默认: 1）"
     )
     
     parser.add_argument(

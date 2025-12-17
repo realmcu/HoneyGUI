@@ -19,3 +19,13 @@ class EncodingError(VideoConverterError):
 class PostProcessError(VideoConverterError):
     """后处理脚本执行错误"""
     pass
+
+
+class FFmpegNotFoundError(VideoConverterError):
+    """FFmpeg 未安装或不在 PATH 中"""
+    pass
+
+
+class FFmpegError(VideoConverterError):
+    """FFmpeg 执行错误"""
+    pass

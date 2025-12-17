@@ -1,4 +1,4 @@
-"""视频转换器主模块"""
+"""视频转换器主模块 - 使用 FFmpeg"""
 
 import os
 import tempfile
@@ -7,20 +7,17 @@ from typing import Optional, Callable
 
 from .models import VideoInfo, ConversionResult, OutputFormat
 from .parser import VideoParser
-from .extractor import FrameExtractor
-from .encoders.jpeg import JpegEncoder
-from .encoders.h264 import H264Encoder
-from .writers.mjpeg import MjpegWriter
-from .writers.avi import AviWriter
+from .ffmpeg_builder import FFmpegBuilder
+from .ffmpeg_executor import FFmpegExecutor
 from .postprocess import PostProcessor
-from .exceptions import VideoConverterError, EncodingError
+from .exceptions import VideoConverterError, FFmpegNotFoundError
 
 
 class VideoConverter:
     """
     视频转换器主类
     
-    支持将视频转换为 MJPEG、AVI-MJPEG 和 H264 格式。
+    使用 FFmpeg 将视频转换为 MJPEG、AVI-MJPEG 和 H264 格式。
     """
     
     def __init__(
@@ -35,6 +32,8 @@ class VideoConverter:
         """
         self.progress_callback = progress_callback
         self._parser = VideoParser()
+        self._builder = FFmpegBuilder()
+        self._executor = FFmpegExecutor(progress_callback=progress_callback)
     
     def get_video_info(self, input_path: str) -> VideoInfo:
         """
@@ -47,14 +46,14 @@ class VideoConverter:
             VideoInfo 对象
         """
         return self._parser.parse(input_path)
-    
+
     def convert(
         self, 
         input_path: str, 
         output_path: str, 
         output_format: OutputFormat,
         frame_rate: Optional[float] = None,
-        quality: int = 85
+        quality: int = 1
     ) -> ConversionResult:
         """
         执行视频转换
@@ -64,10 +63,15 @@ class VideoConverter:
             output_path: 输出文件路径
             output_format: 输出格式
             frame_rate: 目标帧率，None 表示保持原帧率
-            quality: JPEG 质量 (1-100) 或 H264 CRF 值
+            quality: MJPEG/AVI 质量 (1-31，1最高，默认1) 或 H264 CRF 值
             
         Returns:
             ConversionResult 对象
+            
+        Raises:
+            FileNotFoundError: 输入文件不存在
+            VideoConverterError: 转换失败
+            FFmpegNotFoundError: FFmpeg 未安装
         """
         try:
             # 获取视频信息
@@ -92,11 +96,11 @@ class VideoConverter:
             else:
                 raise ValueError(f"不支持的输出格式: {output_format}")
                 
-        except VideoConverterError:
+        except (VideoConverterError, FileNotFoundError, FFmpegNotFoundError):
             raise
         except Exception as e:
             raise VideoConverterError(f"转换失败: {e}")
-    
+
     def _convert_to_mjpeg(
         self,
         input_path: str,
@@ -110,21 +114,20 @@ class VideoConverter:
         temp_dir = tempfile.mkdtemp(prefix="mjpeg_frames_")
         
         try:
-            # 初始化组件
-            extractor = FrameExtractor(
-                input_path, 
-                target_fps, 
-                self.progress_callback
+            # 构建 ffmpeg 命令
+            cmd = self._builder.build_mjpeg_frames_cmd(
+                input_path=input_path,
+                output_dir=temp_dir,
+                frame_rate=target_fps,
+                quality=quality
             )
-            encoder = JpegEncoder(quality)
-            writer = MjpegWriter(temp_dir)
             
-            # 提取并编码帧
-            frame_count = 0
-            for frame_idx, frame in extractor:
-                jpeg_data = encoder.encode(frame)
-                writer.write_frame(frame_idx, jpeg_data)
-                frame_count += 1
+            # 执行 ffmpeg 命令
+            self._executor.execute(cmd, total_frames=video_info.frame_count)
+            
+            # 计算实际帧数
+            frame_files = [f for f in os.listdir(temp_dir) if f.endswith('.jpg')]
+            frame_count = len(frame_files)
             
             # 调用后处理脚本打包
             PostProcessor.process_mjpeg(temp_dir, output_path)
@@ -143,7 +146,7 @@ class VideoConverter:
             # 清理临时目录
             if os.path.exists(temp_dir):
                 shutil.rmtree(temp_dir)
-    
+
     def _convert_to_avi_mjpeg(
         self,
         input_path: str,
@@ -157,29 +160,16 @@ class VideoConverter:
         temp_avi = output_path + ".temp.avi"
         
         try:
-            # 初始化组件
-            extractor = FrameExtractor(
-                input_path, 
-                target_fps, 
-                self.progress_callback
+            # 构建 ffmpeg 命令
+            cmd = self._builder.build_avi_cmd(
+                input_path=input_path,
+                output_path=temp_avi,
+                frame_rate=target_fps,
+                quality=quality
             )
             
-            writer = AviWriter(
-                temp_avi,
-                video_info.width,
-                video_info.height,
-                target_fps,
-                quality
-            )
-            
-            # 提取并写入帧
-            frame_count = 0
-            try:
-                for frame_idx, frame in extractor:
-                    writer.write_frame(frame)
-                    frame_count += 1
-            finally:
-                writer.close()
+            # 执行 ffmpeg 命令
+            self._executor.execute(cmd, total_frames=video_info.frame_count)
             
             # 调用后处理脚本进行 8 字节对齐
             PostProcessor.process_avi(temp_avi, output_path)
@@ -189,7 +179,7 @@ class VideoConverter:
                 input_path=input_path,
                 output_path=output_path,
                 output_format=OutputFormat.AVI_MJPEG,
-                frame_count=frame_count,
+                frame_count=video_info.frame_count,
                 frame_rate=target_fps,
                 quality=quality
             )
@@ -198,7 +188,7 @@ class VideoConverter:
             # 清理临时文件
             if os.path.exists(temp_avi):
                 os.remove(temp_avi)
-    
+
     def _convert_to_h264(
         self,
         input_path: str,
@@ -212,29 +202,16 @@ class VideoConverter:
         temp_h264 = output_path + ".temp.h264"
         
         try:
-            # 初始化组件
-            extractor = FrameExtractor(
-                input_path, 
-                target_fps, 
-                self.progress_callback
+            # 构建 ffmpeg 命令
+            cmd = self._builder.build_h264_cmd(
+                input_path=input_path,
+                output_path=temp_h264,
+                frame_rate=target_fps,
+                crf=crf
             )
             
-            encoder = H264Encoder(
-                temp_h264,
-                video_info.width,
-                video_info.height,
-                target_fps,
-                crf
-            )
-            
-            # 提取并编码帧
-            frame_count = 0
-            try:
-                for frame_idx, frame in extractor:
-                    encoder.encode_frame(frame)
-                    frame_count += 1
-            finally:
-                encoder.close()
+            # 执行 ffmpeg 命令
+            self._executor.execute(cmd, total_frames=video_info.frame_count)
             
             # 调用后处理脚本添加头部
             PostProcessor.process_h264(temp_h264, output_path, target_fps)
@@ -244,7 +221,7 @@ class VideoConverter:
                 input_path=input_path,
                 output_path=output_path,
                 output_format=OutputFormat.H264,
-                frame_count=frame_count,
+                frame_count=video_info.frame_count,
                 frame_rate=target_fps,
                 quality=crf
             )

@@ -28,14 +28,24 @@ from .exceptions import (
     VideoFormatError,
     EncodingError,
     PostProcessError,
+    FFmpegNotFoundError,
+    FFmpegError,
 )
 from .converter import VideoConverter
 from .parser import VideoParser
+from .ffmpeg_builder import FFmpegBuilder
+from .ffmpeg_executor import FFmpegExecutor
+from .mjpeg_parser import MjpegParser
+from .avi_parser import AviParser
 
 __version__ = "1.0.0"
 __all__ = [
     "VideoConverter",
     "VideoParser",
+    "FFmpegBuilder",
+    "FFmpegExecutor",
+    "MjpegParser",
+    "AviParser",
     "VideoInfo",
     "ConversionResult", 
     "OutputFormat",
@@ -44,4 +54,6 @@ __all__ = [
     "VideoFormatError",
     "EncodingError",
     "PostProcessError",
+    "FFmpegNotFoundError",
+    "FFmpegError",
 ]

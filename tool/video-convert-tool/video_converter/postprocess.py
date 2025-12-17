@@ -3,7 +3,8 @@
 import os
 import sys
 import subprocess
-from typing import Optional
+import shutil
+from pathlib import Path
 from .exceptions import PostProcessError
 
 
@@ -16,6 +17,8 @@ class PostProcessor:
     - procAVI_no_audio_first.py: AVI 第一步处理
     - procAVI_no_audio_second.py: AVI 第二步处理
     - h264_pack.py: H264 添加头部
+    
+    跨平台兼容：Linux 和 Windows
     """
     
     # 脚本目录（相对于项目根目录）
@@ -23,18 +26,22 @@ class PostProcessor:
     
     @classmethod
     def _get_script_path(cls, script_name: str) -> str:
-        """获取脚本完整路径"""
+        """
+        获取脚本完整路径
+        
+        使用 pathlib 确保跨平台路径兼容性
+        """
         # 尝试多个可能的位置
         possible_paths = [
-            os.path.join(cls.SCRIPT_DIR, script_name),
-            os.path.join(os.path.dirname(__file__), "..", cls.SCRIPT_DIR, script_name),
-            os.path.join(os.getcwd(), cls.SCRIPT_DIR, script_name),
+            Path(cls.SCRIPT_DIR) / script_name,
+            Path(__file__).parent.parent / cls.SCRIPT_DIR / script_name,
+            Path.cwd() / cls.SCRIPT_DIR / script_name,
         ]
         
         for path in possible_paths:
-            abs_path = os.path.abspath(path)
-            if os.path.exists(abs_path):
-                return abs_path
+            abs_path = path.resolve()
+            if abs_path.exists():
+                return str(abs_path)
         
         raise PostProcessError(f"找不到脚本: {script_name}")
     
@@ -102,7 +109,6 @@ class PostProcessor:
             cls._run_script(second_script, ["-i", temp_path, "-o", output_path])
         except PostProcessError as e:
             # 如果第二步失败，使用第一步的结果
-            import shutil
             shutil.copy(temp_path, output_path)
             print(f"警告: 第二步处理失败，使用第一步结果: {e}")
         
