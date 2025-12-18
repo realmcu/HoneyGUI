@@ -175,7 +175,9 @@ static void img_sport_press_cb(void *p)
     {
         return;
     }
-    gui_log("To be developed\n");
+    gui_view_switch_direct(gui_view_get_current(), "workout_view",
+                           SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
 }
 static void img_heart_press_cb(void *p)
 {

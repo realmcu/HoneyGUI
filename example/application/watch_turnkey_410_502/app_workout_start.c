@@ -57,6 +57,31 @@ static char distance_str[20] = "0.00";
 static int8_t page_index = 0;
 bool is_workout_stopped = false;
 uint32_t stopped_workout_milliseconds = 0;
+
+// Activity rings data
+typedef struct
+{
+    uint32_t activity_current;      // Current activity calories
+    uint32_t activity_goal;          // Activity goal (500 kcal)
+    uint32_t exercise_current;       // Current exercise minutes
+    uint32_t exercise_goal;          // Exercise goal (20 min)
+    uint32_t stand_current;          // Current stand hours
+    uint32_t stand_goal;             // Stand goal (6 hours)
+} activity_rings_data_t;
+
+static activity_rings_data_t activity_rings_data =
+{
+    .activity_current = 97,
+    .activity_goal = 500,
+    .exercise_current = 2,
+    .exercise_goal = 20,
+    .stand_current = 6,
+    .stand_goal = 6
+};
+
+static char activity_str[20] = "97/500";
+static char exercise_str[20] = "2/20";
+static char stand_str[20] = "6/6";
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -213,11 +238,14 @@ static void update_workout_data_cb(void *obj)
 
     if (update_counter % 10 == 0)
     {
+        uint32_t calories_increment = 0;
+
         switch (g_selected_workout_index)
         {
         case WORKOUT_TYPE_OUTDOOR_WALK:
         case WORKOUT_TYPE_INDOOR_WALK:
-            current_workout_data.calories += 1;
+            calories_increment = 1;
+            current_workout_data.calories += calories_increment;
             current_workout_data.heart_rate = 90 + (rand() % 20);
             current_workout_data.distance += 0.02f;
             current_workout_data.steps += 2;
@@ -225,14 +253,16 @@ static void update_workout_data_cb(void *obj)
 
         case WORKOUT_TYPE_OUTDOOR_RUN:
         case WORKOUT_TYPE_INDOOR_RUN:
-            current_workout_data.calories += 2;
+            calories_increment = 2;
+            current_workout_data.calories += calories_increment;
             current_workout_data.heart_rate = 120 + (rand() % 40);
             current_workout_data.distance += 0.05f;
             current_workout_data.steps += 3;
             break;
 
         case WORKOUT_TYPE_BICYCLE:
-            current_workout_data.calories += 2;
+            calories_increment = 2;
+            current_workout_data.calories += calories_increment;
             current_workout_data.heart_rate = 100 + (rand() % 30);
             current_workout_data.distance += 0.1f;
             current_workout_data.steps = 0;
@@ -240,21 +270,24 @@ static void update_workout_data_cb(void *obj)
 
         case WORKOUT_TYPE_YOGA:
         case WORKOUT_TYPE_STRETCH:
-            current_workout_data.calories += 1;
+            calories_increment = 1;
+            current_workout_data.calories += calories_increment;
             current_workout_data.heart_rate = 75 + (rand() % 15);
             current_workout_data.distance = 0.0f;
             current_workout_data.steps = 0;
             break;
 
         case WORKOUT_TYPE_JUMP_ROPE:
-            current_workout_data.calories += 3;
+            calories_increment = 3;
+            current_workout_data.calories += calories_increment;
             current_workout_data.heart_rate = 110 + (rand() % 35);
             current_workout_data.distance = 0.0f;
             current_workout_data.steps += 5;
             break;
 
         default:
-            current_workout_data.calories += 1;
+            calories_increment = 1;
+            current_workout_data.calories += calories_increment;
             current_workout_data.heart_rate = 85 + (rand() % 25);
             current_workout_data.distance += 0.02f;
             current_workout_data.steps += 2;
@@ -262,6 +295,23 @@ static void update_workout_data_cb(void *obj)
         }
 
         if (current_workout_data.heart_rate > 200) { current_workout_data.heart_rate = 200; }
+
+        // Update activity rings data
+        activity_rings_data.activity_current += calories_increment;
+        if (activity_rings_data.activity_current > activity_rings_data.activity_goal)
+        {
+            activity_rings_data.activity_current = activity_rings_data.activity_goal;
+        }
+
+        // Update exercise minutes (every 60 seconds)
+        if (current_workout_data.duration > 0 && current_workout_data.duration % 60 == 0)
+        {
+            activity_rings_data.exercise_current++;
+            if (activity_rings_data.exercise_current > activity_rings_data.exercise_goal)
+            {
+                activity_rings_data.exercise_current = activity_rings_data.exercise_goal;
+            }
+        }
     }
 }
 static void update_data_display_cb(void *obj)
@@ -292,6 +342,70 @@ static void update_data_display_cb(void *obj)
             sprintf(distance_str, "%.2f", (double)current_workout_data.distance);
             gui_text_content_set((gui_text_t *)dist_text, distance_str, strlen(distance_str));
         }
+    }
+}
+
+// Update activity rings display callback
+static void update_activity_rings_cb(void *obj)
+{
+    GUI_UNUSED(obj);
+    gui_obj_t *rings_container = (gui_obj_t *)obj;
+    if (!rings_container) { return; }
+
+    // Update text values
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(activity_text, "activity_value", rings_container);
+    if (activity_text)
+    {
+        sprintf(activity_str, "%u/%u", activity_rings_data.activity_current,
+                activity_rings_data.activity_goal);
+        gui_text_content_set((gui_text_t *)activity_text, activity_str, strlen(activity_str));
+    }
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(exercise_text, "exercise_value", rings_container);
+    if (exercise_text)
+    {
+        sprintf(exercise_str, "%u/%u", activity_rings_data.exercise_current,
+                activity_rings_data.exercise_goal);
+        gui_text_content_set((gui_text_t *)exercise_text, exercise_str, strlen(exercise_str));
+    }
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "stand_value", rings_container);
+    if (stand_text)
+    {
+        sprintf(stand_str, "%u/%u", activity_rings_data.stand_current,
+                activity_rings_data.stand_goal);
+        gui_text_content_set((gui_text_t *)stand_text, stand_str, strlen(stand_str));
+    }
+
+    // Update arc angles
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(activity_ring, "activity_ring", rings_container);
+    if (activity_ring)
+    {
+        float progress = (float)activity_rings_data.activity_current /
+                         (float)activity_rings_data.activity_goal;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float angle = 270.0f + (progress * 360.0f);
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)activity_ring, angle);
+    }
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(exercise_ring, "exercise_ring", rings_container);
+    if (exercise_ring)
+    {
+        float progress = (float)activity_rings_data.exercise_current /
+                         (float)activity_rings_data.exercise_goal;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float angle = 270.0f + (progress * 360.0f);
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)exercise_ring, angle);
+    }
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_ring, "stand_ring", rings_container);
+    if (stand_ring)
+    {
+        float progress = (float)activity_rings_data.stand_current /
+                         (float)activity_rings_data.stand_goal;
+        if (progress > 1.0f) { progress = 1.0f; }
+        float angle = 270.0f + (progress * 360.0f);
+        gui_lite_arc_set_end_angle((gui_lite_arc_t *)stand_ring, angle);
     }
 }
 
@@ -369,6 +483,125 @@ static void page_0_design(gui_obj_t *parent)
 
     gui_obj_create_timer(GUI_BASE(data_container), 100, true, update_data_display_cb);
 }
+static void page_1_design(gui_obj_t *parent)
+{
+    // Activity rings container
+    gui_win_t *rings_container = gui_win_create(parent, "activity_rings_container",
+                                                0, 130, SCREEN_WIDTH, SCREEN_HEIGHT - 130);
+
+    // Left side - Text labels and values
+    int left_x = 30;
+    int label_y_start = 60;
+    int line_spacing = 90;
+    int value_offset_y = 35;
+
+    // Activity - Red
+    gui_text_t *activity_label = gui_text_create(rings_container, "activity_label",
+                                                 left_x, label_y_start, 0, 0);
+    gui_text_set(activity_label, "Activity", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
+                 strlen("Activity"), 28);
+    gui_text_type_set(activity_label, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(activity_label, LEFT);
+    gui_text_rendermode_set(activity_label, 2);
+
+    sprintf(activity_str, "%u/%u", activity_rings_data.activity_current,
+            activity_rings_data.activity_goal);
+    gui_text_t *activity_value = gui_text_create(rings_container, "activity_value",
+                                                 left_x, label_y_start + value_offset_y, 0, 0);
+    gui_text_set(activity_value, activity_str, GUI_FONT_SRC_TTF, gui_rgb(255, 45, 85),
+                 strlen(activity_str), 40);
+    gui_text_type_set(activity_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(activity_value, LEFT);
+    gui_text_rendermode_set(activity_value, 2);
+
+    // Exercise - Green
+    gui_text_t *exercise_label = gui_text_create(rings_container, "exercise_label",
+                                                 left_x, label_y_start + line_spacing, 0, 0);
+    gui_text_set(exercise_label, "Exercise", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
+                 strlen("Exercise"), 28);
+    gui_text_type_set(exercise_label, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(exercise_label, LEFT);
+    gui_text_rendermode_set(exercise_label, 2);
+
+    sprintf(exercise_str, "%u/%u", activity_rings_data.exercise_current,
+            activity_rings_data.exercise_goal);
+    gui_text_t *exercise_value = gui_text_create(rings_container, "exercise_value",
+                                                 left_x, label_y_start + line_spacing + value_offset_y, 0, 0);
+    gui_text_set(exercise_value, exercise_str, GUI_FONT_SRC_TTF, gui_rgb(185, 251, 79),
+                 strlen(exercise_str), 40);
+    gui_text_type_set(exercise_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(exercise_value, LEFT);
+    gui_text_rendermode_set(exercise_value, 2);
+
+    // Stand - Cyan
+    gui_text_t *stand_label = gui_text_create(rings_container, "stand_label",
+                                              left_x, label_y_start + line_spacing * 2, 0, 0);
+    gui_text_set(stand_label, "Stand", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
+                 strlen("Stand"), 28);
+    gui_text_type_set(stand_label, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(stand_label, LEFT);
+    gui_text_rendermode_set(stand_label, 2);
+
+    sprintf(stand_str, "%u/%u", activity_rings_data.stand_current, activity_rings_data.stand_goal);
+    gui_text_t *stand_value = gui_text_create(rings_container, "stand_value",
+                                              left_x, label_y_start + line_spacing * 2 + value_offset_y, 0, 0);
+    gui_text_set(stand_value, stand_str, GUI_FONT_SRC_TTF, gui_rgb(0, 255, 255),
+                 strlen(stand_str), 40);
+    gui_text_type_set(stand_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(stand_value, LEFT);
+    gui_text_rendermode_set(stand_value, 2);
+
+    // Right side - Activity rings (concentric arcs)
+    int rings_center_x = SCREEN_WIDTH - 120;
+    int rings_center_y = 180;
+
+    // Calculate progress
+    float activity_progress = (float)activity_rings_data.activity_current /
+                              (float)activity_rings_data.activity_goal;
+    if (activity_progress > 1.0f) { activity_progress = 1.0f; }
+    float activity_angle = 270.0f + (activity_progress * 360.0f);
+
+    float exercise_progress = (float)activity_rings_data.exercise_current /
+                              (float)activity_rings_data.exercise_goal;
+    if (exercise_progress > 1.0f) { exercise_progress = 1.0f; }
+    float exercise_angle = 270.0f + (exercise_progress * 360.0f);
+
+    float stand_progress = (float)activity_rings_data.stand_current /
+                           (float)activity_rings_data.stand_goal;
+    if (stand_progress > 1.0f) { stand_progress = 1.0f; }
+    float stand_angle = 270.0f + (stand_progress * 360.0f);
+
+    // Background rings (dimmed)
+    gui_lite_arc_create(rings_container, "activity_ring_bg",
+                        rings_center_x, rings_center_y,
+                        70, 0, 360,
+                        12, gui_rgba(255, 45, 85, 64));
+    gui_lite_arc_create(rings_container, "exercise_ring_bg",
+                        rings_center_x, rings_center_y,
+                        52, 0, 360,
+                        12, gui_rgba(185, 251, 79, 64));
+    gui_lite_arc_create(rings_container, "stand_ring_bg",
+                        rings_center_x, rings_center_y,
+                        34, 0, 360,
+                        12, gui_rgba(0, 255, 255, 64));
+
+    // Progress rings
+    gui_lite_arc_t *activity_ring = gui_lite_arc_create(rings_container, "activity_ring",
+                                                        rings_center_x, rings_center_y,
+                                                        70, 270, activity_angle,
+                                                        12, gui_rgb(255, 45, 85));
+    gui_lite_arc_t *exercise_ring = gui_lite_arc_create(rings_container, "exercise_ring",
+                                                        rings_center_x, rings_center_y,
+                                                        52, 270, exercise_angle,
+                                                        12, gui_rgb(185, 251, 79));
+    gui_lite_arc_t *stand_ring = gui_lite_arc_create(rings_container, "stand_ring",
+                                                     rings_center_x, rings_center_y,
+                                                     34, 270, stand_angle,
+                                                     12, gui_rgb(0, 255, 255));
+
+    // Create timer to update activity rings display (500ms interval)
+    gui_obj_create_timer(GUI_BASE(rings_container), 500, true, update_activity_rings_cb);
+}
 static void note_design(gui_obj_t *obj, void *p)
 {
     (void)p;
@@ -380,7 +613,7 @@ static void note_design(gui_obj_t *obj, void *p)
         page_0_design(obj);
         break;
     case 1:
-        // page_0_design(obj);
+        page_1_design(obj);
         break;
     default:
         break;
