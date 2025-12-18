@@ -8,7 +8,7 @@
 #include "app_navigation_adapter.h"
 #include "root_image_800_480/ui_resource.h"
 #include "app_map.h"
-#if CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
+#if defined(CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT) && CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
 #include "communicate_protocol.h"
 #include "communicate_parse_navigation.h"
 #include "communicate_parse.h"
@@ -74,7 +74,7 @@ void map_display_buffer_stop(void)
  */
 void app_dashboard_data_send_itp_ack(void)
 {
-#if CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
+#if defined(CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT) && CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
     struct protocol_pack p = {0};
     p.l2_cmd_id = NAVIGATION_INFORMATION_ID;
     p.l2_key = KEY_NAVIGTOR_IMAGE_TRANSFER;
@@ -150,7 +150,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
     memset(&current_navi_data, 0, sizeof(navi_data_t));
 
     // Determine navigation icon type and update turn signal based on turn direction
-// #if CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
+// #if defined(CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT) && CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
     switch (navi_type)
     {
     case SIM_TURN_LEFT:
@@ -215,7 +215,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
         current_navi_data.road_num_len = def_len;
 
         // Append road name if available
-        if (length > 3 && (length - 3) <= (sizeof(current_navi_data.road_names) - def_len))
+        if (length > 3 && ((size_t)(length - 3) <= (sizeof(current_navi_data.road_names) - def_len)))
         {
             memcpy(current_navi_data.road_names + def_len, pValue + 3, length - 3);
             current_navi_data.road_num_len += length - 3;
@@ -250,7 +250,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
         current_navi_data.road_num_len = def_len;
 
         // Append road name if available
-        if (length > 3 && (length - 3) <= (sizeof(current_navi_data.road_names) - def_len))
+        if (length > 3 && ((size_t)(length - 3) <= (sizeof(current_navi_data.road_names) - def_len)))
         {
             memcpy(current_navi_data.road_names + def_len, pValue + 3, length - 3);
             current_navi_data.road_num_len += length - 3;

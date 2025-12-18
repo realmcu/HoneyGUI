@@ -135,15 +135,15 @@ uint8_t scene_flag = 0; // 0: start_engine, 1: dail, 2: digital
 static gui_win_t *win_common = NULL;
 static gui_win_t *win_speed_display = NULL;
 static gui_win_t *win_power_display = NULL;
-static char top_infor_str[32] = {0};
+static char top_infor_str[64] = {0};
 static char loction_str[16] = "Suzhou";
-static char temp_str[8] = "25°C";
+static char temp_str[16] = "25°C";
 static char time_str[8] = "00:00";
 
 static uint16_t speed_val = 0; // km/h
 static uint16_t power_val = 0; // kW
-static char speed_str[4] = "0";
-static char power_str[4] = "0";
+static char speed_str[8] = "0";
+static char power_str[8] = "0";
 
 static uint16_t odo_val = 0; // km
 static uint16_t soc_val = 0; // %

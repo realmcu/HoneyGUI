@@ -8,7 +8,7 @@
 #include "gui_img.h"
 #include "root_image_800_480/ui_resource.h"
 #include <string.h>
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 #if CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
 #include "communicate_protocol.h"
 #include "communicate_parse_notify.h"
@@ -61,7 +61,7 @@ static phone_data_t *get_phone_data(void)
  */
 void app_dashboard_data_set_accept_call(void)
 {
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     phone_data_t *phone = get_phone_data();
 
 #if CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
@@ -87,7 +87,7 @@ void app_dashboard_data_set_reject_end_call(void)
 {
     phone_data_t *phone = get_phone_data();
     GUI_UNUSED(phone);
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 #if CONFIG_REALTEK_APP_DASHBOARD_DEMO_SUPPORT
     if ((phone->status == PHONE_STATUS_ACCEPT) ||
         (phone->status == PHONE_STATUS_ONGOING))
@@ -122,7 +122,7 @@ void app_dashboard_data_update_phone_status(uint8_t key, const uint8_t *phone_nu
     GUI_UNUSED(key);
     GUI_UNUSED(phone_number);
     GUI_UNUSED(length);
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     phone_data_t *phone = get_phone_data();
     gui_dashboard_t *info = get_dashboard_info();
 

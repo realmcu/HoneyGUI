@@ -68,8 +68,8 @@ static STOPWATCH_STATUS status = DEFAULT;
 static uint32_t time_count = 0; //milsec
 static uint32_t time_count_array[TIME_CNT_NUM] = {0}; //milsec
 static uint8_t time_count_index = 0;
-static char count_str[] = "00:00.00";
-static char count_str_array[TIME_CNT_NUM][9] = {0};
+static char count_str[16] = "00:00.00";
+static char count_str_array[TIME_CNT_NUM][16] = {0};
 static const char *lap_str_array[TIME_CNT_NUM] =
 {
     "Lap_1",
@@ -93,7 +93,7 @@ static const char *lap_str_array[TIME_CNT_NUM] =
     "Lap_19",
     "Lap_20",
 };
-static char base_str[4] = {0};
+static char base_str[8] = {0};
 static gui_text_t *t_lap_array[DRAW_DOT_NUM] = {0};
 static uint32_t count_base = 0;
 

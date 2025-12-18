@@ -35,7 +35,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = charging_view_design,
 };
 static uint8_t animation_cnt = 0;
-static char battery_tx_str[4] = {0};
+static char battery_tx_str[8] = {0};
 static uint8_t battery_tx_val = 0;
 
 /*============================================================================*

@@ -13,23 +13,23 @@ CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_DOG_3D'):
-    src += ['app_ui_realgui_3d_dog.c']
+    src += ['example_3d_dog.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)   
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_EARTH_3D'):
-    src += ['app_ui_realgui_3d_earth.c']
+    src += ['example_3d_earth.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_PIKACHU_GLTF_3D'):
-    src += ['app_ui_realgui_3d_pikachu_gltf.c']
+    src += ['example_3d_pikachu_gltf.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_FLAG_GLTF_3D'):
-    src += ['app_ui_realgui_3d_flag_gltf.c']
+    src += ['example_3d_flag_gltf.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_ROBOT_GLTF_3D'):
-    src += ['app_ui_realgui_3d_robot_gltf.c']
+    src += ['example_3d_robot_gltf.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 
 Return('objs')

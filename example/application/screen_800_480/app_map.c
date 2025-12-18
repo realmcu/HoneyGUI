@@ -240,6 +240,7 @@ static void pos_indicator_timer(void *p)
 
 static void map_update_timer(void *p)
 {
+    GUI_UNUSED(p);
     gui_dashboard_t *info = get_dashboard_info();
     if (info == NULL || win_map == NULL)
     {
@@ -470,6 +471,7 @@ void app_check_turn_signal_state(void)
 }
 static void test_navi_update_timer(void *p)
 {
+    GUI_UNUSED(p);
     static uint8_t test_step = 0;
     static uint16_t test_distance = 1500; // Start with 1.5km
     static uint8_t direction_index = 0;

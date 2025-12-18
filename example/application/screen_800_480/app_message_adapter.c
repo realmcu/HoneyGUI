@@ -10,7 +10,7 @@
 #include "root_image_800_480/ui_resource.h"
 #include <string.h>
 
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 #include "trace.h"
 #include "os_timer.h"
 #endif
@@ -19,7 +19,7 @@ static gui_message_info_t g_message_info = {0};
 static gui_win_t *message_popup_win = NULL;
 static gui_text_t *message_text = NULL;
 
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
 static void *message_timer = NULL;
 
 static void message_timer_cb(void *p_handle)
@@ -37,7 +37,7 @@ void gui_message_notify_update(const uint8_t *pValue, uint16_t length, uint8_t m
         return;
     }
 
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     APP_PRINT_INFO1("gui_message_notify_update: length=%d", length);
     APP_PRINT_INFO1("gui_message_notify_update: type=%d", message_type);
 #endif
@@ -60,7 +60,7 @@ void gui_message_notify_update(const uint8_t *pValue, uint16_t length, uint8_t m
     gui_message_popup_show(g_message_info.content, g_message_info.content_len,
                            g_message_info.message_type);
 
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     // Auto dismiss after 3 seconds
     if (message_timer == NULL)
     {

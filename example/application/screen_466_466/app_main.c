@@ -2,12 +2,12 @@
  *                        Header Files
  *============================================================================*/
 #include <stdio.h>
+#include <time.h>
 #include "gui_win.h"
 #include "root_image/ui_resource.h"
 #include "gui_components_init.h"
 #include "gui_view.h"
 #include "gui_img.h"
-#include "HoneyGUI_APP_.version"
 #include "gui_text.h"
 #include "def_msg.h"
 #include "gui_message.h"
@@ -18,6 +18,12 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+#ifndef UI_USERDATA_LENGTH
+#define UI_USERDATA_LENGTH 0
+#endif
+#ifndef UI_VERSION_STRING
+#define UI_VERSION_STRING ""
+#endif
 // #define UI_VERSION_STRING "HoneyGUI_APP_1_0_1_"
 // #define UI_USERDATA_LENGTH (7618516)
 
@@ -365,6 +371,7 @@ static void view_switch_in_ota(gui_view_t *view)
 }
 static void view_switch_out_ota(gui_view_t *view)
 {
+    GUI_UNUSED(view);
 #ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_ota_exit_cb(void);
     wifi_ota_exit_cb();
@@ -373,7 +380,8 @@ static void view_switch_out_ota(gui_view_t *view)
 
 static void view_switch_out_about(gui_view_t *view)
 {
-#ifndef _WIN32
+    GUI_UNUSED(view);
+#ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_about_exit_cb(void);
     wifi_about_exit_cb();
 #endif
@@ -492,11 +500,11 @@ static uint32_t key_highlight_array[] =
 static void input_ip4(char *digit);
 static void view_switch_out_keyboard(gui_view_t *view)
 {
-
+    GUI_UNUSED(view);
 }
 static void view_switch_in_keyboard(gui_view_t *view)
 {
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     // void wifi_camera_exit_cb(void);
     // wifi_camera_exit_cb();
     void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
@@ -633,7 +641,7 @@ static void switch_widget_play_watchface(void *p)
 {
     int watchface_hour = 10;
     int watchface_minute = 34;
-#if defined(_WIN32) || defined(WIN32)
+#if defined(_HONEYGUI_SIMULATOR_) || defined(WIN32)
 
 
     time_t now = time(NULL);
@@ -1435,7 +1443,7 @@ static void view_switch_out_watchface(gui_view_t *view)
 {
     GUI_UNUSED(view);
 
-#ifndef _WIN32
+#ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_setting_enter_cb(void);
     wifi_setting_enter_cb();
 #endif
