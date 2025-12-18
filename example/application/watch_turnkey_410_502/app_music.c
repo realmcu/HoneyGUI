@@ -14,7 +14,7 @@
 #include "gui_list.h"
 #include "app_main_watch.h"
 #include "gui_view_instance.h"
-#include "gui_lite_geometry_round_rect.h"
+#include "gui_rect.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -82,8 +82,8 @@ static void note_design(gui_obj_t *obj, void *p)
     uint16_t index = ((gui_list_note_t *)obj)->index;
     int16_t offset_X = 29;
     int16_t offset_x_icon = 20;
-    gui_lite_round_rect_t *rect_bg = gui_lite_round_rect_create(obj, "canvas_bg", offset_X, 0, 352, 115,
-                                                                30, gui_rgba(98, 101, 98, 255 * 0.7));
+    gui_rounded_rect_t *rect_bg = gui_rect_create(obj, "canvas_bg", offset_X, 0, 352, 115,
+                                                  30, gui_rgba(98, 101, 98, 255 * 0.7));
     if (index == 0)
     {
         rect_bg->base.not_show = true;

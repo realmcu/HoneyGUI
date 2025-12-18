@@ -10,8 +10,8 @@
 #include "gui_img.h"
 #include "gui_list.h"
 #include "gui_view_instance.h"
-#include "gui_lite_geometry_round_rect.h"
-#include "gui_lite_geometry_arc.h"
+#include "gui_rect.h"
+#include "gui_arc.h"
 #include "gui_canvas.h"
 /*============================================================================*
  *                            Macros
@@ -137,7 +137,7 @@ static void draw_timecard(void *parent)
     gui_img_t *rect_timecard = gui_img_create_from_mem(win, __WIN0_NAME, BOTTOM_TIME_CARD_BG_BIN, 35, 0,
                                                        0, 0);
     // gui_img_set_mode(rect_timecard, IMG_SRC_OVER_MODE);
-    // gui_lite_round_rect_t *rect_timecard = gui_lite_round_rect_create(GUI_BASE(win), __WIN1_NAME, 35, 0,
+    // gui_rounded_rect_t *rect_timecard = gui_rect_create(GUI_BASE(win), __WIN1_NAME, 35, 0,
     //                                                                   340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
     // text
     gui_text_t *timecard_date_text = gui_text_create(rect_timecard, "date_s",  15, 20, 0, 0);
@@ -311,7 +311,7 @@ static void update_activity_arcs(void *obj)
         float progress = (float)calories / 500.0f;
         if (progress > 1.0f) { progress = 1.0f; }
         float move_angle = -90.0f + 360.0f * progress;
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_move, move_angle);
+        gui_arc_set_end_angle((gui_arc_t *)arc_move, move_angle);
     }
 
     // Update exercise arc (middle ring)
@@ -321,7 +321,7 @@ static void update_activity_arcs(void *obj)
         float progress = (float)ex_minutes / 60.0f;
         if (progress > 1.0f) { progress = 1.0f; }
         float ex_angle = -90.0f + 360.0f * progress;
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_ex, ex_angle);
+        gui_arc_set_end_angle((gui_arc_t *)arc_ex, ex_angle);
     }
 
     // Update stand arc (inner ring)
@@ -331,7 +331,7 @@ static void update_activity_arcs(void *obj)
         float progress = (float)stand_hours / 6.0f;
         if (progress > 1.0f) { progress = 1.0f; }
         float stand_angle = -90.0f + 360.0f * progress;
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_stand, stand_angle);
+        gui_arc_set_end_angle((gui_arc_t *)arc_stand, stand_angle);
     }
 
     // Update text labels
@@ -373,7 +373,7 @@ static void update_battery_arc(void *obj)
         float progress = (float)battery_level / 100.0f;
         if (progress > 1.0f) { progress = 1.0f; }
         float battery_angle = -90.0f + 360.0f * progress;
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_battery, battery_angle);
+        gui_arc_set_end_angle((gui_arc_t *)arc_battery, battery_angle);
 
         // Change color based on battery level
         gui_color_t color;
@@ -385,7 +385,7 @@ static void update_battery_arc(void *obj)
         {
             color = gui_rgba(52, 199, 89, 255); // Green for normal
         }
-        gui_lite_arc_set_color((gui_lite_arc_t *)arc_battery, color);
+        gui_arc_set_color((gui_arc_t *)arc_battery, color);
     }
 
     // Update battery text using saved widget pointer
@@ -454,30 +454,30 @@ static void note_design(gui_obj_t *obj, void *p)
 
                 // Background arcs (subtle dark colors) - full circles
                 // Move ring background: deep red-brown
-                gui_lite_arc_create(rect_activity, "arc_move_bg",
-                                    center_x, center_y, 42, 0, 360, 8, gui_rgba(45, 20, 25, 255));
+                gui_arc_create(rect_activity, "arc_move_bg",
+                               center_x, center_y, 42, 0, 360, 8, gui_rgba(45, 20, 25, 255));
 
                 // Exercise ring background: deep green
-                gui_lite_arc_create(rect_activity, "arc_ex_bg",
-                                    center_x, center_y, 29, 0, 360, 8, gui_rgba(20, 40, 20, 255));
+                gui_arc_create(rect_activity, "arc_ex_bg",
+                               center_x, center_y, 29, 0, 360, 8, gui_rgba(20, 40, 20, 255));
 
                 // Stand ring background: deep cyan
-                gui_lite_arc_create(rect_activity, "arc_stand_bg",
-                                    center_x, center_y, 17, 0, 360, 8, gui_rgba(18, 35, 40, 255));
+                gui_arc_create(rect_activity, "arc_stand_bg",
+                               center_x, center_y, 17, 0, 360, 8, gui_rgba(18, 35, 40, 255));
 
                 // Foreground arcs (vibrant Apple Watch colors)
                 // Start from -90° (top) for Apple Watch style
                 // Move ring: bright pink-red (Apple's signature Move color)
-                gui_lite_arc_create(rect_activity, "arc_move",
-                                    center_x, center_y, 42, -90, -90, 8, gui_rgba(250, 50, 90, 255));
+                gui_arc_create(rect_activity, "arc_move",
+                               center_x, center_y, 42, -90, -90, 8, gui_rgba(250, 50, 90, 255));
 
                 // Exercise ring: bright lime green (Apple's Exercise color)
-                gui_lite_arc_create(rect_activity, "arc_ex",
-                                    center_x, center_y, 29, -90, -90, 8, gui_rgba(160, 250, 80, 255));
+                gui_arc_create(rect_activity, "arc_ex",
+                               center_x, center_y, 29, -90, -90, 8, gui_rgba(160, 250, 80, 255));
 
                 // Stand ring: bright cyan (Apple's Stand color)
-                gui_lite_arc_create(rect_activity, "arc_stand",
-                                    center_x, center_y, 17, -90, -90, 8, gui_rgba(80, 220, 240, 255));
+                gui_arc_create(rect_activity, "arc_stand",
+                               center_x, center_y, 17, -90, -90, 8, gui_rgba(80, 220, 240, 255));
 
                 // Create timer to update arcs
                 gui_obj_create_timer(GUI_BASE(rect_activity), 1000, true, update_activity_arcs);
@@ -518,12 +518,12 @@ static void note_design(gui_obj_t *obj, void *p)
             float line_width = 7.0f;
 
             // Background arc (dark gray) - full circle
-            gui_lite_arc_t *arc_battery_bg = gui_lite_arc_create(rect_app, "BATTERY",
-                                                                 center_x, center_y, (int)radius, 0, 360, line_width, gui_rgba(40, 40, 40, 255));
+            gui_arc_t *arc_battery_bg = gui_arc_create(rect_app, "BATTERY",
+                                                       center_x, center_y, (int)radius, 0, 360, line_width, gui_rgba(40, 40, 40, 255));
 
             // Foreground arc (green for normal battery)
-            gui_lite_arc_t *arc_battery = gui_lite_arc_create(rect_app, "arc_battery",
-                                                              center_x, center_y, (int)radius, -90, -90, line_width, gui_rgba(52, 199, 89, 255));
+            gui_arc_t *arc_battery = gui_arc_create(rect_app, "arc_battery",
+                                                    center_x, center_y, (int)radius, -90, -90, line_width, gui_rgba(52, 199, 89, 255));
 
             // Battery percentage text (centered in the circle)
             // Text is mounted under arc_battery, coordinates are relative to arc widget's origin
@@ -577,12 +577,12 @@ static void bottom_view_design(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
     // gui_canvas_rect_t *canvas_bg = NULL;
-    gui_lite_round_rect_t *rect_menu_bg = gui_lite_round_rect_create(parent, "bottom_bg", 0, 0,
-                                                                     SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(0, 0, 0, 255));
+    gui_rounded_rect_t *rect_menu_bg = gui_rect_create(parent, "bottom_bg", 0, 0,
+                                                       SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(0, 0, 0, 255));
 
     if (current_watchface_type == WATCHFACE_BIG_NUM)
     {
-        gui_lite_round_rect_set_color(rect_menu_bg, gui_rgba(219, 122, 147, 255));
+        gui_rect_set_color(rect_menu_bg, gui_rgba(219, 122, 147, 255));
     }
 
     gui_obj_create_timer(GUI_BASE(rect_menu_bg), 100, true, timer_cb);

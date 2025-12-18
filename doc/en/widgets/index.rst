@@ -59,7 +59,7 @@ Widgets
     Menu Cellular <gui_menu_cellular>
     Qbcode <gui_qbcode>
     Glass <gui_glass>
-    Geometry Arc <gui_lite_geometry_arc>
-    Geometry Rounded Rectangle <gui_lite_geometry_rect>
-    Geometry Circle <gui_lite_geometry_circle>
+    Geometry Arc <gui_arc>
+    Geometry Rounded Rectangle <gui_rect>
+    Geometry Circle <gui_circle>
 

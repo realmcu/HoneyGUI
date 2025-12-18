@@ -23,17 +23,17 @@ Core Features
    * - Description
      - API 
    * - Create Widget
-     - :cpp:any:`gui_lite_round_rect_create`  
+     - :cpp:any:`gui_rect_create`  
    * - Set Style
-     - :cpp:any:`gui_lite_round_rect_set_style`
+     - :cpp:any:`gui_rect_set_style`
    * - Set Position
-     - :cpp:any:`gui_lite_round_rect_set_position` 
+     - :cpp:any:`gui_rect_set_position` 
    * - Set Size
-     - :cpp:any:`gui_lite_round_rect_set_size`
+     - :cpp:any:`gui_rect_set_size`
    * - Set Color
-     - :cpp:any:`gui_lite_round_rect_set_color`
+     - :cpp:any:`gui_rect_set_color`
    * - Register Click Event Callback
-     - :cpp:any:`gui_lite_round_rect_on_click`
+     - :cpp:any:`gui_rect_on_click`
 
 Corner Radius Description
 -------------------------
@@ -81,14 +81,14 @@ In :file:`menu_config.h`, add:
 Complete Example
 ----------------
 
-.. literalinclude:: ../../../example/widget/lite_geometry_rect/example_gui_lite_geometry_rect.c
+.. literalinclude:: ../../../example/widget/rect/example_gui_rect.c
    :language: c
-   :start-after: /* gui lite geometry rect example start */
-   :end-before: /* gui lite geometry rect example end */
+   :start-after: /* gui rect example start */
+   :end-before: /* gui rect example end */
 
 API 
 -------------
 
 
-.. doxygenfile:: gui_lite_geometry_round_rect.h
+.. doxygenfile:: gui_rect.h
 

@@ -23,21 +23,21 @@
    * - 描述
      - API 
    * - 创建控件
-     - :cpp:any:`gui_lite_arc_create`  
+     - :cpp:any:`gui_arc_create`  
    * - 设置位置
-     - :cpp:any:`gui_lite_arc_set_position` 
+     - :cpp:any:`gui_arc_set_position` 
    * - 设置半径
-     - :cpp:any:`gui_lite_arc_set_radius`
+     - :cpp:any:`gui_arc_set_radius`
    * - 设置颜色
-     - :cpp:any:`gui_lite_arc_set_color`
+     - :cpp:any:`gui_arc_set_color`
    * - 设置起始角度
-     - :cpp:any:`gui_lite_arc_set_start_angle`
+     - :cpp:any:`gui_arc_set_start_angle`
    * - 设置结束角度
-     - :cpp:any:`gui_lite_arc_set_end_angle`
+     - :cpp:any:`gui_arc_set_end_angle`
    * - 设置线宽
-     - :cpp:any:`gui_lite_arc_set_line_width`
+     - :cpp:any:`gui_arc_set_line_width`
    * - 注册点击事件回调
-     - :cpp:any:`gui_lite_arc_on_click`
+     - :cpp:any:`gui_arc_on_click`
 
 角度说明
 --------
@@ -83,11 +83,11 @@
 完整示例
 --------
 
-.. literalinclude:: ../../../example/widget/lite_geometry_arc/example_gui_lite_geometry_arc.c
+.. literalinclude:: ../../../example/widget/arc/example_gui_arc.c
    :language: c
-   :start-after: /* gui lite geometry arc example start */
-   :end-before: /* gui lite geometry arc example end */
+   :start-after: /* gui arc example start */
+   :end-before: /* gui arc example end */
 
 API
 -------
-.. doxygenfile:: gui_lite_geometry_arc.h
+.. doxygenfile:: gui_arc.h

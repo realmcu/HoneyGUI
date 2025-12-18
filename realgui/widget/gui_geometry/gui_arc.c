@@ -2,9 +2,9 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_lite_geometry_arc.c
-  * @brief lite geometry arc widget
-  * @details lite geometry arc widget is used to draw arc shapes on the screen
+  * @file gui_arc.c
+  * @brief arc widget
+  * @details arc widget is used to draw arc shapes on the screen
   * @author
   * @date 2025/11/07
   * @version 1.0
@@ -26,7 +26,7 @@
 #include "acc_api.h"
 #include "tp_algo.h"
 #include "lite_geometry.h"
-#include "gui_lite_geometry_arc.h"
+#include "gui_arc.h"
 
 /*============================================================================*
  *                           Types
@@ -47,12 +47,12 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static bool init_arc_buffer(gui_lite_arc_t *this);
-static void render_arc_to_buffer(gui_lite_arc_t *this);
-static bool is_arc_dirty(gui_lite_arc_t *this);
+static bool init_arc_buffer(gui_arc_t *this);
+static void render_arc_to_buffer(gui_arc_t *this);
+static bool is_arc_dirty(gui_arc_t *this);
 
 /** Touch input preparation - simplified version like round_rect */
-static void gui_lite_arc_input_prepare(gui_obj_t *obj)
+static void gui_arc_input_prepare(gui_obj_t *obj)
 {
     // Arc widget uses the bounding box for touch detection
     // The event is already enabled in prepare phase
@@ -61,7 +61,7 @@ static void gui_lite_arc_input_prepare(gui_obj_t *obj)
 }
 
 /** Check if arc parameters have changed */
-static bool is_arc_dirty(gui_lite_arc_t *this)
+static bool is_arc_dirty(gui_arc_t *this)
 {
     return (this->x != this->cached_x ||
             this->y != this->cached_y ||
@@ -73,7 +73,7 @@ static bool is_arc_dirty(gui_lite_arc_t *this)
 }
 
 /** Update cached parameters */
-static void update_cache(gui_lite_arc_t *this)
+static void update_cache(gui_arc_t *this)
 {
     this->cached_x = this->x;
     this->cached_y = this->y;
@@ -99,7 +99,7 @@ static void set_img_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
     head->rsvd2 = 0;
 }
 
-static void gui_lite_arc_prepare(gui_lite_arc_t *this)
+static void gui_arc_prepare(gui_arc_t *this)
 {
     gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED);
     // Check if we need to re-render
@@ -117,7 +117,7 @@ static void gui_lite_arc_prepare(gui_lite_arc_t *this)
 }
 
 /** Drawing phase processing */
-static void gui_lite_arc_draw(gui_lite_arc_t *this)
+static void gui_arc_draw(gui_arc_t *this)
 {
     if (this->draw_img != NULL && this->buffer_valid)
     {
@@ -141,7 +141,7 @@ static void gui_lite_arc_draw(gui_lite_arc_t *this)
 }
 
 /** End phase processing */
-static void gui_lite_arc_end(gui_lite_arc_t *this)
+static void gui_arc_end(gui_arc_t *this)
 {
     // Only call acc_end_cb, keep buffer cached
     if (this->draw_img != NULL && draw_img_acc_end_cb != NULL)
@@ -150,7 +150,7 @@ static void gui_lite_arc_end(gui_lite_arc_t *this)
     }
 }
 
-static void gui_lite_arc_destroy(gui_lite_arc_t *this)
+static void gui_arc_destroy(gui_arc_t *this)
 {
     // Free cached resources
     if (this->pixel_buffer != NULL)
@@ -168,29 +168,29 @@ static void gui_lite_arc_destroy(gui_lite_arc_t *this)
     this->buffer_valid = false;
 }
 
-static void gui_lite_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+static void gui_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
         switch (cb_type)
         {
         case OBJ_INPUT_PREPARE:
-            gui_lite_arc_input_prepare(obj);
+            gui_arc_input_prepare(obj);
             break;
         case OBJ_PREPARE:
-            gui_lite_arc_prepare((gui_lite_arc_t *)obj);
+            gui_arc_prepare((gui_arc_t *)obj);
             break;
 
         case OBJ_DRAW:
-            gui_lite_arc_draw((gui_lite_arc_t *)obj);
+            gui_arc_draw((gui_arc_t *)obj);
             break;
 
         case OBJ_END:
-            gui_lite_arc_end((gui_lite_arc_t *)obj);
+            gui_arc_end((gui_arc_t *)obj);
             break;
 
         case OBJ_DESTROY:
-            gui_lite_arc_destroy((gui_lite_arc_t *)obj);
+            gui_arc_destroy((gui_arc_t *)obj);
             break;
 
         default:
@@ -200,7 +200,7 @@ static void gui_lite_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 }
 
 /** Initialize arc buffer - allocate once and reuse */
-static bool init_arc_buffer(gui_lite_arc_t *this)
+static bool init_arc_buffer(gui_arc_t *this)
 {
     // Calculate required buffer size
     float outer_r = this->radius + this->line_width / 2 + 2;
@@ -248,7 +248,7 @@ static bool init_arc_buffer(gui_lite_arc_t *this)
 }
 
 /** Render arc to buffer - called only when parameters change */
-static void render_arc_to_buffer(gui_lite_arc_t *this)
+static void render_arc_to_buffer(gui_arc_t *this)
 {
     float outer_r = this->radius + this->line_width / 2 + 2;
     int buffer_w = (int)(outer_r * 2) + 4;
@@ -287,14 +287,14 @@ static void render_arc_to_buffer(gui_lite_arc_t *this)
  *                           Public Functions
  *============================================================================*/
 
-gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name, int x, int y, int radius,
-                                    float start_angle, float end_angle,
-                                    float line_width, gui_color_t color)
+gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radius,
+                          float start_angle, float end_angle,
+                          float line_width, gui_color_t color)
 {
     GUI_ASSERT(parent != NULL);
-    gui_lite_arc_t *arc = gui_malloc(sizeof(gui_lite_arc_t));
+    gui_arc_t *arc = gui_malloc(sizeof(gui_arc_t));
     GUI_ASSERT(arc != NULL);
-    memset(arc, 0x00, sizeof(gui_lite_arc_t));
+    memset(arc, 0x00, sizeof(gui_arc_t));
 
     arc->opacity_value = color.color.rgba.a;
     arc->draw_img = NULL;
@@ -330,7 +330,7 @@ gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name, int x, int y
     arc->cached_color.color.argb_full = 0;
 
     gui_obj_ctor((gui_obj_t *)arc, parent, name, box_x, box_y, box_size, box_size);
-    GET_BASE(arc)->obj_cb = gui_lite_arc_cb;
+    GET_BASE(arc)->obj_cb = gui_arc_cb;
     GET_BASE(arc)->has_input_prepare_cb = true;
     GET_BASE(arc)->has_prepare_cb = true;
     GET_BASE(arc)->has_draw_cb = true;
@@ -349,7 +349,7 @@ gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name, int x, int y
 }
 
 
-void gui_lite_arc_set_position(gui_lite_arc_t *this, int x, int y)
+void gui_arc_set_position(gui_arc_t *this, int x, int y)
 {
     GUI_ASSERT(this != NULL);
     this->x = x;
@@ -357,14 +357,14 @@ void gui_lite_arc_set_position(gui_lite_arc_t *this, int x, int y)
     this->buffer_valid = false;
 }
 
-void gui_lite_arc_set_radius(gui_lite_arc_t *this, int radius)
+void gui_arc_set_radius(gui_arc_t *this, int radius)
 {
     GUI_ASSERT(this != NULL);
     this->radius = radius;
     this->buffer_valid = false;
 }
 
-void gui_lite_arc_set_color(gui_lite_arc_t *this, gui_color_t color)
+void gui_arc_set_color(gui_arc_t *this, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
     this->color = color;
@@ -372,28 +372,28 @@ void gui_lite_arc_set_color(gui_lite_arc_t *this, gui_color_t color)
     this->buffer_valid = false;
 }
 
-void gui_lite_arc_set_start_angle(gui_lite_arc_t *this, float start_angle)
+void gui_arc_set_start_angle(gui_arc_t *this, float start_angle)
 {
     GUI_ASSERT(this != NULL);
     this->start_angle = start_angle;
     this->buffer_valid = false;
 }
 
-void gui_lite_arc_set_end_angle(gui_lite_arc_t *this, float end_angle)
+void gui_arc_set_end_angle(gui_arc_t *this, float end_angle)
 {
     GUI_ASSERT(this != NULL);
     this->end_angle = end_angle;
     this->buffer_valid = false;
 }
 
-void gui_lite_arc_set_line_width(gui_lite_arc_t *this, float line_width)
+void gui_arc_set_line_width(gui_arc_t *this, float line_width)
 {
     GUI_ASSERT(this != NULL);
     this->line_width = line_width;
     this->buffer_valid = false;
 }
 
-void gui_lite_arc_on_click(gui_lite_arc_t *this, void *callback, void *parameter)
+void gui_arc_on_click(gui_arc_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);

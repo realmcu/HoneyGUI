@@ -23,17 +23,17 @@ Core Features
    * - Description
      - API 
    * - Create Widget
-     - :cpp:any:`gui_lite_circle_create`  
+     - :cpp:any:`gui_circle_create`  
    * - Set Style
-     - :cpp:any:`gui_lite_circle_set_style`
+     - :cpp:any:`gui_circle_set_style`
    * - Set Position
-     - :cpp:any:`gui_lite_circle_set_position` 
+     - :cpp:any:`gui_circle_set_position` 
    * - Set Radius
-     - :cpp:any:`gui_lite_circle_set_radius`
+     - :cpp:any:`gui_circle_set_radius`
    * - Set Color
-     - :cpp:any:`gui_lite_circle_set_color`
+     - :cpp:any:`gui_circle_set_color`
    * - Register Click Event Callback
-     - :cpp:any:`gui_lite_circle_on_click`
+     - :cpp:any:`gui_circle_on_click`
 
 Circle Characteristics
 ----------------------
@@ -82,12 +82,12 @@ In :file:`menu_config.h`, add:
 Complete Example
 ----------------
 
-.. literalinclude:: ../../../example/widget/lite_geometry_circle/example_gui_lite_geometry_circle.c
+.. literalinclude:: ../../../example/widget/circle/example_gui_circle.c
    :language: c
-   :start-after: /* gui lite geometry circle example start */
-   :end-before: /* gui lite geometry circle example end */
+   :start-after: /* gui circle example start */
+   :end-before: /* gui circle example end */
 
 API
 ---
 
-.. doxygenfile:: gui_lite_geometry_circle.h
+.. doxygenfile:: gui_circle.h

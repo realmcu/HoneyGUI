@@ -11,8 +11,8 @@
 #include "gui_list.h"
 #include "app_main_watch.h"
 #include "gui_view_instance.h"
-#include "gui_lite_geometry_round_rect.h"
-#include "gui_lite_geometry_arc.h"
+#include "gui_rect.h"
+#include "gui_arc.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -69,7 +69,7 @@ static void update_battery_display(void *obj)
         float progress = (float)battery_level / 100.0f;
         if (progress > 1.0f) { progress = 1.0f; }
         float battery_angle = -90.0f + 360.0f * progress;
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)arc_battery, battery_angle);
+        gui_arc_set_end_angle((gui_arc_t *)arc_battery, battery_angle);
 
         // Change color based on battery level
         gui_color_t color;
@@ -81,7 +81,7 @@ static void update_battery_display(void *obj)
         {
             color = gui_rgba(52, 199, 89, 255); // Green for normal
         }
-        gui_lite_arc_set_color((gui_lite_arc_t *)arc_battery, color);
+        gui_arc_set_color((gui_arc_t *)arc_battery, color);
     }
 
     // Update battery percentage text
@@ -149,8 +149,8 @@ static void battery_design(gui_view_t *view)
         float line_width = 24.0f;
 
         // Background arc (dark gray) - full circle
-        gui_lite_arc_create(parent, "arc_battery_bg",
-                            center_x, center_y, (int)radius, 0, 360, line_width, gui_rgba(50, 50, 50, 255));
+        gui_arc_create(parent, "arc_battery_bg",
+                       center_x, center_y, (int)radius, 0, 360, line_width, gui_rgba(50, 50, 50, 255));
 
         // Foreground arc (green for normal battery, red for low)
         gui_color_t arc_color = battery_level < 20 ? gui_rgba(255, 59, 48, 255) : gui_rgba(52, 199, 89,
@@ -159,8 +159,8 @@ static void battery_design(gui_view_t *view)
         if (progress > 1.0f) { progress = 1.0f; }
         float battery_angle = -90.0f + 360.0f * progress;
 
-        gui_lite_arc_create(parent, "arc_battery",
-                            center_x, center_y, (int)radius, -90, battery_angle, line_width, arc_color);
+        gui_arc_create(parent, "arc_battery",
+                       center_x, center_y, (int)radius, -90, battery_angle, line_width, arc_color);
 
         // Battery percentage text (centered in the circle)
         // Use the global battery_content buffer from bottom_view
@@ -183,8 +183,8 @@ static void battery_design(gui_view_t *view)
         gui_obj_create_timer(parent, 1000, true, update_battery_display);
     }
     {
-        gui_lite_round_rect_t *battery_rect = gui_lite_round_rect_create(parent, "battery_rect", 35, 400,
-                                                                         340, 80, 40, gui_rgba(200, 200, 200, 255 * 0.7));
+        gui_rounded_rect_t *battery_rect = gui_rect_create(parent, "battery_rect", 35, 400,
+                                                           340, 80, 40, gui_rgba(200, 200, 200, 255 * 0.7));
         gui_text_t *battery_text = gui_text_create(battery_rect, "battery_text", 35, 20, 0, 0);
         gui_text_set(battery_text, "Low Power Mode", GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen("Low Power Mode"), 36);

@@ -3,9 +3,9 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_lite_geometry_round_rect.h
-  * @brief Lite round rect widget encapsulation.
-  * @details Lite round rect widget encapsulation.
+  * @file gui_rect.h
+  * @brief Rect widget encapsulation.
+  * @details Rect widget encapsulation.
   * @author wenjing_jiang@realsil.com.cn
   * @date 2025/11/15
   * @version 1.0
@@ -19,8 +19,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_LITE_GEOMETRY_ROUND_RECT_H__
-#define __GUI_LITE_GEOMETRY_ROUND_RECT_H__
+#ifndef __GUI_RECT_H__
+#define __GUI_RECT_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,7 +35,7 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** Lite arc widget structure. */
+/** Rect widget structure. */
 typedef struct
 {
     gui_obj_t base;             /**< Base widget. */
@@ -50,10 +50,10 @@ typedef struct
     uint8_t *rect_data;
     uint8_t opacity_value;      /**< Opacity value. */
 
-    int radius;                 /**< Round rect radius. */
-    gui_color_t color;          /**< Round rect color. */
+    int radius;                 /**< Rect radius. */
+    gui_color_t color;          /**< Rect color. */
     uint8_t checksum;           /**< Checksum for change detection. */
-} gui_lite_round_rect_t;
+} gui_rounded_rect_t;
 
 /*============================================================================*
  *                         Macros
@@ -64,75 +64,75 @@ typedef struct
  *                         Functions
  *============================================================================*/
 /**
- * @brief Create a new lite round rect widget.
+ * @brief Create a new rect widget.
  * @param parent Parent widget or NULL for root widget.
  * @param name Widget name or NULL for default name.
  * @param x X coordinate relative to widget.
  * @param y Y coordinate relative to widget.
- * @param w Round rect width.
- * @param h Round rect height.
- * @param radius Round rect radius.
- * @param color Round rect color.
- * @return Pointer to the created lite round rect widget.
+ * @param w Rect width.
+ * @param h Rect height.
+ * @param radius Rect radius.
+ * @param color Rect color.
+ * @return Pointer to the created rect widget.
  */
-gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name, int x, int y,
-                                                  int w, int h,
-                                                  int radius, gui_color_t color);
+gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y,
+                                    int w, int h,
+                                    int radius, gui_color_t color);
 
 /**
- * @brief Set the style of the lite round rect widget.
- * @param this Pointer to the lite round rect widget.
+ * @brief Set the style of the rect widget.
+ * @param this Pointer to the rect widget.
  * @param x X coordinate relative to widget.
  * @param y Y coordinate relative to widget.
- * @param w Round rect width.
- * @param h Round rect height.
- * @param radius Round rect radius.
- * @param color Round rect color.
+ * @param w Rect width.
+ * @param h Rect height.
+ * @param radius Rect radius.
+ * @param color Rect color.
  */
-void gui_lite_round_rect_set_style(gui_lite_round_rect_t *this,
-                                   int x, int y, int w, int h,
-                                   int radius, gui_color_t color);
+void gui_rect_set_style(gui_rounded_rect_t *this,
+                        int x, int y, int w, int h,
+                        int radius, gui_color_t color);
 
 /**
- * @brief Set the position of the lite round rect widget.
- * @param this Pointer to the lite round rect widget.
+ * @brief Set the position of the rect widget.
+ * @param this Pointer to the rect widget.
  * @param x X coordinate relative to widget.
  * @param y Y coordinate relative to widget.
  */
-void gui_lite_round_rect_set_position(gui_lite_round_rect_t *this, int x, int y);
+void gui_rect_set_position(gui_rounded_rect_t *this, int x, int y);
 
 /**
- * @brief Set the size of the lite round rect widget.
- * @param this Pointer to the lite round rect widget.
- * @param w Round rect width.
- * @param h Round rect height.
+ * @brief Set the size of the rect widget.
+ * @param this Pointer to the rect widget.
+ * @param w Rect width.
+ * @param h Rect height.
  */
-void gui_lite_round_rect_set_size(gui_lite_round_rect_t *this, int w, int h);
+void gui_rect_set_size(gui_rounded_rect_t *this, int w, int h);
 
 /**
- * @brief Set the radius of the lite round rect widget.
- * @param this Pointer to the lite round rect widget.
- * @param radius Round rect radius.
+ * @brief Set the radius of the rect widget.
+ * @param this Pointer to the rect widget.
+ * @param radius Rect radius.
  */
-void gui_lite_round_rect_set_radius(gui_lite_round_rect_t *this, int radius);
+void gui_rect_set_radius(gui_rounded_rect_t *this, int radius);
 
 /**
- * @brief Set the color of the lite round rect widget.
- * @param this Pointer to the lite round rect widget.
- * @param color Round rect color.
+ * @brief Set the color of the rect widget.
+ * @param this Pointer to the rect widget.
+ * @param color Rect color.
  */
-void gui_lite_round_rect_set_color(gui_lite_round_rect_t *this, gui_color_t color);
+void gui_rect_set_color(gui_rounded_rect_t *this, gui_color_t color);
 
 /**
- * @brief Register a click event callback for the lite round rect widget.
- * @param this Pointer to the lite round rect widget.
+ * @brief Register a click event callback for the rect widget.
+ * @param this Pointer to the rect widget.
  * @param callback Callback function pointer.
  * @param parameter Optional parameter to pass to the callback.
  */
-void gui_lite_round_rect_on_click(gui_lite_round_rect_t *this, void *callback, void *parameter);
+void gui_rect_on_click(gui_rounded_rect_t *this, void *callback, void *parameter);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __GUI_LITE_GEOMETRY_ROUND_RECT_H__ */
+#endif /* __GUI_RECT_H__ */

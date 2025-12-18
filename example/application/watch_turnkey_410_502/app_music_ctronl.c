@@ -14,7 +14,7 @@
 #include "gui_list.h"
 #include "app_main_watch.h"
 #include "gui_view_instance.h"
-#include "gui_lite_geometry_round_rect.h"
+// #include "gui_rect.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/

@@ -14,7 +14,7 @@ CPPDEFINES += ['DRV_LCD_HIGHT=480']
 CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_LITE_ARC'):
-    src += ['example_lite_geometry_arc.c']
+    src += ['example_gui_arc.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
     
 Return('objs')

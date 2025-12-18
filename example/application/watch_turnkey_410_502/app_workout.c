@@ -14,7 +14,7 @@
 #include "gui_list.h"
 #include "app_main_watch.h"
 #include "gui_view_instance.h"
-#include "gui_lite_geometry_round_rect.h"
+#include "gui_rect.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -320,8 +320,8 @@ static void workout_view_design(gui_view_t *view)
                                  GUI_EVENT_KB_SHORT_CLICKED);
     }
     gui_obj_t *parent = GUI_BASE(view);
-    gui_lite_round_rect_create(parent, "note", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(32, 36,
-                               17, 255));
+    gui_rect_create(parent, "note", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(32, 36,
+                                                                                   17, 255));
 
 
     int space = 40;

@@ -7,7 +7,7 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "tp_algo.h"
-#include "gui_lite_geometry_round_rect.h"
+#include "gui_rect.h"
 #include "guidef.h"
 #include "gui_list.h"
 #include "app_main_watch.h"
@@ -148,14 +148,14 @@ static void top_view_design(gui_view_t *view)
     // draw background
     if (current_watchface_type == WATCHFACE_BIG_NUM)
     {
-        gui_lite_round_rect_create(GUI_BASE(parent), "background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
-                                   gui_rgba(219, 122, 147, 255 * 0.5));
+        gui_rect_create(GUI_BASE(parent), "background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+                        gui_rgba(219, 122, 147, 255 * 0.5));
     }
     else
     {
 
-        gui_lite_round_rect_create(GUI_BASE(parent), "background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
-                                   gui_rgba(76, 76, 76, 255 * 0.5));
+        gui_rect_create(GUI_BASE(parent), "background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+                        gui_rgba(76, 76, 76, 255 * 0.5));
     }
 
     // create_clear_note(view);

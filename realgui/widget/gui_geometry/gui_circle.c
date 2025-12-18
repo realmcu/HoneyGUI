@@ -2,9 +2,9 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_lite_geometry_circle.c
-  * @brief lite geometry circle widget
-  * @details lite geometry circle widget is used to draw circle shapes on the screen
+  * @file gui_circle.c
+  * @brief circle widget
+  * @details circle widget is used to draw circle shapes on the screen
   * @author
   * @date 2025/12/03
   * @version 2.0
@@ -23,7 +23,7 @@
 #include "gui_fb.h"
 #include "acc_api.h"
 #include "tp_algo.h"
-#include "gui_lite_geometry_circle.h"
+#include "gui_circle.h"
 
 /*============================================================================*
  *                           Types
@@ -46,7 +46,7 @@
  *============================================================================*/
 
 /** Check if a point is inside the circle's bounding circle */
-static bool is_point_in_circle(gui_lite_circle_t *circle, int x, int y)
+static bool is_point_in_circle(gui_circle_t *circle, int x, int y)
 {
     int dx = x - circle->x;
     int dy = y - circle->y;
@@ -56,9 +56,9 @@ static bool is_point_in_circle(gui_lite_circle_t *circle, int x, int y)
     return (distance_sq <= radius_sq);
 }
 
-static void gui_lite_circle_input_prepare(gui_obj_t *obj)
+static void gui_circle_input_prepare(gui_obj_t *obj)
 {
-    gui_lite_circle_t *this = (gui_lite_circle_t *)obj;
+    gui_circle_t *this = (gui_circle_t *)obj;
 
     // Check for touch events
     touch_info_t *tp = tp_get_info();
@@ -96,7 +96,7 @@ static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
 }
 
 /** Create a rectangle image object */
-static void set_rect_img(gui_lite_circle_t *this, draw_img_t **input_img, int16_t x,
+static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
                          int16_t y, uint16_t w, uint16_t h)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -141,7 +141,7 @@ static void set_rect_img(gui_lite_circle_t *this, draw_img_t **input_img, int16_
     *input_img = img;
 }
 /** create vertical arc strip */
-static draw_img_t *create_vertical_arc_strip(gui_lite_circle_t *this, gui_obj_t *obj)
+static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
 {
     if (this->radius <= 0) { return NULL; }
 
@@ -289,7 +289,7 @@ static draw_img_t *create_vertical_arc_strip(gui_lite_circle_t *this, gui_obj_t 
 }
 
 /** Create other three arc segments through transformation*/
-static draw_img_t *create_transformed_arc(gui_lite_circle_t *this, gui_obj_t *obj,
+static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
                                           draw_img_t *base_img,
                                           int pos_x, int pos_y,
                                           bool mirror_x, bool mirror_y,
@@ -364,9 +364,9 @@ static draw_img_t *create_transformed_arc(gui_lite_circle_t *this, gui_obj_t *ob
     return img;
 }
 
-static void gui_lite_circle_prepare(gui_obj_t *obj)
+static void gui_circle_prepare(gui_obj_t *obj)
 {
-    gui_lite_circle_t *this = (gui_lite_circle_t *)obj;
+    gui_circle_t *this = (gui_circle_t *)obj;
     uint8_t last = this->checksum;
     {
         // calculate inner square parameters
@@ -436,7 +436,7 @@ static void gui_lite_circle_prepare(gui_obj_t *obj)
     }
 
     this->checksum = 0;
-    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_lite_circle_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_circle_t));
 
     if (last != this->checksum)
     {
@@ -445,9 +445,9 @@ static void gui_lite_circle_prepare(gui_obj_t *obj)
 }
 
 /** Drawing phase processing */
-static void gui_lite_circle_draw(gui_obj_t *obj)
+static void gui_circle_draw(gui_obj_t *obj)
 {
-    gui_lite_circle_t *this = (gui_lite_circle_t *)obj;
+    gui_circle_t *this = (gui_circle_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
     // in center square
@@ -464,7 +464,7 @@ static void gui_lite_circle_draw(gui_obj_t *obj)
 }
 
 /** End phase processing - Memory management */
-static void gui_lite_circle_end(gui_lite_circle_t *this)
+static void gui_circle_end(gui_circle_t *this)
 {
 #define SAFE_FREE_IMG(img) \
     do { \
@@ -514,34 +514,34 @@ static void gui_lite_circle_end(gui_lite_circle_t *this)
 #undef SAFE_FREE_IMG
 }
 
-static void gui_lite_circle_destroy(gui_lite_circle_t *this)
+static void gui_circle_destroy(gui_circle_t *this)
 {
     GUI_UNUSED(this);
 }
 
-static void gui_lite_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
         switch (cb_type)
         {
         case OBJ_INPUT_PREPARE:
-            gui_lite_circle_input_prepare(obj);
+            gui_circle_input_prepare(obj);
             break;
         case OBJ_PREPARE:
-            gui_lite_circle_prepare(obj);
+            gui_circle_prepare(obj);
             break;
 
         case OBJ_DRAW:
-            gui_lite_circle_draw(obj);
+            gui_circle_draw(obj);
             break;
 
         case OBJ_END:
-            gui_lite_circle_end((gui_lite_circle_t *)obj);
+            gui_circle_end((gui_circle_t *)obj);
             break;
 
         case OBJ_DESTROY:
-            gui_lite_circle_destroy((gui_lite_circle_t *)obj);
+            gui_circle_destroy((gui_circle_t *)obj);
             break;
 
         default:
@@ -554,19 +554,19 @@ static void gui_lite_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
  *                           Public Functions
  *============================================================================*/
 
-gui_lite_circle_t *gui_lite_circle_create(void *parent, const char *name, int x, int y,
-                                          int radius, gui_color_t color)
+gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
+                                int radius, gui_color_t color)
 {
     GUI_ASSERT(parent != NULL);
 
-    gui_lite_circle_t *circle = gui_malloc(sizeof(gui_lite_circle_t));
+    gui_circle_t *circle = gui_malloc(sizeof(gui_circle_t));
     if (circle == NULL)
     {
         gui_log("Failed to allocate circle widget\n");
         return NULL;
     }
 
-    memset(circle, 0x00, sizeof(gui_lite_circle_t));
+    memset(circle, 0x00, sizeof(gui_circle_t));
 
     circle->opacity_value = color.color.rgba.a;
 
@@ -577,7 +577,7 @@ gui_lite_circle_t *gui_lite_circle_create(void *parent, const char *name, int x,
     circle->arc_bottom = NULL;
 
     gui_obj_ctor((gui_obj_t *)circle, parent, name, x - radius, y - radius, radius * 2, radius * 2);
-    GET_BASE(circle)->obj_cb = gui_lite_circle_cb;
+    GET_BASE(circle)->obj_cb = gui_circle_cb;
     GET_BASE(circle)->has_input_prepare_cb = true;
     GET_BASE(circle)->has_prepare_cb = true;
     GET_BASE(circle)->has_draw_cb = true;
@@ -600,9 +600,9 @@ gui_lite_circle_t *gui_lite_circle_create(void *parent, const char *name, int x,
     return circle;
 }
 
-void gui_lite_circle_set_style(gui_lite_circle_t *this,
-                               int x, int y,
-                               int radius, gui_color_t color)
+void gui_circle_set_style(gui_circle_t *this,
+                          int x, int y,
+                          int radius, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
     this->x = x;
@@ -612,7 +612,7 @@ void gui_lite_circle_set_style(gui_lite_circle_t *this,
     this->opacity_value = color.color.rgba.a;
 }
 
-void gui_lite_circle_set_position(gui_lite_circle_t *this, int x, int y)
+void gui_circle_set_position(gui_circle_t *this, int x, int y)
 {
     GUI_ASSERT(this != NULL);
 
@@ -623,7 +623,7 @@ void gui_lite_circle_set_position(gui_lite_circle_t *this, int x, int y)
     }
 }
 
-void gui_lite_circle_set_radius(gui_lite_circle_t *this, int radius)
+void gui_circle_set_radius(gui_circle_t *this, int radius)
 {
     GUI_ASSERT(this != NULL);
 
@@ -633,7 +633,7 @@ void gui_lite_circle_set_radius(gui_lite_circle_t *this, int radius)
     }
 }
 
-void gui_lite_circle_set_color(gui_lite_circle_t *this, gui_color_t color)
+void gui_circle_set_color(gui_circle_t *this, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
 
@@ -644,7 +644,7 @@ void gui_lite_circle_set_color(gui_lite_circle_t *this, gui_color_t color)
     }
 }
 
-void gui_lite_circle_on_click(gui_lite_circle_t *this, void *callback, void *parameter)
+void gui_circle_on_click(gui_circle_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);

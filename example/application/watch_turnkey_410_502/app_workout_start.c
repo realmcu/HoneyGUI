@@ -12,7 +12,7 @@
 #include "gui_view_instance.h"
 #include "gui_list.h"
 #include "gui_text.h"
-#include "gui_lite_geometry_arc.h"
+#include "gui_arc.h"
 /*============================================================================*
  *                            Macros
  *============================================================================*/
@@ -36,7 +36,7 @@ GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, workout_start_design, NULL);
  *============================================================================*/
 static gui_list_t *list = NULL;
 static gui_view_t *current_view = NULL;
-static gui_lite_arc_t *countdown_arc = NULL;
+static gui_arc_t *countdown_arc = NULL;
 static gui_text_t *countdown_text = NULL;
 static bool is_countdown_finished = false;
 static int countdown_value = 3;
@@ -106,7 +106,7 @@ static void countdown_timer_cb(void *obj)
 
             float remaining = (float)countdown_value / 3.0f;
             int end_angle = 270 + (int)(360.0f * remaining);
-            gui_lite_arc_set_end_angle(countdown_arc, end_angle);
+            gui_arc_set_end_angle(countdown_arc, end_angle);
         }
         else
         {
@@ -385,7 +385,7 @@ static void update_activity_rings_cb(void *obj)
                          (float)activity_rings_data.activity_goal;
         if (progress > 1.0f) { progress = 1.0f; }
         float angle = 270.0f + (progress * 360.0f);
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)activity_ring, angle);
+        gui_arc_set_end_angle((gui_arc_t *)activity_ring, angle);
     }
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(exercise_ring, "exercise_ring", rings_container);
@@ -395,7 +395,7 @@ static void update_activity_rings_cb(void *obj)
                          (float)activity_rings_data.exercise_goal;
         if (progress > 1.0f) { progress = 1.0f; }
         float angle = 270.0f + (progress * 360.0f);
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)exercise_ring, angle);
+        gui_arc_set_end_angle((gui_arc_t *)exercise_ring, angle);
     }
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_ring, "stand_ring", rings_container);
@@ -405,7 +405,7 @@ static void update_activity_rings_cb(void *obj)
                          (float)activity_rings_data.stand_goal;
         if (progress > 1.0f) { progress = 1.0f; }
         float angle = 270.0f + (progress * 360.0f);
-        gui_lite_arc_set_end_angle((gui_lite_arc_t *)stand_ring, angle);
+        gui_arc_set_end_angle((gui_arc_t *)stand_ring, angle);
     }
 }
 
@@ -572,32 +572,32 @@ static void page_1_design(gui_obj_t *parent)
     float stand_angle = 270.0f + (stand_progress * 360.0f);
 
     // Background rings (dimmed)
-    gui_lite_arc_create(rings_container, "activity_ring_bg",
-                        rings_center_x, rings_center_y,
-                        70, 0, 360,
-                        12, gui_rgba(255, 45, 85, 64));
-    gui_lite_arc_create(rings_container, "exercise_ring_bg",
-                        rings_center_x, rings_center_y,
-                        52, 0, 360,
-                        12, gui_rgba(185, 251, 79, 64));
-    gui_lite_arc_create(rings_container, "stand_ring_bg",
-                        rings_center_x, rings_center_y,
-                        34, 0, 360,
-                        12, gui_rgba(0, 255, 255, 64));
+    gui_arc_create(rings_container, "activity_ring_bg",
+                   rings_center_x, rings_center_y,
+                   70, 0, 360,
+                   12, gui_rgba(255, 45, 85, 64));
+    gui_arc_create(rings_container, "exercise_ring_bg",
+                   rings_center_x, rings_center_y,
+                   52, 0, 360,
+                   12, gui_rgba(185, 251, 79, 64));
+    gui_arc_create(rings_container, "stand_ring_bg",
+                   rings_center_x, rings_center_y,
+                   34, 0, 360,
+                   12, gui_rgba(0, 255, 255, 64));
 
     // Progress rings
-    gui_lite_arc_t *activity_ring = gui_lite_arc_create(rings_container, "activity_ring",
-                                                        rings_center_x, rings_center_y,
-                                                        70, 270, activity_angle,
-                                                        12, gui_rgb(255, 45, 85));
-    gui_lite_arc_t *exercise_ring = gui_lite_arc_create(rings_container, "exercise_ring",
-                                                        rings_center_x, rings_center_y,
-                                                        52, 270, exercise_angle,
-                                                        12, gui_rgb(185, 251, 79));
-    gui_lite_arc_t *stand_ring = gui_lite_arc_create(rings_container, "stand_ring",
-                                                     rings_center_x, rings_center_y,
-                                                     34, 270, stand_angle,
-                                                     12, gui_rgb(0, 255, 255));
+    gui_arc_t *activity_ring = gui_arc_create(rings_container, "activity_ring",
+                                              rings_center_x, rings_center_y,
+                                              70, 270, activity_angle,
+                                              12, gui_rgb(255, 45, 85));
+    gui_arc_t *exercise_ring = gui_arc_create(rings_container, "exercise_ring",
+                                              rings_center_x, rings_center_y,
+                                              52, 270, exercise_angle,
+                                              12, gui_rgb(185, 251, 79));
+    gui_arc_t *stand_ring = gui_arc_create(rings_container, "stand_ring",
+                                           rings_center_x, rings_center_y,
+                                           34, 270, stand_angle,
+                                           12, gui_rgb(0, 255, 255));
 
     // Create timer to update activity rings display (500ms interval)
     gui_obj_create_timer(GUI_BASE(rings_container), 500, true, update_activity_rings_cb);
@@ -685,9 +685,9 @@ static void workout_start_design(gui_view_t *view)
     // create countdown arc(initially full circle)
     if (!is_countdown_finished)
     {
-        countdown_arc = gui_lite_arc_create(parent, "countdown_arc",
-                                            SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-                                            150, 270, 630, 20, gui_rgb(185, 251, 79));
+        countdown_arc = gui_arc_create(parent, "countdown_arc",
+                                       SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                                       150, 270, 630, 20, gui_rgb(185, 251, 79));
 
         countdown_text = gui_text_create(parent, "countdown_text",
                                          SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 - 55,

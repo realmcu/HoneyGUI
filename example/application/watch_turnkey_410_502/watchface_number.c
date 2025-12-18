@@ -12,7 +12,7 @@
 #include "app_main_watch.h"
 #include "gui_canvas.h"
 #include "gui_view_instance.h"
-#include "gui_lite_geometry_round_rect.h"
+#include "gui_rect.h"
 /*============================================================================*
  *                            Macros
  *============================================================================*/
@@ -108,8 +108,8 @@ void create_watchface_number(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
     gui_win_t *win = gui_win_create(parent, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    gui_lite_round_rect_create(win, "rect_bg", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(219, 122,
-                               147, 255));
+    gui_rect_create(win, "rect_bg", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(219, 122,
+                                                                                   147, 255));
 
     // create time-text
     gui_text_t *t_time = gui_text_create(win, "t_time", -58, 10, 0, 0);

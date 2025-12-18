@@ -3,9 +3,9 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_lite_geometry_circle.h
-  * @brief Lite circle widget encapsulation.
-  * @details Lite circle widget encapsulation.
+  * @file gui_circle.h
+  * @brief Circle widget encapsulation.
+  * @details Circle widget encapsulation.
   * @author wenjing_jiang@realsil.com.cn
   * @date 2025/11/15
   * @version 1.0
@@ -19,8 +19,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_LITE_GEOMETRY_CIRCLE_H__
-#define __GUI_LITE_GEOMETRY_CIRCLE_H__
+#ifndef __GUI_CIRCLE_H__
+#define __GUI_CIRCLE_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,7 +40,7 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** Lite circle widget structure. */
+/** Circle widget structure. */
 typedef struct
 {
     gui_obj_t base;             /**< Base widget. */
@@ -59,7 +59,7 @@ typedef struct
     gui_color_t color;          /**< Circle color. */
     uint8_t opacity_value;      /**< Opacity value. */
     uint8_t checksum;           /**< Checksum for change detection. */
-} gui_lite_circle_t;
+} gui_circle_t;
 
 /*============================================================================*
  *                         Macros
@@ -70,7 +70,7 @@ typedef struct
  *                         Functions
  *============================================================================*/
 /**
- * @brief Create a lite geometry circle widget.
+ * @brief Create a circle widget.
  *
  * @param parent Parent widget.
  * @param name Widget name.
@@ -80,8 +80,8 @@ typedef struct
  * @param color Circle color.
  * @return Pointer to the created circle widget.
  */
-gui_lite_circle_t *gui_lite_circle_create(void *parent, const char *name, int x, int y,
-                                          int radius, gui_color_t color);
+gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
+                                int radius, gui_color_t color);
 
 /**
  * @brief Set circle style.
@@ -92,9 +92,9 @@ gui_lite_circle_t *gui_lite_circle_create(void *parent, const char *name, int x,
  * @param radius Circle radius.
  * @param color Circle color.
  */
-void gui_lite_circle_set_style(gui_lite_circle_t *this,
-                               int x, int y,
-                               int radius, gui_color_t color);
+void gui_circle_set_style(gui_circle_t *this,
+                          int x, int y,
+                          int radius, gui_color_t color);
 
 /**
  * @brief Set circle position.
@@ -103,7 +103,7 @@ void gui_lite_circle_set_style(gui_lite_circle_t *this,
  * @param x X coordinate of circle center.
  * @param y Y coordinate of circle center.
  */
-void gui_lite_circle_set_position(gui_lite_circle_t *this, int x, int y);
+void gui_circle_set_position(gui_circle_t *this, int x, int y);
 
 /**
  * @brief Set circle radius.
@@ -111,7 +111,7 @@ void gui_lite_circle_set_position(gui_lite_circle_t *this, int x, int y);
  * @param this Circle widget pointer.
  * @param radius Circle radius.
  */
-void gui_lite_circle_set_radius(gui_lite_circle_t *this, int radius);
+void gui_circle_set_radius(gui_circle_t *this, int radius);
 
 /**
  * @brief Set circle color.
@@ -119,7 +119,7 @@ void gui_lite_circle_set_radius(gui_lite_circle_t *this, int radius);
  * @param this Circle widget pointer.
  * @param color Circle color.
  */
-void gui_lite_circle_set_color(gui_lite_circle_t *this, gui_color_t color);
+void gui_circle_set_color(gui_circle_t *this, gui_color_t color);
 
 /**
  * @brief Set click callback for the circle.
@@ -128,10 +128,10 @@ void gui_lite_circle_set_color(gui_lite_circle_t *this, gui_color_t color);
  * @param callback Callback function.
  * @param parameter Callback parameter.
  */
-void gui_lite_circle_on_click(gui_lite_circle_t *this, void *callback, void *parameter);
+void gui_circle_on_click(gui_circle_t *this, void *callback, void *parameter);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __GUI_LITE_GEOMETRY_CIRCLE_H__ */
+#endif /* __GUI_CIRCLE_H__ */

@@ -1,6 +1,6 @@
 /* gui lite geometry rect example start */
 #include "gui_components_init.h"
-#include "gui_lite_geometry_round_rect.h"
+#include "gui_rect.h"
 #include "gui_view.h"
 #include "gui_view_instance.h"
 

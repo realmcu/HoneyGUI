@@ -23,21 +23,21 @@ Core Features
    * - Description
      - API 
    * - Create Widget
-     - :cpp:any:`gui_lite_arc_create`  
+     - :cpp:any:`gui_arc_create`  
    * - Set Position
-     - :cpp:any:`gui_lite_arc_set_position` 
+     - :cpp:any:`gui_arc_set_position` 
    * - Set Radius
-     - :cpp:any:`gui_lite_arc_set_radius`
+     - :cpp:any:`gui_arc_set_radius`
    * - Set Color
-     - :cpp:any:`gui_lite_arc_set_color`
+     - :cpp:any:`gui_arc_set_color`
    * - Set Start Angle
-     - :cpp:any:`gui_lite_arc_set_start_angle`
+     - :cpp:any:`gui_arc_set_start_angle`
    * - Set End Angle
-     - :cpp:any:`gui_lite_arc_set_end_angle`
+     - :cpp:any:`gui_arc_set_end_angle`
    * - Set Line Width
-     - :cpp:any:`gui_lite_arc_set_line_width`
+     - :cpp:any:`gui_arc_set_line_width`
    * - Register Click Event Callback
-     - :cpp:any:`gui_lite_arc_on_click`
+     - :cpp:any:`gui_arc_on_click`
 
 Angle Description
 -----------------
@@ -83,13 +83,13 @@ In :file:`menu_config.h`, add:
 Complete Example
 ----------------
 
-.. literalinclude:: ../../../example/widget/lite_geometry_arc/example_gui_lite_geometry_arc.c
+.. literalinclude:: ../../../example/widget/arc/example_gui_arc.c
    :language: c
-   :start-after: /* gui lite geometry arc example start */
-   :end-before: /* gui lite geometry arc example end */
+   :start-after: /* gui arc example start */
+   :end-before: /* gui arc example end */
 
 API
 -------------
 
-.. doxygenfile:: gui_lite_geometry_arc.h
+.. doxygenfile:: gui_arc.h
 

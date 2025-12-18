@@ -2,9 +2,9 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_lite_geometry_round_rect.c
-  * @brief lite geometry round_rect widget with direct rendering
-  * @details round_rect widget using direct rectangle data
+  * @file gui_rect.c
+  * @brief rect widget with direct rendering
+  * @details rect widget using direct rectangle data
   * @author
   * @date 2025/11/26
   * @version 2.0
@@ -23,7 +23,7 @@
 #include "gui_fb.h"
 #include "acc_api.h"
 #include "tp_algo.h"
-#include "gui_lite_geometry_round_rect.h"
+#include "gui_rect.h"
 
 /*============================================================================*
  *                           Types
@@ -65,7 +65,7 @@ static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
 }
 
 /** Create a rectangle image object */
-static void set_rect_img(gui_lite_round_rect_t *this, draw_img_t **input_img, int16_t x,
+static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16_t x,
                          int16_t y, uint16_t w, uint16_t h)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -88,7 +88,7 @@ static void set_rect_img(gui_lite_round_rect_t *this, draw_img_t **input_img, in
     *input_img = img;
 }
 /** Prepare arc image data for a specific corner */
-static void prepare_arc_img(gui_lite_round_rect_t *this, uint8_t *circle_data, int corner_type)
+static void prepare_arc_img(gui_rounded_rect_t *this, uint8_t *circle_data, int corner_type)
 {
     if (this->radius == 0) { return; }
     uint32_t *data = (uint32_t *)(circle_data + sizeof(gui_rgb_data_head_t));
@@ -186,7 +186,7 @@ static void prepare_arc_img(gui_lite_round_rect_t *this, uint8_t *circle_data, i
 }
 
 /** Create corner image for specific corner */
-static draw_img_t *create_corner_img(gui_lite_round_rect_t *this, gui_obj_t *obj,
+static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
                                      int corner_idx, int x, int y)
 {
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
@@ -242,9 +242,9 @@ static draw_img_t *create_corner_img(gui_lite_round_rect_t *this, gui_obj_t *obj
     return img;
 }
 
-static void gui_lite_round_rect_prepare(gui_obj_t *obj)
+static void gui_rect_prepare(gui_obj_t *obj)
 {
-    gui_lite_round_rect_t *this = (gui_lite_round_rect_t *)obj;
+    gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     uint8_t last;
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
@@ -291,7 +291,7 @@ static void gui_lite_round_rect_prepare(gui_obj_t *obj)
     }
     last = this->checksum;
     this->checksum = 0;
-    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_lite_round_rect_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_rounded_rect_t));
 
     if (last != this->checksum)
     {
@@ -300,9 +300,9 @@ static void gui_lite_round_rect_prepare(gui_obj_t *obj)
 }
 
 /** Drawing phase processing */
-static void gui_lite_round_rect_draw(gui_obj_t *obj)
+static void gui_rect_draw(gui_obj_t *obj)
 {
-    gui_lite_round_rect_t *this = (gui_lite_round_rect_t *)obj;
+    gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
     // Draw all parts in order
@@ -314,9 +314,9 @@ static void gui_lite_round_rect_draw(gui_obj_t *obj)
     if (this->circle_10 != NULL) { gui_acc_blit_to_dc(this->circle_10, dc, NULL); }
     if (this->circle_11 != NULL) { gui_acc_blit_to_dc(this->circle_11, dc, NULL); }
 }
-static void gui_lite_round_rect_end(gui_obj_t *obj)
+static void gui_rect_end(gui_obj_t *obj)
 {
-    gui_lite_round_rect_t *this = (gui_lite_round_rect_t *)obj;
+    gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
 #define SAFE_FREE_IMG(img) \
     if (img != NULL) { \
         if (img->data != NULL) { \
@@ -338,33 +338,33 @@ static void gui_lite_round_rect_end(gui_obj_t *obj)
 #undef SAFE_FREE_IMG
 }
 
-static void gui_lite_round_rect_destroy(gui_obj_t *obj)
+static void gui_rect_destroy(gui_obj_t *obj)
 {
-    gui_lite_round_rect_t *this = (gui_lite_round_rect_t *)obj;
+    gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     GUI_UNUSED(this);
     // Resources are cleaned up in end callback
 }
 
-static void gui_lite_round_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+static void gui_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
         switch (cb_type)
         {
         case OBJ_PREPARE:
-            gui_lite_round_rect_prepare(obj);
+            gui_rect_prepare(obj);
             break;
 
         case OBJ_DRAW:
-            gui_lite_round_rect_draw(obj);
+            gui_rect_draw(obj);
             break;
 
         case OBJ_END:
-            gui_lite_round_rect_end(obj);
+            gui_rect_end(obj);
             break;
 
         case OBJ_DESTROY:
-            gui_lite_round_rect_destroy(obj);
+            gui_rect_destroy(obj);
             break;
 
         default:
@@ -377,14 +377,14 @@ static void gui_lite_round_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
  *                           Public Functions
  *============================================================================*/
 
-gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name, int x, int y,
-                                                  int w, int h,
-                                                  int radius, gui_color_t color)
+gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y,
+                                    int w, int h,
+                                    int radius, gui_color_t color)
 {
     GUI_ASSERT(parent != NULL);
-    gui_lite_round_rect_t *round_rect = gui_malloc(sizeof(gui_lite_round_rect_t));
+    gui_rounded_rect_t *round_rect = gui_malloc(sizeof(gui_rounded_rect_t));
     GUI_ASSERT(round_rect != NULL);
-    memset(round_rect, 0x00, sizeof(gui_lite_round_rect_t));
+    memset(round_rect, 0x00, sizeof(gui_rounded_rect_t));
 
     round_rect->opacity_value = UINT8_MAX;
     round_rect->rect_0 = NULL;
@@ -396,7 +396,7 @@ gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name
     round_rect->circle_11 = NULL;
 
     gui_obj_ctor((gui_obj_t *)round_rect, parent, name, x, y, w, h);
-    GET_BASE(round_rect)->obj_cb = gui_lite_round_rect_cb;
+    GET_BASE(round_rect)->obj_cb = gui_rect_cb;
     GET_BASE(round_rect)->has_input_prepare_cb = true;
     GET_BASE(round_rect)->has_prepare_cb = true;
     GET_BASE(round_rect)->has_draw_cb = true;
@@ -416,9 +416,9 @@ gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name
     return round_rect;
 }
 
-void gui_lite_round_rect_set_style(gui_lite_round_rect_t *this,
-                                   int x, int y, int w, int h,
-                                   int radius, gui_color_t color)
+void gui_rect_set_style(gui_rounded_rect_t *this,
+                        int x, int y, int w, int h,
+                        int radius, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
     this->base.x = x;
@@ -430,34 +430,34 @@ void gui_lite_round_rect_set_style(gui_lite_round_rect_t *this,
     this->opacity_value = color.color.rgba.a;
 }
 
-void gui_lite_round_rect_set_position(gui_lite_round_rect_t *this, int x, int y)
+void gui_rect_set_position(gui_rounded_rect_t *this, int x, int y)
 {
     GUI_ASSERT(this != NULL);
     this->base.x = x;
     this->base.y = y;
 }
 
-void gui_lite_round_rect_set_size(gui_lite_round_rect_t *this, int w, int h)
+void gui_rect_set_size(gui_rounded_rect_t *this, int w, int h)
 {
     GUI_ASSERT(this != NULL);
     this->base.w = w;
     this->base.h = h;
 }
 
-void gui_lite_round_rect_set_radius(gui_lite_round_rect_t *this, int radius)
+void gui_rect_set_radius(gui_rounded_rect_t *this, int radius)
 {
     GUI_ASSERT(this != NULL);
     this->radius = radius;
 }
 
-void gui_lite_round_rect_set_color(gui_lite_round_rect_t *this, gui_color_t color)
+void gui_rect_set_color(gui_rounded_rect_t *this, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
     this->color = color;
     this->opacity_value = color.color.rgba.a;
 }
 
-void gui_lite_round_rect_on_click(gui_lite_round_rect_t *this, void *callback, void *parameter)
+void gui_rect_on_click(gui_rounded_rect_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);

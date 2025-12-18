@@ -12,7 +12,7 @@
 #include "gui_view_instance.h"
 #include "gui_list.h"
 #include "gui_text.h"
-#include "gui_lite_geometry_arc.h"
+#include "gui_arc.h"
 /*============================================================================*
  *                            Macros
  *============================================================================*/

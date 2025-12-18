@@ -3,9 +3,9 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_lite_geometry_arc.h
-  * @brief Lite arc widget encapsulation.
-  * @details Lite arc widget encapsulation.
+  * @file gui_arc.h
+  * @brief Arc widget encapsulation.
+  * @details Arc widget encapsulation.
   * @author wenjing_jiang@realsil.com.cn
   * @date 2025/11/15
   * @version 1.0
@@ -19,8 +19,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_LITE_GEOMETRY_ARC_H__
-#define __GUI_LITE_GEOMETRY_ARC_H__
+#ifndef __GUI_ARC_H__
+#define __GUI_ARC_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,7 +35,7 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** Lite arc widget structure. */
+/** Arc widget structure. */
 typedef struct
 {
     gui_obj_t base;             /**< Base widget. */
@@ -67,7 +67,7 @@ typedef struct
     float cached_end_angle;
     float cached_line_width;
     gui_color_t cached_color;
-} gui_lite_arc_t;
+} gui_arc_t;
 
 /*============================================================================*
  *                         Macros
@@ -78,7 +78,7 @@ typedef struct
  *                         Functions
  *============================================================================*/
 /**
- * @brief Create a new lite arc widget.
+ * @brief Create a new arc widget.
  * @param parent Parent widget or NULL for top-level widget.
  * @param name Name of the widget.
  * @param x Center X coordinate.
@@ -88,12 +88,12 @@ typedef struct
  * @param end_angle End angle in degrees.
  * @param line_width Line width.
  * @param color Arc color.
- * @return Pointer to the created lite arc widget.
+ * @return Pointer to the created arc widget.
  */
-gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name,
-                                    int x, int y, int radius,
-                                    float start_angle, float end_angle,
-                                    float line_width, gui_color_t color);
+gui_arc_t *gui_arc_create(void *parent, const char *name,
+                          int x, int y, int radius,
+                          float start_angle, float end_angle,
+                          float line_width, gui_color_t color);
 
 /**
  * @brief Move arc geometry.
@@ -101,52 +101,52 @@ gui_lite_arc_t *gui_lite_arc_create(void *parent, const char *name,
  * @param x New center X coordinate relative to widget.
  * @param y New center Y coordinate relative to widget.
  */
-void gui_lite_arc_set_position(gui_lite_arc_t *this, int x, int y);
+void gui_arc_set_position(gui_arc_t *this, int x, int y);
 
 /**
- * @brief Set the radius of the lite arc widget.
- * @param this Pointer to the lite arc widget.
+ * @brief Set the radius of the arc widget.
+ * @param this Pointer to the arc widget.
  * @param radius Arc radius.
  */
-void gui_lite_arc_set_radius(gui_lite_arc_t *this, int radius);
+void gui_arc_set_radius(gui_arc_t *this, int radius);
 
 /**
- * @brief Set the color of the lite arc widget.
- * @param this Pointer to the lite arc widget.
+ * @brief Set the color of the arc widget.
+ * @param this Pointer to the arc widget.
  * @param color Arc color.
  */
-void gui_lite_arc_set_color(gui_lite_arc_t *this, gui_color_t color);
+void gui_arc_set_color(gui_arc_t *this, gui_color_t color);
 /**
- * @brief Set the start angle of the lite arc widget.
- * @param this Pointer to the lite arc widget.
+ * @brief Set the start angle of the arc widget.
+ * @param this Pointer to the arc widget.
  * @param start_angle Start angle in degrees.
  */
-void gui_lite_arc_set_start_angle(gui_lite_arc_t *this, float start_angle);
+void gui_arc_set_start_angle(gui_arc_t *this, float start_angle);
 
 /**
- * @brief Set the end angle of the lite arc widget.
- * @param this Pointer to the lite arc widget.
+ * @brief Set the end angle of the arc widget.
+ * @param this Pointer to the arc widget.
  * @param end_angle End angle in degrees.
  */
-void gui_lite_arc_set_end_angle(gui_lite_arc_t *this, float end_angle);
+void gui_arc_set_end_angle(gui_arc_t *this, float end_angle);
 
 /**
- * @brief Set the line width of the lite arc widget.
- * @param this Pointer to the lite arc widget.
+ * @brief Set the line width of the arc widget.
+ * @param this Pointer to the arc widget.
  * @param line_width Line width.
  */
-void gui_lite_arc_set_line_width(gui_lite_arc_t *this, float line_width);
+void gui_arc_set_line_width(gui_arc_t *this, float line_width);
 
 /**
- * @brief Register click event callback for lite arc widget.
+ * @brief Register click event callback for arc widget.
  * @param this Pointer to the arc widget.
  * @param callback Callback function pointer.
  * @param parameter Optional parameter to pass to callback.
  */
-void gui_lite_arc_on_click(gui_lite_arc_t *this, void *callback, void *parameter);
+void gui_arc_on_click(gui_arc_t *this, void *callback, void *parameter);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __GUI_LITE_GEOMETRY_ARC_H__ */
+#endif /* __GUI_ARC_H__ */
