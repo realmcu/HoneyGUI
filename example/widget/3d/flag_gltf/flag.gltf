@@ -3119,13 +3119,14 @@
 	],
 	"materials":[
 		{
-			"alphaMode":"BLEND",
 			"doubleSided":true,
-			"name":"Flag_Dirty.002",
+			"name":"flag",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
-				}
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
 			}
 		}
 	],

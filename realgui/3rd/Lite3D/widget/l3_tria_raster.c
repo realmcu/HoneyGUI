@@ -286,13 +286,34 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
                 gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
                                      image_addr, srcX + srcY * src_head->w, src_head->type);
 
-                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                if (source_alpha > 0 && (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx]))
                 {
-                    // Completely opaque pixel processing
                     zbuffer[pixelIdx] = originalZ;
-                    writebuf[pixelIdx] = ((source_red & 0xF8) << 8) |
-                                         ((source_green & 0xFC) << 3) |
-                                         ((source_blue & 0xF8) >> 3);
+
+                    if (source_alpha == 255)
+                    {
+                        // Completely opaque pixel processing
+                        writebuf[pixelIdx] = ((source_red & 0xF8) << 8) |
+                                             ((source_green & 0xFC) << 3) |
+                                             ((source_blue & 0xF8) >> 3);
+                    }
+                    else
+                    {
+                        // Alpha blending for semi-transparent pixels
+                        l3_color_rgb565_t *dst = (l3_color_rgb565_t *)writebuf + pixelIdx;
+                        uint8_t dstR = dst->r << 3;
+                        uint8_t dstG = dst->g << 2;
+                        uint8_t dstB = dst->b << 3;
+
+                        uint8_t inv_alpha = 255 - source_alpha;
+                        uint8_t outR = (source_red * source_alpha + dstR * inv_alpha) / 255;
+                        uint8_t outG = (source_green * source_alpha + dstG * inv_alpha) / 255;
+                        uint8_t outB = (source_blue * source_alpha + dstB * inv_alpha) / 255;
+
+                        writebuf[pixelIdx] = ((outR & 0xF8) << 8) |
+                                             ((outG & 0xFC) << 3) |
+                                             ((outB & 0xF8) >> 3);
+                    }
                 }
             }
 
@@ -318,9 +339,32 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
                 gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
                                      image_addr, srcX + srcY * src_head->w, src_head->type);
 
-                writebuf[pixelIdx] = ((source_red & 0xF8) << 8) |
-                                     ((source_green & 0xFC) << 3) |
-                                     ((source_blue & 0xF8) >> 3);
+                if (source_alpha > 0)
+                {
+                    if (source_alpha == 255)
+                    {
+                        writebuf[pixelIdx] = ((source_red & 0xF8) << 8) |
+                                             ((source_green & 0xFC) << 3) |
+                                             ((source_blue & 0xF8) >> 3);
+                    }
+                    else
+                    {
+                        // Alpha blending for semi-transparent pixels
+                        l3_color_rgb565_t *dst = (l3_color_rgb565_t *)writebuf + pixelIdx;
+                        uint8_t dstR = dst->r << 3;
+                        uint8_t dstG = dst->g << 2;
+                        uint8_t dstB = dst->b << 3;
+
+                        uint8_t inv_alpha = 255 - source_alpha;
+                        uint8_t outR = (source_red * source_alpha + dstR * inv_alpha) / 255;
+                        uint8_t outG = (source_green * source_alpha + dstG * inv_alpha) / 255;
+                        uint8_t outB = (source_blue * source_alpha + dstB * inv_alpha) / 255;
+
+                        writebuf[pixelIdx] = ((outR & 0xF8) << 8) |
+                                             ((outG & 0xFC) << 3) |
+                                             ((outB & 0xF8) >> 3);
+                    }
+                }
 
             }
 
