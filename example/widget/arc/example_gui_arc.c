@@ -30,8 +30,6 @@ static void create_activity_rings(float center_x, float center_y)
     gui_arc_t *ring_stand = gui_arc_create(gui_obj_get_root(), "test_ring_stand", center_x,
                                            center_y, inner_radius, 0, 360, inner_thickness,
                                            track_color_stand);
-    gui_arc_set_style(ring_stand, center_x, center_y, inner_radius, 0, 360, inner_thickness,
-                      track_color_stand);
 
     GUI_UNUSED(ring_move);
     GUI_UNUSED(ring_exercise);

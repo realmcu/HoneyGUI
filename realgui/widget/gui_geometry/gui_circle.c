@@ -76,6 +76,93 @@ static void gui_circle_input_prepare(gui_obj_t *obj)
     }
 }
 
+/** Create a complete circle in a single buffer to avoid seams */
+static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
+{
+    int diameter = this->radius * 2;
+    int r = this->radius;
+
+    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
+    if (img == NULL) { return NULL; }
+    memset(img, 0x00, sizeof(draw_img_t));
+
+    // Create pixel buffer
+    uint32_t buffer_size = diameter * diameter * 4 + sizeof(gui_rgb_data_head_t);
+    uint8_t *buffer = gui_malloc(buffer_size);
+    if (buffer == NULL)
+    {
+        gui_free(img);
+        return NULL;
+    }
+    memset(buffer, 0x00, buffer_size);
+
+    // Set header
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 0;
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = ARGB8888;
+    head->w = diameter;
+    head->h = diameter;
+    head->version = 0;
+    head->rsvd2 = 0;
+
+    uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
+    uint32_t solid_color = this->color.color.argb_full;
+
+    // Fill circle with anti-aliasing
+    float center = (float)r;
+    for (int y = 0; y < diameter; y++)
+    {
+        for (int x = 0; x < diameter; x++)
+        {
+            float dx = x + 0.5f - center;
+            float dy = y + 0.5f - center;
+            float dist = sqrtf(dx * dx + dy * dy);
+
+            if (dist <= r - 0.5f)
+            {
+                // Fully inside
+                pixels[y * diameter + x] = solid_color;
+            }
+            else if (dist < r + 0.5f)
+            {
+                // Anti-aliasing edge
+                float alpha = r + 0.5f - dist;
+                gui_color_t color = this->color;
+                color.color.rgba.a = (uint8_t)(alpha * color.color.rgba.a);
+                pixels[y * diameter + x] = color.color.argb_full;
+            }
+            // else: outside, leave transparent
+        }
+    }
+
+    img->data = buffer;
+    img->blend_mode = IMG_SRC_OVER_MODE;
+    img->opacity_value = this->opacity_value;
+    img->high_quality = 1;
+
+    // Apply transformation matrix
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+
+    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(&img->inverse);
+
+    draw_img_load_scale(img, IMG_SRC_MEMADDR);
+    draw_img_new_area(img, NULL);
+
+    return img;
+}
+
 /** Set image data header for rectangle */
 static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, gui_color_t color)
 {
@@ -93,6 +180,37 @@ static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
     // For rectangle, we can use the color directly in the header
     gui_rect_file_head_t *rect_head = (gui_rect_file_head_t *)head;
     rect_head->color = color;
+}
+
+/** Create a solid color image buffer for better anti-aliasing with transformations */
+static uint8_t *create_solid_color_buffer_circle(uint16_t w, uint16_t h, gui_color_t color)
+{
+    uint32_t buffer_size = w * h * 4 + sizeof(gui_rgb_data_head_t);
+    uint8_t *buffer = gui_malloc(buffer_size);
+    if (buffer == NULL) { return NULL; }
+
+    // Set header
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 0;
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = ARGB8888;
+    head->w = w;
+    head->h = h;
+    head->version = 0;
+    head->rsvd2 = 0;
+
+    // Fill with solid color
+    uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
+    uint32_t argb = color.color.argb_full;
+    for (int i = 0; i < w * h; i++)
+    {
+        pixels[i] = argb;
+    }
+
+    return buffer;
 }
 
 /** Create a rectangle image object */
@@ -117,20 +235,51 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
     if (img == NULL) { return; }
 
     memset(img, 0x00, sizeof(draw_img_t));
-    img->blend_mode = IMG_RECT;
-    img->opacity_value = this->opacity_value;
 
-    gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
-    if (rect_data == NULL)
+    // Check if transformation is applied
+    bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f);
+
+    if (has_transform)
     {
-        gui_free(img);
-        return;
+        // Use IMG_SRC_OVER_MODE with actual pixel buffer for anti-aliasing
+        img->blend_mode = IMG_SRC_OVER_MODE;
+        img->high_quality = 1;
+        img->data = create_solid_color_buffer_circle(w, h, this->color);
+        if (img->data == NULL)
+        {
+            gui_free(img);
+            *input_img = NULL;
+            return;
+        }
+    }
+    else
+    {
+        // Use IMG_RECT for better performance when no transformation
+        img->blend_mode = IMG_RECT;
+        gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
+        if (rect_data == NULL)
+        {
+            gui_free(img);
+            return;
+        }
+
+        set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
+        img->data = rect_data;
     }
 
-    set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
-    img->data = rect_data;
+    img->opacity_value = this->opacity_value;
 
-    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    // Start with user's transformation matrix if exists, otherwise identity
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+
+    // Apply translation for this rect part (after user's transformation)
     matrix_translate(x, y, &img->matrix);
 
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
@@ -277,7 +426,14 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
     img->opacity_value = this->opacity_value;
     img->high_quality = 1;
 
-    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    // Initialize with identity matrix
+    matrix_identity(&img->matrix);
+
+    // Apply user's transformation matrix if exists
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
 
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(&img->inverse);
@@ -319,10 +475,17 @@ static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
     int base_width = head->w;
     int base_height = head->h;
 
-    // copy object matrix to img matrix
-    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    // Start with user's transformation matrix if exists, otherwise identity
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
 
-    // apply position translation
+    // Apply position translation (after user's transformation)
     matrix_translate((float)pos_x, (float)pos_y, &img->matrix);
 
     if (is_top_bottom)
@@ -368,7 +531,43 @@ static void gui_circle_prepare(gui_obj_t *obj)
 {
     gui_circle_t *this = (gui_circle_t *)obj;
     uint8_t last = this->checksum;
+
+    // Initialize obj->matrix if not already done
+    if (obj->matrix == NULL)
     {
+        obj->matrix = gui_malloc(sizeof(gui_matrix_t));
+        GUI_ASSERT(obj->matrix != NULL);
+        matrix_identity(obj->matrix);
+    }
+
+    // Apply transformations (like gui_img_prepare does)
+    float center_x = (float)this->radius;
+    float center_y = (float)this->radius;
+
+    // Apply offset first
+    matrix_translate(this->offset_x, this->offset_y, obj->matrix);
+    // Translate to center
+    matrix_translate(center_x, center_y, obj->matrix);
+    // Apply scale
+    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+    // Apply rotation
+    matrix_rotate(this->degrees, obj->matrix);
+    // Translate back
+    matrix_translate(-center_x, -center_y, obj->matrix);
+
+    // Check if we need single buffer (for transparency or small circles)
+    int diameter = this->radius * 2;
+    bool need_single_buffer = (this->color.color.rgba.a < 255) ||
+                              (diameter * diameter < 10000);
+
+    if (need_single_buffer)
+    {
+        // Use single buffer for transparency or small circles to avoid seams
+        this->center_rect = create_circle_buffer(this, obj);
+    }
+    else
+    {
+        // Use optimized multi-part rendering for large opaque circles
         // calculate inner square parameters
         int inner_half = (int)floorf(this->radius * M_SQRT1_2);
         int inner_size = inner_half * 2;
@@ -378,7 +577,6 @@ static void gui_circle_prepare(gui_obj_t *obj)
         if (arc_width < 1) { arc_width = 1; }
 
         // ensure inner square size not greater than diameter
-        int diameter = this->radius * 2;
         if (inner_size > diameter) { inner_size = diameter; }
 
         // inner square position: start from (arc_width, arc_width)
@@ -597,6 +795,13 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->color = color;
     circle->checksum = 0;
 
+    // Initialize transformation parameters
+    circle->degrees = 0.0f;
+    circle->scale_x = 1.0f;
+    circle->scale_y = 1.0f;
+    circle->offset_x = 0.0f;
+    circle->offset_y = 0.0f;
+
     return circle;
 }
 
@@ -648,4 +853,24 @@ void gui_circle_on_click(gui_circle_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);
+}
+
+void gui_circle_rotate(gui_circle_t *this, float degrees)
+{
+    GUI_ASSERT(this != NULL);
+    this->degrees = degrees;
+}
+
+void gui_circle_scale(gui_circle_t *this, float scale_x, float scale_y)
+{
+    GUI_ASSERT(this != NULL);
+    this->scale_x = scale_x;
+    this->scale_y = scale_y;
+}
+
+void gui_circle_translate(gui_circle_t *this, float tx, float ty)
+{
+    GUI_ASSERT(this != NULL);
+    this->offset_x = tx;
+    this->offset_y = ty;
 }

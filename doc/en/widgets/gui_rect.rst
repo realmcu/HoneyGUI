@@ -34,6 +34,12 @@ Core Features
      - :cpp:any:`gui_rect_set_color`
    * - Register Click Event Callback
      - :cpp:any:`gui_rect_on_click`
+   * - Rotation Transform
+     - :cpp:any:`gui_rect_rotate`
+   * - Scale Transform
+     - :cpp:any:`gui_rect_scale`
+   * - Translation Transform
+     - :cpp:any:`gui_rect_translate`
 
 Corner Radius Description
 -------------------------
@@ -53,6 +59,7 @@ Feature Highlights
 - **Transparency Support**: Uses ARGB color format for semi-transparent effects
 - **Lightweight**: Minimal memory footprint, suitable for embedded systems and resource-constrained environments
 - **Dynamic Updates**: Supports runtime dynamic modification of position and style
+- **Matrix Transforms**: Supports rotation, scale, and translation matrix transforms for complex geometric effects
 
 Use Cases
 ---------
@@ -66,6 +73,7 @@ Rounded Rectangle widgets are applicable in scenarios such as:
 - **Progress Bar Containers**: Create rounded containers for progress bars
 - **List Items**: Implement rounded list items or menu items
 - **Animated Elements**: Support animation effects with dynamic position changes
+- **Transform Animations**: Leverage rotation, scale, and translation for complex animation effects
 
 Configuration Instructions
 --------------------------

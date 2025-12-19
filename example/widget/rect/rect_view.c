@@ -14,10 +14,10 @@ static void app_rect_design(gui_view_t *view)
                              SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
-    gui_lite_round_rect_create(parent, "bg", 0, 0, 480, 480, 0, gui_rgba(255, 200, 200, 255));
-    gui_lite_round_rect_create(parent, "geometry2", 100, 200, 200, 200, 20, gui_rgba(0, 255, 0, 200));
-    gui_lite_round_rect_create(parent, "geometry3", 150, 250, 200, 200, 20, gui_rgba(0, 0, 255, 200));
-    gui_lite_round_rect_create(parent, "canvas_clear", 29, 0, 352, 120, 30, gui_rgba(39, 43, 44, 255));
+    gui_rect_create(parent, "bg", 0, 0, 480, 480, 0, gui_rgba(255, 200, 200, 255));
+    gui_rect_create(parent, "geometry2", 100, 200, 200, 200, 20, gui_rgba(0, 255, 0, 200));
+    gui_rect_create(parent, "geometry3", 150, 250, 200, 200, 20, gui_rgba(0, 0, 255, 200));
+    gui_rect_create(parent, "canvas_clear", 29, 10, 352, 100, 30, gui_rgba(39, 43, 44, 255));
 
 }
 GUI_VIEW_INSTANCE(RECT_VIEW_NAME, false, app_rect_design, 0);

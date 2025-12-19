@@ -59,6 +59,13 @@ typedef struct
     gui_color_t color;          /**< Circle color. */
     uint8_t opacity_value;      /**< Opacity value. */
     uint8_t checksum;           /**< Checksum for change detection. */
+
+    // Transformation parameters
+    float degrees;              /**< Rotation angle in degrees. */
+    float scale_x;              /**< Scale factor in X direction. */
+    float scale_y;              /**< Scale factor in Y direction. */
+    float offset_x;             /**< Translation offset in X direction. */
+    float offset_y;             /**< Translation offset in Y direction. */
 } gui_circle_t;
 
 /*============================================================================*
@@ -129,6 +136,32 @@ void gui_circle_set_color(gui_circle_t *this, gui_color_t color);
  * @param parameter Callback parameter.
  */
 void gui_circle_on_click(gui_circle_t *this, void *callback, void *parameter);
+
+/**
+ * @brief Apply rotation transformation to the circle widget.
+ *
+ * @param this Circle widget pointer.
+ * @param degrees Rotation angle in degrees (clockwise).
+ */
+void gui_circle_rotate(gui_circle_t *this, float degrees);
+
+/**
+ * @brief Apply scale transformation to the circle widget.
+ *
+ * @param this Circle widget pointer.
+ * @param scale_x Scale factor in X direction.
+ * @param scale_y Scale factor in Y direction.
+ */
+void gui_circle_scale(gui_circle_t *this, float scale_x, float scale_y);
+
+/**
+ * @brief Apply translation transformation to the circle widget.
+ *
+ * @param this Circle widget pointer.
+ * @param tx Translation in X direction (pixels).
+ * @param ty Translation in Y direction (pixels).
+ */
+void gui_circle_translate(gui_circle_t *this, float tx, float ty);
 
 #ifdef __cplusplus
 }

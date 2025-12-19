@@ -53,6 +53,13 @@ typedef struct
     int radius;                 /**< Rect radius. */
     gui_color_t color;          /**< Rect color. */
     uint8_t checksum;           /**< Checksum for change detection. */
+
+    // Transformation parameters
+    float degrees;              /**< Rotation angle in degrees. */
+    float scale_x;              /**< Scale factor in X direction. */
+    float scale_y;              /**< Scale factor in Y direction. */
+    float offset_x;             /**< Translation offset in X direction. */
+    float offset_y;             /**< Translation offset in Y direction. */
 } gui_rounded_rect_t;
 
 /*============================================================================*
@@ -130,6 +137,29 @@ void gui_rect_set_color(gui_rounded_rect_t *this, gui_color_t color);
  * @param parameter Optional parameter to pass to the callback.
  */
 void gui_rect_on_click(gui_rounded_rect_t *this, void *callback, void *parameter);
+
+/**
+ * @brief Apply rotation transformation to the rect widget.
+ * @param this Pointer to the rect widget.
+ * @param degrees Rotation angle in degrees (clockwise).
+ */
+void gui_rect_rotate(gui_rounded_rect_t *this, float degrees);
+
+/**
+ * @brief Apply scale transformation to the rect widget.
+ * @param this Pointer to the rect widget.
+ * @param scale_x Scale factor in X direction.
+ * @param scale_y Scale factor in Y direction.
+ */
+void gui_rect_scale(gui_rounded_rect_t *this, float scale_x, float scale_y);
+
+/**
+ * @brief Apply translation transformation to the rect widget.
+ * @param this Pointer to the rect widget.
+ * @param tx Translation in X direction (pixels).
+ * @param ty Translation in Y direction (pixels).
+ */
+void gui_rect_translate(gui_rounded_rect_t *this, float tx, float ty);
 
 #ifdef __cplusplus
 }

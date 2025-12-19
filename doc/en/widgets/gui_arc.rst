@@ -11,7 +11,7 @@ The Geometry Arc widget is a lightweight :term:`GUI` drawing component designed 
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1763432727908123796/8b4e718c_13406851.png" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1766129069269773340/db7572e4_13406851.png" width= "400" /></div>
    <br>
 
 Core Features
@@ -38,6 +38,12 @@ Core Features
      - :cpp:any:`gui_arc_set_line_width`
    * - Register Click Event Callback
      - :cpp:any:`gui_arc_on_click`
+   * - Rotation Transform
+     - :cpp:any:`gui_arc_rotate`
+   * - Scale Transform
+     - :cpp:any:`gui_arc_scale`
+   * - Translation Transform
+     - :cpp:any:`gui_arc_translate`
 
 Angle Description
 -----------------
@@ -57,6 +63,7 @@ Features Highlights
 - **Flexible Configuration**: Allows customization of angle range, line width, and color
 - **Lightweight**: Minimal memory footprint, suitable for embedded systems and resource-constrained environments
 - **Ring Support**: Automatically draws a full circle when start and end angles differ by 360°
+- **Matrix Transforms**: Supports rotation, scale, and translation matrix transforms for complex arc effects
 
 Use Cases
 ---------
@@ -68,6 +75,7 @@ The arc widget is useful in scenarios such as:
 - **Data Visualization**: Showing proportional data, statistical charts
 - **UI Decoration**: As decorative elements in the interface
 - **State Indicators**: Representing system statuses, connection statuses, etc.
+- **Transform Animations**: Leverage rotation, scale, and translation for complex arc animation effects
 
 Configuration Instructions
 --------------------------

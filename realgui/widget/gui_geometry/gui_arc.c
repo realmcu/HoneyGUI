@@ -101,6 +101,31 @@ static void set_img_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
 
 static void gui_arc_prepare(gui_arc_t *this)
 {
+    gui_obj_t *obj = (gui_obj_t *)this;
+
+    // Initialize obj->matrix if not already done
+    if (obj->matrix == NULL)
+    {
+        obj->matrix = gui_malloc(sizeof(gui_matrix_t));
+        GUI_ASSERT(obj->matrix != NULL);
+        matrix_identity(obj->matrix);
+    }
+
+    // Apply transformations (like gui_img_prepare does)
+    float center_x = obj->w / 2.0f;
+    float center_y = obj->h / 2.0f;
+
+    // Apply offset first
+    matrix_translate(this->offset_x, this->offset_y, obj->matrix);
+    // Translate to center
+    matrix_translate(center_x, center_y, obj->matrix);
+    // Apply scale
+    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+    // Apply rotation
+    matrix_rotate(this->degrees, obj->matrix);
+    // Translate back
+    matrix_translate(-center_x, -center_y, obj->matrix);
+
     gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED);
     // Check if we need to re-render
     if (!this->buffer_valid || is_arc_dirty(this))
@@ -127,7 +152,16 @@ static void gui_arc_draw(gui_arc_t *this)
         // We just need to position the buffer at the widget's location
         // No offset needed since arc->x, arc->y are already relative to the bounding box
 
-        memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+        // Initialize with identity matrix or copy user's matrix
+        if (obj->matrix != NULL)
+        {
+            memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+        }
+        else
+        {
+            matrix_identity(&this->draw_img->matrix);
+        }
+
         memcpy(&this->draw_img->inverse, &this->draw_img->matrix, sizeof(struct gui_matrix));
         matrix_inverse(&this->draw_img->inverse);
 
@@ -345,6 +379,13 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
     }
     GET_BASE(arc)->create_done = true;
 
+    // Initialize transformation parameters
+    arc->degrees = 0.0f;
+    arc->scale_x = 1.0f;
+    arc->scale_y = 1.0f;
+    arc->offset_x = 0.0f;
+    arc->offset_y = 0.0f;
+
     return arc;
 }
 
@@ -397,4 +438,27 @@ void gui_arc_on_click(gui_arc_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);
+}
+
+void gui_arc_rotate(gui_arc_t *this, float degrees)
+{
+    GUI_ASSERT(this != NULL);
+    this->degrees = degrees;
+    this->buffer_valid = false;
+}
+
+void gui_arc_scale(gui_arc_t *this, float scale_x, float scale_y)
+{
+    GUI_ASSERT(this != NULL);
+    this->scale_x = scale_x;
+    this->scale_y = scale_y;
+    this->buffer_valid = false;
+}
+
+void gui_arc_translate(gui_arc_t *this, float tx, float ty)
+{
+    GUI_ASSERT(this != NULL);
+    this->offset_x = tx;
+    this->offset_y = ty;
+    this->buffer_valid = false;
 }

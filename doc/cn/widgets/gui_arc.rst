@@ -11,7 +11,7 @@
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1763432727908123796/8b4e718c_13406851.png" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1766129069269773340/db7572e4_13406851.png" width= "400" /></div>
    <br>
 
 核心功能
@@ -38,6 +38,12 @@
      - :cpp:any:`gui_arc_set_line_width`
    * - 注册点击事件回调
      - :cpp:any:`gui_arc_on_click`
+   * - 旋转变换
+     - :cpp:any:`gui_arc_rotate`
+   * - 缩放变换
+     - :cpp:any:`gui_arc_scale`
+   * - 平移变换
+     - :cpp:any:`gui_arc_translate`
 
 角度说明
 --------
@@ -57,6 +63,7 @@
 - **灵活配置**: 支持自定义角度范围、线宽和颜色
 - **轻量级**: 内存占用小，适合嵌入式系统和资源受限环境
 - **圆环支持**: 当起始角度和结束角度相差360°时，自动绘制完整圆环
+- **矩阵变换**: 支持旋转、缩放、平移等矩阵变换操作，实现复杂的圆弧变换效果
 
 应用场景
 --------
@@ -68,6 +75,7 @@
 - **数据可视化**: 展示比例数据、统计图表
 - **用户界面装饰**: 作为界面的装饰元素
 - **状态指示**: 表示系统状态、连接状态等
+- **变换动画**: 利用旋转、缩放、平移实现复杂的圆弧动画效果
 
 配置说明
 --------

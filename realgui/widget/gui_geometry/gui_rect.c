@@ -64,6 +64,37 @@ static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
     rect_head->color = color;
 }
 
+/** Create a solid color image buffer for better anti-aliasing with transformations */
+static uint8_t *create_solid_color_buffer(uint16_t w, uint16_t h, gui_color_t color)
+{
+    uint32_t buffer_size = w * h * 4 + sizeof(gui_rgb_data_head_t);
+    uint8_t *buffer = gui_malloc(buffer_size);
+    if (buffer == NULL) { return NULL; }
+
+    // Set header
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 0;
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = ARGB8888;
+    head->w = w;
+    head->h = h;
+    head->version = 0;
+    head->rsvd2 = 0;
+
+    // Fill with solid color
+    uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
+    uint32_t argb = color.color.argb_full;
+    for (int i = 0; i < w * h; i++)
+    {
+        pixels[i] = argb;
+    }
+
+    return buffer;
+}
+
 /** Create a rectangle image object */
 static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16_t x,
                          int16_t y, uint16_t w, uint16_t h)
@@ -71,13 +102,45 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     memset(img, 0x00, sizeof(draw_img_t));
-    img->blend_mode = IMG_RECT;
-    img->opacity_value = UINT8_MAX;
-    gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
-    set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
-    img->data = rect_data;
 
-    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    // Check if transformation is applied
+    bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f);
+
+    if (has_transform)
+    {
+        // Use IMG_SRC_OVER_MODE with actual pixel buffer for anti-aliasing
+        img->blend_mode = IMG_SRC_OVER_MODE;
+        img->high_quality = 1;
+        img->data = create_solid_color_buffer(w, h, this->color);
+        if (img->data == NULL)
+        {
+            gui_free(img);
+            *input_img = NULL;
+            return;
+        }
+    }
+    else
+    {
+        // Use IMG_RECT for better performance when no transformation
+        img->blend_mode = IMG_RECT;
+        gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
+        set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
+        img->data = rect_data;
+    }
+
+    img->opacity_value = UINT8_MAX;
+
+    // Start with user's transformation matrix if exists, otherwise identity
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+
+    // Apply translation for this rect part (after user's transformation)
     matrix_translate(x, y, &img->matrix);
 
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
@@ -185,6 +248,131 @@ static void prepare_arc_img(gui_rounded_rect_t *this, uint8_t *circle_data, int 
     }
 }
 
+/** Create a complete rounded rectangle in a single buffer to avoid seams */
+static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_t *obj)
+{
+    int w = this->base.w;
+    int h = this->base.h;
+    int r = this->radius;
+
+    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
+    if (img == NULL) { return NULL; }
+    memset(img, 0x00, sizeof(draw_img_t));
+
+    // Create pixel buffer
+    uint32_t buffer_size = w * h * 4 + sizeof(gui_rgb_data_head_t);
+    uint8_t *buffer = gui_malloc(buffer_size);
+    if (buffer == NULL)
+    {
+        gui_free(img);
+        return NULL;
+    }
+    memset(buffer, 0x00, buffer_size);
+
+    // Set header
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 0;
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = ARGB8888;
+    head->w = w;
+    head->h = h;
+    head->version = 0;
+    head->rsvd2 = 0;
+
+    uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
+    uint32_t solid_color = this->color.color.argb_full;
+
+    // Fill rounded rectangle with anti-aliasing
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            // Check if pixel is in corner region
+            bool in_corner = false;
+            float dx = 0, dy = 0;
+
+            // Top-left corner
+            if (x < r && y < r)
+            {
+                dx = r - x - 0.5f;
+                dy = r - y - 0.5f;
+                in_corner = true;
+            }
+            // Top-right corner
+            else if (x >= w - r && y < r)
+            {
+                dx = x - (w - r) + 0.5f;
+                dy = r - y - 0.5f;
+                in_corner = true;
+            }
+            // Bottom-left corner
+            else if (x < r && y >= h - r)
+            {
+                dx = r - x - 0.5f;
+                dy = y - (h - r) + 0.5f;
+                in_corner = true;
+            }
+            // Bottom-right corner
+            else if (x >= w - r && y >= h - r)
+            {
+                dx = x - (w - r) + 0.5f;
+                dy = y - (h - r) + 0.5f;
+                in_corner = true;
+            }
+
+            if (in_corner)
+            {
+                float dist = sqrtf(dx * dx + dy * dy);
+                if (dist <= r - 0.5f)
+                {
+                    // Fully inside
+                    pixels[y * w + x] = solid_color;
+                }
+                else if (dist < r + 0.5f)
+                {
+                    // Anti-aliasing edge
+                    float alpha = r + 0.5f - dist;
+                    gui_color_t color = this->color;
+                    color.color.rgba.a = (uint8_t)(alpha * color.color.rgba.a);
+                    pixels[y * w + x] = color.color.argb_full;
+                }
+                // else: outside, leave transparent
+            }
+            else
+            {
+                // Inside main rectangle area
+                pixels[y * w + x] = solid_color;
+            }
+        }
+    }
+
+    img->data = buffer;
+    img->blend_mode = IMG_SRC_OVER_MODE;
+    img->opacity_value = this->opacity_value;
+    img->high_quality = 1;
+
+    // Apply transformation matrix
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+
+    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(&img->inverse);
+
+    draw_img_load_scale(img, IMG_SRC_MEMADDR);
+    draw_img_new_area(img, NULL);
+
+    return img;
+}
+
 /** Create corner image for specific corner */
 static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
                                      int corner_idx, int x, int y)
@@ -228,11 +416,19 @@ static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
     img->opacity_value = this->opacity_value;
     img->high_quality = 1;
 
-    // Set up transformation matrix
-    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    // Start with user's transformation matrix if exists, otherwise identity
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+
+    // Apply translation for this corner (after user's transformation)
     matrix_translate(x, y, &img->matrix);
 
-    // No rotation needed since we're generating each corner separately
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(&img->inverse);
 
@@ -247,20 +443,48 @@ static void gui_rect_prepare(gui_obj_t *obj)
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     uint8_t last;
 
+    // Initialize obj->matrix if not already done
+    if (obj->matrix == NULL)
+    {
+        obj->matrix = gui_malloc(sizeof(gui_matrix_t));
+        GUI_ASSERT(obj->matrix != NULL);
+        matrix_identity(obj->matrix);
+    }
+
+    // Apply transformations (like gui_img_prepare does)
+    float center_x = this->base.w / 2.0f;
+    float center_y = this->base.h / 2.0f;
+
+    // Apply offset first
+    matrix_translate(this->offset_x, this->offset_y, obj->matrix);
+    // Translate to center
+    matrix_translate(center_x, center_y, obj->matrix);
+    // Apply scale
+    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+    // Apply rotation
+    matrix_rotate(this->degrees, obj->matrix);
+    // Translate back
+    matrix_translate(-center_x, -center_y, obj->matrix);
+
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+
+    // Check if we need single buffer (for transparency or small size)
+    bool need_single_buffer = (this->color.color.rgba.a < 255) ||
+                              (this->base.w * this->base.h <= 40000);
+
     if (this->radius == 0)
     {
-        set_rect_img(this, &this->rect_0, \
-                     0, \
-                     0, \
-                     this->base.w, \
-                     this->base.h);
+        // Simple rectangle without rounded corners
+        set_rect_img(this, &this->rect_0, 0, 0, this->base.w, this->base.h);
     }
-    // Create rectangle parts with precise boundaries (no overlap)
-    // Corners are (radius+1) x (radius+1) and now fill all rows including row 0
-    // corner_idx: 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
+    else if (need_single_buffer)
+    {
+        // Use single buffer for transparency or small rectangles to avoid seams
+        this->rect_0 = create_rounded_rect_buffer(this, obj);
+    }
     else
     {
+        // Use optimized multi-part rendering for large opaque rectangles
         // Top rectangle: between the two top corners
         set_rect_img(this, &this->rect_0, \
                      this->radius + 1,  \
@@ -305,7 +529,7 @@ static void gui_rect_draw(gui_obj_t *obj)
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
-    // Draw all parts in order
+    // Draw all parts
     if (this->rect_0 != NULL) { gui_acc_blit_to_dc(this->rect_0, dc, NULL); }
     if (this->rect_1 != NULL) { gui_acc_blit_to_dc(this->rect_1, dc, NULL); }
     if (this->rect_2 != NULL) { gui_acc_blit_to_dc(this->rect_2, dc, NULL); }
@@ -413,6 +637,13 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
     round_rect->radius = radius;
     round_rect->color = color;
 
+    // Initialize transformation parameters
+    round_rect->degrees = 0.0f;
+    round_rect->scale_x = 1.0f;
+    round_rect->scale_y = 1.0f;
+    round_rect->offset_x = 0.0f;
+    round_rect->offset_y = 0.0f;
+
     return round_rect;
 }
 
@@ -461,4 +692,24 @@ void gui_rect_on_click(gui_rounded_rect_t *this, void *callback, void *parameter
 {
     gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);
+}
+
+void gui_rect_rotate(gui_rounded_rect_t *this, float degrees)
+{
+    GUI_ASSERT(this != NULL);
+    this->degrees = degrees;
+}
+
+void gui_rect_scale(gui_rounded_rect_t *this, float scale_x, float scale_y)
+{
+    GUI_ASSERT(this != NULL);
+    this->scale_x = scale_x;
+    this->scale_y = scale_y;
+}
+
+void gui_rect_translate(gui_rounded_rect_t *this, float tx, float ty)
+{
+    GUI_ASSERT(this != NULL);
+    this->offset_x = tx;
+    this->offset_y = ty;
 }

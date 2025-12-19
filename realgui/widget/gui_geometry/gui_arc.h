@@ -67,6 +67,13 @@ typedef struct
     float cached_end_angle;
     float cached_line_width;
     gui_color_t cached_color;
+
+    // Transformation parameters
+    float degrees;              /**< Rotation angle in degrees. */
+    float scale_x;              /**< Scale factor in X direction. */
+    float scale_y;              /**< Scale factor in Y direction. */
+    float offset_x;             /**< Translation offset in X direction. */
+    float offset_y;             /**< Translation offset in Y direction. */
 } gui_arc_t;
 
 /*============================================================================*
@@ -144,6 +151,29 @@ void gui_arc_set_line_width(gui_arc_t *this, float line_width);
  * @param parameter Optional parameter to pass to callback.
  */
 void gui_arc_on_click(gui_arc_t *this, void *callback, void *parameter);
+
+/**
+ * @brief Apply rotation transformation to the arc widget.
+ * @param this Pointer to the arc widget.
+ * @param degrees Rotation angle in degrees (clockwise).
+ */
+void gui_arc_rotate(gui_arc_t *this, float degrees);
+
+/**
+ * @brief Apply scale transformation to the arc widget.
+ * @param this Pointer to the arc widget.
+ * @param scale_x Scale factor in X direction.
+ * @param scale_y Scale factor in Y direction.
+ */
+void gui_arc_scale(gui_arc_t *this, float scale_x, float scale_y);
+
+/**
+ * @brief Apply translation transformation to the arc widget.
+ * @param this Pointer to the arc widget.
+ * @param tx Translation in X direction (pixels).
+ * @param ty Translation in Y direction (pixels).
+ */
+void gui_arc_translate(gui_arc_t *this, float tx, float ty);
 
 #ifdef __cplusplus
 }

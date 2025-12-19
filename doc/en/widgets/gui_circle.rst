@@ -34,6 +34,12 @@ Core Features
      - :cpp:any:`gui_circle_set_color`
    * - Register Click Event Callback
      - :cpp:any:`gui_circle_on_click`
+   * - Rotation Transform
+     - :cpp:any:`gui_circle_rotate`
+   * - Scale Transform
+     - :cpp:any:`gui_circle_scale`
+   * - Translation Transform
+     - :cpp:any:`gui_circle_translate`
 
 Circle Characteristics
 ----------------------
@@ -54,6 +60,7 @@ Feature Highlights
 - **Transparency Support**: Supports ARGB color format for semi-transparent circle effects
 - **Lightweight**: Minimal memory usage, suitable for embedded systems and resource-limited environments
 - **Dynamic Updates**: Allows for runtime dynamic modification of position and style
+- **Matrix Transforms**: Supports rotation, scale, and translation matrix transforms to create ellipses and complex transform effects
 
 Use Cases
 ---------
@@ -67,6 +74,8 @@ The circle widget is suitable for the following scenarios:
 - **Button Design**: Implement circular interactive buttons
 - **Decorative Elements**: Serve as decorative circular elements in the UI
 - **Data Visualization**: Used in pie charts, radar charts, etc., for data visualization components
+- **Ellipse Drawing**: Create ellipse shapes using scale transforms
+- **Transform Animations**: Leverage rotation, scale, and translation for complex animation effects
 
 Configuration Instructions
 --------------------------
