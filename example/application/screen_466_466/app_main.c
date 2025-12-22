@@ -11,6 +11,7 @@
 #include "gui_text.h"
 #include "def_msg.h"
 #include "gui_message.h"
+#include "trace.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -194,6 +195,7 @@ static char ip_string_buffer[16] = {"192.168.137.1"};
 static int ip_string_buffer_index = 0;
 static void jump_to_camera_view(void)
 {
+    gui_log("[Yuyin] jump_to_camera_view");
     gui_view_switch_direct(image_466_466_view_keyboard, gui_view_descriptor_image_466_466_camera.name,
                            SWITCH_OUT_ANIMATION_MOVE_TO_LEFT, SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT
                           );
@@ -217,6 +219,7 @@ static void jump_to_keyboard_view(void)
 }
 static void jump_to_keyboard_view_camera(void)
 {
+    gui_log("[Yuyin] jump_to_keyboard_view_camera called\n");
     before_keyboard = BEFORE_KEYBOARD_CAMERA;
     jump_to_keyboard_view();
 
@@ -224,6 +227,7 @@ static void jump_to_keyboard_view_camera(void)
 }
 static void jump_to_keyboard_view_ota(void)
 {
+    gui_log("[Yuyin] jump_to_keyboard_view_ota called\n");
     before_keyboard = BEFORE_KEYBOARD_OTA;
     jump_to_keyboard_view();
 }
@@ -292,6 +296,7 @@ const __attribute__((aligned(8))) unsigned char video_logo_image[] =
 };
 static void view_switch_in_camera(gui_view_t *view)
 {
+    DBG_DIRECT("[Yuyin] view_switch_in_camera");
     gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
@@ -344,6 +349,8 @@ static void view_switch_out_camera(gui_view_t *view)
     wifi_gui_msg_handler(1, NULL);
 #endif
 
+    password_flag = false;
+
 #ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_gui_camera_exit_cb(void);
     wifi_gui_camera_exit_cb();
@@ -372,6 +379,7 @@ static void view_switch_in_ota(gui_view_t *view)
 static void view_switch_out_ota(gui_view_t *view)
 {
     GUI_UNUSED(view);
+    password_flag = false;
 #ifndef _HONEYGUI_SIMULATOR_
     extern void wifi_ota_exit_cb(void);
     wifi_ota_exit_cb();
@@ -501,14 +509,31 @@ static void input_ip4(char *digit);
 static void view_switch_out_keyboard(gui_view_t *view)
 {
     GUI_UNUSED(view);
+    gui_log("[Yuyin] view_switch_out_keyboard, password_flag %d", password_flag);
+    if (!password_flag)
+    {
+#ifndef _WIN32
+        void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
+        wifi_gui_msg_handler(1, NULL); // 1: wifi power off
+#endif
+    }
+    else
+    {
+        gui_set_keep_active_time(0xFFFFFFFF);
+    }
 }
 static void view_switch_in_keyboard(gui_view_t *view)
 {
 #ifndef _HONEYGUI_SIMULATOR_
+    gui_log("[Yuyin] view_switch_in_keyboard, before_keyboard %d", before_keyboard);
+
     // void wifi_camera_exit_cb(void);
     // wifi_camera_exit_cb();
-    void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
-    wifi_gui_msg_handler(2, NULL);
+    if (before_keyboard == BEFORE_KEYBOARD_CAMERA)
+    {
+        void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
+        wifi_gui_msg_handler(2, NULL);
+    }
 #endif
 
     input_ip4_x = 0;
@@ -637,6 +662,7 @@ static struct tm *localtime_r_compat(const time_t *timep, struct tm *result)
 #define localtime_r localtime_r_compat
 #endif
 
+
 static void switch_widget_play_watchface(void *p)
 {
     int watchface_hour = 10;
@@ -655,6 +681,12 @@ static void switch_widget_play_watchface(void *p)
         }
     }
 #endif
+
+    // user code start
+    void wifi_gui_get_clock_time(int *hour, int *minute);
+    wifi_gui_get_clock_time(&watchface_hour, &watchface_minute);
+    // user code end
+
     int index_hour_tens = watchface_hour / 10;
     int index_hour_units = watchface_hour % 10;
     int index_min_tens = watchface_minute / 10;
@@ -1307,6 +1339,8 @@ static void view_switch_in(gui_view_t *view)
 #ifndef _HONEYGUI_SIMULATOR_
     // extern void wifi_setting_enter_cb(void);
     // wifi_setting_enter_cb();
+    DBG_DIRECT("[Yuyin] view_switch_in");
+    gui_set_keep_active_time(60000);
 #endif
     gui_view_switch_on_event(view, gui_view_descriptor_image_466_466_watchface.name,
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
