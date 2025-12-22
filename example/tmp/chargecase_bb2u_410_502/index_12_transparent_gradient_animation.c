@@ -114,7 +114,7 @@ static void transparent_gradient_animation_switch_in(gui_view_t *view)
     {
         gui_img_t *img =
             gui_img_create_from_mem(view,
-                                    0, (void *)FILE_POINTER(BOTTOM_BG_BIN), 0, 0, 0, 0);
+                                    0, BOTTOM_BG_BIN, 0, 0, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
 
@@ -122,7 +122,7 @@ static void transparent_gradient_animation_switch_in(gui_view_t *view)
     {
         gui_img_t *img =
             gui_img_create_from_mem(view,
-                                    0, (void *)FILE_POINTER(BOTTOM_BG_BIN), 0, 0, 0, 0);
+                                    0, BOTTOM_BG_BIN, 0, 0, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_obj_create_timer((void *)img, 10, true, switch_widget_play_watchface);
 
@@ -130,7 +130,7 @@ static void transparent_gradient_animation_switch_in(gui_view_t *view)
     {
         gui_img_t *img =
             gui_img_create_from_mem(view,
-                                    0, (void *)FILE_POINTER(MODE_CONT_BIN), 0, 0, 0, 0);
+                                    0, MODE_CONT_BIN, 0, 0, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_obj_create_timer((void *)img, 10, true, switch_widget_play_watchface2);
 
@@ -138,7 +138,7 @@ static void transparent_gradient_animation_switch_in(gui_view_t *view)
     {
         gui_img_t *img =
             gui_img_create_from_mem(view,
-                                    0, (void *)FILE_POINTER(RETURN_BIN), 0, 0, 0, 0);
+                                    0, RETURN_BIN, 0, 0, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_obj_create_timer((void *)img, 10, true, switch_widget_play_watchface3);
 

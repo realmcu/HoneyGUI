@@ -56,8 +56,6 @@
 // Public macro interface
 #define GUI_VIEW_INSTANCE(view_name, view_keep, on_switch_in_func, on_switch_out_func) \
     _GUI_VIEW_INSTANCE_IMPL(view_name, view_keep, on_switch_in_func, on_switch_out_func, __LINE__)
-extern unsigned char *resource_root;
-#define FILE_POINTER(ADDRESS) (const uint8_t *)(resource_root + ADDRESS)
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
 /**
 * @brief Macro to get a widget pointer by name from the root of a GUI object tree.

@@ -122,7 +122,7 @@ static void entrance_animation(void *p)
         gui_text_t *text = gui_text_create(GUI_BASE(p)->parent, 0, 180, 0, 40, 502);
         gui_text_set(text, battery_tx_str, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(battery_tx_str),
                      40);
-        gui_text_type_set(text, (void *)FILE_POINTER(NOTO_SANS_SC_BOLD_FONT_BIN), FONT_SRC_MEMADDR);
+        gui_text_type_set(text, NOTO_SANS_SC_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, VERTICAL_LEFT_MID);
         gui_text_rendermode_set(text, 2);
         gui_obj_create_timer(GUI_BASE(text), 30, true, battery_update_cb);
@@ -140,7 +140,7 @@ static void charging_view_design(gui_view_t *view)
     animation_cnt = 0;
 
     gui_obj_t *parent = GUI_BASE(view);
-    gui_img_t *bg = gui_img_create_from_mem(parent, "bg", (void *)FILE_POINTER(BG_CHARGE_BIN), 0, 0, 0,
+    gui_img_t *bg = gui_img_create_from_mem(parent, "bg", BG_CHARGE_BIN, 0, 0, 0,
                                             0);
     gui_img_set_mode(bg, IMG_COVER_MODE);
     gui_img_set_opacity(bg, 1);
@@ -148,7 +148,7 @@ static void charging_view_design(gui_view_t *view)
     float focus_x = 36.f;
     float focus_y = 87.f / 2;
     gui_img_t *charging_icon = gui_img_create_from_mem(parent, "icon",
-                                                       (void *)FILE_POINTER(ICON_CHARGING_BIN),
+                                                       ICON_CHARGING_BIN,
                                                        ICON_CHARGING_START_X + focus_x, ICON_CHARGING_Y + focus_y, 0, 0);
     gui_img_set_focus(charging_icon, focus_x, focus_y);
     gui_img_set_opacity(charging_icon, 1);

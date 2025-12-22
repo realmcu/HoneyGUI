@@ -69,18 +69,18 @@ void fps_create(void *parent)
     text = fps;
     gui_text_t *t_fps = gui_text_create(fps_rect, "t_fps", 10, 0, gui_get_screen_width(), font_size);
     gui_text_set(t_fps, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(t_fps, (void *)FILE_POINTER(HEADING_1_BIN), FONT_SRC_MEMADDR);
+    gui_text_type_set(t_fps, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_t *widget_count = gui_text_create(fps_rect, "widget_count", 10, 16, gui_get_screen_width(),
                                                font_size);
     gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(widget_count, (void *)FILE_POINTER(HEADING_1_BIN), FONT_SRC_MEMADDR);
+    gui_text_type_set(widget_count, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_t *mem = gui_text_create(fps_rect, "mem", 10, 16 * 2, gui_get_screen_width(), font_size);
     gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(mem, (void *)FILE_POINTER(HEADING_1_BIN), FONT_SRC_MEMADDR);
+    gui_text_type_set(mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_t *low_mem = gui_text_create(fps_rect, "low_mem", 10, 16 * 3, gui_get_screen_width(),
                                           font_size);
     gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(low_mem, (void *)FILE_POINTER(HEADING_1_BIN), FONT_SRC_MEMADDR);
+    gui_text_type_set(low_mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
 }
 
 

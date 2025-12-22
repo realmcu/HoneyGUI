@@ -181,7 +181,7 @@ static void press_tab(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
 
     gui_img_t *img = (gui_img_t *)obj;
-    gui_img_set_image_data(img, (void *)FILE_POINTER(ICON_PRESSING_BIN));
+    gui_img_set_image_data(img, ICON_PRESSING_BIN);
     gui_img_scale(img, 0.8f, 0.8f);
     gui_obj_create_timer(GUI_BASE(img), 10, true, tab_scale);
     gui_obj_start_timer(GUI_BASE(img));
@@ -226,7 +226,7 @@ void lock_view_design(gui_view_t *view)
     gui_img_set_quality(tab, true);
     gui_obj_add_event_cb(tab, press_tab, GUI_EVENT_TOUCH_PRESSED, NULL);
 
-    gui_img_create_from_mem(tab, 0, (void *)FILE_POINTER(ICON_TAB_BIN), 27, 27, 0, 0);
+    gui_img_create_from_mem(tab, 0, ICON_TAB_BIN, 27, 27, 0, 0);
 
-    gui_img_create_from_mem(parent, 0, (void *)FILE_POINTER(LOCK_OPEN_BIN), 187, 339, 0, 0);
+    gui_img_create_from_mem(parent, 0, LOCK_OPEN_BIN, 187, 339, 0, 0);
 }

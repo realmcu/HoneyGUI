@@ -14,7 +14,7 @@ static void smooth_gradient_image_switch_in(gui_view_t *view)
                              GUI_EVENT_TOUCH_MOVE_LEFT);
     gui_img_t *img =
         gui_img_create_from_mem(view,
-                                0, (void *)FILE_POINTER(BOTTOM_BG_BIN), 0, 0, 0, 0);
+                                0, BOTTOM_BG_BIN, 0, 0, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 }
 

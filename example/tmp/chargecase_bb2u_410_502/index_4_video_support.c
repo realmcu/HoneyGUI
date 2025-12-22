@@ -60,7 +60,7 @@ static void video_support_switch_in(gui_view_t *view)
 
 
     gui_video_t *video = gui_video_create_from_mem(view, "video",
-                                                   (void *)FILE_POINTER(EARTH_420_410_502_40_LQ_MJPG), 0, 0,
+                                                   EARTH_420_410_502_40_LQ_MJPG, 0, 0,
                                                    410,
                                                    502);
     gui_video_set_frame_rate(video, 30.f);

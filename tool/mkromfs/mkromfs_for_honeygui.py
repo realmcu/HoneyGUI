@@ -213,10 +213,10 @@ class Folder(object):
                 macro_base = ''.join(ch if ch.isalnum() else '_' for ch in str(c._name))
                 macro_name = (macro_base if macro_base and not macro_base[0].isdigit() else 'F_' + macro_base).upper()
                 resource_defines['if_defs'].append(
-                    f"#define   {macro_name:<40}(void *)(resource_root + 0x{offset:08x})"
+                    f"#define   {macro_name:<40} (void *)(resource_root + 0x{offset:08x})"
                 )
                 resource_defines['else_defs'].append(
-                    f"#define   {macro_name:<40}(void *)(0x{data_addr:08x})"
+                    f"#define   {macro_name:<40} (void *)(0x{data_addr:08x})"
                 )
                 
                 data = add_data + c.bin_data(data_addr)
