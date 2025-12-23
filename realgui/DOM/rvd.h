@@ -537,4 +537,74 @@ extern gui_animate_callback_t rvd_app_ota_window_animate_callback;
  * @param parameter Pointer to the parameter to be passed to the callback function.
  */
 void rvd_function_async(void *function, void *parameter);
+
+/**
+ * @brief Replace the image sequence of an animated image widget.
+ *
+ * This function replaces the image array used for frame animation in an image widget.
+ * It can be used to dynamically change the animation frames at runtime.
+ *
+ * @param img_widget Pointer to the image widget (gui_img_t*).
+ * @param new_image_array Array of pointers to new image data.
+ * @param new_image_count Number of images in the new array.
+ * @return true if successful, false if failed.
+ */
+bool gui_img_set_animate_images(gui_img_t *img_widget, void **new_image_array, int new_image_count);
+
+/**
+ * @brief Replace the image sequence of an animated image widget by folder path.
+ *
+ * This function loads all images from a specified folder and replaces
+ * the animation frames of the image widget.
+ *
+ * @param img_widget Pointer to the image widget (gui_img_t*).
+ * @param folder_path Folder path containing the new image sequence (relative to GUI_ROOT_FOLDER).
+ * @return true if successful, false if failed.
+ */
+bool gui_img_set_animate_images_from_folder(gui_img_t *img_widget, const char *folder_path);
+
+/**
+ * @brief Replace the image sequence of an animated image widget by folder path.
+ *
+ * This function loads all images from a specified folder and replaces
+ * the animation frames of the image widget.
+ *
+ * @param img_widget Pointer to the image widget (gui_img_t*).
+ * @param folder_path Folder path containing the new image sequence (relative to GUI_ROOT_FOLDER).
+ * @return true if successful, false if failed.
+ */
+bool gui_img_set_animate_images_from_folder(gui_img_t *img_widget, const char *folder_path);
+/**
+ * @brief Sets up horizontal scrolling animation for a text widget
+ *
+ * This function configures a text widget to scroll horizontally when its content
+ * is wider than the display area. It calculates the appropriate animation duration
+ * based on a fixed scroll speed and sets up the scrolling animation.
+ *
+ * @param textbox Pointer to the gui_text_t widget to configure for scrolling
+ *
+ * @note The function will only enable scrolling if the text content width exceeds
+ *       the widget's default width
+ * @note The scroll speed is defined by TEXTIMG_SCROLL_SPEED constant
+ * @note Animation duration is calculated as: (scroll_distance / speed) * 1000 ms,
+ *       with a minimum duration of 1000 ms
+ */
+
+
+void rvd_set_text_scroll(gui_text_t *textbox);
+/**
+ * @brief Gets the total width of characters in a text widget
+ *
+ * This function calculates and returns the full width required to display
+ * all UTF-8 characters in the text widget's content.
+ *
+ * @param textbox Pointer to the gui_text_t widget to measure
+ * @return int The total width in pixels required to display the text content
+ */
+
+
+int rvd_text_get_chars_width(gui_text_t *textbox);
+
+
+
 #endif /* _RVD_H_ */

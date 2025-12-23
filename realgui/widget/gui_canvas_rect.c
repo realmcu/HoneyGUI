@@ -24,6 +24,7 @@
 #include <draw_img.h>
 #include "acc_init.h"
 #include <tp_algo.h>
+#include "gui_win.h"
 
 
 /*============================================================================*
@@ -116,12 +117,101 @@ static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
     head->h = this->base.h;
 
     const_color->color = this->color;
-
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&this->draw_img->inverse);
     draw_img_load_scale(this->draw_img, IMG_SRC_MEMADDR);
+
+    // Check if parent WINDOW has scope enabled
+    {
+        this->scope = 0;
+        gui_obj_t *o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope && !this->scope_flag)
+            {
+                this->scope = 1;
+                break;
+            }
+        }
+    }
+
+    // Calculate scope area if scope is enabled
+    if (this->scope)
+    {
+        gui_obj_t *o = obj;
+        gui_win_t *win_scope = 0;
+        this->ax = obj->x;
+        this->ay = obj->y;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+            {
+                win_scope = (void *)o;
+                break;
+            }
+        }
+        o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            this->ax += o->x;
+            this->ay += o->y;
+        }
+        if (win_scope)
+        {
+            int ax = win_scope->base.x;
+            int ay = win_scope->base.y;
+            o = GUI_BASE(win_scope);
+            while (o->parent != NULL)
+            {
+                o = o->parent;
+                ax += o->x;
+                ay += o->y;
+            }
+            int w_w = win_scope->base.w;
+            int w_h = win_scope->base.h;
+            int rect_x = this->ax;
+            int rect_y = this->ay;
+            int rect_w = this->draw_img->img_w;
+            int rect_h = this->draw_img->img_h;
+
+            this->scope_x1 = 0;
+            this->scope_x2 = rect_w;
+            this->scope_y1 = 0;
+            this->scope_y2 = rect_h;
+            obj->not_show = 0;
+
+            if (ax > rect_x)
+            {
+                this->scope_x1 = ax - rect_x;
+            }
+            if (ay > rect_y)
+            {
+                this->scope_y1 = ay - rect_y;
+            }
+            if (ax + w_w < rect_x + rect_w)
+            {
+                this->scope_x2 = -(rect_x - (ax + w_w));
+            }
+            if (ay + w_h < rect_y + rect_h)
+            {
+                this->scope_y2 = -(rect_y - (ay + w_h));
+            }
+            if (ay + w_h < rect_y)
+            {
+                this->scope_y2 = this->scope_y1 - 1;
+            }
+            if (ay > rect_y + rect_h)
+            {
+                this->scope_y2 = this->scope_y1 - 1;
+            }
+        }
+    }
+
     draw_img_new_area(this->draw_img, NULL);
 
 }
@@ -137,7 +227,21 @@ static void gui_canvas_rect_draw(gui_canvas_rect_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+    if (this->scope || this->scope_flag)
+    {
+        gui_rect_t rect =
+        {
+            .x1 = this->scope_x1,
+            .x2 = this->scope_x2,
+            .y1 = this->scope_y1,
+            .y2 = this->scope_y2,
+        };
+        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+    }
+    else
+    {
+        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+    }
 }
 
 static void gui_canvas_rect_end(gui_canvas_rect_t *this)

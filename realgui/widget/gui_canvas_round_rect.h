@@ -53,8 +53,15 @@ typedef struct gui_canvas_round_rect
     uint8_t *rect_data;
     int  r;
     gui_color_t color;
+    uint16_t scope_x1;
+    uint16_t scope_x2;
+    uint16_t scope_y1;
+    uint16_t scope_y2;
+    int16_t ax, ay;
     uint8_t opacity_value;
-    bool use_external_picture;
+    uint8_t use_external_picture : 1;
+    uint8_t scope : 1;
+    uint8_t scope_flag : 1;
 } gui_canvas_round_rect_t;
 
 

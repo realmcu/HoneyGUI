@@ -2053,7 +2053,7 @@ static stbi_uc *stbi__hdr_to_ldr(float   *data, int x, int y, int comp)
 #ifndef STBI_NO_JPEG
 
 // huffman decoding acceleration
-#define FAST_BITS   9  // larger handles more cases; smaller stomps less cache
+#define FAST_BITS   6  // larger handles more cases; smaller stomps less cache
 
 typedef struct
 {
@@ -4517,7 +4517,7 @@ static int stbi__jpeg_info(stbi__context *s, int *x, int *y, int *comp)
 #ifndef STBI_NO_ZLIB
 
 // fast-way is faster to check than jpeg huffman, but slow way is slower
-#define STBI__ZFAST_BITS  9 // accelerate all cases in default tables
+#define STBI__ZFAST_BITS  6 // accelerate all cases in default tables
 #define STBI__ZFAST_MASK  ((1 << STBI__ZFAST_BITS) - 1)
 #define STBI__ZNSYMS 288 // number of symbols in literal/length alphabet
 

@@ -4144,7 +4144,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             }
             else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
             {
-#ifdef __WIN32
+#ifdef _WIN32
                 font_type2 = GUI_FONT_SRC_TTF;
                 GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
                 GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_TTF;
@@ -4552,6 +4552,12 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_press_highlight_ani)
     gui_log("default scale:%f\n", scale);
     GUI_TYPE(gui_win_t, this_widget)->scale = scale;
     GUI_TYPE(gui_win_t, this_widget)->scale_y = scale;
+    if (scale >= 0.999f)
+    {
+        scale = 0;
+        GUI_TYPE(gui_win_t, this_widget)->scale = scale;
+        GUI_TYPE(gui_win_t, this_widget)->scale_y = scale;
+    }
 
 
 }
@@ -12495,9 +12501,160 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             // ((gui_img_t *)parent)->simple = 0;
         }
     }
-
-
     return parent;
+}
+
+/**
+ * @brief Replace the image sequence of an animated image widget.
+ *
+ * This function replaces the image array used for frame animation in an image widget.
+ * It can be used to dynamically change the animation frames at runtime.
+ *
+ * @param img_widget Pointer to the image widget (gui_img_t*).
+ * @param new_image_array Array of pointers to new image data.
+ * @param new_image_count Number of images in the new array.
+ * @return true if successful, false if failed.
+ */
+bool gui_img_set_animate_images(gui_img_t *img_widget, void **new_image_array, int new_image_count)
+{
+    if (img_widget == NULL || new_image_array == NULL || new_image_count <= 0)
+    {
+        return false;
+    }
+
+    // Get the animate params from the image widget's animate member
+    gui_animate_t *animate = img_widget->animate;
+    if (animate == NULL || animate->callback == NULL)
+    {
+        return false;
+    }
+
+    // Get the params pointer from the animate structure
+    image_animate_params_t *params = (image_animate_params_t *)animate->p;
+    if (params == NULL)
+    {
+        return false;
+    }
+
+    // Free the old image array if it exists
+    if (params->image_arr != NULL)
+    {
+        gui_free(params->image_arr);
+    }
+
+    // Allocate and copy the new image array
+    params->image_arr = gui_malloc(new_image_count * sizeof(void *));
+    if (params->image_arr == NULL)
+    {
+        return false;
+    }
+    memcpy(params->image_arr, new_image_array, new_image_count * sizeof(void *));
+    params->image_count = new_image_count;
+
+    // Set the first image as current
+    gui_img_set_attribute(img_widget, GET_BASE(img_widget)->name,
+                          params->image_arr[0], GET_BASE(img_widget)->x,
+                          GET_BASE(img_widget)->y);
+
+    return true;
+}
+
+/**
+ * @brief Replace the image sequence of an animated image widget by folder path.
+ *
+ * This function loads all images from a specified folder and replaces
+ * the animation frames of the image widget.
+ *
+ * @param img_widget Pointer to the image widget (gui_img_t*).
+ * @param folder_path Folder path containing the new image sequence (relative to GUI_ROOT_FOLDER).
+ * @return true if successful, false if failed.
+ */
+bool gui_img_set_animate_images_from_folder(gui_img_t *img_widget, const char *folder_path)
+{
+    if (img_widget == NULL || folder_path == NULL)
+    {
+        return false;
+    }
+
+    // Count files in the folder
+    int file_count = 0;
+    {
+        gui_fs_dir *dir = NULL;
+        struct gui_fs_dirent *entry;
+        char *path = gui_malloc(strlen(folder_path) + strlen(GUI_ROOT_FOLDER) + 1);
+        if (path == NULL)
+        {
+            return false;
+        }
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder_path);
+        if ((dir = gui_fs_opendir(path)) == NULL)
+        {
+            gui_free(path);
+            return false;
+        }
+        gui_free(path);
+        while ((entry = gui_fs_readdir(dir)) != NULL)
+        {
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                file_count++;
+            }
+        }
+        gui_fs_closedir(dir);
+    }
+
+    if (file_count == 0)
+    {
+        return false;
+    }
+
+    // Allocate image array and load images
+    void **image_array = gui_malloc(file_count * sizeof(void *));
+    if (image_array == NULL)
+    {
+        return false;
+    }
+
+    int count = 0;
+    {
+        gui_fs_dir *dir = NULL;
+        struct gui_fs_dirent *entry;
+        char *path = gui_malloc(strlen(folder_path) + strlen(GUI_ROOT_FOLDER) + 1);
+        if (path == NULL)
+        {
+            gui_free(image_array);
+            return false;
+        }
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder_path);
+        if ((dir = gui_fs_opendir(path)) == NULL)
+        {
+            gui_free(path);
+            gui_free(image_array);
+            return false;
+        }
+
+        while ((entry = gui_fs_readdir(dir)) != NULL)
+        {
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder_path) + 2);
+                if (path2 != NULL)
+                {
+                    sprintf(path2, "%s/%s", folder_path, entry->d_name);
+                    image_array[count++] = (void *)gui_get_image_file_address(path2);
+                    gui_free(path2);
+                }
+            }
+        }
+        gui_free(path);
+        gui_fs_closedir(dir);
+    }
+
+    // Set the new image array
+    bool result = gui_img_set_animate_images(img_widget, image_array, count);
+    gui_free(image_array);
+
+    return result;
 }
 
 typedef struct xml_widget_create_new
@@ -12634,7 +12791,7 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
         time_t rawtime; GUI_UNUSED(rawtime);
         struct tm *timeinfo; GUI_UNUSED(timeinfo);
 
-#if __WIN32
+#if _WIN32
         time(&rawtime);
         timeinfo = localtime(&rawtime);
 #else
@@ -12707,7 +12864,7 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
 
 static void get_time(uint16_t *seconds, uint16_t *minute, uint16_t *hour, int *millisecond)
 {
-#ifndef __WIN32
+#ifndef _WIN32
     // extern struct tm watch_clock_get(void);
     // extern uint16_t millisecond_cnt;
     // struct tm watch_time = watch_clock_get();
@@ -13106,7 +13263,8 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         {
                             if (parent->type == SEEKBAR)
                             {
-                                GUI_API(gui_seekbar_t).animate((void *)parent, dur_num, repeat_num, multi_animate_callback, params);
+                                GUI_API(gui_seekbar_t).append_animate((void *)parent, dur_num, repeat_num, multi_animate_callback,
+                                                                      params, aniamte_name);
                             }
                         }
                         else
@@ -13980,8 +14138,15 @@ static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             else  if (to->type == SEEKBAR)
             {
 
-                gui_seekbar_t *img = GUI_TYPE(gui_seekbar_t, to);
-                gui_obj_stop_animate(img->animate);
+                if (GUI_TYPE(gui_seekbar_t, to)->animate)
+                {
+                    //GUI_TYPE(gui_img_t, to)->animate->animate = 0;
+                    for (size_t i = 0; i < GUI_TYPE(gui_img_t, to)->animate_array_length; i++)
+                    {
+                        ((gui_animate_t **)(GUI_TYPE(gui_img_t, to)->animate))[i]->animate = 0;
+                    }
+
+                }
             }
         }
     }
@@ -13999,36 +14164,6 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             {
                 gui_img_t *img = GUI_TYPE(gui_img_t, to);
                 bool create = 1;
-                // bool new_trigger = 0;
-                // for (size_t i = 0; i < img->animate_array_length; i++)
-                // {
-                //     char *a = ((gui_animate_t **)(img->animate))[i]->name;
-                //     char *b = to_name[1];
-                //     if (!(((gui_animate_t **)(img->animate))[i]->trigger_name == to_name[2]))
-                //     {
-                //         new_trigger = 1;
-                //     }
-                // }
-                // if (new_trigger)
-                // {
-                //     for (size_t i = 0; i < img->animate_array_length; i++)
-                //     {
-
-                //         for (size_t i = 0; i < img->animate_array_length; i++)
-                //         {
-                //             image_animate_params_t *params = ((((gui_animate_t **)(img->animate))[i])->p);
-                //             //gui_free(params->animate_type);
-                //             gui_free((((gui_animate_t **)(img->animate))[i])->p);
-                //             gui_free(((gui_animate_t **)(img->animate))[i]);
-                //             ((gui_animate_t **)(img->animate))[i] = NULL;
-                //         }
-                //         gui_free(img->animate);
-                //         img->animate = 0;
-                //         img->animate_array_length = 0;
-
-
-                //     }
-                // }
 
                 {
                     for (size_t i = 0; i < img->animate_array_length; i++)
@@ -14069,16 +14204,17 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             {
                 gui_seekbar_t *img = GUI_TYPE(gui_seekbar_t, to);
                 bool create = 1;
-                bool new_trigger = 0;
 
-
-
-
-                if (img->animate)
                 {
-                    create = 0;
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+                        if (GUI_STRINGS_EQUAL(((gui_animate_t **)(img->animate))[i]->name, to_name[1]))
+                        {
+                            create = 0;
+                            gui_obj_restart_animate(((gui_animate_t **)(img->animate))[i]);
+                        }
+                    }
                 }
-
                 if (create)
                 {
                     ezxml_t f = 0;
@@ -14091,17 +14227,18 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                     }
                     foreach_create_animate(f, to, to_name[1]);
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+                        (((gui_animate_t **)(img->animate))[i]->trigger_name = to_name[2]);
 
+                    }
                     //gui_log(" ");
                     if (f1 == 0)
                     {
                         ezxml_free(f);
                     }
                 }
-                else
-                {
-                    gui_obj_restart_animate(img->animate);
-                }
+
             }
         }
     }

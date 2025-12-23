@@ -43,8 +43,15 @@ typedef struct gui_canvas_rect
     gui_obj_t base;
     draw_img_t *draw_img;
     gui_color_t color;
+    uint16_t scope_x1;
+    uint16_t scope_x2;
+    uint16_t scope_y1;
+    uint16_t scope_y2;
+    int16_t ax, ay;
     uint8_t opacity_value;
     uint8_t tp_block : 1;
+    uint8_t scope : 1;
+    uint8_t scope_flag : 1;
 } gui_canvas_rect_t;
 
 

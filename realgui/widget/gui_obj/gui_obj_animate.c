@@ -193,7 +193,7 @@ void gui_obj_stop_animate(gui_animate_t *animate)
         return;
     }
 
-    gui_log("gui_obj_stop_animate\n");
+    //gui_log("gui_obj_stop_animate\n");
     animate->animate = false;
 }
 float gui_animation_get_progress(gui_animate_t *animation)

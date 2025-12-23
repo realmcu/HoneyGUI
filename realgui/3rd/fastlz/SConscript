@@ -1,0 +1,15 @@
+# building script for FastLZ
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src += ['fastlz.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('realgui/3rd/fastlz', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+
+Return('group')

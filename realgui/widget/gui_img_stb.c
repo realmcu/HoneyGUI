@@ -23,22 +23,7 @@
 #include "draw_img.h"
 #include "tp_algo.h"
 #include "gui_img_stb.h"
-#define STB_IMAGE_IMPLEMENTATION
-
-#define STBI_ONLY_JPEG
-#define STBI_ONLY_PNG
-#define STBI_NO_HDR
-#define STBI_NO_LINEAR
-#define STBI_NO_GIF
-#define STBI_NO_PIC
-#define STBI_NO_THREAD_LOCALS
-
-#include "gui_api.h"
-#define STBI_MALLOC(sz)           gui_malloc(sz)
-#define STBI_REALLOC(p,newsz)     gui_realloc(p, newsz)
-#define STBI_FREE(p)              gui_free(p)
-#define STB_IMAGE_STATIC
-#include "stb_image.h"
+#include "gui_stb.h"
 #ifdef TJPG
 #define TJPGD_IMPLEMENTATION
 #include "../3rd/tjpgd/tjpgd.h"

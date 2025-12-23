@@ -519,7 +519,7 @@ void gui_text_ctor(gui_text_t *this,
     this->font_mode = FONT_SRC_MEMADDR;
     this->content_refresh = false;
     this->layout_refresh = false;
-    this->rendermode = 2;
+    this->rendermode = 3;
     this->use_img_blit = true;
 }
 

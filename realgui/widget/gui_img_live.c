@@ -21,22 +21,7 @@
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "gui_img_live.h"
-#define STB_IMAGE_IMPLEMENTATION
 
-#define STBI_ONLY_JPEG
-#define STBI_ONLY_PNG
-#define STBI_NO_HDR
-#define STBI_NO_LINEAR
-#define STBI_NO_GIF
-#define STBI_NO_PIC
-#define STBI_NO_THREAD_LOCALS
-
-#include "gui_api.h"
-#define STBI_MALLOC(sz)           gui_malloc(sz)
-#define STBI_REALLOC(p,newsz)     gui_realloc(p, newsz)
-#define STBI_FREE(p)              gui_free(p)
-#define STB_IMAGE_STATIC
-#include "stb_image.h"
 
 #ifdef IMG_LIVE_TJPGDEC
 #include "../3rd/tjpgd/tjpgd.h"
@@ -223,16 +208,14 @@ static void *gui_img_live_decode_jpeg(void *jepg)
     /* Initialize input stream */
     GUI_ASSERT(jepg != NULL);
     devid.mem_addr = jepg;
-    devid.state = 0;
-
-    /* Prepare to decompress */
+    devid.state = 0;    /* Prepare to decompress */
     work = (void *)gui_malloc(sz_work);
     res = jd_prepare(&jdec, in_func, work, sz_work, &devid);
     if (res == JDR_OK)
     {
         /* It is ready to dcompress and image info is available here */
-        printf("Image size is %u x %u.\n%u bytes of work ares is used.\n", jdec.width, jdec.height,
-               sz_work - jdec.sz_pool);
+        printf("Image size is %u x %u.\n%zu bytes of work ares is used.\n", jdec.width, jdec.height,
+               (size_t)(sz_work - jdec.sz_pool));
 
         /* Initialize output device */
         gui_rgb_data_head_t header = {0};
@@ -240,12 +223,11 @@ static void *gui_img_live_decode_jpeg(void *jepg)
         header.type = (JD_FORMAT == 0) ? 0x03 : (JD_FORMAT == 1) ? 0x00 : 0x00;
         header.w = jdec.width;
         header.h = jdec.height;
-
         data = (uint8_t *)gui_malloc(N_BPP * jdec.width * jdec.height + sizeof(
                                          gui_rgb_data_head_t)); /* Create frame buffer for output image */
         memcpy(data, &header, sizeof(gui_rgb_data_head_t));
 
-        devid.fbuf = (data + sizeof(gui_rgb_data_head_t)) ;
+        devid.fbuf = ((uint8_t *)data + sizeof(gui_rgb_data_head_t)) ;
         devid.wfbuf = jdec.width;
 
 
@@ -310,7 +292,7 @@ static void gui_img_live_draw(gui_obj_t *obj)
 #else
         // stb decode
         {
-            int x, y, n, ok;
+            int x = 0, y = 0, n = 0, ok;
             typedef unsigned char stbi_uc;
             extern stbi_uc *stbi_load_from_memory(stbi_uc const * buffer, int len, int *x, int *y,
                                                   int *channels_in_file, int desired_channels);
@@ -328,7 +310,6 @@ static void gui_img_live_draw(gui_obj_t *obj)
             }
         }
 #endif
-
 #endif
         data = this->frame_buff;
     }

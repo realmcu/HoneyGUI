@@ -27,6 +27,7 @@
 #include <tp_algo.h>
 #include "nanovg.h"
 #include "math.h"
+#include "gui_win.h"
 
 
 /*============================================================================*
@@ -149,6 +150,174 @@ static void prepare_arc_img(gui_canvas_round_rect_t *this)
             data[(right + 1) * img_w + k] = color.color.argb_full;
         }
     }
+}
+
+static void gui_canvas_round_rect_prepare_scope(gui_canvas_round_rect_t *this)
+{
+    gui_obj_t *obj = (gui_obj_t *)this;
+
+    // Check if parent WINDOW has scope enabled
+    {
+        this->scope = 0;
+        gui_obj_t *o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope && !this->scope_flag)
+            {
+                this->scope = 1;
+                break;
+            }
+        }
+    }
+
+    // Calculate scope area if scope is enabled
+    if (this->scope)
+    {
+        gui_obj_t *o = obj;
+        gui_win_t *win_scope = 0;
+        this->ax = obj->x;
+        this->ay = obj->y;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+            {
+                win_scope = (void *)o;
+                break;
+            }
+        }
+        o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            this->ax += o->x;
+            this->ay += o->y;
+        }
+        if (win_scope)
+        {
+            int win_ax = win_scope->base.x;
+            int win_ay = win_scope->base.y;
+            o = GUI_BASE(win_scope);
+            while (o->parent != NULL)
+            {
+                o = o->parent;
+                win_ax += o->x;
+                win_ay += o->y;
+            }
+            int w_w = win_scope->base.w;
+            int w_h = win_scope->base.h;
+
+            // Store window scope absolute coordinates for draw phase
+            this->scope_x1 = win_ax;
+            this->scope_y1 = win_ay;
+            this->scope_x2 = win_ax + w_w;
+            this->scope_y2 = win_ay + w_h;
+        }
+    }
+}
+
+// Helper function to calculate rect for individual draw_img based on window scope
+static void calculate_img_scope_rect(gui_canvas_round_rect_t *this, draw_img_t *img,
+                                     gui_rect_t *out_rect)
+{
+    if (!img || !out_rect)
+    {
+        return;
+    }
+
+    // Get image display position and size from draw_img (set by draw_img_new_area)
+    int img_ax = img->img_target_x;
+    int img_ay = img->img_target_y;
+    int img_w = img->img_w;
+    int img_h = img->img_h;
+
+    // Window scope absolute coordinates
+    int win_x1 = this->scope_x1;
+    int win_y1 = this->scope_y1;
+    int win_x2 = this->scope_x2;
+    int win_y2 = this->scope_y2;
+
+    // Initialize to full image
+    out_rect->x1 = 0;
+    out_rect->y1 = 0;
+    out_rect->x2 = img_w;
+    out_rect->y2 = img_h;
+
+    // Calculate clipping based on window bounds
+    if (win_x1 > img_ax)
+    {
+        out_rect->x1 = win_x1 - img_ax;
+    }
+    if (win_y1 > img_ay)
+    {
+        out_rect->y1 = win_y1 - img_ay;
+    }
+    if (win_x2 < img_ax + img_w)
+    {
+        out_rect->x2 = win_x2 - img_ax;
+    }
+    if (win_y2 < img_ay + img_h)
+    {
+        out_rect->y2 = win_y2 - img_ay;
+    }
+}
+
+// Helper function to calculate rect for rotated circle image based on window scope
+// Uses inverse matrix to transform window bounds to source image coordinates
+static void calculate_circle_scope_rect(gui_canvas_round_rect_t *this, draw_img_t *img,
+                                        gui_rect_t *out_rect)
+{
+    if (!img || !out_rect)
+    {
+        return;
+    }
+
+    int img_w = img->img_w;
+    int img_h = img->img_h;
+
+    // Initialize to full image
+    out_rect->x1 = 0;
+    out_rect->y1 = 0;
+    out_rect->x2 = img_w;
+    out_rect->y2 = img_h;
+
+    // Window scope absolute coordinates
+    int win_x1 = this->scope_x1;
+    int win_y1 = this->scope_y1;
+    int win_x2 = this->scope_x2;
+    int win_y2 = this->scope_y2;
+
+    // Transform window corners to source image coordinates using inverse matrix
+    // We need to find the bounding box in source coordinates
+    gui_point3f_t corners[4];
+    float src_x_min, src_x_max, src_y_min, src_y_max;
+
+    // Transform all 4 corners of the window scope
+    corners[0].p[0] = win_x1; corners[0].p[1] = win_y1; corners[0].p[2] = 1.0f;
+    corners[1].p[0] = win_x2; corners[1].p[1] = win_y1; corners[1].p[2] = 1.0f;
+    corners[2].p[0] = win_x1; corners[2].p[1] = win_y2; corners[2].p[2] = 1.0f;
+    corners[3].p[0] = win_x2; corners[3].p[1] = win_y2; corners[3].p[2] = 1.0f;
+
+    // Apply inverse matrix to get source coordinates
+    matrix_multiply_point(&img->inverse, &corners[0]);
+    src_x_min = src_x_max = corners[0].p[0];
+    src_y_min = src_y_max = corners[0].p[1];
+
+    for (int i = 1; i < 4; i++)
+    {
+        matrix_multiply_point(&img->inverse, &corners[i]);
+        if (corners[i].p[0] < src_x_min) { src_x_min = corners[i].p[0]; }
+        if (corners[i].p[0] > src_x_max) { src_x_max = corners[i].p[0]; }
+        if (corners[i].p[1] < src_y_min) { src_y_min = corners[i].p[1]; }
+        if (corners[i].p[1] > src_y_max) { src_y_max = corners[i].p[1]; }
+    }
+
+    // Clamp to image bounds and set output rect
+    out_rect->x1 = (int16_t)(src_x_min < 0 ? 0 : (src_x_min > img_w ? img_w : src_x_min));
+    out_rect->y1 = (int16_t)(src_y_min < 0 ? 0 : (src_y_min > img_h ? img_h : src_y_min));
+    out_rect->x2 = (int16_t)(src_x_max < 0 ? 0 : (src_x_max > img_w ? img_w : src_x_max));
+    out_rect->y2 = (int16_t)(src_y_max < 0 ? 0 : (src_y_max > img_h ? img_h : src_y_max));
 }
 
 static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, int16_t x,
@@ -302,8 +471,7 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
 
             set_arc_w_and_h(head, this->r + 1, this->r + 1, this->color);
 
-        }
-        set_arc_img(this, &this->circle_00, -1, -1, 0);
+        }        set_arc_img(this, &this->circle_00, -1, -1, 0);
         set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 2, -1, 90);
         set_arc_img(this, &this->circle_10, -1, this->base.h - 2 * this->r - 2, 270);
         set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 2, this->base.h - 2 * this->r - 2,
@@ -311,7 +479,7 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
         gui_fb_change();
     }
 
-
+    gui_canvas_round_rect_prepare_scope(this);
 
 }
 static void gui_canvas_round_rect_prepare_ftl(gui_canvas_round_rect_t *this)
@@ -425,7 +593,7 @@ static void gui_canvas_round_rect_prepare_ftl(gui_canvas_round_rect_t *this)
         gui_fb_change();
     }
 
-
+    gui_canvas_round_rect_prepare_scope(this);
 
 }
 static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)
@@ -439,13 +607,43 @@ static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    gui_acc_blit_to_dc(this->rect_0, dc, NULL);
-    gui_acc_blit_to_dc(this->rect_1, dc, NULL);
-    gui_acc_blit_to_dc(this->rect_2, dc, NULL);
-    gui_acc_blit_to_dc(this->circle_00, dc, NULL);
-    gui_acc_blit_to_dc(this->circle_01, dc, NULL);
-    gui_acc_blit_to_dc(this->circle_10, dc, NULL);
-    gui_acc_blit_to_dc(this->circle_11, dc, NULL);
+    if (this->scope || this->scope_flag)
+    {
+        gui_rect_t rect;
+
+        // Rectangles (no rotation) - use scope rect
+        calculate_img_scope_rect(this, this->rect_0, &rect);
+        gui_acc_blit_to_dc(this->rect_0, dc, &rect);
+
+        calculate_img_scope_rect(this, this->rect_1, &rect);
+        gui_acc_blit_to_dc(this->rect_1, dc, &rect);
+
+        calculate_img_scope_rect(this, this->rect_2, &rect);
+        gui_acc_blit_to_dc(this->rect_2, dc, &rect);
+
+        // Circles (with rotation) - use inverse matrix to calculate scope rect
+        calculate_circle_scope_rect(this, this->circle_00, &rect);
+        gui_acc_blit_to_dc(this->circle_00, dc, &rect);
+
+        calculate_circle_scope_rect(this, this->circle_01, &rect);
+        gui_acc_blit_to_dc(this->circle_01, dc, &rect);
+
+        calculate_circle_scope_rect(this, this->circle_10, &rect);
+        gui_acc_blit_to_dc(this->circle_10, dc, &rect);
+
+        calculate_circle_scope_rect(this, this->circle_11, &rect);
+        gui_acc_blit_to_dc(this->circle_11, dc, &rect);
+    }
+    else
+    {
+        gui_acc_blit_to_dc(this->rect_0, dc, NULL);
+        gui_acc_blit_to_dc(this->rect_1, dc, NULL);
+        gui_acc_blit_to_dc(this->rect_2, dc, NULL);
+        gui_acc_blit_to_dc(this->circle_00, dc, NULL);
+        gui_acc_blit_to_dc(this->circle_01, dc, NULL);
+        gui_acc_blit_to_dc(this->circle_10, dc, NULL);
+        gui_acc_blit_to_dc(this->circle_11, dc, NULL);
+    }
 }
 static void blit_to_dc_ftl(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
@@ -477,9 +675,8 @@ static void blit_to_dc_ftl(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
             gui_ftl_read(base, data, size);
         }
         image->data = data;
-
     }
-    gui_acc_blit_to_dc(image, dc, NULL);
+    gui_acc_blit_to_dc(image, dc, rect);
     if (!(dc->section_count != dc->section_total - 1))
     {
         gui_free(image->data);
@@ -489,32 +686,75 @@ static void gui_canvas_round_rect_draw_ftl(gui_canvas_round_rect_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
-    gui_dispdev_t *dc = gui_get_dc();
-
-    GUI_UNUSED(this);
+    gui_dispdev_t *dc = gui_get_dc();    GUI_UNUSED(this);
     GUI_UNUSED(root);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    gui_acc_blit_to_dc(this->rect_0, dc, NULL);
-    gui_acc_blit_to_dc(this->rect_1, dc, NULL);
-    gui_acc_blit_to_dc(this->rect_2, dc, NULL);
-    if (this->use_external_picture)
+    if (this->scope || this->scope_flag)
     {
-        blit_to_dc_ftl(this->circle_00, dc, NULL);
-        blit_to_dc_ftl(this->circle_01, dc, NULL);
-        blit_to_dc_ftl(this->circle_10, dc, NULL);
-        blit_to_dc_ftl(this->circle_11, dc, NULL);
+        gui_rect_t rect;
+
+        // Rectangles (no rotation) - use scope rect
+        calculate_img_scope_rect(this, this->rect_0, &rect);
+        gui_acc_blit_to_dc(this->rect_0, dc, &rect);
+
+        calculate_img_scope_rect(this, this->rect_1, &rect);
+        gui_acc_blit_to_dc(this->rect_1, dc, &rect);
+
+        calculate_img_scope_rect(this, this->rect_2, &rect);
+        gui_acc_blit_to_dc(this->rect_2, dc, &rect);
+
+        // Circles (with rotation) - use inverse matrix to calculate scope rect
+        if (this->use_external_picture)
+        {
+            calculate_circle_scope_rect(this, this->circle_00, &rect);
+            blit_to_dc_ftl(this->circle_00, dc, &rect);
+
+            calculate_circle_scope_rect(this, this->circle_01, &rect);
+            blit_to_dc_ftl(this->circle_01, dc, &rect);
+
+            calculate_circle_scope_rect(this, this->circle_10, &rect);
+            blit_to_dc_ftl(this->circle_10, dc, &rect);
+
+            calculate_circle_scope_rect(this, this->circle_11, &rect);
+            blit_to_dc_ftl(this->circle_11, dc, &rect);
+        }
+        else
+        {
+            calculate_circle_scope_rect(this, this->circle_00, &rect);
+            gui_acc_blit_to_dc(this->circle_00, dc, &rect);
+
+            calculate_circle_scope_rect(this, this->circle_01, &rect);
+            gui_acc_blit_to_dc(this->circle_01, dc, &rect);
+
+            calculate_circle_scope_rect(this, this->circle_10, &rect);
+            gui_acc_blit_to_dc(this->circle_10, dc, &rect);
+
+            calculate_circle_scope_rect(this, this->circle_11, &rect);
+            gui_acc_blit_to_dc(this->circle_11, dc, &rect);
+        }
     }
     else
     {
-        gui_acc_blit_to_dc(this->circle_00, dc, NULL);
-        gui_acc_blit_to_dc(this->circle_01, dc, NULL);
-        gui_acc_blit_to_dc(this->circle_10, dc, NULL);
-        gui_acc_blit_to_dc(this->circle_11, dc, NULL);
+        gui_acc_blit_to_dc(this->rect_0, dc, NULL);
+        gui_acc_blit_to_dc(this->rect_1, dc, NULL);
+        gui_acc_blit_to_dc(this->rect_2, dc, NULL);
+        if (this->use_external_picture)
+        {
+            blit_to_dc_ftl(this->circle_00, dc, NULL);
+            blit_to_dc_ftl(this->circle_01, dc, NULL);
+            blit_to_dc_ftl(this->circle_10, dc, NULL);
+            blit_to_dc_ftl(this->circle_11, dc, NULL);
+        }
+        else
+        {
+            gui_acc_blit_to_dc(this->circle_00, dc, NULL);
+            gui_acc_blit_to_dc(this->circle_01, dc, NULL);
+            gui_acc_blit_to_dc(this->circle_10, dc, NULL);
+            gui_acc_blit_to_dc(this->circle_11, dc, NULL);
+        }
     }
-
-
 }
 #define IMG_DATA_FREE(draw_img ) \
     if(draw_img!=NULL)  \

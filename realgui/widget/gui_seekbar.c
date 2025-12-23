@@ -67,7 +67,20 @@ extern void gui_progressbar_h_thumb_ctor(gui_progressbar_t *this,
 static void gui_seekbar_update_att(gui_obj_t *obj)
 {
     gui_seekbar_t *this = (void *)obj;
-    animate_frame_update(this->animate, obj);
+    if (this->animate_array_length == 0)
+    {
+        if (this->animate)
+        {
+            animate_frame_update(this->animate, obj);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < this->animate_array_length; i++)
+        {
+            animate_frame_update(((gui_animate_t **)(this->animate))[i], obj);
+        }
+    }
 }
 
 static void gui_seekbar_prepare(gui_obj_t *obj)
@@ -601,6 +614,64 @@ static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
         }
     }
 }
+static void destroy(gui_obj_t *obj)
+{
+    gui_seekbar_t *this = (gui_seekbar_t *)obj;
+
+    if (this->animate)
+    {
+        if (this->animate_array_length == 0)
+        {
+            gui_free(this->animate);
+            this->animate = NULL;
+        }
+        else
+        {
+            for (size_t i = 0; i < this->animate_array_length; i++)
+            {
+                gui_free(((gui_animate_t **)(this->animate))[i]);
+                ((gui_animate_t **)(this->animate))[i] = NULL;
+            }
+            this->animate = 0;
+            this->animate_array_length = 0;
+        }
+
+
+    }
+
+
+}
+static void append_animate(gui_seekbar_t              *_this,
+                           uint32_t                dur,
+                           int                     repeat_count,
+                           gui_animate_callback_t  callback,
+                           void                   *p,
+                           const char             *name)
+{
+    if (_this->animate_array_length == 0 && _this->animate)
+    {
+        memset(_this->animate, 0, sizeof(*_this->animate));
+        gui_free(_this->animate);
+        _this->animate = 0;
+    }
+    _this->animate_array_length++;
+    _this->animate = gui_realloc(_this->animate, sizeof(gui_animate_t) * _this->animate_array_length);
+    ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1] = gui_malloc(sizeof(
+                                                                                gui_animate_t));
+    gui_animate_t *animate = ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1];
+
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    if (dur == 0)
+    {
+        animate->dur = 1000;
+    }
+    animate->callback = callback;
+    animate->repeat_count = repeat_count;
+    animate->p = p;
+    animate->name = name;
+}
 static void gui_seekbar_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
@@ -610,7 +681,11 @@ static void gui_seekbar_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         case OBJ_PREPARE:
             gui_seekbar_prepare(obj);
             break;
-
+        case OBJ_DESTROY:
+            {
+                destroy(obj);
+            }
+            break;
         default:
             break;
         }
@@ -626,7 +701,11 @@ static void gui_seekbar_h_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         case OBJ_PREPARE:
             gui_seekbar_h_prepare(obj);
             break;
-
+        case OBJ_DESTROY:
+            {
+                destroy(obj);
+            }
+            break;
         default:
             break;
         }
@@ -641,7 +720,11 @@ static void gui_seekbar_h_cb_double(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         case OBJ_PREPARE:
             gui_seekbar_h_prepare_double(obj);
             break;
-
+        case OBJ_DESTROY:
+            {
+                destroy(obj);
+            }
+            break;
         default:
             break;
         }
@@ -656,7 +739,11 @@ static void gui_seekbar_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         case OBJ_PREPARE:
             gui_seekbar_prepare_arc(obj);
             break;
-
+        case OBJ_DESTROY:
+            {
+                destroy(obj);
+            }
+            break;
         default:
             break;
         }
@@ -856,6 +943,7 @@ _gui_api_gui_seekbar_t _gui_api_for_gui_seekbar_t =
     .get_progress = (float(*)(gui_seekbar_t *))gui_progressbar_get_percentage,
     .set_progress = (void (*)(gui_seekbar_t *, float))gui_progressbar_set_percentage,
     .on_change = on_change,
+    .append_animate = append_animate,
 };
 /*============================================================================*
  *                           Public Functions

@@ -25,9 +25,9 @@ if(1) #set to 1 to enable or variable to for depnedency
 			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_cover.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_bypass.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_filter.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_bypass.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_cover.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_bypass.c"			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_cover.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_filter.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_fastlz.c"
 	)
 
 

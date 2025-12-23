@@ -62,6 +62,7 @@ typedef struct gui_seekbar
     // knob
     int16_t knob_step;
     uint8_t  knob_en:  1;
+    uint8_t animate_array_length;
 } gui_seekbar_t;
 
 //_GUI_API_DEFINE(gui_seekbar_t)
@@ -71,7 +72,13 @@ typedef struct __gui_api_gui_seekbar_t
     float (*get_progress)(gui_seekbar_t *_this);
     void (*set_progress)(gui_seekbar_t *_this, float progress);
     void (*on_change)(gui_seekbar_t *_this, gui_event_cb_t function, void *param);
-//_GUI_API_DECLARE(gui_seekbar_t)
+    void (*append_animate)(gui_seekbar_t              *_this,
+                           uint32_t                dur,
+                           int                     repeat_count,
+                           gui_animate_callback_t  callback,
+                           void                   *p,
+                           const char             *name);
+    //_GUI_API_DECLARE(gui_seekbar_t)
 } _gui_api_gui_seekbar_t; extern _gui_api_gui_seekbar_t _gui_api_for_gui_seekbar_t;
 /*============================================================================*
  *                         Constants

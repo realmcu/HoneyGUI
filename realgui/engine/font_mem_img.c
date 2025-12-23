@@ -364,19 +364,16 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
 {
     int16_t buf_width = 0;
     int16_t buf_height = 0;
-    uint8_t font_img_pixel_bytes;
-
-    gui_text_rect_t rect = {0};
+    uint8_t font_img_pixel_bytes;    gui_text_rect_t rect = {0};
     rect.x1 = 0;
-    rect.y1 = 0;
-    rect.x2 = rect.x1 + text->base.w;
+    rect.y1 = 0;    rect.x2 = rect.x1 + text->base.w;
     rect.y2 = rect.y1 + text->base.h;
     TEXT_MODE mode = text->mode;
-    if (text->mode == CENTER || text->mode == RIGHT)
+    if (text->mode == CENTER || text->mode == RIGHT ||
+        text->mode == MID_LEFT || text->mode == MID_CENTER || text->mode == MID_RIGHT)
     {
         text->mode = LEFT;
-    }
-    gui_font_mem_load(text, &rect);
+    }    gui_font_mem_load(text, &rect);
     text->mode = mode;
     switch (font_img_type)
     {
@@ -397,8 +394,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     if (font_img_pixel_bytes == 0)
     {
         return NULL;
-    }
-    switch (text->mode)
+    }    switch (text->mode)
     {
     case LEFT:
     case CENTER:
@@ -407,9 +403,22 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
             int offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0);
             buf_width = text->base.w - offset * 2;
             buf_height = text->font_height;
-            *img_x = offset * text->mode;
+            *img_x = offset * (text->mode & 0x0F);
             break;
         }
+    case MID_LEFT:
+    case MID_CENTER:
+    case MID_RIGHT:
+        {
+            int offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0);
+            buf_width = text->base.w - offset * 2;
+            buf_height = text->font_height;
+            *img_x = offset * (text->mode & 0x0F);
+            *img_y = _UI_MAX((text->base.h - text->font_height) / 2, 0);
+            break;
+        }
+
+
     case MULTI_LEFT:
     case MULTI_CENTER:
     case MULTI_RIGHT:
@@ -450,6 +459,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
     rect.x2 = rect.x1 + buf_width;
     rect.y2 = rect.y1 + buf_height;
+
     for (uint16_t i = 0; i < text->active_font_len; i++)
     {
         gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,

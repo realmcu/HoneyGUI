@@ -3,8 +3,7 @@ from building import *
 
 cwd = GetCurrentDir()
 
-src = Glob('*.c')
-src += Glob('*.cpp')
+src = []
 
 CPPPATH = [cwd]
 

@@ -21,11 +21,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "acc_sw_rle.h"
+#include "acc_sw_fastlz.h"
 #include "acc_sw_bypass.h"
 #include "acc_sw_cover.h"
 #include "acc_sw_filter.h"
 #include <acc_sw_raster.h>
 #include "acc_sw.h"
+#include "def_file.h"
 
 /*============================================================================*
  *                           Types
@@ -118,10 +120,31 @@ void sw_acc_end_cb(draw_img_t *image)
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     gui_rgb_data_head_t *header = (gui_rgb_data_head_t *)image->data;
-
     if (header->compress)
     {
-        rle(image, dc, rect);
+        /* Get compression header to determine compression algorithm type, using imdc_file_header_t structure */
+        imdc_file_header_t *compress_head = (imdc_file_header_t *)((uint8_t *)image->data +
+                                                                   sizeof(gui_rgb_data_head_t));
+        uint8_t algorithm = compress_head->algorithm_type.algorithm;
+
+        switch (algorithm)
+        {
+        case COMPRESS_ALGO_RLE:
+            rle(image, dc, rect);
+            break;
+        case COMPRESS_ALGO_FASTLZ:
+            fastlz_blit(image, dc, rect);
+            break;
+        case COMPRESS_ALGO_YUV_SAMPLE_FASTLZ:
+        case COMPRESS_ALGO_YUV_SAMPLE:
+            /* YUV_Sample related algorithms are not supported yet, fall back to RLE processing */
+            rle(image, dc, rect);
+            break;
+        default:
+            /* Unknown algorithm, use RLE by default */
+            rle(image, dc, rect);
+            break;
+        }
     }
     else
     {
@@ -135,4 +158,5 @@ void sw_acc_init(void)
     draw_img_acc_prepare_cb = sw_acc_prepare_cb;
     draw_img_acc_end_cb = sw_acc_end_cb;
 }
+
 
