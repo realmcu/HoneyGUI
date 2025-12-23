@@ -109,25 +109,24 @@ static void canvas_rect_cb(gui_canvas_t *canvas)
 static uint8_t *buffer = 0;
 static void radial_gradient_switch_in(gui_view_t *view)
 {
-    GUI_UNUSED(view);
-//     gui_log("radial_gradient_view switch in\n");
-// // gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, CANVAS_W2, CANVAS_H2);
-//     // gui_canvas_set_canvas_cb(canvas, canvas_rect_cb333);
+    gui_log("radial_gradient_view switch in\n");
+// gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, CANVAS_W2, CANVAS_H2);
+    // gui_canvas_set_canvas_cb(canvas, canvas_rect_cb333);
 
-//     buffer = gui_lower_malloc(CANVAS_W3 * CANVAS_H3 * 4);
-//     memset(buffer, 0, CANVAS_W3 * CANVAS_H3 * 4);
-//     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
-//                                       0, 480, 480, render, buffer);
-//     gui_img_t *img = gui_img_create_from_mem(view, 0, buffer, 0, 0, 0, 0);
-//     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-//     gui_view_switch_on_event(view, "inner_shadow_view",
-//                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
-//                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
-//                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-//     gui_view_switch_on_event(view, "multiple_layer_animation_view",
-//                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
-//                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
-//                              GUI_EVENT_TOUCH_MOVE_LEFT);
+    buffer = gui_lower_malloc(CANVAS_W3 * CANVAS_H3 * 4);
+    memset(buffer, 0, CANVAS_W3 * CANVAS_H3 * 4);
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+                                      0, 480, 480, render, buffer);
+    gui_img_t *img = gui_img_create_from_mem(view, 0, buffer, 0, 0, 0, 0);
+    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    gui_view_switch_on_event(view, "inner_shadow_view",
+                             SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
+                             GUI_EVENT_TOUCH_MOVE_RIGHT);
+    gui_view_switch_on_event(view, "multiple_layer_animation_view",
+                             SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
+                             GUI_EVENT_TOUCH_MOVE_LEFT);
 }
 
 static void radial_gradient_switch_out(gui_view_t *view)

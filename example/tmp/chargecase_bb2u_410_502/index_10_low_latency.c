@@ -37,11 +37,11 @@ static void update_face_animation(void *param)
 
 static void face_global_cb(l3_model_base_t *this)
 {
-    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 65), 1,
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 1), 1,
                              32767,
                              90, this->viewPortWidth, this->viewPortHeight);
 
-    l3_world_initialize(&this->world, 0, 22, 65, 0, current_rot_angle, 0, 5);
+    l3_world_initialize(&this->world, 0, 0, 37, 0, current_rot_angle, 0, 5);
 
 }
 
