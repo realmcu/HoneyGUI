@@ -11,7 +11,6 @@
 #include "gui_text.h"
 #include "def_msg.h"
 #include "gui_message.h"
-#include "trace.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -296,7 +295,7 @@ const __attribute__((aligned(8))) unsigned char video_logo_image[] =
 };
 static void view_switch_in_camera(gui_view_t *view)
 {
-    DBG_DIRECT("[Yuyin] view_switch_in_camera");
+    GUI_UNUSED(view);
     gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
@@ -512,7 +511,7 @@ static void view_switch_out_keyboard(gui_view_t *view)
     gui_log("[Yuyin] view_switch_out_keyboard, password_flag %d", password_flag);
     if (!password_flag)
     {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(_HONEYGUI_SIMULATOR_)
         void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
         wifi_gui_msg_handler(1, NULL); // 1: wifi power off
 #endif
@@ -683,8 +682,10 @@ static void switch_widget_play_watchface(void *p)
 #endif
 
     // user code start
+#if !defined(_WIN32) && !defined(_HONEYGUI_SIMULATOR_)
     void wifi_gui_get_clock_time(int *hour, int *minute);
     wifi_gui_get_clock_time(&watchface_hour, &watchface_minute);
+#endif
     // user code end
 
     int index_hour_tens = watchface_hour / 10;
@@ -1339,7 +1340,6 @@ static void view_switch_in(gui_view_t *view)
 #ifndef _HONEYGUI_SIMULATOR_
     // extern void wifi_setting_enter_cb(void);
     // wifi_setting_enter_cb();
-    DBG_DIRECT("[Yuyin] view_switch_in");
     gui_set_keep_active_time(60000);
 #endif
     gui_view_switch_on_event(view, gui_view_descriptor_image_466_466_watchface.name,

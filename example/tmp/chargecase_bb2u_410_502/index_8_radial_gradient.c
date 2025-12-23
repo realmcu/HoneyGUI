@@ -109,7 +109,7 @@ static void canvas_rect_cb(gui_canvas_t *canvas)
 static uint8_t *buffer = 0;
 static void radial_gradient_switch_in(gui_view_t *view)
 {
-//     GUI_UNUSED(view);
+    GUI_UNUSED(view);
 //     gui_log("radial_gradient_view switch in\n");
 // // gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, CANVAS_W2, CANVAS_H2);
 //     // gui_canvas_set_canvas_cb(canvas, canvas_rect_cb333);

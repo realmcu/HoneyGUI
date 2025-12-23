@@ -586,18 +586,18 @@ static void page_1_design(gui_obj_t *parent)
                    12, gui_rgba(0, 255, 255, 64));
 
     // Progress rings
-    gui_arc_t *activity_ring = gui_arc_create(rings_container, "activity_ring",
-                                              rings_center_x, rings_center_y,
-                                              70, 270, activity_angle,
-                                              12, gui_rgb(255, 45, 85));
-    gui_arc_t *exercise_ring = gui_arc_create(rings_container, "exercise_ring",
-                                              rings_center_x, rings_center_y,
-                                              52, 270, exercise_angle,
-                                              12, gui_rgb(185, 251, 79));
-    gui_arc_t *stand_ring = gui_arc_create(rings_container, "stand_ring",
-                                           rings_center_x, rings_center_y,
-                                           34, 270, stand_angle,
-                                           12, gui_rgb(0, 255, 255));
+    gui_arc_create(rings_container, "activity_ring",
+                   rings_center_x, rings_center_y,
+                   70, 270, activity_angle,
+                   12, gui_rgb(255, 45, 85));
+    gui_arc_create(rings_container, "exercise_ring",
+                   rings_center_x, rings_center_y,
+                   52, 270, exercise_angle,
+                   12, gui_rgb(185, 251, 79));
+    gui_arc_create(rings_container, "stand_ring",
+                   rings_center_x, rings_center_y,
+                   34, 270, stand_angle,
+                   12, gui_rgb(0, 255, 255));
 
     // Create timer to update activity rings display (500ms interval)
     gui_obj_create_timer(GUI_BASE(rings_container), 500, true, update_activity_rings_cb);

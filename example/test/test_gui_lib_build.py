@@ -15,20 +15,28 @@ if sys.platform == 'win32':
 
 # ============ Configuration ============
 
+
+# Detect platform and set appropriate generator
+if sys.platform == 'win32':
+    CMAKE_GENERATOR = "MinGW Makefiles"
+    BUILD_CMD = "mingw32-make"
+else:
+    CMAKE_GENERATOR = "Unix Makefiles"
+    BUILD_CMD = "make"
+
 # Define toolchain configuration
-# Keys correspond to directory names, values contain generator and build command
 TOOL_CONFIG = {
     "armcc": {
-        "generator": "MinGW Makefiles",
-        "build_cmd": "mingw32-make"
+        "generator": CMAKE_GENERATOR,
+        "build_cmd": BUILD_CMD
     },
     "armclang": {
-        "generator": "MinGW Makefiles",
-        "build_cmd": "mingw32-make"
+        "generator": CMAKE_GENERATOR,
+        "build_cmd": BUILD_CMD
     },
     "arm-none-eabi-gcc": {
-        "generator": "MinGW Makefiles",
-        "build_cmd": "mingw32-make"
+        "generator": CMAKE_GENERATOR,
+        "build_cmd": BUILD_CMD
     }
 }
 
