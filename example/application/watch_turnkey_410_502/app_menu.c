@@ -221,8 +221,8 @@ static void switch_app_calendar(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    gui_view_switch_direct(gui_view_get_current(), "calendar_view", SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
+    // gui_view_switch_direct(gui_view_get_current(), "calendar_view", SWITCH_OUT_ANIMATION_FADE,
+    //                        SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_compass(void *obj, gui_event_t e, void *param)
@@ -230,7 +230,8 @@ static void switch_app_compass(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(gui_view_get_current(), "compass_view", SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    gui_view_switch_direct(gui_view_get_current(), "compass_view", SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_home(void *obj, gui_event_t e, void *param)
