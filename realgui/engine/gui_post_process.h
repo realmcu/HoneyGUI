@@ -1,5 +1,5 @@
-#ifndef __POST_PROCESS_H__
-#define __POST_PROCESS_H__
+#ifndef __GUI_POST_PROCESS_H__
+#define __GUI_POST_PROCESS_H__
 #ifdef __cplusplus
 extern "C" {
 #endif

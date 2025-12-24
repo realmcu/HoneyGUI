@@ -1,5 +1,5 @@
 /**
- * @file acc_sw_rle.h
+ * @file acc_sw_idu.h
  * @author wenjing_jiang@realsil.com.cn
  * @brief
  * @version 0.1
@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2023
  *
  */
-#ifndef __ACC_SW_RLE_H__
-#define __ACC_SW_RLE_H__
+#ifndef __ACC_SW_IDU_H__
+#define __ACC_SW_IDU_H__
 
 #include "guidef.h"
 #include "draw_img.h"

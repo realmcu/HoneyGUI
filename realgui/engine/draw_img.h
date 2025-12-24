@@ -1,8 +1,8 @@
 /*
  * File      : draw_img.h
  */
-#ifndef __DRAW_IMAGE_H__
-#define __DRAW_IMAGE_H__
+#ifndef __DRAW_IMG_H__
+#define __DRAW_IMG_H__
 
 #include "guidef.h"
 #include "gui_api.h"
