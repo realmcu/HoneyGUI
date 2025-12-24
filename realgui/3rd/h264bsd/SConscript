@@ -1,33 +1,21 @@
 # for module compiling
-
 import os
+import sys
+
 from building import *
-import menu_config
 
-# get current directory
-cwd  = GetCurrentDir()
-objs = []
-list = os.listdir(cwd)
-parent_dir = os.path.dirname(cwd)
+cwd = GetCurrentDir()
+inc = [cwd]
+src = Glob('*.c') + Glob('*.cpp')
 
-src = Split("""
-""")
-
-path = []
-
-
-src += Glob(cwd + '/src/*.c')
-src += Glob(cwd + '/port/*.c')
-
-path += [cwd, 
-         cwd + '/src',
-         cwd + '/port',
-         cwd + '/inc']
-
-print(path)
-
-
-objs = DefineGroup('realgui/3rd/h264bsd', src, depend = [], CPPPATH = path)
-
+if GetDepend(['']):
+    objs = DefineGroup('3rd', src, depend = [''], CPPPATH = inc)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

@@ -1,41 +1,21 @@
-# building script for HoneyGUI
+# for module compiling
+import os
+import sys
 
 from building import *
 
 cwd = GetCurrentDir()
-src = Split("""
-""")
+inc = [cwd]
+src = Glob('*.c') + Glob('*.cpp')
 
-libs = ['lx_vglite_gcc']
-libpath = [cwd + '/vglite']
+if GetDepend(['CONFIG_REALTEK_BUILD_LITE_GFX']):
+    objs = DefineGroup('3rd', src, depend = [''], CPPPATH = inc)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
-src += Glob("platform/*.cpp")
-src += Glob("platform/*.c")
-src += Glob("vglite/source/interface/*.cpp")
-src += Glob("vglite/source/lib/*.cpp")
-src += Glob("vglite/source/widgets/*.cpp")
-src += Glob("vglite/source/transitions/*.cpp")
-src += Glob("HoneyGUI-Adapt/gui_widget_litegfx.c")
-if GetDepend('CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'):
-    src += Glob("HoneyGUI-Adapt/tab_*.c")
-    
-
-
-CPPPATH = [cwd, os.path.join(cwd, 'platform'),
-           os.path.join(cwd, 'HoneyGUI-Adapt'),
-           os.path.join(cwd, 'vglite/include'),
-           os.path.join(cwd, 'vglite/include/interface'),
-           os.path.join(cwd, 'vglite/include/lib'),
-           os.path.join(cwd, 'vglite/include/widgets'),
-           os.path.join(cwd, 'vglite/source/widgets'),
-           os.path.join(cwd, 'vglite/include/transitions'),
-           os.path.join(cwd, 'vglite/source/transitions'),           
-           ]
-
-# add src and include to group.
-CPPDEFINES = []
-if GetDepend('CONFIG_REALTEK_BUILD_LITE_GFX'):
-    CPPDEFINES += ['ENABLE_LITE_GFX']
-objs = DefineGroup('realgui/3rd', src,depend = ['CONFIG_REALTEK_BUILD_LITE_GFX'],CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES, LIBS = libs, LIBPATH = libpath)
-    
 Return('objs')

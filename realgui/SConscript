@@ -1,23 +1,21 @@
 # for module compiling
 import os
+import sys
+
 from building import *
 
-cwd  = GetCurrentDir()
-objs = []
-list = os.listdir(cwd)
-src = Split("""""")
-CPPPATH = [cwd]
+cwd = GetCurrentDir()
+inc = [cwd]
+src = Glob('*.c') + Glob('*.cpp')
 
-CPPDEFINES = ['ENABLE_HONEYGUI']
-
-
-objs = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
-
-if GetDepend('CONFIG_REALTEK_HONEYGUI'):
+if GetDepend(['']):
+    objs = DefineGroup('realgui', src, depend = [''], CPPPATH = inc, CPPDEFINES = ['ENABLE_HONEYGUI'])
+    list = os.listdir(cwd)
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):
-            if not os.path.isfile(os.path.join(path, 'SConstruct')):
-                objs = objs + SConscript(os.path.join(d, 'SConscript'))
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

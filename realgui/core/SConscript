@@ -6,13 +6,16 @@ from building import *
 
 cwd = GetCurrentDir()
 inc = [cwd]
-src = Glob('*.c')
+src = Glob('*.c') + Glob('*.cpp')
 
-objs = DefineGroup('core', src, depend = [''], CPPPATH = inc)
-list = os.listdir(cwd)
-for d in list:
-    path = os.path.join(cwd, d)
-    if os.path.isfile(os.path.join(path, 'SConscript')):
-        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+if GetDepend(['']):
+    objs = DefineGroup('core', src, depend = [''], CPPPATH = inc)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

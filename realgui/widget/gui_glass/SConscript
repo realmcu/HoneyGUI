@@ -1,15 +1,21 @@
-# building script for HoneyGUI
+# for module compiling
+import os
+import sys
 
 from building import *
 
 cwd = GetCurrentDir()
-src = Split("""
-""")
+inc = [cwd]
+src = Glob('*.c') + Glob('*.cpp')
 
-src = Glob('*.c')
-
-CPPPATH = [cwd]
-
-objs = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
+if GetDepend(['']):
+    objs = DefineGroup('widget', src, depend = [''], CPPPATH = inc)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

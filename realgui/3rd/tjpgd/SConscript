@@ -1,12 +1,21 @@
+# for module compiling
+import os
+import sys
 
 from building import *
 
 cwd = GetCurrentDir()
+inc = [cwd]
+src = Glob('*.c') + Glob('*.cpp')
 
-src = Glob('*.c')
-
-CPPPATH = [cwd]
-
-objs = DefineGroup('realgui/3rd', src, depend = [''], CPPPATH = CPPPATH)
+if GetDepend(['']):
+    objs = DefineGroup('3rd', src, depend = [''], CPPPATH = inc)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')
