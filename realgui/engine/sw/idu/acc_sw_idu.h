@@ -13,7 +13,6 @@
 
 #include "guidef.h"
 #include "draw_img.h"
-#include "draw_path.h"
 #include "gui_api_color.h"
 
 
