@@ -45,6 +45,11 @@ config REALTEK_BUILD_REAL_EARTH_3D
     help
       RTK GUI 3D Demo
 
+config REALTEK_BUILD_REAL_DONUT_3D
+    bool "3D Donut Demo"
+    help
+      RTK GUI 3D Demo
+
 config REALTEK_BUILD_REAL_PIKACHU_GLTF_3D
     bool "3D Pikachu GLTF Demo"
     help

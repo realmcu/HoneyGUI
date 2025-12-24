@@ -63,10 +63,14 @@ static void __l3_push_tria_img(l3_obj_model_t *_this)
 
             if (tria_img.fill_data == NULL) // Fill with material color
             {
+                float nz = fabsf(tria_img.p0.normal.uz);
+                const float MIN_LIGHT_INTENSITY = 0.5f;
+                const float MAX_LIGHT_INTENSITY = 1.0f;
+                float light_intensity = fmaxf(MIN_LIGHT_INTENSITY, fminf(MAX_LIGHT_INTENSITY, nz));
                 float *color_diffuse = _this->desc->materials[material_id].diffuse;
-                uint8_t color_r = (uint8_t)(*color_diffuse * opacity_value);
-                uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * opacity_value);
-                uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * opacity_value);
+                uint8_t color_r = (uint8_t)(*color_diffuse * opacity_value * light_intensity);
+                uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * opacity_value * light_intensity);
+                uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * opacity_value * light_intensity);
 
                 render_color = ((color_r & 0xF8) << 8) |
                                ((color_g & 0xFC) << 3) |

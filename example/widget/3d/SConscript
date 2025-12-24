@@ -20,6 +20,10 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_EARTH_3D'):
     src += ['example_3d_earth.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_DONUT_3D'):
+    src += ['example_3d_donut.c']
+    objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
+
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_PIKACHU_GLTF_3D'):
     src += ['example_3d_pikachu_gltf.c']
     objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
