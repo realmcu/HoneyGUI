@@ -235,7 +235,7 @@ static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *_this = (void *)obj;
-    gui_point3f_t point = {{0, 0, 1}};
+    gui_point3f_t point = {0, 0, 1};
 
     if (!_this->base.not_show)
     {
@@ -282,8 +282,8 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
 
     matrix_multiply_point(obj->matrix, &point);
 
-    _this->offset_x = point.p[0];
-    _this->offset_y = point.p[1];
+    _this->offset_x = point.x;
+    _this->offset_y = point.y;
 }
 
 static void gui_scroll_text_draw(gui_obj_t *obj)

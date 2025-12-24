@@ -90,7 +90,7 @@ uint32_t draw_img_get_pixel_byte(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
 
 bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 {
-    gui_point3f_t pox = {{0.0f}};
+    gui_point3f_t pox = {0};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;
@@ -116,76 +116,76 @@ bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
         y2 = _UI_MIN(img->img_h - 1, rect->y2);
     }
 
-    pox.p[0] = x1;
-    pox.p[1] = y1;
-    pox.p[2] = 1.0f;
+    pox.x = x1;
+    pox.y = y1;
+    pox.z = 1.0f;
     matrix_multiply_point(&img->matrix, &pox);
-    x_min = pox.p[0];
-    x_max = pox.p[0];
-    y_min = pox.p[1];
-    y_max = pox.p[1];
+    x_min = pox.x;
+    x_max = pox.x;
+    y_min = pox.y;
+    y_max = pox.y;
 
-    pox.p[0] = x2;
-    pox.p[1] = y1;
-    pox.p[2] = 1.0f;
+    pox.x = x2;
+    pox.y = y1;
+    pox.z = 1.0f;
     matrix_multiply_point(&img->matrix, &pox);
-    if (x_min > pox.p[0])
+    if (x_min > pox.x)
     {
-        x_min = pox.p[0];
+        x_min = pox.x;
     }
-    if (x_max < pox.p[0])
+    if (x_max < pox.x)
     {
-        x_max = pox.p[0];
+        x_max = pox.x;
     }
-    if (y_min > pox.p[1])
+    if (y_min > pox.y)
     {
-        y_min = pox.p[1];
+        y_min = pox.y;
     }
-    if (y_max < pox.p[1])
+    if (y_max < pox.y)
     {
-        y_max = pox.p[1];
-    }
-
-    pox.p[0] = x2;
-    pox.p[1] = y2;
-    pox.p[2] = 1.0f;
-    matrix_multiply_point(&img->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
+        y_max = pox.y;
     }
 
-    pox.p[0] = x1;
-    pox.p[1] = y2;
-    pox.p[2] = 1.0f;
+    pox.x = x2;
+    pox.y = y2;
+    pox.z = 1.0f;
     matrix_multiply_point(&img->matrix, &pox);
-    if (x_min > pox.p[0])
+    if (x_min > pox.x)
     {
-        x_min = pox.p[0];
+        x_min = pox.x;
     }
-    if (x_max < pox.p[0])
+    if (x_max < pox.x)
     {
-        x_max = pox.p[0];
+        x_max = pox.x;
     }
-    if (y_min > pox.p[1])
+    if (y_min > pox.y)
     {
-        y_min = pox.p[1];
+        y_min = pox.y;
     }
-    if (y_max < pox.p[1])
+    if (y_max < pox.y)
     {
-        y_max = pox.p[1];
+        y_max = pox.y;
+    }
+
+    pox.x = x1;
+    pox.y = y2;
+    pox.z = 1.0f;
+    matrix_multiply_point(&img->matrix, &pox);
+    if (x_min > pox.x)
+    {
+        x_min = pox.x;
+    }
+    if (x_max < pox.x)
+    {
+        x_max = pox.x;
+    }
+    if (y_min > pox.y)
+    {
+        y_min = pox.y;
+    }
+    if (y_max < pox.y)
+    {
+        y_max = pox.y;
     }
 
     if (draw_img_acc_prepare_cb != NULL)

@@ -24,6 +24,7 @@
 #include "acc_api.h"
 #include "tp_algo.h"
 #include "nanovg.h"
+#include "gui_math.h"
 #include <math.h>
 
 /*============================================================================*

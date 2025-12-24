@@ -322,19 +322,19 @@ void gui_obj_get_area(gui_obj_t *obj,
 {
     gui_point3f_t p[4] =
     {
-        {{0, 0, 1}},
-        {{obj->w - 1, 0, 1}},
-        {{0, obj->h - 1, 1}},
-        {{obj->w - 1, obj->h - 1, 1}}
+        {0, 0, 1},
+        {obj->w - 1, 0, 1},
+        {0, obj->h - 1, 1},
+        {obj->w - 1, obj->h - 1, 1}
     };
 
     float x_min = 0.0f, x_max = 0.0f, y_min = 0.0f, y_max = 0.0f;
 
     matrix_multiply_point(obj->matrix, p);
-    x_min = p->p[0];
-    x_max = p->p[0];
-    y_min = p->p[1];
-    y_max = p->p[1];
+    x_min = p->x;
+    x_max = p->x;
+    y_min = p->y;
+    y_max = p->y;
 
     matrix_multiply_point(obj->matrix, p + 1);
     matrix_multiply_point(obj->matrix, p + 2);
@@ -344,24 +344,24 @@ void gui_obj_get_area(gui_obj_t *obj,
     {
         gui_point3f_t *point = p + i;
 
-        if (point->p[0] < x_min)
+        if (point->x < x_min)
         {
-            x_min = point->p[0];
+            x_min = point->x;
         }
 
-        if (point->p[0] > x_max)
+        if (point->x > x_max)
         {
-            x_max = point->p[0];
+            x_max = point->x;
         }
 
-        if (point->p[1] < y_min)
+        if (point->y < y_min)
         {
-            y_min = point->p[1];
+            y_min = point->y;
         }
 
-        if (point->p[1] > y_max)
+        if (point->y > y_max)
         {
-            y_max = point->p[1];
+            y_max = point->y;
         }
     }
 

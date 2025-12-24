@@ -302,7 +302,7 @@ static void gui_text_prepare(gui_obj_t *obj)
 
     gui_text_t *this = (void *)obj;
     // touch_info_t *tp = tp_get_info();
-    gui_point3f_t point = {{0, 0, 1}};
+    gui_point3f_t point = {0, 0, 1};
     uint8_t last;
 
     if (this->font_type == GUI_FONT_SRC_IMG)
@@ -330,8 +330,8 @@ static void gui_text_prepare(gui_obj_t *obj)
         matrix_multiply(obj->matrix, this->matrix);
     }
     matrix_multiply_point(obj->matrix, &point);
-    this->offset_x = point.p[0];
-    this->offset_y = point.p[1];
+    this->offset_x = point.x;
+    this->offset_y = point.y;
 
     if (this->mode == LEFT ||
         this->mode == CENTER ||

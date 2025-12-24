@@ -62,10 +62,10 @@ static bool obj_is_active(gui_obj_t *obj)
 
     gui_point3f_t p[4] =
     {
-        { {0, 0, 1} },
-        { {obj->w, 0, 1} },
-        { {0, obj->h, 1} },
-        { {obj->w, obj->h, 1} }
+        {0, 0, 1},
+        {obj->w, 0, 1},
+        {0, obj->h, 1},
+        {obj->w, obj->h, 1}
     };
 
     float x_min = 0.0f;
@@ -75,10 +75,10 @@ static bool obj_is_active(gui_obj_t *obj)
 
 
     matrix_multiply_point(obj->matrix, p);
-    x_min = p->p[0];
-    x_max = p->p[0];
-    y_min = p->p[1];
-    y_max = p->p[1];
+    x_min = p->x;
+    x_max = p->x;
+    y_min = p->y;
+    y_max = p->y;
     matrix_multiply_point(obj->matrix, p + 1);
     matrix_multiply_point(obj->matrix, p + 2);
     matrix_multiply_point(obj->matrix, p + 3);
@@ -86,36 +86,36 @@ static bool obj_is_active(gui_obj_t *obj)
     for (uint32_t i = 1; i < 3; i++)
     {
         gui_point3f_t *point = p + i;
-        if (point->p[0] < x_min)
+        if (point->x < x_min)
         {
-            x_min = point->p[0];
+            x_min = point->x;
         }
     }
 
     for (uint32_t i = 1; i < 3; i++)
     {
         gui_point3f_t *point = p + i;
-        if (point->p[0] > x_max)
+        if (point->x > x_max)
         {
-            x_max = point->p[0];
+            x_max = point->x;
         }
     }
 
     for (uint32_t i = 1; i < 3; i++)
     {
         gui_point3f_t *point = p + i;
-        if (point->p[1] < y_min)
+        if (point->y < y_min)
         {
-            y_min = point->p[1];
+            y_min = point->y;
         }
     }
 
     for (uint32_t i = 1; i < 3; i++)
     {
         gui_point3f_t *point = p + i;
-        if (point->p[1] > y_max)
+        if (point->y > y_max)
         {
-            y_max = point->p[1];
+            y_max = point->y;
         }
     }
 

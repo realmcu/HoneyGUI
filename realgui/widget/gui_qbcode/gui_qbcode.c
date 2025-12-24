@@ -48,13 +48,13 @@
 
 static void gui_qbcode_prepare(gui_obj_t *obj)
 {
-    gui_point3f_t point = {{0, 0, 1}};
+    gui_point3f_t point = {0, 0, 1};
     gui_qbcode_t *this = (void *)obj;
 
     matrix_multiply_point(obj->matrix, &point);
 
-    this->offset_x = point.p[0];
-    this->offset_y = point.p[1];
+    this->offset_x = point.x;
+    this->offset_y = point.y;
     this->scale_x = obj->matrix->m[0][0];
     this->scale_y = obj->matrix->m[1][1];
 }

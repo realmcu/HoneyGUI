@@ -82,7 +82,9 @@ typedef struct gui_matrix
 
 typedef struct gui_point3f
 {
-    float p[3];
+    float x;
+    float y;
+    float z;
 } gui_point3f_t;
 
 typedef struct gui_rect
