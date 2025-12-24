@@ -26,7 +26,7 @@
 #include "l3_tria_raster.h"
 #include "l3_rect_raster.h"
 
-static void __l3_push_tria_img(l3_obj_model_t *_this)
+static void __l3_push_tria_img(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_matrix)
 {
     uint32_t width = _this->base.viewPortWidth;
     uint32_t height = _this->base.viewPortHeight;
@@ -113,13 +113,22 @@ static void __l3_push_tria_img(l3_obj_model_t *_this)
     _this->base.combined_img->blend_mode = L3_IMG_FILTER_BLACK;
 
     l3_3x3_matrix_translate(&_this->base.combined_img->matrix, _this->base.x, _this->base.y);
+
+    if (parent_matrix != NULL)
+    {
+        l3_3x3_matrix_t tmp;
+        memcpy(&tmp, parent_matrix, sizeof(l3_3x3_matrix_t));
+        l3_3x3_matrix_mul(&tmp, &_this->base.combined_img->matrix);
+        memcpy(&_this->base.combined_img->matrix, &tmp, sizeof(l3_3x3_matrix_t));
+    }
+
     memcpy(&_this->base.combined_img->inverse, &_this->base.combined_img->matrix,
            sizeof(l3_3x3_matrix_t));
     l3_3x3_matrix_inverse(&_this->base.combined_img->inverse);
     l3_calulate_draw_img_target_area(_this->base.combined_img, NULL);
 }
 
-void l3_tria_push(l3_obj_model_t *_this)
+void l3_tria_push(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_matrix)
 {
     _this->base.light.initialized = false;
     l3_4x4_matrix_t transform_matrix;
@@ -189,7 +198,7 @@ void l3_tria_push(l3_obj_model_t *_this)
     );
 
     MEASURE_CPU_CYCLES(
-        __l3_push_tria_img(_this);
+        __l3_push_tria_img(_this, parent_matrix);
     );
 }
 

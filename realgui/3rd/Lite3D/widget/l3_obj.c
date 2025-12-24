@@ -264,7 +264,7 @@ void l3_obj_set_face_transform(l3_model_base_t *base, l3_face_transform_cb cb)
     _this->face_transform_cb = (l3_4x4_matrix_t(*)(l3_obj_model_t *, size_t))cb;
 }
 
-void l3_obj_push(l3_model_base_t *base)
+void l3_obj_push(l3_model_base_t *base, l3_3x3_matrix_t *parent_matrix)
 {
     l3_obj_model_t *_this = (l3_obj_model_t *)base;
     if (_this == NULL)
@@ -275,11 +275,11 @@ void l3_obj_push(l3_model_base_t *base)
     switch (_this->desc->file_head.face_type)
     {
     case LITE_3D_FACE_RECTANGLE:
-        l3_rect_push(_this);
+        l3_rect_push(_this, parent_matrix);
         break;
 
     case LITE_3D_FACE_TRIANGLE:
-        l3_tria_push(_this);
+        l3_tria_push(_this, parent_matrix);
         break;
 
     default:

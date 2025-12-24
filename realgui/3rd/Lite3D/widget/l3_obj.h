@@ -176,8 +176,9 @@ void l3_obj_set_face_transform(l3_model_base_t *base, l3_face_transform_cb cb);
  * @brief Push the model's state to the rendering pipeline.
  *
  * @param base Pointer to the 3D base model.
+ * @param parent_matrix Pointer to the parent matrix.
  */
-void l3_obj_push(l3_model_base_t *base);
+void l3_obj_push(l3_model_base_t *base, l3_3x3_matrix_t *parent_matrix);
 
 /**
  * @brief Render the model.

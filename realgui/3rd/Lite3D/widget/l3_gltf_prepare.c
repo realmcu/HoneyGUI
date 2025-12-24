@@ -507,7 +507,7 @@ static void render_node_recursive(l3_gltf_model_t *_this, int node_index,
     }
 }
 
-void l3_gltf_prepare(l3_gltf_model_t *_this)
+void l3_gltf_prepare(l3_gltf_model_t *_this, l3_3x3_matrix_t *parent_matrix)
 {
     if (!_this || !_this->desc || !_this->base.combined_img)
     {
@@ -648,6 +648,15 @@ void l3_gltf_prepare(l3_gltf_model_t *_this)
     _this->base.combined_img->blend_mode = L3_IMG_FILTER_BLACK;
 
     l3_3x3_matrix_translate(&_this->base.combined_img->matrix, _this->base.x, _this->base.y);
+
+    if (parent_matrix != NULL)
+    {
+        l3_3x3_matrix_t tmp;
+        memcpy(&tmp, parent_matrix, sizeof(l3_3x3_matrix_t));
+        l3_3x3_matrix_mul(&tmp, &_this->base.combined_img->matrix);
+        memcpy(&_this->base.combined_img->matrix, &tmp, sizeof(l3_3x3_matrix_t));
+    }
+
     memcpy(&_this->base.combined_img->inverse, &_this->base.combined_img->matrix,
            sizeof(l3_3x3_matrix_t));
     l3_3x3_matrix_inverse(&_this->base.combined_img->inverse);

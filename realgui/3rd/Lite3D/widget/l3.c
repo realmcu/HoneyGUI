@@ -113,9 +113,9 @@ l3_model_base_t *l3_create_model_ftl(void            *desc_addr,
     }
 }
 
-void l3_push(l3_model_base_t *_this)
+void l3_push(l3_model_base_t *_this, l3_3x3_matrix_t *parent_matrix)
 {
-    _this->ops->push(_this);
+    _this->ops->push(_this, parent_matrix);
 }
 
 void l3_draw(l3_model_base_t *_this)

@@ -418,11 +418,11 @@ void l3_gltf_set_global_transform(l3_model_base_t *base, l3_global_transform_cb 
     _this->global_transform_cb = (void (*)(l3_gltf_model_t *))cb;
 }
 
-void l3_gltf_push(l3_model_base_t *base)
+void l3_gltf_push(l3_model_base_t *base, l3_3x3_matrix_t *parent_matrix)
 {
     l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
-    extern void l3_gltf_prepare(l3_gltf_model_t *_this);
-    l3_gltf_prepare(_this);
+    extern void l3_gltf_prepare(l3_gltf_model_t *_this, l3_3x3_matrix_t *parent_matrix);
+    l3_gltf_prepare(_this, parent_matrix);
 }
 
 void l3_gltf_draw(l3_model_base_t *base)

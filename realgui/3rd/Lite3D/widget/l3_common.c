@@ -320,6 +320,39 @@ void l3_3x3_matrix_translate(l3_3x3_matrix_t *m, float t_x, float t_y)
 
 }
 
+void l3_3x3_matrix_mul(l3_3x3_matrix_t *input_left, l3_3x3_matrix_t *input_right)
+{
+    float m00 = input_left->u.m[0][0];
+    float m01 = input_left->u.m[0][1];
+    float m02 = input_left->u.m[0][2];
+    float m10 = input_left->u.m[1][0];
+    float m11 = input_left->u.m[1][1];
+    float m12 = input_left->u.m[1][2];
+    float m20 = input_left->u.m[2][0];
+    float m21 = input_left->u.m[2][1];
+    float m22 = input_left->u.m[2][2];
+
+    float t00 = input_right->u.m[0][0];
+    float t01 = input_right->u.m[0][1];
+    float t02 = input_right->u.m[0][2];
+    float t10 = input_right->u.m[1][0];
+    float t11 = input_right->u.m[1][1];
+    float t12 = input_right->u.m[1][2];
+    float t20 = input_right->u.m[2][0];
+    float t21 = input_right->u.m[2][1];
+    float t22 = input_right->u.m[2][2];
+
+    input_left->u.m[0][0] = (m00 * t00) + (m01 * t10) + (m02 * t20);
+    input_left->u.m[0][1] = (m00 * t01) + (m01 * t11) + (m02 * t21);
+    input_left->u.m[0][2] = (m00 * t02) + (m01 * t12) + (m02 * t22);
+    input_left->u.m[1][0] = (m10 * t00) + (m11 * t10) + (m12 * t20);
+    input_left->u.m[1][1] = (m10 * t01) + (m11 * t11) + (m12 * t21);
+    input_left->u.m[1][2] = (m10 * t02) + (m11 * t12) + (m12 * t22);
+    input_left->u.m[2][0] = (m20 * t00) + (m21 * t10) + (m22 * t20);
+    input_left->u.m[2][1] = (m20 * t01) + (m21 * t11) + (m22 * t21);
+    input_left->u.m[2][2] = (m20 * t02) + (m21 * t12) + (m22 * t22);
+}
+
 void l3_4x4_matrix_identity(l3_4x4_matrix_t *m)
 {
     memcpy(m, &identity_4x4_matrix, sizeof(l3_4x4_matrix_t));
@@ -507,28 +540,19 @@ l3_4d_point_t l3_4x4_matrix_mul_4d_point(l3_4x4_matrix_t *mat, l3_4d_point_t p)
 {
 #ifdef GUI_3D_USE_MVE
     l3_4d_point_t point;
-    float32x4_t out;
-
     uint32x4_t col_offsets = {0, 16, 32, 48};
 
-    float32x4_t col0 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][0],
-                                                      col_offsets); //// col0 = [m[0][0], m[1][0], m[2][0], m[3][0]]
-    out  = vmulq_n_f32(col0, p.x);
+    float32x4_t col0 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][0], col_offsets);
+    float32x4_t col1 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][1], col_offsets);
+    float32x4_t col2 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][2], col_offsets);
+    float32x4_t col3 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][3], col_offsets);
 
-    float32x4_t col1 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][1],
-                                                      col_offsets); //// col1 = [m[0][1], m[1][1], m[2][1], m[3][1]]
-    out += vmulq_n_f32(col1, p.y);
-
-    float32x4_t col2 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][2],
-                                                      col_offsets); //// col2 = [m[0][2], m[1][2], m[2][2], m[3][2]]
-    out += vmulq_n_f32(col2, p.z);
-
-    float32x4_t col3 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][3],
-                                                      col_offsets); //// col3 = [m[0][3], m[1][3], m[2][3], m[3][3]]
-    out += vmulq_n_f32(col3, p.w);
+    float32x4_t out = vmulq_n_f32(col0, p.x);
+    out = vfmaq_n_f32(out, col1, p.y);
+    out = vfmaq_n_f32(out, col2, p.z);
+    out = vfmaq_n_f32(out, col3, p.w);
 
     vst1q_f32((float *)&point, out);
-
     return point;
 #else
     l3_4d_point_t point;

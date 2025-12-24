@@ -26,7 +26,7 @@
 #include "l3_tria_raster.h"
 #include "l3_rect_raster.h"
 
-static void __l3_push_rect_img_front(l3_obj_model_t *this)
+static void __l3_push_rect_img_front(l3_obj_model_t *this, l3_3x3_matrix_t *parent_matrix)
 {
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
@@ -54,6 +54,15 @@ static void __l3_push_rect_img_front(l3_obj_model_t *this)
         }
 
         l3_generate_3x3_matrix(src, dst, (float *)&this->img[i].matrix);
+
+        if (parent_matrix != NULL)
+        {
+            l3_3x3_matrix_t tmp;
+            memcpy(&tmp, parent_matrix, sizeof(l3_3x3_matrix_t));
+            l3_3x3_matrix_mul(&tmp, &this->img[i].matrix);
+            memcpy(&this->img[i].matrix, &tmp, sizeof(l3_3x3_matrix_t));
+        }
+
         memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(l3_3x3_matrix_t));
         l3_3x3_matrix_inverse(&this->img[i].inverse);
 
@@ -67,7 +76,7 @@ static void __l3_push_rect_img_front(l3_obj_model_t *this)
     }
 }
 
-static void __l3_push_rect_img_front_and_back(l3_obj_model_t *this)
+static void __l3_push_rect_img_front_and_back(l3_obj_model_t *this, l3_3x3_matrix_t *parent_matrix)
 {
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
@@ -90,6 +99,15 @@ static void __l3_push_rect_img_front_and_back(l3_obj_model_t *this)
         }
 
         l3_generate_3x3_matrix(src, dst, (float *)&this->img[i].matrix);
+
+        if (parent_matrix != NULL)
+        {
+            l3_3x3_matrix_t tmp;
+            memcpy(&tmp, parent_matrix, sizeof(l3_3x3_matrix_t));
+            l3_3x3_matrix_mul(&tmp, &this->img[i].matrix);
+            memcpy(&this->img[i].matrix, &tmp, sizeof(l3_3x3_matrix_t));
+        }
+
         memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(l3_3x3_matrix_t));
         l3_3x3_matrix_inverse(&this->img[i].inverse);
 
@@ -103,7 +121,7 @@ static void __l3_push_rect_img_front_and_back(l3_obj_model_t *this)
     }
 }
 
-static void __l3_push_rect_img_front_and_sort(l3_obj_model_t *_this)
+static void __l3_push_rect_img_front_and_sort(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_matrix)
 {
     uint32_t width = _this->base.viewPortWidth;
     uint32_t height = _this->base.viewPortHeight;
@@ -190,6 +208,16 @@ static void __l3_push_rect_img_front_and_sort(l3_obj_model_t *_this)
     _this->base.combined_img->blend_mode = L3_IMG_FILTER_BLACK;
 
     l3_3x3_matrix_translate(&_this->base.combined_img->matrix, _this->base.x, _this->base.y);
+
+    // 如果有父控件的矩阵，则与之相乘
+    if (parent_matrix != NULL)
+    {
+        l3_3x3_matrix_t tmp;
+        memcpy(&tmp, parent_matrix, sizeof(l3_3x3_matrix_t));
+        l3_3x3_matrix_mul(&tmp, &_this->base.combined_img->matrix);
+        memcpy(&_this->base.combined_img->matrix, &tmp, sizeof(l3_3x3_matrix_t));
+    }
+
     memcpy(&_this->base.combined_img->inverse, &_this->base.combined_img->matrix,
            sizeof(l3_3x3_matrix_t));
     l3_3x3_matrix_inverse(&_this->base.combined_img->inverse);
@@ -244,21 +272,21 @@ void l3_rect_push_prepare(l3_obj_model_t *_this)
 
 }
 
-void l3_rect_push(l3_obj_model_t *_this)
+void l3_rect_push(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_matrix)
 {
     l3_rect_push_prepare(_this);
 
     if (_this->base.draw_type == L3_DRAW_FRONT_ONLY)
     {
-        __l3_push_rect_img_front(_this);
+        __l3_push_rect_img_front(_this, parent_matrix);
     }
     else if (_this->base.draw_type == L3_DRAW_FRONT_AND_BACK)
     {
-        __l3_push_rect_img_front_and_back(_this);
+        __l3_push_rect_img_front_and_back(_this, parent_matrix);
     }
     else if (_this->base.draw_type == L3_DRAW_FRONT_AND_SORT)
     {
-        __l3_push_rect_img_front_and_sort(_this);
+        __l3_push_rect_img_front_and_sort(_this, parent_matrix);
     }
 }
 

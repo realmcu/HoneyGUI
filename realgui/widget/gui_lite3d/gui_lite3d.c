@@ -28,7 +28,15 @@
 static void gui_lite3d_prepare(gui_obj_t *obj)
 {
     gui_lite3d_t *this = (gui_lite3d_t *)obj;
-    l3_push(this->model);
+
+    // Check if obj->matrix is identity matrix
+    l3_3x3_matrix_t *parent_matrix = NULL;
+    if (!matrix_is_identity(obj->matrix))
+    {
+        parent_matrix = (l3_3x3_matrix_t *)obj->matrix;
+    }
+
+    l3_push(this->model, parent_matrix);
 
     touch_info_t *tp = tp_get_info();
     if (tp->type == TOUCH_SHORT)

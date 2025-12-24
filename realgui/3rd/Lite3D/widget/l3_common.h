@@ -420,6 +420,7 @@ void l3_3x3_matrix_identity(l3_3x3_matrix_t *m);
 void l3_3x3_matrix_translate(l3_3x3_matrix_t *m, float t_x, float t_y);
 void l3_3x3_matrix_inverse(l3_3x3_matrix_t *m);
 void l3_3x3_matrix_mul_3d_point(l3_3x3_matrix_t *m, l3_3d_point_t *p);
+void l3_3x3_matrix_mul(l3_3x3_matrix_t *input_left, l3_3x3_matrix_t *input_right);
 
 void l3_4x4_matrix_identity(l3_4x4_matrix_t *m);
 void l3_4x4_matrix_zero(l3_4x4_matrix_t *m);

@@ -81,7 +81,7 @@ struct l3_model_base
 
 struct l3_model_ops
 {
-    void (*push)(l3_model_base_t *this);
+    void (*push)(l3_model_base_t *this, l3_3x3_matrix_t *parent_matrix);
     void (*draw)(l3_model_base_t *this);
     void (*model_free)(l3_model_base_t *this);
 
@@ -140,8 +140,9 @@ l3_model_base_t *l3_create_model_ftl(void            *desc_addr,
  * @brief Push the model's state to the rendering pipeline.
  *
  * @param _this Pointer to the 3D base model.
+ * @param parent_matrix Pointer to the parent matrix.
  */
-void l3_push(l3_model_base_t *_this);
+void l3_push(l3_model_base_t *_this, l3_3x3_matrix_t *parent_matrix);
 
 /**
  * @brief Render the model.
