@@ -117,8 +117,7 @@ u32 h264bsdInit(storage_t *pStorage, u32 noOutputReordering)
      * specific NEON optimized "memset" for clearing the structure */
     size = (sizeof(macroblockLayer_t) + 63) & ~0x3F;
 
-    pStorage->mbLayer = (macroblockLayer_t *)malloc(size);
-    // ALLOCATE(pStorage->mbLayer, size, uint8_t);
+    pStorage->mbLayer = (macroblockLayer_t *)h264bsd_malloc(size);
     if (!pStorage->mbLayer)
     {
         return HANTRO_NOK;
@@ -595,8 +594,7 @@ void h264bsdShutdown(storage_t *pStorage)
         }
     }
 
-    free(pStorage->mbLayer);
-    // FREE(pStorage->mbLayer);
+    h264bsd_free(pStorage->mbLayer);
     FREE(pStorage->mb);
     FREE(pStorage->sliceGroupMap);
 
@@ -693,9 +691,9 @@ u32 *h264bsdNextOutputPictureRGBA(storage_t *pStorage, u32 *picId, u32 *isIdrPic
 
     if (pStorage->conversionBufferSize < rgbSize)
     {
-        if (pStorage->conversionBuffer != NULL) { free(pStorage->conversionBuffer); }
+        if (pStorage->conversionBuffer != NULL) { h264bsd_free(pStorage->conversionBuffer); }
         pStorage->conversionBufferSize = rgbSize;
-        pStorage->conversionBuffer = (u32 *)malloc(rgbSize);
+        pStorage->conversionBuffer = (u32 *)h264bsd_malloc(rgbSize);
     }
 
     h264bsdConvertToRGBA(width, height, data, pStorage->conversionBuffer);
@@ -837,9 +835,9 @@ u32 *h264bsdNextOutputPictureYCbCrA(storage_t *pStorage, u32 *picId, u32 *isIdrP
 
     if (pStorage->conversionBufferSize < rgbSize)
     {
-        if (pStorage->conversionBuffer != NULL) { free(pStorage->conversionBuffer); }
+        if (pStorage->conversionBuffer != NULL) { h264bsd_free(pStorage->conversionBuffer); }
         pStorage->conversionBufferSize = rgbSize;
-        pStorage->conversionBuffer = (u32 *)malloc(rgbSize);
+        pStorage->conversionBuffer = (u32 *)h264bsd_malloc(rgbSize);
     }
 
     h264bsdConvertToYCbCrA(width, height, data, pStorage->conversionBuffer);
@@ -1228,7 +1226,7 @@ u32 h264bsdProfile(storage_t *pStorage)
 
 storage_t *h264bsdAlloc()
 {
-    return (storage_t *)malloc(sizeof(storage_t));
+    return (storage_t *)h264bsd_malloc(sizeof(storage_t));
 }
 
 /*------------------------------------------------------------------------------
@@ -1251,7 +1249,7 @@ storage_t *h264bsdAlloc()
 
 void h264bsdFree(storage_t *pStorage)
 {
-    free(pStorage);
+    h264bsd_free(pStorage);
 }
 
 /*------------------------------------------------------------------------------

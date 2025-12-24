@@ -150,16 +150,14 @@
 /* macro to allocate memory */
 #define ALLOCATE(ptr, count, type) \
     { \
-        (ptr) = h264bsd_lower_malloc((count) * sizeof(type));\
+        (ptr) = h264bsd_malloc((count) * sizeof(type));\
     }
-// (ptr) = malloc((count) * sizeof(type));
 
 /* macro to free allocated memory */
 #define FREE(ptr) \
     { \
-        if(ptr){h264bsd_lower_free((ptr)); (ptr) = NULL;} \
+        if(ptr){h264bsd_free((ptr)); (ptr) = NULL;} \
     }
-// free((ptr)); (ptr) = NULL;
 
 #define ALIGN(ptr, bytePos) \
     (ptr + ( ((bytePos - (uintptr_t)ptr) & (bytePos - 1)) / sizeof(*ptr) ))

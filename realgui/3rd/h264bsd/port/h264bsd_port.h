@@ -16,10 +16,6 @@ void *h264bsd_malloc(size_t size);
 void *h264bsd_realloc(void *ptr, size_t size);
 void h264bsd_free(void *ptr);
 
-void *h264bsd_lower_malloc(size_t size);
-void *h264bsd_lower_realloc(void *ptr, size_t size);
-void h264bsd_lower_free(void *ptr);
-
 #ifdef __cplusplus
 }
 #endif

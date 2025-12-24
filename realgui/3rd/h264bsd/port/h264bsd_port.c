@@ -69,17 +69,3 @@ void h264bsd_free(void *ptr)
 {
     h264bsd_port_free(ptr);
 }
-
-void *h264bsd_lower_realloc(void *ptr, size_t size)
-{
-    return h264bsd_port_realloc(ptr, size);
-}
-
-void *h264bsd_lower_malloc(size_t size)
-{
-    return h264bsd_port_malloc(size);
-}
-void h264bsd_lower_free(void *ptr)
-{
-    h264bsd_port_free(ptr);
-}
