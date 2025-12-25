@@ -167,58 +167,7 @@ void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
     }
 }
 
-void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
-{
-    int source_w = image->img_w;
-    int source_h = image->img_h;
 
-    uint8_t *line_buf = buf;
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
-    gui_img_file_t *img_file = (gui_img_file_t *)image->data;
-    imdc_file_t *file = (imdc_file_t *)img_file->data.unzip_data;
-
-    memcpy(buf, head, sizeof(struct gui_rgb_data_head));
-    head = buf;
-    line_buf = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uintptr_t)(buf));
-    if (head->type == RGB565)//rle_rgb565
-    {
-        uint8_t source_bytes_per_pixel = 2;
-        for (int k = 0; k < source_h; k++)
-        {
-            uncompressed_rle_rgb565(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
-        }
-        head->type = RGB565;
-    }
-    else if (head->type == ARGB8565)//rle_argb8565
-    {
-        uint8_t source_bytes_per_pixel = 3;
-        for (int k = 0; k < source_h; k++)
-        {
-            uncompressed_rle_argb8565(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
-        }
-        head->type = ARGB8565;
-    }
-    else if (head->type == RGB888)//rle_rgb888
-    {
-        uint8_t source_bytes_per_pixel = 3;
-        for (int k = 0; k < source_h; k++)
-        {
-            uncompressed_rle_rgb888(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
-        }
-        head->type = RGB888;
-    }
-    else if (head->type == ARGB8888)//rle_rgba8888
-    {
-        uint8_t source_bytes_per_pixel = 4;
-        for (int k = 0; k < source_h; k++)
-        {
-            uncompressed_rle_argb8888(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
-        }
-        head->type = ARGB8888;
-    }
-    head->compress = 0;
-    return;
-}
 bool is_identity_matrix(gui_matrix_t *matrix)
 {
     return (matrix->m[0][0] == 1) && (matrix->m[1][1] == 1) && (matrix->m[2][2] == 1) &&
@@ -245,7 +194,7 @@ void handle_image_blend_mode(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *r
         break;
     }
 }
-void rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+void blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (!is_identity_matrix(&image->matrix))
     {

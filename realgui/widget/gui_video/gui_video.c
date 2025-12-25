@@ -25,6 +25,7 @@
 #include <math.h>
 #include "gui_h264bsd.h"
 #include "gui_vfs.h"
+#include "acc_sw_jpeg.h"
 
 /*============================================================================*
  *                           Types
@@ -1899,6 +1900,11 @@ static int video_src_init_mjpg(gui_video_t  *this)
 
 static int gui_video_src_init(gui_video_t  *this)
 {
+    if (this == NULL)
+    {
+        return -1;
+    }
+
     int res = -1;
     uint8_t header[16];
 
@@ -1997,6 +2003,11 @@ static void gui_img_video_ctor(gui_video_t  *this,
                                int16_t         w,
                                int16_t         h)
 {
+    if (this == NULL)
+    {
+        return;
+    }
+
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     // uint32_t live_time = 0;
@@ -2245,6 +2256,10 @@ gui_video_t *gui_video_create_from_ftl(void           *parent,
 
     gui_video_t *img = gui_malloc(sizeof(gui_video_t));
     GUI_ASSERT(img != NULL);
+    if (img == NULL)
+    {
+        return NULL;
+    }
 
     memset(img, 0x00, sizeof(gui_video_t));
     img->storage_type = IMG_SRC_FTL;
@@ -2273,6 +2288,10 @@ gui_video_t *gui_video_create_from_fs(void           *parent,
 
     gui_video_t *img = gui_malloc(sizeof(gui_video_t));
     GUI_ASSERT(img != NULL);
+    if (img == NULL)
+    {
+        return NULL;
+    }
 
     memset(img, 0x00, sizeof(gui_video_t));
     img->storage_type = IMG_SRC_FILESYS;
@@ -2301,6 +2320,10 @@ gui_video_t *gui_video_create_from_mem(void           *parent,
 
     gui_video_t *img = gui_malloc(sizeof(gui_video_t));
     GUI_ASSERT(img != NULL);
+    if (img == NULL)
+    {
+        return NULL;
+    }
 
     memset(img, 0x00, sizeof(gui_video_t));
     img->storage_type = IMG_SRC_MEMADDR;

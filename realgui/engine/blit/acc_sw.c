@@ -53,7 +53,7 @@
  *============================================================================*/
 
 
-void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+void blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     gui_rgb_data_head_t *head = image->data;
 
@@ -123,12 +123,11 @@ void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 
     if (header->compress)
     {
-        //GUI_ASSERT(NULL);
-        rle(image, dc, rect);
+        blit_compressed(image, dc, rect);
     }
     else
     {
-        no_rle(image, dc, rect);
+        blit_uncompressed(image, dc, rect);
     }
 }
 void sw_acc_init(void)

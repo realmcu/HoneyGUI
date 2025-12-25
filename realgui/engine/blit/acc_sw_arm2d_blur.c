@@ -171,7 +171,7 @@ typedef union arm_2d_color_rgb565_t
 
 static inline uint16_t arm2d_local_rgb565_pack(arm2d_local_color_fast_rgb_t *ptRGB)
 {
-    GUI_ASSERT(NULL != ptRGB);
+    // GUI_ASSERT(NULL != ptRGB);
 
     arm_2d_color_rgb565_t tOutput =
     {
@@ -185,7 +185,7 @@ static inline uint16_t arm2d_local_rgb565_pack(arm2d_local_color_fast_rgb_t *ptR
 static inline void arm2d_local_rgb565_unpack_comp(uint16_t hwColor,
                                                   arm2d_local_color_fast_rgb_t *ptRGB)
 {
-    GUI_ASSERT(NULL != ptRGB);
+    // GUI_ASSERT(NULL != ptRGB);
 
     /* uses explicit extraction, leading to a more efficient autovectorized code */
     uint16_t maskRunpk = 0x001f, maskGunpk = 0x003f;

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include "acc_api.h"
+#include "acc_sw_jpeg.h"
 #include "gui_vfs.h"
 
 void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
