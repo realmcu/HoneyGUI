@@ -37,6 +37,7 @@ extern "C" {
 #include "gui_api_ftl.h"
 #include "gui_api_indev.h"
 #include "gui_api_os.h"
+#include "gui_listener.h"
 
 
 /*============================================================================*

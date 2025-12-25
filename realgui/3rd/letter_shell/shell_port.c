@@ -134,27 +134,10 @@ static int gui_port_console_init(void)
     return 0;
 }
 
-
-#ifdef ENABLE_RTK_GUI_CONSOLE
 #include "gui_components_init.h"
 GUI_INIT_DEVICE_EXPORT(gui_port_console_init);
 
-void func(int i, char ch, char *str)
-{
-    (void)i;
-    (void)ch;
-    (void)str;
-    printf("\033[1;31m");
-    printf("Hello, World!\n");
 
-    printf("\033[0m");
-    printf("Hello, World again!\n");
-}
-SHELL_EXPORT_CMD(
-    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC) | SHELL_CMD_DISABLE_RETURN,
-    io, func, test);
-
-#endif
 
 #endif
 

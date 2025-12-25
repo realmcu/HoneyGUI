@@ -114,6 +114,11 @@ void gui_server_msg_handler(gui_msg_t *msg)
             reset_time = gui_ms_get();
             break;
         }
+    case GUI_EVENT_SUBSCRIBE_TOPIC:
+        {
+            msg->cb(msg->payload);
+            break;
+        }
     default:
 
         break;
