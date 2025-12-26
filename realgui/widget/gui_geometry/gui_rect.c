@@ -128,7 +128,7 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
         img->data = rect_data;
     }
 
-    img->opacity_value = UINT8_MAX;
+    img->opacity_value = this->opacity_value;
 
     // Start with user's transformation matrix if exists, otherwise identity
     if (obj->matrix != NULL)
@@ -660,7 +660,11 @@ void gui_rect_set_style(gui_rounded_rect_t *this,
     this->color = color;
     this->opacity_value = color.color.rgba.a;
 }
-
+void gui_rect_set_opacity(gui_rounded_rect_t *this, uint8_t opacity)
+{
+    GUI_ASSERT(this != NULL);
+    this->opacity_value = opacity;
+}
 void gui_rect_set_position(gui_rounded_rect_t *this, int x, int y)
 {
     GUI_ASSERT(this != NULL);

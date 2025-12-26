@@ -32,6 +32,8 @@ Core Features
      - :cpp:any:`gui_circle_set_radius`
    * - Set Color
      - :cpp:any:`gui_circle_set_color`
+   * - Set Opacity
+     - :cpp:any:`gui_circle_set_opacity`
    * - Register Click Event Callback
      - :cpp:any:`gui_circle_on_click`
    * - Rotation Transform

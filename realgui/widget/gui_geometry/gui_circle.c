@@ -837,7 +837,11 @@ void gui_circle_set_radius(gui_circle_t *this, int radius)
         this->radius = radius;
     }
 }
-
+void gui_circle_set_opacity(gui_circle_t *this, uint8_t opacity)
+{
+    GUI_ASSERT(this != NULL);
+    this->opacity_value = opacity;
+}
 void gui_circle_set_color(gui_circle_t *this, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);

@@ -30,6 +30,8 @@
      - :cpp:any:`gui_arc_set_radius`
    * - 设置颜色
      - :cpp:any:`gui_arc_set_color`
+   * - 设置不透明度
+     - :cpp:any:`gui_arc_set_opacity`
    * - 设置起始角度
      - :cpp:any:`gui_arc_set_start_angle`
    * - 设置结束角度

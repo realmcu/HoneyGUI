@@ -32,6 +32,8 @@ Core Features
      - :cpp:any:`gui_rect_set_size`
    * - Set Color
      - :cpp:any:`gui_rect_set_color`
+   * - Set Opacity
+     - :cpp:any:`gui_rect_set_opacity`
    * - Register Click Event Callback
      - :cpp:any:`gui_rect_on_click`
    * - Rotation Transform

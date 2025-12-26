@@ -404,7 +404,12 @@ void gui_arc_set_radius(gui_arc_t *this, int radius)
     this->radius = radius;
     this->buffer_valid = false;
 }
-
+void gui_arc_set_opacity(gui_arc_t *this, uint8_t opacity)
+{
+    GUI_ASSERT(this != NULL);
+    this->opacity_value = opacity;
+    this->buffer_valid = false;
+}
 void gui_arc_set_color(gui_arc_t *this, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);

@@ -32,6 +32,8 @@
      - :cpp:any:`gui_rect_set_size` 
    * - 设置颜色 
      - :cpp:any:`gui_rect_set_color`
+   * - 设置不透明度
+     - :cpp:any:`gui_rect_set_opacity`
    * - 注册点击事件回调
      - :cpp:any:`gui_rect_on_click`
    * - 旋转变换

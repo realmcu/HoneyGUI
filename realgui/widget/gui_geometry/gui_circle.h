@@ -119,7 +119,12 @@ void gui_circle_set_position(gui_circle_t *this, int x, int y);
  * @param radius Circle radius.
  */
 void gui_circle_set_radius(gui_circle_t *this, int radius);
-
+/**
+ * @brief Set the opacity of the circle widget.
+ * @param this Pointer to the circle widget.
+ * @param opacity Opacity value (0-255).
+ */
+void gui_circle_set_opacity(gui_circle_t *this, uint8_t opacity);
 /**
  * @brief Set circle color.
  *

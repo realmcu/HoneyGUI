@@ -30,6 +30,8 @@ Core Features
      - :cpp:any:`gui_arc_set_radius`
    * - Set Color
      - :cpp:any:`gui_arc_set_color`
+   * - Set Opacity
+     - :cpp:any:`gui_arc_set_opacity`
    * - Set Start Angle
      - :cpp:any:`gui_arc_set_start_angle`
    * - Set End Angle

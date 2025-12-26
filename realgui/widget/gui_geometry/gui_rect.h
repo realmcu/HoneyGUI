@@ -99,7 +99,12 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
 void gui_rect_set_style(gui_rounded_rect_t *this,
                         int x, int y, int w, int h,
                         int radius, gui_color_t color);
-
+/**
+ * @brief Set the opacity of the rect widget.
+ * @param this Pointer to the rect widget.
+ * @param opacity Opacity value (0-255).
+ */
+void gui_rect_set_opacity(gui_rounded_rect_t *this, uint8_t opacity);
 /**
  * @brief Set the position of the rect widget.
  * @param this Pointer to the rect widget.

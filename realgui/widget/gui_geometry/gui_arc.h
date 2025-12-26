@@ -116,7 +116,12 @@ void gui_arc_set_position(gui_arc_t *this, int x, int y);
  * @param radius Arc radius.
  */
 void gui_arc_set_radius(gui_arc_t *this, int radius);
-
+/**
+ * @brief Set the opacity of the arc widget.
+ * @param this Pointer to the arc widget.
+ * @param opacity Opacity value (0-255).
+ */
+void gui_arc_set_opacity(gui_arc_t *this, uint8_t opacity);
 /**
  * @brief Set the color of the arc widget.
  * @param this Pointer to the arc widget.
