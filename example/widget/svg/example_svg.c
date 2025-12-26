@@ -39,6 +39,10 @@ static int app_init(void)
                                               10, 200);
     gui_svg_set_opacity(svg3, 200);
 
+    gui_svg_create_from_file(gui_obj_get_root(), "svg_file",
+                             "/pc/example/widget/svg/example.svg",
+                             150, 150);
+
     return 0;
 }
 

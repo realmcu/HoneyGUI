@@ -63,31 +63,61 @@ static void render_svg_shape(NVGcontext *vg, NSVGshape *shape, float scale, uint
             nvgClosePath(vg);
         }
 
-        if (shape->fill.type != NSVG_PAINT_NONE)
+        if (shape->fill.type == NSVG_PAINT_COLOR)
         {
-            NVGcolor color;
-            if (shape->fill.type == NSVG_PAINT_COLOR)
+            unsigned int c = shape->fill.d.color;
+            NVGcolor color = nvgRGBA(c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF,
+                                     (((c >> 24) & 0xFF) * opacity) / 255);
+            nvgFillColor(vg, color);
+            nvgFill(vg);
+        }
+        else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT)
+        {
+            NSVGgradient *grad = shape->fill.d.gradient;
+            if (grad && grad->nstops >= 2)
             {
-                unsigned int c = shape->fill.d.color;
-                color = nvgRGBA((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF,
-                                (((c >> 24) & 0xFF) * opacity) / 255);
-                nvgFillColor(vg, color);
+                unsigned int c0 = grad->stops[0].color;
+                unsigned int c1 = grad->stops[grad->nstops - 1].color;
+                NVGcolor icol = nvgRGBA(c0 & 0xFF, (c0 >> 8) & 0xFF, (c0 >> 16) & 0xFF,
+                                        (((c0 >> 24) & 0xFF) * opacity) / 255);
+                NVGcolor ocol = nvgRGBA(c1 & 0xFF, (c1 >> 8) & 0xFF, (c1 >> 16) & 0xFF,
+                                        (((c1 >> 24) & 0xFF) * opacity) / 255);
+                NVGpaint paint = nvgLinearGradient(vg,
+                                                   shape->bounds[0] * scale, shape->bounds[1] * scale,
+                                                   shape->bounds[2] * scale, shape->bounds[3] * scale,
+                                                   icol, ocol);
+                nvgFillPaint(vg, paint);
+                nvgFill(vg);
+            }
+        }
+        else if (shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT)
+        {
+            NSVGgradient *grad = shape->fill.d.gradient;
+            if (grad && grad->nstops >= 2)
+            {
+                unsigned int c0 = grad->stops[0].color;
+                unsigned int c1 = grad->stops[grad->nstops - 1].color;
+                NVGcolor icol = nvgRGBA(c0 & 0xFF, (c0 >> 8) & 0xFF, (c0 >> 16) & 0xFF,
+                                        (((c0 >> 24) & 0xFF) * opacity) / 255);
+                NVGcolor ocol = nvgRGBA(c1 & 0xFF, (c1 >> 8) & 0xFF, (c1 >> 16) & 0xFF,
+                                        (((c1 >> 24) & 0xFF) * opacity) / 255);
+                float cx = (shape->bounds[0] + shape->bounds[2]) * 0.5f * scale;
+                float cy = (shape->bounds[1] + shape->bounds[3]) * 0.5f * scale;
+                float r = (shape->bounds[2] - shape->bounds[0]) * 0.5f * scale;
+                NVGpaint paint = nvgRadialGradient(vg, cx, cy, 0, r, icol, ocol);
+                nvgFillPaint(vg, paint);
                 nvgFill(vg);
             }
         }
 
-        if (shape->stroke.type != NSVG_PAINT_NONE)
+        if (shape->stroke.type == NSVG_PAINT_COLOR)
         {
-            NVGcolor color;
-            if (shape->stroke.type == NSVG_PAINT_COLOR)
-            {
-                unsigned int c = shape->stroke.d.color;
-                color = nvgRGBA((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF,
-                                (((c >> 24) & 0xFF) * opacity) / 255);
-                nvgStrokeColor(vg, color);
-                nvgStrokeWidth(vg, shape->strokeWidth * scale);
-                nvgStroke(vg);
-            }
+            unsigned int c = shape->stroke.d.color;
+            NVGcolor color = nvgRGBA(c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF,
+                                     (((c >> 24) & 0xFF) * opacity) / 255);
+            nvgStrokeColor(vg, color);
+            nvgStrokeWidth(vg, shape->strokeWidth * scale);
+            nvgStroke(vg);
         }
     }
 }
@@ -243,7 +273,26 @@ gui_svg_t *gui_svg_create_from_file(void       *parent,
     gui_svg_ctor(_this, parent, name, x, y, 0, 0);
     _this->from_file = 1;
 
-    _this->svg_data = nsvgParseFromFile(filename, "px", 96);
+    gui_vfs_file_t *fd = gui_vfs_open(filename, GUI_VFS_READ);
+    if (fd)
+    {
+        gui_vfs_stat_t stat;
+        if (gui_vfs_stat(filename, &stat) == 0)
+        {
+            char *svg_buf = gui_malloc(stat.size + 1);
+            if (svg_buf)
+            {
+                int read_size = gui_vfs_read(fd, svg_buf, stat.size);
+                if (read_size > 0)
+                {
+                    svg_buf[read_size] = '\0';
+                    _this->svg_data = nsvgParse(svg_buf, "px", 96);
+                }
+                gui_free(svg_buf);
+            }
+        }
+        gui_vfs_close(fd);
+    }
 
     if (_this->svg_data)
     {

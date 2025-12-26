@@ -205,6 +205,7 @@ void nsvgDelete(NSVGimage *image);
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "gui_api_os.h"
 
 #define NSVG_PI (3.14159265358979323846264338327f)
 #define NSVG_KAPPA90 (0.5522847493f)    // Length proportional to radius of a cubic bezier handle for 90deg arcs.
@@ -3288,6 +3289,10 @@ static void nsvg__startElement(void *ud, const char *el, const char **attr)
         {
             nsvg__parseGradientStop(p, attr);
         }
+        else
+        {
+            gui_log("[nanosvg] unsupported tag in defs: <%s>\n", el);
+        }
         return;
     }
 
@@ -3361,6 +3366,10 @@ static void nsvg__startElement(void *ud, const char *el, const char **attr)
     else if (strcmp(el, "svg") == 0)
     {
         nsvg__parseSVG(p, attr);
+    }
+    else
+    {
+        gui_log("[nanosvg] unsupported tag: <%s>\n", el);
     }
 }
 
