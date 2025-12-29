@@ -77,7 +77,7 @@
 图像输出
 ~~~~~~~~~~
 
-使用 ``gui_canvas_output_buffer`` 函数（预分配缓冲区）。
+使用 ``gui_canvas_render_to_image_buffer`` 函数（预分配缓冲区）。
 
    此函数需要预先分配缓冲区，适用于需要重复渲染或内存受限的场景。
 

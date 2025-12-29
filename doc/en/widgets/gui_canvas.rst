@@ -77,7 +77,7 @@ You can manually trigger a redraw by setting canvas->render = 1. The system will
 Image Output
 ~~~~~~~~~~~~
 
-Using ``gui_canvas_output_buffer`` function (pre-allocated buffer).
+Using ``gui_canvas_render_to_image_buffer`` function (pre-allocated buffer).
 
 This function requires a pre-allocated buffer and is suitable for scenarios where repeated rendering or memory constraints are important.
 
