@@ -108,6 +108,7 @@ static void gui_view_released_view_timer_cb(void *obj)
         }
         g_SwitchDone = true;
         g_Release = 0;
+        g_Target = g_Release;
         g_NextView = NULL;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         // gui_log("current view name = %s\n", g_CurrentView->base.name);
@@ -124,6 +125,7 @@ static void gui_view_animate_timer_cb(void *obj)
     if (g_Release >= g_Target)
     {
         g_Release = 0;
+        g_Target = g_Release;
         _this->current_transition_style = SWITCH_INIT_STATE;
         gui_obj_delete_timer(obj);
 

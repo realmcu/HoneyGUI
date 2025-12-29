@@ -3,7 +3,6 @@
  *============================================================================*/
 #include <stdio.h>
 #include <time.h>
-#include "cJSON.h"
 #include "gui_obj.h"
 #include "gui_text.h"
 #include "gui_win.h"
