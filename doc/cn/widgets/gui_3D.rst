@@ -322,7 +322,7 @@ HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 控件，使�
 3D 小狗
 ~~~~~~~~
 
-在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_DOG_3D`` 来运行此示例。该模型由 774 个三角形面组成，支持自定义材质基础色的填充。
+请通过 ``menuconfig`` 启用 Kconfig 选项并保存到 ``win32_sim/.config`` 来运行该示例。该模型由 774 个三角形面组成，支持自定义材质基础色的填充。
 
 .. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_dog.c
    :language: c

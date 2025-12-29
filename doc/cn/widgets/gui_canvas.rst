@@ -100,7 +100,14 @@
 
 完整卡片视图使用示例：
 
-在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_CANVAS`` 来运行此示例。
+请通过 ``menuconfig`` 启用 Kconfig 选项来运行该示例：
+
+.. code-block:: shell
+
+   cd win32_sim
+   menuconfig ../Kconfig.gui
+
+选择 ``Canvas Demo``（``CONFIG_REALTEK_BUILD_REAL_CANVAS``），保存到 ``win32_sim/.config``。
 
 .. literalinclude:: ../../../example/widget/canvas/example_gui_canvas.c
    :language: c

@@ -99,7 +99,14 @@ Example Code
 
 Complete card view usage example:
 
-Enable macro ``CONFIG_REALTEK_BUILD_CANVAS`` in :file:`menu_config.h` to run this example.
+Enable the Kconfig option via ``menuconfig`` to run this example:
+
+.. code-block:: shell
+
+   cd win32_sim
+   menuconfig ../Kconfig.gui
+
+Select ``Canvas Demo`` (``CONFIG_REALTEK_BUILD_REAL_CANVAS``), then save to ``win32_sim/.config``.
 
 .. literalinclude:: ../../../example/widget/canvas/example_gui_canvas.c
    :language: c

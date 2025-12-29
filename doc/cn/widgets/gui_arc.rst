@@ -84,7 +84,14 @@
 
 要使用圆弧控件，需要在配置文件中启用相应的宏定义：
 
-在 :file:`menu_config.h` 中添加：
+通过 ``menuconfig`` 启用 Kconfig 选项：
+
+.. code-block:: shell
+
+   cd win32_sim
+   menuconfig ../Kconfig.gui
+
+选择 ``Geometry ARC Demo``（``CONFIG_REALTEK_BUILD_REAL_LITE_ARC``），保存到 ``win32_sim/.config``。
 
 .. code-block:: c
 

@@ -84,7 +84,14 @@ Configuration Instructions
 
 To use the arc widget, enable the corresponding macro in the configuration file:
 
-In :file:`menu_config.h`, add:
+Enable the Kconfig option via ``menuconfig``:
+
+.. code-block:: shell
+
+   cd win32_sim
+   menuconfig ../Kconfig.gui
+
+Select ``Geometry ARC Demo`` (``CONFIG_REALTEK_BUILD_REAL_LITE_ARC``), then save to ``win32_sim/.config``.
 
 .. code-block:: c
 

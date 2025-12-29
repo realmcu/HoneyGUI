@@ -323,7 +323,7 @@ This model consists of 1454 triangular faces and is filled with a default materi
 3D Dog
 ~~~~~~~~
 
-To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_DOG_3D`` in :file:`menu_config.h`. The model consists of 774 triangular surfaces and supports filling with a custom material base color.
+To run this example, enable the Kconfig option via ``menuconfig`` and save to ``win32_sim/.config``. The model consists of 774 triangular surfaces and supports filling with a custom material base color.
 
 .. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_dog.c
    :language: c

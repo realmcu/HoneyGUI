@@ -2,7 +2,14 @@
 Samples
 =======
 
-We have provided some example applications to help everyone become familiar with using this environment. The sample program will continue to increase. You can choose from the following configurations. The configuration file is ``menu_config.h``.
+We have provided some example applications to help everyone become familiar with using this environment. The sample program will continue to increase. Use Kconfig to choose the demo via ``menuconfig``:
+
+.. code-block:: shell
+
+   cd win32_sim
+   menuconfig ../Kconfig.gui
+
+After saving, the configuration is written to ``win32_sim/.config`` and the build system will compile the selected sample.
 
 .. figure:: https://foruda.gitee.com/images/1718765392647198639/ac4aa231_13408154.png
    :align: center
