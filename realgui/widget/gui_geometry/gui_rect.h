@@ -30,11 +30,21 @@ extern "C" {
 #include "guidef.h"
 #include "gui_obj.h"
 #include "draw_img.h"
-// #include "lite_geometry.h"
+#include "lite_geometry.h"
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+
+/** Rect gradient direction */
+typedef enum
+{
+    RECT_GRADIENT_HORIZONTAL = 0,  /**< Left to right */
+    RECT_GRADIENT_VERTICAL,        /**< Top to bottom */
+    RECT_GRADIENT_DIAGONAL_TL_BR,  /**< Top-left to bottom-right */
+    RECT_GRADIENT_DIAGONAL_TR_BL,  /**< Top-right to bottom-left */
+} gui_rect_gradient_dir_t;
+
 /** Rect widget structure. */
 typedef struct
 {
@@ -60,6 +70,11 @@ typedef struct
     float scale_y;              /**< Scale factor in Y direction. */
     float offset_x;             /**< Translation offset in X direction. */
     float offset_y;             /**< Translation offset in Y direction. */
+
+    // Gradient parameters
+    Gradient *gradient;         /**< Optional gradient for rect fill. */
+    bool use_gradient;          /**< Flag to enable gradient rendering. */
+    gui_rect_gradient_dir_t gradient_dir; /**< Gradient direction. */
 } gui_rounded_rect_t;
 
 /*============================================================================*
@@ -165,6 +180,27 @@ void gui_rect_scale(gui_rounded_rect_t *this, float scale_x, float scale_y);
  * @param ty Translation in Y direction (pixels).
  */
 void gui_rect_translate(gui_rounded_rect_t *this, float tx, float ty);
+
+/**
+ * @brief Set linear gradient for rect widget.
+ * @param this Pointer to the rect widget.
+ * @param direction Gradient direction (horizontal, vertical, diagonal).
+ */
+void gui_rect_set_linear_gradient(gui_rounded_rect_t *this, gui_rect_gradient_dir_t direction);
+
+/**
+ * @brief Add color stop to rect gradient.
+ * @param this Pointer to the rect widget.
+ * @param position Position of color stop (0.0 to 1.0).
+ * @param color Color at this stop.
+ */
+void gui_rect_add_gradient_stop(gui_rounded_rect_t *this, float position, gui_color_t color);
+
+/**
+ * @brief Clear gradient and use solid color.
+ * @param this Pointer to the rect widget.
+ */
+void gui_rect_clear_gradient(gui_rounded_rect_t *this);
 
 #ifdef __cplusplus
 }

@@ -46,6 +46,12 @@
      - :cpp:any:`gui_arc_scale`
    * - 平移变换
      - :cpp:any:`gui_arc_translate`
+   * - 设置角度渐变
+     - :cpp:any:`gui_arc_set_angular_gradient`
+   * - 添加渐变色点
+     - :cpp:any:`gui_arc_add_gradient_stop`
+   * - 清除渐变色
+     - :cpp:any:`gui_arc_clear_gradient`
 
 角度说明
 --------
@@ -56,6 +62,38 @@
 - **90°**: 6点钟方向（正南方向）
 - **180°**: 9点钟方向（正西方向）
 - **270°**: 12点钟方向（正北方向）
+
+渐变色填充
+----------
+
+圆弧控件支持角度渐变色填充，可以沿着圆弧的角度方向实现平滑的颜色过渡效果。
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1767061805476727891/be89d853_13406851.png" width= "400" /></div>
+   <br>
+
+**渐变色工作原理**
+
+- 渐变色沿圆弧的角度方向线性插值
+- 支持最多 8 个颜色停止点（color stops）
+- 颜色停止点的位置用 0.0 ~ 1.0 的归一化值表示，其中 0.0 对应起始角度，1.0 对应结束角度
+- 像素颜色通过在相邻颜色停止点之间进行线性插值计算得出
+- 采用角度渐变（Angular Gradient）方式，沿圆弧的角度方向平滑过渡
+
+**使用步骤**
+
+1. 创建圆弧控件
+2. 调用 :cpp:any:`gui_arc_set_angular_gradient` 设置渐变范围
+3. 调用 :cpp:any:`gui_arc_add_gradient_stop` 添加颜色停止点（至少需要 2 个）
+4. 可选：调用 :cpp:any:`gui_arc_clear_gradient` 清除渐变设置
+
+**关键要点**
+
+- **无缝循环**: 对于完整圆环（0° 到 360°），起始颜色和结束颜色应相同，以实现无缝的颜色循环
+- **颜色插值**: 支持 RGBA 颜色空间的线性插值，包括透明度通道
+- **性能优化**: 采用颜色查找表（LUT）预计算，确保高效的渲染性能
 
 特性亮点
 --------
@@ -91,7 +129,7 @@
    cd win32_sim
    menuconfig ../Kconfig.gui
 
-选择 ``Geometry ARC Demo``（``CONFIG_REALTEK_BUILD_REAL_LITE_ARC``），保存到 ``win32_sim/.config``。
+选择 ``Geometry ARC Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_ARC`` )，保存到 ``win32_sim/.config``。
 
 .. code-block:: c
 

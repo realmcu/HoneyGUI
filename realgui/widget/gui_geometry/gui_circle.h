@@ -40,6 +40,14 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
+
+/** Circle gradient type */
+typedef enum
+{
+    CIRCLE_GRADIENT_RADIAL = 0,   /**< From center to edge */
+    CIRCLE_GRADIENT_ANGULAR,      /**< Along the circumference */
+} gui_circle_gradient_type_t;
+
 /** Circle widget structure. */
 typedef struct
 {
@@ -66,6 +74,11 @@ typedef struct
     float scale_y;              /**< Scale factor in Y direction. */
     float offset_x;             /**< Translation offset in X direction. */
     float offset_y;             /**< Translation offset in Y direction. */
+
+    // Gradient parameters
+    Gradient *gradient;         /**< Optional gradient for circle fill. */
+    bool use_gradient;          /**< Flag to enable gradient rendering. */
+    gui_circle_gradient_type_t gradient_type; /**< Gradient type. */
 } gui_circle_t;
 
 /*============================================================================*
@@ -167,6 +180,38 @@ void gui_circle_scale(gui_circle_t *this, float scale_x, float scale_y);
  * @param ty Translation in Y direction (pixels).
  */
 void gui_circle_translate(gui_circle_t *this, float tx, float ty);
+
+/**
+ * @brief Set radial gradient for circle widget (from center to edge).
+ *
+ * @param this Circle widget pointer.
+ */
+void gui_circle_set_radial_gradient(gui_circle_t *this);
+
+/**
+ * @brief Set angular gradient for circle widget (along circumference).
+ *
+ * @param this Circle widget pointer.
+ * @param start_angle Start angle in degrees.
+ * @param end_angle End angle in degrees.
+ */
+void gui_circle_set_angular_gradient(gui_circle_t *this, float start_angle, float end_angle);
+
+/**
+ * @brief Add color stop to circle gradient.
+ *
+ * @param this Circle widget pointer.
+ * @param position Position of color stop (0.0 to 1.0).
+ * @param color Color at this stop.
+ */
+void gui_circle_add_gradient_stop(gui_circle_t *this, float position, gui_color_t color);
+
+/**
+ * @brief Clear gradient and use solid color.
+ *
+ * @param this Circle widget pointer.
+ */
+void gui_circle_clear_gradient(gui_circle_t *this);
 
 #ifdef __cplusplus
 }

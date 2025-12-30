@@ -74,6 +74,10 @@ typedef struct
     float scale_y;              /**< Scale factor in Y direction. */
     float offset_x;             /**< Translation offset in X direction. */
     float offset_y;             /**< Translation offset in Y direction. */
+
+    // Gradient parameters
+    Gradient *gradient;         /**< Optional gradient for arc stroke. */
+    bool use_gradient;          /**< Flag to enable gradient rendering. */
 } gui_arc_t;
 
 /*============================================================================*
@@ -179,6 +183,28 @@ void gui_arc_scale(gui_arc_t *this, float scale_x, float scale_y);
  * @param ty Translation in Y direction (pixels).
  */
 void gui_arc_translate(gui_arc_t *this, float tx, float ty);
+
+/**
+ * @brief Set angular gradient for arc widget.
+ * @param this Pointer to the arc widget.
+ * @param start_angle Start angle for gradient (degrees).
+ * @param end_angle End angle for gradient (degrees).
+ */
+void gui_arc_set_angular_gradient(gui_arc_t *this, float start_angle, float end_angle);
+
+/**
+ * @brief Add color stop to arc gradient.
+ * @param this Pointer to the arc widget.
+ * @param position Position of color stop (0.0 to 1.0).
+ * @param color Color at this stop.
+ */
+void gui_arc_add_gradient_stop(gui_arc_t *this, float position, gui_color_t color);
+
+/**
+ * @brief Clear gradient and use solid color.
+ * @param this Pointer to the arc widget.
+ */
+void gui_arc_clear_gradient(gui_arc_t *this);
 
 #ifdef __cplusplus
 }

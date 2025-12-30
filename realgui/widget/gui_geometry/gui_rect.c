@@ -24,6 +24,7 @@
 #include "acc_api.h"
 #include "tp_algo.h"
 #include "gui_rect.h"
+#include "lite_geometry.h"
 
 /*============================================================================*
  *                           Types
@@ -285,11 +286,100 @@ static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_
     uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
     uint32_t solid_color = this->color.color.argb_full;
 
+    // Check if gradient is enabled
+    bool use_gradient = (this->use_gradient && this->gradient != NULL &&
+                         this->gradient->stop_count >= 2);
+
+    // Pre-calculate for gradient
+    float w_inv = (w > 1) ? 1.0f / (float)(w - 1) : 0.0f;
+    float h_inv = (h > 1) ? 1.0f / (float)(h - 1) : 0.0f;
+    float diag_inv = 1.0f;
+    if (use_gradient && (this->gradient_dir == RECT_GRADIENT_DIAGONAL_TL_BR ||
+                         this->gradient_dir == RECT_GRADIENT_DIAGONAL_TR_BL))
+    {
+        float diag_len = (float)(w - 1 + h - 1);
+        diag_inv = (diag_len > 0) ? 1.0f / diag_len : 0.0f;
+    }
+
+    // Ordered dithering matrix (8x8 Bayer matrix for better quality)
+    // Values normalized to [-0.5, 0.5]
+    static const float dither_matrix[8][8] =
+    {
+        {  0.0f / 64 - 0.5f, 32.0f / 64 - 0.5f,  8.0f / 64 - 0.5f, 40.0f / 64 - 0.5f,  2.0f / 64 - 0.5f, 34.0f / 64 - 0.5f, 10.0f / 64 - 0.5f, 42.0f / 64 - 0.5f},
+        { 48.0f / 64 - 0.5f, 16.0f / 64 - 0.5f, 56.0f / 64 - 0.5f, 24.0f / 64 - 0.5f, 50.0f / 64 - 0.5f, 18.0f / 64 - 0.5f, 58.0f / 64 - 0.5f, 26.0f / 64 - 0.5f},
+        { 12.0f / 64 - 0.5f, 44.0f / 64 - 0.5f,  4.0f / 64 - 0.5f, 36.0f / 64 - 0.5f, 14.0f / 64 - 0.5f, 46.0f / 64 - 0.5f,  6.0f / 64 - 0.5f, 38.0f / 64 - 0.5f},
+        { 60.0f / 64 - 0.5f, 28.0f / 64 - 0.5f, 52.0f / 64 - 0.5f, 20.0f / 64 - 0.5f, 62.0f / 64 - 0.5f, 30.0f / 64 - 0.5f, 54.0f / 64 - 0.5f, 22.0f / 64 - 0.5f},
+        {  3.0f / 64 - 0.5f, 35.0f / 64 - 0.5f, 11.0f / 64 - 0.5f, 43.0f / 64 - 0.5f,  1.0f / 64 - 0.5f, 33.0f / 64 - 0.5f,  9.0f / 64 - 0.5f, 41.0f / 64 - 0.5f},
+        { 51.0f / 64 - 0.5f, 19.0f / 64 - 0.5f, 59.0f / 64 - 0.5f, 27.0f / 64 - 0.5f, 49.0f / 64 - 0.5f, 17.0f / 64 - 0.5f, 57.0f / 64 - 0.5f, 25.0f / 64 - 0.5f},
+        { 15.0f / 64 - 0.5f, 47.0f / 64 - 0.5f,  7.0f / 64 - 0.5f, 39.0f / 64 - 0.5f, 13.0f / 64 - 0.5f, 45.0f / 64 - 0.5f,  5.0f / 64 - 0.5f, 37.0f / 64 - 0.5f},
+        { 63.0f / 64 - 0.5f, 31.0f / 64 - 0.5f, 55.0f / 64 - 0.5f, 23.0f / 64 - 0.5f, 61.0f / 64 - 0.5f, 29.0f / 64 - 0.5f, 53.0f / 64 - 0.5f, 21.0f / 64 - 0.5f}
+    };
+
     // Fill rounded rectangle with anti-aliasing
     for (int y = 0; y < h; y++)
     {
+        // Get dither row for this y (only used when gradient is enabled)
+        const float *dither_row = use_gradient ? dither_matrix[y & 7] : NULL;
+
         for (int x = 0; x < w; x++)
         {
+            // Calculate gradient color for this pixel using direct interpolation
+            uint32_t pixel_color = solid_color;
+            if (use_gradient)
+            {
+                // Get dither value for this pixel
+                float dither = dither_row[x & 7];
+
+                float t = 0.0f;
+                switch (this->gradient_dir)
+                {
+                case RECT_GRADIENT_HORIZONTAL:
+                    t = (float)x * w_inv;
+                    break;
+                case RECT_GRADIENT_VERTICAL:
+                    t = (float)y * h_inv;
+                    break;
+                case RECT_GRADIENT_DIAGONAL_TL_BR:
+                    t = ((float)x + (float)y) * diag_inv;
+                    break;
+                case RECT_GRADIENT_DIAGONAL_TR_BL:
+                    t = ((float)(w - 1 - x) + (float)y) * diag_inv;
+                    break;
+                }
+
+                // Clamp t to [0, 1]
+                if (t < 0.0f) { t = 0.0f; }
+                if (t > 1.0f) { t = 1.0f; }
+
+                // Get interpolated color
+                pixel_color = gradient_get_color(this->gradient, t);
+
+                // Apply RGB565-aware dithering to each color channel
+                // RGB565: R=5bit(32 levels), G=6bit(64 levels), B=5bit(32 levels)
+                // Dither amount: R,B need ~8 levels of dither (256/32), G needs ~4 levels (256/64)
+                int a = (pixel_color >> 24) & 0xFF;
+                int r = (pixel_color >> 16) & 0xFF;
+                int g = (pixel_color >> 8) & 0xFF;
+                int b = pixel_color & 0xFF;
+
+                // Apply dithering scaled for RGB565 quantization
+                // R and B: 8 levels per step (256/32), so dither by ~4
+                // G: 4 levels per step (256/64), so dither by ~2
+                // Alpha: also dither to reduce banding in transparency gradients
+                a = a + (int)(dither * 8.0f);
+                r = r + (int)(dither * 8.0f);
+                g = g + (int)(dither * 4.0f);
+                b = b + (int)(dither * 8.0f);
+
+                // Clamp to [0, 255]
+                a = (a < 0) ? 0 : ((a > 255) ? 255 : a);
+                r = (r < 0) ? 0 : ((r > 255) ? 255 : r);
+                g = (g < 0) ? 0 : ((g > 255) ? 255 : g);
+                b = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+
+                pixel_color = ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+            }
+
             // Check if pixel is in corner region
             bool in_corner = false;
             float dx = 0, dy = 0;
@@ -329,22 +419,22 @@ static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_
                 if (dist <= r - 0.5f)
                 {
                     // Fully inside
-                    pixels[y * w + x] = solid_color;
+                    pixels[y * w + x] = pixel_color;
                 }
                 else if (dist < r + 0.5f)
                 {
                     // Anti-aliasing edge
                     float alpha = r + 0.5f - dist;
-                    gui_color_t color = this->color;
-                    color.color.rgba.a = (uint8_t)(alpha * color.color.rgba.a);
-                    pixels[y * w + x] = color.color.argb_full;
+                    uint8_t base_alpha = (pixel_color >> 24) & 0xFF;
+                    uint8_t new_alpha = (uint8_t)(alpha * base_alpha);
+                    pixels[y * w + x] = (pixel_color & 0x00FFFFFF) | ((uint32_t)new_alpha << 24);
                 }
                 // else: outside, leave transparent
             }
             else
             {
                 // Inside main rectangle area
-                pixels[y * w + x] = solid_color;
+                pixels[y * w + x] = pixel_color;
             }
         }
     }
@@ -468,11 +558,12 @@ static void gui_rect_prepare(gui_obj_t *obj)
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
 
-    // Check if we need single buffer (for transparency or small size)
+    // Check if we need single buffer (for transparency, small size, or gradient)
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
-                              (this->base.w * this->base.h <= 40000);
+                              (this->base.w * this->base.h <= 40000) ||
+                              (this->use_gradient && this->gradient != NULL);
 
-    if (this->radius == 0)
+    if (this->radius == 0 && !this->use_gradient)
     {
         // Simple rectangle without rounded corners
         set_rect_img(this, &this->rect_0, 0, 0, this->base.w, this->base.h);
@@ -565,8 +656,13 @@ static void gui_rect_end(gui_obj_t *obj)
 static void gui_rect_destroy(gui_obj_t *obj)
 {
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
-    GUI_UNUSED(this);
-    // Resources are cleaned up in end callback
+
+    // Free gradient if allocated
+    if (this->gradient != NULL)
+    {
+        gui_free(this->gradient);
+        this->gradient = NULL;
+    }
 }
 
 static void gui_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -644,6 +740,11 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
     round_rect->offset_x = 0.0f;
     round_rect->offset_y = 0.0f;
 
+    // Initialize gradient parameters
+    round_rect->gradient = NULL;
+    round_rect->use_gradient = false;
+    round_rect->gradient_dir = RECT_GRADIENT_HORIZONTAL;
+
     return round_rect;
 }
 
@@ -716,4 +817,49 @@ void gui_rect_translate(gui_rounded_rect_t *this, float tx, float ty)
     GUI_ASSERT(this != NULL);
     this->offset_x = tx;
     this->offset_y = ty;
+}
+
+void gui_rect_set_linear_gradient(gui_rounded_rect_t *this, gui_rect_gradient_dir_t direction)
+{
+    GUI_ASSERT(this != NULL);
+
+    // Allocate gradient if not exists
+    if (this->gradient == NULL)
+    {
+        this->gradient = gui_malloc(sizeof(Gradient));
+        if (this->gradient == NULL) { return; }
+    }
+
+    // Initialize gradient
+    gradient_init(this->gradient, GRADIENT_LINEAR);
+    this->gradient_dir = direction;
+    this->use_gradient = true;
+}
+
+void gui_rect_add_gradient_stop(gui_rounded_rect_t *this, float position, gui_color_t color)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient == NULL)
+    {
+        // Auto-create gradient with default direction
+        gui_rect_set_linear_gradient(this, RECT_GRADIENT_HORIZONTAL);
+    }
+
+    if (this->gradient != NULL)
+    {
+        gradient_add_stop(this->gradient, position, color.color.argb_full);
+    }
+}
+
+void gui_rect_clear_gradient(gui_rounded_rect_t *this)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient != NULL)
+    {
+        gui_free(this->gradient);
+        this->gradient = NULL;
+    }
+    this->use_gradient = false;
 }

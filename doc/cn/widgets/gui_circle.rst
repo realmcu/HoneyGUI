@@ -42,6 +42,14 @@
      - :cpp:any:`gui_circle_scale`
    * - 平移变换
      - :cpp:any:`gui_circle_translate`
+   * - 设置径向渐变
+     - :cpp:any:`gui_circle_set_radial_gradient`
+   * - 设置角度渐变
+     - :cpp:any:`gui_circle_set_angular_gradient`
+   * - 添加渐变色点
+     - :cpp:any:`gui_circle_add_gradient_stop`
+   * - 清除渐变色
+     - :cpp:any:`gui_circle_clear_gradient`
 
 圆形特性
 --------
@@ -52,6 +60,49 @@
 - **半径控制**: 支持任意大小的半径值
 - **完美圆形**: 确保绘制完美的几何圆形
 - **边界处理**: 自动处理圆形与边界的裁剪
+
+渐变色填充
+----------
+
+圆形控件支持径向渐变和角度渐变两种渐变色填充方式，可以创建丰富的视觉效果。
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1767064721463984141/294aaa5b_13406851.png" width= "400" /></div>
+   <br>
+
+**渐变类型**
+
+支持 2 种渐变类型：
+
+- **CIRCLE_GRADIENT_RADIAL**: 径向渐变（从圆心向外）
+- **CIRCLE_GRADIENT_ANGULAR**: 角度渐变（沿圆周方向）
+
+**渐变色工作原理**
+
+- 径向渐变：颜色从圆心向边缘线性插值
+- 角度渐变：颜色沿圆周角度方向线性插值
+- 支持最多 8 个颜色停止点（color stops）
+- 颜色停止点的位置用 0.0 ~ 1.0 的归一化值表示
+- 像素颜色通过在相邻颜色停止点之间进行线性插值计算得出
+- 采用有序抖动（Ordered Dithering）算法消除 RGB565 格式的色阶问题
+
+**使用步骤**
+
+1. 创建圆形控件
+2. 调用 :cpp:any:`gui_circle_set_radial_gradient` 设置径向渐变，或调用 :cpp:any:`gui_circle_set_angular_gradient` 设置角度渐变
+3. 调用 :cpp:any:`gui_circle_add_gradient_stop` 添加颜色停止点（至少需要 2 个）
+4. 可选：调用 :cpp:any:`gui_circle_clear_gradient` 清除渐变设置
+
+**关键要点**
+
+- **径向渐变**: 适合创建光晕、太阳等从中心向外发散的效果
+- **角度渐变**: 适合创建彩虹圆环、色轮等沿圆周变化的效果
+- **无缝循环**: 对于角度渐变，起始颜色和结束颜色应相同，以实现无缝的颜色循环
+- **颜色插值**: 支持 RGBA 颜色空间的线性插值，包括透明度通道
+- **抗色阶**: 针对 RGB565 显示屏优化，使用抖动算法消除色阶
+- **性能优化**: 对非渐变场景几乎无性能影响
 
 特性亮点
 --------
@@ -91,7 +142,7 @@
    cd win32_sim
    menuconfig ../Kconfig.gui
 
-选择 ``Geometry CIRCLE Demo``（``CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE``），保存到 ``win32_sim/.config``。
+选择 ``Geometry CIRCLE Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE`` )，保存到 ``win32_sim/.config``。
 
 .. code-block:: c
 

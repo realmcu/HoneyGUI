@@ -42,6 +42,12 @@
      - :cpp:any:`gui_rect_scale`
    * - 平移变换
      - :cpp:any:`gui_rect_translate`
+   * - 设置线性渐变
+     - :cpp:any:`gui_rect_set_linear_gradient`
+   * - 添加渐变色点
+     - :cpp:any:`gui_rect_add_gradient_stop`
+   * - 清除渐变色
+     - :cpp:any:`gui_rect_clear_gradient`
 
 圆角说明
 --------
@@ -50,6 +56,47 @@
 
 - **radius = 0**: 绘制直角矩形
 - **radius > 0**: 绘制圆角矩形，半径值决定圆角弧度
+
+渐变色填充
+----------
+
+圆角矩形控件支持线性渐变色填充，可以沿着不同方向实现平滑的颜色过渡效果。
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1767064264621594527/6fa7801d_13406851.png" width= "400" /></div>
+   <br>
+
+**渐变方向**
+
+支持 4 种线性渐变方向：
+
+- **RECT_GRADIENT_HORIZONTAL**: 水平渐变（从左到右）
+- **RECT_GRADIENT_VERTICAL**: 垂直渐变（从上到下）
+- **RECT_GRADIENT_DIAGONAL_TL_BR**: 对角线渐变（从左上到右下）
+- **RECT_GRADIENT_DIAGONAL_TR_BL**: 对角线渐变（从右上到左下）
+
+**渐变色工作原理**
+
+- 渐变色沿指定方向线性插值
+- 支持最多 8 个颜色停止点（color stops）
+- 颜色停止点的位置用 0.0 ~ 1.0 的归一化值表示
+- 像素颜色通过在相邻颜色停止点之间进行线性插值计算得出
+- 采用有序抖动（Ordered Dithering）算法消除 RGB565 格式的色阶问题
+
+**使用步骤**
+
+1. 创建圆角矩形控件
+2. 调用 :cpp:any:`gui_rect_set_linear_gradient` 设置渐变方向
+3. 调用 :cpp:any:`gui_rect_add_gradient_stop` 添加颜色停止点（至少需要 2 个）
+4. 可选：调用 :cpp:any:`gui_rect_clear_gradient` 清除渐变设置
+
+**关键要点**
+
+- **颜色插值**: 支持 RGBA 颜色空间的线性插值，包括透明度通道
+- **抗色阶**: 针对 RGB565 显示屏优化，使用抖动算法消除色阶
+- **性能优化**: 对非渐变场景几乎无性能影响
 
 特性亮点
 --------
@@ -88,7 +135,7 @@
    cd win32_sim
    menuconfig ../Kconfig.gui
 
-选择 ``Geometry RECT Demo``（``CONFIG_REALTEK_BUILD_REAL_LITE_RECT``），保存到 ``win32_sim/.config``。
+选择 ``Geometry RECT Demo`` （ ``CONFIG_REALTEK_BUILD_REAL_LITE_RECT`` ），保存到 ``win32_sim/.config``。
 
 .. code-block:: c
 

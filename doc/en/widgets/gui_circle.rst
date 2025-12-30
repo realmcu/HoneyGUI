@@ -42,6 +42,14 @@ Core Features
      - :cpp:any:`gui_circle_scale`
    * - Translation Transform
      - :cpp:any:`gui_circle_translate`
+   * - Set Radial Gradient
+     - :cpp:any:`gui_circle_set_radial_gradient`
+   * - Set Angular Gradient
+     - :cpp:any:`gui_circle_set_angular_gradient`
+   * - Add Gradient Stop
+     - :cpp:any:`gui_circle_add_gradient_stop`
+   * - Clear Gradient
+     - :cpp:any:`gui_circle_clear_gradient`
 
 Circle Characteristics
 ----------------------
@@ -52,6 +60,49 @@ The circle widget has the following geometric characteristics:
 - **Radius Control**: Support any size radius value
 - **Perfect Circle**: Ensure perfect geometric circular rendering
 - **Boundary Handling**: Automatically handle clipping with boundaries
+
+Gradient Fill
+-------------
+
+The circle widget supports both radial and angular gradient color filling, enabling rich visual effects.
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1767064721463984141/294aaa5b_13406851.png" width= "400" /></div>
+   <br>
+
+**Gradient Types**
+
+Supports 2 gradient types:
+
+- **CIRCLE_GRADIENT_RADIAL**: Radial gradient (from center to edge)
+- **CIRCLE_GRADIENT_ANGULAR**: Angular gradient (along the circumference)
+
+**How Gradient Works**
+
+- Radial gradient: Colors are linearly interpolated from center to edge
+- Angular gradient: Colors are linearly interpolated along the circumference
+- Supports up to 8 color stops
+- Color stop positions are represented as normalized values from 0.0 to 1.0
+- Pixel colors are computed through linear interpolation between adjacent color stops
+- Uses ordered dithering algorithm to eliminate banding artifacts on RGB565 displays
+
+**Usage Steps**
+
+1. Create a circle widget
+2. Call :cpp:any:`gui_circle_set_radial_gradient` for radial gradient, or :cpp:any:`gui_circle_set_angular_gradient` for angular gradient
+3. Call :cpp:any:`gui_circle_add_gradient_stop` to add color stops (minimum 2 required)
+4. Optional: Call :cpp:any:`gui_circle_clear_gradient` to clear gradient settings
+
+**Key Points**
+
+- **Radial Gradient**: Ideal for creating glow, sun, and other center-to-edge effects
+- **Angular Gradient**: Ideal for creating rainbow rings, color wheels, and other circumferential effects
+- **Seamless Loop**: For angular gradients, start and end colors should be identical for seamless color cycling
+- **Color Interpolation**: Supports linear interpolation in RGBA color space, including the alpha channel
+- **Anti-Banding**: Optimized for RGB565 displays using dithering algorithm to eliminate color banding
+- **Performance Optimization**: Minimal performance impact on non-gradient scenarios
 
 Feature Highlights
 ------------------
@@ -91,7 +142,7 @@ Enable the Kconfig option via ``menuconfig``:
    cd win32_sim
    menuconfig ../Kconfig.gui
 
-Select ``Geometry CIRCLE Demo`` (``CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE``), then save to ``win32_sim/.config``.
+Select ``Geometry CIRCLE Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE`` ), then save to ``win32_sim/.config``.
 
 .. code-block:: c
 

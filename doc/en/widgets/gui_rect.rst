@@ -42,6 +42,12 @@ Core Features
      - :cpp:any:`gui_rect_scale`
    * - Translation Transform
      - :cpp:any:`gui_rect_translate`
+   * - Set Linear Gradient
+     - :cpp:any:`gui_rect_set_linear_gradient`
+   * - Add Gradient Stop
+     - :cpp:any:`gui_rect_add_gradient_stop`
+   * - Clear Gradient
+     - :cpp:any:`gui_rect_clear_gradient`
 
 Corner Radius Description
 -------------------------
@@ -51,6 +57,46 @@ The rounded rectangle supports the same corner radius for all four corners:
 - **radius = 0**: Draw a rectangle with sharp corners
 - **radius > 0**: Draw a rounded rectangle, with the radius determining the arc of the corners
 
+Gradient Fill
+-------------
+
+The rounded rectangle widget supports linear gradient color filling, enabling smooth color transitions along different directions.
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1767064264621594527/6fa7801d_13406851.png" width= "400" /></div>
+   <br>
+
+**Gradient Directions**
+
+Supports 4 linear gradient directions:
+
+- **RECT_GRADIENT_HORIZONTAL**: Horizontal gradient (left to right)
+- **RECT_GRADIENT_VERTICAL**: Vertical gradient (top to bottom)
+- **RECT_GRADIENT_DIAGONAL_TL_BR**: Diagonal gradient (top-left to bottom-right)
+- **RECT_GRADIENT_DIAGONAL_TR_BL**: Diagonal gradient (top-right to bottom-left)
+
+**How Gradient Works**
+
+- Gradient colors are linearly interpolated along the specified direction
+- Supports up to 8 color stops
+- Color stop positions are represented as normalized values from 0.0 to 1.0
+- Pixel colors are computed through linear interpolation between adjacent color stops
+- Uses ordered dithering algorithm to eliminate banding artifacts on RGB565 displays
+
+**Usage Steps**
+
+1. Create a rounded rectangle widget
+2. Call :cpp:any:`gui_rect_set_linear_gradient` to set the gradient direction
+3. Call :cpp:any:`gui_rect_add_gradient_stop` to add color stops (minimum 2 required)
+4. Optional: Call :cpp:any:`gui_rect_clear_gradient` to clear gradient settings
+
+**Key Points**
+
+- **Color Interpolation**: Supports linear interpolation in RGBA color space, including the alpha channel
+- **Anti-Banding**: Optimized for RGB565 displays using dithering algorithm to eliminate color banding
+- **Performance Optimization**: Minimal performance impact on non-gradient scenarios
 
 Feature Highlights
 ------------------
@@ -89,7 +135,7 @@ Enable the Kconfig option via ``menuconfig``:
    cd win32_sim
    menuconfig ../Kconfig.gui
 
-Select ``Geometry RECT Demo`` (``CONFIG_REALTEK_BUILD_REAL_LITE_RECT``), then save to ``win32_sim/.config``.
+Select ``Geometry RECT Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_RECT`` ), then save to ``win32_sim/.config``.
 
 .. code-block:: c
 

@@ -199,6 +199,12 @@ static void gui_arc_destroy(gui_arc_t *this)
         this->draw_img = NULL;
     }
 
+    if (this->gradient != NULL)
+    {
+        gui_free(this->gradient);
+        this->gradient = NULL;
+    }
+
     this->buffer_valid = false;
 }
 
@@ -302,19 +308,35 @@ static void render_arc_to_buffer(gui_arc_t *this)
     this->draw_ctx.clip_rect.y = 0;
     this->draw_ctx.clip_rect.w = buffer_w;
     this->draw_ctx.clip_rect.h = buffer_w;
+    this->draw_ctx.gradient = this->gradient;
 
     // Draw arc at center of buffer
     float center_x = buffer_w / 2.0f;
 
-    // Draw arc using optimized SDF-based algorithm
-    draw_arc_df_aa(&this->draw_ctx,
-                   center_x,
-                   center_x,
-                   this->radius,
-                   this->line_width,
-                   this->start_angle,
-                   this->end_angle,
-                   this->color.color.argb_full);
+    // Draw arc using gradient or solid color
+    if (this->use_gradient && this->gradient != NULL)
+    {
+        draw_arc_df_aa_gradient(&this->draw_ctx,
+                                center_x,
+                                center_x,  // center_y (square buffer, so same as center_x)
+                                this->radius,
+                                this->line_width,
+                                this->start_angle,
+                                this->end_angle,
+                                this->gradient);
+    }
+    else
+    {
+        // Draw arc using optimized SDF-based algorithm
+        draw_arc_df_aa(&this->draw_ctx,
+                       center_x,
+                       center_x,
+                       this->radius,
+                       this->line_width,
+                       this->start_angle,
+                       this->end_angle,
+                       this->color.color.argb_full);
+    }
 }
 
 /*============================================================================*
@@ -337,6 +359,11 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
     arc->buffer_valid = false;
     arc->draw_ctx.format = PIXEL_FORMAT_ARGB8888;
     arc->draw_ctx.enable_aa = true;
+    arc->draw_ctx.gradient = NULL;
+
+    // Initialize gradient support
+    arc->gradient = NULL;
+    arc->use_gradient = false;
 
     // Calculate widget bounding box
     float outer_r = radius + line_width / 2 + 2;
@@ -465,5 +492,66 @@ void gui_arc_translate(gui_arc_t *this, float tx, float ty)
     GUI_ASSERT(this != NULL);
     this->offset_x = tx;
     this->offset_y = ty;
+    this->buffer_valid = false;
+}
+
+void gui_arc_set_angular_gradient(gui_arc_t *this, float start_angle, float end_angle)
+{
+    GUI_ASSERT(this != NULL);
+
+    // Allocate gradient if not exists
+    if (this->gradient == NULL)
+    {
+        this->gradient = gui_malloc(sizeof(Gradient));
+        GUI_ASSERT(this->gradient != NULL);
+    }
+
+    // Calculate gradient span
+    float span = end_angle - start_angle;
+
+    // Auto-compensate for full circle gradient to enable end cap
+    // When span is ~360° or start==end (full circle), add 1° to trigger end cap drawing
+    if (fabsf(span) < 0.1f || (span >= 359.9f && span <= 360.1f))
+    {
+        // Full circle case: add 1° to enable end cap
+        end_angle = start_angle + 361.0f;
+    }
+
+    // Initialize angular gradient
+    gradient_init(this->gradient, GRADIENT_ANGULAR);
+    this->gradient->angular_cx = this->x;
+    this->gradient->angular_cy = this->y;
+    this->gradient->angular_start = start_angle;
+    this->gradient->angular_end = end_angle;
+
+    this->use_gradient = true;
+    this->buffer_valid = false;
+}
+
+void gui_arc_add_gradient_stop(gui_arc_t *this, float position, gui_color_t color)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient == NULL)
+    {
+        // Initialize default angular gradient if not set
+        gui_arc_set_angular_gradient(this, this->start_angle, this->end_angle);
+    }
+
+    gradient_add_stop(this->gradient, position, color.color.argb_full);
+    this->buffer_valid = false;
+}
+
+void gui_arc_clear_gradient(gui_arc_t *this)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient != NULL)
+    {
+        gui_free(this->gradient);
+        this->gradient = NULL;
+    }
+
+    this->use_gradient = false;
     this->buffer_valid = false;
 }

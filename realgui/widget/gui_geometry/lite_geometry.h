@@ -79,6 +79,43 @@ typedef enum
     PIXEL_FORMAT_ARGB8888
 } PixelFormat;
 
+// Gradient types
+typedef enum
+{
+    GRADIENT_NONE = 0,
+    GRADIENT_LINEAR,
+    GRADIENT_RADIAL,
+    GRADIENT_ANGULAR
+} GradientType;
+
+// Gradient stop structure
+typedef struct
+{
+    float position;      // 0.0 to 1.0
+    PixelColor color;
+} GradientStop;
+
+// Gradient definition
+typedef struct
+{
+    GradientType type;
+    GradientStop stops[8];  // Support up to 8 color stops
+    int stop_count;
+
+    // Linear gradient parameters
+    float linear_x1, linear_y1;  // Start point
+    float linear_x2, linear_y2;  // End point
+
+    // Radial gradient parameters
+    float radial_cx, radial_cy;  // Center point
+    float radial_r;              // Radius
+
+    // Angular gradient parameters (for arc)
+    float angular_cx, angular_cy;  // Center point
+    float angular_start;           // Start angle in degrees
+    float angular_end;             // End angle in degrees
+} Gradient;
+
 typedef struct
 {
     uint8_t *buffer;
@@ -89,6 +126,7 @@ typedef struct
     bool enable_aa; //anti-aliasing
     Rect clip_rect;
     bool enable_stroke_cap; //enable stroke cap
+    Gradient *gradient;     // Optional gradient for fills/strokes
 } DrawContext;
 
 void add_pixel_with_coverage_rgb565(DrawContext *ctx, int x, int y, PixelColor color,
@@ -138,10 +176,21 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                     PixelColor stroke_color);
 void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
                       float arc_radius, float line_width, PixelColor color);
+void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
+                             float radius, float line_width,
+                             float start_angle, float end_angle,
+                             Gradient *gradient);
 void draw_symmetric_pixels(DrawContext *ctx, float cx, float cy, int x, int y,
                            PixelColor color, float coverage);
 PixelColor create_color_by_format(PixelFormat format, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 PixelColor RGBA_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
+// Gradient functions
+void gradient_init(Gradient *grad, GradientType type);
+void gradient_add_stop(Gradient *grad, float position, PixelColor color);
+PixelColor gradient_get_color(Gradient *grad, float t);
+PixelColor gradient_get_color_at_point(Gradient *grad, float x, float y);
+PixelColor gradient_get_color_at_angle(Gradient *grad, float angle);
 
 #define COLOR_RED     create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 0, 255)
 #define COLOR_GREEN   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 255, 0, 255)

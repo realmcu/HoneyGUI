@@ -46,6 +46,12 @@ Core Features
      - :cpp:any:`gui_arc_scale`
    * - Translation Transform
      - :cpp:any:`gui_arc_translate`
+   * - Set Angular Gradient
+     - :cpp:any:`gui_arc_set_angular_gradient`
+   * - Add Gradient Stop
+     - :cpp:any:`gui_arc_add_gradient_stop`
+   * - Clear Gradient
+     - :cpp:any:`gui_arc_clear_gradient`
 
 Angle Description
 -----------------
@@ -56,6 +62,38 @@ The arc uses a standard mathematical coordinate system for angles:
 - **90°**: Points to 6 o'clock (due south)
 - **180°**: Points to 9 o'clock (due west)
 - **270°**: Points to 12 o'clock (due north)
+
+Gradient Fill
+-------------
+
+The arc widget supports angular gradient color filling, enabling smooth color transitions along the arc's angular direction.
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1767061805476727891/be89d853_13406851.png" width= "400" /></div>
+   <br>
+
+**How Gradient Works**
+
+- Gradient colors are linearly interpolated along the arc's angular direction
+- Supports up to 8 color stops
+- Color stop positions are represented as normalized values from 0.0 to 1.0, where 0.0 corresponds to the start angle and 1.0 corresponds to the end angle
+- Pixel colors are computed through linear interpolation between adjacent color stops
+- Uses angular gradient approach, providing smooth color transitions along the arc's angular direction
+
+**Usage Steps**
+
+1. Create an arc widget
+2. Call :cpp:any:`gui_arc_set_angular_gradient` to set the gradient range
+3. Call :cpp:any:`gui_arc_add_gradient_stop` to add color stops (minimum 2 required)
+4. Optional: Call :cpp:any:`gui_arc_clear_gradient` to clear gradient settings
+
+**Key Points**
+
+- **Seamless Loop**: For a full circle (0° to 360°), the start and end colors should be identical to achieve seamless color cycling
+- **Color Interpolation**: Supports linear interpolation in RGBA color space, including the alpha channel
+- **Performance Optimization**: Uses a color lookup table (LUT) for pre-computation, ensuring efficient rendering performance
 
 Features Highlights
 -------------------
@@ -91,7 +129,7 @@ Enable the Kconfig option via ``menuconfig``:
    cd win32_sim
    menuconfig ../Kconfig.gui
 
-Select ``Geometry ARC Demo`` (``CONFIG_REALTEK_BUILD_REAL_LITE_ARC``), then save to ``win32_sim/.config``.
+Select ``Geometry ARC Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_ARC`` ), then save to ``win32_sim/.config``.
 
 .. code-block:: c
 

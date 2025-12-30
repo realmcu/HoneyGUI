@@ -1429,3 +1429,632 @@ void draw_arc(DrawContext *ctx, float center_x, float center_y,
     }
     // No non-AA version for now, always use AA
 }
+
+// ==================== Gradient Functions ====================
+
+/**
+ * Initialize a gradient structure
+ */
+void gradient_init(Gradient *grad, GradientType type)
+{
+    if (grad == NULL) { return; }
+
+    grad->type = type;
+    grad->stop_count = 0;
+    grad->linear_x1 = 0;
+    grad->linear_y1 = 0;
+    grad->linear_x2 = 0;
+    grad->linear_y2 = 0;
+    grad->radial_cx = 0;
+    grad->radial_cy = 0;
+    grad->radial_r = 0;
+    grad->angular_cx = 0;
+    grad->angular_cy = 0;
+    grad->angular_start = 0;
+    grad->angular_end = 360;
+}
+
+/**
+ * Add a color stop to gradient
+ */
+void gradient_add_stop(Gradient *grad, float position, PixelColor color)
+{
+    if (grad == NULL || grad->stop_count >= 8) { return; }
+
+    // Clamp position to [0, 1]
+    position = LG_CLAMP(position, 0.0f, 1.0f);
+
+    // Insert stop in sorted order
+    int insert_idx = grad->stop_count;
+    for (int i = 0; i < grad->stop_count; i++)
+    {
+        if (position < grad->stops[i].position)
+        {
+            insert_idx = i;
+            break;
+        }
+    }
+
+    // Shift existing stops
+    for (int i = grad->stop_count; i > insert_idx; i--)
+    {
+        grad->stops[i] = grad->stops[i - 1];
+    }
+
+    // Insert new stop
+    grad->stops[insert_idx].position = position;
+    grad->stops[insert_idx].color = color;
+    grad->stop_count++;
+}
+
+/**
+ * Interpolate color between two stops
+ */
+static PixelColor interpolate_color(PixelColor c1, PixelColor c2, float t)
+{
+    int a1 = (c1 >> 24) & 0xFF;
+    int r1 = (c1 >> 16) & 0xFF;
+    int g1 = (c1 >> 8) & 0xFF;
+    int b1 = c1 & 0xFF;
+
+    int a2 = (c2 >> 24) & 0xFF;
+    int r2 = (c2 >> 16) & 0xFF;
+    int g2 = (c2 >> 8) & 0xFF;
+    int b2 = c2 & 0xFF;
+
+    // Use int for interpolation to avoid overflow
+    int a = (int)(a1 + (a2 - a1) * t);
+    int r = (int)(r1 + (r2 - r1) * t);
+    int g = (int)(g1 + (g2 - g1) * t);
+    int b = (int)(b1 + (b2 - b1) * t);
+
+    // Clamp to [0, 255]
+    a = (a < 0) ? 0 : ((a > 255) ? 255 : a);
+    r = (r < 0) ? 0 : ((r > 255) ? 255 : r);
+    g = (g < 0) ? 0 : ((g > 255) ? 255 : g);
+    b = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+
+    return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+}
+
+/**
+ * Get color from gradient at position t (0.0 to 1.0)
+ */
+PixelColor gradient_get_color(Gradient *grad, float t)
+{
+    if (grad == NULL || grad->stop_count == 0)
+    {
+        return 0xFF000000; // Black
+    }
+
+    if (grad->stop_count == 1)
+    {
+        return grad->stops[0].color;
+    }
+
+    // Clamp t to [0, 1]
+    t = LG_CLAMP(t, 0.0f, 1.0f);
+
+    // Find the two stops to interpolate between
+    if (t <= grad->stops[0].position)
+    {
+        return grad->stops[0].color;
+    }
+
+    if (t >= grad->stops[grad->stop_count - 1].position)
+    {
+        return grad->stops[grad->stop_count - 1].color;
+    }
+
+    for (int i = 0; i < grad->stop_count - 1; i++)
+    {
+        if (t >= grad->stops[i].position && t <= grad->stops[i + 1].position)
+        {
+            float pos1 = grad->stops[i].position;
+            float pos2 = grad->stops[i + 1].position;
+            float local_t = (t - pos1) / (pos2 - pos1);
+
+            return interpolate_color(grad->stops[i].color, grad->stops[i + 1].color, local_t);
+        }
+    }
+
+    return grad->stops[grad->stop_count - 1].color;
+}
+
+/**
+ * Get color from gradient at specific point (for linear/radial gradients)
+ */
+PixelColor gradient_get_color_at_point(Gradient *grad, float x, float y)
+{
+    if (grad == NULL) { return 0xFF000000; }
+
+    float t = 0.0f;
+
+    switch (grad->type)
+    {
+    case GRADIENT_LINEAR:
+        {
+            // Calculate projection onto gradient line
+            float dx = grad->linear_x2 - grad->linear_x1;
+            float dy = grad->linear_y2 - grad->linear_y1;
+            float len_sq = dx * dx + dy * dy;
+
+            if (len_sq < 0.0001f)
+            {
+                t = 0.0f;
+            }
+            else
+            {
+                float px = x - grad->linear_x1;
+                float py = y - grad->linear_y1;
+                t = (px * dx + py * dy) / len_sq;
+            }
+        }
+        break;
+
+    case GRADIENT_RADIAL:
+        {
+            // Calculate distance from center
+            float dx = x - grad->radial_cx;
+            float dy = y - grad->radial_cy;
+            float dist = sqrtf(dx * dx + dy * dy);
+
+            if (grad->radial_r > 0.0001f)
+            {
+                t = dist / grad->radial_r;
+            }
+            else
+            {
+                t = 0.0f;
+            }
+        }
+        break;
+
+    default:
+        t = 0.0f;
+        break;
+    }
+
+    return gradient_get_color(grad, t);
+}
+
+/**
+ * Get color from gradient at specific angle (for angular gradients)
+ * Improved version with correct angle handling for full circles
+ */
+PixelColor gradient_get_color_at_angle(Gradient *grad, float angle)
+{
+    if (grad == NULL || grad->type != GRADIENT_ANGULAR)
+    {
+        return 0xFF000000;
+    }
+
+    if (grad->stop_count == 0)
+    {
+        return 0xFF000000;
+    }
+
+    if (grad->stop_count == 1)
+    {
+        return grad->stops[0].color;
+    }
+
+    // Get gradient angle range (use original values, don't normalize)
+    float start = grad->angular_start;
+    float end = grad->angular_end;
+
+    // Calculate angle span
+    float span = end - start;
+    if (span <= 0.0f) { span += 360.0f; }
+
+    // Normalize input angle to be relative to start
+    float angle_offset = angle - start;
+
+    // Handle wrap-around
+    while (angle_offset < 0.0f) { angle_offset += 360.0f; }
+    while (angle_offset >= 360.0f) { angle_offset -= 360.0f; }
+
+    // Calculate t (0.0 to 1.0)
+    float t = angle_offset / span;
+
+    // Clamp t to [0, 1] range
+    if (t < 0.0f) { t = 0.0f; }
+    if (t > 1.0f) { t = 1.0f; }
+
+    return gradient_get_color(grad, t);
+}
+
+/**
+ * Draw arc with gradient - optimized version using LUT
+ * Performance optimizations:
+ * 1. Pre-computed angle-to-color lookup table (LUT)
+ * 2. Fast integer angle calculation using atan2 approximation
+ * 3. Squared distance comparison (no sqrt)
+ * 4. Minimized branching in hot loop
+ */
+void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
+                             float radius, float line_width,
+                             float start_angle, float end_angle,
+                             Gradient *gradient)
+{
+    if (radius <= 0 || line_width <= 0 || gradient == NULL) { return; }
+
+    // Read gradient angles from struct using union to handle potential alignment issues
+    volatile unsigned char *bytes = (volatile unsigned char *)gradient;
+    union { unsigned char b[4]; float f; } start_union, end_union;
+    start_union.b[0] = bytes[108]; start_union.b[1] = bytes[109];
+    start_union.b[2] = bytes[110]; start_union.b[3] = bytes[111];
+    end_union.b[0] = bytes[112]; end_union.b[1] = bytes[113];
+    end_union.b[2] = bytes[114]; end_union.b[3] = bytes[115];
+    float gradient_start = start_union.f;
+    float gradient_end = end_union.f;
+
+    // Save original angles for cap calculation
+    float original_start_angle = start_angle;
+    float original_end_angle = end_angle;
+
+    // CRITICAL: Calculate original angle span BEFORE normalization
+    // This preserves the intent of full circle (e.g., 270-630 = 360° span)
+    float original_span = original_end_angle - original_start_angle;
+    bool is_full_circle = (original_span >= 359.9f || original_span <= -359.9f ||
+                           fabsf(original_span) < 0.1f);  // 270-270 case
+
+    // For full circle, treat as 0-360 internally
+    if (is_full_circle)
+    {
+        start_angle = 0.0f;
+        end_angle = 360.0f;
+    }
+    else
+    {
+        // Normalize angles
+        start_angle = normalize_angle_arc(start_angle);
+        end_angle = normalize_angle_arc(end_angle);
+    }
+
+    // Calculate angle span
+    float angle_span = end_angle - start_angle;
+    if (angle_span <= 0) { angle_span += 360.0f; }
+
+    // Calculate bounding box
+    float outer_r = radius + line_width / 2.0f + 2.0f;
+    int min_x = (int)(center_x - outer_r);
+    int max_x = (int)(center_x + outer_r) + 1;
+    int min_y = (int)(center_y - outer_r);
+    int max_y = (int)(center_y + outer_r) + 1;
+
+    // Clip to context bounds
+    min_x = LG_MAX(min_x, ctx->clip_rect.x);
+    max_x = LG_MIN(max_x, ctx->clip_rect.x + ctx->clip_rect.w);
+    min_y = LG_MAX(min_y, ctx->clip_rect.y);
+    max_y = LG_MIN(max_y, ctx->clip_rect.y + ctx->clip_rect.h);
+
+    if (min_x >= max_x || min_y >= max_y) { return; }
+
+    // Direct pixel access
+    int pixel_size = (ctx->format == PIXEL_FORMAT_RGB565) ? 2 : 4;
+    uint8_t *buffer = ctx->buffer;
+    int stride = ctx->width * pixel_size;
+
+    // ========== OPTIMIZATION 1: Pre-compute color LUT ==========
+    // Build 360-entry lookup table for angle-to-color mapping
+    PixelColor color_lut[360];
+    for (int i = 0; i < 360; i++)
+    {
+        color_lut[i] = gradient_get_color_at_angle(gradient, (float)i);
+    }
+
+    // ========== OPTIMIZATION 2: Pre-calculate constants ==========
+    // Check if gradient angle span exceeds 360 degrees
+    float gradient_span = gradient_end - gradient_start;
+    if (gradient_span <= 0.0f) { gradient_span += 360.0f; }
+    bool gradient_over_360 = (gradient_span > 360.0f);
+
+    bool has_caps = (angle_span < 359.9f);
+
+    // CRITICAL: When gradient > 360°, we need to draw end cap even for full circle
+    bool draw_end_cap = gradient_over_360 && !has_caps;
+
+    float start_cap_x = 0, start_cap_y = 0, end_cap_x = 0, end_cap_y = 0;
+    PixelColor start_color = gradient->stops[0].color;
+    PixelColor end_color = gradient->stops[gradient->stop_count - 1].color;
+
+    // Pre-normalize angles for range checking
+    int norm_start_i = (int)start_angle;
+    int norm_end_i = (int)end_angle;
+    if (norm_start_i < 0) { norm_start_i += 360; }
+    if (norm_start_i >= 360) { norm_start_i -= 360; }
+    if (norm_end_i < 0) { norm_end_i += 360; }
+    if (norm_end_i >= 360) { norm_end_i -= 360; }
+
+    if (has_caps || draw_end_cap)
+    {
+        float start_rad = original_start_angle * M_PI / 180.0f;
+        float end_rad = original_end_angle * M_PI / 180.0f;
+        start_cap_x = center_x + radius * cosf(start_rad);
+        start_cap_y = center_y + radius * sinf(start_rad);
+        end_cap_x = center_x + radius * cosf(end_rad);
+        end_cap_y = center_y + radius * sinf(end_rad);
+    }
+
+    // ========== OPTIMIZATION 3: Pre-calculate ring parameters ==========
+    float inner_r = radius - line_width / 2.0f;
+    // float outer_r_check = radius + line_width / 2.0f;
+    float aa_width = 1.5f;
+
+    // Conversion factor for atan2 result to degrees
+    const float RAD_TO_DEG = 180.0f / M_PI;
+
+    // ========== Main rendering loop ==========
+    for (int py = min_y; py < max_y; py++)
+    {
+        float dy = py + 0.5f - center_y;
+        float dy_sq = dy * dy;
+        uint8_t *row = buffer + py * stride;
+
+        for (int px = min_x; px < max_x; px++)
+        {
+            float dx = px + 0.5f - center_x;
+            float dist_sq = dx * dx + dy_sq;
+
+            // Quick rejection: outside outer circle or inside inner circle
+            if (dist_sq > (outer_r + 2.0f) * (outer_r + 2.0f)) { continue; }
+            if (dist_sq < (inner_r - 2.0f) * (inner_r - 2.0f) && inner_r > 2.0f) { continue; }
+
+            // Compute SDF
+            float sdf = arc_sdf(px + 0.5f, py + 0.5f, center_x, center_y,
+                                radius, line_width, start_angle, end_angle);
+
+            // Convert SDF to coverage
+            float coverage = 1.0f - smoothstep(-aa_width, aa_width, sdf);
+            if (coverage < 0.001f) { continue; }
+
+            // ========== OPTIMIZATION 4: Fast angle calculation ==========
+            float angle = atan2f(dy, dx) * RAD_TO_DEG;
+            int angle_i = (int)(angle + 360.5f) % 360;  // Fast normalize to [0, 359]
+
+            // ========== OPTIMIZATION 5: Simplified cap detection ==========
+            PixelColor stroke_color;
+
+            if (has_caps)
+            {
+                // Check if in arc range using integer comparison
+                bool in_arc_range;
+                if (norm_start_i <= norm_end_i)
+                {
+                    in_arc_range = (angle_i >= norm_start_i && angle_i <= norm_end_i);
+                }
+                else
+                {
+                    in_arc_range = (angle_i >= norm_start_i || angle_i <= norm_end_i);
+                }
+
+                if (!in_arc_range)
+                {
+                    // In cap region
+                    float dx_start = px + 0.5f - start_cap_x;
+                    float dy_start = py + 0.5f - start_cap_y;
+                    float dx_end = px + 0.5f - end_cap_x;
+                    float dy_end = py + 0.5f - end_cap_y;
+
+                    float dist_start_sq = dx_start * dx_start + dy_start * dy_start;
+                    float dist_end_sq = dx_end * dx_end + dy_end * dy_end;
+
+                    // CRITICAL FIX: When gradient span > 360°, end cap should also use gradient color
+                    if (gradient_over_360 && dist_end_sq < dist_start_sq)
+                    {
+                        // End cap with gradient: use the color at the end angle
+                        stroke_color = gradient_get_color_at_angle(gradient, angle);
+                    }
+                    else
+                    {
+                        // Normal cap behavior: use solid color
+                        stroke_color = (dist_start_sq < dist_end_sq) ? start_color : end_color;
+                    }
+                }
+                else
+                {
+                    // Use LUT for color lookup
+                    stroke_color = color_lut[angle_i];
+                }
+            }
+            else
+            {
+                // Full circle - direct LUT lookup
+                stroke_color = color_lut[angle_i];
+            }
+
+            // Extract color components
+            uint8_t color_a = (stroke_color >> 24) & 0xFF;
+            if (color_a == 0) { continue; }
+
+            uint8_t color_r = (stroke_color >> 16) & 0xFF;
+            uint8_t color_g = (stroke_color >> 8) & 0xFF;
+            uint8_t color_b = stroke_color & 0xFF;
+
+            // Compute final alpha
+            uint8_t final_alpha = (uint8_t)(color_a * coverage);
+            if (final_alpha == 0) { continue; }
+
+            // Write pixel
+            int byte_offset = px * pixel_size;
+
+            if (ctx->format == PIXEL_FORMAT_ARGB8888)
+            {
+                uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
+
+                if (final_alpha == 255)
+                {
+                    *pixel_ptr = stroke_color;
+                }
+                else
+                {
+                    uint32_t bg = *pixel_ptr;
+                    uint8_t bg_a = (bg >> 24) & 0xFF;
+
+                    if (bg_a == 0)
+                    {
+                        *pixel_ptr = (final_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
+                    }
+                    else
+                    {
+                        uint16_t inv_alpha = 256 - final_alpha;
+                        uint8_t bg_r = (bg >> 16) & 0xFF;
+                        uint8_t bg_g = (bg >> 8) & 0xFF;
+                        uint8_t bg_b = bg & 0xFF;
+
+                        uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
+                        uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
+                        uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
+                        uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
+
+                        *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
+                    }
+                }
+            }
+            else if (ctx->format == PIXEL_FORMAT_RGB565)
+            {
+                uint16_t *pixel_ptr = (uint16_t *)(row + byte_offset);
+
+                if (final_alpha == 255)
+                {
+                    *pixel_ptr = (uint16_t)stroke_color;
+                }
+                else
+                {
+                    uint16_t bg = *pixel_ptr;
+                    uint16_t inv_alpha = 256 - final_alpha;
+
+                    uint8_t bg_r = (bg >> 11) & 0x1F;
+                    uint8_t bg_g = (bg >> 5) & 0x3F;
+                    uint8_t bg_b = bg & 0x1F;
+
+                    uint8_t fg_r = (color_r >> 3) & 0x1F;
+                    uint8_t fg_g = (color_g >> 2) & 0x3F;
+                    uint8_t fg_b = (color_b >> 3) & 0x1F;
+
+                    uint8_t out_r = ((bg_r * inv_alpha + fg_r * final_alpha) >> 8) & 0x1F;
+                    uint8_t out_g = ((bg_g * inv_alpha + fg_g * final_alpha) >> 8) & 0x3F;
+                    uint8_t out_b = ((bg_b * inv_alpha + fg_b * final_alpha) >> 8) & 0x1F;
+
+                    *pixel_ptr = (out_r << 11) | (out_g << 5) | out_b;
+                }
+            }
+        }
+    }
+
+    // ========== SPECIAL: Draw end cap for gradient > 360° on full circle ==========
+    // When arc is full circle (0-360) but gradient exceeds 360° (e.g., 0-361),
+    // we need to draw the end cap separately since arc_sdf doesn't handle it
+    // The end cap should protrude OUTWARD from the arc at the end angle position
+    if (draw_end_cap)
+    {
+        float cap_radius = line_width / 2.0f;
+
+        // Calculate end cap center position
+        // The cap center should be on the arc's center line (at radius distance from center)
+        // at the gradient end angle position
+        // Use gradient_end from gradient struct (already read at function start)
+        float end_angle_rad = gradient_end * M_PI / 180.0f;
+        float cap_center_x = center_x + radius * cosf(end_angle_rad);
+        float cap_center_y = center_y + radius * sinf(end_angle_rad);
+
+        int cap_min_x = (int)(cap_center_x - cap_radius - 2);
+        int cap_max_x = (int)(cap_center_x + cap_radius + 2);
+        int cap_min_y = (int)(cap_center_y - cap_radius - 2);
+        int cap_max_y = (int)(cap_center_y + cap_radius + 2);
+
+        // Clip to context bounds
+        cap_min_x = LG_MAX(cap_min_x, ctx->clip_rect.x);
+        cap_max_x = LG_MIN(cap_max_x, ctx->clip_rect.x + ctx->clip_rect.w);
+        cap_min_y = LG_MAX(cap_min_y, ctx->clip_rect.y);
+        cap_max_y = LG_MIN(cap_max_y, ctx->clip_rect.y + ctx->clip_rect.h);
+
+        for (int py = cap_min_y; py < cap_max_y; py++)
+        {
+            float dy_cap = py + 0.5f - cap_center_y;
+            uint8_t *row = buffer + py * stride;
+
+            for (int px = cap_min_x; px < cap_max_x; px++)
+            {
+                float dx_cap = px + 0.5f - cap_center_x;
+
+                // Distance from cap center
+                float dist_cap = sqrtf(dx_cap * dx_cap + dy_cap * dy_cap);
+
+                // SDF for circle cap
+                float sdf = dist_cap - cap_radius;
+                float coverage = 1.0f - smoothstep(-aa_width, aa_width, sdf);
+                if (coverage < 0.001f) { continue; }
+
+                // Use the end color of the gradient for the cap
+                PixelColor stroke_color = end_color;
+
+                uint8_t color_a = (stroke_color >> 24) & 0xFF;
+                if (color_a == 0) { continue; }
+
+                uint8_t color_r = (stroke_color >> 16) & 0xFF;
+                uint8_t color_g = (stroke_color >> 8) & 0xFF;
+                uint8_t color_b = stroke_color & 0xFF;
+
+                uint8_t final_alpha = (uint8_t)(color_a * coverage);
+                if (final_alpha == 0) { continue; }
+
+                int byte_offset = px * pixel_size;
+
+                if (ctx->format == PIXEL_FORMAT_ARGB8888)
+                {
+                    uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
+                    if (final_alpha == 255)
+                    {
+                        *pixel_ptr = stroke_color;
+                    }
+                    else
+                    {
+                        uint32_t bg = *pixel_ptr;
+                        uint8_t bg_a = (bg >> 24) & 0xFF;
+                        if (bg_a == 0)
+                        {
+                            *pixel_ptr = (final_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
+                        }
+                        else
+                        {
+                            uint16_t inv_alpha = 256 - final_alpha;
+                            uint8_t bg_r = (bg >> 16) & 0xFF;
+                            uint8_t bg_g = (bg >> 8) & 0xFF;
+                            uint8_t bg_b = bg & 0xFF;
+                            uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
+                            uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
+                            uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
+                            uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
+                            *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
+                        }
+                    }
+                }
+                else if (ctx->format == PIXEL_FORMAT_RGB565)
+                {
+                    uint16_t *pixel_ptr = (uint16_t *)(row + byte_offset);
+                    if (final_alpha == 255)
+                    {
+                        *pixel_ptr = (uint16_t)stroke_color;
+                    }
+                    else
+                    {
+                        uint16_t bg = *pixel_ptr;
+                        uint16_t inv_alpha = 256 - final_alpha;
+                        uint8_t bg_r = (bg >> 11) & 0x1F;
+                        uint8_t bg_g = (bg >> 5) & 0x3F;
+                        uint8_t bg_b = bg & 0x1F;
+                        uint8_t fg_r = (color_r >> 3) & 0x1F;
+                        uint8_t fg_g = (color_g >> 2) & 0x3F;
+                        uint8_t fg_b = (color_b >> 3) & 0x1F;
+                        uint8_t out_r = ((bg_r * inv_alpha + fg_r * final_alpha) >> 8) & 0x1F;
+                        uint8_t out_g = ((bg_g * inv_alpha + fg_g * final_alpha) >> 8) & 0x3F;
+                        uint8_t out_b = ((bg_b * inv_alpha + fg_b * final_alpha) >> 8) & 0x1F;
+                        *pixel_ptr = (out_r << 11) | (out_g << 5) | out_b;
+                    }
+                }
+            }
+        }
+    }
+}

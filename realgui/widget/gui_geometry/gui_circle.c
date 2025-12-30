@@ -112,31 +112,137 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
     uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
     uint32_t solid_color = this->color.color.argb_full;
 
+    // Pre-compute gradient LUT if gradient is enabled
+    uint32_t *gradient_lut = NULL;
+    int lut_size = 0;
+    bool use_radial = (this->use_gradient && this->gradient != NULL &&
+                       this->gradient->stop_count >= 2 &&
+                       this->gradient_type == CIRCLE_GRADIENT_RADIAL);
+    bool use_angular = (this->use_gradient && this->gradient != NULL &&
+                        this->gradient->stop_count >= 2 &&
+                        this->gradient_type == CIRCLE_GRADIENT_ANGULAR);
+
+    if (use_radial)
+    {
+        // LUT size = radius for radial gradient
+        lut_size = r + 1;
+        gradient_lut = gui_malloc(lut_size * sizeof(uint32_t));
+        if (gradient_lut != NULL)
+        {
+            for (int i = 0; i < lut_size; i++)
+            {
+                float t = (float)i / (float)r;
+                gradient_lut[i] = gradient_get_color(this->gradient, t);
+            }
+        }
+    }
+    else if (use_angular)
+    {
+        // LUT size = 360 for angular gradient
+        lut_size = 360;
+        gradient_lut = gui_malloc(lut_size * sizeof(uint32_t));
+        if (gradient_lut != NULL)
+        {
+            float start_angle = this->gradient->angular_start;
+            float end_angle = this->gradient->angular_end;
+            float angle_range = end_angle - start_angle;
+            if (angle_range <= 0) { angle_range = 360.0f; }
+
+            for (int i = 0; i < lut_size; i++)
+            {
+                float angle = (float)i;
+                float t = (angle - start_angle) / angle_range;
+                if (t < 0) { t += 1.0f; }
+                if (t > 1.0f) { t -= 1.0f; }
+                t = (t < 0) ? 0 : ((t > 1.0f) ? 1.0f : t);
+                gradient_lut[i] = gradient_get_color(this->gradient, t);
+            }
+        }
+    }
+
     // Fill circle with anti-aliasing
     float center = (float)r;
-    for (int y = 0; y < diameter; y++)
-    {
-        for (int x = 0; x < diameter; x++)
-        {
-            float dx = x + 0.5f - center;
-            float dy = y + 0.5f - center;
-            float dist = sqrtf(dx * dx + dy * dy);
 
-            if (dist <= r - 0.5f)
+    if (use_radial || use_angular)
+    {
+        // Gradient path: need to calculate color for each pixel
+        for (int y = 0; y < diameter; y++)
+        {
+            for (int x = 0; x < diameter; x++)
             {
-                // Fully inside
-                pixels[y * diameter + x] = solid_color;
+                float dx = x + 0.5f - center;
+                float dy = y + 0.5f - center;
+                float dist = sqrtf(dx * dx + dy * dy);
+
+                // Calculate gradient color for this pixel
+                uint32_t pixel_color = solid_color;
+                if (use_radial && gradient_lut != NULL)
+                {
+                    int lut_idx = (int)dist;
+                    if (lut_idx < 0) { lut_idx = 0; }
+                    if (lut_idx >= lut_size) { lut_idx = lut_size - 1; }
+                    pixel_color = gradient_lut[lut_idx];
+                }
+                else if (use_angular && gradient_lut != NULL && dist > 0.5f)
+                {
+                    // Calculate angle (0-360)
+                    float angle = atan2f(dy, dx) * 180.0f / M_PI;
+                    if (angle < 0) { angle += 360.0f; }
+                    int lut_idx = (int)angle;
+                    if (lut_idx < 0) { lut_idx = 0; }
+                    if (lut_idx >= 360) { lut_idx = 359; }
+                    pixel_color = gradient_lut[lut_idx];
+                }
+
+                if (dist <= r - 0.5f)
+                {
+                    // Fully inside
+                    pixels[y * diameter + x] = pixel_color;
+                }
+                else if (dist < r + 0.5f)
+                {
+                    // Anti-aliasing edge
+                    float alpha = r + 0.5f - dist;
+                    uint8_t base_alpha = (pixel_color >> 24) & 0xFF;
+                    uint8_t new_alpha = (uint8_t)(alpha * base_alpha);
+                    pixels[y * diameter + x] = (pixel_color & 0x00FFFFFF) | ((uint32_t)new_alpha << 24);
+                }
+                // else: outside, leave transparent
             }
-            else if (dist < r + 0.5f)
-            {
-                // Anti-aliasing edge
-                float alpha = r + 0.5f - dist;
-                gui_color_t color = this->color;
-                color.color.rgba.a = (uint8_t)(alpha * color.color.rgba.a);
-                pixels[y * diameter + x] = color.color.argb_full;
-            }
-            // else: outside, leave transparent
         }
+    }
+    else
+    {
+        // Non-gradient path: optimized for solid color
+        for (int y = 0; y < diameter; y++)
+        {
+            for (int x = 0; x < diameter; x++)
+            {
+                float dx = x + 0.5f - center;
+                float dy = y + 0.5f - center;
+                float dist = sqrtf(dx * dx + dy * dy);
+
+                if (dist <= r - 0.5f)
+                {
+                    // Fully inside
+                    pixels[y * diameter + x] = solid_color;
+                }
+                else if (dist < r + 0.5f)
+                {
+                    // Anti-aliasing edge
+                    float alpha = r + 0.5f - dist;
+                    uint8_t base_alpha = (solid_color >> 24) & 0xFF;
+                    uint8_t new_alpha = (uint8_t)(alpha * base_alpha);
+                    pixels[y * diameter + x] = (solid_color & 0x00FFFFFF) | ((uint32_t)new_alpha << 24);
+                }
+                // else: outside, leave transparent
+            }
+        }
+    }
+
+    if (gradient_lut != NULL)
+    {
+        gui_free(gradient_lut);
     }
 
     img->data = buffer;
@@ -555,10 +661,11 @@ static void gui_circle_prepare(gui_obj_t *obj)
     // Translate back
     matrix_translate(-center_x, -center_y, obj->matrix);
 
-    // Check if we need single buffer (for transparency or small circles)
+    // Check if we need single buffer (for transparency, small circles, or gradient)
     int diameter = this->radius * 2;
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
-                              (diameter * diameter < 10000);
+                              (diameter * diameter < 10000) ||
+                              (this->use_gradient && this->gradient != NULL);
 
     if (need_single_buffer)
     {
@@ -714,7 +821,12 @@ static void gui_circle_end(gui_circle_t *this)
 
 static void gui_circle_destroy(gui_circle_t *this)
 {
-    GUI_UNUSED(this);
+    // Free gradient if allocated
+    if (this->gradient != NULL)
+    {
+        gui_free(this->gradient);
+        this->gradient = NULL;
+    }
 }
 
 static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -802,6 +914,11 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->offset_x = 0.0f;
     circle->offset_y = 0.0f;
 
+    // Initialize gradient parameters
+    circle->gradient = NULL;
+    circle->use_gradient = false;
+    circle->gradient_type = CIRCLE_GRADIENT_RADIAL;
+
     return circle;
 }
 
@@ -877,4 +994,73 @@ void gui_circle_translate(gui_circle_t *this, float tx, float ty)
     GUI_ASSERT(this != NULL);
     this->offset_x = tx;
     this->offset_y = ty;
+}
+
+void gui_circle_set_radial_gradient(gui_circle_t *this)
+{
+    GUI_ASSERT(this != NULL);
+
+    // Allocate gradient if not exists
+    if (this->gradient == NULL)
+    {
+        this->gradient = gui_malloc(sizeof(Gradient));
+        if (this->gradient == NULL) { return; }
+    }
+
+    // Initialize gradient
+    gradient_init(this->gradient, GRADIENT_RADIAL);
+    this->gradient->radial_cx = (float)this->radius;
+    this->gradient->radial_cy = (float)this->radius;
+    this->gradient->radial_r = (float)this->radius;
+    this->gradient_type = CIRCLE_GRADIENT_RADIAL;
+    this->use_gradient = true;
+}
+
+void gui_circle_set_angular_gradient(gui_circle_t *this, float start_angle, float end_angle)
+{
+    GUI_ASSERT(this != NULL);
+
+    // Allocate gradient if not exists
+    if (this->gradient == NULL)
+    {
+        this->gradient = gui_malloc(sizeof(Gradient));
+        if (this->gradient == NULL) { return; }
+    }
+
+    // Initialize gradient
+    gradient_init(this->gradient, GRADIENT_ANGULAR);
+    this->gradient->angular_cx = (float)this->radius;
+    this->gradient->angular_cy = (float)this->radius;
+    this->gradient->angular_start = start_angle;
+    this->gradient->angular_end = end_angle;
+    this->gradient_type = CIRCLE_GRADIENT_ANGULAR;
+    this->use_gradient = true;
+}
+
+void gui_circle_add_gradient_stop(gui_circle_t *this, float position, gui_color_t color)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient == NULL)
+    {
+        // Auto-create gradient with default type (radial)
+        gui_circle_set_radial_gradient(this);
+    }
+
+    if (this->gradient != NULL)
+    {
+        gradient_add_stop(this->gradient, position, color.color.argb_full);
+    }
+}
+
+void gui_circle_clear_gradient(gui_circle_t *this)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient != NULL)
+    {
+        gui_free(this->gradient);
+        this->gradient = NULL;
+    }
+    this->use_gradient = false;
 }
