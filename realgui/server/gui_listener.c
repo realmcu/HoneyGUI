@@ -13,58 +13,35 @@
 #include "gui_message.h"
 #include <string.h>
 
-#define MAX_SUBSCRIPTIONS 32
-
-typedef struct
+typedef struct subscription
 {
+    struct subscription *next;
     gui_obj_t *obj;
-    char topic[64];
     gui_listener_cb_t callback;
-    bool active;
+    char topic[];
 } subscription_t;
 
-static subscription_t subscriptions[MAX_SUBSCRIPTIONS];
-static bool listener_initialized = false;
-
-static void listener_init(void)
-{
-    if (listener_initialized)
-    {
-        return;
-    }
-
-    memset(subscriptions, 0, sizeof(subscriptions));
-    listener_initialized = true;
-}
+static subscription_t *sub_head = NULL;
 
 void gui_msg_subscribe(gui_obj_t *obj, const char *topic, gui_listener_cb_t callback)
 {
-    if (!listener_initialized)
-    {
-        listener_init();
-    }
-
     if (!obj || !topic || !callback)
     {
         return;
     }
 
-    // Find empty slot
-    for (int i = 0; i < MAX_SUBSCRIPTIONS; i++)
+    size_t topic_len = strlen(topic) + 1;
+    subscription_t *sub = gui_malloc(sizeof(subscription_t) + topic_len);
+    if (!sub)
     {
-        if (!subscriptions[i].active)
-        {
-            subscriptions[i].obj = obj;
-            strncpy(subscriptions[i].topic, topic, sizeof(subscriptions[i].topic) - 1);
-            subscriptions[i].topic[sizeof(subscriptions[i].topic) - 1] = '\0';
-            subscriptions[i].callback = callback;
-            subscriptions[i].active = true;
-            return;
-        }
+        return;
     }
 
-    // No free slot
-    GUI_ASSERT(NULL);
+    sub->obj = obj;
+    sub->callback = callback;
+    memcpy(sub->topic, topic, topic_len);
+    sub->next = sub_head;
+    sub_head = sub;
 }
 
 void gui_msg_unsubscribe(gui_obj_t *obj, const char *topic)
@@ -74,15 +51,17 @@ void gui_msg_unsubscribe(gui_obj_t *obj, const char *topic)
         return;
     }
 
-    for (int i = 0; i < MAX_SUBSCRIPTIONS; i++)
+    subscription_t **pp = &sub_head;
+    while (*pp)
     {
-        if (subscriptions[i].active &&
-            subscriptions[i].obj == obj &&
-            strcmp(subscriptions[i].topic, topic) == 0)
+        subscription_t *cur = *pp;
+        if (cur->obj == obj && strcmp(cur->topic, topic) == 0)
         {
-            subscriptions[i].active = false;
+            *pp = cur->next;
+            gui_free(cur);
             return;
         }
+        pp = &cur->next;
     }
 }
 
@@ -90,9 +69,9 @@ typedef struct
 {
     gui_listener_cb_t callback;
     gui_obj_t *obj;
-    char topic[64];
     void *data;
     uint16_t len;
+    char topic[];
 } msg_task_t;
 
 static void msg_task_exec(void *p)
@@ -112,20 +91,19 @@ void gui_msg_publish(const char *topic, void *data, uint16_t len)
         return;
     }
 
-    for (int i = 0; i < MAX_SUBSCRIPTIONS; i++)
+    for (subscription_t *sub = sub_head; sub; sub = sub->next)
     {
-        if (subscriptions[i].active &&
-            strcmp(subscriptions[i].topic, topic) == 0)
+        if (strcmp(sub->topic, topic) == 0)
         {
-            msg_task_t *task = gui_malloc(sizeof(msg_task_t));
+            size_t topic_len = strlen(topic) + 1;
+            msg_task_t *task = gui_malloc(sizeof(msg_task_t) + topic_len);
             if (task)
             {
-                task->callback = subscriptions[i].callback;
-                task->obj = subscriptions[i].obj;
-                strncpy(task->topic, topic, sizeof(task->topic) - 1);
-                task->topic[sizeof(task->topic) - 1] = '\0';
+                task->callback = sub->callback;
+                task->obj = sub->obj;
                 task->data = data;
                 task->len = len;
+                memcpy(task->topic, topic, topic_len);
 
                 gui_msg_t msg =
                 {
