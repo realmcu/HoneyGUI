@@ -7,6 +7,7 @@
 #define GUI_VFS_GENERIC_H
 
 #include <stddef.h>
+#include "gui_vfs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +19,7 @@ extern "C" {
  * Implement these functions to adapt any filesystem to VFS.
  * All functions are optional except fs_open, fs_close, fs_read.
  */
-typedef struct gui_fs_adapter
+struct gui_fs_adapter
 {
     /* File operations */
     void *(*fs_open)(const char *path, int flags);
@@ -35,7 +36,7 @@ typedef struct gui_fs_adapter
 
     /* File info (optional) */
     int (*fs_stat)(const char *path, int *is_dir, size_t *size);
-} gui_fs_adapter_t;
+};
 
 /**
  * @brief Mount generic filesystem
