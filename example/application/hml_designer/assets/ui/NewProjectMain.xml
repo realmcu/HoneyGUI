@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hml>
+    <meta>
+        <project name="NewProject" appId="com.example.NewProject" resolution="410X502" minSdk="API 2: HoneyGUI V1.1.0" pixelMode="ARGB8888" />
+        <author name="Anonymous" />
+    </meta>
+    <view>
+        <hg_view id="NewProjectMainView" x="0" y="0" width="410" height="502" backgroundColor="#000000" entry="true">
+            <hg_image id="hg_image_1767082489570_74x5" x="105" y="141" width="200" height="200" src="assets/test.png" zIndex="1" />
+        </hg_view>
+    </view>
+</hml>

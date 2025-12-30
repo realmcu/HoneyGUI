@@ -69,6 +69,6 @@ char *hml_resolve_asset_path(const char *src, char *buf, size_t buf_size)
     const char *dot = strrchr(filename, '.');
     size_t name_len = dot ? (size_t)(dot - filename) : strlen(filename);
 
-    snprintf(buf, buf_size, "/%.*s.bin", (int)name_len, filename);
+    snprintf(buf, buf_size, "/hml/%.*s.bin", (int)name_len, filename);
     return buf;
 }

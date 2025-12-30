@@ -43,15 +43,18 @@ static int app_init(void)
 {
     gui_log("=== HML Designer App ===\n");
 
-    gui_vfs_mount_romfs("/rom", &app_romfs_root, 0);
+    gui_vfs_mount_posix("/hml", "./example/application/hml_designer/assets");
 
     // Register callbacks
     hml_register_callback("on_button_click", on_button_click);
     hml_register_callback("on_button_long_press", on_button_long_press);
     gui_log("[OK] Callbacks registered\n");
 
+    // Scan and register all views
+    hml_scan_views("/hml/ui");
+
     // Load HML from romfs
-    gui_obj_t *ui = hml_load(gui_obj_get_root(), "/rom/ui/main/NewProjectMain.hml");
+    gui_obj_t *ui = hml_load(gui_obj_get_root(), "/hml/ui/NewProjectMain.xml");
 
     if (ui)
     {

@@ -18,6 +18,13 @@ extern "C" {
 typedef void (*hml_callback_t)(gui_obj_t *obj);
 
 /**
+ * @brief Scan directory and register all hg_view descriptors
+ * @param dir_path Directory path to scan (e.g., "/hml/ui")
+ * @return Number of views registered, -1 on error
+ */
+int hml_scan_views(const char *dir_path);
+
+/**
  * @brief Load HML from file
  * @param parent Parent GUI object
  * @param path HML file path in romfs

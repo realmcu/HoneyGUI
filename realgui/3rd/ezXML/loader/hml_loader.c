@@ -9,10 +9,108 @@
 #include "ezxml.h"
 #include "gui_vfs.h"
 #include "gui_api.h"
+#include "gui_view.h"
 #include <string.h>
 #include <stdlib.h>
 
 #define HML_MAX_CALLBACKS 64
+
+/*============================================================================*
+ *                              View Scan
+ *============================================================================*/
+
+static void hml_view_on_switch_in(gui_view_t *view)
+{
+    (void)view;
+}
+
+static void hml_scan_node_for_views(ezxml_t node, int *count)
+{
+    for (ezxml_t child = node->child; child; child = child->ordered)
+    {
+        if (strcmp(child->name, "hg_view") == 0)
+        {
+            const char *id = ezxml_attr(child, "id");
+            if (id)
+            {
+                size_t len = strlen(id) + 1;
+                char *name_copy = gui_malloc(len);
+                gui_view_descriptor_t *desc = gui_malloc(sizeof(gui_view_descriptor_t));
+                gui_view_t **pView = gui_malloc(sizeof(gui_view_t *));
+                if (desc && name_copy && pView)
+                {
+                    memcpy(name_copy, id, len);
+                    *pView = NULL;
+                    memset(desc, 0, sizeof(gui_view_descriptor_t));
+                    desc->name = name_copy;
+                    desc->pView = pView;
+                    desc->on_switch_in = hml_view_on_switch_in;
+                    gui_view_descriptor_register(desc);
+                    gui_log("[HML] Register view: %s\n", id);
+                    (*count)++;
+                }
+            }
+        }
+        hml_scan_node_for_views(child, count);
+    }
+}
+
+static int hml_scan_file(const char *path, int *count)
+{
+    size_t size = 0;
+    char *content = (char *)gui_vfs_load_file(path, &size);
+    if (!content || size == 0)
+    {
+        return -1;
+    }
+
+    ezxml_t root = ezxml_parse_str(content, size);
+    if (root)
+    {
+        hml_scan_node_for_views(root, count);
+        ezxml_free(root);
+    }
+
+    gui_free(content);
+    return 0;
+}
+
+int hml_scan_views(const char *dir_path)
+{
+    if (!dir_path) { return -1; }
+
+    void *dir = gui_vfs_opendir(dir_path);
+    if (!dir)
+    {
+        gui_log("[HML] Failed to open dir: %s\n", dir_path);
+        return -1;
+    }
+
+    int count = 0;
+    gui_vfs_stat_t stat;
+    char path[512];
+
+    while (gui_vfs_readdir(dir, &stat) == 0)
+    {
+        if (stat.name[0] == '.') { continue; }
+
+        snprintf(path, sizeof(path), "%s/%s", dir_path, stat.name);
+
+        if (stat.type == GUI_VFS_TYPE_FILE)
+        {
+            const char *ext = strrchr(stat.name, '.');
+            if (ext && (strcmp(ext, ".xml") == 0 || strcmp(ext, ".hml") == 0))
+            {
+                gui_log("[HML] Scan file: %s\n", path);
+                hml_scan_file(path, &count);
+            }
+        }
+    }
+
+    gui_vfs_closedir(dir);
+    gui_log("[HML] Total views registered: %d\n", count);
+    return count;
+}
 
 /*============================================================================*
  *                              Callback Registry
@@ -109,18 +207,27 @@ static void hml_parse_children(gui_obj_t *parent, ezxml_t node)
 
     for (ezxml_t child = node->child; child; child = child->ordered)
     {
+        bool matched = false;
         for (int i = 0; registry[i].tag; i++)
         {
             if (strcmp(child->name, registry[i].tag) == 0)
             {
+                gui_log("[HML] Create <%s>\n", child->name);
                 gui_obj_t *obj = registry[i].creator(parent, child);
                 if (obj)
                 {
                     hml_bind_events(obj, child);
                     hml_parse_children(obj, child);
                 }
+                matched = true;
                 break;
             }
+        }
+        // Skip wrapper nodes (hml, meta, view, etc.), parse their children
+        if (!matched)
+        {
+            gui_log("[HML] Skip <%s>\n", child->name);
+            hml_parse_children(parent, child);
         }
     }
 }
