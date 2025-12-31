@@ -30,7 +30,8 @@ static int app_init(void)
     gui_log("=== HML Designer App ===\n");
 
 #ifdef _HONEYGUI_SIMULATOR_
-    gui_vfs_mount_posix("/hml", "./example/application/hml_designer/assets");
+    // gui_vfs_mount_posix("/hml", "./example/application/hml_designer/assets");
+    gui_vfs_mount_romfs("/hml", &app_romfs_root, 0);
 #else
     gui_vfs_mount_romfs("/hml", 0x704D1000, 0);
 #endif
