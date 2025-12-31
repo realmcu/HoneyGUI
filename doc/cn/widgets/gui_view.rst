@@ -83,25 +83,25 @@
 ~~~~~~~~~~
 以下是四个单独的 C 文件，每个 C 文件中包含 view 控件的描述子以及 design 函数。
 
-.. literalinclude:: ../../../example/widget/view/app_ui_view_blue.c
+.. literalinclude:: ../../../example/widget/view/example_view_blue.c
    :language: c
    :start-after: /* view blue start*/
    :end-before: /* view blue end*/
 
 
-.. literalinclude:: ../../../example/widget/view/app_ui_view_white.c
+.. literalinclude:: ../../../example/widget/view/example_view_white.c
    :language: c
    :start-after: /* view white start*/
    :end-before: /* view white end*/
 
 
-.. literalinclude:: ../../../example/widget/view/app_ui_view_yellow.c
+.. literalinclude:: ../../../example/widget/view/example_view_yellow.c
    :language: c
    :start-after: /* view yellow start*/
    :end-before: /* view yellow end*/
 
 
-.. literalinclude:: ../../../example/widget/view/app_ui_view_lime.c
+.. literalinclude:: ../../../example/widget/view/example_view_lime.c
    :language: c
    :start-after: /* view lime start*/
    :end-before: /* view lime end*/
