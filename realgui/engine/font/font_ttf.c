@@ -23,6 +23,7 @@
 #include <stddef.h>
 #include <math.h>
 #include "font_rendering_utils.h"
+#include "gui_vfs.h"
 
 
 /*============================================================================*
@@ -642,10 +643,12 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
 void gui_font_get_ttf_info(gui_text_t *text)
 {
     GUI_ASSERT(text->path != NULL);
     GUI_FONT_HEAD_TTF *ttfbin;
+
     if (text->font_mode == FONT_SRC_MEMADDR)
     {
         ttfbin = (GUI_FONT_HEAD_TTF *)text->path;
@@ -654,6 +657,18 @@ void gui_font_get_ttf_info(gui_text_t *text)
     {
         ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
         gui_ftl_read((uintptr_t)text->path, (uint8_t *)ttfbin, sizeof(GUI_FONT_HEAD_TTF));
+    }
+    else if (text->font_mode == FONT_SRC_FILESYS)
+    {
+        gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+        if (file == NULL)
+        {
+            gui_log("TTF FILESYS: failed to open %s\n", (const char *)text->path);
+            return;
+        }
+        ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+        gui_vfs_read(file, ttfbin, sizeof(GUI_FONT_HEAD_TTF));
+        gui_vfs_close(file);
     }
     else
     {
@@ -664,7 +679,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
     if (ttfbin->file_type != FONT_FILE_TTF_FLAG)
     {
         gui_log("this ttf-bin font file is not valid \n");
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             gui_free(ttfbin);
         }
@@ -678,7 +693,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
     {
         gui_log("Warning! After process, unicode len of text: %s is 0!\n", text->base.name);
         text->font_len = 0;
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             gui_free(ttfbin);
         }
@@ -692,7 +707,8 @@ void gui_font_get_ttf_info(gui_text_t *text)
     if (chr == NULL)
     {
         GUI_ASSERT(NULL != NULL);
-        if (text->font_mode == FONT_SRC_FTL)
+        gui_free(unicode_buf);
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             gui_free(ttfbin);
         }
@@ -718,6 +734,26 @@ void gui_font_get_ttf_info(gui_text_t *text)
         {
             gui_ftl_read((uintptr_t)text->path + ttfbin->head_length,
                          preloaded_index_table, ttfbin->index_area_size);
+        }
+    }
+    else if (text->font_mode == FONT_SRC_FILESYS && ttfbin->index_method == 1 &&
+             ttfbin->index_area_size > 0)
+    {
+        preloaded_index_table = gui_malloc(ttfbin->index_area_size);
+        if (preloaded_index_table != NULL)
+        {
+            gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+            if (file != NULL)
+            {
+                gui_vfs_seek(file, ttfbin->head_length, GUI_VFS_SEEK_SET);
+                gui_vfs_read(file, preloaded_index_table, ttfbin->index_area_size);
+                gui_vfs_close(file);
+            }
+            else
+            {
+                gui_free(preloaded_index_table);
+                preloaded_index_table = NULL;
+            }
         }
     }
 
@@ -751,12 +787,55 @@ void gui_font_get_ttf_info(gui_text_t *text)
         }
         else
         {
+            uint8_t *index_table_ptr = NULL;
+            uint8_t *fs_index_table = NULL;  /* For FILESYS index_method=0 */
+
+            if (text->font_mode == FONT_SRC_FILESYS)
+            {
+                /* For FILESYS, we need to load index table from file for index_method=0 */
+                if (ttfbin->index_method == 0 && ttfbin->index_area_size > 0)
+                {
+                    fs_index_table = gui_malloc(ttfbin->index_area_size);
+                    if (fs_index_table != NULL)
+                    {
+                        gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+                        if (file != NULL)
+                        {
+                            gui_vfs_seek(file, ttfbin->head_length, GUI_VFS_SEEK_SET);
+                            gui_vfs_read(file, fs_index_table, ttfbin->index_area_size);
+                            gui_vfs_close(file);
+                            index_table_ptr = fs_index_table;
+                        }
+                        else
+                        {
+                            gui_free(fs_index_table);
+                            fs_index_table = NULL;
+                        }
+                    }
+                }
+                else
+                {
+                    /* index_method=1 uses preloaded_index_table */
+                    index_table_ptr = preloaded_index_table;
+                }
+            }
+            else
+            {
+                index_table_ptr = (uint8_t *)text->path + ttfbin->head_length;
+            }
+
             uint32_t ttfoffset = getGlyphOffset(unicode_buf[uni_i], ttfbin,
-                                                (uint8_t *)text->path + ttfbin->head_length,
-                                                text->font_mode, preloaded_index_table);
+                                                index_table_ptr,
+                                                text->font_mode == FONT_SRC_FILESYS ? FONT_SRC_MEMADDR : text->font_mode,
+                                                preloaded_index_table);
+
+            if (fs_index_table != NULL)
+            {
+                gui_free(fs_index_table);
+            }
+
             if (ttfoffset == 0)
             {
-                gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
                 continue;
             }
 
@@ -767,11 +846,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 FontGlyphData *glyphData = (FontGlyphData *)font_ptr;
 
                 chr[chr_i].unicode = unicode_buf[uni_i];
-                // chr[chr_i].x = 0;
-                // chr[chr_i].y = 0;
-                // chr[chr_i].w = 0;
                 chr[chr_i].h = text->font_height;
-                // chr[chr_i].char_y = 0;
                 chr[chr_i].char_w = glyphData->advance * scale;
                 chr[chr_i].char_h = text->font_height;
                 chr[chr_i].dot_addr = font_ptr;
@@ -801,11 +876,47 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
 
                 chr[chr_i].unicode = unicode_buf[uni_i];
-                // chr[chr_i].x = 0;
-                // chr[chr_i].y = 0;
-                // chr[chr_i].w = 0;
                 chr[chr_i].h = text->font_height;
-                // chr[chr_i].char_y = 0;
+                chr[chr_i].char_w = glyphData->advance * scale;
+                chr[chr_i].char_h = text->font_height;
+                chr[chr_i].dot_addr = dot_addr;
+
+                gui_free(glyphData);
+                gui_free(winding_lengths);
+            }
+            else if (text->font_mode == FONT_SRC_FILESYS)
+            {
+                gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+                if (file == NULL)
+                {
+                    continue;
+                }
+                FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                gui_vfs_seek(file, ttfoffset, GUI_VFS_SEEK_SET);
+                gui_vfs_read(file, glyphData, sizeof(FontGlyphData));
+
+                int line_count = 0;
+                uint8_t winding_length = glyphData->winding_count;
+                uint8_t *winding_lengths = gui_malloc(winding_length);
+                gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths), GUI_VFS_SEEK_SET);
+                gui_vfs_read(file, winding_lengths, winding_length);
+                for (int i = 0; i < glyphData->winding_count; i++)
+                {
+                    line_count += winding_lengths[i];
+                }
+
+                uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
+                                                   FontWindings));
+                memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
+                memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
+                gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                             GUI_VFS_SEEK_SET);
+                gui_vfs_read(file, dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                             line_count * sizeof(FontWindings));
+                gui_vfs_close(file);
+
+                chr[chr_i].unicode = unicode_buf[uni_i];
+                chr[chr_i].h = text->font_height;
                 chr[chr_i].char_w = glyphData->advance * scale;
                 chr[chr_i].char_h = text->font_height;
                 chr[chr_i].dot_addr = dot_addr;
@@ -829,7 +940,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
         gui_free(preloaded_index_table);
     }
 
-    if (text->font_mode == FONT_SRC_FTL)
+    if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
     {
         gui_free(ttfbin);
     }
@@ -880,7 +991,7 @@ void gui_font_ttf_unload(gui_text_t *text)
     if (text->data)
     {
         mem_char_t *chr = text->data;
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             for (int i = 0; i < text->font_len; i++)
             {
@@ -913,6 +1024,17 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
         gui_ftl_read((uintptr_t)text->path, (uint8_t *)ttfbin, sizeof(GUI_FONT_HEAD_TTF));
     }
+    else if (text->font_mode == FONT_SRC_FILESYS)
+    {
+        gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+        if (file == NULL)
+        {
+            return;
+        }
+        ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+        gui_vfs_read(file, ttfbin, sizeof(GUI_FONT_HEAD_TTF));
+        gui_vfs_close(file);
+    }
     else
     {
         GUI_ASSERT(NULL != NULL);
@@ -922,7 +1044,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
     if (ttfbin->file_type != FONT_FILE_TTF_FLAG)
     {
         gui_log("this ttf-bin font file is not valid \n");
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             gui_free(ttfbin);
         }
@@ -938,7 +1060,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
     if (scale <= 0)
     {
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             gui_free(ttfbin);
         }
@@ -1425,7 +1547,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
             gui_free(img_out);
         }
     }
-    if (text->font_mode == FONT_SRC_FTL)
+    if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
     {
         gui_free(ttfbin);
     }

@@ -1298,6 +1298,7 @@ void font_glyph_render(draw_font_t *font, font_glyph_t *glyph)
         }
         break;
     default:
+        gui_log("Error! No render mode support by font rendering!");
         break;
     }
 }

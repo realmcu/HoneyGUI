@@ -6,8 +6,8 @@
   * @brief realui memory font engine
   * @details realui memory font engine
   * @author luke_sun@realsil.com.cn
-  * @date 2025/12/04
-  * @version v2.0
+  * @date 2025/12/31
+  * @version v2.1
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
@@ -92,10 +92,43 @@ int32_t font_index_bsearch_bmp(uintptr_t table_offset, uint32_t index_area_size,
     return -1;
 }
 
+/**
+ * @brief Read font data from filesystem
+ * @param font_index Font library index
+ * @param offset Offset in font file
+ * @param buf Buffer to read into
+ * @param size Size to read
+ * @return Number of bytes read, or -1 on error
+ */
+static int font_fs_read(uint8_t font_index, uint32_t offset, uint8_t *buf, uint32_t size)
+{
+    if (font_lib_tab[font_index].font_file == NULL)
+    {
+        return -1;
+    }
+
+    gui_vfs_file_t *file = gui_vfs_open((const char *)font_lib_tab[font_index].font_file, GUI_VFS_READ);
+    if (file == NULL)
+    {
+        return -1;
+    }
+
+    if (gui_vfs_seek(file, offset, GUI_VFS_SEEK_SET) < 0)
+    {
+        gui_vfs_close(file);
+        return -1;
+    }
+
+    int read_size = gui_vfs_read(file, buf, size);
+    gui_vfs_close(file);
+
+    return read_size;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
-    uint8_t font_index;
+    uint8_t font_index = 0;
     uintptr_t table_offset;
     uintptr_t dot_offset;
     if (text == NULL)
@@ -115,8 +148,13 @@ void gui_font_get_dot_info(gui_text_t *text)
             text->font_mode = FONT_SRC_FTL;
             text->path = font_lib_tab[font_index].font_file;
         }
+        else if (font_lib_tab[font_index].type == FONT_SRC_FILESYS)
+        {
+            text->font_mode = FONT_SRC_FILESYS;
+            text->path = font_lib_tab[font_index].font_file;
+        }
     }
-    font = (GUI_FONT_HEAD_BMP *)text->path;
+
     if (text->font_mode == FONT_SRC_MEMADDR)
     {
         font = (GUI_FONT_HEAD_BMP *)text->path;
@@ -132,6 +170,21 @@ void gui_font_get_dot_info(gui_text_t *text)
         font = (GUI_FONT_HEAD_BMP *)font_lib_tab[font_index].data;
         table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
+    }
+    else if (text->font_mode == FONT_SRC_FILESYS)
+    {
+        font_index = get_fontlib_by_name(text->path);
+        font = (GUI_FONT_HEAD_BMP *)font_lib_tab[font_index].data;
+        if (font == NULL)
+        {
+            return;
+        }
+        table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
+        dot_offset = font->head_length + font->index_area_size;
+    }
+    else
+    {
+        font = (GUI_FONT_HEAD_BMP *)text->path;
     }
     GUI_ASSERT(font != 0)
     if (font == NULL)
@@ -244,9 +297,9 @@ void gui_font_get_dot_info(gui_text_t *text)
                                                          index_unit_length);
                     offset = *offset_addr;
                     if (offset == 0xFFFFFFFF) { continue; }
-                    chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
                     if (text->font_mode == FONT_SRC_MEMADDR)
                     {
+                        chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
                         chr[chr_i].char_w = (uint8_t)(*(chr[chr_i].dot_addr - 2));
                         chr[chr_i].char_y = (uint8_t)(*(chr[chr_i].dot_addr - 4));
                         chr[chr_i].char_h = (uint8_t)(*(chr[chr_i].dot_addr - 1)) - chr[chr_i].char_y;
@@ -255,6 +308,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else if (text->font_mode == FONT_SRC_FTL)
                     {
+                        chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
                         uint8_t header[4];
                         gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 4, header, 4);
 
@@ -270,6 +324,37 @@ void gui_font_get_dot_info(gui_text_t *text)
                         uint8_t *dot_buf = gui_malloc(dot_size);
                         gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
 
+                        chr[chr_i].dot_addr = dot_buf;
+                    }
+                    else if (text->font_mode == FONT_SRC_FILESYS)
+                    {
+                        /* For crop mode, offset points directly to char data in file */
+                        uint32_t file_offset = offset;
+                        uint8_t header[4];
+                        int ret = font_fs_read(font_index, file_offset, header, 4);
+                        if (ret < 0)
+                        {
+                            continue;
+                        }
+
+                        chr[chr_i].char_y = header[0];
+                        chr[chr_i].char_w = header[2];
+                        chr[chr_i].char_h = header[3] - chr[chr_i].char_y;
+                        line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
+                        chr[chr_i].w = line_byte * 8 / render_mode;
+
+                        uint32_t dot_size = line_byte * chr[chr_i].char_h;
+                        uint8_t *dot_buf = gui_malloc(dot_size);
+                        if (dot_buf == NULL)
+                        {
+                            continue;
+                        }
+                        ret = font_fs_read(font_index, file_offset + 4, dot_buf, dot_size);
+                        if (ret < 0)
+                        {
+                            gui_free(dot_buf);
+                            continue;
+                        }
                         chr[chr_i].dot_addr = dot_buf;
                     }
                 }
@@ -350,14 +435,15 @@ void gui_font_get_dot_info(gui_text_t *text)
                 {
                     offset = *(uint16_t *)(uintptr_t)(chr[chr_i].unicode * 2 + table_offset);
                     if (offset == 0xFFFF) { continue; }
-                    chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
                     if (text->font_mode == FONT_SRC_MEMADDR)
                     {
+                        chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
                         chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
                         chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
                     }
                     else if (text->font_mode == FONT_SRC_FTL)
                     {
+                        chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
                         uint8_t header[2];
                         gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
                         chr[chr_i].char_w = (int16_t)header[0];
@@ -365,6 +451,31 @@ void gui_font_get_dot_info(gui_text_t *text)
                         uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
                         uint8_t *dot_buf = gui_malloc(dot_size);
                         gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
+                        chr[chr_i].dot_addr = dot_buf;
+                    }
+                    else if (text->font_mode == FONT_SRC_FILESYS)
+                    {
+                        uint32_t file_offset = (uint32_t)offset * font_area + dot_offset;
+                        uint8_t header[2];
+                        int ret = font_fs_read(font_index, file_offset + 2, header, 2);
+                        if (ret < 0)
+                        {
+                            continue;
+                        }
+                        chr[chr_i].char_w = (int16_t)header[0];
+                        chr[chr_i].char_h = (int16_t)header[1];
+                        uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
+                        uint8_t *dot_buf = gui_malloc(dot_size);
+                        if (dot_buf == NULL)
+                        {
+                            continue;
+                        }
+                        ret = font_fs_read(font_index, file_offset + 4, dot_buf, dot_size);
+                        if (ret < 0)
+                        {
+                            gui_free(dot_buf);
+                            continue;
+                        }
                         chr[chr_i].dot_addr = dot_buf;
                     }
                 }
@@ -433,14 +544,15 @@ void gui_font_get_dot_info(gui_text_t *text)
                             gui_log("Character %x not found in BMP-BIN file \n", chr[chr_i].unicode);
                             continue;
                         }
-                        chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
                         if (text->font_mode == FONT_SRC_MEMADDR)
                         {
+                            chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
                             chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
                             chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
                         }
                         else if (text->font_mode == FONT_SRC_FTL)
                         {
+                            chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
                             uint8_t header[2];
                             gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
                             chr[chr_i].char_w = (int16_t)header[0];
@@ -448,6 +560,18 @@ void gui_font_get_dot_info(gui_text_t *text)
                             uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
                             uint8_t *dot_buf = gui_malloc(dot_size);
                             gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
+                            chr[chr_i].dot_addr = dot_buf;
+                        }
+                        else if (text->font_mode == FONT_SRC_FILESYS)
+                        {
+                            uint32_t file_offset = (uint32_t)index * font_area + dot_offset;
+                            uint8_t header[2];
+                            font_fs_read(font_index, file_offset + 2, header, 2);
+                            chr[chr_i].char_w = (int16_t)header[0];
+                            chr[chr_i].char_h = (int16_t)header[1];
+                            uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
+                            uint8_t *dot_buf = gui_malloc(dot_size);
+                            font_fs_read(font_index, file_offset + 4, dot_buf, dot_size);
                             chr[chr_i].dot_addr = dot_buf;
                         }
                     }
@@ -914,7 +1038,7 @@ void gui_font_mem_unload(gui_text_t *text)
 {
     if (text->data)
     {
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             mem_char_t *chr = text->data;
             for (int i = 0; i < text->font_len; i++)
@@ -940,7 +1064,7 @@ void gui_font_mem_destroy(gui_text_t *text)
 {
     if (text->data)
     {
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             mem_char_t *chr = text->data;
             for (int i = 0; i < text->font_len; i++)
@@ -1045,7 +1169,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
     GUI_FONT_HEAD_BMP *font;
-    if (text->font_mode == FONT_SRC_FTL)
+    if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
     {
         font = (GUI_FONT_HEAD_BMP *)font_lib_tab[get_fontlib_by_name(text->path)].data;
     }
@@ -1122,9 +1246,105 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
     return i;
 }
 
-uint8_t gui_font_mem_init_fs(uint8_t *font_bin_addr)
+uint8_t gui_font_mem_init_fs(uint8_t *font_path)
 {
-    return gui_font_mem_init(font_bin_addr);
+    if (!font_path)
+    {
+        return UINT8_MAX;
+    }
+
+    /* Open font file and read header */
+    gui_vfs_file_t *file = gui_vfs_open((const char *)font_path, GUI_VFS_READ);
+    if (file == NULL)
+    {
+        gui_log("gui_font_mem_init_fs: failed to open %s\n", font_path);
+        return UINT8_MAX;
+    }
+
+    /* Read font header */
+    uint8_t *data = gui_malloc(sizeof(GUI_FONT_HEAD_BMP));
+    if (data == NULL)
+    {
+        gui_vfs_close(file);
+        return UINT8_MAX;
+    }
+
+    int read_size = gui_vfs_read(file, data, sizeof(GUI_FONT_HEAD_BMP));
+    if (read_size != sizeof(GUI_FONT_HEAD_BMP))
+    {
+        gui_log("gui_font_mem_init_fs: failed to read header\n");
+        gui_free(data);
+        gui_vfs_close(file);
+        return UINT8_MAX;
+    }
+
+    GUI_FONT_HEAD_BMP *font = (GUI_FONT_HEAD_BMP *)data;
+    if (font->file_type != FONT_FILE_BMP_FLAG)
+    {
+        gui_log("gui_font_mem_init_fs: invalid font file\n");
+        gui_free(data);
+        gui_vfs_close(file);
+        return UINT8_MAX;
+    }
+
+    /* Find empty slot or existing entry */
+    int i = 0;
+    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
+    {
+        if (font_lib_tab[i].font_file == NULL)
+        {
+            break;
+        }
+        if (font_lib_tab[i].font_file == font_path)
+        {
+            if (font_lib_tab[i].type == FONT_SRC_FILESYS)
+            {
+                gui_log("gui_font_mem_init_fs: font already loaded\n");
+                gui_free(data);
+                gui_vfs_close(file);
+                return i;
+            }
+            break;
+        }
+    }
+    if (i >= (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)))
+    {
+        gui_free(data);
+        gui_vfs_close(file);
+        return UINT8_MAX;
+    }
+
+    /* Read header + index area */
+    uint32_t head_index_len = font->head_length + font->index_area_size;
+    data = gui_realloc(data, head_index_len);
+    if (data == NULL)
+    {
+        gui_vfs_close(file);
+        return UINT8_MAX;
+    }
+
+    gui_vfs_seek(file, 0, GUI_VFS_SEEK_SET);
+    read_size = gui_vfs_read(file, data, head_index_len);
+    gui_vfs_close(file);
+
+    if (read_size != (int)head_index_len)
+    {
+        gui_log("gui_font_mem_init_fs: failed to read index area\n");
+        gui_free(data);
+        return UINT8_MAX;
+    }
+
+    font = (GUI_FONT_HEAD_BMP *)data;
+
+    /* Fill font library entry */
+    font_lib_tab[i].font_file = font_path;
+    font_lib_tab[i].font_size = font->font_size;
+    font_lib_tab[i].type = FONT_SRC_FILESYS;
+    font_lib_tab[i].data = data;
+
+    gui_log("gui_font_mem_init_fs: loaded %s, size=%d, index=%d\n",
+            font_path, font->font_size, i);
+    return i;
 }
 
 uint8_t gui_font_mem_init_mem(uint8_t *font_bin_addr)

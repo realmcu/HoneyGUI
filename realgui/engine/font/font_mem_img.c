@@ -147,7 +147,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
 
     mem_char_t *chr = text->data;
     GUI_FONT_HEAD_BMP *font;
-    if (text->font_mode == FONT_SRC_FTL)
+    if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
     {
         font = (GUI_FONT_HEAD_BMP *)font_lib_tab[get_fontlib_by_name(text->path)].data;
     }

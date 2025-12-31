@@ -526,7 +526,7 @@ void gui_font_mat_destroy(gui_text_t *text)
 {
     if (text->data)
     {
-        if (text->font_mode == FONT_SRC_FTL)
+        if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
             mem_char_t *chr = text->data;
             for (int i = 0; i < text->font_len; i++)
