@@ -461,11 +461,11 @@ void gui_font_get_dot_info(gui_text_t *text)
         }
     }
     text->char_width_sum = all_char_w;
-    text->char_width_sum += text->extra_letter_spacing * (text->font_len - 1);
     text->char_height_sum = all_char_h;
     text->char_line_sum = line_flag;
     text->font_len = chr_i;
     text->active_font_len = chr_i;
+    text->char_width_sum += text->extra_letter_spacing * (text->font_len - 1);
     gui_free(unicode_buf);
 }
 
