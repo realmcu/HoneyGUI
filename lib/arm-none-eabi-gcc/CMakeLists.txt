@@ -74,28 +74,4 @@ install(TARGETS ${GUI_TARGET_NAME}
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
 
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/gui_version.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})		
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/widget/*.h")
-list(FILTER NEW_HEADER_FILES EXCLUDE REGEX "/gui_todo_widget/")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/server/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/core/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/app/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/dc/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/input/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/engine/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/3rd/nanovg/base/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-
-install(FILES ${HEADER_FILES} DESTINATION include)
-
-install(DIRECTORY "../../realgui/3rd/box2d/include/box2d" DESTINATION "include")
-
-install(FILES ${SRC_FILES} DESTINATION src)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../install_headers.cmake)

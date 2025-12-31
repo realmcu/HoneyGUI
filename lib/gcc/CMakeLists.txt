@@ -17,8 +17,14 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/install" CACHE PATH "Installation Directory" FORCE)
 
+execute_process( 
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/../../tool/convert_dot_config_to.py 
+    ${CMAKE_CURRENT_SOURCE_DIR}/.config 
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
-
+include(${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
 
 project(HoneyGUI)
 
@@ -34,9 +40,4 @@ install(TARGETS ${GUI_TARGET_NAME}
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
 
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/widget/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/server/*.h")
-list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
-
-install(FILES ${HEADER_FILES} DESTINATION include)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../install_headers.cmake)
