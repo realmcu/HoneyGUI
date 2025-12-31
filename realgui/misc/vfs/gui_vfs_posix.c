@@ -12,13 +12,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifndef _WIN32
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#else
-#include <windows.h>
-#endif
+
 
 /* POSIX backend data */
 typedef struct
@@ -95,7 +92,7 @@ static int posix_tell(void *file)
     return ftell(fp);
 }
 
-#ifndef _WIN32
+
 static void *posix_opendir(const char *path, void *user_data)
 {
     posix_backend_t *backend = (posix_backend_t *)user_data;
@@ -107,17 +104,24 @@ static void *posix_opendir(const char *path, void *user_data)
     return (void *)dir;
 }
 
-static int posix_readdir(void *dir, gui_vfs_stat_t *stat)
+static int posix_readdir(void *dir, gui_vfs_stat_t *vfs_stat)
 {
     DIR *d = (DIR *)dir;
     struct dirent *entry = readdir(d);
 
     if (!entry) { return -1; }
 
-    strncpy(stat->name, entry->d_name, sizeof(stat->name) - 1);
-    stat->name[sizeof(stat->name) - 1] = '\0';
-    stat->type = (entry->d_type == DT_DIR) ? GUI_VFS_TYPE_DIR : GUI_VFS_TYPE_FILE;
-    stat->size = 0; /* Would need stat() to get size */
+    strncpy(vfs_stat->name, entry->d_name, sizeof(vfs_stat->name) - 1);
+    vfs_stat->name[sizeof(vfs_stat->name) - 1] = '\0';
+
+#if defined(_DIRENT_HAVE_D_TYPE) && defined(DT_DIR)
+    vfs_stat->type = (entry->d_type == DT_DIR) ? GUI_VFS_TYPE_DIR : GUI_VFS_TYPE_FILE;
+#else
+    struct stat st;
+    vfs_stat->type = (stat(entry->d_name, &st) == 0 && S_ISDIR(st.st_mode))
+                     ? GUI_VFS_TYPE_DIR : GUI_VFS_TYPE_FILE;
+#endif
+    vfs_stat->size = 0;
 
     return 0;
 }
@@ -148,13 +152,7 @@ static int posix_stat(const char *path, gui_vfs_stat_t *vfs_stat, void *user_dat
 
     return 0;
 }
-#else
-/* Windows implementation would go here */
-static void *posix_opendir(const char *path, void *user_data) { (void)path; (void)user_data; return NULL; }
-static int posix_readdir(void *dir, gui_vfs_stat_t *stat) { (void)dir; (void)stat; return -1; }
-static int posix_closedir(void *dir) { (void)dir; return -1; }
-static int posix_stat(const char *path, gui_vfs_stat_t *stat, void *user_data) { (void)path; (void)stat; (void)user_data; return -1; }
-#endif
+
 
 /* POSIX VFS operations table */
 static const gui_vfs_ops_t posix_ops =
