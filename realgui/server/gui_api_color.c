@@ -503,6 +503,20 @@ void gui_fb_clear(uint8_t *addr, gui_color_t color, uint32_t len/*pixel count*/)
         p->color.argb_channel.b = color.color.rgba.b;
         gui_memset32((uint32_t *)addr, pixel, len);
     }
+    else if (dc->bit_depth == 24)
+    {
+        uint8_t *p_dst = (uint8_t *)addr;
+        uint8_t r = color.color.rgba.r;
+        uint8_t g = color.color.rgba.g;
+        uint8_t b = color.color.rgba.b;
+
+        for (uint32_t i = 0; i < len; i++)
+        {
+            *p_dst++ = b;
+            *p_dst++ = g;
+            *p_dst++ = r;
+        }
+    }
     else if (dc->bit_depth == 8)
     {
         uint8_t pixel = 0;
