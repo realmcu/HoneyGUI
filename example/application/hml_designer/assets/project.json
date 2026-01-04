@@ -1,0 +1,14 @@
+{
+  "name": "NewProject",
+  "appId": "com.example.NewProject",
+  "version": "1.0.0",
+  "resolution": "410X502",
+  "cornerRadius": 0,
+  "targetEngine": "honeygui",
+  "minSdk": "API 2: HoneyGUI V1.1.0",
+  "pixelMode": "ARGB8888",
+  "mainHmlFile": "ui/NewProjectMain.hml",
+  "honeyguiSdkPath": "/home/howie_wang/.HoneyGUI-SDK",
+  "romfsBaseAddr": "0x04400000",
+  "created": "2025-12-31T10:14:55.554Z"
+}
