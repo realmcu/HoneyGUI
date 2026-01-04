@@ -23,7 +23,7 @@ extern const struct romfs_dirent app_romfs_root;
 
 static char *get_main_hml_path(void)
 {
-    gui_vfs_file_t *fd = gui_vfs_open("/hml/project.json", 0);
+    gui_vfs_file_t *fd = gui_vfs_open("/hml/project.json", GUI_VFS_READ);
     if (!fd) { return NULL; }
 
     gui_vfs_stat_t st;
@@ -68,8 +68,8 @@ static int app_init(void)
     gui_log("=== HML Designer App ===\n");
 
 #ifdef _HONEYGUI_SIMULATOR_
-    gui_vfs_mount_posix("/hml", "./example/application/hml_designer/assets");
-    // gui_vfs_mount_romfs("/hml", &app_romfs_root, 0);
+    // gui_vfs_mount_posix("/hml", "./example/application/hml_designer/assets");
+    gui_vfs_mount_romfs("/hml", &app_romfs_root, 0);
 #else
     gui_vfs_mount_romfs("/hml", (void *)0x704D1000, 0);
 #endif

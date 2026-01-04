@@ -32,6 +32,7 @@ static void *romfs_vfs_open(const char *path, gui_vfs_mode_t mode, void *user_da
     (void)user_data;
 
     /* ROMFS is read-only */
+    GUI_ASSERT(mode == GUI_VFS_READ);
     if (mode != GUI_VFS_READ) { return NULL; }
 
     /* Add leading slash if missing */
