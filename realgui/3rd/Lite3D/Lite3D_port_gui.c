@@ -52,8 +52,14 @@ void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
 }
 
 /* Please call this function in a source C file when this file in gui.lib to make sure compiler link this file. */
+static bool l3_installed = false;
 int l3_init(void)
 {
+    if (l3_installed)
+    {
+        return 0;
+    }
+    l3_installed = true;
     l3_malloc_imp = l3_port_malloc;
     l3_free_imp = l3_port_free;
     l3_ftl_read_imp = l3_port_ftl_read;
@@ -62,6 +68,4 @@ int l3_init(void)
     gui_log("Lite3D port initialized\n");
     return 0;
 }
-
-GUI_INIT_PREV_EXPORT(l3_init);
 

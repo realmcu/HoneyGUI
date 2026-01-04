@@ -131,6 +131,8 @@ gui_lite3d_t *gui_lite3d_create(void                  *parent,
                                 int16_t                h)
 {
     GUI_ASSERT(parent != NULL);
+    extern int l3_init(void);
+    l3_init();
 
     if (name == NULL)
     {

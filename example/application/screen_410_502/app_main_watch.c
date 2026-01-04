@@ -447,9 +447,6 @@ static int app_init(void)
 #endif
 #endif
 
-    extern int l3_init(void);
-    l3_init();
-
     if (gui_get_audio() == NULL)
     {
         gui_audio_info_register(&gui_audio_info);
