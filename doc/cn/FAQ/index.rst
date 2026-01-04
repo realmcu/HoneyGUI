@@ -14,3 +14,5 @@
     规格 <specification>
     帧率 <FPS>
     显示 <display>
+    低功耗状态 <DLPS>
+    

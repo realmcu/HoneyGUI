@@ -14,3 +14,4 @@ Some common problems that arise during the use of GUI can be referred to in this
     Specification <specification>
     How to Increase FPS <FPS>
     Display <display>
+    DLPS <DLPS>
