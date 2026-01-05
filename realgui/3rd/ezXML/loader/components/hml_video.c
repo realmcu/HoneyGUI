@@ -1,0 +1,51 @@
+/**
+ * @file hml_video.c
+ * @brief HML Video Component (hg_video)
+ */
+
+#include "../hml_component.h"
+#include "../hml_utils.h"
+#include "gui_video.h"
+#include "gui_vfs.h"
+#include "gui_api.h"
+#include <stdio.h>
+
+gui_obj_t *hml_create_video(gui_obj_t *parent, ezxml_t node)
+{
+    const char *id = hml_attr_str(node, "id", "video");
+    int x = hml_attr_int(node, "x", 0);
+    int y = hml_attr_int(node, "y", 0);
+    int w = hml_attr_width(node, 0);
+    int h = hml_attr_height(node, 0);
+    const char *src = ezxml_attr(node, "src");
+
+    if (!src)
+    {
+        gui_log("hml_video: missing 'src' attribute\n");
+        return NULL;
+    }
+
+    // Convert: assets/birds.mp4 → /hml/birds.mjpeg
+    const char *filename = strrchr(src, '/');
+    if (!filename) { filename = src; }
+    else { filename++; }
+
+    const char *dot = strrchr(filename, '.');
+    size_t name_len = dot ? (size_t)(dot - filename) : strlen(filename);
+
+    char video_path[128];
+    snprintf(video_path, sizeof(video_path), "/hml/%.*s.mjpeg", (int)name_len, filename);
+
+    // Load from romfs
+    size_t size;
+    void *video_data = gui_vfs_load_file(video_path, &size);
+
+    if (!video_data)
+    {
+        gui_log("hml_video: failed to load '%s'\n", video_path);
+        return NULL;
+    }
+
+    gui_video_t *video = gui_video_create_from_mem(parent, id, video_data, x, y, w, h);
+    return (gui_obj_t *)video;
+}

@@ -192,6 +192,7 @@ const hml_component_entry_t *hml_get_component_registry(void)
         {"hg_canvas",   hml_create_canvas},
         {"hg_rect",     hml_create_canvas},
         {"hg_button",   hml_create_button},
+        {"hg_video",    hml_create_video},
         {NULL, NULL}
     };
     return registry;

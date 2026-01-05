@@ -42,6 +42,7 @@ gui_obj_t *hml_create_image(gui_obj_t *parent, ezxml_t node);
 gui_obj_t *hml_create_text(gui_obj_t *parent, ezxml_t node);
 gui_obj_t *hml_create_button(gui_obj_t *parent, ezxml_t node);
 gui_obj_t *hml_create_canvas(gui_obj_t *parent, ezxml_t node);
+gui_obj_t *hml_create_video(gui_obj_t *parent, ezxml_t node);
 
 #ifdef __cplusplus
 }
