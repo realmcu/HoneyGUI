@@ -751,13 +751,41 @@ ezxml_t ezxml_parse_file(const char *file)
 {
     if (!file) { return NULL; }
 
-    // Load file using vfs
-    size_t size = 0;
-    void *content = gui_vfs_load_file(file, &size);
-    if (!content || size == 0)
+    extern void gui_log(const char *format, ...);
+
+    gui_vfs_file_t *f = gui_vfs_open(file, GUI_VFS_READ);
+    if (!f)
     {
-        extern void gui_log(const char *format, ...);
         gui_log("ERROR: ezxml open %s failed!\n", file);
+        return NULL;
+    }
+
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+    int size = gui_vfs_tell(f);
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+
+    if (size <= 0)
+    {
+        gui_vfs_close(f);
+        gui_log("ERROR: ezxml file %s is empty!\n", file);
+        return NULL;
+    }
+
+    void *content = gui_malloc(size);
+    if (!content)
+    {
+        gui_vfs_close(f);
+        gui_log("ERROR: ezxml malloc failed for %s!\n", file);
+        return NULL;
+    }
+
+    int read_size = gui_vfs_read(f, content, size);
+    gui_vfs_close(f);
+
+    if (read_size != size)
+    {
+        gui_free(content);
+        gui_log("ERROR: ezxml read %s failed!\n", file);
         return NULL;
     }
 

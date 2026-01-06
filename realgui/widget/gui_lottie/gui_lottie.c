@@ -324,15 +324,37 @@ gui_lottie_t *gui_lottie_create_from_file(void       *parent,
     gui_lottie_ctor(_this, parent, name, x, y, w, h);
     _this->from_file = 1;
 
-    size_t size = 0;
-    void *data = gui_vfs_load_file(filename, &size);
-    if (data && size > 0)
+    const void *addr = gui_vfs_get_file_address(filename);
+    if (addr)
     {
-        _this->lottie_data = gui_malloc(size + 1);
-        memcpy(_this->lottie_data, data, size);
-        ((char *)_this->lottie_data)[size] = '\0';
-        gui_free(data);
+        /* XIP: use directly, add null terminator copy */
+        gui_vfs_stat_t st;
+        gui_vfs_stat(filename, &st);
+        _this->lottie_data = gui_malloc(st.size + 1);
+        memcpy(_this->lottie_data, addr, st.size);
+        ((char *)_this->lottie_data)[st.size] = '\0';
+    }
+    else
+    {
+        /* Non-XIP: read file */
+        gui_vfs_file_t *f = gui_vfs_open(filename, GUI_VFS_READ);
+        if (f)
+        {
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+            int fsize = gui_vfs_tell(f);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+            if (fsize > 0)
+            {
+                _this->lottie_data = gui_malloc(fsize + 1);
+                gui_vfs_read(f, _this->lottie_data, fsize);
+                ((char *)_this->lottie_data)[fsize] = '\0';
+            }
+            gui_vfs_close(f);
+        }
+    }
 
+    if (_this->lottie_data)
+    {
         gui_lottie_parse(_this, (const char *)_this->lottie_data);
     }
 

@@ -211,10 +211,22 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     }
     if (src_mode == IMG_SRC_FILESYS)
     {
-        size_t size;
-        uint8_t *data = (uint8_t *)gui_vfs_load_file((const char *)image->data, &size);
-        GUI_ASSERT(data != NULL);
-        image->data = data;
+        const char *path = (const char *)image->data;
+        const void *data = gui_vfs_get_file_address(path);
+        if (!data)
+        {
+            /* Fallback: read file into memory */
+            gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
+            GUI_ASSERT(f != NULL);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+            int size = gui_vfs_tell(f);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+            data = gui_malloc(size);
+            GUI_ASSERT(data != NULL);
+            gui_vfs_read(f, (void *)data, size);
+            gui_vfs_close(f);
+        }
+        image->data = (uint8_t *)data;
 
         return;
     }

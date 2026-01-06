@@ -237,57 +237,6 @@ int gui_vfs_stat(const char *path, gui_vfs_stat_t *stat)
     return mount->ops->stat(rel_path, stat, mount->user_data);
 }
 
-void *gui_vfs_load_file(const char *path, size_t *size)
-{
-    gui_vfs_file_t *file = gui_vfs_open(path, GUI_VFS_READ);
-    if (!file) { return NULL; }
-
-    /* Try XIP first (zero-copy) */
-    const void *addr = gui_vfs_get_addr(file, size);
-    if (addr)
-    {
-        /* XIP supported, but we need to copy for consistency */
-        void *buf = gui_malloc(*size);
-        if (buf)
-        {
-            memcpy(buf, addr, *size);
-        }
-        gui_vfs_close(file);
-        return buf;
-    }
-
-    /* Get file size */
-    gui_vfs_seek(file, 0, GUI_VFS_SEEK_END);
-    int file_size = gui_vfs_tell(file);
-    gui_vfs_seek(file, 0, GUI_VFS_SEEK_SET);
-
-    if (file_size <= 0)
-    {
-        gui_vfs_close(file);
-        return NULL;
-    }
-
-    /* Allocate and read */
-    void *buf = gui_malloc(file_size);
-    if (!buf)
-    {
-        gui_vfs_close(file);
-        return NULL;
-    }
-
-    int read_size = gui_vfs_read(file, buf, file_size);
-    gui_vfs_close(file);
-
-    if (read_size != file_size)
-    {
-        gui_free(buf);
-        return NULL;
-    }
-
-    if (size) { *size = file_size; }
-    return buf;
-}
-
 const char *gui_vfs_get_mount_prefix(const char *path)
 {
     if (!path) { return NULL; }

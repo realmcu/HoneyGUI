@@ -37,8 +37,21 @@ gui_obj_t *hml_create_video(gui_obj_t *parent, ezxml_t node)
     snprintf(video_path, sizeof(video_path), "/hml/%.*s.mjpeg", (int)name_len, filename);
 
     // Load from romfs
-    size_t size;
-    void *video_data = gui_vfs_load_file(video_path, &size);
+    const void *video_data = gui_vfs_get_file_address(video_path);
+    if (!video_data)
+    {
+        /* Fallback: read file into memory */
+        gui_vfs_file_t *f = gui_vfs_open(video_path, GUI_VFS_READ);
+        if (f)
+        {
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+            int size = gui_vfs_tell(f);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+            void *buf = gui_malloc(size);
+            if (buf) { gui_vfs_read(f, buf, size); video_data = buf; }
+            gui_vfs_close(f);
+        }
+    }
 
     if (!video_data)
     {
@@ -46,6 +59,6 @@ gui_obj_t *hml_create_video(gui_obj_t *parent, ezxml_t node)
         return NULL;
     }
 
-    gui_video_t *video = gui_video_create_from_mem(parent, id, video_data, x, y, w, h);
+    gui_video_t *video = gui_video_create_from_mem(parent, id, (void *)video_data, x, y, w, h);
     return (gui_obj_t *)video;
 }

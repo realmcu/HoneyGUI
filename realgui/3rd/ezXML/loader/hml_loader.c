@@ -57,12 +57,20 @@ static void hml_scan_node_for_views(ezxml_t node, int *count)
 
 static int hml_scan_file(const char *path, int *count)
 {
-    size_t size = 0;
-    char *content = (char *)gui_vfs_load_file(path, &size);
-    if (!content || size == 0)
-    {
-        return -1;
-    }
+    gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
+    if (!f) { return -1; }
+
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+    int size = gui_vfs_tell(f);
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+
+    if (size <= 0) { gui_vfs_close(f); return -1; }
+
+    char *content = (char *)gui_malloc(size);
+    if (!content) { gui_vfs_close(f); return -1; }
+
+    gui_vfs_read(f, content, size);
+    gui_vfs_close(f);
 
     ezxml_t root = ezxml_parse_str(content, size);
     if (root)
@@ -277,13 +285,24 @@ gui_obj_t *hml_load(gui_obj_t *parent, const char *path)
 {
     if (!path) { return NULL; }
 
-    size_t size = 0;
-    char *content = (char *)gui_vfs_load_file(path, &size);
-    if (!content || size == 0)
+    gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
+    if (!f)
     {
         gui_log("hml_load: failed to load '%s'\n", path);
         return NULL;
     }
+
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+    int size = gui_vfs_tell(f);
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+
+    if (size <= 0) { gui_vfs_close(f); return NULL; }
+
+    char *content = (char *)gui_malloc(size);
+    if (!content) { gui_vfs_close(f); return NULL; }
+
+    gui_vfs_read(f, content, size);
+    gui_vfs_close(f);
 
     gui_obj_t *result = hml_load_mem(parent, content, size);
     gui_free(content);

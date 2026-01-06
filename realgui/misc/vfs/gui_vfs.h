@@ -241,14 +241,6 @@ int gui_vfs_closedir(gui_vfs_dir_t *dir);
 int gui_vfs_stat(const char *path, gui_vfs_stat_t *stat);
 
 /**
- * @brief Helper: Load entire file into memory
- * @param path File path
- * @param size Output: file size
- * @return Allocated buffer (caller must free), or NULL on error
- */
-void *gui_vfs_load_file(const char *path, size_t *size);
-
-/**
  * @brief Get mount point prefix for a path
  * @param path File path
  * @return Mount point prefix, or NULL if not found
