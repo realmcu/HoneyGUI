@@ -170,7 +170,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
     // cache img to buffer
 
-    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
+    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->data);
     gui_palette_file_t palette = {0};
     change_gif_to_palette(_this, &palette);
 
@@ -190,7 +190,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
 
     // release img if cached
-    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
+    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->data);
 
 }
 /**

@@ -202,7 +202,7 @@ bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 }
 
 
-void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
+void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode, const char *path)
 {
     gui_dispdev_t *dc = gui_get_dc();
     if (dc->section_count != 0)
@@ -211,7 +211,6 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     }
     if (src_mode == IMG_SRC_FILESYS)
     {
-        const char *path = (const char *)image->data;
         const void *data = gui_vfs_get_file_address(path);
         if (!data)
         {
@@ -292,14 +291,23 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
 
 }
 
-void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
+void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *path)
 {
     gui_dispdev_t *dc = gui_get_dc();
     if (dc->section_count != dc->section_total - 1)
     {
         return;
     }
-    if ((src_mode == IMG_SRC_FILESYS) || (src_mode == IMG_SRC_FTL))
+    if (src_mode == IMG_SRC_FILESYS)
+    {
+        /* Only free if data is not XIP address */
+        if (path && gui_vfs_get_file_address(path) == img->data)
+        {
+            return;  /* XIP, do not free */
+        }
+        gui_free(img->data);
+    }
+    else if (src_mode == IMG_SRC_FTL)
     {
         gui_free(img->data);
     }

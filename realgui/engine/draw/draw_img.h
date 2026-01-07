@@ -97,8 +97,8 @@ void draw_img_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
 bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect);
 gui_rgb_data_head_t draw_img_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
 uint32_t draw_img_get_pixel_byte(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
-void draw_img_cache(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
-void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
+void draw_img_cache(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *path);
+void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *path);
 bool draw_img_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                           int32_t *x_start, int32_t *x_end, int32_t *y_start, int32_t *y_end);
 extern void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect);

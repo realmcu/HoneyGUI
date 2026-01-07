@@ -113,7 +113,15 @@ void gui_sleep_cb(void);
 void gui_log(const char *format, ...);
 void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size);
 
-void gui_assert_handler(const char *ex_string, const char *func, uint32_t line);
+#if defined(__GNUC__) || defined(__clang__)
+#define GUI_NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#define GUI_NORETURN __declspec(noreturn)
+#else
+#define GUI_NORETURN
+#endif
+
+GUI_NORETURN void gui_assert_handler(const char *ex_string, const char *func, uint32_t line);
 
 
 uint32_t gui_ms_get(void);

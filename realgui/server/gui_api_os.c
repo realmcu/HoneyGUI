@@ -410,14 +410,15 @@ void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size)
 
 void gui_assert_handler(const char *ex_string, const char *func, uint32_t line)
 {
-    volatile char dummy = 0;
     gui_log("\033[1;31m");
     gui_log("(%s) assertion failed at function:%s, line number:%d \n", ex_string, func, line);
     gui_log("\033[0m");
-#ifndef _HONEYGUI_SIMULATOR_
+#ifdef _HONEYGUI_SIMULATOR_
+    abort();
+#else
     *(volatile uint32_t *)0xFFFFFFFF = 0;
 #endif
-    while (dummy == 0);
+    while (1);
 }
 
 
