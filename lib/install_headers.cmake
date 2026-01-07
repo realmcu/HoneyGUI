@@ -39,14 +39,14 @@ file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/gifdec/*.h")
 list(APPEND HEADER_FILES ${TMP_HEADERS})
 
 # Lite3D headers - conditionally included based on config
-if(DEFINED CONFIG_REALTEK_BUILD_LITE3D)
+if(DEFINED CONFIG_REALTEK_BUILD_LITE3D AND CONFIG_REALTEK_BUILD_LITE3D)
     file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/Lite3D/widget/*.h")
     list(APPEND HEADER_FILES ${TMP_HEADERS})
 
 endif()
 
 # H264 decoder headers - conditionally included based on config
-if(DEFINED CONFIG_REALTEK_H264_DECODER)
+if(DEFINED CONFIG_REALTEK_H264_DECODER AND CONFIG_REALTEK_H264_DECODER)
     file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/h264bsd/inc/*.h")
     list(APPEND HEADER_FILES ${TMP_HEADERS})
 endif()
@@ -54,6 +54,6 @@ endif()
 install(FILES ${HEADER_FILES} DESTINATION include)
 
 # Box2D directory installation - conditionally included
-if(DEFINED CONFIG_REALTEK_BUILD_GUI_BOX2D)
+if(DEFINED CONFIG_REALTEK_BUILD_GUI_BOX2D AND CONFIG_REALTEK_BUILD_GUI_BOX2D)
     install(DIRECTORY "${REALGUI_DIR}/3rd/box2d/include/box2d" DESTINATION include)
 endif()
