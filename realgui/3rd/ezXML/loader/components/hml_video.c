@@ -60,5 +60,7 @@ gui_obj_t *hml_create_video(gui_obj_t *parent, ezxml_t node)
     }
 
     gui_video_t *video = gui_video_create_from_mem(parent, id, (void *)video_data, x, y, w, h);
+    gui_video_set_state(video, GUI_VIDEO_STATE_PLAYING);
+    gui_video_set_repeat_count(video, GUI_VIDEO_REPEAT_INFINITE);
     return (gui_obj_t *)video;
 }
