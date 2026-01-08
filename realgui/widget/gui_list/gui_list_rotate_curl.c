@@ -50,22 +50,19 @@
 void gui_list_rotate_curl(gui_list_note_t *this, float degree)
 {
     gui_obj_t *obj = GUI_BASE(this);
-    gui_dispdev_t *dc = gui_get_dc();
     gui_list_t *list = (gui_list_t *)obj->parent;
     gui_matrix_t rotate_3D;
     gui_matrix_t temp;
-    float w = dc->screen_width;
-    float h = dc->screen_height;
+    float w = obj->w;
+    float h = obj->h;
     float rotate_degree_x = 0;
     float rotate_degree_y = 0;
     if (list->dir == HORIZONTAL)
     {
-        w = obj->w;
         rotate_degree_x = -degree;
     }
     else
     {
-        h = obj->h;
         rotate_degree_y = degree;
     }
 
