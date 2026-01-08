@@ -130,11 +130,11 @@ static void l3_fill_color_rgb565(float y, float xleft, float xright, float oneov
         for (int ix = startX; ix < endX; ++ix)
         {
             int pixelIdx = ix + rowOffset;
-            const float originalZ = 1.0f / oneoverz;
+            // const float originalZ = 1.0f / oneoverz;
 
-            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+            if (zbuffer[pixelIdx] == 0 || oneoverz > zbuffer[pixelIdx])
             {
-                zbuffer[pixelIdx] = originalZ;
+                zbuffer[pixelIdx] = oneoverz;
                 writebuf[pixelIdx] = fill_color;
             }
             oneoverz += oneoverz_step;
@@ -177,11 +177,11 @@ static void l3_fill_color_argb8888(float y, float xleft, float xright, float one
             for (int ix = startX; ix < endX; ++ix)
             {
                 int pixelIdx = ix + rowOffset;
-                const float originalZ = 1.0f / oneoverz;
+                // const float originalZ = 1.0f / oneoverz;
 
-                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                if (zbuffer[pixelIdx] == 0 || oneoverz > zbuffer[pixelIdx])
                 {
-                    zbuffer[pixelIdx] = originalZ;
+                    zbuffer[pixelIdx] = oneoverz;
                     writebuf[pixelIdx] = fill_color;
                 }
                 oneoverz += oneoverz_step;
@@ -243,6 +243,50 @@ static void l3_fill_color_argb8888(float y, float xleft, float xright, float one
 
                 oneoverz += oneoverz_step;
             }
+        }
+    }
+}
+
+
+static void l3_fill_color_I8(float y, float xleft, float xright, float oneoverz,
+                             float oneoverz_step, \
+                             float *zbuffer, uint8_t *writebuf, int width, \
+                             uint8_t fill_color)
+{
+    int startX = (int)(xleft + 0.5f);
+    int endX = ((int)(xright + 0.5f) > width) ? width : (int)(xright + 0.5f);
+
+    if (startX < 0)
+    {
+        oneoverz += (0 - startX) * oneoverz_step;
+        startX = 0;
+    }
+
+    int rowOffset = (int)y * width;
+
+    if (zbuffer != NULL)
+    {
+        for (int ix = startX; ix < endX; ++ix)
+        {
+            int pixelIdx = ix + rowOffset;
+            // const float originalZ = 1.0f / oneoverz;
+
+            if (zbuffer[pixelIdx] == 0 || oneoverz > zbuffer[pixelIdx])
+            {
+                zbuffer[pixelIdx] = oneoverz;
+                writebuf[pixelIdx] = fill_color;
+            }
+            oneoverz += oneoverz_step;
+        }
+    }
+    else
+    {
+        for (int ix = startX; ix < endX; ++ix)
+        {
+            int pixelIdx = ix + rowOffset;
+            writebuf[pixelIdx] = fill_color;
+
+            oneoverz += oneoverz_step;
         }
     }
 }
@@ -542,6 +586,26 @@ static void l3_render_with_color_argb8888(float y, float y0, float y1, float y2,
 }
 
 
+static void l3_render_with_color_I8(float y, float y0, float y1, float y2, \
+                                    float inv_z0, float inv_z1, float inv_z2, \
+                                    bool k01infinite, float k01, float b01, \
+                                    bool k02infinite, float k02, float b02, \
+                                    float *zbuffer, uint8_t *writebuf, int width, \
+                                    uint8_t fill_color)
+{
+    float xleft, xright, oneoverz_left, oneoverz_step;
+
+    l3_get_z_interpolate(y, y0, y1, y2, \
+                         k01infinite, k01, b01, \
+                         k02infinite, k02, b02, \
+                         inv_z0, inv_z1, inv_z2, \
+                         &xleft, &xright, &oneoverz_left, &oneoverz_step);
+
+    l3_fill_color_I8(y, xleft, xright, oneoverz_left, oneoverz_step, zbuffer,
+                     writebuf, width, fill_color);
+}
+
+
 static void l3_render_with_texture_rgb565(float y, float y0, float y1, float y2, \
                                           float inv_z0, float inv_z1, float inv_z2, \
                                           float soverz0, float soverz1, float soverz2, \
@@ -636,6 +700,16 @@ static void l3_render_triangle_half(l3_draw_tria_img_t *image,
                                         zbuffer, writebuf, width, fill_color);
         }
     }
+    else if (image->fill_type == L3_FILL_COLOR_I8)
+    {
+        uint8_t fill_color = *((uint8_t *)image->fill_data);
+        for (float y = y_start; y <= y_end; y++)
+        {
+            l3_render_with_color_I8(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                    k01infinite, k01, b01, k02infinite, k02, b02,
+                                    zbuffer, writebuf, width, fill_color);
+        }
+    }
     else if (image->fill_type == L3_FILL_COLOR_ARGB8888)
     {
         uint32_t fill_color = *((uint32_t *)image->fill_data);
@@ -698,6 +772,12 @@ void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combi
     int width = src_head->w;
     int height = src_head->h;
     uint8_t *writebuf = (uint8_t *)combined_image->data + sizeof(l3_img_head_t);
+
+    // For I8 format: header + clut_count(4) + clut_data + pixel_index
+    if (src_head->type == LITE_I8)
+    {
+        writebuf = (uint8_t *)combined_image->data + sizeof(l3_img_head_t) + 257 * 4;
+    }
 
     //    p0
     // p1   p2

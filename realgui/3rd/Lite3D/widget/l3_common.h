@@ -101,12 +101,14 @@ typedef enum
     L3_FILL_IMAGE_ARGB8888,
     L3_FILL_COLOR_RGB565,
     L3_FILL_COLOR_ARGB8888,
+    L3_FILL_COLOR_I8,
 } L3_FILL_TYPE;
 
 typedef enum
 {
     LITE_RGB565 = 0,
     LITE_ARGB8888 = 4,
+    LITE_I8 = 0x38,
 } L3_IMAGE_TYPE;
 
 typedef enum

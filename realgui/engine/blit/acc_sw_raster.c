@@ -108,6 +108,20 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
             *source_blue = pixel_mix->color.argb_channel.b;
             break;
         }
+    case I8:
+        {
+            uint8_t *pixel = (uint8_t *)(uintptr_t)image_base + image_off;
+            uint8_t index = *pixel;
+            uint32_t *palette = (uint32_t *)palette_data;
+
+            uint32_t abgr = palette[index];
+            // ABGR format in little-endian: 0xAABBGGRR
+            *source_red = abgr & 0xFF;
+            *source_green = (abgr >> 8) & 0xFF;
+            *source_blue = (abgr >> 16) & 0xFF;
+            *source_alpha = (abgr >> 24) & 0xFF;
+            break;
+        }
     default:
         {
             GUI_ASSERT(NULL != NULL); // Ensure an error is noticed
@@ -400,9 +414,24 @@ void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
                                    , 0, 0, 0
 #endif
                                  };
-    params.image_base = sizeof(gui_rgb_data_head_t) + (uintptr_t)(image->data);
-    params.palette_index = ((gui_palette_file_t *)head)->palette_index;
-    params.palette_data = ((gui_palette_file_t *)head)->palette_data;
+
+    if (input_type == I8)
+    {
+        // I8 format: header + clut_count(4) + clut_data(count*4) + pixel_index
+        uint32_t *clut_count = (uint32_t *)((uint8_t *)image->data + sizeof(gui_rgb_data_head_t));
+        uint32_t *clut = clut_count + 1;
+        params.palette_data = (uint8_t *)clut;
+        params.palette_index = NULL;
+        params.image_base = sizeof(gui_rgb_data_head_t) + sizeof(uint32_t) + (*clut_count) * 4 +
+                            (uintptr_t)(image->data);
+    }
+    else
+    {
+        params.image_base = sizeof(gui_rgb_data_head_t) + (uintptr_t)(image->data);
+        params.palette_index = ((gui_palette_file_t *)head)->palette_index;
+        params.palette_data = ((gui_palette_file_t *)head)->palette_data;
+    }
+
     params.color_mix = image->fg_color_set;
 
     bool use_rle = (head->compress == 1);

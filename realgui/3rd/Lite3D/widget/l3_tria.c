@@ -38,9 +38,20 @@ static void __l3_push_tria_img(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_ma
         memset(depthBuffer, 0x00, width * height * sizeof(float));
     }
 
-    memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
+    l3_img_head_t *head = (l3_img_head_t *)_this->base.combined_img->data;
+    if (head->type == LITE_I8)
+    {
+        // I8 format: header + clut_count(4) + clut_data + pixel_index
+        memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t) + 257 * 4, 0x00,
+               width * height * 1);
+    }
+    else
+    {
+        memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
+    }
 
-    uint16_t render_color = 0;
+    uint16_t render_color_rgb565 = 0;
+    uint8_t render_color_I8 = 0;
     uint8_t opacity_value = UINT8_MAX;
 
     for (uint32_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
@@ -72,12 +83,12 @@ static void __l3_push_tria_img(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_ma
                 uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * opacity_value * light_intensity);
                 uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * opacity_value * light_intensity);
 
-                render_color = ((color_r & 0xF8) << 8) |
-                               ((color_g & 0xFC) << 3) |
-                               ((color_b & 0xF8) >> 3);
+                render_color_rgb565 = ((color_r & 0xF8) << 8) |
+                                      ((color_g & 0xFC) << 3) |
+                                      ((color_b & 0xF8) >> 3);
 
                 tria_img.fill_type = L3_FILL_COLOR_RGB565;
-                tria_img.fill_data = &render_color;
+                tria_img.fill_data = &render_color_rgb565;
             }
             else // Fill with texture image
             {
@@ -92,11 +103,10 @@ static void __l3_push_tria_img(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_ma
         {
             float nz = fabsf(tria_img.p0.normal.uz);
             uint8_t color_intensity = (uint8_t)(opacity_value * fmaxf(0.5f, fminf(1.0f, nz)));
-            render_color = ((color_intensity & 0xF8) << 8) |
-                           ((color_intensity & 0xFC) << 3) |
-                           ((color_intensity & 0xF8) >> 3);
-            tria_img.fill_type = L3_FILL_COLOR_RGB565;
-            tria_img.fill_data = &render_color;
+
+            render_color_I8 = color_intensity;
+            tria_img.fill_type = L3_FILL_COLOR_I8;
+            tria_img.fill_data = &render_color_I8;
         }
 
         l3_draw_tria_to_canvas(&tria_img, _this->base.combined_img, depthBuffer);

@@ -206,13 +206,48 @@ l3_obj_model_t *l3_create_obj_model(void                 *desc_addr,
             this->base.combined_img = l3_malloc(sizeof(l3_draw_rect_img_t));
             memset(this->base.combined_img, 0x00, sizeof(l3_draw_rect_img_t));
 
-            this->base.combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
-            memset(this->base.combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
+            // Check if model has materials/textures
+            bool has_material = (this->desc->num_materials > 0 && this->desc->textures != NULL);
 
-            l3_img_head_t *head = (l3_img_head_t *)this->base.combined_img->data;
-            head->w = w;
-            head->h = h;
-            head->type = LITE_RGB565;
+            if (has_material)
+            {
+                // Use RGB565 for models with materials
+                this->base.combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
+                memset(this->base.combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
+
+                l3_img_head_t *head = (l3_img_head_t *)this->base.combined_img->data;
+                head->w = w;
+                head->h = h;
+                head->type = LITE_RGB565;
+            }
+            else
+            {
+                // Use I8 for models without materials (save 50% memory)
+                // I8 format: header + clut_count(4) + clut_data(count*4 ABGR) + pixel_index(w*h)
+                uint32_t clut_count = 256;
+                uint32_t clut_size = clut_count * 4; // 256 ABGR entries
+                uint32_t total_size = sizeof(l3_img_head_t) + sizeof(uint32_t) + clut_size + w * h * 1;
+                this->base.combined_img->data = l3_malloc(total_size);
+                memset(this->base.combined_img->data, 0x00, total_size);
+
+                l3_img_head_t *head = (l3_img_head_t *)this->base.combined_img->data;
+                head->w = w;
+                head->h = h;
+                head->type = LITE_I8;
+
+                // Write CLUT count
+                uint32_t *clut_count_ptr = (uint32_t *)((uint8_t *)this->base.combined_img->data + sizeof(
+                                                            l3_img_head_t));
+                *clut_count_ptr = clut_count;
+
+                // Initialize grayscale CLUT (256 levels) in ABGR format
+                uint32_t *clut = clut_count_ptr + 1;
+                for (int i = 0; i < 256; i++)
+                {
+                    // ABGR format: A=0xFF, B=i, G=i, R=i
+                    clut[i] = 0xFF000000 | (i << 16) | (i << 8) | i;
+                }
+            }
         }
         break;
 
