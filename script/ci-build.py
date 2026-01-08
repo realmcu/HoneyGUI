@@ -118,7 +118,25 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=Keil_path):
         print("build {} fail".format(chip_type))
         return False
+    #reset
+    repo.git.checkout('--', '.')
+    repo.git.clean('-dfx')
 
+    return True
+
+
+def Test_handler(module, submodule, manifest_path, repo_home, chip_type):
+    os.chdir('./example/test')
+    try:
+        result_lines = subprocess.check_output([r'python', r'run_all_tests.py'], universal_newlines=True, stderr=subprocess.STDOUT)
+        print('run_all_tests.py\r\n{}'.format(result_lines))
+        if 'FINAL RESULT: [FAIL] SOME TESTS FAILED' in result_lines or 'FINAL RESULT: [OK] ALL TESTS PASSED' not in result_lines:
+            print("run_all_tests fail")
+            return False
+    except Exception as e:
+        print("run_all_tests.py fail: {}".format(e.output))
+        return False
+    os.chdir('./../..')
     return True
 
 
@@ -140,11 +158,26 @@ def GUI_handler(module, submodule, manifest_path, repo_home, chip_type):
         print("SDK build fail!")
         return False
     ret2 = DOC_handler(module, submodule, manifest_path, repo_home, chip_type)
-    if ret1 and ret2:
-        return True
-    else:
+    if not ret2:
+        print("DOC build fail!")
         return False
+    ret3 = Test_handler(module, submodule, manifest_path, repo_home, chip_type)
+    if not ret3:
+        print("Test build fail!")
+        return False
+    return True
 
+
+def GUI_No_Test_handler(module, submodule, manifest_path, repo_home, chip_type):
+    ret1 = SDK_handler(module, submodule, manifest_path, repo_home, chip_type)
+    if not ret1:
+        print("SDK build fail!")
+        return False
+    ret2 = DOC_handler(module, submodule, manifest_path, repo_home, chip_type)
+    if not ret2:
+        print("DOC build fail!")
+        return False
+    return True
 
 
 def App_handler(module, submodule, manifest_path, repo_home, chip_type):
@@ -180,15 +213,16 @@ def Keyword_handler(module, submodule, manifest_path, repo_home, chip_type):
 
 # module tuple table: module, submodule, handler
 module_table =  (
-                    ['sdk', 'GUI',          '',         GUI_handler ],
-                    ['sdk', 'Doc',          '',         DOC_handler ],
+                    ['sdk', 'GUI',          '',              GUI_handler ],
+                    ['sdk', 'GUI',          'BypassTest',    GUI_No_Test_handler ],
+                    ['sdk', 'Doc',          '',              DOC_handler ],
 
-                    ['sdk', 'Script',       'CI',            SDK_handler ],
+                    ['sdk', 'Script',       'CI',            GUI_handler ],
                     ['sdk', 'Script',       'Other',         SDK_handler ],
                     ['sdk', 'Script',       'Nightly',       SDK_handler ],
                     ['sdk', 'Script',       'Release',       SDK_handler ],
 
-                    ['sdk', 'Debug',        '',       Debug_handler ],
+                    ['sdk', 'Debug',        '',              Debug_handler ],
             )
 
 
