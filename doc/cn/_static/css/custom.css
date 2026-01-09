@@ -14,7 +14,7 @@ footer {
     margin-top: 28px;
 }
 p {
-    margin: 5px 0;
+    margin: 16px 0 3px;
     line-height: 28px;
 }
 /* =========== Render Common Style =========== */
@@ -433,7 +433,7 @@ html.writer-html5 .rst-content dl.field-list dd {
   text-overflow: ellipsis;   /* 可选：在溢出时显示省略号 */
 }
 html.writer-html5 .rst-content dl.field-list>dt {
-    padding-top: 7px;
+    padding-top: 3px;
 }
 
 /* ---------- See-Also Lists ---------- */
@@ -464,6 +464,7 @@ html.writer-html5 .rst-content dl.field-list>dt {
 }
 .rst-content code, .rst-content tt, code {
     white-space: normal;
+    font-size: 12px;
 }
 .rtk-inline-code,
 .rst-content code {
@@ -699,6 +700,9 @@ section[id*="deprecated-api"] .highlight-cpp {
 /* 需同步在conf.py中添加 */
 .red-text {
     color: red;
+}
+.hide-text {
+    display: none;
 }
 .dt-highlighted {
     background: #f1c40f !important;

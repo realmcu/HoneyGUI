@@ -293,7 +293,7 @@ def custom_role(role_name, rawtext, text, lineno, inliner, options={}, content=[
     node = nodes.inline(rawtext, text, classes=[role_name])
     return [node], []
 
-custom_role_list = ['red-text', 'bolditalic']
+custom_role_list = ['red-text', 'bolditalic', 'hide-text']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 
