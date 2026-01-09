@@ -3,14 +3,11 @@
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_circle.c
-  * @brief circle widget
-  * @details circle widget is used to draw circle shapes on the screen
+  * @brief circle widget with hyper-optimized rendering
+  * @details Quadrant-based rendering with branchless dithering
   * @author
   * @date 2025/12/03
-  * @version 2.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
+  * @version 3.0
   ***************************************************************************************
   */
 
@@ -19,6 +16,7 @@
  *============================================================================*/
 #include <string.h>
 #include <math.h>
+#include <stddef.h>
 #include "guidef.h"
 #include "gui_fb.h"
 #include "acc_api.h"
@@ -26,20 +24,10 @@
 #include "gui_circle.h"
 
 /*============================================================================*
- *                           Types
+ *                           Configuration
  *============================================================================*/
-
-/*============================================================================*
- *                           Constants
- *============================================================================*/
-
-/*============================================================================*
- *                            Macros
- *============================================================================*/
-
-/*============================================================================*
- *                            Variables
- *============================================================================*/
+// 1 = Enable Dither (Better gradients), 0 = Disable (Max speed)
+#define GUI_CIRCLE_ENABLE_DITHER 1
 
 /*============================================================================*
  *                           Private Functions
@@ -76,11 +64,42 @@ static void gui_circle_input_prepare(gui_obj_t *obj)
     }
 }
 
-/** Create a complete circle in a single buffer to avoid seams */
+/**
+ * Branchless Dither (Optimized)
+ * Uses bitwise logic to clamp values between 0-255 without 'if' statements
+ */
+static inline uint32_t fast_dither(uint32_t color, int x, int y)
+{
+    static const int8_t dither_table[16] =
+    {
+        -8,  0, -6,  2,
+        4, -4,  6, -2,
+        -5,  3, -7,  1,
+        7, -1,  5, -3
+    };
+
+    // Get dither value
+    int d = dither_table[(y & 3) * 4 + (x & 3)];
+
+    // Unpack
+    int a = (color >> 24) & 0xFF;
+    int r = (color >> 16) & 0xFF;
+    int g = (color >> 8) & 0xFF;
+    int b = color & 0xFF;
+
+    // Add & Clamp (Branchless)
+    r += d; r = (r < 0) ? 0 : (r > 255 ? 255 : r);
+    g += d; g = (g < 0) ? 0 : (g > 255 ? 255 : g);
+    b += d; b = (b < 0) ? 0 : (b > 255 ? 255 : b);
+
+    return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+}
+
+/** Create a complete circle in a single buffer with Symmetry Optimization */
 static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
 {
-    int diameter = this->radius * 2;
     int r = this->radius;
+    int diameter = r * 2; // Keep diameter even for perfect symmetry logic
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return NULL; }
@@ -112,7 +131,7 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
     uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
     uint32_t solid_color = this->color.color.argb_full;
 
-    // Pre-compute gradient LUT if gradient is enabled
+    // --- Pre-compute Gradient LUT ---
     uint32_t *gradient_lut = NULL;
     int lut_size = 0;
     bool use_radial = (this->use_gradient && this->gradient != NULL &&
@@ -124,10 +143,9 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
 
     if (use_radial)
     {
-        // LUT size = radius for radial gradient
         lut_size = r + 1;
         gradient_lut = gui_malloc(lut_size * sizeof(uint32_t));
-        if (gradient_lut != NULL)
+        if (gradient_lut)
         {
             for (int i = 0; i < lut_size; i++)
             {
@@ -138,10 +156,9 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
     }
     else if (use_angular)
     {
-        // LUT size = 360 for angular gradient
         lut_size = 360;
         gradient_lut = gui_malloc(lut_size * sizeof(uint32_t));
-        if (gradient_lut != NULL)
+        if (gradient_lut)
         {
             float start_angle = this->gradient->angular_start;
             float end_angle = this->gradient->angular_end;
@@ -152,91 +169,125 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
             {
                 float angle = (float)i;
                 float t = (angle - start_angle) / angle_range;
-                if (t < 0) { t += 1.0f; }
-                if (t > 1.0f) { t -= 1.0f; }
+                if (t < 0) { t += 1.0f; } if (t > 1.0f) { t -= 1.0f; }
                 t = (t < 0) ? 0 : ((t > 1.0f) ? 1.0f : t);
                 gradient_lut[i] = gradient_get_color(this->gradient, t);
             }
         }
     }
 
-    // Fill circle with anti-aliasing
+    // --- High Performance Quadrant Rendering ---
+    // We iterate only the Top-Left quadrant (0 to r-1)
+    // and map the results to the other 3 quadrants.
+
     float center = (float)r;
+    bool dither = GUI_CIRCLE_ENABLE_DITHER;
 
-    if (use_radial || use_angular)
+    // Optimization: Calculate r_sq once
+    float r_in = r - 0.5f;
+    float r_out = r + 0.5f;
+    float r_in_sq = r_in * r_in;
+    float r_out_sq = r_out * r_out;
+
+    for (int y = 0; y < r; y++)
     {
-        // Gradient path: need to calculate color for each pixel
-        for (int y = 0; y < diameter; y++)
+        // Pointers to the 4 target rows
+        uint32_t *line_tl = pixels + y * diameter;                  // Top-Left Row
+        uint32_t *line_tr = pixels + y * diameter;                  // Top-Right Row (same row)
+        uint32_t *line_bl = pixels + (diameter - 1 - y) * diameter; // Bottom-Left Row
+        uint32_t *line_br = pixels + (diameter - 1 - y) * diameter; // Bottom-Right Row (same row)
+
+        for (int x = 0; x < r; x++)
         {
-            for (int x = 0; x < diameter; x++)
+            // Coordinate relative to center (Top-Left quadrant: dx < 0, dy < 0)
+            float dx = x + 0.5f - center;
+            float dy = y + 0.5f - center;
+            float dist_sq = dx * dx + dy * dy;
+
+            // 1. Check bounds (Clipping)
+            if (dist_sq >= r_out_sq) { continue; } // Outside circle, skip (pixels are 0 init)
+
+            uint32_t base_color = solid_color;
+            float dist = 0.0f; // Calculate only if needed
+
+            // 2. Calculate Color
+            if (use_radial && gradient_lut)
             {
-                float dx = x + 0.5f - center;
-                float dy = y + 0.5f - center;
-                float dist = sqrtf(dx * dx + dy * dy);
-
-                // Calculate gradient color for this pixel
-                uint32_t pixel_color = solid_color;
-                if (use_radial && gradient_lut != NULL)
-                {
-                    int lut_idx = (int)dist;
-                    if (lut_idx < 0) { lut_idx = 0; }
-                    if (lut_idx >= lut_size) { lut_idx = lut_size - 1; }
-                    pixel_color = gradient_lut[lut_idx];
-                }
-                else if (use_angular && gradient_lut != NULL && dist > 0.5f)
-                {
-                    // Calculate angle (0-360)
-                    float angle = atan2f(dy, dx) * 180.0f / M_PI;
-                    if (angle < 0) { angle += 360.0f; }
-                    int lut_idx = (int)angle;
-                    if (lut_idx < 0) { lut_idx = 0; }
-                    if (lut_idx >= 360) { lut_idx = 359; }
-                    pixel_color = gradient_lut[lut_idx];
-                }
-
-                if (dist <= r - 0.5f)
-                {
-                    // Fully inside
-                    pixels[y * diameter + x] = pixel_color;
-                }
-                else if (dist < r + 0.5f)
-                {
-                    // Anti-aliasing edge
-                    float alpha = r + 0.5f - dist;
-                    uint8_t base_alpha = (pixel_color >> 24) & 0xFF;
-                    uint8_t new_alpha = (uint8_t)(alpha * base_alpha);
-                    pixels[y * diameter + x] = (pixel_color & 0x00FFFFFF) | ((uint32_t)new_alpha << 24);
-                }
-                // else: outside, leave transparent
+                dist = sqrtf(dist_sq); // SQRT #1
+                int idx = (int)dist;
+                if (idx >= lut_size) { idx = lut_size - 1; }
+                base_color = gradient_lut[idx];
             }
-        }
-    }
-    else
-    {
-        // Non-gradient path: optimized for solid color
-        for (int y = 0; y < diameter; y++)
-        {
-            for (int x = 0; x < diameter; x++)
+            else if (use_angular && gradient_lut)
             {
-                float dx = x + 0.5f - center;
-                float dy = y + 0.5f - center;
-                float dist = sqrtf(dx * dx + dy * dy);
-
-                if (dist <= r - 0.5f)
-                {
-                    // Fully inside
-                    pixels[y * diameter + x] = solid_color;
-                }
-                else if (dist < r + 0.5f)
-                {
-                    // Anti-aliasing edge
-                    float alpha = r + 0.5f - dist;
-                    uint8_t base_alpha = (solid_color >> 24) & 0xFF;
-                    uint8_t new_alpha = (uint8_t)(alpha * base_alpha);
-                    pixels[y * diameter + x] = (solid_color & 0x00FFFFFF) | ((uint32_t)new_alpha << 24);
-                }
-                // else: outside, leave transparent
+                // Determine Angle for Top-Left
+                float angle = atan2f(dy, dx) * 180.0f / M_PI; // ATAN2 #1
+                if (angle < 0) { angle += 360.0f; }
+                // Hack: pass angle in color var to avoid struct overhead
+                base_color = (uint32_t)angle;
             }
+
+            // 3. Calculate Alpha (Anti-aliasing)
+            uint8_t alpha_final = 255;
+            if (dist_sq > r_in_sq)
+            {
+                if (dist == 0.0f) { dist = sqrtf(dist_sq); } // SQRT #2 (Only on edge)
+                float alpha_f = r_out - dist;
+                alpha_final = (uint8_t)(alpha_f * 255.0f);
+            }
+
+            // 4. Fill 4 Quadrants (Mirroring)
+            int x_tl = x;
+            int x_tr = diameter - 1 - x;
+            int y_bottom = (diameter - 1 - y);
+
+            // Function macro to apply alpha and dither
+#define APPLY_PIXEL(target_ptr, t_x, t_y, t_color) \
+    do { \
+        uint32_t c = t_color; \
+        if(dither) c = fast_dither(c, t_x, t_y); \
+        if(alpha_final < 255) { \
+            uint8_t base_a = (c >> 24) & 0xFF; \
+            uint8_t new_a = (uint8_t)((alpha_final * base_a) >> 8); \
+            c = (c & 0x00FFFFFF) | ((uint32_t)new_a << 24); \
+        } \
+        target_ptr[t_x] = c; \
+    } while(0)
+
+            if (use_angular && gradient_lut)
+            {
+                // Angular gradient needs special mirroring
+                float angle_tl = (float)base_color;
+
+                // TL
+                int idx = (int)angle_tl % 360;
+                APPLY_PIXEL(line_tl, x_tl, y, gradient_lut[idx]);
+
+                // TR (Mirror X -> 180 - angle + 360)
+                float angle_tr = 540.0f - angle_tl;
+                idx = (int)angle_tr % 360;
+                APPLY_PIXEL(line_tr, x_tr, y, gradient_lut[idx]);
+
+                // BL (Mirror Y -> 360 - angle)
+                float angle_bl = 360.0f - angle_tl;
+                idx = (int)angle_bl % 360;
+                APPLY_PIXEL(line_bl, x_tl, y_bottom, gradient_lut[idx]);
+
+                // BR (Mirror XY -> angle + 180)
+                float angle_br = angle_tl + 180.0f;
+                idx = (int)angle_br % 360;
+                APPLY_PIXEL(line_br, x_tr, y_bottom, gradient_lut[idx]);
+
+            }
+            else
+            {
+                // Radial or Solid: Color is identical for all 4 quadrants
+                APPLY_PIXEL(line_tl, x_tl, y, base_color);
+                APPLY_PIXEL(line_tr, x_tr, y, base_color);
+                APPLY_PIXEL(line_bl, x_tl, y_bottom, base_color);
+                APPLY_PIXEL(line_br, x_tr, y_bottom, base_color);
+            }
+#undef APPLY_PIXEL
         }
     }
 
@@ -259,7 +310,6 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
     {
         matrix_identity(&img->matrix);
     }
-
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(&img->inverse);
 
@@ -283,7 +333,6 @@ static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
     head->version = 0;
     head->rsvd2 = 0;
 
-    // For rectangle, we can use the color directly in the header
     gui_rect_file_head_t *rect_head = (gui_rect_file_head_t *)head;
     rect_head->color = color;
 }
@@ -295,7 +344,6 @@ static uint8_t *create_solid_color_buffer_circle(uint16_t w, uint16_t h, gui_col
     uint8_t *buffer = gui_malloc(buffer_size);
     if (buffer == NULL) { return NULL; }
 
-    // Set header
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
     head->scan = 0;
     head->align = 0;
@@ -308,14 +356,12 @@ static uint8_t *create_solid_color_buffer_circle(uint16_t w, uint16_t h, gui_col
     head->version = 0;
     head->rsvd2 = 0;
 
-    // Fill with solid color
     uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
     uint32_t argb = color.color.argb_full;
     for (int i = 0; i < w * h; i++)
     {
         pixels[i] = argb;
     }
-
     return buffer;
 }
 
@@ -347,7 +393,6 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
 
     if (has_transform)
     {
-        // Use IMG_SRC_OVER_MODE with actual pixel buffer for anti-aliasing
         img->blend_mode = IMG_SRC_OVER_MODE;
         img->high_quality = 1;
         img->data = create_solid_color_buffer_circle(w, h, this->color);
@@ -360,7 +405,6 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
     }
     else
     {
-        // Use IMG_RECT for better performance when no transformation
         img->blend_mode = IMG_RECT;
         gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
         if (rect_data == NULL)
@@ -375,7 +419,6 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
 
     img->opacity_value = this->opacity_value;
 
-    // Start with user's transformation matrix if exists, otherwise identity
     if (obj->matrix != NULL)
     {
         memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -385,9 +428,7 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
         matrix_identity(&img->matrix);
     }
 
-    // Apply translation for this rect part (after user's transformation)
     matrix_translate(x, y, &img->matrix);
-
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(&img->inverse);
 
@@ -395,26 +436,22 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
     draw_img_new_area(img, NULL);
     *input_img = img;
 }
-/** create vertical arc strip */
+
+/** create vertical arc strip (Legacy/Fallback) */
 static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
 {
     if (this->radius <= 0) { return NULL; }
 
     int inner_half = (int)(this->radius * M_SQRT1_2);
     int inner_size = inner_half * 2;
-
-    // arc width = r - inner_half
     int arc_width = this->radius - inner_half;
     if (arc_width < 1) { arc_width = 1; }
-
     int arc_height = inner_size;
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return NULL; }
-
     memset(img, 0x00, sizeof(draw_img_t));
 
-    // buffer size = arc_width * arc_height * 4 + sizeof(gui_rgb_data_head_t)
     uint32_t buffer_size = arc_width * arc_height * 4 + sizeof(gui_rgb_data_head_t);
     uint8_t *arc_data = gui_malloc(buffer_size);
     if (arc_data == NULL)
@@ -424,7 +461,6 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
     }
     memset(arc_data, 0x00, buffer_size);
 
-    // set image header
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)arc_data;
     head->scan = 0;
     head->align = 0;
@@ -440,12 +476,10 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
     uint32_t *pixels = (uint32_t *)(arc_data + sizeof(gui_rgb_data_head_t));
     uint32_t solid_color = this->color.color.argb_full;
 
-    // radius center (0, arc_height/2)
     float center_y = (float)arc_height / 2.0f;
     float radius = (float)this->radius;
     float radius_sq = radius * radius;
 
-    // pre-calculate exact boundary for each row
     float *exact_boundaries = gui_malloc(arc_height * sizeof(float));
     if (exact_boundaries == NULL)
     {
@@ -454,16 +488,11 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
         return NULL;
     }
 
-    // calculate exact boundary for each row
     for (int y = 0; y < arc_height; y++)
     {
         float py = y + 0.5f - center_y;
         float py_sq = py * py;
-
-        if (py_sq > radius_sq)
-        {
-            exact_boundaries[y] = -1000.0f; // out of circle
-        }
+        if (py_sq > radius_sq) { exact_boundaries[y] = -1000.0f; }
         else
         {
             float dx = sqrtf(radius_sq - py_sq);
@@ -471,47 +500,30 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
         }
     }
 
-    // fill pixel
     for (int y = 0; y < arc_height; y++)
     {
         float exact_boundary = exact_boundaries[y];
-
         if (exact_boundary < -500.0f)
         {
-            for (int x = 0; x < arc_width; x++)
-            {
-                pixels[y * arc_width + x] = solid_color;
-            }
+            for (int x = 0; x < arc_width; x++) { pixels[y * arc_width + x] = solid_color; }
             continue;
         }
 
         for (int x = 0; x < arc_width; x++)
         {
             float pixel_center_x = x + 0.5f;
-
-            // calculate distance to boundary
             float distance_to_boundary = pixel_center_x - exact_boundary;
-
             float coverage;
 
-            if (distance_to_boundary >= 0.5f)
-            {
-                coverage = 1.0f;
-            }
-            else if (distance_to_boundary <= -0.5f)
-            {
-                coverage = 0.0f;
-            }
+            if (distance_to_boundary >= 0.5f) { coverage = 1.0f; }
+            else if (distance_to_boundary <= -0.5f) { coverage = 0.0f; }
             else
             {
                 float t = (distance_to_boundary + 0.5f);
                 coverage = 0.5f - 0.5f * cosf(M_PI * t);
             }
 
-            if (coverage > 0.999f)
-            {
-                pixels[y * arc_width + x] = solid_color;
-            }
+            if (coverage > 0.999f) { pixels[y * arc_width + x] = solid_color; }
             else if (coverage > 0.001f)
             {
                 gui_color_t color = this->color;
@@ -532,10 +544,7 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
     img->opacity_value = this->opacity_value;
     img->high_quality = 1;
 
-    // Initialize with identity matrix
     matrix_identity(&img->matrix);
-
-    // Apply user's transformation matrix if exists
     if (obj->matrix != NULL)
     {
         memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -550,7 +559,7 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
     return img;
 }
 
-/** Create other three arc segments through transformation*/
+/** Create other three arc segments through transformation (Legacy/Fallback)*/
 static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
                                           draw_img_t *base_img,
                                           int pos_x, int pos_y,
@@ -558,30 +567,18 @@ static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
                                           bool is_top_bottom)
 {
     GUI_UNUSED(this);
-    if (base_img == NULL || base_img->data == NULL)
-    {
-        gui_log("create_transformed_arc: base_img is NULL\n");
-        return NULL;
-    }
+    if (base_img == NULL || base_img->data == NULL) { return NULL; }
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL)
-    {
-        gui_log("create_transformed_arc: failed to allocate img\n");
-        return NULL;
-    }
+    if (img == NULL) { return NULL; }
 
     memcpy(img, base_img, sizeof(draw_img_t));
-
-    // share pixel data with base_img
     img->data = base_img->data;
 
-    // get base image size
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)base_img->data;
     int base_width = head->w;
     int base_height = head->h;
 
-    // Start with user's transformation matrix if exists, otherwise identity
     if (obj->matrix != NULL)
     {
         memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -591,36 +588,17 @@ static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
         matrix_identity(&img->matrix);
     }
 
-    // Apply position translation (after user's transformation)
     matrix_translate((float)pos_x, (float)pos_y, &img->matrix);
 
     if (is_top_bottom)
     {
-        // top bottom arc need rotate 90 degree
-        if (mirror_y)
-        {
-            // bottom arc: rotate -90 degree (counterclockwise)
-            matrix_rotate(-90.0f, &img->matrix);
-        }
-        else
-        {
-            // top arc: rotate 90 degree (clockwise)
-            matrix_rotate(90.0f, &img->matrix);
-        }
+        if (mirror_y) { matrix_rotate(-90.0f, &img->matrix); }
+        else { matrix_rotate(90.0f, &img->matrix); }
     }
     else if (mirror_x)
     {
-        // right arc need horizontal mirror
-
-        // right arc: horizontal mirror (x-axis reverse)
-
-        // first translate to image center
         matrix_translate((float)base_width / 2.0f, (float)base_height / 2.0f, &img->matrix);
-
-        // horizontal mirror (x-axis reverse)
         matrix_scale(-1.0f, 1.0f, &img->matrix);
-
-        // mirror back to original position
         matrix_translate(-(float)base_width / 2.0f, -(float)base_height / 2.0f, &img->matrix);
     }
 
@@ -638,7 +616,6 @@ static void gui_circle_prepare(gui_obj_t *obj)
     gui_circle_t *this = (gui_circle_t *)obj;
     uint8_t last = this->checksum;
 
-    // Initialize obj->matrix if not already done
     if (obj->matrix == NULL)
     {
         obj->matrix = gui_malloc(sizeof(gui_matrix_t));
@@ -646,22 +623,44 @@ static void gui_circle_prepare(gui_obj_t *obj)
         matrix_identity(obj->matrix);
     }
 
-    // Apply transformations (like gui_img_prepare does)
     float center_x = (float)this->radius;
     float center_y = (float)this->radius;
 
-    // Apply offset first
     matrix_translate(this->offset_x, this->offset_y, obj->matrix);
-    // Translate to center
     matrix_translate(center_x, center_y, obj->matrix);
-    // Apply scale
     matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-    // Apply rotation
     matrix_rotate(this->degrees, obj->matrix);
-    // Translate back
     matrix_translate(-center_x, -center_y, obj->matrix);
 
-    // Check if we need single buffer (for transparency, small circles, or gradient)
+    // Calculate checksum only for key properties (exclude pointers)
+    // Manually calculate checksum for critical fields only
+    uint8_t new_checksum = 0;
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->x, sizeof(this->x));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->y, sizeof(this->y));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->radius, sizeof(this->radius));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->color, sizeof(this->color));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->opacity_value,
+                                    sizeof(this->opacity_value));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->degrees, sizeof(this->degrees));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->scale_x, sizeof(this->scale_x));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->scale_y, sizeof(this->scale_y));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->offset_x, sizeof(this->offset_x));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->offset_y, sizeof(this->offset_y));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->use_gradient,
+                                    sizeof(this->use_gradient));
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->gradient_type,
+                                    sizeof(this->gradient_type));
+
+    // Include gradient data if present
+    if (this->gradient != NULL)
+    {
+        new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)this->gradient, sizeof(Gradient));
+    }
+
+    // Only regenerate buffers if properties changed
+    bool need_regenerate = (last != new_checksum);
+
+    // Force single buffer for Gradient or Alpha or Small Circles
     int diameter = this->radius * 2;
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
                               (diameter * diameter < 10000) ||
@@ -669,79 +668,71 @@ static void gui_circle_prepare(gui_obj_t *obj)
 
     if (need_single_buffer)
     {
-        // Use single buffer for transparency or small circles to avoid seams
-        this->center_rect = create_circle_buffer(this, obj);
+        if (need_regenerate || this->center_rect == NULL)
+        {
+            this->center_rect = create_circle_buffer(this, obj);
+        }
     }
     else
     {
         // Use optimized multi-part rendering for large opaque circles
-        // calculate inner square parameters
-        int inner_half = (int)floorf(this->radius * M_SQRT1_2);
-        int inner_size = inner_half * 2;
-        int arc_width = this->radius - inner_half;
-
-        if (inner_size < 1) { inner_size = 1; }
-        if (arc_width < 1) { arc_width = 1; }
-
-        // ensure inner square size not greater than diameter
-        if (inner_size > diameter) { inner_size = diameter; }
-
-        // inner square position: start from (arc_width, arc_width)
-        int inner_x = arc_width;
-        int inner_y = arc_width;
-
-        // center square (inner square)
-        if (inner_size > 0)
+        if (need_regenerate || this->center_rect == NULL)
         {
-            set_rect_img(this, &this->center_rect, inner_x, inner_y, inner_size, inner_size);
-        }
+            int inner_half = (int)floorf(this->radius * M_SQRT1_2);
+            int inner_size = inner_half * 2;
+            int arc_width = this->radius - inner_half;
 
-        // create left vertical arc strip (base image)
-        this->arc_left = create_vertical_arc_strip(this, obj);
+            if (inner_size < 1) { inner_size = 1; }
+            if (arc_width < 1) { arc_width = 1; }
+            if (inner_size > diameter) { inner_size = diameter; }
 
-        if (this->arc_left != NULL)
-        {
-            // left vertical arc position: touch center square left edge
-            int left_x = 0;          // x from 0
-            int left_y = arc_width;  // y align with center square top edge
+            int inner_x = arc_width;
+            int inner_y = arc_width;
 
-            // set left vertical arc position
-            matrix_identity(&this->arc_left->matrix);
-            matrix_translate((float)left_x, (float)left_y, &this->arc_left->matrix);
+            if (inner_size > 0)
+            {
+                set_rect_img(this, &this->center_rect, inner_x, inner_y, inner_size, inner_size);
+            }
 
-            // combine with object matrix
-            struct gui_matrix obj_matrix;
-            memcpy(&obj_matrix, obj->matrix, sizeof(struct gui_matrix));
-            matrix_multiply(&this->arc_left->matrix, &obj_matrix);
+            this->arc_left = create_vertical_arc_strip(this, obj);
 
-            memcpy(&this->arc_left->inverse, &this->arc_left->matrix, sizeof(struct gui_matrix));
-            matrix_inverse(&this->arc_left->inverse);
-            draw_img_new_area(this->arc_left, NULL);
+            if (this->arc_left != NULL)
+            {
+                int left_x = 0;
+                int left_y = arc_width;
 
-            // right vertical arc position: touch center square right edge
-            int right_x = arc_width + inner_size - 1;  // x align with center square right edge
-            int right_y = arc_width;
-            this->arc_right = create_transformed_arc(this, obj, this->arc_left,
-                                                     right_x, right_y,
-                                                     true, false, false);
-            // top vertical arc position: touch center square top edge
-            int top_x = arc_width + inner_size;                  // x align with center square left edge
-            int top_y = 0;                          // y in top
-            this->arc_top = create_transformed_arc(this, obj, this->arc_left,
-                                                   top_x, top_y,
-                                                   false, false, true);
+                matrix_identity(&this->arc_left->matrix);
+                matrix_translate((float)left_x, (float)left_y, &this->arc_left->matrix);
 
-            // bottom vertical arc position: touch center square bottom edge
-            int bottom_x = arc_width;               // x align with center square left edge
-            int bottom_y = arc_width * 2 + inner_size - 1; // y align with center square bottom edge
-            this->arc_bottom = create_transformed_arc(this, obj, this->arc_left,
-                                                      bottom_x, bottom_y,
-                                                      false, true, true);
+                struct gui_matrix obj_matrix;
+                memcpy(&obj_matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_multiply(&this->arc_left->matrix, &obj_matrix);
+
+                memcpy(&this->arc_left->inverse, &this->arc_left->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->arc_left->inverse);
+                draw_img_new_area(this->arc_left, NULL);
+
+                int right_x = arc_width + inner_size - 1;
+                int right_y = arc_width;
+                this->arc_right = create_transformed_arc(this, obj, this->arc_left,
+                                                         right_x, right_y,
+                                                         true, false, false);
+                int top_x = arc_width + inner_size;
+                int top_y = 0;
+                this->arc_top = create_transformed_arc(this, obj, this->arc_left,
+                                                       top_x, top_y,
+                                                       false, false, true);
+
+                int bottom_x = arc_width;
+                int bottom_y = arc_width * 2 + inner_size - 1;
+                this->arc_bottom = create_transformed_arc(this, obj, this->arc_left,
+                                                          bottom_x, bottom_y,
+                                                          false, true, true);
+            }
         }
     }
 
-    this->checksum = 0;
-    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_circle_t));
+    this->checksum = new_checksum;
 
     if (last != this->checksum)
     {
@@ -755,13 +746,7 @@ static void gui_circle_draw(gui_obj_t *obj)
     gui_circle_t *this = (gui_circle_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
-    // in center square
-    if (this->center_rect != NULL)
-    {
-        gui_acc_blit_to_dc(this->center_rect, dc, NULL);
-    }
-
-    // in vertical arc strip
+    if (this->center_rect != NULL) { gui_acc_blit_to_dc(this->center_rect, dc, NULL); }
     if (this->arc_left != NULL) { gui_acc_blit_to_dc(this->arc_left, dc, NULL); }
     if (this->arc_right != NULL) { gui_acc_blit_to_dc(this->arc_right, dc, NULL); }
     if (this->arc_top != NULL) { gui_acc_blit_to_dc(this->arc_top, dc, NULL); }
@@ -771,57 +756,13 @@ static void gui_circle_draw(gui_obj_t *obj)
 /** End phase processing - Memory management */
 static void gui_circle_end(gui_circle_t *this)
 {
-#define SAFE_FREE_IMG(img) \
-    do { \
-        if ((img) != NULL) { \
-            if ((img)->data != NULL) { \
-                gui_free((img)->data); \
-                (img)->data = NULL; \
-            } \
-            gui_free(img); \
-            (img) = NULL; \
-        } \
-    } while(0)
-
-    SAFE_FREE_IMG(this->center_rect);
-    if (this->arc_left != NULL)
-    {
-        if (this->arc_left->data != NULL)
-        {
-            gui_free(this->arc_left->data);
-            this->arc_left->data = NULL;
-        }
-        gui_free(this->arc_left);
-        this->arc_left = NULL;
-    }
-
-    // other vertical arc strip
-    if (this->arc_right != NULL)
-    {
-        this->arc_right->data = NULL;
-        gui_free(this->arc_right);
-        this->arc_right = NULL;
-    }
-
-    if (this->arc_top != NULL)
-    {
-        this->arc_top->data = NULL;
-        gui_free(this->arc_top);
-        this->arc_top = NULL;
-    }
-
-    if (this->arc_bottom != NULL)
-    {
-        this->arc_bottom->data = NULL;
-        gui_free(this->arc_bottom);
-        this->arc_bottom = NULL;
-    }
-#undef SAFE_FREE_IMG
+    // DO NOT free buffers here - they are cached for reuse
+    // Buffers will be freed in gui_circle_destroy() when widget is destroyed
+    (void)this; // Suppress unused parameter warning
 }
 
 static void gui_circle_destroy(gui_circle_t *this)
 {
-    // Free gradient if allocated
     if (this->gradient != NULL)
     {
         gui_free(this->gradient);
@@ -841,19 +782,15 @@ static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         case OBJ_PREPARE:
             gui_circle_prepare(obj);
             break;
-
         case OBJ_DRAW:
             gui_circle_draw(obj);
             break;
-
         case OBJ_END:
             gui_circle_end((gui_circle_t *)obj);
             break;
-
         case OBJ_DESTROY:
             gui_circle_destroy((gui_circle_t *)obj);
             break;
-
         default:
             break;
         }
@@ -879,13 +816,6 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     memset(circle, 0x00, sizeof(gui_circle_t));
 
     circle->opacity_value = color.color.rgba.a;
-
-    circle->center_rect = NULL;
-    circle->arc_left = NULL;
-    circle->arc_right = NULL;
-    circle->arc_top = NULL;
-    circle->arc_bottom = NULL;
-
     gui_obj_ctor((gui_obj_t *)circle, parent, name, x - radius, y - radius, radius * 2, radius * 2);
     GET_BASE(circle)->obj_cb = gui_circle_cb;
     GET_BASE(circle)->has_input_prepare_cb = true;
@@ -906,15 +836,11 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->radius = radius;
     circle->color = color;
     circle->checksum = 0;
-
-    // Initialize transformation parameters
     circle->degrees = 0.0f;
     circle->scale_x = 1.0f;
     circle->scale_y = 1.0f;
     circle->offset_x = 0.0f;
     circle->offset_y = 0.0f;
-
-    // Initialize gradient parameters
     circle->gradient = NULL;
     circle->use_gradient = false;
     circle->gradient_type = CIRCLE_GRADIENT_RADIAL;
@@ -922,9 +848,7 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     return circle;
 }
 
-void gui_circle_set_style(gui_circle_t *this,
-                          int x, int y,
-                          int radius, gui_color_t color)
+void gui_circle_set_style(gui_circle_t *this, int x, int y, int radius, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
     this->x = x;
@@ -937,7 +861,6 @@ void gui_circle_set_style(gui_circle_t *this,
 void gui_circle_set_position(gui_circle_t *this, int x, int y)
 {
     GUI_ASSERT(this != NULL);
-
     if (this->x != x || this->y != y)
     {
         this->x = x;
@@ -948,7 +871,6 @@ void gui_circle_set_position(gui_circle_t *this, int x, int y)
 void gui_circle_set_radius(gui_circle_t *this, int radius)
 {
     GUI_ASSERT(this != NULL);
-
     if (this->radius != radius)
     {
         this->radius = radius;
@@ -962,7 +884,6 @@ void gui_circle_set_opacity(gui_circle_t *this, uint8_t opacity)
 void gui_circle_set_color(gui_circle_t *this, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
-
     if (this->color.color.argb_full != color.color.argb_full)
     {
         this->color = color;
@@ -999,15 +920,11 @@ void gui_circle_translate(gui_circle_t *this, float tx, float ty)
 void gui_circle_set_radial_gradient(gui_circle_t *this)
 {
     GUI_ASSERT(this != NULL);
-
-    // Allocate gradient if not exists
     if (this->gradient == NULL)
     {
         this->gradient = gui_malloc(sizeof(Gradient));
         if (this->gradient == NULL) { return; }
     }
-
-    // Initialize gradient
     gradient_init(this->gradient, GRADIENT_RADIAL);
     this->gradient->radial_cx = (float)this->radius;
     this->gradient->radial_cy = (float)this->radius;
@@ -1019,15 +936,11 @@ void gui_circle_set_radial_gradient(gui_circle_t *this)
 void gui_circle_set_angular_gradient(gui_circle_t *this, float start_angle, float end_angle)
 {
     GUI_ASSERT(this != NULL);
-
-    // Allocate gradient if not exists
     if (this->gradient == NULL)
     {
         this->gradient = gui_malloc(sizeof(Gradient));
         if (this->gradient == NULL) { return; }
     }
-
-    // Initialize gradient
     gradient_init(this->gradient, GRADIENT_ANGULAR);
     this->gradient->angular_cx = (float)this->radius;
     this->gradient->angular_cy = (float)this->radius;
@@ -1040,13 +953,10 @@ void gui_circle_set_angular_gradient(gui_circle_t *this, float start_angle, floa
 void gui_circle_add_gradient_stop(gui_circle_t *this, float position, gui_color_t color)
 {
     GUI_ASSERT(this != NULL);
-
     if (this->gradient == NULL)
     {
-        // Auto-create gradient with default type (radial)
         gui_circle_set_radial_gradient(this);
     }
-
     if (this->gradient != NULL)
     {
         gradient_add_stop(this->gradient, position, color.color.argb_full);
@@ -1056,7 +966,6 @@ void gui_circle_add_gradient_stop(gui_circle_t *this, float position, gui_color_
 void gui_circle_clear_gradient(gui_circle_t *this)
 {
     GUI_ASSERT(this != NULL);
-
     if (this->gradient != NULL)
     {
         gui_free(this->gradient);

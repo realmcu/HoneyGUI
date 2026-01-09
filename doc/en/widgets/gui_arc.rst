@@ -53,6 +53,23 @@ Core Features
    * - Clear Gradient
      - :cpp:any:`gui_arc_clear_gradient`
 
+Arc Group Features
+------------------
+
+.. list-table::
+   :header-rows: 1
+
+   * - Description
+     - API 
+   * - Create Arc Group
+     - :cpp:any:`gui_arc_group_create`  
+   * - Add Arc to Group
+     - :cpp:any:`gui_arc_group_add_arc` 
+   * - Set Gradient for Arc
+     - :cpp:any:`gui_arc_group_set_gradient`
+   * - Add Gradient Stop
+     - :cpp:any:`gui_arc_group_add_gradient_stop`
+
 Angle Description
 -----------------
 
@@ -104,6 +121,31 @@ Features Highlights
 - **Lightweight**: Minimal memory footprint, suitable for embedded systems and resource-constrained environments
 - **Ring Support**: Automatically draws a full circle when start and end angles differ by 360°
 - **Matrix Transforms**: Supports rotation, scale, and translation matrix transforms for complex arc effects
+- **Batch Rendering**: Arc Group widget enables batch rendering of multiple static arcs for improved performance
+
+Arc Group Widget
+----------------
+
+The Arc Group widget is designed for batch rendering multiple static arcs in a single buffer, significantly improving rendering performance by reducing hardware transfer operations.
+
+**Performance Benefits**
+
+- **Reduced Transfer Overhead**: Combines multiple arcs into one buffer, reducing DMA/GPU transfer calls
+- **Optimized for Static Content**: Ideal for background arcs that don't change frequently
+- **Memory Efficient**: Shares a single buffer for multiple arcs
+
+**Use Cases**
+
+- Activity rings (fitness tracking displays)
+- Multi-layer progress indicators
+- Dashboard backgrounds with multiple circular elements
+- Static decorative arc patterns
+
+**Limitations**
+
+- Maximum 8 arcs per group (configurable via MAX_ARCS_IN_GROUP)
+- All arcs in a group share the same buffer and are rendered together
+- Best suited for static or infrequently changing content
 
 Use Cases
 ---------
@@ -147,4 +189,6 @@ API
 -------------
 
 .. doxygenfile:: gui_arc.h
+
+.. doxygenfile:: gui_arc_group.h
 

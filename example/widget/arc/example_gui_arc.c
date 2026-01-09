@@ -2,6 +2,9 @@
 #include "guidef.h"
 #include "gui_components_init.h"
 #include "gui_arc.h"
+#include "gui_arc_group.h"
+#include "gui_rect.h"
+#include "gui_circle.h"
 
 static void create_activity_rings(float center_x, float center_y)
 {
@@ -128,13 +131,86 @@ void example_arc_gradient(void *parent)
     gui_arc_add_gradient_stop(arc4, 0.5f, gui_rgba(255, 255, 0, 255));   // Yellow (middle)
     gui_arc_add_gradient_stop(arc4, 1.0f, gui_rgba(0, 255, 0, 255));     // Green (end)
 }
+
+void example_arc_group(void *parent)
+{
+    // Example: Arc Group for batch rendering multiple static arcs
+    // This is useful for background rings that don't change frequently
+    // Performance benefit: Reduces DMA/GPU transfer calls by combining multiple arcs into one buffer
+
+    float center_x = 240.0f;
+    float center_y = 240.0f;
+
+    // Calculate bounding box for the arc group
+    float outer_radius = 163.0f;
+    float outer_thickness = 22.0f;
+    int box_size = (int)(outer_radius + outer_thickness / 2 + 2) * 2 + 4;
+    int box_x = (int)center_x - box_size / 2;
+    int box_y = (int)center_y - box_size / 2;
+
+    // Create arc group for background rings
+    gui_arc_group_t *bg_group = gui_arc_group_create(parent, "bg_rings",
+                                                     box_x, box_y, box_size, box_size);
+
+    float group_cx = box_size / 2.0f, group_cy = group_cx;
+
+    // Add first arc (outer ring) with gradient
+    int arc0 = gui_arc_group_add_arc(bg_group, group_cx, group_cy,
+                                     163.0f, 0, 360, 22.0f, gui_rgba(50, 50, 50, 255));
+    gui_arc_group_set_gradient(bg_group, arc0, 0, 360);
+    gui_arc_group_add_gradient_stop(bg_group, arc0, 0.0f, gui_rgba(60, 0, 0, 100));
+    gui_arc_group_add_gradient_stop(bg_group, arc0, 0.5f, gui_rgba(80, 20, 20, 100));
+    gui_arc_group_add_gradient_stop(bg_group, arc0, 1.0f, gui_rgba(60, 0, 0, 100));
+
+    // Add second arc (middle ring) with gradient
+    int arc1 = gui_arc_group_add_arc(bg_group, group_cx, group_cy,
+                                     136.5f, 0, 360, 22.0f, gui_rgba(50, 50, 50, 255));
+    gui_arc_group_set_gradient(bg_group, arc1, 0, 360);
+    gui_arc_group_add_gradient_stop(bg_group, arc1, 0.0f, gui_rgba(0, 60, 0, 100));
+    gui_arc_group_add_gradient_stop(bg_group, arc1, 0.5f, gui_rgba(20, 80, 20, 100));
+    gui_arc_group_add_gradient_stop(bg_group, arc1, 1.0f, gui_rgba(0, 60, 0, 100));
+
+    // Add third arc (inner ring) with gradient
+    int arc2 = gui_arc_group_add_arc(bg_group, group_cx, group_cy,
+                                     110.0f, 0, 360, 22.0f, gui_rgba(50, 50, 50, 255));
+    gui_arc_group_set_gradient(bg_group, arc2, 0, 360);
+    gui_arc_group_add_gradient_stop(bg_group, arc2, 0.0f, gui_rgba(0, 20, 60, 100));
+    gui_arc_group_add_gradient_stop(bg_group, arc2, 0.5f, gui_rgba(20, 40, 80, 100));
+    gui_arc_group_add_gradient_stop(bg_group, arc2, 1.0f, gui_rgba(0, 20, 60, 100));
+
+    // Create foreground arcs separately (these can change dynamically)
+    gui_arc_t *arc_move = gui_arc_create(parent, "fg_arc_move", center_x, center_y,
+                                         163.0f, 0, 252.0f, 22.0f, gui_rgba(255, 0, 0, 255));
+    gui_arc_set_angular_gradient(arc_move, 0, 252.0f);
+    gui_arc_add_gradient_stop(arc_move, 0.0f, gui_rgba(250, 17, 79, 255));
+    gui_arc_add_gradient_stop(arc_move, 1.0f, gui_rgba(255, 100, 150, 255));
+
+    gui_arc_t *arc_exercise = gui_arc_create(parent, "fg_arc_exercise", center_x, center_y,
+                                             136.5f, 0, 72.0f, 22.0f, gui_rgba(0, 255, 0, 255));
+    gui_arc_set_angular_gradient(arc_exercise, 0, 72.0f);
+    gui_arc_add_gradient_stop(arc_exercise, 0.0f, gui_rgba(164, 255, 4, 255));
+    gui_arc_add_gradient_stop(arc_exercise, 1.0f, gui_rgba(255, 255, 0, 255));
+
+    gui_arc_t *arc_stand = gui_arc_create(parent, "fg_arc_stand", center_x, center_y,
+                                          110.0f, 0, 198.0f, 22.0f, gui_rgba(0, 0, 255, 255));
+    gui_arc_set_angular_gradient(arc_stand, 0, 198.0f);
+    gui_arc_add_gradient_stop(arc_stand, 0.0f, gui_rgba(0, 255, 255, 255));
+    gui_arc_add_gradient_stop(arc_stand, 1.0f, gui_rgba(0, 150, 255, 255));
+
+    GUI_UNUSED(bg_group);
+    GUI_UNUSED(arc_move);
+    GUI_UNUSED(arc_exercise);
+    GUI_UNUSED(arc_stand);
+}
+
 static int geometry_demo_init(void)
 {
 
     // float center_x = 480 / 2.0f;
     // float center_y = 480 / 2.0f;
     // create_activity_rings(center_x, center_y);
-    example_arc_gradient(gui_obj_get_root());
+    // example_arc_gradient(gui_obj_get_root());
+    example_arc_group(gui_obj_get_root());
 
     return 0;
 }

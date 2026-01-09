@@ -74,6 +74,7 @@ typedef struct
     // Gradient parameters
     Gradient *gradient;         /**< Optional gradient for rect fill. */
     bool use_gradient;          /**< Flag to enable gradient rendering. */
+    bool enable_dither;         /**< Flag to enable dithering for gradient. */
     gui_rect_gradient_dir_t gradient_dir; /**< Gradient direction. */
 } gui_rounded_rect_t;
 
@@ -201,6 +202,14 @@ void gui_rect_add_gradient_stop(gui_rounded_rect_t *this, float position, gui_co
  * @param this Pointer to the rect widget.
  */
 void gui_rect_clear_gradient(gui_rounded_rect_t *this);
+
+/**
+ * @brief Enable or disable dithering for gradient.
+ * @param this Pointer to the rect widget.
+ * @param enable true to enable dithering, false to disable.
+ * @note Dithering reduces color banding but may impact performance.
+ */
+void gui_rect_set_dither(gui_rounded_rect_t *this, bool enable);
 
 #ifdef __cplusplus
 }

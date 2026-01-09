@@ -506,16 +506,9 @@ void gui_arc_set_angular_gradient(gui_arc_t *this, float start_angle, float end_
         GUI_ASSERT(this->gradient != NULL);
     }
 
-    // Calculate gradient span
-    float span = end_angle - start_angle;
-
-    // Auto-compensate for full circle gradient to enable end cap
-    // When span is ~360° or start==end (full circle), add 1° to trigger end cap drawing
-    if (fabsf(span) < 0.1f || (span >= 359.9f && span <= 360.1f))
-    {
-        // Full circle case: add 1° to enable end cap
-        end_angle = start_angle + 361.0f;
-    }
+    // REMOVED: Auto-compensation for full circle gradient
+    // The draw_arc_df_aa_gradient function now handles full circles efficiently
+    // without needing the +1° trick for end caps
 
     // Initialize angular gradient
     gradient_init(this->gradient, GRADIENT_ANGULAR);
