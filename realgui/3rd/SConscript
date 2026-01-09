@@ -12,7 +12,7 @@ if GetDepend(['']):
     objs = DefineGroup('3rd', src, depend = [''], CPPPATH = inc)
     list = os.listdir(cwd)
     for d in list:
-        if d == 'win32_sim':
+        if d == 'sim_experimental':
             continue
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):
