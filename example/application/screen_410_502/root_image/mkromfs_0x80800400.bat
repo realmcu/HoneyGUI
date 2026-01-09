@@ -1,0 +1,1 @@
+python ../../../../tool/mkromfs/mkromfs_for_honeygui.py -i root -o root_0x80800400.bin -b -a 0x80800400
