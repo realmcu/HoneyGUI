@@ -5,7 +5,7 @@
 
 #include "../hml_component.h"
 #include "../hml_utils.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 
 gui_obj_t *hml_create_canvas(gui_obj_t *parent, ezxml_t node)
 {
@@ -16,6 +16,6 @@ gui_obj_t *hml_create_canvas(gui_obj_t *parent, ezxml_t node)
     int h = hml_attr_height(node, 100);
     gui_color_t color = hml_attr_color(node, "color", 0xFFFFFFFF);
 
-    gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, id, x, y, w, h, color);
+    gui_rounded_rect_t *rect = gui_rect_create(parent, id, x, y, w, h, 0, color);
     return (gui_obj_t *)rect;
 }

@@ -11,7 +11,7 @@
 #include "app_main_watch.h"
 #include "gui_menu_cellular.h"
 #include "gui_view_instance.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 
 /*============================================================================*
  *                           Types
@@ -552,8 +552,8 @@ static void app_menu_design(gui_view_t *view)
         };
         int array_size = sizeof(cellilar_img_data_array) / sizeof(cellilar_img_data_array[0]);
         int16_t icon_size = 100;
-        gui_canvas_rect_create(GUI_BASE(win), "background", 0, 0,
-                               SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(0, 0, 0, 255));
+        gui_rect_create(GUI_BASE(win), "background", 0, 0,
+                        SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(0, 0, 0, 255));
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, icon_size, cellilar_img_data_array,
                                                              array_size);
         menu_cellular = menu;

@@ -9,7 +9,7 @@
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_canvas.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "app_main_watch.h"
 #include "gui_view_instance.h"
 #include "tp_algo.h"
@@ -820,7 +820,7 @@ static void page_active_multi_design(gui_obj_t *parent)
 /* Page timer end */
 static void page_timer_end_design(gui_obj_t *parent)
 {
-    gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0xC3, 0x50, 0x21));
+    gui_rect_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgb(0xC3, 0x50, 0x21));
     int16_t bg_cancel_y = 402;
 
     arc_end = 1.f;

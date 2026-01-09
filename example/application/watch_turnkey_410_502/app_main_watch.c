@@ -10,7 +10,7 @@
 #include "gui_win.h"
 #include "guidef.h"
 #include "kb_algo.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "gui_view.h"
 #include "app_main_watch.h"
 #include "gui_message.h"
@@ -125,10 +125,10 @@ static void fps_create(void *parent)
 {
     char *text;
     int font_size = 20;
-    gui_canvas_rect_t *fps_rect = gui_canvas_rect_create(parent, "rect_fps",
-                                                         gui_get_screen_width() / 2 - 140 / 2, 0, 140,
-                                                         70,
-                                                         APP_COLOR_GRAY_OPACITY(150));
+    gui_rounded_rect_t *fps_rect = gui_rect_create(parent, "rect_fps",
+                                                   gui_get_screen_width() / 2 - 140 / 2, 0, 140,
+                                                   70, 0,
+                                                   APP_COLOR_GRAY_OPACITY(150));
     gui_obj_create_timer(GUI_BASE(fps_rect), 10, true, gui_fps_cb);
     sprintf(fps, "FPS:%d", gui_fps());
     text = fps;
