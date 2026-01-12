@@ -27,6 +27,7 @@
 #include "font_custom.h"
 #include "tp_algo.h"
 #include "gui_fb.h"
+#include "gui_vfs.h"
 
 /*============================================================================*
  *                           Types
@@ -649,6 +650,31 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
         if (flag == FONT_FILE_BMP_FLAG)
         {
             gui_font_mem_init_ftl(font_source);
+        }
+        else if (flag == FONT_FILE_TTF_FLAG)
+        {
+            gui_font_ttf_init_ftl(font_source);
+        }
+    }
+    else if (font_mode == FONT_SRC_FILESYS)
+    {
+        /* Auto-initialize FS font (lazy loading with ref counting) */
+        /* Try BMP first, then TTF */
+        gui_vfs_file_t *file = gui_vfs_open((const char *)font_source, GUI_VFS_READ);
+        if (file != NULL)
+        {
+            uint8_t header[2];
+            gui_vfs_read(file, header, 2);
+            gui_vfs_close(file);
+
+            if (header[1] == FONT_FILE_BMP_FLAG)
+            {
+                gui_font_mem_init_fs(font_source);
+            }
+            else if (header[1] == FONT_FILE_TTF_FLAG)
+            {
+                gui_font_ttf_init_fs(font_source);
+            }
         }
     }
     this->path = font_source;

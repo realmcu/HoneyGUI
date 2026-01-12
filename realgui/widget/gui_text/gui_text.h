@@ -34,6 +34,7 @@ extern "C" {
 #include "gui_img.h"
 #include "draw_font.h"
 #include "gui_win.h"
+#include "font_types.h"
 
 /*============================================================================*
  *                         Types
@@ -83,26 +84,6 @@ typedef enum
     RTL_MULTI_LEFT       = 0x65,
 } TEXT_MODE;
 /* TEXT_MODE end */
-
-/** @brief Font type enum. */
-typedef enum
-{
-    GUI_FONT_SRC_BMP = 0x00,
-    GUI_FONT_SRC_IMG = 0x01,
-    GUI_FONT_SRC_MAT = 0x02,
-
-    GUI_FONT_SRC_TTF = 0x10,
-    GUI_FONT_SRC_STB = 0x11,
-
-    GUI_FONT_SRC_CUS = 0x20,
-} FONT_SRC_TYPE;
-
-typedef enum
-{
-    FONT_SRC_MEMADDR = 0,
-    FONT_SRC_FILESYS = 1,
-    FONT_SRC_FTL     = 2,
-} FONT_SRC_MODE;
 
 /** @brief Text widget structure. */
 typedef struct gui_text

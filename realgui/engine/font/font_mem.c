@@ -7,7 +7,7 @@
   * @details realui memory font engine
   * @author luke_sun@realsil.com.cn
   * @date 2025/12/31
-  * @version v2.1
+  * @version v3.0 - Refactored to use font_lib_manager
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
@@ -17,46 +17,48 @@
 #include <string.h>
 #include "draw_font.h"
 #include "font_mem.h"
+#include "font_lib_manager.h"
 #include "font_rendering_utils.h"
 #include "gui_vfs.h"
 
-MEM_FONT_LIB font_lib_tab[10];
-uint8_t get_fontlib_by_size(uint8_t font_size)
+/*============================================================================*
+ *                      Font Library Access Functions
+ *============================================================================*/
+
+FONT_LIB_NODE *get_fontlib_by_size(uint8_t font_size)
 {
-    uint8_t tab_size = sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB);
-    for (size_t i = 0; i < tab_size; i++)
+    FONT_LIB_NODE *node = gui_font_lib_find_by_size(font_size, GUI_FONT_SRC_BMP);
+    if (node != NULL)
     {
-        if (font_lib_tab[i].font_size == font_size)
-        {
-            return i;
-        }
+        return node;
     }
-    gui_log("Can not match font file, use default \n");
-    if (font_lib_tab[0].font_size == 0)
+
+    /* Return first node as default */
+    node = gui_font_lib_get_head();
+    if (node == NULL)
     {
-        gui_log("There is no font file \n");
-        GUI_ASSERT(font_lib_tab[0].font_size != 0)
+        gui_log("Error: No font file registered! Please call gui_font_mem_init() first.\n");
+        GUI_ASSERT(node != NULL);
     }
-    return 0;
+    return node;
 }
 
-uint8_t get_fontlib_by_name(uint8_t *font_file)
+FONT_LIB_NODE *get_fontlib_by_name(uint8_t *font_file)
 {
-    uint8_t tab_size = sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB);
-    for (size_t i = 0; i < tab_size; i++)
+    FONT_LIB_NODE *node = gui_font_lib_find(font_file);
+    if (node != NULL)
     {
-        if (font_lib_tab[i].font_file == font_file)
-        {
-            return i;
-        }
+        return node;
     }
-    gui_log("Can not match font file, use default \n");
-    if (font_lib_tab[0].font_file == NULL)
+
+    /* Return first node as default */
+    node = gui_font_lib_get_head();
+    if (node == NULL)
     {
-        gui_log("There is no font file \n");
-        GUI_ASSERT(font_lib_tab[0].font_file != 0)
+        gui_log("Error: No font file registered! Please call gui_font_mem_init() first.\n");
+        GUI_ASSERT(node != NULL);
     }
-    return 0;
+    return node;
 }
 
 int32_t font_index_bsearch_bmp(uintptr_t table_offset, uint32_t index_area_size, uint32_t unicode)
@@ -94,20 +96,20 @@ int32_t font_index_bsearch_bmp(uintptr_t table_offset, uint32_t index_area_size,
 
 /**
  * @brief Read font data from filesystem
- * @param font_index Font library index
+ * @param node Font library node
  * @param offset Offset in font file
  * @param buf Buffer to read into
  * @param size Size to read
  * @return Number of bytes read, or -1 on error
  */
-static int font_fs_read(uint8_t font_index, uint32_t offset, uint8_t *buf, uint32_t size)
+static int font_fs_read(FONT_LIB_NODE *node, uint32_t offset, uint8_t *buf, uint32_t size)
 {
-    if (font_lib_tab[font_index].font_file == NULL)
+    if (node == NULL || node->font_file == NULL)
     {
         return -1;
     }
 
-    gui_vfs_file_t *file = gui_vfs_open((const char *)font_lib_tab[font_index].font_file, GUI_VFS_READ);
+    gui_vfs_file_t *file = gui_vfs_open((const char *)node->font_file, GUI_VFS_READ);
     if (file == NULL)
     {
         return -1;
@@ -128,7 +130,7 @@ static int font_fs_read(uint8_t font_index, uint32_t offset, uint8_t *buf, uint3
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
-    uint8_t font_index = 0;
+    FONT_LIB_NODE *node = NULL;
     uintptr_t table_offset;
     uintptr_t dot_offset;
     if (text == NULL)
@@ -137,21 +139,11 @@ void gui_font_get_dot_info(gui_text_t *text)
     }
     if (text->path == NULL)
     {
-        font_index = get_fontlib_by_size(text->font_height);
-        if (font_lib_tab[font_index].type == FONT_SRC_MEMADDR)
+        node = get_fontlib_by_size(text->font_height);
+        if (node != NULL)
         {
-            text->font_mode = FONT_SRC_MEMADDR;
-            text->path = font_lib_tab[font_index].font_file;
-        }
-        else if (font_lib_tab[font_index].type == FONT_SRC_FTL)
-        {
-            text->font_mode = FONT_SRC_FTL;
-            text->path = font_lib_tab[font_index].font_file;
-        }
-        else if (font_lib_tab[font_index].type == FONT_SRC_FILESYS)
-        {
-            text->font_mode = FONT_SRC_FILESYS;
-            text->path = font_lib_tab[font_index].font_file;
+            text->font_mode = node->src_mode;
+            text->path = node->font_file;
         }
     }
 
@@ -166,15 +158,23 @@ void gui_font_get_dot_info(gui_text_t *text)
     }
     else if (text->font_mode == FONT_SRC_FTL)
     {
-        font_index = get_fontlib_by_name(text->path);
-        font = (GUI_FONT_HEAD_BMP *)font_lib_tab[font_index].data;
+        node = get_fontlib_by_name(text->path);
+        if (node == NULL)
+        {
+            return;
+        }
+        font = (GUI_FONT_HEAD_BMP *)node->cached_data;
         table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
     }
     else if (text->font_mode == FONT_SRC_FILESYS)
     {
-        font_index = get_fontlib_by_name(text->path);
-        font = (GUI_FONT_HEAD_BMP *)font_lib_tab[font_index].data;
+        node = get_fontlib_by_name(text->path);
+        if (node == NULL)
+        {
+            return;
+        }
+        font = (GUI_FONT_HEAD_BMP *)node->cached_data;
         if (font == NULL)
         {
             return;
@@ -331,7 +331,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         /* For crop mode, offset points directly to char data in file */
                         uint32_t file_offset = offset;
                         uint8_t header[4];
-                        int ret = font_fs_read(font_index, file_offset, header, 4);
+                        int ret = font_fs_read(node, file_offset, header, 4);
                         if (ret < 0)
                         {
                             continue;
@@ -349,7 +349,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         {
                             continue;
                         }
-                        ret = font_fs_read(font_index, file_offset + 4, dot_buf, dot_size);
+                        ret = font_fs_read(node, file_offset + 4, dot_buf, dot_size);
                         if (ret < 0)
                         {
                             gui_free(dot_buf);
@@ -457,7 +457,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     {
                         uint32_t file_offset = (uint32_t)offset * font_area + dot_offset;
                         uint8_t header[2];
-                        int ret = font_fs_read(font_index, file_offset + 2, header, 2);
+                        int ret = font_fs_read(node, file_offset + 2, header, 2);
                         if (ret < 0)
                         {
                             continue;
@@ -470,7 +470,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         {
                             continue;
                         }
-                        ret = font_fs_read(font_index, file_offset + 4, dot_buf, dot_size);
+                        ret = font_fs_read(node, file_offset + 4, dot_buf, dot_size);
                         if (ret < 0)
                         {
                             gui_free(dot_buf);
@@ -566,12 +566,12 @@ void gui_font_get_dot_info(gui_text_t *text)
                         {
                             uint32_t file_offset = (uint32_t)index * font_area + dot_offset;
                             uint8_t header[2];
-                            font_fs_read(font_index, file_offset + 2, header, 2);
+                            font_fs_read(node, file_offset + 2, header, 2);
                             chr[chr_i].char_w = (int16_t)header[0];
                             chr[chr_i].char_h = (int16_t)header[1];
                             uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
                             uint8_t *dot_buf = gui_malloc(dot_size);
-                            font_fs_read(font_index, file_offset + 4, dot_buf, dot_size);
+                            font_fs_read(node, file_offset + 4, dot_buf, dot_size);
                             chr[chr_i].dot_addr = dot_buf;
                         }
                     }
@@ -1171,11 +1171,16 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
     GUI_FONT_HEAD_BMP *font;
     if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
     {
-        font = (GUI_FONT_HEAD_BMP *)font_lib_tab[get_fontlib_by_name(text->path)].data;
+        FONT_LIB_NODE *node = get_fontlib_by_name(text->path);
+        font = (node != NULL) ? (GUI_FONT_HEAD_BMP *)node->cached_data : NULL;
     }
     else
     {
         font = (GUI_FONT_HEAD_BMP *)text->path;
+    }
+    if (font == NULL)
+    {
+        return;
     }
     uint8_t render_mode = font->render_mode;
     gui_color_t outcolor = text->color;
@@ -1199,6 +1204,15 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
     {
         return UINT8_MAX;
     }
+
+    /* Check if already loaded */
+    FONT_LIB_NODE *node = gui_font_lib_find(font_bin_addr);
+    if (node != NULL && node->font_type == GUI_FONT_SRC_BMP)
+    {
+        gui_font_lib_addref(node);
+        return 0;
+    }
+
     uint8_t *data = gui_malloc(sizeof(GUI_FONT_HEAD_BMP));
     gui_ftl_read((uintptr_t)font_bin_addr, data, sizeof(GUI_FONT_HEAD_BMP));
 
@@ -1209,41 +1223,22 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
         gui_free(data);
         return UINT8_MAX;
     }
-    int i = 0;
-    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
-    {
-        if (font_lib_tab[i].font_file == NULL)
-        {
-            break;
-        }
-        if (font_lib_tab[i].font_file == font_bin_addr)
-        {
-            if (font_lib_tab[i].type == FONT_SRC_FTL)
-            {
-                gui_log("this font file has been created \n");
-                gui_free(data);
-                return i;
-            }
-            break;
-        }
-    }
-    if (i >= (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)))
-    {
-        gui_free(data);
-        return UINT8_MAX;
-    }
 
     uint32_t head_index_len = font->head_length + font->index_area_size;
     data = gui_realloc(data, head_index_len);
     font = (GUI_FONT_HEAD_BMP *)data;
     gui_ftl_read((uintptr_t)font_bin_addr, data, head_index_len);
 
-    font_lib_tab[i].font_file = font_bin_addr;
-    font_lib_tab[i].font_size = font->font_size;
-    font_lib_tab[i].type = FONT_SRC_FTL;
-    font_lib_tab[i].data = data;
-    gui_log("font_lib_tab[%d].data has been created, need to free, size : %d \n", i, head_index_len);
-    return i;
+    /* Register to font_lib_manager */
+    node = gui_font_lib_register(font_bin_addr, font->font_size, FONT_SRC_FTL,
+                                 GUI_FONT_SRC_BMP, data, head_index_len);
+    if (node == NULL)
+    {
+        gui_free(data);
+        return UINT8_MAX;
+    }
+
+    return 0;
 }
 
 uint8_t gui_font_mem_init_fs(uint8_t *font_path)
@@ -1251,6 +1246,14 @@ uint8_t gui_font_mem_init_fs(uint8_t *font_path)
     if (!font_path)
     {
         return UINT8_MAX;
+    }
+
+    /* Check if already loaded */
+    FONT_LIB_NODE *node = gui_font_lib_find(font_path);
+    if (node != NULL && node->font_type == GUI_FONT_SRC_BMP)
+    {
+        gui_font_lib_addref(node);
+        return 0;
     }
 
     /* Open font file and read header */
@@ -1287,33 +1290,6 @@ uint8_t gui_font_mem_init_fs(uint8_t *font_path)
         return UINT8_MAX;
     }
 
-    /* Find empty slot or existing entry */
-    int i = 0;
-    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
-    {
-        if (font_lib_tab[i].font_file == NULL)
-        {
-            break;
-        }
-        if (font_lib_tab[i].font_file == font_path)
-        {
-            if (font_lib_tab[i].type == FONT_SRC_FILESYS)
-            {
-                gui_log("gui_font_mem_init_fs: font already loaded\n");
-                gui_free(data);
-                gui_vfs_close(file);
-                return i;
-            }
-            break;
-        }
-    }
-    if (i >= (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)))
-    {
-        gui_free(data);
-        gui_vfs_close(file);
-        return UINT8_MAX;
-    }
-
     /* Read header + index area */
     uint32_t head_index_len = font->head_length + font->index_area_size;
     data = gui_realloc(data, head_index_len);
@@ -1336,15 +1312,17 @@ uint8_t gui_font_mem_init_fs(uint8_t *font_path)
 
     font = (GUI_FONT_HEAD_BMP *)data;
 
-    /* Fill font library entry */
-    font_lib_tab[i].font_file = font_path;
-    font_lib_tab[i].font_size = font->font_size;
-    font_lib_tab[i].type = FONT_SRC_FILESYS;
-    font_lib_tab[i].data = data;
+    /* Register to font_lib_manager */
+    node = gui_font_lib_register(font_path, font->font_size, FONT_SRC_FILESYS,
+                                 GUI_FONT_SRC_BMP, data, head_index_len);
+    if (node == NULL)
+    {
+        gui_free(data);
+        return UINT8_MAX;
+    }
 
-    gui_log("gui_font_mem_init_fs: loaded %s, size=%d, index=%d\n",
-            font_path, font->font_size, i);
-    return i;
+    gui_log("gui_font_mem_init_fs: loaded %s, size=%d\n", font_path, font->font_size);
+    return 0;
 }
 
 uint8_t gui_font_mem_init_mem(uint8_t *font_bin_addr)
@@ -1358,56 +1336,43 @@ uint8_t gui_font_mem_init(uint8_t *font_bin_addr)
     {
         return UINT8_MAX;
     }
+
+    /* Check if already loaded */
+    FONT_LIB_NODE *node = gui_font_lib_find(font_bin_addr);
+    if (node != NULL && node->font_type == GUI_FONT_SRC_BMP)
+    {
+        gui_font_lib_addref(node);
+        return 0;
+    }
+
     GUI_FONT_HEAD_BMP *font = (GUI_FONT_HEAD_BMP *)font_bin_addr;
     if (font->file_type != FONT_FILE_BMP_FLAG)
     {
         gui_log("this font file is not valid \n");
         return UINT8_MAX;
     }
-    int i = 0;
-    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
-    {
-        if (font_lib_tab[i].font_file == NULL)
-        {
-            break;
-        }
-        if (font_lib_tab[i].font_file == font_bin_addr)
-        {
-            break;
-        }
-    }
-    if (i >= (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)))
+
+    /* Register to font_lib_manager (no cached data for MEM mode) */
+    node = gui_font_lib_register(font_bin_addr, font->font_size, FONT_SRC_MEMADDR,
+                                 GUI_FONT_SRC_BMP, NULL, 0);
+    if (node == NULL)
     {
         return UINT8_MAX;
     }
 
-    font_lib_tab[i].font_file = font_bin_addr;
-    font_lib_tab[i].font_size = font->font_size;
-    font_lib_tab[i].type = FONT_SRC_MEMADDR;
-    return i;
+    return 0;
 }
 
-uint8_t gui_font_mem_delate(uint8_t *font_bin_addr)
+uint8_t gui_font_mem_delete(uint8_t *font_bin_addr)
 {
     if (!font_bin_addr)
     {
         return UINT8_MAX;
     }
-    int i = 0;
-    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
-    {
-        if (font_lib_tab[i].font_file == font_bin_addr)
-        {
-            if (font_lib_tab[i].data)
-            {
-                gui_free(font_lib_tab[i].data);
-            }
-            memset(&font_lib_tab[i], 0, sizeof(MEM_FONT_LIB));
-            gui_log("font_lib_tab[%d].data has been free \n", i);
-            return i;
-        }
-    }
-    return UINT8_MAX;
+
+    /* Release from font_lib_manager */
+    gui_font_lib_release(font_bin_addr);
+    return 0;
 }
 
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr)

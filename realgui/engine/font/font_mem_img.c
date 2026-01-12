@@ -18,8 +18,6 @@
 #include "font_mem_img.h"
 #include "font_rendering_utils.h"
 
-extern MEM_FONT_LIB font_lib_tab[10];
-
 static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_t render_mode,
                                       gui_text_rect_t *rect, uint8_t *buffer, int buf_width, GUI_FormatType type)
 {
@@ -149,11 +147,17 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     GUI_FONT_HEAD_BMP *font;
     if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
     {
-        font = (GUI_FONT_HEAD_BMP *)font_lib_tab[get_fontlib_by_name(text->path)].data;
+        FONT_LIB_NODE *node = get_fontlib_by_name(text->path);
+        font = (node != NULL) ? (GUI_FONT_HEAD_BMP *)node->cached_data : NULL;
     }
     else
     {
         font = (GUI_FONT_HEAD_BMP *)text->path;
+    }
+    if (font == NULL)
+    {
+        gui_free(img_buf);
+        return NULL;
     }
     uint8_t render_mode = font->render_mode;
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);

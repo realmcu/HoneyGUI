@@ -8,7 +8,7 @@
   * @details memory font engine header file
   * @author luke_sun@realsil.com.cn
   * @date 2025/12/04
-  * @version v2.0
+  * @version v3.0 - Refactored to use font_lib_manager
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
@@ -24,6 +24,7 @@
 #include "draw_font.h"
 #include "gui_text.h"
 #include "font_rendering_utils.h"
+#include "font_lib_manager.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -111,7 +112,7 @@ uint8_t gui_font_mem_init_mem(uint8_t *font_bin_addr);
  * @param font_bin_addr Font file address.
  * @return Font library index.
  */
-uint8_t gui_font_mem_delate(uint8_t *font_bin_addr);
+uint8_t gui_font_mem_delete(uint8_t *font_bin_addr);
 
 /**
  * @brief Preprocessing of bitmap fonts using internal engines.
@@ -163,20 +164,20 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
 
 /**
- * @brief Get the font library index by size.
+ * @brief Get the font library node by size.
  *
  * @param font_size Font size.
- * @return Font library index.
+ * @return Font library node pointer, or NULL if not found.
  */
-uint8_t get_fontlib_by_size(uint8_t font_size);
+FONT_LIB_NODE *get_fontlib_by_size(uint8_t font_size);
 
 /**
- * @brief Get the font library index by name.
+ * @brief Get the font library node by name.
  *
  * @param font_file Font file.
- * @return Font library index.
+ * @return Font library node pointer, or NULL if not found.
  */
-uint8_t get_fontlib_by_name(uint8_t *font_file);
+FONT_LIB_NODE *get_fontlib_by_name(uint8_t *font_file);
 
 /**
  * @brief Text layout by mode.

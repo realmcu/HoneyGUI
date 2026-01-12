@@ -33,6 +33,7 @@ extern "C" {
 #include "draw_font.h"
 #include "gui_text.h"
 #include "font_rendering_utils.h"
+#include "font_lib_manager.h"
 
 
 /*============================================================================*
@@ -121,6 +122,38 @@ typedef enum
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+
+/**
+ * @brief Initialize ttf font from FTL storage
+ *
+ * @param font_bin_addr Font file address in FTL
+ * @return 0 on success, UINT8_MAX on failure
+ */
+uint8_t gui_font_ttf_init_ftl(uint8_t *font_bin_addr);
+
+/**
+ * @brief Initialize ttf font from filesystem
+ *
+ * @param font_path Font file path
+ * @return 0 on success, UINT8_MAX on failure
+ */
+uint8_t gui_font_ttf_init_fs(uint8_t *font_path);
+
+/**
+ * @brief Initialize ttf font from memory
+ *
+ * @param font_bin_addr Font data address in memory
+ * @return 0 on success, UINT8_MAX on failure
+ */
+uint8_t gui_font_ttf_init_mem(uint8_t *font_bin_addr);
+
+/**
+ * @brief Delete ttf font from library
+ *
+ * @param font_bin_addr Font file address
+ * @return 0 on success, UINT8_MAX on failure
+ */
+uint8_t gui_font_ttf_delete(uint8_t *font_bin_addr);
 
 /**
  * @brief Preprocessing of ttf font drawing with ttf
