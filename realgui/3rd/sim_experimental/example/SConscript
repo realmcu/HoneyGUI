@@ -3,7 +3,22 @@ from building import *
 
 cwd = GetCurrentDir()
 
-src = Glob('*.c')
+src = []
+
+if GetDepend(['CONFIG_REALTEK_BUILD_H264']):
+    src += ['H264-demo.c']
+
+if GetDepend(['CONFIG_REALTEK_BUILD_TVG']):
+    src += ['NanoVG-demo.c']
+
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI_USE_ARM2D']):
+    src += ['Arm2D-demo.c']
+
+if GetDepend(['CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D']):
+    src += ['Lite3D-demo-Earth.c']
+
+if GetDepend(['CONFIG_REALTEK_BUILD_REAL_FACE_3D']):
+    src += ['Lite3D-demo-Face.c']
 
 CPPPATH = [cwd]
 

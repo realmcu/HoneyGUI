@@ -1,102 +1,80 @@
 import os
 import sys
+import subprocess
+import uuid
 import menu_config
 from SCons.Script import *
-import subprocess
-import platform
-import uuid
 
-TOOL_ROOT="../../../tool/scons-tool"
+TOOL_ROOT = os.path.abspath('../../../tool/scons-tool')
 
-sys.path = sys.path + [os.path.join(TOOL_ROOT, '')]
+sys.path.append(TOOL_ROOT)
 try:
     from building import *
 except:
     print('Cannot found Scons tool root directory, please check TOOL_ROOT')
     exit(-1)
 
-TARGET = 'sdl_sim.' + 'exe'
+TARGET = 'sdl_sim.exe' if sys.platform == 'win32' else 'sdl_sim'
 
+env_params = {
+    'CC': menu_config.CC,
+    'CFLAGS': menu_config.CFLAGS,
+    'CXX': menu_config.CXX,
+    'CXXFLAGS': menu_config.CXXFLAGS,
+    'LINKFLAGS': menu_config.LFLAGS
+}
 
-
-env = Environment(tools = ['mingw'],
-                  CC=menu_config.CC, CFLAGS = menu_config.CFLAGS,
-                  LINK=menu_config.LINK,
-                  CXX = menu_config.CXX, CXXFLAGS = menu_config.CXXFLAGS,
-                  LINKFLAGS = menu_config.LFLAGS)
-
-
-RTE_ROOT = os.path.abspath('../../../win32_sim/RTE') #run time envirament
+if sys.platform == 'win32':
+    env = Environment(tools=['mingw'], **env_params)
+else:
+    env = Environment(tools=['default'], PROGSUFFIX='', **env_params)
 
 PLATFORM = menu_config.PLATFORM
-
 LITE3D_DIR = os.path.abspath('./../Lite3D/')
 NANOVG_DIR = os.path.abspath('./../nanovg/')
 H264BSD_DIR = os.path.abspath('./../h264bsd/')
 ARM2D_DIR = os.path.abspath('./../Arm2D/')
+RTE_ROOT = os.path.abspath('../../../lib/sim')
 
-Export('PLATFORM')
-Export('TOOL_ROOT')
+Export('PLATFORM', 'TOOL_ROOT', 'env')
 
-
-# prepare building environment
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
 
-# set spawn: save & load long param as temp file
 def ourspawn(sh, escape, cmd, args, e):
     filename = str(uuid.uuid4())
-    newargs = ' '.join(args[1:])
-    cmdline = cmd + " " + newargs
-    if (len(cmdline) > 16 * 1024):
-        f = open(filename, 'w')
-        f.write(' '.join(args[1:]).replace('\\', '/'))
-        f.close()
-        # exec
+    cmdline = cmd + " " + ' '.join(args[1:])
+    if len(cmdline) > 16 * 1024:
+        with open(filename, 'w') as f:
+            f.write(' '.join(args[1:]).replace('\\', '/'))
         cmdline = cmd + " @" + filename
     proc = subprocess.Popen(cmdline, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, shell = False, env = e)
+                           stderr=subprocess.PIPE, shell=False, env=e)
     data, err = proc.communicate()
     rv = proc.wait()
     def res_output(_output, _s):
         if len(_s):
-            if isinstance(_s, str):
-                _output(_s)
-            elif isinstance(_s, bytes):
-                _output(str(_s, 'UTF-8'))
-            else:
-                _output(str(_s))
+            _output(str(_s, 'UTF-8') if isinstance(_s, bytes) else str(_s))
     res_output(sys.stderr.write, err)
     res_output(sys.stdout.write, data)
     if os.path.isfile(filename):
         os.remove(filename)
     return rv
-if platform.system() == 'Windows':
+
+if sys.platform == 'win32':
     env['SPAWN'] = ourspawn
 
-# include app
-objs.extend(SConscript(os.path.join(LITE3D_DIR, 'SConscript')))
-objs.extend(SConscript(os.path.join(H264BSD_DIR, 'SConscript')))
-objs.extend(SConscript(os.path.join(NANOVG_DIR, 'SConscript')))
-objs.extend(SConscript(os.path.join(ARM2D_DIR, 'SConscript')))
-objs.extend(SConscript(os.path.join(RTE_ROOT, 'SConscript')))
+for path in [LITE3D_DIR, H264BSD_DIR, NANOVG_DIR, ARM2D_DIR, RTE_ROOT]:
+    sconscript = os.path.join(path, 'SConscript')
+    if os.path.exists(sconscript):
+        objs.extend(SConscript(sconscript))
 
-env.Append(LIBS = [
-    'mingw32',
-    'user32',
-    'gdi32',
-    'winmm',
-    'imm32',
-    'ole32',
-    'oleaut32',
-    'version',
-    'uuid',
-    'advapi32',
-    'setupapi',
-    'shell32',
-    'dinput8',
-    'opengl32',
-    'm'
-])
+if sys.platform == 'win32':
+    env.Append(LIBS=[
+        'mingw32', 'user32', 'gdi32', 'winmm', 'imm32', 'ole32',
+        'oleaut32', 'version', 'uuid', 'advapi32', 'setupapi',
+        'shell32', 'dinput8', 'opengl32', 'm'
+    ])
+else:
+    env.Append(LIBS=['SDL2', 'GL', 'pthread', 'm', 'dl'])
 
-# make a building
 DoBuilding(TARGET, objs)

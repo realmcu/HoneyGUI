@@ -66,6 +66,7 @@ void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t
 
 static void *sdl_flush(void *arg)
 {
+    (void)arg;
     while (true)
     {
         usleep((1000 / 60) * 1000);
@@ -81,6 +82,7 @@ static void *sdl_flush(void *arg)
 
 void *rtk_gui_sdl(void *arg)
 {
+    (void)arg;
     int quit = 0;
     /* Enable standard application logging */
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);

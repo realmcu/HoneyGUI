@@ -26,64 +26,52 @@ config REALTEK_BUILD_GUI_USE_ARM2D
     help
       Enable ARM2D acceleration library
 
+config REALTEK_BUILD_H264
+    bool "Enable H264"
+    default n
+    help
+      Enable H264 video codec
+
 endmenu
 
-menu "Lite3D Source Configuration"
+choice
+    prompt "Lite3D Source Configuration"
     depends on REALTEK_BUILD_LITE3D
-
-config REALTEK_BUILD_LITE3D_SOURCE
-    bool "Enable Lite3D Source"
-    default y
-    help
-      Enable Lite3D source code
+    default REALTEK_BUILD_REAL_BUTTERFLY_3D
 
 config REALTEK_BUILD_REAL_BUTTERFLY_3D
     bool "Butterfly 3D Demo"
-    default y
-    depends on REALTEK_BUILD_LITE3D_SOURCE
     help
       Enable Butterfly 3D demo
 
 config REALTEK_BUILD_REAL_PRISM_MIRROR_3D
     bool "Prism Mirror 3D Demo"
-    default n
-    depends on REALTEK_BUILD_LITE3D_SOURCE
     help
       Enable Prism Mirror 3D demo
 
 config REALTEK_BUILD_REAL_FACE_3D
     bool "Face 3D Demo"
-    default n
-    depends on REALTEK_BUILD_LITE3D_SOURCE
     help
       Enable Face 3D demo
 
 config REALTEK_BUILD_REAL_DOG_3D
     bool "Dog 3D Demo"
-    default n
-    depends on REALTEK_BUILD_LITE3D_SOURCE
     help
       Enable Dog 3D demo
 
 config REALTEK_BUILD_REAL_DISC_3D
     bool "Disc 3D Demo"
-    default n
-    depends on REALTEK_BUILD_LITE3D_SOURCE
     help
       Enable Disc 3D demo
 
 config REALTEK_BUILD_REAL_PRISM_THICK_3D
     bool "Prism Thick 3D Demo"
-    default n
-    depends on REALTEK_BUILD_LITE3D_SOURCE
     help
       Enable Prism Thick 3D demo
 
 config REALTEK_BUILD_REAL_APPLIST_3D
     bool "AppList 3D Demo"
-    default n
-    depends on REALTEK_BUILD_LITE3D_SOURCE
     help
       Enable AppList 3D demo
 
-endmenu
+endchoice

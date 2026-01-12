@@ -26,6 +26,8 @@
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", \
            COMPANY_NAME, \
            PROJECT_NAME, \

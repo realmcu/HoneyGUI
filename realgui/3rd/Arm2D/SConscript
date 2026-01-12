@@ -8,7 +8,7 @@ cwd = GetCurrentDir()
 inc = [cwd]
 src = Glob('*.c') + Glob('*.cpp')
 
-if GetDepend(['']):
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI_USE_ARM2D']):
     objs = DefineGroup('3rd', src, depend = [''], CPPPATH = inc)
     list = os.listdir(cwd)
     for d in list:
