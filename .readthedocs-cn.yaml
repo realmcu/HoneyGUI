@@ -27,4 +27,5 @@ sphinx:
 # to build your documentation
 python:
   install:
-    - requirements: doc/requirements.txt
+    - method: pipenv
+      pipfile: doc/Pipfile 
