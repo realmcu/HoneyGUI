@@ -31,6 +31,7 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 #include "guidef.h"
+#include "tlsf.h"
 
 /*============================================================================*
  *                         Macros
@@ -76,6 +77,8 @@ extern "C" {
  *============================================================================*/
 
 void gui_os_api_register(gui_os_api_t *info);
+
+tlsf_t gui_get_tlsf(void);
 
 void *gui_thread_create(const char *name, void (*entry)(void *param), void *param,
                         uint32_t stack_size, uint8_t priority);

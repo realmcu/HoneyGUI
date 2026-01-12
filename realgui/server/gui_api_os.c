@@ -85,6 +85,11 @@ void gui_os_api_register(gui_os_api_t *info)
     os_api = info;
 }
 
+tlsf_t gui_get_tlsf(void)
+{
+    return tlsf;
+}
+
 void *gui_thread_create(const char *name, void (*entry)(void *param), void *param,
                         uint32_t stack_size, uint8_t priority)
 {

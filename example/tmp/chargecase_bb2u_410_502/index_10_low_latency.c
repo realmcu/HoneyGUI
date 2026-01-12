@@ -10,6 +10,7 @@
 static float delta_angle = -90.0f;
 static float target_rot_angle = 0.0f;
 static float current_rot_angle = 0.0f;
+static void *desc_buffer = NULL;
 
 static void update_face_animation(void *param)
 {
@@ -58,7 +59,16 @@ static void low_latency_switch_in(gui_view_t *view)
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    l3_model_base_t *face_3d = l3_create_model((void *)_acdesc_face, L3_DRAW_FRONT_AND_SORT, 35, 81,
+#if 1
+    l3_desc_file_head_t *file_head = (l3_desc_file_head_t *)_acdesc_face;
+    uint32_t file_size = file_head->file_size;
+    desc_buffer = gui_malloc(file_size);
+    memcpy(desc_buffer, (void *)_acdesc_face, file_size);
+    void *desc_addr = desc_buffer;
+#else
+    void *desc_addr = (void *)_acdesc_face;
+#endif
+    l3_model_base_t *face_3d = l3_create_model((void *)desc_addr, L3_DRAW_FRONT_AND_SORT, 35, 81,
                                                340,
                                                340);
     l3_set_global_transform(face_3d, (l3_global_transform_cb)face_global_cb);
@@ -74,6 +84,12 @@ static void low_latency_switch_out(gui_view_t *view)
 {
     GUI_UNUSED(view);
     gui_log("low_latency_view switch out\n");
+
+    if (desc_buffer != NULL)
+    {
+        gui_free(desc_buffer);
+        desc_buffer = NULL;
+    }
 }
 
 GUI_VIEW_INSTANCE("low_latency_view", 1, low_latency_switch_in, low_latency_switch_out);
