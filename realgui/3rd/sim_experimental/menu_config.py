@@ -57,12 +57,10 @@ else:
     CXXFLAGS = CFLAGS_BASE + ' -std=c++11 -Wmissing-field-initializers'
 
 if sys.platform.startswith('linux'):
-    LFLAGS = ' -T honeygui_linux.lds'
-    LFLAGS += ' -pthread'
+    LFLAGS = ' -pthread'
     LFLAGS += ' -Wl,-z,noexecstack'
 else:
-    LFLAGS = ' -T default.ld'
-    LFLAGS += ' -pthread -static-libgcc -static-libstdc++ -static'
+    LFLAGS = ' -pthread -static-libgcc -static-libstdc++ -static'
 LFLAGS += ' -Wl,-Map=sdl_sim.map'
 
 POST_ACTION = OBJCPY + ' -O binary $TARGET sdl_sim.bin\n'

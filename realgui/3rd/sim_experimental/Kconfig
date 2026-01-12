@@ -2,37 +2,46 @@
 
 menu "Framework Configuration"
 
+choice
+    prompt "Select Demo Module"
+    default REALTEK_BUILD_LITE3D
+
+config REALTEK_BUILD_NONE
+    bool "None"
+    help
+      No demo module enabled
+
 config REALTEK_BUILD_TVG
-    bool "Enable ThorVG"
-    default n
+    bool "ThorVG"
     help
       Enable ThorVG vector graphics library
 
 config REALTEK_BUILD_GIFDEC
-    bool "Enable GIFDEC"
-    default n
+    bool "GIFDEC"
     help
       Enable GIF decoder library
 
 config REALTEK_BUILD_LITE3D
-    bool "Enable RTK Lite3D"
-    default y
+    bool "RTK Lite3D"
     help
       Enable RTK Lite3D library
 
 config REALTEK_BUILD_GUI_USE_ARM2D
-    bool "Enable ARM2D"
-    default y
+    bool "ARM2D"
     help
       Enable ARM2D acceleration library
 
 config REALTEK_BUILD_H264
-    bool "Enable H264"
-    default n
+    bool "H264"
     help
       Enable H264 video codec
 
-endmenu
+config REALTEK_BUILD_OPENGL
+    bool "OpenGL"
+    help
+      Enable OpenGL test module
+
+endchoice
 
 choice
     prompt "Lite3D Source Configuration"
@@ -41,37 +50,25 @@ choice
 
 config REALTEK_BUILD_REAL_BUTTERFLY_3D
     bool "Butterfly 3D Demo"
-    help
-      Enable Butterfly 3D demo
 
 config REALTEK_BUILD_REAL_PRISM_MIRROR_3D
     bool "Prism Mirror 3D Demo"
-    help
-      Enable Prism Mirror 3D demo
 
 config REALTEK_BUILD_REAL_FACE_3D
     bool "Face 3D Demo"
-    help
-      Enable Face 3D demo
 
 config REALTEK_BUILD_REAL_DOG_3D
     bool "Dog 3D Demo"
-    help
-      Enable Dog 3D demo
 
 config REALTEK_BUILD_REAL_DISC_3D
     bool "Disc 3D Demo"
-    help
-      Enable Disc 3D demo
 
 config REALTEK_BUILD_REAL_PRISM_THICK_3D
     bool "Prism Thick 3D Demo"
-    help
-      Enable Prism Thick 3D demo
 
 config REALTEK_BUILD_REAL_APPLIST_3D
     bool "AppList 3D Demo"
-    help
-      Enable AppList 3D demo
 
 endchoice
+
+endmenu

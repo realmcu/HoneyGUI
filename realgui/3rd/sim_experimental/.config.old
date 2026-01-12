@@ -2,9 +2,10 @@
 #
 # Framework Configuration
 #
+CONFIG_REALTEK_BUILD_NONE=y
 # CONFIG_REALTEK_BUILD_TVG is not set
 # CONFIG_REALTEK_BUILD_GIFDEC is not set
 # CONFIG_REALTEK_BUILD_LITE3D is not set
-CONFIG_REALTEK_BUILD_GUI_USE_ARM2D=y
+# CONFIG_REALTEK_BUILD_GUI_USE_ARM2D is not set
 # CONFIG_REALTEK_BUILD_H264 is not set
 # end of Framework Configuration

@@ -20,6 +20,9 @@ if GetDepend(['CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D']):
 if GetDepend(['CONFIG_REALTEK_BUILD_REAL_FACE_3D']):
     src += ['Lite3D-demo-Face.c']
 
+if GetDepend(['CONFIG_REALTEK_BUILD_OPENGL']):
+    src += ['OpenGL-demo.c']
+
 CPPPATH = [cwd]
 
 objs = DefineGroup('realgui/3rd', src, depend = [''], CPPPATH = CPPPATH)

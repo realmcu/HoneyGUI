@@ -8,7 +8,9 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [],
+            "environment": [
+                { "name": "DEBUG_MODE", "value": "1" }
+            ],
             "externalConsole": false,
             "MIMode": "gdb",
             "windows": {

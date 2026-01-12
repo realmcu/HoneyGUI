@@ -75,6 +75,6 @@ if sys.platform == 'win32':
         'shell32', 'dinput8', 'opengl32', 'm'
     ])
 else:
-    env.Append(LIBS=['SDL2', 'GL', 'pthread', 'm', 'dl'])
+    env.Append(LIBS=['SDL2', 'GL', 'X11', 'Xext', 'pthread', 'm', 'dl'])
 
 DoBuilding(TARGET, objs)

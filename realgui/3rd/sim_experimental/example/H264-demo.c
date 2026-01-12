@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "components_init.h"
 #include "fb_sdl.h"
 #include "gui_h264bsd.h"
 
 #include "earth_240x240_header.txt"
 
 
-static int h264bsd_example(void)
+__attribute__((constructor(1001))) static int h264bsd_example(void)
 {
     printf("h264bsd example test code:\n");
 
@@ -27,5 +26,3 @@ static int h264bsd_example(void)
 
     return 0;
 }
-
-// GUI_INIT_APP_EXPORT(h264bsd_example);

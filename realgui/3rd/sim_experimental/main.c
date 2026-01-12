@@ -16,7 +16,6 @@
 #include <unistd.h>
 #include "unistd.h"
 #include "time.h"
-#include "components_init.h"
 
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__
@@ -33,7 +32,6 @@ int main(int argc, char **argv)
            PROJECT_NAME, \
            COMPILE_TIME);
 
-    components_init();
     while (1)
     {
         time_t now;

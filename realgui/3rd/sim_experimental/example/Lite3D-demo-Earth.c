@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "components_init.h"
 #include "fb_sdl.h"
 #include "l3.h"
 #include "desc_earth.txt"
@@ -46,5 +45,7 @@ static int lite3D_example(void)
 
     return 0;
 }
-
-// GUI_INIT_APP_EXPORT(lite3D_example);
+__attribute__((constructor(1001))) static int lite3d_demo(void)
+{
+    return lite3D_example();
+}

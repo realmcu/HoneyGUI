@@ -7,12 +7,18 @@
             "command": "scons",
             "windows": {
                 "options": {
-                    "cwd": "${workspaceFolder}"
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "DEBUG_MODE": "1"
+                    }
                 }
             },
             "linux": {
                 "options": {
-                    "cwd": "${workspaceFolder}"
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "DEBUG_MODE": "1"
+                    }
                 }
             },
             "problemMatcher": ["$gcc"],

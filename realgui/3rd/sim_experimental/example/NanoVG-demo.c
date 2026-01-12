@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "components_init.h"
 #include "fb_sdl.h"
 #include "nanovg.h"
 #include "nanovg_agge.h"
@@ -97,5 +96,7 @@ static int nanovg_example(void)
 
     return 0;
 }
-
-// GUI_INIT_APP_EXPORT(nanovg_example);
+__attribute__((constructor(1001))) static int nanovg_demo(void)
+{
+    return nanovg_example();
+}
