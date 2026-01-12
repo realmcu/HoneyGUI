@@ -1,23 +1,34 @@
 {
     "configurations": [
         {
-            "name": "windows-gcc-x64",
+            "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../nanovg/**",
                 "${workspaceFolder}/../h264bsd/**",
-                "${workspaceFolder}/../Lite3D/**"
+                "${workspaceFolder}/../Lite3D/**",
+                "${workspaceFolder}/../Arm2D/**"
             ],
-            "defines": [
-                "__WIN32"
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/../nanovg/**",
+                "${workspaceFolder}/../h264bsd/**",
+                "${workspaceFolder}/../Lite3D/**",
+                "${workspaceFolder}/../Arm2D/**"
             ],
+            "defines": ["__WIN32"],
             "compilerPath": "C:/mingw64/bin/gcc.exe",
-            "cStandard": "${default}",
-            "cppStandard": "${default}",
-            "intelliSenseMode": "windows-gcc-x64",
-            "compilerArgs": [
-                ""
-            ]
+            "cStandard": "gnu11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4

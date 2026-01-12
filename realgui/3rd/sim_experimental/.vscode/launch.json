@@ -1,45 +1,32 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "g++.exe build and debug active file",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}\\sdl_sim.exe",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe",
-      "setupCommands": [
+    "version": "0.2.0",
+    "configurations": [
         {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
+            "name": "Debug sdl_sim",
+            "type": "cppdbg",
+            "request": "launch",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "windows": {
+                "program": "${workspaceFolder}\\sdl_sim.exe",
+                "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe"
+            },
+            "linux": {
+                "program": "${workspaceFolder}/sdl_sim",
+                "miDebuggerPath": "/usr/bin/gdb"
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "scons build"
         }
-      ],
-      "preLaunchTask": "g++.exe build active file"
-    },
-    {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "cppdbg",
-      "request": "launch",
-      "args": [],
-      "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "g:/Wearable/misc/sdl_sim/thorvg",
-      "program": "g:/Wearable/misc/sdl_sim/thorvg/build/Debug/outDebug",
-      "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
-    }
-  ]
+    ]
 }
