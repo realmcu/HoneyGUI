@@ -41,7 +41,7 @@ static void face_global_cb(l3_model_base_t *this)
                              32767,
                              90, this->viewPortWidth, this->viewPortHeight);
 
-    l3_world_initialize(&this->world, 0, 0, 37, 0, current_rot_angle, 0, 5);
+    l3_world_initialize(&this->world, 0, 0, 27, 0, current_rot_angle, 0, 5);
 
 }
 
@@ -58,12 +58,13 @@ static void low_latency_switch_in(gui_view_t *view)
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    l3_model_base_t *face_3d = l3_create_model((void *)_acdesc_face, L3_DRAW_FRONT_AND_SORT, 0, 0, 410,
-                                               502);
+    l3_model_base_t *face_3d = l3_create_model((void *)_acdesc_face, L3_DRAW_FRONT_AND_SORT, 35, 81,
+                                               340,
+                                               340);
     l3_set_global_transform(face_3d, (l3_global_transform_cb)face_global_cb);
 
     gui_lite3d_t *lite3d_face = gui_lite3d_create(view, "lite3d-widget", face_3d,
-                                                  0, 0, 410, 502);
+                                                  0, 0, 0, 0);
 
     target_rot_angle += delta_angle;
     gui_obj_create_timer(GUI_BASE(lite3d_face), 10, true, update_face_animation);
