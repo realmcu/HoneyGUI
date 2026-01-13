@@ -774,21 +774,24 @@ static void gui_rect_prepare(gui_obj_t *obj)
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     uint8_t last = this->checksum;
 
-    if (obj->matrix == NULL)
+    // obj->matrix is already initialized by gui_obj_ctor
+    // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
+
+    // Apply transformations if needed
+    bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f ||
+                          this->offset_x != 0.0f || this->offset_y != 0.0f);
+
+    if (has_transform)
     {
-        obj->matrix = gui_malloc(sizeof(gui_matrix_t));
-        GUI_ASSERT(obj->matrix != NULL);
-        matrix_identity(obj->matrix);
+        float center_x = this->base.w / 2.0f;
+        float center_y = this->base.h / 2.0f;
+
+        matrix_translate(this->offset_x, this->offset_y, obj->matrix);
+        matrix_translate(center_x, center_y, obj->matrix);
+        matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+        matrix_rotate(this->degrees, obj->matrix);
+        matrix_translate(-center_x, -center_y, obj->matrix);
     }
-
-    float center_x = this->base.w / 2.0f;
-    float center_y = this->base.h / 2.0f;
-
-    matrix_translate(this->offset_x, this->offset_y, obj->matrix);
-    matrix_translate(center_x, center_y, obj->matrix);
-    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-    matrix_rotate(this->degrees, obj->matrix);
-    matrix_translate(-center_x, -center_y, obj->matrix);
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
 
@@ -870,6 +873,98 @@ static void gui_rect_prepare(gui_obj_t *obj)
     }
 
     this->checksum = new_checksum;
+
+    // Check if matrix changed (important for list scrolling optimization)
+    bool matrix_changed = (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0);
+
+    // Only update draw_img matrix and area when matrix actually changed
+    if (matrix_changed)
+    {
+        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
+
+        if (this->radius == 0 && !this->use_gradient)
+        {
+            // Simple rect case - rect_0 covers the whole area
+            if (this->rect_0 != NULL)
+            {
+                memcpy(&this->rect_0->matrix, obj->matrix, sizeof(struct gui_matrix));
+                memcpy(&this->rect_0->inverse, obj->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->rect_0->inverse);
+                draw_img_new_area(this->rect_0, NULL);
+            }
+        }
+        else if (this->rect_1 == NULL)
+        {
+            // Single buffer case (gradient or small rect)
+            if (this->rect_0 != NULL)
+            {
+                memcpy(&this->rect_0->matrix, obj->matrix, sizeof(struct gui_matrix));
+                memcpy(&this->rect_0->inverse, obj->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->rect_0->inverse);
+                draw_img_new_area(this->rect_0, NULL);
+            }
+        }
+        else
+        {
+            // Split rendering case - need to apply offsets
+            if (this->rect_0 != NULL)
+            {
+                memcpy(&this->rect_0->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate(this->radius + 1, 0, &this->rect_0->matrix);
+                memcpy(&this->rect_0->inverse, &this->rect_0->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->rect_0->inverse);
+                draw_img_new_area(this->rect_0, NULL);
+            }
+            if (this->rect_1 != NULL)
+            {
+                memcpy(&this->rect_1->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate(0, this->radius + 1, &this->rect_1->matrix);
+                memcpy(&this->rect_1->inverse, &this->rect_1->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->rect_1->inverse);
+                draw_img_new_area(this->rect_1, NULL);
+            }
+            if (this->rect_2 != NULL)
+            {
+                memcpy(&this->rect_2->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate(this->radius + 1, this->base.h - this->radius - 1, &this->rect_2->matrix);
+                memcpy(&this->rect_2->inverse, &this->rect_2->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->rect_2->inverse);
+                draw_img_new_area(this->rect_2, NULL);
+            }
+            if (this->circle_00 != NULL)
+            {
+                memcpy(&this->circle_00->matrix, obj->matrix, sizeof(struct gui_matrix));
+                memcpy(&this->circle_00->inverse, obj->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->circle_00->inverse);
+                draw_img_new_area(this->circle_00, NULL);
+            }
+            if (this->circle_01 != NULL)
+            {
+                memcpy(&this->circle_01->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate(this->base.w - this->radius - 1, 0, &this->circle_01->matrix);
+                memcpy(&this->circle_01->inverse, &this->circle_01->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->circle_01->inverse);
+                draw_img_new_area(this->circle_01, NULL);
+            }
+            if (this->circle_10 != NULL)
+            {
+                memcpy(&this->circle_10->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate(0, this->base.h - this->radius - 1, &this->circle_10->matrix);
+                memcpy(&this->circle_10->inverse, &this->circle_10->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->circle_10->inverse);
+                draw_img_new_area(this->circle_10, NULL);
+            }
+            if (this->circle_11 != NULL)
+            {
+                memcpy(&this->circle_11->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate(this->base.w - this->radius - 1, this->base.h - this->radius - 1,
+                                 &this->circle_11->matrix);
+                memcpy(&this->circle_11->inverse, &this->circle_11->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->circle_11->inverse);
+                draw_img_new_area(this->circle_11, NULL);
+            }
+        }
+    }
 
     if (last != this->checksum)
     {
@@ -1008,110 +1103,110 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
     return round_rect;
 }
 
-void gui_rect_set_style(gui_rounded_rect_t *this,
+void gui_rect_set_style(gui_rounded_rect_t *rect,
                         int x, int y, int w, int h,
                         int radius, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
-    this->base.x = x;
-    this->base.y = y;
-    this->base.w = w;
-    this->base.h = h;
-    this->radius = radius;
-    this->color = color;
-    this->opacity_value = color.color.rgba.a;
+    GUI_ASSERT(rect != NULL);
+    rect->base.x = x;
+    rect->base.y = y;
+    rect->base.w = w;
+    rect->base.h = h;
+    rect->radius = radius;
+    rect->color = color;
+    rect->opacity_value = color.color.rgba.a;
 }
-void gui_rect_set_opacity(gui_rounded_rect_t *this, uint8_t opacity)
+void gui_rect_set_opacity(gui_rounded_rect_t *rect, uint8_t opacity)
 {
-    GUI_ASSERT(this != NULL);
-    this->opacity_value = opacity;
+    GUI_ASSERT(rect != NULL);
+    rect->opacity_value = opacity;
 }
-void gui_rect_set_position(gui_rounded_rect_t *this, int x, int y)
+void gui_rect_set_position(gui_rounded_rect_t *rect, int x, int y)
 {
-    GUI_ASSERT(this != NULL);
-    this->base.x = x;
-    this->base.y = y;
-}
-
-void gui_rect_set_size(gui_rounded_rect_t *this, int w, int h)
-{
-    GUI_ASSERT(this != NULL);
-    this->base.w = w;
-    this->base.h = h;
+    GUI_ASSERT(rect != NULL);
+    rect->base.x = x;
+    rect->base.y = y;
 }
 
-void gui_rect_set_radius(gui_rounded_rect_t *this, int radius)
+void gui_rect_set_size(gui_rounded_rect_t *rect, int w, int h)
 {
-    GUI_ASSERT(this != NULL);
-    this->radius = radius;
+    GUI_ASSERT(rect != NULL);
+    rect->base.w = w;
+    rect->base.h = h;
 }
 
-void gui_rect_set_color(gui_rounded_rect_t *this, gui_color_t color)
+void gui_rect_set_radius(gui_rounded_rect_t *rect, int radius)
 {
-    GUI_ASSERT(this != NULL);
-    this->color = color;
-    this->opacity_value = color.color.rgba.a;
+    GUI_ASSERT(rect != NULL);
+    rect->radius = radius;
 }
 
-void gui_rect_on_click(gui_rounded_rect_t *this, void *callback, void *parameter)
+void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color)
 {
-    gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
+    GUI_ASSERT(rect != NULL);
+    rect->color = color;
+    rect->opacity_value = color.color.rgba.a;
+}
+
+void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb((gui_obj_t *)rect, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);
 }
 
-void gui_rect_rotate(gui_rounded_rect_t *this, float degrees)
+void gui_rect_rotate(gui_rounded_rect_t *rect, float degrees)
 {
-    GUI_ASSERT(this != NULL);
-    this->degrees = degrees;
+    GUI_ASSERT(rect != NULL);
+    rect->degrees = degrees;
 }
 
-void gui_rect_scale(gui_rounded_rect_t *this, float scale_x, float scale_y)
+void gui_rect_scale(gui_rounded_rect_t *rect, float scale_x, float scale_y)
 {
-    GUI_ASSERT(this != NULL);
-    this->scale_x = scale_x;
-    this->scale_y = scale_y;
+    GUI_ASSERT(rect != NULL);
+    rect->scale_x = scale_x;
+    rect->scale_y = scale_y;
 }
 
-void gui_rect_translate(gui_rounded_rect_t *this, float tx, float ty)
+void gui_rect_translate(gui_rounded_rect_t *rect, float tx, float ty)
 {
-    GUI_ASSERT(this != NULL);
-    this->offset_x = tx;
-    this->offset_y = ty;
+    GUI_ASSERT(rect != NULL);
+    rect->offset_x = tx;
+    rect->offset_y = ty;
 }
 
-void gui_rect_set_linear_gradient(gui_rounded_rect_t *this, gui_rect_gradient_dir_t direction)
+void gui_rect_set_linear_gradient(gui_rounded_rect_t *rect, gui_rect_gradient_dir_t direction)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->gradient == NULL)
+    GUI_ASSERT(rect != NULL);
+    if (rect->gradient == NULL)
     {
-        this->gradient = gui_malloc(sizeof(Gradient));
-        if (this->gradient == NULL) { return; }
+        rect->gradient = gui_malloc(sizeof(Gradient));
+        if (rect->gradient == NULL) { return; }
     }
-    gradient_init(this->gradient, GRADIENT_LINEAR);
-    this->gradient_dir = direction;
-    this->use_gradient = true;
+    gradient_init(rect->gradient, GRADIENT_LINEAR);
+    rect->gradient_dir = direction;
+    rect->use_gradient = true;
 }
 
-void gui_rect_add_gradient_stop(gui_rounded_rect_t *this, float position, gui_color_t color)
+void gui_rect_add_gradient_stop(gui_rounded_rect_t *rect, float position, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->gradient == NULL)
+    GUI_ASSERT(rect != NULL);
+    if (rect->gradient == NULL)
     {
-        gui_rect_set_linear_gradient(this, RECT_GRADIENT_HORIZONTAL);
+        gui_rect_set_linear_gradient(rect, RECT_GRADIENT_HORIZONTAL);
     }
-    if (this->gradient != NULL)
+    if (rect->gradient != NULL)
     {
-        gradient_add_stop(this->gradient, position, color.color.argb_full);
+        gradient_add_stop(rect->gradient, position, color.color.argb_full);
     }
 }
 
-void gui_rect_clear_gradient(gui_rounded_rect_t *this)
+void gui_rect_clear_gradient(gui_rounded_rect_t *rect)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->gradient != NULL)
+    GUI_ASSERT(rect != NULL);
+    if (rect->gradient != NULL)
     {
-        gui_free(this->gradient);
-        this->gradient = NULL;
+        gui_free(rect->gradient);
+        rect->gradient = NULL;
     }
-    this->use_gradient = false;
+    rect->use_gradient = false;
 }

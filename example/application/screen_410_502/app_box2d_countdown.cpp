@@ -9,7 +9,7 @@
 #include "box2d/box2d.h"
 #include "gui_canvas.h"
 #include "tp_algo.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "gui_view.h"
 #include "app_main_watch.h"
 
@@ -394,7 +394,7 @@ static bool init()
     if (!win) { return false; }
 
     // background
-    gui_canvas_rect_create((gui_obj_t *)current_view, 0, 0, 0, screen_w, screen_h, gui_rgb(30, 30, 30));
+    gui_rect_create((gui_obj_t *)current_view, 0, 0, 0, screen_w, screen_h, 0, gui_rgb(30, 30, 30));
 
     gui_obj_create_timer(GUI_BASE(win), 16, true, app_box2d_cb);
     gui_obj_start_timer(GUI_BASE(win));

@@ -417,93 +417,93 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
 }
 
 
-void gui_arc_set_position(gui_arc_t *this, int x, int y)
+void gui_arc_set_position(gui_arc_t *arc, int x, int y)
 {
-    GUI_ASSERT(this != NULL);
-    this->x = x;
-    this->y = y;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->x = x;
+    arc->y = y;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_set_radius(gui_arc_t *this, int radius)
+void gui_arc_set_radius(gui_arc_t *arc, int radius)
 {
-    GUI_ASSERT(this != NULL);
-    this->radius = radius;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->radius = radius;
+    arc->buffer_valid = false;
 }
-void gui_arc_set_opacity(gui_arc_t *this, uint8_t opacity)
+void gui_arc_set_opacity(gui_arc_t *arc, uint8_t opacity)
 {
-    GUI_ASSERT(this != NULL);
-    this->opacity_value = opacity;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->opacity_value = opacity;
+    arc->buffer_valid = false;
 }
-void gui_arc_set_color(gui_arc_t *this, gui_color_t color)
+void gui_arc_set_color(gui_arc_t *arc, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
-    this->color = color;
-    this->opacity_value = color.color.rgba.a;
-    this->buffer_valid = false;
-}
-
-void gui_arc_set_start_angle(gui_arc_t *this, float start_angle)
-{
-    GUI_ASSERT(this != NULL);
-    this->start_angle = start_angle;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->color = color;
+    arc->opacity_value = color.color.rgba.a;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_set_end_angle(gui_arc_t *this, float end_angle)
+void gui_arc_set_start_angle(gui_arc_t *arc, float start_angle)
 {
-    GUI_ASSERT(this != NULL);
-    this->end_angle = end_angle;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->start_angle = start_angle;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_set_line_width(gui_arc_t *this, float line_width)
+void gui_arc_set_end_angle(gui_arc_t *arc, float end_angle)
 {
-    GUI_ASSERT(this != NULL);
-    this->line_width = line_width;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->end_angle = end_angle;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_on_click(gui_arc_t *this, void *callback, void *parameter)
+void gui_arc_set_line_width(gui_arc_t *arc, float line_width)
 {
-    gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
+    GUI_ASSERT(arc != NULL);
+    arc->line_width = line_width;
+    arc->buffer_valid = false;
+}
+
+void gui_arc_on_click(gui_arc_t *arc, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb((gui_obj_t *)arc, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);
 }
 
-void gui_arc_rotate(gui_arc_t *this, float degrees)
+void gui_arc_rotate(gui_arc_t *arc, float degrees)
 {
-    GUI_ASSERT(this != NULL);
-    this->degrees = degrees;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->degrees = degrees;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_scale(gui_arc_t *this, float scale_x, float scale_y)
+void gui_arc_scale(gui_arc_t *arc, float scale_x, float scale_y)
 {
-    GUI_ASSERT(this != NULL);
-    this->scale_x = scale_x;
-    this->scale_y = scale_y;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->scale_x = scale_x;
+    arc->scale_y = scale_y;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_translate(gui_arc_t *this, float tx, float ty)
+void gui_arc_translate(gui_arc_t *arc, float tx, float ty)
 {
-    GUI_ASSERT(this != NULL);
-    this->offset_x = tx;
-    this->offset_y = ty;
-    this->buffer_valid = false;
+    GUI_ASSERT(arc != NULL);
+    arc->offset_x = tx;
+    arc->offset_y = ty;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_set_angular_gradient(gui_arc_t *this, float start_angle, float end_angle)
+void gui_arc_set_angular_gradient(gui_arc_t *arc, float start_angle, float end_angle)
 {
-    GUI_ASSERT(this != NULL);
+    GUI_ASSERT(arc != NULL);
 
     // Allocate gradient if not exists
-    if (this->gradient == NULL)
+    if (arc->gradient == NULL)
     {
-        this->gradient = gui_malloc(sizeof(Gradient));
-        GUI_ASSERT(this->gradient != NULL);
+        arc->gradient = gui_malloc(sizeof(Gradient));
+        GUI_ASSERT(arc->gradient != NULL);
     }
 
     // REMOVED: Auto-compensation for full circle gradient
@@ -511,40 +511,41 @@ void gui_arc_set_angular_gradient(gui_arc_t *this, float start_angle, float end_
     // without needing the +1° trick for end caps
 
     // Initialize angular gradient
-    gradient_init(this->gradient, GRADIENT_ANGULAR);
-    this->gradient->angular_cx = this->x;
-    this->gradient->angular_cy = this->y;
-    this->gradient->angular_start = start_angle;
-    this->gradient->angular_end = end_angle;
+    gradient_init(arc->gradient, GRADIENT_ANGULAR);
+    arc->gradient->angular_cx = arc->x;
+    arc->gradient->angular_cy = arc->y;
+    arc->gradient->angular_start = start_angle;
+    arc->gradient->angular_end = end_angle;
 
-    this->use_gradient = true;
-    this->buffer_valid = false;
+    arc->use_gradient = true;
+    arc->buffer_valid = false;
 }
 
-void gui_arc_add_gradient_stop(gui_arc_t *this, float position, gui_color_t color)
+void gui_arc_add_gradient_stop(gui_arc_t *arc, float position, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
+    GUI_ASSERT(arc != NULL);
 
-    if (this->gradient == NULL)
+    if (arc->gradient == NULL)
     {
         // Initialize default angular gradient if not set
-        gui_arc_set_angular_gradient(this, this->start_angle, this->end_angle);
+        gui_arc_set_angular_gradient(arc, arc->start_angle, arc->end_angle);
     }
 
-    gradient_add_stop(this->gradient, position, color.color.argb_full);
-    this->buffer_valid = false;
+    gradient_add_stop(arc->gradient, position, color.color.argb_full);
+    arc->buffer_valid = false;
 }
 
-void gui_arc_clear_gradient(gui_arc_t *this)
+void gui_arc_clear_gradient(gui_arc_t *arc)
 {
-    GUI_ASSERT(this != NULL);
+    GUI_ASSERT(arc != NULL);
 
-    if (this->gradient != NULL)
+    if (arc->gradient != NULL)
     {
-        gui_free(this->gradient);
-        this->gradient = NULL;
+        gui_free(arc->gradient);
+        arc->gradient = NULL;
     }
 
-    this->use_gradient = false;
-    this->buffer_valid = false;
+    arc->use_gradient = false;
+    arc->buffer_valid = false;
 }
+

@@ -78,7 +78,7 @@ gui_arc_group_t *gui_arc_group_create(void *parent, const char *name,
 
 /**
  * @brief Add arc to group.
- * @param this Arc group widget.
+ * @param group Arc group widget.
  * @param cx Center X relative to group.
  * @param cy Center Y relative to group.
  * @param radius Arc radius.
@@ -88,28 +88,28 @@ gui_arc_group_t *gui_arc_group_create(void *parent, const char *name,
  * @param color Arc color.
  * @return Index of added arc, or -1 if group is full.
  */
-int gui_arc_group_add_arc(gui_arc_group_t *this, float cx, float cy,
+int gui_arc_group_add_arc(gui_arc_group_t *group, float cx, float cy,
                           float radius, float start_angle, float end_angle,
                           float line_width, gui_color_t color);
 
 /**
  * @brief Set gradient for arc in group.
- * @param this Arc group widget.
+ * @param group Arc group widget.
  * @param arc_index Index of arc (returned by add_arc).
  * @param start_angle Gradient start angle.
  * @param end_angle Gradient end angle.
  */
-void gui_arc_group_set_gradient(gui_arc_group_t *this, int arc_index,
+void gui_arc_group_set_gradient(gui_arc_group_t *group, int arc_index,
                                 float start_angle, float end_angle);
 
 /**
  * @brief Add gradient stop to arc in group.
- * @param this Arc group widget.
+ * @param group Arc group widget.
  * @param arc_index Index of arc.
  * @param position Stop position (0.0-1.0).
  * @param color Stop color.
  */
-void gui_arc_group_add_gradient_stop(gui_arc_group_t *this, int arc_index,
+void gui_arc_group_add_gradient_stop(gui_arc_group_t *group, int arc_index,
                                      float position, gui_color_t color);
 
 #ifdef __cplusplus

@@ -8,8 +8,7 @@
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_list.h"
-#include "gui_canvas_rect.h"
-#include "gui_canvas_round_rect.h"
+#include "gui_rect.h"
 #include "app_main_watch.h"
 #include "watch_adapt.h"
 
@@ -176,7 +175,7 @@ static void on_playing(void *p)
     gui_text_content_set(t, play_time_str, strlen(play_time_str));
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas, "time_bar", win_play)
-    gui_canvas_rect_set_size((gui_canvas_rect_t *)canvas, 300 * time / duration, 3);
+    gui_rect_set_size((gui_rounded_rect_t *)canvas, 300 * time / duration, 3);
 
     bool completion_status = false;
     if (gui_audio->record_completion_status)
@@ -224,7 +223,7 @@ static void click_file_play(void *obj, gui_event_t e, void *param)
         }
         img->data = RECORD_PAUSE_BIN;
         GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas, "time_bar", win_play)
-        gui_canvas_rect_set_size((gui_canvas_rect_t *)canvas, 1, 3);
+        gui_rect_set_size((gui_rounded_rect_t *)canvas, 1, 3);
         gui_obj_start_timer(o);
 
         {
@@ -254,8 +253,8 @@ static void list_design(gui_obj_t *obj, void *p)
     gui_list_note_t *note = GUI_TYPE(gui_list_note_t, obj);
     uint8_t index = note->index;
     if (index >= record_file_num) { return;}
-    gui_canvas_round_rect_t *rect = gui_canvas_round_rect_create(obj, 0, 55, 0, 300, 50, 10, gui_rgb(60,
-                                                                 150, 255));
+    gui_rounded_rect_t *rect = gui_rect_create(obj, 0, 55, 0, 300, 50, 10, gui_rgb(60,
+                                                                                   150, 255));
 
     // gui_img_t *img_file = gui_img_create_from_mem(rect, 0, RECORD_FILE_BIN, 10, 10, 0, 0);
     gui_text_t *text = gui_text_create(rect, 0, 0, 0, 300, 50);
@@ -295,8 +294,8 @@ static void create_recorder_play(void)
     gui_list_set_note_num(list, record_file_num > 5 ? record_file_num + 3 : record_file_num);
     gui_list_set_style(list, LIST_CLASSIC);
 
-    gui_canvas_rect_t *canvas_top = gui_canvas_rect_create(GUI_BASE(win_play), 0, 0, 0, SCREEN_WIDTH,
-                                                           80, APP_COLOR_BLACK);
+    gui_rounded_rect_t *canvas_top = gui_rect_create(GUI_BASE(win_play), 0, 0, 0, SCREEN_WIDTH,
+                                                     80, 0, APP_COLOR_BLACK);
     gui_obj_add_event_cb(canvas_top, click_canvas_cb, GUI_EVENT_TOUCH_CLICKED,
                          NULL); // Disable click event of this area
     gui_text_t *text = gui_text_create(canvas_top, 0, 0, 20, SCREEN_WIDTH, 60);
@@ -310,8 +309,8 @@ static void create_recorder_play(void)
     gui_img_set_quality(img_ret, true);
     gui_obj_add_event_cb(img_ret, click_to_recorder_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_canvas_rect_t *canvas_bottom = gui_canvas_rect_create(GUI_BASE(win_play), 0, 0,
-                                                              SCREEN_HEIGHT - 150, SCREEN_WIDTH, 150, APP_COLOR_BLACK);
+    gui_rounded_rect_t *canvas_bottom = gui_rect_create(GUI_BASE(win_play), 0, 0,
+                                                        SCREEN_HEIGHT - 150, SCREEN_WIDTH, 150, 0, APP_COLOR_BLACK);
     gui_obj_add_event_cb(canvas_bottom, click_canvas_cb, GUI_EVENT_TOUCH_CLICKED,
                          NULL); // Disable click event of this area
     gui_img_t *img_play = gui_img_create_from_mem(canvas_bottom, "img_play", RECORD_PLAY_BIN, 165, 55,
@@ -319,8 +318,8 @@ static void create_recorder_play(void)
     gui_obj_add_event_cb(img_play, click_play_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_create_timer(GUI_BASE(img_play), 1000, true, on_playing);
     gui_obj_stop_timer(GUI_BASE(img_play));
-    gui_canvas_rect_create(GUI_BASE(canvas_bottom), 0, 55, 40, 300, 3, gui_rgb(150, 150, 150));
-    gui_canvas_rect_create(GUI_BASE(canvas_bottom), "time_bar", 55, 40, 1, 3, APP_COLOR_WHITE);
+    gui_rect_create(GUI_BASE(canvas_bottom), 0, 55, 40, 300, 3, 0, gui_rgb(150, 150, 150));
+    gui_rect_create(GUI_BASE(canvas_bottom), "time_bar", 55, 40, 1, 3, 0, APP_COLOR_WHITE);
 
     text = gui_text_create(canvas_bottom, "file_name", 55, 5, 0, 0);
     gui_text_set(text, play_file_name, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(play_file_name), 32);
@@ -434,8 +433,8 @@ static void create_recorder(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(text), 1000, true, record_time_update);
     gui_obj_stop_timer(GUI_BASE(text));
 
-    gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(win_recorder), 0, 105, 410,
-                                                                   200, 50, 10, gui_rgb(70, 80, 90));
+    gui_rounded_rect_t *canvas = gui_rect_create(GUI_BASE(win_recorder), 0, 105, 410,
+                                                 200, 50, 10, gui_rgb(70, 80, 90));
     gui_obj_add_event_cb(canvas, click_enter_file_win_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     // gui_img_t *img_file = gui_img_create_from_mem(canvas, 0, RECORD_FILE_BIN, 10, 10, 0, 0);
     text = gui_text_create(canvas, 0, 0, 0, 200, 50);

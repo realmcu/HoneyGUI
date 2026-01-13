@@ -76,6 +76,9 @@ typedef struct
     bool use_gradient;          /**< Flag to enable gradient rendering. */
     bool enable_dither;         /**< Flag to enable dithering for gradient. */
     gui_rect_gradient_dir_t gradient_dir; /**< Gradient direction. */
+
+    // Matrix cache for change detection
+    gui_matrix_t last_matrix;   /**< Cached matrix for change detection. */
 } gui_rounded_rect_t;
 
 /*============================================================================*
@@ -104,7 +107,7 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
 
 /**
  * @brief Set the style of the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param x X coordinate relative to widget.
  * @param y Y coordinate relative to widget.
  * @param w Rect width.
@@ -112,104 +115,104 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
  * @param radius Rect radius.
  * @param color Rect color.
  */
-void gui_rect_set_style(gui_rounded_rect_t *this,
+void gui_rect_set_style(gui_rounded_rect_t *rect,
                         int x, int y, int w, int h,
                         int radius, gui_color_t color);
 /**
  * @brief Set the opacity of the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param opacity Opacity value (0-255).
  */
-void gui_rect_set_opacity(gui_rounded_rect_t *this, uint8_t opacity);
+void gui_rect_set_opacity(gui_rounded_rect_t *rect, uint8_t opacity);
 /**
  * @brief Set the position of the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param x X coordinate relative to widget.
  * @param y Y coordinate relative to widget.
  */
-void gui_rect_set_position(gui_rounded_rect_t *this, int x, int y);
+void gui_rect_set_position(gui_rounded_rect_t *rect, int x, int y);
 
 /**
  * @brief Set the size of the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param w Rect width.
  * @param h Rect height.
  */
-void gui_rect_set_size(gui_rounded_rect_t *this, int w, int h);
+void gui_rect_set_size(gui_rounded_rect_t *rect, int w, int h);
 
 /**
  * @brief Set the radius of the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param radius Rect radius.
  */
-void gui_rect_set_radius(gui_rounded_rect_t *this, int radius);
+void gui_rect_set_radius(gui_rounded_rect_t *rect, int radius);
 
 /**
  * @brief Set the color of the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param color Rect color.
  */
-void gui_rect_set_color(gui_rounded_rect_t *this, gui_color_t color);
+void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color);
 
 /**
  * @brief Register a click event callback for the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param callback Callback function pointer.
  * @param parameter Optional parameter to pass to the callback.
  */
-void gui_rect_on_click(gui_rounded_rect_t *this, void *callback, void *parameter);
+void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter);
 
 /**
  * @brief Apply rotation transformation to the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param degrees Rotation angle in degrees (clockwise).
  */
-void gui_rect_rotate(gui_rounded_rect_t *this, float degrees);
+void gui_rect_rotate(gui_rounded_rect_t *rect, float degrees);
 
 /**
  * @brief Apply scale transformation to the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param scale_x Scale factor in X direction.
  * @param scale_y Scale factor in Y direction.
  */
-void gui_rect_scale(gui_rounded_rect_t *this, float scale_x, float scale_y);
+void gui_rect_scale(gui_rounded_rect_t *rect, float scale_x, float scale_y);
 
 /**
  * @brief Apply translation transformation to the rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param tx Translation in X direction (pixels).
  * @param ty Translation in Y direction (pixels).
  */
-void gui_rect_translate(gui_rounded_rect_t *this, float tx, float ty);
+void gui_rect_translate(gui_rounded_rect_t *rect, float tx, float ty);
 
 /**
  * @brief Set linear gradient for rect widget.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param direction Gradient direction (horizontal, vertical, diagonal).
  */
-void gui_rect_set_linear_gradient(gui_rounded_rect_t *this, gui_rect_gradient_dir_t direction);
+void gui_rect_set_linear_gradient(gui_rounded_rect_t *rect, gui_rect_gradient_dir_t direction);
 
 /**
  * @brief Add color stop to rect gradient.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param position Position of color stop (0.0 to 1.0).
- * @param color Color at this stop.
+ * @param color Color at rect stop.
  */
-void gui_rect_add_gradient_stop(gui_rounded_rect_t *this, float position, gui_color_t color);
+void gui_rect_add_gradient_stop(gui_rounded_rect_t *rect, float position, gui_color_t color);
 
 /**
  * @brief Clear gradient and use solid color.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  */
-void gui_rect_clear_gradient(gui_rounded_rect_t *this);
+void gui_rect_clear_gradient(gui_rounded_rect_t *rect);
 
 /**
  * @brief Enable or disable dithering for gradient.
- * @param this Pointer to the rect widget.
+ * @param rect Pointer to the rect widget.
  * @param enable true to enable dithering, false to disable.
  * @note Dithering reduces color banding but may impact performance.
  */
-void gui_rect_set_dither(gui_rounded_rect_t *this, bool enable);
+void gui_rect_set_dither(gui_rounded_rect_t *rect, bool enable);
 
 #ifdef __cplusplus
 }

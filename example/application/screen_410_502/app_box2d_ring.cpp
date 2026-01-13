@@ -12,7 +12,7 @@
 #include "gui_win.h"
 #include "gui_img.h"
 #include "box2d/box2d.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "gui_view.h"
 #include "app_main_watch.h"
 
@@ -340,8 +340,8 @@ static void canvas_callback(NVGcontext *vg)
 static void render()
 {
     count = 0;
-    gui_canvas_rect_create((gui_obj_t *)current_view, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-                           gui_rgba(255, 255, 255, 255));
+    gui_rect_create((gui_obj_t *)current_view, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+                    gui_rgba(255, 255, 255, 255));
 
     // Draw balls
     for (Ball &ball : balls)

@@ -4,7 +4,7 @@
 #include "root_image/ui_resource.h"
 #include "gui_img.h"
 #include "app_main_watch.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "guidef.h"
 #include "watch_adapt.h"
 

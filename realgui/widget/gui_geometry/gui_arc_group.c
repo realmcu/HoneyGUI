@@ -276,19 +276,19 @@ gui_arc_group_t *gui_arc_group_create(void *parent, const char *name,
     return group;
 }
 
-int gui_arc_group_add_arc(gui_arc_group_t *this, float cx, float cy,
+int gui_arc_group_add_arc(gui_arc_group_t *group, float cx, float cy,
                           float radius, float start_angle, float end_angle,
                           float line_width, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
+    GUI_ASSERT(group != NULL);
 
-    if (this->arc_count >= MAX_ARCS_IN_GROUP)
+    if (group->arc_count >= MAX_ARCS_IN_GROUP)
     {
         return -1;  // Group is full
     }
 
-    int index = this->arc_count;
-    arc_def_t *arc = &this->arcs[index];
+    int index = group->arc_count;
+    arc_def_t *arc = &group->arcs[index];
 
     arc->cx = cx;
     arc->cy = cy;
@@ -300,19 +300,19 @@ int gui_arc_group_add_arc(gui_arc_group_t *this, float cx, float cy,
     arc->gradient = NULL;
     arc->use_gradient = false;
 
-    this->arc_count++;
-    this->buffer_valid = false;
+    group->arc_count++;
+    group->buffer_valid = false;
 
     return index;
 }
 
-void gui_arc_group_set_gradient(gui_arc_group_t *this, int arc_index,
+void gui_arc_group_set_gradient(gui_arc_group_t *group, int arc_index,
                                 float start_angle, float end_angle)
 {
-    GUI_ASSERT(this != NULL);
-    GUI_ASSERT(arc_index >= 0 && arc_index < this->arc_count);
+    GUI_ASSERT(group != NULL);
+    GUI_ASSERT(arc_index >= 0 && arc_index < group->arc_count);
 
-    arc_def_t *arc = &this->arcs[arc_index];
+    arc_def_t *arc = &group->arcs[arc_index];
 
     if (arc->gradient == NULL)
     {
@@ -327,22 +327,22 @@ void gui_arc_group_set_gradient(gui_arc_group_t *this, int arc_index,
     arc->gradient->angular_end = end_angle;
 
     arc->use_gradient = true;
-    this->buffer_valid = false;
+    group->buffer_valid = false;
 }
 
-void gui_arc_group_add_gradient_stop(gui_arc_group_t *this, int arc_index,
+void gui_arc_group_add_gradient_stop(gui_arc_group_t *group, int arc_index,
                                      float position, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
-    GUI_ASSERT(arc_index >= 0 && arc_index < this->arc_count);
+    GUI_ASSERT(group != NULL);
+    GUI_ASSERT(arc_index >= 0 && arc_index < group->arc_count);
 
-    arc_def_t *arc = &this->arcs[arc_index];
+    arc_def_t *arc = &group->arcs[arc_index];
 
     if (arc->gradient == NULL)
     {
-        gui_arc_group_set_gradient(this, arc_index, arc->start_angle, arc->end_angle);
+        gui_arc_group_set_gradient(group, arc_index, arc->start_angle, arc->end_angle);
     }
 
     gradient_add_stop(arc->gradient, position, color.color.argb_full);
-    this->buffer_valid = false;
+    group->buffer_valid = false;
 }

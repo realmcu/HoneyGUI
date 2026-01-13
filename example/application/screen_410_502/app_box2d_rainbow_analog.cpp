@@ -12,7 +12,7 @@
 #include "gui_canvas.h"
 #include "tp_algo.h"
 #include <random>  // For secure random numbers
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "gui_view.h"
 #include "app_main_watch.h"
 #include "root_image/ui_resource.h"

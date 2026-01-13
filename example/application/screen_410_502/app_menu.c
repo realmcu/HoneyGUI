@@ -9,7 +9,7 @@
 #include "gui_menu_cellular.h"
 #include "guidef.h"
 #include "gui_list.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 
 
 /*============================================================================*
@@ -581,7 +581,7 @@ static void note_design(gui_obj_t *obj, void *p)
     uint16_t index = note->index;
     if (index < sizeof(text_array) / sizeof(text_array[0]) - 1)
     {
-        gui_canvas_rect_create(GUI_BASE(note), "note", 0, 0, 0, 100, color_t[index % 2]);
+        gui_rect_create(GUI_BASE(note), "note", 0, 0, 0, 100, 0, color_t[index % 2]);
         gui_img_t *img = gui_img_create_from_mem(note, 0, design_p->img_data_array[index], 30, 0, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         char *text = (char *)text_array[index];
@@ -822,8 +822,8 @@ static void app_menu_design(gui_view_t *view)
         };
         int array_size = sizeof(cellilar_img_data_array) / sizeof(cellilar_img_data_array[0]);
         int16_t icon_size = 100;
-        gui_canvas_rect_create(GUI_BASE(win), "background", 0, 0,
-                               SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(76, 76, 76, 255));
+        gui_rect_create(GUI_BASE(win), "background", 0, 0,
+                        SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(76, 76, 76, 255));
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, icon_size, cellilar_img_data_array,
                                                              array_size);
         menu_cellular = menu;

@@ -106,112 +106,112 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
 /**
  * @brief Set circle style.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param x X coordinate of circle center.
  * @param y Y coordinate of circle center.
  * @param radius Circle radius.
  * @param color Circle color.
  */
-void gui_circle_set_style(gui_circle_t *this,
+void gui_circle_set_style(gui_circle_t *circle,
                           int x, int y,
                           int radius, gui_color_t color);
 
 /**
  * @brief Set circle position.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param x X coordinate of circle center.
  * @param y Y coordinate of circle center.
  */
-void gui_circle_set_position(gui_circle_t *this, int x, int y);
+void gui_circle_set_position(gui_circle_t *circle, int x, int y);
 
 /**
  * @brief Set circle radius.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param radius Circle radius.
  */
-void gui_circle_set_radius(gui_circle_t *this, int radius);
+void gui_circle_set_radius(gui_circle_t *circle, int radius);
 /**
  * @brief Set the opacity of the circle widget.
- * @param this Pointer to the circle widget.
+ * @param circle Pointer to the circle widget.
  * @param opacity Opacity value (0-255).
  */
-void gui_circle_set_opacity(gui_circle_t *this, uint8_t opacity);
+void gui_circle_set_opacity(gui_circle_t *circle, uint8_t opacity);
 /**
  * @brief Set circle color.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param color Circle color.
  */
-void gui_circle_set_color(gui_circle_t *this, gui_color_t color);
+void gui_circle_set_color(gui_circle_t *circle, gui_color_t color);
 
 /**
  * @brief Set click callback for the circle.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param callback Callback function.
  * @param parameter Callback parameter.
  */
-void gui_circle_on_click(gui_circle_t *this, void *callback, void *parameter);
+void gui_circle_on_click(gui_circle_t *circle, void *callback, void *parameter);
 
 /**
  * @brief Apply rotation transformation to the circle widget.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param degrees Rotation angle in degrees (clockwise).
  */
-void gui_circle_rotate(gui_circle_t *this, float degrees);
+void gui_circle_rotate(gui_circle_t *circle, float degrees);
 
 /**
  * @brief Apply scale transformation to the circle widget.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param scale_x Scale factor in X direction.
  * @param scale_y Scale factor in Y direction.
  */
-void gui_circle_scale(gui_circle_t *this, float scale_x, float scale_y);
+void gui_circle_scale(gui_circle_t *circle, float scale_x, float scale_y);
 
 /**
  * @brief Apply translation transformation to the circle widget.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param tx Translation in X direction (pixels).
  * @param ty Translation in Y direction (pixels).
  */
-void gui_circle_translate(gui_circle_t *this, float tx, float ty);
+void gui_circle_translate(gui_circle_t *circle, float tx, float ty);
 
 /**
  * @brief Set radial gradient for circle widget (from center to edge).
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  */
-void gui_circle_set_radial_gradient(gui_circle_t *this);
+void gui_circle_set_radial_gradient(gui_circle_t *circle);
 
 /**
  * @brief Set angular gradient for circle widget (along circumference).
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param start_angle Start angle in degrees.
  * @param end_angle End angle in degrees.
  */
-void gui_circle_set_angular_gradient(gui_circle_t *this, float start_angle, float end_angle);
+void gui_circle_set_angular_gradient(gui_circle_t *circle, float start_angle, float end_angle);
 
 /**
  * @brief Add color stop to circle gradient.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  * @param position Position of color stop (0.0 to 1.0).
- * @param color Color at this stop.
+ * @param color Color at circle stop.
  */
-void gui_circle_add_gradient_stop(gui_circle_t *this, float position, gui_color_t color);
+void gui_circle_add_gradient_stop(gui_circle_t *circle, float position, gui_color_t color);
 
 /**
  * @brief Clear gradient and use solid color.
  *
- * @param this Circle widget pointer.
+ * @param circle Circle widget pointer.
  */
-void gui_circle_clear_gradient(gui_circle_t *this);
+void gui_circle_clear_gradient(gui_circle_t *circle);
 
 #ifdef __cplusplus
 }

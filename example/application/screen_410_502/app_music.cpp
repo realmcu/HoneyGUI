@@ -21,7 +21,7 @@
 #include "app_main_watch.h"
 #include "guidef.h"
 #include "root_image/ui_resource.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "tp_algo.h"
@@ -191,7 +191,7 @@ constexpr char MP3_FILE[] =
 gui_text_t *play_time_text = nullptr;
 gui_text_t *music_time_text = nullptr;
 gui_text_t *music_name_text = nullptr;
-gui_canvas_rect_t *current_time_bar = nullptr;
+gui_rounded_rect_t *current_time_bar = nullptr;
 gui_list_t *lrc_list = nullptr;
 gui_img_t *play_button = nullptr;
 int page_list_item_space = 0;
@@ -473,7 +473,7 @@ private:
 
         format_time(time, play_time_array);
         gui_text_content_set(play_time_text, play_time_array, strlen(play_time_array));
-        gui_canvas_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
+        gui_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
         int16_t offset = -(time / duration * (page_list_item_space * lyrics_array_length));
         gui_list_set_offset(lrc_list, offset);
 
@@ -576,8 +576,8 @@ private:
         gui_list_note_t *note = GUI_TYPE(gui_list_note_t, obj);
         uint8_t index = note->index;
         if (index == MUSIC_NUM_MAX) { return; }
-        gui_canvas_rect_t *rect = gui_canvas_rect_create(GUI_BASE(note), 0, 0, 0, SCREEN_W, LIST_SONG_H,
-                                                         COLOR_THEME);
+        gui_rounded_rect_t *rect = gui_rect_create(GUI_BASE(note), 0, 0, 0, SCREEN_W, LIST_SONG_H, 0,
+                                                   COLOR_THEME);
         gui_obj_hidden(GUI_BASE(rect), true);
 
         int font_size = 32;
@@ -710,7 +710,7 @@ private:
     {
         /*LIST WINDOW*/
         music_list_win = gui_win_create(parent, "win list", 0, 0, SCREEN_W, SCREEN_H);
-        gui_canvas_rect_create(GUI_BASE(music_list_win), 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_LIST);
+        gui_rect_create(GUI_BASE(music_list_win), 0, 0, 0, SCREEN_W, SCREEN_H, 0, COLOR_LIST);
         gui_list_t *music_list = gui_list_create(music_list_win, "music_list", 0, 0, SCREEN_W, SCREEN_H,
                                                  LIST_SONG_H, 0, VERTICAL, music_list_design, NULL, false);
         gui_list_set_note_num(music_list, MUSIC_NUM_MAX + 1);
@@ -719,7 +719,7 @@ private:
 
         /*LYRIC WINDOW*/
         lrc_win = gui_win_create(parent, "LYRIC", 0, 0, SCREEN_W, SCREEN_H);
-        gui_canvas_rect_create(GUI_BASE(lrc_win), 0, 0, 0, SCREEN_W, SCREEN_H, gui_color_css("GhostWhite"));
+        gui_rect_create(GUI_BASE(lrc_win), 0, 0, 0, SCREEN_W, SCREEN_H, 0, gui_color_css("GhostWhite"));
         int arrayLength = 0;
         all_lyrics_array = get_lyric_at_time(arrayLength,
                                              LRC_CONTENT); // If use other overload functions, notice mem management
@@ -743,7 +743,7 @@ private:
                              NULL);
 
         parent = GUI_BASE(win_cover);
-        gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H, APP_COLOR_SILVER);
+        gui_rect_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H, 0, APP_COLOR_SILVER);
         img_cover = gui_img_create_from_mem(parent, 0, RECTANGLE86_BIN, COVER_X, COVER_Y, 0, 0);
         play_button = gui_img_create_from_mem(parent, 0, PLAY_BIN, MINIMIZE_SWITCH_TARGT_X, BUTTON_Y, 0, 0);
         gui_obj_add_event_cb(play_button, play_button_cb, GUI_EVENT_TOUCH_PRESSED, NULL);
@@ -779,10 +779,10 @@ private:
                                        LEFT);
         dispaly_text(parent, artist_name, COVER_X, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME, 24, LEFT);
         dispaly_text(parent, album_name, COVER_X + 180, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME, 24, LEFT);
-        gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, COVER_W, 3,
-                               COLOR_ARTISTNAME);
-        current_time_bar = gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16,
-                                                  1, 3, APP_COLOR_WHITE);
+        gui_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, COVER_W, 3, 0,
+                        COLOR_ARTISTNAME);
+        current_time_bar = gui_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16,
+                                           1, 3, 0, APP_COLOR_WHITE);
         play_time_text = dispaly_text(parent, play_time_array, COVER_X,
                                       COVER_Y + COVER_W + 18 + 15 + 16 + 4,
                                       APP_COLOR_WHITE, 24, LEFT);

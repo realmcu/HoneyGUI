@@ -9,7 +9,7 @@
 #include "gui_text.h"
 #include "cJSON.h"
 #include "gui_canvas_img.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
 
@@ -281,8 +281,8 @@ static void heartrate_design(gui_view_t *view)
 
     win_hb = gui_win_create(obj, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
-    gui_canvas_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-                           gui_rgb(0, 0, 0));
+    gui_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                    0, gui_rgb(0, 0, 0));
     {
         char *text = "Current heartrate";
         int font_size = 32;

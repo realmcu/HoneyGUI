@@ -10,7 +10,7 @@
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_lite3d.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 
 /*============================================================================*
  *                            Macros
@@ -466,7 +466,7 @@ static void app_ui_butterflys_design(gui_view_t *view)
 
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_canvas_rect_create(obj, 0, 0, 0, 410, 502, gui_rgba(30, 30, 30, 255));
+    gui_rect_create(obj, 0, 0, 0, 410, 502, 0, gui_rgba(30, 30, 30, 255));
 
     // Particles
     butterfly_win[0] = gui_win_create(obj, 0, 0, 0, dc->screen_width, dc->screen_height);

@@ -192,20 +192,20 @@ PixelColor gradient_get_color(Gradient *grad, float t);
 PixelColor gradient_get_color_at_point(Gradient *grad, float x, float y);
 PixelColor gradient_get_color_at_angle(Gradient *grad, float angle);
 
-#define COLOR_RED     create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 0, 255)
-#define COLOR_GREEN   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 255, 0, 255)
-#define COLOR_BLUE    create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 255, 255)
-#define COLOR_WHITE   create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 255, 255, 255)
-#define COLOR_BLACK   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 0, 255)
-#define COLOR_YELLOW  create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 255, 0, 255)
-#define COLOR_CYAN    create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 255, 255, 255)
-#define COLOR_MAGENTA create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 255, 255)
+// #define COLOR_RED     create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 0, 255)
+// #define COLOR_GREEN   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 255, 0, 255)
+// #define COLOR_BLUE    create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 255, 255)
+// #define COLOR_WHITE   create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 255, 255, 255)
+// #define COLOR_BLACK   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 0, 255)
+// #define COLOR_YELLOW  create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 255, 0, 255)
+// #define COLOR_CYAN    create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 255, 255, 255)
+// #define COLOR_MAGENTA create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 255, 255)
 
-// opacity 50%
-#define COLOR_RED_50     create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 0, 128)
-#define COLOR_GREEN_50   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 255, 0, 128)
-#define COLOR_BLUE_50    create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 255, 128)
-#define COLOR_WHITE_50   create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 255, 255, 128)
-#define COLOR_BLACK_50   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 0, 128)
-#define COLOR_MAGENTA_50 create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 255, 128)
+// // opacity 50%
+// #define COLOR_RED_50     create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 0, 128)
+// #define COLOR_GREEN_50   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 255, 0, 128)
+// #define COLOR_BLUE_50    create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 255, 128)
+// #define COLOR_WHITE_50   create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 255, 255, 128)
+// #define COLOR_BLACK_50   create_color_by_format(PIXEL_FORMAT_ARGB8888, 0, 0, 0, 128)
+// #define COLOR_MAGENTA_50 create_color_by_format(PIXEL_FORMAT_ARGB8888, 255, 0, 255, 128)
 #endif // LITE_GEOMETRY_H

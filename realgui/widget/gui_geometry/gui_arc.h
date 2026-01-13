@@ -108,103 +108,103 @@ gui_arc_t *gui_arc_create(void *parent, const char *name,
 
 /**
  * @brief Move arc geometry.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param x New center X coordinate relative to widget.
  * @param y New center Y coordinate relative to widget.
  */
-void gui_arc_set_position(gui_arc_t *this, int x, int y);
+void gui_arc_set_position(gui_arc_t *arc, int x, int y);
 
 /**
  * @brief Set the radius of the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param radius Arc radius.
  */
-void gui_arc_set_radius(gui_arc_t *this, int radius);
+void gui_arc_set_radius(gui_arc_t *arc, int radius);
 /**
  * @brief Set the opacity of the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param opacity Opacity value (0-255).
  */
-void gui_arc_set_opacity(gui_arc_t *this, uint8_t opacity);
+void gui_arc_set_opacity(gui_arc_t *arc, uint8_t opacity);
 /**
  * @brief Set the color of the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param color Arc color.
  */
-void gui_arc_set_color(gui_arc_t *this, gui_color_t color);
+void gui_arc_set_color(gui_arc_t *arc, gui_color_t color);
 /**
  * @brief Set the start angle of the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param start_angle Start angle in degrees.
  */
-void gui_arc_set_start_angle(gui_arc_t *this, float start_angle);
+void gui_arc_set_start_angle(gui_arc_t *arc, float start_angle);
 
 /**
  * @brief Set the end angle of the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param end_angle End angle in degrees.
  */
-void gui_arc_set_end_angle(gui_arc_t *this, float end_angle);
+void gui_arc_set_end_angle(gui_arc_t *arc, float end_angle);
 
 /**
  * @brief Set the line width of the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param line_width Line width.
  */
-void gui_arc_set_line_width(gui_arc_t *this, float line_width);
+void gui_arc_set_line_width(gui_arc_t *arc, float line_width);
 
 /**
  * @brief Register click event callback for arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param callback Callback function pointer.
  * @param parameter Optional parameter to pass to callback.
  */
-void gui_arc_on_click(gui_arc_t *this, void *callback, void *parameter);
+void gui_arc_on_click(gui_arc_t *arc, void *callback, void *parameter);
 
 /**
  * @brief Apply rotation transformation to the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param degrees Rotation angle in degrees (clockwise).
  */
-void gui_arc_rotate(gui_arc_t *this, float degrees);
+void gui_arc_rotate(gui_arc_t *arc, float degrees);
 
 /**
  * @brief Apply scale transformation to the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param scale_x Scale factor in X direction.
  * @param scale_y Scale factor in Y direction.
  */
-void gui_arc_scale(gui_arc_t *this, float scale_x, float scale_y);
+void gui_arc_scale(gui_arc_t *arc, float scale_x, float scale_y);
 
 /**
  * @brief Apply translation transformation to the arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param tx Translation in X direction (pixels).
  * @param ty Translation in Y direction (pixels).
  */
-void gui_arc_translate(gui_arc_t *this, float tx, float ty);
+void gui_arc_translate(gui_arc_t *arc, float tx, float ty);
 
 /**
  * @brief Set angular gradient for arc widget.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param start_angle Start angle for gradient (degrees).
  * @param end_angle End angle for gradient (degrees).
  */
-void gui_arc_set_angular_gradient(gui_arc_t *this, float start_angle, float end_angle);
+void gui_arc_set_angular_gradient(gui_arc_t *arc, float start_angle, float end_angle);
 
 /**
  * @brief Add color stop to arc gradient.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  * @param position Position of color stop (0.0 to 1.0).
- * @param color Color at this stop.
+ * @param color Color at arc stop.
  */
-void gui_arc_add_gradient_stop(gui_arc_t *this, float position, gui_color_t color);
+void gui_arc_add_gradient_stop(gui_arc_t *arc, float position, gui_color_t color);
 
 /**
  * @brief Clear gradient and use solid color.
- * @param this Pointer to the arc widget.
+ * @param arc Pointer to the arc widget.
  */
-void gui_arc_clear_gradient(gui_arc_t *this);
+void gui_arc_clear_gradient(gui_arc_t *arc);
 
 #ifdef __cplusplus
 }

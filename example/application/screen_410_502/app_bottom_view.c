@@ -10,8 +10,7 @@
 #include "gui_win.h"
 #include "gui_canvas.h"
 #include "gui_img.h"
-#include "gui_canvas_rect.h"
-#include "gui_canvas_round_rect.h"
+#include "gui_rect.h"
 #include "gui_list.h"
 
 /*============================================================================*
@@ -184,9 +183,9 @@ static void time_update_cb(void)
 static void draw_timecard(void *parent)
 {
     // gui_win_t *win = gui_win_create(parent, __WIN1_NAME, 0, 0, SCREEN_WIDTH, 60);
-    gui_canvas_round_rect_t *canvas_timecard = gui_canvas_round_rect_create(GUI_BASE(parent),
-                                                                            __WIN1_NAME,
-                                                                            35, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
+    gui_rounded_rect_t *canvas_timecard = gui_rect_create(GUI_BASE(parent),
+                                                          __WIN1_NAME,
+                                                          35, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
 
     // text
     gui_text_t *timecard_date_text = gui_text_create(canvas_timecard, "timecard_date_1",  15, 20, 0, 0);
@@ -481,8 +480,8 @@ static void bottom_view_design(gui_view_t *view)
 
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
-    gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(parent, "bg", 0, 0, SCREEN_WIDTH,
-                                                          SCREEN_HEIGHT, gui_rgb(0, 0, 0));
+    gui_rounded_rect_t *canvas_bg = gui_rect_create(parent, "bg", 0, 0, SCREEN_WIDTH,
+                                                    SCREEN_HEIGHT, 0, gui_rgb(0, 0, 0));
     gui_obj_create_timer(GUI_BASE(canvas_bg), 100, true, timer_cb);
 
     //clock circle

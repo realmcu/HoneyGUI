@@ -848,128 +848,128 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     return circle;
 }
 
-void gui_circle_set_style(gui_circle_t *this, int x, int y, int radius, gui_color_t color)
+void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
-    this->x = x;
-    this->y = y;
-    this->radius = radius;
-    this->color = color;
-    this->opacity_value = color.color.rgba.a;
+    GUI_ASSERT(circle != NULL);
+    circle->x = x;
+    circle->y = y;
+    circle->radius = radius;
+    circle->color = color;
+    circle->opacity_value = color.color.rgba.a;
 }
 
-void gui_circle_set_position(gui_circle_t *this, int x, int y)
+void gui_circle_set_position(gui_circle_t *circle, int x, int y)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->x != x || this->y != y)
+    GUI_ASSERT(circle != NULL);
+    if (circle->x != x || circle->y != y)
     {
-        this->x = x;
-        this->y = y;
+        circle->x = x;
+        circle->y = y;
     }
 }
 
-void gui_circle_set_radius(gui_circle_t *this, int radius)
+void gui_circle_set_radius(gui_circle_t *circle, int radius)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->radius != radius)
+    GUI_ASSERT(circle != NULL);
+    if (circle->radius != radius)
     {
-        this->radius = radius;
+        circle->radius = radius;
     }
 }
-void gui_circle_set_opacity(gui_circle_t *this, uint8_t opacity)
+void gui_circle_set_opacity(gui_circle_t *circle, uint8_t opacity)
 {
-    GUI_ASSERT(this != NULL);
-    this->opacity_value = opacity;
+    GUI_ASSERT(circle != NULL);
+    circle->opacity_value = opacity;
 }
-void gui_circle_set_color(gui_circle_t *this, gui_color_t color)
+void gui_circle_set_color(gui_circle_t *circle, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->color.color.argb_full != color.color.argb_full)
+    GUI_ASSERT(circle != NULL);
+    if (circle->color.color.argb_full != color.color.argb_full)
     {
-        this->color = color;
-        this->opacity_value = color.color.rgba.a;
+        circle->color = color;
+        circle->opacity_value = color.color.rgba.a;
     }
 }
 
-void gui_circle_on_click(gui_circle_t *this, void *callback, void *parameter)
+void gui_circle_on_click(gui_circle_t *circle, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb((gui_obj_t *)this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
+    gui_obj_add_event_cb((gui_obj_t *)circle, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
                          parameter);
 }
 
-void gui_circle_rotate(gui_circle_t *this, float degrees)
+void gui_circle_rotate(gui_circle_t *circle, float degrees)
 {
-    GUI_ASSERT(this != NULL);
-    this->degrees = degrees;
+    GUI_ASSERT(circle != NULL);
+    circle->degrees = degrees;
 }
 
-void gui_circle_scale(gui_circle_t *this, float scale_x, float scale_y)
+void gui_circle_scale(gui_circle_t *circle, float scale_x, float scale_y)
 {
-    GUI_ASSERT(this != NULL);
-    this->scale_x = scale_x;
-    this->scale_y = scale_y;
+    GUI_ASSERT(circle != NULL);
+    circle->scale_x = scale_x;
+    circle->scale_y = scale_y;
 }
 
-void gui_circle_translate(gui_circle_t *this, float tx, float ty)
+void gui_circle_translate(gui_circle_t *circle, float tx, float ty)
 {
-    GUI_ASSERT(this != NULL);
-    this->offset_x = tx;
-    this->offset_y = ty;
+    GUI_ASSERT(circle != NULL);
+    circle->offset_x = tx;
+    circle->offset_y = ty;
 }
 
-void gui_circle_set_radial_gradient(gui_circle_t *this)
+void gui_circle_set_radial_gradient(gui_circle_t *circle)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->gradient == NULL)
+    GUI_ASSERT(circle != NULL);
+    if (circle->gradient == NULL)
     {
-        this->gradient = gui_malloc(sizeof(Gradient));
-        if (this->gradient == NULL) { return; }
+        circle->gradient = gui_malloc(sizeof(Gradient));
+        if (circle->gradient == NULL) { return; }
     }
-    gradient_init(this->gradient, GRADIENT_RADIAL);
-    this->gradient->radial_cx = (float)this->radius;
-    this->gradient->radial_cy = (float)this->radius;
-    this->gradient->radial_r = (float)this->radius;
-    this->gradient_type = CIRCLE_GRADIENT_RADIAL;
-    this->use_gradient = true;
+    gradient_init(circle->gradient, GRADIENT_RADIAL);
+    circle->gradient->radial_cx = (float)circle->radius;
+    circle->gradient->radial_cy = (float)circle->radius;
+    circle->gradient->radial_r = (float)circle->radius;
+    circle->gradient_type = CIRCLE_GRADIENT_RADIAL;
+    circle->use_gradient = true;
 }
 
-void gui_circle_set_angular_gradient(gui_circle_t *this, float start_angle, float end_angle)
+void gui_circle_set_angular_gradient(gui_circle_t *circle, float start_angle, float end_angle)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->gradient == NULL)
+    GUI_ASSERT(circle != NULL);
+    if (circle->gradient == NULL)
     {
-        this->gradient = gui_malloc(sizeof(Gradient));
-        if (this->gradient == NULL) { return; }
+        circle->gradient = gui_malloc(sizeof(Gradient));
+        if (circle->gradient == NULL) { return; }
     }
-    gradient_init(this->gradient, GRADIENT_ANGULAR);
-    this->gradient->angular_cx = (float)this->radius;
-    this->gradient->angular_cy = (float)this->radius;
-    this->gradient->angular_start = start_angle;
-    this->gradient->angular_end = end_angle;
-    this->gradient_type = CIRCLE_GRADIENT_ANGULAR;
-    this->use_gradient = true;
+    gradient_init(circle->gradient, GRADIENT_ANGULAR);
+    circle->gradient->angular_cx = (float)circle->radius;
+    circle->gradient->angular_cy = (float)circle->radius;
+    circle->gradient->angular_start = start_angle;
+    circle->gradient->angular_end = end_angle;
+    circle->gradient_type = CIRCLE_GRADIENT_ANGULAR;
+    circle->use_gradient = true;
 }
 
-void gui_circle_add_gradient_stop(gui_circle_t *this, float position, gui_color_t color)
+void gui_circle_add_gradient_stop(gui_circle_t *circle, float position, gui_color_t color)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->gradient == NULL)
+    GUI_ASSERT(circle != NULL);
+    if (circle->gradient == NULL)
     {
-        gui_circle_set_radial_gradient(this);
+        gui_circle_set_radial_gradient(circle);
     }
-    if (this->gradient != NULL)
+    if (circle->gradient != NULL)
     {
-        gradient_add_stop(this->gradient, position, color.color.argb_full);
+        gradient_add_stop(circle->gradient, position, color.color.argb_full);
     }
 }
 
-void gui_circle_clear_gradient(gui_circle_t *this)
+void gui_circle_clear_gradient(gui_circle_t *circle)
 {
-    GUI_ASSERT(this != NULL);
-    if (this->gradient != NULL)
+    GUI_ASSERT(circle != NULL);
+    if (circle->gradient != NULL)
     {
-        gui_free(this->gradient);
-        this->gradient = NULL;
+        gui_free(circle->gradient);
+        circle->gradient = NULL;
     }
-    this->use_gradient = false;
+    circle->use_gradient = false;
 }

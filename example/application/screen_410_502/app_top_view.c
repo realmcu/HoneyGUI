@@ -7,8 +7,7 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "tp_algo.h"
-#include "gui_canvas_rect.h"
-#include "gui_canvas_round_rect.h"
+#include "gui_rect.h"
 #include "guidef.h"
 #include "gui_list.h"
 #include "app_main_watch.h"
@@ -48,7 +47,7 @@ static gui_view_descriptor_t const descriptor =
 };
 
 static gui_list_t *list;
-static gui_canvas_round_rect_t *canvas_clear;
+static gui_rounded_rect_t *canvas_clear;
 static information_t *infor_rec[INFOR_NUM_MAX];
 static uint8_t infor_num = 0;
 static bool clear_flag = false; // 1: not create new information note
@@ -113,7 +112,7 @@ static void view_more_cb(void *p)
 
 static void canvas_color_change_cb(void *p)
 {
-    gui_canvas_round_rect_set_color((gui_canvas_round_rect_t *)p, gui_rgb(39, 43, 44));
+    gui_rect_set_color((gui_rounded_rect_t *)p, gui_rgb(39, 43, 44));
 }
 
 static void view_more_click_cb(void *widget, gui_event_t e, void *param)
@@ -126,7 +125,7 @@ static void view_more_click_cb(void *widget, gui_event_t e, void *param)
         gui_obj_create_timer(obj, 20, true, cancel_cb);
         return;
     }
-    gui_canvas_round_rect_set_color((gui_canvas_round_rect_t *)obj, APP_COLOR_WHITE);
+    gui_rect_set_color((gui_rounded_rect_t *)obj, APP_COLOR_WHITE);
     gui_obj_create_timer(obj, 10, false, canvas_color_change_cb);
     gui_obj_start_timer(obj);
 }
@@ -156,7 +155,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     gui_obj_create_timer(GUI_BASE(win), 20, true, view_more_cb);
     gui_obj_add_event_cb(GUI_BASE(win), (gui_event_cb_t)view_more_event_cb,
                          GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL); // stop list scroll
-    gui_canvas_rect_create(GUI_BASE(win), 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0, 0));
+    gui_rect_create(GUI_BASE(win), 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgb(0, 0, 0));
     {
         char *content = "Cancel";
         gui_text_t *text = gui_text_create(win, "cancel",  37, 35, 80, 32);
@@ -208,8 +207,8 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     }
 
     // options
-    gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_1",
-                                                                   30, 160, 350, 80, 15, gui_rgb(39, 43, 44));
+    gui_rounded_rect_t *canvas = gui_rect_create(GUI_BASE(win), "canvas_1",
+                                                 30, 160, 350, 80, 15, gui_rgb(39, 43, 44));
     content = "Don't remind for an hour";
     text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
     gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
@@ -219,8 +218,8 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     gui_text_mode_set(text, CENTER);
     gui_obj_add_event_cb(GUI_BASE(canvas), view_more_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_2", 30, 250, 350, 80, 15,
-                                          gui_rgb(39, 43, 44));
+    canvas = gui_rect_create(GUI_BASE(win), "canvas_2", 30, 250, 350, 80, 15,
+                             gui_rgb(39, 43, 44));
     content = "Don't remind today";
     text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
     gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
@@ -230,8 +229,8 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     gui_text_mode_set(text, CENTER);
     gui_obj_add_event_cb(GUI_BASE(canvas), view_more_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_3", 30, 340, 350, 80, 15,
-                                          gui_rgb(39, 43, 44));
+    canvas = gui_rect_create(GUI_BASE(win), "canvas_3", 30, 340, 350, 80, 15,
+                             gui_rgb(39, 43, 44));
     content = "Add this to Summary";
     text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
     gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
@@ -333,9 +332,9 @@ static void create_inform_note(gui_obj_t *obj, void *param)
     const char *time = inform->time;
     app_name app = inform->app;
 
-    gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(obj, "bg", 30, 0, 350,
-                                                                   220,
-                                                                   35, gui_rgb(39, 43, 44));
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "bg", 30, 0, 350,
+                                                 220,
+                                                 35, gui_rgb(39, 43, 44));
     gui_obj_add_event_cb(obj, (gui_event_cb_t)create_view_more, GUI_EVENT_TOUCH_CLICKED,
                          (void *)inform);
     // message
@@ -481,8 +480,8 @@ static void canvas_clear_update_pos_cb(void *widget)
 static void create_clear_note(void *parent)
 {
     gui_text_t *clear_text;
-    canvas_clear = gui_canvas_round_rect_create(GUI_BASE(parent), "canvas_clear",
-                                                52, 40, 305, 80, 40, gui_rgb(39, 43, 44));
+    canvas_clear = gui_rect_create(GUI_BASE(parent), "canvas_clear",
+                                   52, 40, 305, 80, 40, gui_rgb(39, 43, 44));
     gui_obj_add_event_cb(GUI_BASE(canvas_clear), (gui_event_cb_t)clear_all_note_cb,
                          GUI_EVENT_TOUCH_CLICKED, NULL);
     // text
@@ -503,8 +502,8 @@ static void top_view_design(gui_view_t *view)
     gui_view_set_opacity(view, 200);
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
-    gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(parent), "background", 0, 0,
-                                                          SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(76, 76, 76));
+    gui_rounded_rect_t *canvas_bg = gui_rect_create(GUI_BASE(parent), "background", 0, 0,
+                                                    SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgb(76, 76, 76));
     gui_obj_create_timer(GUI_BASE(canvas_bg), 20, true, canvas_clear_update_pos_cb);
 
     create_clear_note(view);
