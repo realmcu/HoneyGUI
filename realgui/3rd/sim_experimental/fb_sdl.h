@@ -28,6 +28,14 @@ extern "C" {
 void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t height,
                                     const uint8_t *bitmap);
 
+int32_t sim_get_width(void);
+int32_t sim_get_height(void);
+
+// Mouse interaction state
+extern float mouse_rot_x;
+extern float mouse_rot_y;
+extern float mouse_zoom;
+
 
 
 #ifdef __cplusplus
