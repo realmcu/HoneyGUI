@@ -1802,3 +1802,70 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 }
 
 
+
+uint32_t gui_get_ttf_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset,
+                                uint8_t font_height)
+{
+    if (content == NULL || font_bin_addr == NULL)
+    {
+        return 0;
+    }
+
+    GUI_FONT_HEAD_TTF *ttfbin = (GUI_FONT_HEAD_TTF *)font_bin_addr;
+
+    if (ttfbin->file_type != FONT_FILE_TTF_FLAG)
+    {
+        gui_log("gui_get_ttf_char_width: invalid TTF file\n");
+        return 0;
+    }
+
+    uint32_t string_len = strlen(content);
+    uint32_t *unicode_buffer = NULL;
+    uint16_t unicode_len = 0;
+
+    unicode_len = process_content_by_charset(charset, content, string_len, &unicode_buffer);
+    if (unicode_len == 0)
+    {
+        return 0;
+    }
+
+    if (content_has_ap_unicode(unicode_buffer, unicode_len))
+    {
+        unicode_len = process_ap_unicode(unicode_buffer, unicode_len);
+    }
+
+    float scale = (float)font_height / (ttfbin->ascent - ttfbin->descent);
+    uint32_t all_char_w = 0;
+    uint8_t *index_table_ptr = (uint8_t *)font_bin_addr + ttfbin->head_length;
+
+    for (uint32_t i = 0; i < unicode_len; i++)
+    {
+        if (unicode_buffer[i] == 0x0A)
+        {
+            /* Line feed - no width */
+            continue;
+        }
+        else if (unicode_buffer[i] == 0x20)
+        {
+            /* Space character */
+            all_char_w += (font_height + 3) / 4;
+        }
+        else
+        {
+            /* Get glyph offset */
+            uint32_t ttfoffset = getGlyphOffset(unicode_buffer[i], ttfbin, index_table_ptr,
+                                                FONT_SRC_MEMADDR, NULL);
+            if (ttfoffset == 0)
+            {
+                continue;
+            }
+
+            /* Get glyph data */
+            FontGlyphData *glyphData = (FontGlyphData *)((uint8_t *)font_bin_addr + ttfoffset);
+            all_char_w += glyphData->advance * scale;
+        }
+    }
+
+    gui_free(unicode_buffer);
+    return all_char_w;
+}

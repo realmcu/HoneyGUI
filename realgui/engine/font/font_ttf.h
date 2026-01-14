@@ -185,6 +185,18 @@ void gui_font_ttf_unload(gui_text_t *text);
  */
 void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect);
 
+/**
+ * @brief Get the pixel width of the text in the current ttf font file.
+ *
+ * @param content Text pointer.
+ * @param font_bin_addr Font file address.
+ * @param charset Text encoding format.
+ * @param font_height Font height in pixels.
+ * @return Character width.
+ */
+uint32_t gui_get_ttf_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset,
+                                uint8_t font_height);
+
 #ifdef __cplusplus
 }
 #endif
