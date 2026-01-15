@@ -48,8 +48,11 @@ typedef struct gui_glass
     gui_obj_t base;                    /* Base object structure. */
     draw_img_t *draw_img;              /* Drawing image structure. */
 
-    int16_t t_x;                         /* Translation in X direction. */
-    int16_t t_y;                         /* Translation in Y direction. */
+    int16_t t_x;                         /* Translation in X direction (touch delta). */
+    int16_t t_y;                         /* Translation in Y direction (touch delta). */
+
+    float drag_x;                        /* Accumulated drag offset in X direction. */
+    float drag_y;                        /* Accumulated drag offset in Y direction. */
 
     int16_t history_x;
     int16_t history_y;
