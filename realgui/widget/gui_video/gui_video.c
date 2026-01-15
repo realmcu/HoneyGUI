@@ -1898,6 +1898,104 @@ static int video_src_init_mjpg(gui_video_t  *this)
     return 0;
 }
 
+int gui_video_get_filesize_from_addr(void *addr, uint8_t storage_type)
+{
+    if (addr == NULL || storage_type == IMG_SRC_FILESYS)
+    {
+        return -1;
+    }
+
+    int res = -1;
+    uint8_t header[32];
+
+    memset(header, 0, sizeof(header));
+    if (storage_type == IMG_SRC_MEMADDR)
+    {
+        memcpy(header, addr, sizeof(header));
+    }
+    else if (storage_type == IMG_SRC_FTL)
+    {
+        gui_ftl_read((uintptr_t)addr, (uint8_t *)header, sizeof(header));
+    }
+
+
+    if (is_mjpeg(header))
+    {
+        if (storage_type == IMG_SRC_MEMADDR)
+        {
+            uint16_t *op = (uint16_t *)addr;
+            while (1)
+            {
+                if (*op == 0xD9FF)
+                {
+                    op++;
+                    if (*op != 0xD8FF)
+                    {
+                        return ((uintptr_t)op - (uintptr_t)addr);
+                    }
+                }
+                op++;
+            }
+        }
+        else if (storage_type == IMG_SRC_FTL)
+        {
+            uint8_t *rbuff = gui_malloc(2 * 1024);
+            uint32_t offset = 0;
+            uint8_t flg_eoi = false;
+            if (!rbuff)
+            {
+                gui_log("video read buff malloc failed\n");
+                return -1;
+            }
+            memset(rbuff, 0, 2 * 1024);
+            while (1)
+            {
+                gui_ftl_read((uintptr_t)((uint8_t *)addr + offset), rbuff, 2 * 1024);
+                uint16_t *op = (uint16_t *)rbuff;
+                while ((uint8_t *)op - (uint8_t *)rbuff < 2 * 1024)
+                {
+                    if (*op == 0xD9FF)
+                    {
+                        // static uint16_t frame = 0;
+                        // gui_log("Frame %d", frame++);
+                        flg_eoi = true;
+                    }
+                    else if (flg_eoi)
+                    {
+                        flg_eoi = false;
+                        if (*op != 0xD8FF)
+                        {
+                            uint32_t sz = (uint8_t *)op - (uint8_t *)rbuff + offset;
+                            // gui_log("EOF: %d\n", sz);
+                            gui_free(rbuff);
+                            return (sz);
+                        }
+                    }
+                    op++;
+                }
+                offset += 2 * 1024;
+            }
+        }
+    }
+    else if (is_h264(header))
+    {
+        gui_h264_header_t *h264_header = (gui_h264_header_t *)header;
+        return h264_header->size;
+    }
+    else if (is_avi(header))
+    {
+        gui_riff_header_t *avi_header = (gui_riff_header_t *)header;
+        return avi_header->size + 8;
+    }
+    else
+    {
+        res = -1;
+        gui_log("video src type err!\n");
+    }
+
+    return res;
+}
+
 static int gui_video_src_init(gui_video_t  *this)
 {
     if (this == NULL)

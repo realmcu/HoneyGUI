@@ -101,6 +101,14 @@ typedef struct
     uint32_t size;
 } gui_h264_header_t;
 
+/* AVI RIFF header*/
+typedef struct
+{
+    char symbol[4]; // "RIFF"
+    uint32_t size;
+    char format[4]; // "AVI_"
+} gui_riff_header_t;
+
 /* AVI main header */
 typedef struct
 {
@@ -240,6 +248,23 @@ typedef struct
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/**
+ * @brief Retrieves the video file size from a memory address or FTL storage address.
+ *
+ * @param[in] addr         The starting address of the video data.
+ *                         - For IMG_SRC_MEMADDR: Pointer to the data in RAM or Flash.
+ *                         - For IMG_SRC_FTL: Storage address or offset in Flash.
+ * @param[in] storage_type The storage source type.
+ *                         Supported types: IMG_SRC_MEMADDR, IMG_SRC_FTL.
+ *
+ * @return int
+ *         Returns the file size in bytes. Returns 0 or a negative value on failure.
+ *
+ * @note
+ * 1. For file paths, please use the file system (FS) API to get the file size.
+ * 2. Supported video formats: mjpeg, avi, h264.
+ */
+int gui_video_get_filesize_from_addr(void *addr, uint8_t storage_type);
 
 void gui_video_set_frame_rate(gui_video_t *this, float fps);
 
