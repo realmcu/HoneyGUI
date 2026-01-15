@@ -260,5 +260,11 @@ void gui_port_os_init(void)
 
     gui_os_api_register(&os_api);
 
+#if defined(__has_include)
+#if __has_include("shell_port.h")
+    extern int gui_port_console_init(void);
+    gui_port_console_init();
+#endif
+#endif
 }
 

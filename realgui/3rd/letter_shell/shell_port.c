@@ -16,6 +16,8 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <stdbool.h>
 #include "shell.h"
 #include "shell_port.h"
 #include "shell_fs.h"
@@ -108,12 +110,8 @@ void userShellInit(void)
     shellInit(&shell, shellBuffer, 512);
     shellCompanionAdd(&shell, SHELL_COMPANION_ID_FS, &shellFs);
 }
-//CEVENT_EXPORT(EVENT_INIT_STAGE2, userShellInit);
 
 
-
-#include <pthread.h>
-#include <stdbool.h>
 static void *shell_task(void *arg)
 {
     (void)arg;
@@ -126,16 +124,14 @@ static void *shell_task(void *arg)
         }
     }
 }
-static int gui_port_console_init(void)
+
+int gui_port_console_init(void)
 {
     pthread_t thread;
     userShellInit();
     pthread_create(&thread, NULL, shell_task, NULL);
     return 0;
 }
-
-#include "gui_components_init.h"
-GUI_INIT_DEVICE_EXPORT(gui_port_console_init);
 
 
 
