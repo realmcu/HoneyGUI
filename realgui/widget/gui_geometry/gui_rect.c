@@ -34,6 +34,20 @@
  *                           Private Functions
  *============================================================================*/
 
+/** Safely free a draw_img_t and its data */
+static void free_draw_img(draw_img_t **img)
+{
+    if (img == NULL || *img == NULL) { return; }
+
+    if ((*img)->data != NULL)
+    {
+        gui_free((void *)(*img)->data);
+        (*img)->data = NULL;
+    }
+    gui_free(*img);
+    *img = NULL;
+}
+
 /** Set image data header for rectangle */
 static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, gui_color_t color)
 {
@@ -83,6 +97,9 @@ static uint8_t *create_solid_color_buffer(uint16_t w, uint16_t h, gui_color_t co
 static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16_t x,
                          int16_t y, uint16_t w, uint16_t h)
 {
+    // Free old buffer first to prevent memory leak
+    free_draw_img(input_img);
+
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     memset(img, 0x00, sizeof(draw_img_t));
@@ -690,8 +707,12 @@ static void fill_solid_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, 
     if (mask) { gui_free(mask); }
 }
 
-static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_t *obj)
+static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_t *obj,
+                                              draw_img_t **old_img)
 {
+    // Free old buffer first to prevent memory leak
+    free_draw_img(old_img);
+
     uint32_t *pixels = NULL;
     draw_img_t *img = alloc_rect_img_buffer(this, obj, &pixels);
     if (img == NULL) { return NULL; }
@@ -717,8 +738,11 @@ static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_
 
 /** Create corner image for specific corner (Legacy/Fallback) */
 static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                     int corner_idx, int x, int y)
+                                     int corner_idx, int x, int y, draw_img_t **old_img)
 {
+    // Free old buffer first to prevent memory leak
+    free_draw_img(old_img);
+
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return NULL; }
     memset(img, 0x00, sizeof(draw_img_t));
@@ -838,7 +862,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
     {
         if (need_regenerate || this->rect_0 == NULL)
         {
-            this->rect_0 = create_rounded_rect_buffer(this, obj);
+            this->rect_0 = create_rounded_rect_buffer(this, obj, &this->rect_0);
         }
     }
     else
@@ -864,11 +888,13 @@ static void gui_rect_prepare(gui_obj_t *obj)
                          this->base.w - 2 * (this->radius + 1), \
                          this->radius + 1);
 
-            this->circle_00 = create_corner_img(this, obj, 0, 0, 0);
-            this->circle_01 = create_corner_img(this, obj, 1, this->base.w - this->radius - 1, 0);
-            this->circle_10 = create_corner_img(this, obj, 3, 0, this->base.h - this->radius - 1);
+            this->circle_00 = create_corner_img(this, obj, 0, 0, 0, &this->circle_00);
+            this->circle_01 = create_corner_img(this, obj, 1, this->base.w - this->radius - 1, 0,
+                                                &this->circle_01);
+            this->circle_10 = create_corner_img(this, obj, 3, 0, this->base.h - this->radius - 1,
+                                                &this->circle_10);
             this->circle_11 = create_corner_img(this, obj, 2, this->base.w - this->radius - 1,
-                                                this->base.h - this->radius - 1);
+                                                this->base.h - this->radius - 1, &this->circle_11);
         }
     }
 
@@ -1004,24 +1030,14 @@ static void gui_rect_destroy(gui_obj_t *obj)
         this->gradient = NULL;
     }
 
-    // Free cached buffers
-#define SAFE_FREE_IMG(img) \
-    if (img != NULL) { \
-        if (img->data != NULL) { \
-            gui_free((void *)img->data); \
-            img->data = NULL; \
-        } \
-        gui_free(img); \
-        img = NULL; \
-    }
-
-    SAFE_FREE_IMG(this->rect_0);
-    SAFE_FREE_IMG(this->rect_1);
-    SAFE_FREE_IMG(this->rect_2);
-    SAFE_FREE_IMG(this->circle_00);
-    SAFE_FREE_IMG(this->circle_01);
-    SAFE_FREE_IMG(this->circle_10);
-    SAFE_FREE_IMG(this->circle_11);
+    // Free cached buffers using the helper function
+    free_draw_img(&this->rect_0);
+    free_draw_img(&this->rect_1);
+    free_draw_img(&this->rect_2);
+    free_draw_img(&this->circle_00);
+    free_draw_img(&this->circle_01);
+    free_draw_img(&this->circle_10);
+    free_draw_img(&this->circle_11);
 
     if (this->circle_data != NULL)
     {
@@ -1033,7 +1049,6 @@ static void gui_rect_destroy(gui_obj_t *obj)
         gui_free(this->rect_data);
         this->rect_data = NULL;
     }
-#undef SAFE_FREE_IMG
 }
 
 static void gui_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)

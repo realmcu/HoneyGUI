@@ -33,6 +33,20 @@
  *                           Private Functions
  *============================================================================*/
 
+/** Safely free a draw_img_t and its data */
+static void free_draw_img_circle(draw_img_t **img)
+{
+    if (img == NULL || *img == NULL) { return; }
+
+    if ((*img)->data != NULL)
+    {
+        gui_free((void *)(*img)->data);
+        (*img)->data = NULL;
+    }
+    gui_free(*img);
+    *img = NULL;
+}
+
 /** Check if a point is inside the circle's bounding circle */
 static bool is_point_in_circle(gui_circle_t *circle, int x, int y)
 {
@@ -96,8 +110,11 @@ static inline uint32_t fast_dither(uint32_t color, int x, int y)
 }
 
 /** Create a complete circle in a single buffer with Symmetry Optimization */
-static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj)
+static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw_img_t **old_img)
 {
+    // Free old buffer first to prevent memory leak
+    free_draw_img_circle(old_img);
+
     int r = this->radius;
     int diameter = r * 2; // Keep diameter even for perfect symmetry logic
 
@@ -438,8 +455,12 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
 }
 
 /** create vertical arc strip (Legacy/Fallback) */
-static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj)
+static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
+                                             draw_img_t **old_img)
 {
+    // Free old buffer first to prevent memory leak
+    free_draw_img_circle(old_img);
+
     if (this->radius <= 0) { return NULL; }
 
     int inner_half = (int)(this->radius * M_SQRT1_2);
@@ -564,10 +585,19 @@ static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
                                           draw_img_t *base_img,
                                           int pos_x, int pos_y,
                                           bool mirror_x, bool mirror_y,
-                                          bool is_top_bottom)
+                                          bool is_top_bottom,
+                                          draw_img_t **old_img)
 {
     GUI_UNUSED(this);
     if (base_img == NULL || base_img->data == NULL) { return NULL; }
+
+    // Free old img structure (but not data, as it's shared with base_img)
+    if (old_img != NULL && *old_img != NULL)
+    {
+        // Don't free data - it's shared with base_img
+        gui_free(*old_img);
+        *old_img = NULL;
+    }
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return NULL; }
@@ -670,7 +700,7 @@ static void gui_circle_prepare(gui_obj_t *obj)
     {
         if (need_regenerate || this->center_rect == NULL)
         {
-            this->center_rect = create_circle_buffer(this, obj);
+            this->center_rect = create_circle_buffer(this, obj, &this->center_rect);
         }
     }
     else
@@ -694,7 +724,7 @@ static void gui_circle_prepare(gui_obj_t *obj)
                 set_rect_img(this, &this->center_rect, inner_x, inner_y, inner_size, inner_size);
             }
 
-            this->arc_left = create_vertical_arc_strip(this, obj);
+            this->arc_left = create_vertical_arc_strip(this, obj, &this->arc_left);
 
             if (this->arc_left != NULL)
             {
@@ -716,18 +746,18 @@ static void gui_circle_prepare(gui_obj_t *obj)
                 int right_y = arc_width;
                 this->arc_right = create_transformed_arc(this, obj, this->arc_left,
                                                          right_x, right_y,
-                                                         true, false, false);
+                                                         true, false, false, &this->arc_right);
                 int top_x = arc_width + inner_size;
                 int top_y = 0;
                 this->arc_top = create_transformed_arc(this, obj, this->arc_left,
                                                        top_x, top_y,
-                                                       false, false, true);
+                                                       false, false, true, &this->arc_top);
 
                 int bottom_x = arc_width;
                 int bottom_y = arc_width * 2 + inner_size - 1;
                 this->arc_bottom = create_transformed_arc(this, obj, this->arc_left,
                                                           bottom_x, bottom_y,
-                                                          false, true, true);
+                                                          false, true, true, &this->arc_bottom);
             }
         }
     }
@@ -763,11 +793,37 @@ static void gui_circle_end(gui_circle_t *this)
 
 static void gui_circle_destroy(gui_circle_t *this)
 {
+    // Free gradient data
     if (this->gradient != NULL)
     {
         gui_free(this->gradient);
         this->gradient = NULL;
     }
+
+    // Free cached buffers
+    // Note: For transformed arcs (arc_right, arc_top, arc_bottom),
+    // they share pixel data with arc_left, so we only free the structure
+    if (this->arc_right != NULL)
+    {
+        gui_free(this->arc_right);
+        this->arc_right = NULL;
+    }
+    if (this->arc_top != NULL)
+    {
+        gui_free(this->arc_top);
+        this->arc_top = NULL;
+    }
+    if (this->arc_bottom != NULL)
+    {
+        gui_free(this->arc_bottom);
+        this->arc_bottom = NULL;
+    }
+
+    // Free arc_left (which owns the pixel data)
+    free_draw_img_circle(&this->arc_left);
+
+    // Free center_rect
+    free_draw_img_circle(&this->center_rect);
 }
 
 static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
