@@ -2,7 +2,6 @@
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_img.h"
-#include "gui_gray.h"
 #include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"

@@ -6,7 +6,7 @@
 #include "stdlib.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
-#include "gui_canvas_rect.h"
+#include "gui_rect.h"
 #include "gui_list.h"
 
 /* Use the following macro to checkout the different style lists */
@@ -39,15 +39,15 @@ static void note_design(gui_obj_t *obj, void *p)
     };
     uint16_t index = ((gui_list_note_t *)obj)->index % (sizeof(color) / sizeof(gui_color_t));
 #ifdef RUN_VERTICAL_CIRCLE_STYLE
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 480, 100, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 480, 100, 0, color[index]);
 #endif
 
 #ifdef RUN_HORIZONTAL_ZOOM_STYLE
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 100, 480, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 100, 480, 0, color[index]);
 #endif
 
 #ifdef RUN_VERTICAL_CARD_STYLE
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 50, 0, 380, 150, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 50, 0, 380, 150, 0, color[index]);
 #endif
 
 #ifdef RUN_VERTICAL_FAN_STYLE
@@ -56,7 +56,7 @@ static void note_design(gui_obj_t *obj, void *p)
         APP_COLOR_SILVER_OPACITY(150),
         APP_COLOR_WHITE_OPACITY,
     };
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 50, 0, 380, 100, color2[index % 2]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 50, 0, 380, 100, 0, color2[index % 2]);
 #endif
 
 #ifdef RUN_VERTICAL_HELIX_STYLE
@@ -65,7 +65,7 @@ static void note_design(gui_obj_t *obj, void *p)
         APP_COLOR_SILVER_OPACITY(150),
         APP_COLOR_WHITE_OPACITY,
     };
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 50, 0, 380, 100, color2[index % 2]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 50, 0, 380, 100, 0, color2[index % 2]);
 #endif
 
 #ifdef RUN_VERTICAL_CURL_STYLE
@@ -74,15 +74,15 @@ static void note_design(gui_obj_t *obj, void *p)
         APP_COLOR_SILVER_OPACITY(150),
         APP_COLOR_WHITE_OPACITY,
     };
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 0, 100, color2[index % 2]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 0, 100, 0, color2[index % 2]);
 #endif
 
 #ifdef RUN_VERTICAL_CLASSIC_STYLE
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 480, 480, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 480, 480, 0, color[index]);
 #endif
 
 #ifdef RUN_VERTICAL_FADE_STYLE
-    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 480, 480, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 480, 480, 0, color[index]);
 #endif
     GUI_UNUSED(canvas);
 }

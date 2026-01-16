@@ -9,9 +9,6 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-#include "gui_canvas_rect.h"
-#include "gui_canvas_round_rect.h"
-#include "gui_canvas.h"
 
 static void draw_circle_callback(gui_canvas_t *canvas)
 {
