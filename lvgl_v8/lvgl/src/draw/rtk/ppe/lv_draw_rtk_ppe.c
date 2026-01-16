@@ -177,6 +177,7 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
         if (res != LV_FS_RES_OK) { return LV_RES_INV; }
+        extern lv_fs_res_t lv_fs_ioctl(lv_fs_file_t *file_p, void **file_addr, int cmd);
         res = lv_fs_ioctl(&f, (void **)&file_data, 0);
         if (res == LV_FS_RES_NOT_IMP)
         {

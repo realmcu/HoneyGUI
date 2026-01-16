@@ -15,6 +15,7 @@
 #include "rtl_ppe.h"
 #include "rtl_gdma.h"
 #include "rtl_idu.h"
+#include "math.h"
 /*********************
  *      DEFINES
  *********************/
