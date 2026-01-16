@@ -11,7 +11,7 @@ SDK_PATH_RELATIVE_TO_WORKSPACE = ''
 SDK_BRANCH = ''
 
 HONEYGUI_BRANCH_CUT_MAP = [
-    "release/v1.0":[
+    "_release/v1.0":[
         "cutThrottle" : "BB2CCutTest",
     ]
 ]
@@ -32,7 +32,7 @@ test_module_map = [
     ,
     "HoneyGUI_Monkey_Test": [
         "label": "HoneyGUI_Monkey_Test",
-        "Test": 1,
+        "Test": 0,
         "displayNmae": "HoneyGUI_Monkey_Test",
         "testResult": true
     ]
