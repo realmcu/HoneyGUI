@@ -1267,25 +1267,31 @@ static inline float arc_sdf(float px, float py, float cx, float cy,
 static inline bool is_in_angle_range_fast(float dx, float dy, uint16_t start_angle,
                                           uint16_t end_angle)
 {
-    // Quick quadrant check
+    // Quick quadrant check using pixel center position
+    // Use > instead of >= for consistent boundary handling
     int quadrant;
-    if (dx >= 0)
+    if (dx > 0)
     {
         quadrant = (dy >= 0) ? 0 : 3;  // Q1 or Q4
     }
-    else
+    else if (dx < 0)
     {
         quadrant = (dy >= 0) ? 1 : 2;  // Q2 or Q3
     }
+    else
+    {
+        // dx == 0: on Y axis
+        quadrant = (dy >= 0) ? 0 : 3;  // Assign to Q1 or Q4
+    }
 
     uint16_t quadrant_start = quadrant * 90;
-    uint16_t quadrant_end = quadrant_start + 90;
+    uint16_t quadrant_end = quadrant_start + 89;  // Use 89 instead of 90 to avoid boundary overlap
 
     // Check if current quadrant is in arc range
     if (end_angle < start_angle)
     {
         // Cross zero
-        if (!(quadrant_start < end_angle || quadrant_end > start_angle))
+        if (!(quadrant_start <= end_angle || quadrant_end >= start_angle))
         {
             return false;
         }
@@ -1430,40 +1436,91 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
     int pixel_size = (ctx->format == PIXEL_FORMAT_RGB565) ? 2 : 4;
     int stride = ctx->width * pixel_size;
 
-    // Process each quadrant
+    // Process each quadrant with strict non-overlapping boundaries
     for (int quad = 0; quad < 4; quad++)
     {
         if (!quadrants[quad]) { continue; }
 
-        // Calculate quadrant bounds - expand to include cap regions
+        // Calculate quadrant bounds with strict boundaries to avoid overlap
+        // Use center_x/center_y as exclusive boundaries between quadrants
         int qx_start, qx_end, qy_start, qy_end;
         float cap_expand = cap_r + aa_width + 1.0f;
+        int center_x_int = (int)center_x;
+        int center_y_int = (int)center_y;
+
+        // Check if start/end cap is in this quadrant and needs boundary extension
+        bool has_start_cap = (start_cap_quad == quad);
+        bool has_end_cap = (end_cap_quad == quad);
 
         switch (quad)
         {
-        case 0: // Q1: x >= center, y >= center
-            qx_start = (int)(center_x - cap_expand);
-            qx_end = (int)(center_x + outer_radius + aa_width);
-            qy_start = (int)(center_y - cap_expand);
-            qy_end = (int)(center_y + outer_radius + aa_width);
+        case 0: // Q1: x >= center, y >= center (angles 0-90)
+            qx_start = center_x_int;
+            qx_end = (int)(center_x + outer_radius + aa_width + cap_expand);
+            qy_start = center_y_int;
+            qy_end = (int)(center_y + outer_radius + aa_width + cap_expand);
+            // Extend for caps that cross into adjacent quadrants
+            if (has_start_cap)
+            {
+                qx_start = LG_MIN(qx_start, (int)(start_cap_x - cap_expand));
+                qy_start = LG_MIN(qy_start, (int)(start_cap_y - cap_expand));
+            }
+            if (has_end_cap)
+            {
+                qx_start = LG_MIN(qx_start, (int)(end_cap_x - cap_expand));
+                qy_start = LG_MIN(qy_start, (int)(end_cap_y - cap_expand));
+            }
             break;
-        case 1: // Q2: x <= center, y >= center
-            qx_start = (int)(center_x - outer_radius - aa_width);
-            qx_end = (int)(center_x + cap_expand);
-            qy_start = (int)(center_y - cap_expand);
-            qy_end = (int)(center_y + outer_radius + aa_width);
+        case 1: // Q2: x < center, y >= center (angles 90-180)
+            qx_start = (int)(center_x - outer_radius - aa_width - cap_expand);
+            qx_end = center_x_int - 1;
+            qy_start = center_y_int;
+            qy_end = (int)(center_y + outer_radius + aa_width + cap_expand);
+            // Extend for caps
+            if (has_start_cap)
+            {
+                qx_end = LG_MAX(qx_end, (int)(start_cap_x + cap_expand));
+                qy_start = LG_MIN(qy_start, (int)(start_cap_y - cap_expand));
+            }
+            if (has_end_cap)
+            {
+                qx_end = LG_MAX(qx_end, (int)(end_cap_x + cap_expand));
+                qy_start = LG_MIN(qy_start, (int)(end_cap_y - cap_expand));
+            }
             break;
-        case 2: // Q3: x <= center, y <= center
-            qx_start = (int)(center_x - outer_radius - aa_width);
-            qx_end = (int)(center_x + cap_expand);
-            qy_start = (int)(center_y - outer_radius - aa_width);
-            qy_end = (int)(center_y + cap_expand);
+        case 2: // Q3: x < center, y < center (angles 180-270)
+            qx_start = (int)(center_x - outer_radius - aa_width - cap_expand);
+            qx_end = center_x_int - 1;
+            qy_start = (int)(center_y - outer_radius - aa_width - cap_expand);
+            qy_end = center_y_int - 1;
+            // Extend for caps
+            if (has_start_cap)
+            {
+                qx_end = LG_MAX(qx_end, (int)(start_cap_x + cap_expand));
+                qy_end = LG_MAX(qy_end, (int)(start_cap_y + cap_expand));
+            }
+            if (has_end_cap)
+            {
+                qx_end = LG_MAX(qx_end, (int)(end_cap_x + cap_expand));
+                qy_end = LG_MAX(qy_end, (int)(end_cap_y + cap_expand));
+            }
             break;
-        case 3: // Q4: x >= center, y <= center
-            qx_start = (int)(center_x - cap_expand);
-            qx_end = (int)(center_x + outer_radius + aa_width);
-            qy_start = (int)(center_y - outer_radius - aa_width);
-            qy_end = (int)(center_y + cap_expand);
+        case 3: // Q4: x >= center, y < center (angles 270-360)
+            qx_start = center_x_int;
+            qx_end = (int)(center_x + outer_radius + aa_width + cap_expand);
+            qy_start = (int)(center_y - outer_radius - aa_width - cap_expand);
+            qy_end = center_y_int - 1;
+            // Extend for caps
+            if (has_start_cap)
+            {
+                qx_start = LG_MIN(qx_start, (int)(start_cap_x - cap_expand));
+                qy_end = LG_MAX(qy_end, (int)(start_cap_y + cap_expand));
+            }
+            if (has_end_cap)
+            {
+                qx_start = LG_MIN(qx_start, (int)(end_cap_x - cap_expand));
+                qy_end = LG_MAX(qy_end, (int)(end_cap_y + cap_expand));
+            }
             break;
         }
 
@@ -1474,9 +1531,6 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
         qy_end = LG_MIN(qy_end, ctx->clip_rect.y + ctx->clip_rect.h - 1);
 
         if (qx_start > qx_end || qy_start > qy_end) { continue; }
-
-        // For partial arcs, always need angle check
-        bool needs_angle_check = true;
 
         // Process rows in this quadrant
         for (int py = qy_start; py <= qy_end; py++)
@@ -1497,11 +1551,7 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 float coverage;
 
                 // Check if in angle range
-                bool in_angle = true;
-                if (needs_angle_check)
-                {
-                    in_angle = is_in_angle_range_fast(dx, dy, start_angle_deg, end_angle_deg);
-                }
+                bool in_angle = is_in_angle_range_fast(dx, dy, start_angle_deg, end_angle_deg);
 
                 if (!in_angle)
                 {
