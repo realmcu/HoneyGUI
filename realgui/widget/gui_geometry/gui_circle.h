@@ -79,6 +79,7 @@ typedef struct
     Gradient *gradient;         /**< Optional gradient for circle fill. */
     bool use_gradient;          /**< Flag to enable gradient rendering. */
     gui_circle_gradient_type_t gradient_type; /**< Gradient type. */
+    gui_matrix_t last_matrix;
 } gui_circle_t;
 
 /*============================================================================*

@@ -565,10 +565,14 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
     img->opacity_value = this->opacity_value;
     img->high_quality = 1;
 
-    matrix_identity(&img->matrix);
+    // Copy parent matrix (don't reinitialize - it may contain parent transformations)
     if (obj->matrix != NULL)
     {
         memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
     }
 
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
@@ -646,21 +650,24 @@ static void gui_circle_prepare(gui_obj_t *obj)
     gui_circle_t *this = (gui_circle_t *)obj;
     uint8_t last = this->checksum;
 
-    if (obj->matrix == NULL)
+    // obj->matrix is already initialized by gui_obj_ctor
+    // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
+
+    // Apply transformations if needed
+    bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f ||
+                          this->offset_x != 0.0f || this->offset_y != 0.0f);
+
+    if (has_transform)
     {
-        obj->matrix = gui_malloc(sizeof(gui_matrix_t));
-        GUI_ASSERT(obj->matrix != NULL);
-        matrix_identity(obj->matrix);
+        float center_x = (float)this->radius;
+        float center_y = (float)this->radius;
+
+        matrix_translate(this->offset_x, this->offset_y, obj->matrix);
+        matrix_translate(center_x, center_y, obj->matrix);
+        matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+        matrix_rotate(this->degrees, obj->matrix);
+        matrix_translate(-center_x, -center_y, obj->matrix);
     }
-
-    float center_x = (float)this->radius;
-    float center_y = (float)this->radius;
-
-    matrix_translate(this->offset_x, this->offset_y, obj->matrix);
-    matrix_translate(center_x, center_y, obj->matrix);
-    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-    matrix_rotate(this->degrees, obj->matrix);
-    matrix_translate(-center_x, -center_y, obj->matrix);
 
     // Calculate checksum only for key properties (exclude pointers)
     // Manually calculate checksum for critical fields only
@@ -731,12 +738,8 @@ static void gui_circle_prepare(gui_obj_t *obj)
                 int left_x = 0;
                 int left_y = arc_width;
 
-                matrix_identity(&this->arc_left->matrix);
+                // Apply position offset on top of parent matrix
                 matrix_translate((float)left_x, (float)left_y, &this->arc_left->matrix);
-
-                struct gui_matrix obj_matrix;
-                memcpy(&obj_matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_multiply(&this->arc_left->matrix, &obj_matrix);
 
                 memcpy(&this->arc_left->inverse, &this->arc_left->matrix, sizeof(struct gui_matrix));
                 matrix_inverse(&this->arc_left->inverse);
@@ -763,6 +766,94 @@ static void gui_circle_prepare(gui_obj_t *obj)
     }
 
     this->checksum = new_checksum;
+
+    // Check if matrix changed (important for list scrolling optimization)
+    bool matrix_changed = (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0);
+
+    // Only update draw_img matrix and area when matrix actually changed
+    if (matrix_changed)
+    {
+        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
+
+        // Update center_rect matrix
+        if (this->center_rect != NULL)
+        {
+            memcpy(&this->center_rect->matrix, obj->matrix, sizeof(struct gui_matrix));
+            memcpy(&this->center_rect->inverse, obj->matrix, sizeof(struct gui_matrix));
+            matrix_inverse(&this->center_rect->inverse);
+            draw_img_new_area(this->center_rect, NULL);
+        }
+
+        // Update arc matrices (for multi-part rendering)
+        if (this->arc_left != NULL)
+        {
+            int diameter = this->radius * 2;
+            GUI_UNUSED(diameter);
+            int inner_half = (int)floorf(this->radius * M_SQRT1_2);
+            int arc_width = this->radius - inner_half;
+
+            // Update arc_left
+            memcpy(&this->arc_left->matrix, obj->matrix, sizeof(struct gui_matrix));
+            matrix_translate(0.0f, (float)arc_width, &this->arc_left->matrix);
+            memcpy(&this->arc_left->inverse, &this->arc_left->matrix, sizeof(struct gui_matrix));
+            matrix_inverse(&this->arc_left->inverse);
+            draw_img_new_area(this->arc_left, NULL);
+
+            // Update arc_right
+            if (this->arc_right != NULL)
+            {
+                int inner_size = inner_half * 2;
+                int right_x = arc_width + inner_size - 1;
+                int right_y = arc_width;
+
+                memcpy(&this->arc_right->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate((float)right_x, (float)right_y, &this->arc_right->matrix);
+
+                gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->arc_left->data;
+                int base_width = head->w;
+                int base_height = head->h;
+                matrix_translate((float)base_width / 2.0f, (float)base_height / 2.0f, &this->arc_right->matrix);
+                matrix_scale(-1.0f, 1.0f, &this->arc_right->matrix);
+                matrix_translate(-(float)base_width / 2.0f, -(float)base_height / 2.0f, &this->arc_right->matrix);
+
+                memcpy(&this->arc_right->inverse, &this->arc_right->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->arc_right->inverse);
+                draw_img_new_area(this->arc_right, NULL);
+            }
+
+            // Update arc_top
+            if (this->arc_top != NULL)
+            {
+                int inner_size = inner_half * 2;
+                int top_x = arc_width + inner_size;
+                int top_y = 0;
+
+                memcpy(&this->arc_top->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate((float)top_x, (float)top_y, &this->arc_top->matrix);
+                matrix_rotate(90.0f, &this->arc_top->matrix);
+
+                memcpy(&this->arc_top->inverse, &this->arc_top->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->arc_top->inverse);
+                draw_img_new_area(this->arc_top, NULL);
+            }
+
+            // Update arc_bottom
+            if (this->arc_bottom != NULL)
+            {
+                int inner_size = inner_half * 2;
+                int bottom_x = arc_width;
+                int bottom_y = arc_width * 2 + inner_size - 1;
+
+                memcpy(&this->arc_bottom->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate((float)bottom_x, (float)bottom_y, &this->arc_bottom->matrix);
+                matrix_rotate(-90.0f, &this->arc_bottom->matrix);
+
+                memcpy(&this->arc_bottom->inverse, &this->arc_bottom->matrix, sizeof(struct gui_matrix));
+                matrix_inverse(&this->arc_bottom->inverse);
+                draw_img_new_area(this->arc_bottom, NULL);
+            }
+        }
+    }
 
     if (last != this->checksum)
     {
@@ -900,6 +991,9 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->gradient = NULL;
     circle->use_gradient = false;
     circle->gradient_type = CIRCLE_GRADIENT_RADIAL;
+
+    // Initialize last_matrix to identity
+    matrix_identity(&circle->last_matrix);
 
     return circle;
 }
