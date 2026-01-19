@@ -99,6 +99,7 @@ static void compass_info_design(gui_view_t *view)
 {
     current_view = view;
     const char *obj_name = gui_view_get_current()->descriptor->name;
+    GUI_UNUSED(obj_name);
     VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
     VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
     {

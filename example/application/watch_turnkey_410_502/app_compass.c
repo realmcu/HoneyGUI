@@ -54,6 +54,7 @@ char compass_display_str[32];
 // Clean up compass resources
 static void compass_clean(gui_view_t *view)
 {
+    GUI_UNUSED(view);
     current_angle = 0;
 }
 
