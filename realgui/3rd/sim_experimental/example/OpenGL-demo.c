@@ -1,27 +1,16 @@
 /*
  * ============================================================================
- * OpenGL + GLFW Demo - Step 2: Uniform 变量
+ * OpenGL + GLFW Demo - 自定义矩阵实现
  * ============================================================================
  *
- * 学习目标：
- *   1. 理解 Uniform 变量 - CPU 向 GPU 传递全局参数
- *   2. 动态控制光照参数 (光源方向、颜色)
- *   3. 理解 glGetUniformLocation / glUniform* 的用法
+ * 本示例展示：
+ *   1. 手动构建透视投影矩阵和视图矩阵
+ *   2. 通过 Uniform 传递 MVP 矩阵到着色器
+ *   3. 完全摆脱固定管线函数 (gluPerspective/gluLookAt)
+ *   4. 动态光照效果 (光源旋转动画)
  *
- * Uniform vs Attribute vs Varying:
- *   ┌──────────┬─────────────────┬─────────────────────────┐
- *   │ 类型     │ 来源            │ 特点                    │
- *   ├──────────┼─────────────────┼─────────────────────────┤
- *   │ Attribute│ glVertex/glNormal│ 每个顶点不同           │
- *   │ Uniform  │ glUniform*      │ 全局共享，CPU动态设置   │
- *   │ Varying  │ 顶点着色器输出  │ 自动插值到片段着色器    │
- *   └──────────┴─────────────────┴─────────────────────────┘
- *
- * 数据流:
- *   CPU                              GPU
- *   ───                              ───
- *   glUniform3f(uLightDir, x,y,z) ──→ uniform vec3 uLightDir
- *   glUniform3f(uBaseColor, r,g,b)──→ uniform vec3 uBaseColor
+ * 矩阵变换流程:
+ *   模型空间 ──Model──→ 世界空间 ──View──→ 相机空间 ──Projection──→ 裁剪空间
  */
 
 #include <stdio.h>
@@ -36,12 +25,115 @@
  * 比如 glCreateShader, glCompileShader 等着色器相关函数 */
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>  /* GLFW: 窗口和 OpenGL 上下文管理 */
-#include <GL/glu.h>       /* GLU: OpenGL 工具库，提供 gluPerspective, gluLookAt 等 */
 #include "fb_sdl.h"       /* 自定义: 把渲染结果显示到 LCD */
 
 /* 模型数据的最大容量 */
 #define MAX_VERTICES 1000  /* 最多 1000 个顶点 */
 #define MAX_FACES 2000     /* 最多 2000 个三角面 */
+
+/* ============================================================================
+ * 矩阵工具函数
+ * ============================================================================ */
+
+/* 4x4 矩阵类型 (列主序，OpenGL 标准) */
+typedef float mat4[16];
+
+/* 矩阵乘法: result = a × b */
+static void mat4_multiply(mat4 result, const mat4 a, const mat4 b)
+{
+    mat4 tmp;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            tmp[i * 4 + j] = 0;
+            for (int k = 0; k < 4; k++)
+            {
+                tmp[i * 4 + j] += a[k * 4 + j] * b[i * 4 + k];
+            }
+        }
+    }
+    memcpy(result, tmp, sizeof(mat4));
+}
+
+/* 单位矩阵 */
+static void mat4_identity(mat4 m)
+{
+    memset(m, 0, sizeof(mat4));
+    m[0] = m[5] = m[10] = m[15] = 1.0f;
+}
+
+/* 透视投影矩阵 - 替代 gluPerspective */
+static void mat4_perspective(mat4 m, float fov_y, float aspect, float near, float far)
+{
+    float f = 1.0f / tanf(fov_y / 2.0f);
+
+    memset(m, 0, sizeof(mat4));
+    m[0]  = f / aspect;
+    m[5]  = f;
+    m[10] = -(far + near) / (far - near);
+    m[11] = -1.0f;
+    m[14] = -(2.0f * far * near) / (far - near);
+}
+
+/* 视图矩阵 - 替代 gluLookAt */
+static void mat4_look_at(mat4 m, float eye[3], float center[3], float up[3])
+{
+    /* 计算相机坐标系的三个轴 */
+    float f[3] =
+    {
+        center[0] - eye[0],
+        center[1] - eye[1],
+        center[2] - eye[2]
+    };
+
+    /* 归一化 forward */
+    float len = sqrtf(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
+    f[0] /= len; f[1] /= len; f[2] /= len;
+
+    /* right = forward × up */
+    float r[3] =
+    {
+        f[1] *up[2] - f[2] *up[1],
+        f[2] *up[0] - f[0] *up[2],
+        f[0] *up[1] - f[1] *up[0]
+    };
+    len = sqrtf(r[0] * r[0] + r[1] * r[1] + r[2] * r[2]);
+    r[0] /= len; r[1] /= len; r[2] /= len;
+
+    /* up' = right × forward */
+    float u[3] =
+    {
+        r[1] *f[2] - r[2] *f[1],
+        r[2] *f[0] - r[0] *f[2],
+        r[0] *f[1] - r[1] *f[0]
+    };
+
+    /* 构建视图矩阵 (旋转 + 平移) */
+    mat4_identity(m);
+    m[0] = r[0];  m[4] = r[1];  m[8]  = r[2];
+    m[1] = u[0];  m[5] = u[1];  m[9]  = u[2];
+    m[2] = -f[0]; m[6] = -f[1]; m[10] = -f[2];
+    m[12] = -(r[0] * eye[0] + r[1] * eye[1] + r[2] * eye[2]);
+    m[13] = -(u[0] * eye[0] + u[1] * eye[1] + u[2] * eye[2]);
+    m[14] = f[0] * eye[0] + f[1] * eye[1] + f[2] * eye[2];
+}
+
+/* 旋转矩阵 (绕任意轴) */
+static void mat4_rotate(mat4 m, float angle, float x, float y, float z)
+{
+    float len = sqrtf(x * x + y * y + z * z);
+    x /= len; y /= len; z /= len;
+
+    float c = cosf(angle);
+    float s = sinf(angle);
+    float t = 1.0f - c;
+
+    mat4_identity(m);
+    m[0] = t * x * x + c;     m[4] = t * x * y - s * z;   m[8]  = t * x * z + s * y;
+    m[1] = t * x * y + s * z;   m[5] = t * y * y + c;     m[9]  = t * y * z - s * x;
+    m[2] = t * x * z - s * y;   m[6] = t * y * z + s * x;   m[10] = t * z * z + c;
+}
 
 /* ============================================================================
  * 模型数据存储
@@ -56,113 +148,95 @@ static float vertices[MAX_VERTICES][3];
  * 例如: normals[0] = {0, 1, 0} 表示第一个面朝上 */
 static float normals[MAX_FACES][3];
 
-/* 面索引数组: faces[i] = {v0, v1, v2}
- * 每个面由 3 个顶点索引组成，指向 vertices 数组
- * 例如: faces[0] = {0, 1, 2} 表示第一个三角形用顶点 0, 1, 2 */
-static int faces[MAX_FACES][3];
+/* 面索引数组: faces[i][j] = 顶点索引, faces_tex[i][j] = 纹理坐标索引 */
+static int faces[MAX_FACES][3];      /* 顶点索引 */
+static int faces_tex[MAX_FACES][3];  /* 纹理坐标索引 */
 
 static int vertex_count = 0;  /* 实际加载的顶点数量 */
 static int face_count = 0;    /* 实际加载的面数量 */
+
+/* VBO (Vertex Buffer Object) - GPU 显存中的顶点缓冲 */
+static GLuint g_vbo_position = 0;  /* 顶点位置缓冲 */
+static GLuint g_vbo_normal = 0;    /* 顶点法线缓冲 */
+static GLuint g_vbo_texcoord = 0;  /* 纹理坐标缓冲 */
+static int g_triangle_count = 0;   /* 三角形数量 */
+
+/* 纹理对象 */
+static GLuint g_texture = 0;
+
+/* 纹理坐标数组 */
+static float texcoords[MAX_VERTICES][2];
+static int texcoord_count = 0;
 
 /* ============================================================================
  * 着色器源代码
  * ============================================================================
  *
- * 着色器是运行在 GPU 上的小程序，用 GLSL 语言编写。
- *
- * 两种着色器：
- *   1. 顶点着色器 (Vertex Shader): 每个顶点执行一次
- *      - 输入: 顶点位置、法线等
- *      - 输出: 变换后的位置 (gl_Position)
- *      - 本模型有 740 个顶点，所以执行 740 次 (并行)
- *
- *   2. 片段着色器 (Fragment Shader): 每个像素执行一次
- *      - 输入: 从顶点着色器插值得到的数据
- *      - 输出: 像素颜色 (gl_FragColor)
- *      - 屏幕 454x454 ≈ 20万像素，所以执行约 20万次 (并行)
+ * 添加纹理映射支持：
+ *   - 顶点着色器传递纹理坐标
+ *   - 片段着色器采样纹理
  */
 
-/* 顶点着色器源代码
- *
- * #version 120: 使用 GLSL 1.20 版本 (兼容 OpenGL 2.1)
- *
- * 内置输入变量 (由固定管线提供):
- *   gl_Vertex  - 顶点位置，来自 glVertex3fv()
- *   gl_Normal  - 顶点法线，来自 glNormal3fv()
- *   gl_ModelViewProjectionMatrix - MVP 矩阵，来自 glMatrixMode/gluPerspective/gluLookAt
- *   gl_NormalMatrix - 法线变换矩阵 (ModelView 的逆转置)
- *
- * varying 变量:
- *   用于从顶点着色器传递数据到片段着色器
- *   GPU 会自动在三角形内部进行线性插值
- */
+/* 顶点着色器源代码 */
 static const char *vertex_shader_src =
     "#version 120\n"
 
+    /* 自定义 MVP 矩阵 */
+    "uniform mat4 uMVP;\n"
+    "uniform mat4 uModelView;\n"
+
     /* varying: 输出到片段着色器，GPU 会在三角形内插值 */
     "varying vec3 vNormal;\n"
+    "varying vec2 vTexCoord;\n"
 
     "void main() {\n"
-    /* 将法线从模型空间变换到视图空间
-     * gl_NormalMatrix = (ModelView矩阵的左上3x3)的逆转置
-     * 为什么要逆转置? 因为法线不能直接用 ModelView 变换，会变形 */
-    "    vNormal = gl_NormalMatrix * gl_Normal;\n"
+    /* 使用自定义矩阵变换法线 */
+    "    vNormal = mat3(uModelView) * gl_Normal;\n"
 
-    /* 将顶点位置从模型空间变换到裁剪空间
-     * gl_ModelViewProjectionMatrix = Projection × View × Model
-     * 这是固定管线帮我们算好的组合矩阵 */
-    "    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+    /* 传递纹理坐标 */
+    "    vTexCoord = gl_MultiTexCoord0.xy;\n"
+
+    /* 使用自定义 MVP 矩阵变换顶点 */
+    "    gl_Position = uMVP * gl_Vertex;\n"
     "}\n";
 
-/* 片段着色器源代码
- *
- * 【第二步改动】添加 Uniform 变量:
- *   - uLightDir:  光源方向，由 CPU 每帧设置
- *   - uBaseColor: 基础颜色，由 CPU 设置
- *   - uAmbient:   环境光强度
- *
- * Uniform 的特点:
- *   - 所有像素共享同一个值
- *   - CPU 可以动态修改
- *   - 适合传递: 光源参数、时间、相机位置等
- */
+/* 片段着色器源代码 */
 static const char *fragment_shader_src =
     "#version 120\n"
 
     /* varying: 从顶点着色器接收，已经被 GPU 插值过 */
     "varying vec3 vNormal;\n"
+    "varying vec2 vTexCoord;\n"
 
-    /* 【新增】Uniform 变量 - 由 CPU 通过 glUniform* 设置 */
+    /* Uniform 变量 - 由 CPU 通过 glUniform* 设置 */
     "uniform vec3 uLightDir;\n"   /* 光源方向 */
     "uniform vec3 uBaseColor;\n"  /* 基础颜色 */
     "uniform float uAmbient;\n"   /* 环境光强度 */
+    "uniform sampler2D uTexture;\n"  /* 纹理采样器 */
 
     "void main() {\n"
-    /* 归一化法线 (插值后长度可能不是 1) */
+    /* 采样纹理 */
+    "    vec4 texColor = texture2D(uTexture, vTexCoord);\n"
+
+    /* 光照计算 */
     "    vec3 N = normalize(vNormal);\n"
-
-    /* 【改动】使用 Uniform 变量，而不是硬编码 */
     "    vec3 L = normalize(uLightDir);\n"
-
-    /* 漫反射计算 + 环境光 */
     "    float diff = max(dot(N, L), 0.0);\n"
-    "    float lighting = diff + uAmbient;\n"  /* 漫反射 + 环境光 */
+    "    float lighting = diff + uAmbient;\n"
 
-    /* 【改动】使用 Uniform 颜色 */
-    "    vec3 color = uBaseColor * lighting;\n"
-
-    /* 输出像素颜色 */
+    /* 纹理颜色 × 光照 */
+    "    vec3 color = texColor.rgb * lighting;\n"
     "    gl_FragColor = vec4(color, 1.0);\n"
     "}\n";
 
 /* 着色器程序 ID (GPU 上的程序句柄) */
 static GLuint g_program = 0;
 
-/* 【新增】Uniform 变量的位置 (Location)
- *
- * 每个 Uniform 在着色器程序中有一个"位置"编号
- * 需要先用 glGetUniformLocation 获取，然后用 glUniform* 设置值
- */
+/* 矩阵 Uniform 位置 */
+static GLint g_loc_mvp = -1;
+static GLint g_loc_modelview = -1;
+
+/* 光照 Uniform 位置 */
 static GLint g_loc_lightDir = -1;
 static GLint g_loc_baseColor = -1;
 static GLint g_loc_ambient = -1;
@@ -231,8 +305,7 @@ static void init_shaders(void)
     glAttachShader(g_program, vs);
     glAttachShader(g_program, fs);
 
-    /* 链接程序: 把顶点着色器和片段着色器连接起来
-     * 检查 varying 变量是否匹配等 */
+    /* 链接程序 */
     glLinkProgram(g_program);
 
     /* 检查链接状态 */
@@ -245,22 +318,65 @@ static void init_shaders(void)
         printf("Program link error: %s\n", log);
     }
 
-    /* 【新增】获取 Uniform 变量的位置
-     *
-     * glGetUniformLocation: 查询 Uniform 变量在程序中的位置
-     * 返回 -1 表示变量不存在或被优化掉了
-     *
-     * 为什么需要位置?
-     *   着色器编译后，变量名变成了数字编号
-     *   我们需要这个编号才能设置值
-     */
+    /* 获取矩阵 Uniform 位置 */
+    g_loc_mvp = glGetUniformLocation(g_program, "uMVP");
+    g_loc_modelview = glGetUniformLocation(g_program, "uModelView");
+
+    /* 获取光照 Uniform 位置 */
     g_loc_lightDir = glGetUniformLocation(g_program, "uLightDir");
     g_loc_baseColor = glGetUniformLocation(g_program, "uBaseColor");
     g_loc_ambient = glGetUniformLocation(g_program, "uAmbient");
 
     printf("Shaders compiled and linked successfully!\n");
-    printf("Uniform locations: lightDir=%d, baseColor=%d, ambient=%d\n",
-           g_loc_lightDir, g_loc_baseColor, g_loc_ambient);
+    printf("Uniform locations: MVP=%d, ModelView=%d, lightDir=%d\n",
+           g_loc_mvp, g_loc_modelview, g_loc_lightDir);
+}
+
+/* ============================================================================
+ * 生成程序化纹理 - 棋盘格
+ * ============================================================================
+ *
+ * 生成一个简单的棋盘格纹理来演示纹理映射
+ * 不需要外部图片文件，代码自包含
+ */
+static void create_checkerboard_texture(void)
+{
+    const int size = 256;  /* 纹理大小 256x256 */
+    const int grid = 16;   /* 每个格子大小 */
+
+    unsigned char *data = malloc(size * size * 3);  /* RGB 格式 */
+
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            /* 判断是黑格还是白格 */
+            int is_white = ((x / grid) + (y / grid)) % 2;
+            unsigned char color = is_white ? 255 : 64;
+
+            int idx = (y * size + x) * 3;
+            data[idx + 0] = color;  /* R */
+            data[idx + 1] = color;  /* G */
+            data[idx + 2] = color;  /* B */
+        }
+    }
+
+    /* 创建 OpenGL 纹理 */
+    glGenTextures(1, &g_texture);
+    glBindTexture(GL_TEXTURE_2D, g_texture);
+
+    /* 设置纹理参数 */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    /* 上传纹理数据到 GPU */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size, size, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    free(data);
+    printf("Checkerboard texture created: %dx%d\n", size, size);
 }
 
 /* ============================================================================
@@ -270,14 +386,8 @@ static void init_shaders(void)
  * OBJ 是一种简单的 3D 模型文件格式:
  *   v x y z      - 顶点坐标
  *   vn x y z     - 顶点法线 (本代码未使用，自己计算)
- *   vt u v       - 纹理坐标 (本代码未使用)
- *   f v1 v2 v3   - 面，由 3 个顶点索引组成
- *
- * 例如:
- *   v 1.0 2.0 3.0           # 顶点 1
- *   v 4.0 5.0 6.0           # 顶点 2
- *   v 7.0 8.0 9.0           # 顶点 3
- *   f 1 2 3                 # 面，使用顶点 1,2,3 (索引从 1 开始)
+ *   vt u v       - 纹理坐标
+ *   f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 - 面
  */
 static void load_obj(const char *filename)
 {
@@ -296,21 +406,33 @@ static void load_obj(const char *filename)
                    &vertices[vertex_count][2]);  /* z */
             vertex_count++;
         }
-        /* 解析面行: "f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3"
-         * %*d 表示读取但忽略 (跳过纹理和法线索引) */
+        /* 解析纹理坐标行: "vt u v" */
+        else if (line[0] == 'v' && line[1] == 't' && line[2] == ' ')
+        {
+            sscanf(line, "vt %f %f",
+                   &texcoords[texcoord_count][0],  /* u */
+                   &texcoords[texcoord_count][1]); /* v */
+            texcoord_count++;
+        }
+        /* 解析面行: "f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3" */
         else if (line[0] == 'f' && line[1] == ' ')
         {
-            int v1, v2, v3;
-            sscanf(line, "f %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &v1, &v2, &v3);
+            int v1, v2, v3, vt1, vt2, vt3;
+            sscanf(line, "f %d/%d/%*d %d/%d/%*d %d/%d/%*d",
+                   &v1, &vt1, &v2, &vt2, &v3, &vt3);
             /* OBJ 索引从 1 开始，C 数组从 0 开始，所以 -1 */
             faces[face_count][0] = v1 - 1;
             faces[face_count][1] = v2 - 1;
             faces[face_count][2] = v3 - 1;
+            faces_tex[face_count][0] = vt1 - 1;
+            faces_tex[face_count][1] = vt2 - 1;
+            faces_tex[face_count][2] = vt3 - 1;
             face_count++;
         }
     }
     fclose(f);
-    printf("Loaded: %d vertices, %d faces\n", vertex_count, face_count);
+    printf("Loaded: %d vertices, %d texcoords, %d faces\n",
+           vertex_count, texcoord_count, face_count);
 }
 
 /* ============================================================================
@@ -417,6 +539,86 @@ static void normalize_vertices(void)
 }
 
 /* ============================================================================
+ * 创建 VBO - 上传顶点数据到 GPU 显存
+ * ============================================================================
+ *
+ * VBO 优势:
+ *   - 数据只上传一次，存储在 GPU 显存
+ *   - 渲染时直接从显存读取，无需每帧传输
+ *   - 一次 glDrawArrays 调用绘制所有顶点
+ *
+ * 数据组织:
+ *   将面索引展开为顶点数组，每个三角形 3 个顶点
+ */
+static void create_vbo(void)
+{
+    /* 计算需要的顶点数量 (每个面 3 个顶点) */
+    g_triangle_count = face_count;
+    int total_vertices = face_count * 3;
+
+    /* 分配临时数组，存储展开后的顶点数据 */
+    float *positions = malloc(total_vertices * 3 * sizeof(float));
+    float *normals_data = malloc(total_vertices * 3 * sizeof(float));
+    float *texcoords_data = malloc(total_vertices * 2 * sizeof(float));
+
+    /* 展开面索引为顶点数组 */
+    for (int i = 0; i < face_count; i++)
+    {
+        /* 每个面的法线 */
+        float *n = normals[i];
+
+        /* 三个顶点 */
+        for (int j = 0; j < 3; j++)
+        {
+            int idx = i * 3 + j;
+            int v_idx = faces[i][j];
+            int vt_idx = faces_tex[i][j];
+
+            /* 复制顶点位置 */
+            positions[idx * 3 + 0] = vertices[v_idx][0];
+            positions[idx * 3 + 1] = vertices[v_idx][1];
+            positions[idx * 3 + 2] = vertices[v_idx][2];
+
+            /* 复制法线 (每个面的三个顶点共享同一个法线) */
+            normals_data[idx * 3 + 0] = n[0];
+            normals_data[idx * 3 + 1] = n[1];
+            normals_data[idx * 3 + 2] = n[2];
+
+            /* 复制纹理坐标 */
+            texcoords_data[idx * 2 + 0] = texcoords[vt_idx][0];
+            texcoords_data[idx * 2 + 1] = texcoords[vt_idx][1];
+        }
+    }
+
+    /* 创建位置 VBO */
+    glGenBuffers(1, &g_vbo_position);
+    glBindBuffer(GL_ARRAY_BUFFER, g_vbo_position);
+    glBufferData(GL_ARRAY_BUFFER, total_vertices * 3 * sizeof(float),
+                 positions, GL_STATIC_DRAW);
+
+    /* 创建法线 VBO */
+    glGenBuffers(1, &g_vbo_normal);
+    glBindBuffer(GL_ARRAY_BUFFER, g_vbo_normal);
+    glBufferData(GL_ARRAY_BUFFER, total_vertices * 3 * sizeof(float),
+                 normals_data, GL_STATIC_DRAW);
+
+    /* 创建纹理坐标 VBO */
+    glGenBuffers(1, &g_vbo_texcoord);
+    glBindBuffer(GL_ARRAY_BUFFER, g_vbo_texcoord);
+    glBufferData(GL_ARRAY_BUFFER, total_vertices * 2 * sizeof(float),
+                 texcoords_data, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);  /* 解绑 */
+
+    /* 释放临时数组 */
+    free(positions);
+    free(normals_data);
+    free(texcoords_data);
+
+    printf("VBO created: %d triangles, %d vertices\n", g_triangle_count, total_vertices);
+}
+
+/* ============================================================================
  * 渲染线程
  * ============================================================================
  *
@@ -456,7 +658,13 @@ static void *render_thread(void *arg)
     /* 初始化着色器程序 */
     init_shaders();
 
-    /* 【新增】帧计数器，用于动画 */
+    /* 创建纹理 */
+    create_checkerboard_texture();
+
+    /* 创建 VBO - 上传顶点数据到 GPU */
+    create_vbo();
+
+    /* 帧计数器，用于动画 */
     int frame = 0;
 
     /* ========== 渲染循环 ========== */
@@ -464,90 +672,91 @@ static void *render_thread(void *arg)
     {
         frame++;  /* 每帧递增 */
 
-        /* ---------- 设置投影矩阵 ----------
-         * 投影矩阵: 定义相机的"镜头"
-         * gluPerspective(fov, aspect, near, far)
-         *   fov    = 45°  视野角度
-         *   aspect = w/h  宽高比
-         *   near   = 0.1  近裁剪面
-         *   far    = 100  远裁剪面
-         */
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(45.0, (double)w / h, 0.1, 100.0);
+        /* ========== 手动构建矩阵 ========== */
 
-        /* ---------- 设置模型视图矩阵 ----------
-         * 模型视图矩阵 = View × Model
-         *
-         * gluLookAt: 设置相机位置和朝向
-         *   eye    = (0, 0, mouse_zoom)  相机位置
-         *   center = (0, 0, 0)           看向原点
-         *   up     = (0, 1, 0)           上方向
-         *
-         * glRotatef: 旋转模型 (响应鼠标拖动)
-         */
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        gluLookAt(0, 0, mouse_zoom, 0, 0, 0, 0, 1, 0);
+        /* 1. 投影矩阵 */
+        mat4 proj;
+        mat4_perspective(proj, 45.0f * M_PI / 180.0f, (float)w / h, 0.1f, 100.0f);
 
-        glRotatef(mouse_rot_x, 1, 0, 0);  /* 绕 X 轴旋转 */
-        glRotatef(mouse_rot_y, 0, 1, 0);  /* 绕 Y 轴旋转 */
+        /* 2. 视图矩阵 */
+        float eye[3] = {0, 0, mouse_zoom};
+        float center[3] = {0, 0, 0};
+        float up[3] = {0, 1, 0};
+        mat4 view;
+        mat4_look_at(view, eye, center, up);
+
+        /* 3. 模型矩阵 (旋转) */
+        mat4 rot_x, rot_y, model;
+        mat4_rotate(rot_x, mouse_rot_x * M_PI / 180.0f, 1, 0, 0);
+        mat4_rotate(rot_y, mouse_rot_y * M_PI / 180.0f, 0, 1, 0);
+        mat4_multiply(model, rot_y, rot_x);
+
+        /* 4. 组合 MVP = Projection × View × Model */
+        mat4 modelview, mvp;
+        mat4_multiply(modelview, view, model);
+        mat4_multiply(mvp, proj, modelview);
 
         /* ---------- 清空帧缓冲 ---------- */
         glClearColor(0.15f, 0.15f, 0.2f, 1.0f);  /* 背景色: 深蓝灰 */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* ---------- 启用着色器程序 ----------
-         * 从这里开始，所有绘制都会使用我们的着色器
-         * 而不是固定管线的默认处理 */
+        /* ---------- 启用着色器程序 ---------- */
         glUseProgram(g_program);
 
-        /* ---------- 【改动】设置 Uniform 变量 - 让光源旋转！ ----------
-         *
-         * 这就是 Uniform 的意义：
-         * 我们可以每帧传入不同的值，实现动态效果
-         *
-         * 如果光源方向写死在着色器里，就做不到这个！
-         */
+        /* 通过 Uniform 传递矩阵 */
+        glUniformMatrix4fv(g_loc_mvp, 1, GL_FALSE, mvp);
+        glUniformMatrix4fv(g_loc_modelview, 1, GL_FALSE, modelview);
+
+        /* ---------- 设置光照参数 ---------- */
         float angle = frame * 0.02f;  /* 每帧旋转一点 */
         float lx = cosf(angle) * 2.0f;  /* 光源绕 Y 轴旋转 */
         float ly = 1.0f;
         float lz = sinf(angle) * 2.0f;
 
-        glUniform3f(g_loc_lightDir, lx, ly, lz);  /* 每帧不同的光源方向！ */
+        glUniform3f(g_loc_lightDir, lx, ly, lz);
         glUniform3f(g_loc_baseColor, 0.9f, 0.7f, 0.6f);
         glUniform1f(g_loc_ambient, 0.2f);
 
-        /* ---------- 绘制模型 ----------
-         * glBegin/glEnd: 立即模式绘制 (简单但效率低)
-         *
-         * 对于每个三角形:
-         *   1. glNormal3fv: 设置法线 → 传给着色器的 gl_Normal
-         *   2. glVertex3fv: 设置顶点 → 传给着色器的 gl_Vertex
-         *
-         * GPU 会并行执行所有顶点的着色器代码
-         */
-        glBegin(GL_TRIANGLES);
-        for (int i = 0; i < face_count; i++)
-        {
-            glNormal3fv(normals[i]);              /* 设置这个面的法线 */
-            glVertex3fv(vertices[faces[i][0]]);   /* 第 1 个顶点 */
-            glVertex3fv(vertices[faces[i][1]]);   /* 第 2 个顶点 */
-            glVertex3fv(vertices[faces[i][2]]);   /* 第 3 个顶点 */
-        }
-        glEnd();
+        /* ---------- 绑定纹理 ---------- */
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, g_texture);
+        glEnable(GL_TEXTURE_2D);
 
-        /* 关闭着色器 (恢复固定管线，虽然这里没用到) */
+        /* ---------- 使用 VBO 绘制模型 ---------- */
+
+        /* 启用顶点属性数组 */
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        /* 绑定位置 VBO */
+        glBindBuffer(GL_ARRAY_BUFFER, g_vbo_position);
+        glVertexPointer(3, GL_FLOAT, 0, 0);
+
+        /* 绑定法线 VBO */
+        glBindBuffer(GL_ARRAY_BUFFER, g_vbo_normal);
+        glNormalPointer(GL_FLOAT, 0, 0);
+
+        /* 绑定纹理坐标 VBO */
+        glBindBuffer(GL_ARRAY_BUFFER, g_vbo_texcoord);
+        glTexCoordPointer(2, GL_FLOAT, 0, 0);
+
+        /* 一次调用绘制所有三角形 */
+        glDrawArrays(GL_TRIANGLES, 0, g_triangle_count * 3);
+
+        /* 禁用顶点属性数组 */
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        /* 关闭着色器 */
         glUseProgram(0);
 
         /* 等待 GPU 完成所有渲染操作 */
         glFinish();
 
-        /* ---------- 读取像素并显示 ----------
-         * glReadPixels: 从 GPU 帧缓冲读取像素到 CPU 内存
-         *
-         * 注意: OpenGL 的 Y 轴是向上的，LCD 的 Y 轴是向下的
-         * 所以需要垂直翻转 */
+        /* ---------- 读取像素并显示 ---------- */
         glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, fb);
 
         /* 像素格式转换 + 垂直翻转 */
