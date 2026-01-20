@@ -4,6 +4,10 @@ ci_check_config = {
             "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
         },
+        'GUI-BypassTest': {
+            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
+            "build_handler": None
+        },
         'DOC': {
             "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
