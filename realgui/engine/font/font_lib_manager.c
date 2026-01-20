@@ -16,6 +16,8 @@
 
 #include <string.h>
 #include "font_lib_manager.h"
+#include "gui_components_init.h"
+#include "default_font.h"
 
 /*============================================================================*
  *                            Variables
@@ -208,4 +210,40 @@ void gui_font_lib_clear_all(void)
     font_lib_head = NULL;
     font_lib_count = 0;
     // gui_log("font_lib: cleared all fonts\n");
+}
+
+/*============================================================================*
+ *                      Default Font Initialization
+ *============================================================================*/
+
+/**
+ * @brief Initialize default font at system startup
+ * @details This function is automatically called during GUI initialization.
+ *          The default font is registered at the head of font library,
+ *          ensuring it's available as fallback.
+ * @return 0 on success, -1 on failure
+ */
+int gui_default_font_init(void)
+{
+    /* Register default font to font library */
+    FONT_LIB_NODE *node = gui_font_lib_register(
+                              (uint8_t *)default_font_size16_bits1_bitmap,
+                              16,  /* font size */
+                              FONT_SRC_MEMADDR,
+                              GUI_FONT_SRC_BMP,
+                              NULL,  /* no cached data for MEM mode */
+                              0);
+
+    if (node != NULL)
+    {
+        /* Set high reference count to prevent accidental release */
+        node->ref_count = 0xFFFF;
+        gui_log("Default font initialized (size=16, type=BMP)\n");
+        return 0;
+    }
+    else
+    {
+        gui_log("Warning: Failed to initialize default font\n");
+        return -1;
+    }
 }

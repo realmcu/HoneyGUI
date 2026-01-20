@@ -104,6 +104,8 @@ int gui_server_init(void)
         return 0;
     }
     inited = true;
+
+    /* Port */
     extern void gui_port_dc_init(void);
     extern void gui_port_indev_init(void);
     extern void gui_port_os_init(void);
@@ -116,6 +118,10 @@ int gui_server_init(void)
     gui_port_fs_init();
     gui_port_ftl_init();
     gui_port_acc_init();
+
+    /* Engine */
+    extern int gui_default_font_init(void);
+    gui_default_font_init();
 
     gui_fb_change();
 
