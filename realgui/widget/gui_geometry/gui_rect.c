@@ -818,6 +818,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
     }
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
 
     // Calculate checksum only for key properties (exclude pointers)
     uint8_t new_checksum = 0;
@@ -1166,6 +1167,12 @@ void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color)
 void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter)
 {
     gui_obj_add_event_cb((gui_obj_t *)rect, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
+                         parameter);
+}
+
+void gui_rect_on_press(gui_rounded_rect_t *rect, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb((gui_obj_t *)rect, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED,
                          parameter);
 }
 

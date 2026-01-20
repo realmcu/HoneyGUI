@@ -163,6 +163,14 @@ void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color);
 void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter);
 
 /**
+ * @brief Register a press event callback for the rect widget.
+ * @param rect Pointer to the rect widget.
+ * @param callback Callback function pointer.
+ * @param parameter Optional parameter to pass to the callback.
+ */
+void gui_rect_on_press(gui_rounded_rect_t *rect, void *callback, void *parameter);
+
+/**
  * @brief Apply rotation transformation to the rect widget.
  * @param rect Pointer to the rect widget.
  * @param degrees Rotation angle in degrees (clockwise).
