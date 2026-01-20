@@ -547,6 +547,10 @@ static void gui_view_destroy(gui_obj_t *obj)
     {
         g_CurrentView = NULL;
     }
+    else if (_this == g_NextView)
+    {
+        g_NextView = NULL;
+    }
 }
 
 static void gui_view_end(gui_obj_t *obj)
@@ -701,6 +705,9 @@ gui_view_t *gui_view_create(void       *parent,
     if (g_CurrentView == NULL && parent != gui_obj_get_fake_root())
     {
         g_CurrentView = _this;
+        g_SurpressEvent = false;
+        g_SurpressTP = true;
+        g_SwitchDone = false;
     }
     return _this;
 }

@@ -251,8 +251,6 @@ static void dashboard_digital_entrance_animation(void *p)
         uint16_t cnt_led = 10;
         if (cnt <= cnt_led)
         {
-            gui_obj_t *win_common = gui_list_entry((&(GUI_BASE(current_view))->child_list)->prev, gui_obj_t,
-                                                   brother_list);
             GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", win_common);
             GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", win_common);
             GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", win_common);
@@ -547,8 +545,6 @@ static void dashboard_dail_entrance_animation(void *p)
         uint16_t cnt_led = 10;
         if (cnt <= cnt_led)
         {
-            gui_obj_t *win_common = gui_list_entry((&(GUI_BASE(current_view))->child_list)->prev, gui_obj_t,
-                                                   brother_list);
             GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", win_common);
             GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", win_common);
             GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", win_common);

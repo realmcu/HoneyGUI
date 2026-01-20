@@ -41,6 +41,7 @@ static bool g_Limit = false;
 static int16_t g_Bar_Width = 0;
 static int16_t g_Bar_Height = 0;
 static gui_color_t g_Bar_Color = {0};
+static int8_t g_move_indicator = 0;
 
 /*============================================================================*
  *                           Private Functions
@@ -194,14 +195,10 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
 
             int16_t distance;
             int16_t half_grid = grid_size / 2;
-
-            if (remainder > half_grid)
+            int16_t abs_remainder = abs(remainder);
+            if (abs_remainder > half_grid)
             {
-                distance = grid_size - remainder;
-            }
-            else if (remainder < -half_grid)
-            {
-                distance = -grid_size - remainder;
+                distance = g_move_indicator * (grid_size - abs_remainder);
             }
             else
             {
@@ -826,6 +823,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
     case HORIZONTAL:
         {
             gui_list_update_speed(_this, tp->deltaX);
+            g_move_indicator = tp->deltaX > 0 ? 1 : -1;
 
             _this->offset = _this->hold + tp->deltaX;
             offset_min = obj->w - _this->total_length - _this->out_scope;
@@ -840,6 +838,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
     case VERTICAL:
         {
             gui_list_update_speed(_this, tp->deltaY);
+            g_move_indicator = tp->deltaY > 0 ? 1 : -1;
 
             _this->offset = _this->hold + tp->deltaY;
             offset_min = obj->h - _this->total_length - _this->out_scope;
