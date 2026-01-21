@@ -187,6 +187,7 @@ static void gui_arc_end(gui_arc_t *this)
 static void gui_arc_destroy(gui_arc_t *this)
 {
     // Free cached resources
+    // Note: draw_img->data points to pixel_buffer, so only free pixel_buffer
     if (this->pixel_buffer != NULL)
     {
         gui_free(this->pixel_buffer);
@@ -195,6 +196,7 @@ static void gui_arc_destroy(gui_arc_t *this)
 
     if (this->draw_img != NULL)
     {
+        // Don't free draw_img->data - it's the same as pixel_buffer
         gui_free(this->draw_img);
         this->draw_img = NULL;
     }
@@ -238,7 +240,6 @@ static void gui_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
-
 /** Initialize arc buffer - allocate once and reuse */
 static bool init_arc_buffer(gui_arc_t *this)
 {
@@ -246,6 +247,10 @@ static bool init_arc_buffer(gui_arc_t *this)
     float outer_r = this->radius + this->line_width / 2 + 2;
     int buffer_w = (int)(outer_r * 2) + 4;
     int buffer_h = (int)(outer_r * 2) + 4;
+
+    // Save buffer dimensions
+    this->buffer_w = buffer_w;
+    this->buffer_h = buffer_h;
 
     int bytes_per_pixel = 4;
     uint32_t required_size = (uint32_t)(buffer_w * buffer_h * bytes_per_pixel + sizeof(
@@ -290,35 +295,37 @@ static bool init_arc_buffer(gui_arc_t *this)
 /** Render arc to buffer - called only when parameters change */
 static void render_arc_to_buffer(gui_arc_t *this)
 {
-    float outer_r = this->radius + this->line_width / 2 + 2;
-    int buffer_w = (int)(outer_r * 2) + 4;
+    // Use the saved buffer dimensions
+    int buffer_w = this->buffer_w;
+    int buffer_h = this->buffer_h;
 
     // Setup image header
     gui_rgb_data_head_t *img_header = (gui_rgb_data_head_t *)this->pixel_buffer;
-    set_img_header(img_header, (uint16_t)buffer_w, (uint16_t)buffer_w);
+    set_img_header(img_header, (uint16_t)buffer_w, (uint16_t)buffer_h);
 
     // Clear pixel data
     uint8_t *pixel_data = this->pixel_buffer + sizeof(gui_rgb_data_head_t);
-    memset(pixel_data, 0x00, (size_t)(buffer_w * buffer_w * 4));
+    memset(pixel_data, 0x00, (size_t)(buffer_w * buffer_h * 4));
 
     // Initialize draw context
-    init_draw_context(&this->draw_ctx, pixel_data, buffer_w, buffer_w, PIXEL_FORMAT_ARGB8888);
+    init_draw_context(&this->draw_ctx, pixel_data, buffer_w, buffer_h, PIXEL_FORMAT_ARGB8888);
     this->draw_ctx.enable_aa = true;
     this->draw_ctx.clip_rect.x = 0;
     this->draw_ctx.clip_rect.y = 0;
     this->draw_ctx.clip_rect.w = buffer_w;
-    this->draw_ctx.clip_rect.h = buffer_w;
+    this->draw_ctx.clip_rect.h = buffer_h;
     this->draw_ctx.gradient = this->gradient;
 
     // Draw arc at center of buffer
     float center_x = buffer_w / 2.0f;
+    float center_y = buffer_h / 2.0f;
 
     // Draw arc using gradient or solid color
     if (this->use_gradient && this->gradient != NULL)
     {
         draw_arc_df_aa_gradient(&this->draw_ctx,
                                 center_x,
-                                center_x,  // center_y (square buffer, so same as center_x)
+                                center_y,
                                 this->radius,
                                 this->line_width,
                                 this->start_angle,
@@ -330,7 +337,7 @@ static void render_arc_to_buffer(gui_arc_t *this)
         // Draw arc using optimized SDF-based algorithm
         draw_arc_df_aa(&this->draw_ctx,
                        center_x,
-                       center_x,
+                       center_y,
                        this->radius,
                        this->line_width,
                        this->start_angle,

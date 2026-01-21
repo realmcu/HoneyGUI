@@ -819,6 +819,8 @@ static void gui_rect_prepare(gui_obj_t *obj)
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
 
     // Calculate checksum only for key properties (exclude pointers)
     uint8_t new_checksum = 0;
@@ -849,7 +851,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
 
     // FORCE single buffer for gradient or alpha for consistency
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
-                              (this->base.w * this->base.h <= 40000) ||
+                              (this->base.w * this->base.h <= 10000) ||
                               (this->use_gradient && this->gradient != NULL);
 
     if (this->radius == 0 && !this->use_gradient)
@@ -1167,12 +1169,6 @@ void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color)
 void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter)
 {
     gui_obj_add_event_cb((gui_obj_t *)rect, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED,
-                         parameter);
-}
-
-void gui_rect_on_press(gui_rounded_rect_t *rect, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb((gui_obj_t *)rect, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED,
                          parameter);
 }
 

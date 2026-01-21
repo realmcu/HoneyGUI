@@ -74,6 +74,9 @@ static void gui_circle_input_prepare(gui_obj_t *obj)
         if (is_point_in_circle(this, local_x, local_y))
         {
             gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
         }
     }
 }
@@ -778,8 +781,29 @@ static void gui_circle_prepare(gui_obj_t *obj)
         // Update center_rect matrix
         if (this->center_rect != NULL)
         {
-            memcpy(&this->center_rect->matrix, obj->matrix, sizeof(struct gui_matrix));
-            memcpy(&this->center_rect->inverse, obj->matrix, sizeof(struct gui_matrix));
+            // For single-buffer rendering (gradient/alpha/small circles), no offset needed
+            bool need_single_buffer = (this->color.color.rgba.a < 255) ||
+                                      (diameter * diameter < 10000) ||
+                                      (this->use_gradient && this->gradient != NULL);
+
+            if (need_single_buffer)
+            {
+                // Single buffer - no offset
+                memcpy(&this->center_rect->matrix, obj->matrix, sizeof(struct gui_matrix));
+            }
+            else
+            {
+                // Multi-part rendering - need to add center rect offset
+                int inner_half = (int)floorf(this->radius * M_SQRT1_2);
+                int arc_width = this->radius - inner_half;
+                int inner_x = arc_width;
+                int inner_y = arc_width;
+
+                memcpy(&this->center_rect->matrix, obj->matrix, sizeof(struct gui_matrix));
+                matrix_translate((float)inner_x, (float)inner_y, &this->center_rect->matrix);
+            }
+
+            memcpy(&this->center_rect->inverse, &this->center_rect->matrix, sizeof(struct gui_matrix));
             matrix_inverse(&this->center_rect->inverse);
             draw_img_new_area(this->center_rect, NULL);
         }

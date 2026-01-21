@@ -42,6 +42,106 @@ static void set_img_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
     head->rsvd2 = 0;
 }
 
+/**
+ * Calculate the bounding box for a single arc
+ * Returns the min/max coordinates that the arc occupies
+ */
+static void calculate_arc_bbox(float cx, float cy, float radius, float line_width,
+                               float start_angle, float end_angle,
+                               float *min_x, float *max_x, float *min_y, float *max_y)
+{
+    float outer_r = radius + line_width / 2.0f + 2.0f;
+    float inner_r = radius - line_width / 2.0f - 2.0f;
+    if (inner_r < 0) { inner_r = 0; }
+
+    // Calculate angle span BEFORE normalization to detect full circles
+    float angle_span = end_angle - start_angle;
+    if (angle_span < 0) { angle_span += 360.0f; }
+
+    // Check if this is a full circle (including 0->360 case)
+    if (angle_span >= 359.0f || angle_span <= 1.0f)
+    {
+        // Full circle - use entire bounding box
+        *min_x = cx - outer_r;
+        *max_x = cx + outer_r;
+        *min_y = cy - outer_r;
+        *max_y = cy + outer_r;
+        return;
+    }
+
+    // Normalize angles to 0-360 range for partial arc calculation
+    while (start_angle < 0) { start_angle += 360.0f; }
+    while (end_angle < 0) { end_angle += 360.0f; }
+    while (start_angle >= 360.0f) { start_angle -= 360.0f; }
+    while (end_angle >= 360.0f) { end_angle -= 360.0f; }
+
+    // For partial arcs, calculate actual bounds
+    *min_x = cx;
+    *max_x = cx;
+    *min_y = cy;
+    *max_y = cy;
+
+    // Sample points along the arc
+    int num_samples = (int)(angle_span / 10.0f) + 2;
+    if (num_samples < 3) { num_samples = 3; }
+
+    for (int i = 0; i <= num_samples; i++)
+    {
+        float t = (float)i / (float)num_samples;
+        float angle = start_angle + t * angle_span;
+        float rad = angle * 3.14159265f / 180.0f;
+        float cos_a = cosf(rad);
+        float sin_a = sinf(rad);
+
+        // Check outer edge
+        float x_outer = cx + outer_r * cos_a;
+        float y_outer = cy + outer_r * sin_a;
+        if (x_outer < *min_x) { *min_x = x_outer; }
+        if (x_outer > *max_x) { *max_x = x_outer; }
+        if (y_outer < *min_y) { *min_y = y_outer; }
+        if (y_outer > *max_y) { *max_y = y_outer; }
+
+        // Check inner edge
+        if (inner_r > 0)
+        {
+            float x_inner = cx + inner_r * cos_a;
+            float y_inner = cy + inner_r * sin_a;
+            if (x_inner < *min_x) { *min_x = x_inner; }
+            if (x_inner > *max_x) { *max_x = x_inner; }
+            if (y_inner < *min_y) { *min_y = y_inner; }
+            if (y_inner > *max_y) { *max_y = y_inner; }
+        }
+    }
+
+    // Check cardinal directions if they fall within the arc
+    float cardinal_angles[] = {0, 90, 180, 270};
+    for (int i = 0; i < 4; i++)
+    {
+        float angle = cardinal_angles[i];
+        bool in_arc = false;
+
+        if (start_angle <= end_angle)
+        {
+            in_arc = (angle >= start_angle && angle <= end_angle);
+        }
+        else
+        {
+            in_arc = (angle >= start_angle || angle <= end_angle);
+        }
+
+        if (in_arc)
+        {
+            float rad = angle * 3.14159265f / 180.0f;
+            float x = cx + outer_r * cosf(rad);
+            float y = cy + outer_r * sinf(rad);
+            if (x < *min_x) { *min_x = x; }
+            if (x > *max_x) { *max_x = x; }
+            if (y < *min_y) { *min_y = y; }
+            if (y > *max_y) { *max_y = y; }
+        }
+    }
+}
+
 static void gui_arc_group_input_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
@@ -62,6 +162,57 @@ static void gui_arc_group_prepare(gui_arc_group_t *this)
         obj->matrix = gui_malloc(sizeof(gui_matrix_t));
         GUI_ASSERT(obj->matrix != NULL);
         matrix_identity(obj->matrix);
+    }
+
+    // Optimize buffer size on first allocation based on actual arcs
+    if (this->pixel_buffer == NULL && this->arc_count > 0)
+    {
+        float min_x = 1e9f, max_x = -1e9f, min_y = 1e9f, max_y = -1e9f;
+
+        // Calculate bounding box for all arcs
+        for (int i = 0; i < this->arc_count; i++)
+        {
+            arc_def_t *arc = &this->arcs[i];
+            float arc_min_x, arc_max_x, arc_min_y, arc_max_y;
+
+            calculate_arc_bbox(arc->cx, arc->cy, arc->radius, arc->line_width,
+                               arc->start_angle, arc->end_angle,
+                               &arc_min_x, &arc_max_x, &arc_min_y, &arc_max_y);
+            if (arc_min_x < min_x) { min_x = arc_min_x; }
+            if (arc_max_x > max_x) { max_x = arc_max_x; }
+            if (arc_min_y < min_y) { min_y = arc_min_y; }
+            if (arc_max_y > max_y) { max_y = arc_max_y; }
+        }
+
+        // Calculate optimized buffer size
+        int optimized_w = (int)(max_x - min_x) + 4;
+        int optimized_h = (int)(max_y - min_y) + 4;
+
+
+        // Use optimized size if it saves memory (either dimension smaller)
+        int original_pixels = this->buffer_w * this->buffer_h;
+        int optimized_pixels = optimized_w * optimized_h;
+
+        if (optimized_pixels < original_pixels)
+        {
+            // Adjust arc coordinates to be relative to the optimized buffer
+            float offset_x = min_x;
+            float offset_y = min_y;
+
+            for (int i = 0; i < this->arc_count; i++)
+            {
+                this->arcs[i].cx -= offset_x;
+                this->arcs[i].cy -= offset_y;
+            }
+
+            // Update widget position to compensate for the offset
+            gui_obj_t *obj = (gui_obj_t *)this;
+            obj->x += (int)offset_x;
+            obj->y += (int)offset_y;
+
+            this->buffer_w = optimized_w;
+            this->buffer_h = optimized_h;
+        }
     }
 
     // Allocate buffer if needed
@@ -117,9 +268,6 @@ static void gui_arc_group_prepare(gui_arc_group_t *this)
     this->draw_ctx.clip_rect.y = 0;
     this->draw_ctx.clip_rect.w = this->buffer_w;
     this->draw_ctx.clip_rect.h = this->buffer_h;
-
-#include "gui_api_os.h"
-    gui_log("[GUI MODULE]Arc group rendering %d arcs in one buffer\n", this->arc_count);
 
     // Render all arcs to buffer
     for (int i = 0; i < this->arc_count; i++)

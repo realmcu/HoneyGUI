@@ -44,6 +44,8 @@ typedef struct
     draw_img_t *draw_img;       /**< Drawing image object. */
     uint8_t *pixel_buffer;      /**< Cached pixel buffer. */
     uint32_t buffer_size;       /**< Buffer size. */
+    int buffer_w;               /**< Actual buffer width (may be optimized). */
+    int buffer_h;               /**< Actual buffer height (may be optimized). */
     bool buffer_valid;          /**< Buffer cache valid flag. */
 
     // Drawing context
