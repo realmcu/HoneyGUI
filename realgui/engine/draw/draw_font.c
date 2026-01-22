@@ -922,6 +922,19 @@ uint32_t get_thai_mark_char_width(mem_char_t *chr, uint32_t char_count)
 uint32_t process_thai_char_struct(mem_char_t *chr, uint32_t unicode_len,
                                   THAI_MARK_INFO **mark_array_out, uint32_t *mark_count_out)
 {
+    if (unicode_len == 0 || chr == NULL)
+    {
+        if (mark_array_out)
+        {
+            *mark_array_out = NULL;
+        }
+        if (mark_count_out)
+        {
+            *mark_count_out = 0;
+        }
+        return 0;
+    }
+
     uint32_t base_count = 0;
     uint32_t mark_count = 0;
     int32_t last_base_idx = -1;
