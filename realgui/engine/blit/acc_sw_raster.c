@@ -325,7 +325,19 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
     gui_img_file_t *file = (gui_img_file_t *)image->data;
     gui_rgb_data_head_t *head = image->data;
     char input_type = head->type;
-    imdc_file_t *compressed = (imdc_file_t *)(&(file->data.imdc_file));
+    imdc_file_t *compressed;
+    if (input_type == I8)
+    {
+        // I8 RLE format: header + clut_count(4) + clut_data(count*4) + imdc_file
+        uint32_t *clut_count = (uint32_t *)((uint8_t *)image->data + sizeof(gui_rgb_data_head_t));
+        uint32_t actual_color = ((*clut_count) >> 16) + 1;
+        uintptr_t imdc_offset = sizeof(gui_rgb_data_head_t) + sizeof(uint32_t) + actual_color * 4;
+        compressed = (imdc_file_t *)((uint8_t *)image->data + imdc_offset);
+    }
+    else
+    {
+        compressed = (imdc_file_t *)(&(file->data.imdc_file));
+    }
     if (y != y_record || x <= x_record || image_record != image)
     {
         y_record = y;
@@ -415,6 +427,22 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
             pixel[0] = node->alpha;
             break;
         }
+    case I8:
+        {
+            imdc_i8_node_t *node = NULL;
+            do
+            {
+                node = (imdc_i8_node_t *)(uintptr_t)line;
+                location += node->len;
+                line = line + sizeof(imdc_i8_node_t);
+            }
+            while (location < (x + 1));
+            location -= node->len;
+            line -= sizeof(imdc_i8_node_t);
+            pixel[0] = node->index;
+            break;
+        }
+
     default:
         {
             gui_log("Unsupported image type in RLE: %d\n", input_type);

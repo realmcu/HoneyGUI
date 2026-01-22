@@ -152,6 +152,12 @@ typedef struct imdc_a8_node
     uint8_t len;
     uint8_t alpha;       //a8
 } imdc_a8_node_t;
+
+typedef struct imdc_i8_node
+{
+    uint8_t len;
+    uint8_t index;       //i8 palette index
+} imdc_i8_node_t;
 #pragma pack()
 
 
