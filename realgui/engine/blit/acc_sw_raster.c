@@ -422,7 +422,8 @@ void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         uint32_t *clut = clut_count + 1;
         params.palette_data = (uint8_t *)clut;
         params.palette_index = NULL;
-        params.image_base = sizeof(gui_rgb_data_head_t) + sizeof(uint32_t) + (*clut_count) * 4 +
+        params.image_base = sizeof(gui_rgb_data_head_t) + sizeof(uint32_t) + (((
+                                                                                   *clut_count) >> 16) + 1) * 4 +
                             (uintptr_t)(image->data);
     }
     else
