@@ -181,12 +181,6 @@ endchoice
 
 menu "HoneyGUI Feature Configuration"
 
-config REALTEK_BUILD_PINYIN
-    bool "Enable Keyboard and Pinyin"
-    default y
-    help
-      RTK GUI Enable KeyBoard And Pinyin input
-
 config REALTEK_BUILD_LETTER_SHELL
     bool "Enable LetterShell"
     default y
@@ -221,6 +215,14 @@ config REALTEK_BUILD_LITE3D
     default n
     help
       RTK GUI Enable Lite3D library
+
+config REALTEK_BUILD_XML_LOADER
+    bool "Enable XML Loader"
+    default n
+    select REALTEK_BUILD_LITE3D
+    select REALTEK_H264_DECODER
+    help
+      RTK GUI Enable XML Loader (ezXML)
 
 endmenu
 

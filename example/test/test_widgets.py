@@ -56,10 +56,10 @@ def main():
         with open(".config", "w") as f:
             f.write("CONFIG_REALTEK_HONEYGUI=y\n")
             f.write("CONFIG_{}=y\n".format(config_name))
-            f.write("CONFIG_REALTEK_BUILD_PINYIN=y\n")
             f.write("CONFIG_REALTEK_BUILD_LETTER_SHELL=y\n")
             f.write("CONFIG_REALTEK_BUILD_GUI_BOX2D=y\n")
             f.write("CONFIG_REALTEK_BUILD_LITE3D=y\n")
+            f.write("CONFIG_REALTEK_BUILD_XML_LOADER=y\n")
         
         # Clean
         subprocess.run(["scons", "-c"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

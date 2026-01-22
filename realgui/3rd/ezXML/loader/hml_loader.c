@@ -195,7 +195,6 @@ const hml_component_entry_t *hml_get_component_registry(void)
         {"hg_window",   hml_create_view},
         {"hg_win",      hml_create_view},
         {"hg_image",    hml_create_image},
-        {"hg_img",      hml_create_image},
         {"hg_text",     hml_create_text},
         {"hg_canvas",   hml_create_canvas},
         {"hg_rect",     hml_create_canvas},
