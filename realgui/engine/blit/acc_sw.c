@@ -69,7 +69,7 @@ void blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             argb8565_2_rgb565(image, dc, rect);
             return;
         }
-        else if (head->type == ALPHAMASK)
+        else if (head->type == ALPHAMASK || head->type == A8)
         {
             a8_2_rgb565(image, dc, rect);
             return;

@@ -147,6 +147,11 @@ typedef struct imdc_argb8888_node
     uint8_t len;
     uint32_t pixel32;    //argb8888
 } imdc_argb8888_node_t;
+typedef struct imdc_a8_node
+{
+    uint8_t len;
+    uint8_t alpha;       //a8
+} imdc_a8_node_t;
 #pragma pack()
 
 

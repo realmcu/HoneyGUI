@@ -98,6 +98,7 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
             break;
         }
     case ALPHAMASK:
+    case A8:
         {
             color_a8_t *pixel = (color_a8_t *)(uintptr_t)image_base + image_off;
             color_argb8888_t *pixel_mix = (color_argb8888_t *)&color_mix;
@@ -213,6 +214,16 @@ static void gui_apply_blend_mode(uint8_t *target_red, uint8_t *target_green, uin
     case IMG_SRC_OVER_MODE:
     case IMG_RECT:
         {
+            source_alpha = (source_alpha * opacity_value) / 255;
+            blend_colors(target_alpha, source_alpha, source_alpha);
+            blend_colors(target_red, source_red, source_alpha);
+            blend_colors(target_green, source_green, source_alpha);
+            blend_colors(target_blue, source_blue, source_alpha);
+            break;
+        }
+    case IMG_2D_SW_FIX_A8_FG:
+        {
+            // A8 format with fixed foreground color (use background from framebuffer)
             source_alpha = (source_alpha * opacity_value) / 255;
             blend_colors(target_alpha, source_alpha, source_alpha);
             blend_colors(target_red, source_red, source_alpha);
@@ -386,6 +397,22 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
             location -= node->len;
             line -= sizeof(imdc_argb8888_node_t);
             memcpy(pixel, &(node->pixel32), sizeof(node->pixel32));
+            break;
+        }
+    case ALPHAMASK:
+    case A8:
+        {
+            imdc_a8_node_t *node = NULL;
+            do
+            {
+                node = (imdc_a8_node_t *)(uintptr_t)line;
+                location += node->len;
+                line = line + sizeof(imdc_a8_node_t);
+            }
+            while (location < (x + 1));
+            location -= node->len;
+            line -= sizeof(imdc_a8_node_t);
+            pixel[0] = node->alpha;
             break;
         }
     default:
