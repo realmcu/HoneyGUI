@@ -550,7 +550,7 @@ void gui_text_set(gui_text_t    *this,
                   FONT_SRC_TYPE  text_type,
                   gui_color_t    color,
                   uint16_t       length,
-                  uint8_t        font_size)
+                  uint16_t       font_size)
 {
     this->font_type = text_type;
     this->color = color;
@@ -628,7 +628,7 @@ void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
     this->layout_refresh = true;
 }
 
-void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
+void gui_text_size_set(gui_text_t *this, uint16_t height, uint16_t width)
 {
     (void)width;
     this->font_height = height;

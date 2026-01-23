@@ -1804,7 +1804,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
 
 uint32_t gui_get_ttf_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset,
-                                uint8_t font_height)
+                                uint16_t font_height)
 {
     if (content == NULL || font_bin_addr == NULL)
     {

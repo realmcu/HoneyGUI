@@ -111,7 +111,7 @@ typedef struct gui_text
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
     FONT_SRC_MODE font_mode;
-    uint8_t font_height;
+    uint16_t font_height;
     uint8_t emoji_size;
     uint8_t checksum;
     int8_t extra_letter_spacing;
@@ -189,7 +189,7 @@ void gui_text_set(gui_text_t    *this_widget,
                   FONT_SRC_TYPE  text_type,
                   gui_color_t    color,
                   uint16_t       length,
-                  uint8_t        font_size);
+                  uint16_t       font_size);
 
 /**
  * @brief Set animate.
@@ -294,7 +294,7 @@ void gui_text_move(gui_text_t *this_widget, int16_t x, int16_t y);
  * @param height Font height or font size.
  * @param width Font width (only effective when FreeType is used).
  */
-void gui_text_size_set(gui_text_t *this_widget, uint8_t height, uint8_t width);
+void gui_text_size_set(gui_text_t *this_widget, uint16_t height, uint16_t width);
 
 /**
  * @brief Set text font mode.

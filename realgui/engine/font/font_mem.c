@@ -25,9 +25,9 @@
  *                      Font Library Access Functions
  *============================================================================*/
 
-FONT_LIB_NODE *get_fontlib_by_size(uint8_t font_size)
+FONT_LIB_NODE *get_fontlib_by_size(uint16_t font_size)
 {
-    FONT_LIB_NODE *node = gui_font_lib_find_by_size(font_size, GUI_FONT_SRC_BMP);
+    FONT_LIB_NODE *node = gui_font_lib_find_by_size((uint8_t)font_size, GUI_FONT_SRC_BMP);
     if (node != NULL)
     {
         return node;

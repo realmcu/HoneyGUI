@@ -480,7 +480,7 @@ void gui_scroll_text_set(gui_scroll_text_t *_this,
                          FONT_SRC_TYPE      text_type,
                          gui_color_t        color,
                          uint16_t           length,
-                         uint8_t            font_size)
+                         uint16_t            font_size)
 {
     gui_text_set(&_this->base, text, text_type, color, length, font_size);
     gui_scroll_text_reset(_this);

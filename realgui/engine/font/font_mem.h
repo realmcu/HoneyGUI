@@ -169,7 +169,7 @@ uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
  * @param font_size Font size.
  * @return Font library node pointer, or NULL if not found.
  */
-FONT_LIB_NODE *get_fontlib_by_size(uint8_t font_size);
+FONT_LIB_NODE *get_fontlib_by_size(uint16_t font_size);
 
 /**
  * @brief Get the font library node by name.
