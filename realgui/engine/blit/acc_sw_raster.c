@@ -413,33 +413,22 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
         }
     case ALPHAMASK:
     case A8:
-        {
-            imdc_a8_node_t *node = NULL;
-            do
-            {
-                node = (imdc_a8_node_t *)(uintptr_t)line;
-                location += node->len;
-                line = line + sizeof(imdc_a8_node_t);
-            }
-            while (location < (x + 1));
-            location -= node->len;
-            line -= sizeof(imdc_a8_node_t);
-            pixel[0] = node->alpha;
-            break;
-        }
     case I8:
         {
-            imdc_i8_node_t *node = NULL;
+            // A8 and I8 share the same RLE structure (single byte per pixel)
+            // A8: byte represents alpha value
+            // I8: byte represents palette index
+            imdc_u8_node_t *node = NULL;
             do
             {
-                node = (imdc_i8_node_t *)(uintptr_t)line;
+                node = (imdc_u8_node_t *)(uintptr_t)line;
                 location += node->len;
-                line = line + sizeof(imdc_i8_node_t);
+                line = line + sizeof(imdc_u8_node_t);
             }
             while (location < (x + 1));
             location -= node->len;
-            line -= sizeof(imdc_i8_node_t);
-            pixel[0] = node->index;
+            line -= sizeof(imdc_u8_node_t);
+            pixel[0] = node->value;
             break;
         }
 
