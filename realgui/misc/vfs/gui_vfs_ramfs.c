@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /**
  * @file gui_vfs_ramfs.c
  * @brief RAM filesystem implementation (read/write, XIP support)

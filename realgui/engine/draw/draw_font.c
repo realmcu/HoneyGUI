@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file draw_font.c
-  * @brief Draw font
-  * @details Draw font
-  * @author luke_sun@realsil.com.cn
-  * @date 2025/08/12
-  * @version 1.1
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                           Header Files

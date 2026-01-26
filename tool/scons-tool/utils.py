@@ -1,4 +1,10 @@
 #
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
+#
 # File      : utils.py
 # This file is part of RT-Thread RTOS
 # COPYRIGHT (C) 2006 - 2015, RT-Thread Development Team

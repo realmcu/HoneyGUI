@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 set(CONFIG_SOC_SERIES_RTL8763D y)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \

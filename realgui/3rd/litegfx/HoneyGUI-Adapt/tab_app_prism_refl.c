@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "gui_widget_litegfx.h"
 #include "root_image/ui_resource.h"
 #include "app_gui_main.h"

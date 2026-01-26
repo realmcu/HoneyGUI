@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 """MJPEG 解析器模块 - 用于解析和写入 MJPEG 文件"""
 
 import os

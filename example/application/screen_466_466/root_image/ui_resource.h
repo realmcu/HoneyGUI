@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #define   SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN (uint32_t)(0x000000f8)
 #define   FRAME_0024_BIN                           (uint32_t)(0x000127f8)
 #define   FRAME_0025_BIN                           (uint32_t)(0x00013b78)

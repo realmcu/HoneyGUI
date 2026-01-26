@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 """命令行接口模块"""
 
 import argparse

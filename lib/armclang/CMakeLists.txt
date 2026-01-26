@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 cmake_minimum_required (VERSION 3.10)
 cmake_policy(SET CMP0123 NEW)
 

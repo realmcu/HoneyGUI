@@ -1,20 +1,8 @@
-/**
- \internal
-*****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file
-  * @brief
-  * @details
-  * @author
-  * @date
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
- \endinternal
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "lite_geometry_math.h"
 /**********************
  *  STATIC VARIABLES

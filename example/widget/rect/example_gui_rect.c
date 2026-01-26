@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /* gui rect example start */
 #include "gui_components_init.h"
 #include "gui_rect.h"

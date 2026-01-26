@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /**
  * @file gui_vfs.h
  * @brief Virtual File System abstraction layer for HoneyGUI

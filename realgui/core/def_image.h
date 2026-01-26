@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #ifndef __DEF_IMAGE_H__
 #define __DEF_IMAGE_H__

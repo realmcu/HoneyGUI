@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file l3_gltf.c
-  * @brief
-  * @details
-  * @author
-  * @date
-  * @version
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 /*============================================================================*
  *                        Header Files
@@ -22,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
 #include "l3_common.h"
 #include "l3_gltf.h"
 #include "l3_rect_raster.h"
@@ -260,8 +251,8 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
         dst_sampler->output_count = src_sampler->output_count;
         dst_sampler->output_type = (gltf_data_type)src_sampler->output_type;
 
-        dst_sampler->input_data = (float *)(data_blob_base + src_sampler->input_offset);
-        dst_sampler->output_data = (float *)(data_blob_base + src_sampler->output_offset);
+        dst_sampler->input_data = (float *)(uintptr_t)(data_blob_base + src_sampler->input_offset);
+        dst_sampler->output_data = (float *)(uintptr_t)(data_blob_base + src_sampler->output_offset);
     }
 
     // 2.7 Channel Reconstruction

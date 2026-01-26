@@ -1,18 +1,9 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file acc_sw_rle.c
-  * @brief Picture software decoding library
-  * @details input:rgba/rgb/rgb565;output:rgba/rgb565
-  * @author wenjing_jiang@realsil.com.cn
-  * @date 2023/12/08
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2023 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /*============================================================================*
  *                        Header Files
  *============================================================================*/

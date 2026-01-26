@@ -1,15 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_rect.c
-  * @brief rect widget with hyper-optimized gradient filling
-  * @details Zone-based rendering with pre-computed LUTs and Masks
-  * @author
-  * @date 2025/11/26
-  * @version 3.0
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

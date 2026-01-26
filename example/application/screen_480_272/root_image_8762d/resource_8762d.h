@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #define   WCH6_ARRHOUR0_FINE_BIN                  (void *)0x00a00228
 #define   WCH6_ARRHOUR0_FINE_01_BIN               (void *)0x00a017bc
 #define   WCH6_ARRHOUR0_FINE_02_BIN               (void *)0x00a01b60

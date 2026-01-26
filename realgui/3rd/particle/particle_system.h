@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @file particle_system.h
  * @brief Particle System Core Controller - Main system management
  *
@@ -9,9 +14,6 @@
  * - Boundary detection and recycling
  * - Auto-throttling mechanism
  * - Render callback invocation
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PARTICLE_SYSTEM_H

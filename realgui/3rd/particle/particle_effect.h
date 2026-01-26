@@ -1,17 +1,19 @@
-/**
- * @file particle_effect.h
- * @brief Preset Particle Effects - Pre-configured effect templates
- *
- * This module provides preset particle effects including:
- * - Firework: Explosive burst effect with gravity and fade
- * - Trail: Pointer/cursor trail effect
- * - Touch: Touch interaction feedback effect
- * - Snow: Falling snowflake effect
- * - Bubble: Rising bubble effect
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
+/*
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
  * SPDX-License-Identifier: Apache-2.0
  */
+
+/**
+* @file particle_effect.h
+* @brief Preset Particle Effects - Pre-configured effect templates
+*
+* This module provides preset particle effects including:
+* - Firework: Explosive burst effect with gravity and fade
+* - Trail: Pointer/cursor trail effect
+* - Touch: Touch interaction feedback effect
+* - Snow: Falling snowflake effect
+* - Bubble: Rising bubble effect
+*/
 
 #ifndef PARTICLE_EFFECT_H
 #define PARTICLE_EFFECT_H

@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file guidef.h
-  * @brief base define for RealGUI
-  * @details base define for RealGUI
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/19
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2023 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

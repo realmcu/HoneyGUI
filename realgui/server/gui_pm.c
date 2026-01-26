@@ -1,13 +1,9 @@
-/**
- * @file gui_pm.c
- * @author howie_wang (howie_wang@realtek.com.cn)
- * @brief
- * @version 0.1
- * @date 2023-12-12
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2023
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #include "guidef.h"
 #include "draw_img.h"
 #include "gui_fb.h"

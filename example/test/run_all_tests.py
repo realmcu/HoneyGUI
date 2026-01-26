@@ -1,4 +1,10 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
 #!/usr/bin/env python3
+
 """
 Total test script - Calls all module tests
 Runs all test modules and generates a comprehensive report

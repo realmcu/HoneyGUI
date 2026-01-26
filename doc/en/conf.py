@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 # -*- coding: utf-8 -*-
 #
 # English Language RTD & Sphinx config file

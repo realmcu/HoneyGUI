@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Apply the flags to C and C++ compiler settings armcc
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \

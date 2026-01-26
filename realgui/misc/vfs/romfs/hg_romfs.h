@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef __HG_ROMFS_H__
 #define __HG_ROMFS_H__
 

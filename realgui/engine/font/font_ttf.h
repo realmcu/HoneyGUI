@@ -1,20 +1,8 @@
-/**
- \internal
-*****************************************************************************************
-*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file font_ttf.h
-  * @brief ttf font engine header file
-  * @details ttf font engine header file
-  * @author luke_sun@realsil.com.cn
-  * @date 2024/12/09
-  * @version v1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
- \endinternal
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

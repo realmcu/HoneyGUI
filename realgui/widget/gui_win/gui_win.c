@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_win.c
-  * @brief Window widget
-  * @details A rectangular container widget which can listen to many gestures
-  * @author triton_yu@realsil.com.cn
-  * @date 2023/10/25
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2023 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

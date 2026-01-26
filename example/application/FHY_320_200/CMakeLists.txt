@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 # CMakeLists.txt for FHY_320_200 demo
 cmake_minimum_required(VERSION 3.10)
 

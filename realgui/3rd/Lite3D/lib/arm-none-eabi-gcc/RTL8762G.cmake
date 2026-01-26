@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -xc \
     -march=armv8.1-m.main+dsp+mve+fp \

@@ -1,20 +1,8 @@
-/**
- \internal
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_arc_group.h
-  * @brief Arc group widget for batch rendering multiple background arcs.
-  * @details Optimizes rendering by combining multiple static arcs into one buffer.
-  * @author
-  * @date 2025/01/09
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
- \endinternal
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #ifndef __GUI_ARC_GROUP_H__
 #define __GUI_ARC_GROUP_H__

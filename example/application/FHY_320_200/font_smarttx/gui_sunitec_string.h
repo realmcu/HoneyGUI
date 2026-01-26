@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef _GUI_STRING_TRANSPARENCY_H_
 #define _GUI_STRING_TRANSPARENCY_H_
 

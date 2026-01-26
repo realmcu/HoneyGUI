@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef __L3_TRIA_TRANSFORM_H
 #define __L3_TRIA_TRANSFORM_H
 

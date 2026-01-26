@@ -1,19 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file Lite3D_port.c
-  * @brief Custom configuration
-  * @details Custom configuration
-  * @author sienna_shen@realsil.com.cn
-  * @date 2025/4/11
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
-
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #include <stdlib.h>
 #include "l3.h"

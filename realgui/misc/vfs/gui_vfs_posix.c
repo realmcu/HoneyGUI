@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /**
  * @file gui_vfs_posix.c
  * @brief POSIX filesystem backend for VFS

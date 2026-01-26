@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 static const unsigned char default_font_size16_bits1_bitmap[3632UL + 1] =
 {

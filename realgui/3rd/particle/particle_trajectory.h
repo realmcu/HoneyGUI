@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @file particle_trajectory.h
  * @brief Particle Trajectory Module - Motion path calculations
  *
@@ -7,9 +12,6 @@
  * - Gravity: Acceleration-based motion with configurable gravity
  * - Spiral: Circular motion around a center point
  * - Custom: User-defined trajectory callback
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PARTICLE_TRAJECTORY_H

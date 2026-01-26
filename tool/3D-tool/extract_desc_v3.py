@@ -1,4 +1,10 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
 #!/usr/bin/env python3
+
 """
 Python version of extract_desc_v2.exe
 Extracts 3D model descriptions from OBJ and GLTF files

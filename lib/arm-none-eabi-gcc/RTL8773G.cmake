@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Apply the flags to C and C++ compiler settings
 set(CONFIG_SOC_SERIES_RTL8773G y)
 

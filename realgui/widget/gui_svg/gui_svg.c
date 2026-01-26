@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_svg.c
-  * @brief SVG widget implementation.
-  * @details SVG widget is used to display SVG images on the screen using NanoVG.
-  * @author
-  * @date 2024/12/11
-  * @version 2.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2023 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include <string.h>
 #include "gui_svg.h"

@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 """
 HoneyGUI Binary File Headers
 定义 bin 文件的头部结构

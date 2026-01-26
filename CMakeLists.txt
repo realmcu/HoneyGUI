@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 if(ZEPHYR_BASE)
   if(CONFIG_REALTEK_HONEYGUI) #set to 1 to enable or variable to for dependency
 	  message(STATUS "ZEPHYR_BASE is set to: ${ZEPHYR_BASE}")

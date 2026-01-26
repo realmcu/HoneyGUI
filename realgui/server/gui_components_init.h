@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_components_init.h
-  * @brief app api
-  * @details application startup and close
-  * @author howie_wang@realsil.com.cn
-  * @date
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

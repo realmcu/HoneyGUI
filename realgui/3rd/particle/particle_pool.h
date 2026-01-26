@@ -1,12 +1,14 @@
 /**
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @file particle_pool.h
  * @brief Particle Pool Management - Object pool for efficient particle reuse
  *
  * This module implements an object pool pattern for managing particle lifecycle.
  * It uses a free index stack for O(1) allocation and deallocation.
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PARTICLE_POOL_H

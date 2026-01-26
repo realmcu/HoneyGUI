@@ -1,20 +1,8 @@
-/**
- \internal
-*****************************************************************************************
-*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_scroll_text.c
-  * @brief Scroll text widget.
-  * @details Scroll text widget.
-  * @author luke_sun@realsil.com.cn
-  * @date 2023/11/08
-  * @version v1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2023 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
- \endinternal
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

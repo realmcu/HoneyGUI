@@ -1,13 +1,9 @@
-/**
- * @file acc_api.c
- * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
- * @brief
- * @version 0.1
- * @date 2024-06-21
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2024
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #include <stdio.h>
 #include "acc_api.h"
 #include "acc_sw.h"

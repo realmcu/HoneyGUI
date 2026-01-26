@@ -1,11 +1,13 @@
-# Copyright (c) 2024 Realtek Semiconductor Corp.
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
 # SPDX-License-Identifier: Apache-2.0
+#
 
 cmake_minimum_required(VERSION 3.10)
 if(POLICY CMP0079)
   cmake_policy(SET CMP0079 NEW)
 endif()
-
 # Define a variable for the library name
 if(CONFIG_REALTEK_BUILD_LITE3D) #set to 1 to enable or variable to for dependency
 

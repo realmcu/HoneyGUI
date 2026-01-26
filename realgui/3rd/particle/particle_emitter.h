@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @file particle_emitter.h
  * @brief Particle Emitter Module - Particle generation and emission control
  *
@@ -7,9 +12,6 @@
  * - Line: Emission along a line segment
  * - Circle: Emission within a circular area
  * - Rectangle: Emission within a rectangular area
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PARTICLE_EMITTER_H

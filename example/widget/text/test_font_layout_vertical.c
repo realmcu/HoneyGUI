@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file test_font_layout_vertical.c
-  * @brief Vertical text layout mode test
-  * @details Test application for vertical TEXT_MODE layout modes
-  * @author luke_sun@realsil.com.cn
-  * @date 2025/12/09
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

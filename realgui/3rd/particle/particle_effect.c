@@ -1,10 +1,12 @@
-/**
- * @file particle_effect.c
- * @brief Preset Particle Effects Implementation
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
+/*
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
  * SPDX-License-Identifier: Apache-2.0
  */
+
+/**
+* @file particle_effect.c
+* @brief Preset Particle Effects Implementation
+*/
 
 #include "particle_effect.h"
 #include <math.h>

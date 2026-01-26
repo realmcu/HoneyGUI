@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef __DASHBOARD_ADAPT_H__
 #define __DASHBOARD_ADAPT_H__
 

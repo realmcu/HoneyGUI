@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #define _GNU_SOURCE
 #include "guidef.h"
 #include "gui_port.h"

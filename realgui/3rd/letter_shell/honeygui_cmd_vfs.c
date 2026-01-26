@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /**
  * @file honeygui_cmd_vfs.c
  * @brief HoneyGUI VFS shell commands

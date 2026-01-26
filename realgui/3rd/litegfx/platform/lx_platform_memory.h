@@ -11,6 +11,7 @@
 * Author:LiteGFX Team
 * Date:2021.12.05
 *******************************************************************************/
+
 #ifndef LX_PLATFORM_MEMORY_H
 #define LX_PLATFORM_MEMORY_H
 

@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
  * File      : nanovg_port.h
  */
 #ifndef __NANOVG_PORT_H__

@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
  * File      : draw_img.h
  */
 #ifndef __DRAW_IMG_H__

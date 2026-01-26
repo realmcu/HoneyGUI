@@ -1,4 +1,10 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
 #!/usr/bin/env python3
+
 """
 HoneyGUI Image Converter (Modular Version)
 Convert PNG/JPG/BMP images to HoneyGUI bin format with compression support.

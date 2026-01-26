@@ -1,9 +1,11 @@
 /**
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @file particle_system.c
  * @brief Particle System Core Controller Implementation
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #include "particle_system.h"

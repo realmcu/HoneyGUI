@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 """
 RLE (Run-Length Encoding) Compression
 RLE 行程编码压缩

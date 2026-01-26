@@ -1,13 +1,9 @@
-/**
- * @file l3_sw_raster.h
- * @author wanghao@realsil.com.cn
- * @brief
- * @version 0.1
- * @date 2023-12-25
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2023
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #ifndef __L3_SW_RASTER_H__
 #define __L3_SW_RASTER_H__
 

@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file
-  * @brief
-  * @details
-  * @author
-  * @date
-  * @version
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

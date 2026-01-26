@@ -1,20 +1,8 @@
-/**
- \internal
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_lite3d.h
-  * @brief Lite3D library encapsulation.
-  * @details Lite3D library encapsulation.
-  * @author sienna_shen@realsil.com.cn
-  * @date 2025/7/10
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
- \endinternal
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

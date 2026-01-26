@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 """
 HoneyGUI Image Format Types
 定义所有图片格式和压缩算法的常量

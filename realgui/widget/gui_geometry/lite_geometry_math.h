@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef LITE_GEOMETRY_MATH_H
 #define LITE_GEOMETRY_MATH_H
 #include "lite_geometry.h"

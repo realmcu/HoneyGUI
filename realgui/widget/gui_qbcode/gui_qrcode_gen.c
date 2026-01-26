@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file  gui_qrcode_gen.c
-  * @brief qrcode widget
-  * @details qrcode
-  * @author yuyin1_zhang@realsil.com.cn
-  * @date 2024/4/17
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

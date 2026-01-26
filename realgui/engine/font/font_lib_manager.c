@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file font_lib_manager.c
-  * @brief Unified font library manager implementation
-  * @details Dynamic font library with reference counting for BMP and TTF fonts
-  * @author luke_sun
-  * @date 2025/01/07
-  * @version v1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include <string.h>
 #include "font_lib_manager.h"

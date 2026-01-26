@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef __GUI_POST_PROCESS_H__
 #define __GUI_POST_PROCESS_H__
 #ifdef __cplusplus

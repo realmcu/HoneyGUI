@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
  * File      : gui_matrix.h
  */
 #ifndef __GUI_MATRIX_H__

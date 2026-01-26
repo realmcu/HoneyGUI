@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
  * File      : gui_math.c
  * This file is part of GUI Engine
  */

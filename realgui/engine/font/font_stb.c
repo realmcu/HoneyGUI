@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file font_stb.c
-  * @brief stb truetype engine
-  * @details stb truetype engine
-  * @author luke_sun@realsil.com.cn
-  * @date 2024/11/05
-  * @version v1.1
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #if defined _HONEYGUI_SIMULATOR_
 extern unsigned char *resource_root;
 

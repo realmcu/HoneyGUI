@@ -1,15 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file gui_circle.c
-  * @brief circle widget with hyper-optimized rendering
-  * @details Quadrant-based rendering with branchless dithering
-  * @author
-  * @date 2025/12/03
-  * @version 3.0
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

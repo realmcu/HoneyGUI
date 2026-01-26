@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "gui_view_macro.h"
 #include "gui_img.h"
 static void smooth_gradient_image_switch_in(gui_view_t *view)

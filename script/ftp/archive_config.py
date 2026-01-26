@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 ARCHIVE_MAP = {
     "Common": {
         "script": [(r"script/jenkins-test.py", "sdk"),

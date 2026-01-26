@@ -1,13 +1,9 @@
-/**
- * @file acc_sw_rle_filter.h
- * @author wenjing_jiang@realsil.com.cn
- * @brief
- * @version 0.1
- * @date 2023-12-25
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2023
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #ifndef __ACC_SW_RLE_FILTER_H__
 #define __ACC_SW_RLE_FILTER_H__
 

@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 """
 Adaptive Compression
 自适应压缩 - 自动选择 RLE 或 FastLz

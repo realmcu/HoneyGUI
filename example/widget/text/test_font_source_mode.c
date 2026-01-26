@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file test_font_source_mode.c
-  * @brief Test different font source types and data source modes
-  * @details Tests combinations of GUI_FONT_SRC_BMP/IMG/MAT/TTF with FONT_SRC_MEMADDR/FTL/FILESYS
-  * @author luke_sun
-  * @date 2025/12/31
-  * @version 2.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

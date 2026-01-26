@@ -1,12 +1,7 @@
-/**
- * @file def_compiler.h
- * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
- * @brief
- * @version 0.1
- * @date 2024-06-14
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2024
- *
+ * SPDX-License-Identifier: MIT
  */
 
 #ifndef __DEF_COMPILER_H__

@@ -1,13 +1,7 @@
-
-/**
- * @file wheel_algo.c
- * @author howie_wang (howie_wang@realtek.com.cn)
- * @brief
- * @version 0.1
- * @date 2024-02-22
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2024
- *
+ * SPDX-License-Identifier: MIT
  */
 
 #include "gui_server.h"

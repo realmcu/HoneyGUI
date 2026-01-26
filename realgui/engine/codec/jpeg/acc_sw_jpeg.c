@@ -1,13 +1,9 @@
-/**
- * @file acc_sw_jpeg.c
- * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
- * @brief JPEG decoder implementation
- * @version 0.1
- * @date 2024-06-21
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2024
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #include <stdio.h>
 #include <string.h>
 #include "acc_sw_jpeg.h"

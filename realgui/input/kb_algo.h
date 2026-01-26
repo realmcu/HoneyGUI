@@ -1,12 +1,9 @@
 /*
- * Copyright (c) 2015-2020, RealTek Wristband Development Team
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Change Logs:
- * Date           Author        Notes
- * 2020-11-18     howie  first version
+ * SPDX-License-Identifier: MIT
  */
+
 #ifndef __KB_ALGO_H__
 #define __KB_ALGO_H__
 #include <string.h>

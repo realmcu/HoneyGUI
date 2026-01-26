@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # Apply the flags to C and C++ compiler settings
 set(HW_ACC_PATH "rtl87x2g")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \

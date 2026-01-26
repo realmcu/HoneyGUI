@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file font_mem.c
-  * @brief realui memory font engine
-  * @details realui memory font engine
-  * @author luke_sun@realsil.com.cn
-  * @date 2025/12/31
-  * @version v3.0 - Refactored to use font_lib_manager
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include <string.h>
 #include "draw_font.h"

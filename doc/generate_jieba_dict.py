@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 # run cmd: 
 # python generate_jieba_dict.py ./cn ./cn/word_dict.txt
 # note: ./cn is source_dir; ./cn/word_dict.txt is output_file

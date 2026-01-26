@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom

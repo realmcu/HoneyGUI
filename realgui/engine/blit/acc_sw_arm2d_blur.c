@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "guidef.h"
 #include "gui_api.h"
 #include "gui_post_process.h"

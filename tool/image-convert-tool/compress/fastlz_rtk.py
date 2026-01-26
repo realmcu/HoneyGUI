@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 """
 RTK FastLz Compression - Compatible with Windows Tool
 RTK FastLz 压缩 - 与 Windows 工具兼容

@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @file particle_types.h
  * @brief Particle System Core Types - Independent, no HoneyGUI dependencies
  *
@@ -6,9 +11,6 @@
  * - Platform abstraction interfaces (malloc/free/get_time)
  * - Particle structure definition
  * - Render callback type
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PARTICLE_TYPES_H

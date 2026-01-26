@@ -45,10 +45,10 @@
 # Extract the first 12 characters of the changeID
 
 # 4.0 [mandatory] For statistical purposes
-# https://wiki.realtek.com/display/Bee1/IO+Commit+Sync 
+# Cherry pick configuration
 #[Need Cherry Pick to] NA
 [Need Cherry Pick to] default
-#[Need Cherry Pick to] bb2-master-v2.0,bb2plus-master-v0.0
+#[Need Cherry Pick to] branch-name-v1.0,branch-name-v2.0
 
 # 5.0  [optional] chip info 
 # !!! [attention] Don't use it unless it's a critical moment

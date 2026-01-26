@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef __FONT_FILE_SMARTTX_H__
 #define __FONT_FILE_SMARTTX_H__
 

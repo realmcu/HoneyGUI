@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file def_3d_rect.c
-  * @brief 3D object calculation composed of rectangular grids
-  * @details 3D object calculation composed of rectangular grids
-  * @author sienna_shen@realsil.com.cn
-  * @date 2025/3/7
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include <stdio.h>
 #include <math.h>

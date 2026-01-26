@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2020, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file tp_algo.h
-  * @brief touch panel algorithm
-  * @details input: x,y,press,output: gesture
-  * @author howie
-  * @date 2020-11-18
-  * @version
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2020 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

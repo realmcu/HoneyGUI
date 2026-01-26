@@ -1,4 +1,10 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
 #!/usr/bin/env python3
+
 """
 Batch convert PNG textures to binary format for 3D models
 

@@ -1,17 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file app_music.cpp
-  * @brief Music player using C++ style
-  * @link UI: https://pixso.cn/community/file/w8E6cEgxRlMNE0-faxhJjw
-  * @date 2024/09/24
-  * @version 1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
 *                        Header Files

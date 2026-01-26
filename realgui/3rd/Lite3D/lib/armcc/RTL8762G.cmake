@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # Apply the flags to C and C++ compiler settings armcc
 set(CONFIG_SOC_SERIES_RTL8762G y)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \

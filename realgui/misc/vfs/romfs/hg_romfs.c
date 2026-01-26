@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "hg_romfs.h"
 #include "gui_api_os.h"
 #include "stdarg.h"

@@ -1,13 +1,9 @@
-/**
- * @file gui_listener.h
- * @author howie_wang (howie_wang@realtek.com.cn)
- * @brief Message listener for pub/sub pattern
- * @version 0.1
- * @date 2025-12-25
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2025
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #ifndef __GUI_LISTENER_H__
 #define __GUI_LISTENER_H__
 

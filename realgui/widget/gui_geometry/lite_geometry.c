@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "lite_geometry.h"
 PixelColor RGB565_color(uint8_t r, uint8_t g, uint8_t b)
 {

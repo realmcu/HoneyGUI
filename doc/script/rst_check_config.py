@@ -1,3 +1,8 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
 
 media_check_exclude_pattern = [
     "Glossary.rst"

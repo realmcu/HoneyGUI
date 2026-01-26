@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file font_ttf.c
-  * @brief realui ttf font engine
-  * @details realui ttf font engine
-  * @author luke_sun@realsil.com.cn
-  * @date 2024/12/09
-  * @version v2.0 - Added font_lib_manager support for caching
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 /*============================================================================*
  *                        Header Files

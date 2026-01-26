@@ -1,18 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file font_mem_matrix.c
-  * @brief realui memory font matrix engine
-  * @details realui custom font matrix engine
-  * @author luke_sun@realsil.com.cn
-  * @date 2024/05/21
-  * @version v1.0
-  ***************************************************************************************
-    * @attention
-  * <h2><center>&copy; COPYRIGHT 2024 Realtek Semiconductor Corporation</center></h2>
-  ***************************************************************************************
-  */
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include <string.h>
 #include "draw_font.h"

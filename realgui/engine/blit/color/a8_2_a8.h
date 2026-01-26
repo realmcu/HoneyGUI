@@ -1,13 +1,9 @@
-/**
- * @file a8_2_a8.h
- * @author howie_wang (howie_wang@realtek.com.cn)
- * @brief
- * @version 0.1
- * @date 2025-10-31
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2025
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #ifndef __A8_2_A8_H__
 #define __A8_2_A8_H__
 

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <stdlib.h>

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 const unsigned char gImage_test_gray256[230408] = { 0X00, 0x07, 0XE0, 0X01, 0XE0, 0X01, 0x00, 0x00,
                                                     0X0F, 0X0A, 0X0A, 0X0A, 0X0B, 0X0A, 0X0B, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A,
                                                     0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X0A, 0X09, 0X0A, 0X0A, 0X0A,

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #if defined(_HONEYGUI_SIMULATOR_) && defined(MINIMP3_IMPLEMENTATION)
 #include <iostream>
 #include <thread>

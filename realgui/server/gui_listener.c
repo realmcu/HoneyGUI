@@ -1,13 +1,9 @@
-/**
- * @file gui_listener.c
- * @author howie_wang (howie_wang@realtek.com.cn)
- * @brief Message listener implementation
- * @version 0.1
- * @date 2025-12-25
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
  *
- * @copyright Copyright (c) 2025
- *
+ * SPDX-License-Identifier: MIT
  */
+
 #include "gui_listener.h"
 #include "gui_api.h"
 #include "gui_message.h"

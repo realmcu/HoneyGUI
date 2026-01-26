@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef GUI_VERSION_H
 #define GUI_VERSION_H

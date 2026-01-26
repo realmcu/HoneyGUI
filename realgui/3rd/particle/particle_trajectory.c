@@ -1,12 +1,14 @@
 /**
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @file particle_trajectory.c
  * @brief Particle Trajectory Implementation
  *
  * Implements various trajectory types for particle motion including
  * linear, gravity, spiral, and custom callback-based trajectories.
- *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #include "particle_trajectory.h"

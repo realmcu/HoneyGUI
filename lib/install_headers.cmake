@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 # Common header files installation for HoneyGUI library
 # Usage: include(${CMAKE_CURRENT_SOURCE_DIR}/../install_headers.cmake)
 

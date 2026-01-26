@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef GUI_VIEW_MACRO_H
 #define GUI_VIEW_MACRO_H
 

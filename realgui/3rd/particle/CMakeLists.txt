@@ -1,5 +1,8 @@
-# Copyright (c) 2024 Realtek Semiconductor Corp.
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
 # SPDX-License-Identifier: Apache-2.0
+#
 
 cmake_minimum_required(VERSION 3.10)
 

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/

@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
 set(CONFIG_SOC_SERIES_RTL8763D y)
 set(mcpu_arch "-mcpu=cortex-m4")
 	set(mfpu_arch "-mfpu=fpv4-sp-d16")

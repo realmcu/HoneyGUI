@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /* gui menu cellular widget example start*/
 #include "guidef.h"
 #include "gui_img.h"
