@@ -2,8 +2,8 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file test_font_bitmap_rendering_benchmark.c
-  * @brief font rendering test
+  * @file test_font_vector_bold_rendering.c
+  * @brief font vector bold rendering test
   * @details
   * @author luke_sun@realsil.com.cn
   * @date 2025/04/16
@@ -31,8 +31,8 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "test_font_bitmap_rendering_benchmark"
-#define FONT_NUM 15
+#define CURRENT_VIEW_NAME "test_font_vector_bold_rendering"
+#define FONT_NUM 4
 
 /*============================================================================*
  *                            Variables
@@ -53,22 +53,12 @@ static const gui_view_descriptor_t descriptor =
 };
 static char *text_string[FONT_NUM] =
 {
-    "滕王高阁临江渚，佩玉鸣鸾罢歌舞。",
-    "画栋朝飞南浦云，珠帘暮卷西山雨。",
-    "闲云潭影日悠悠，物换星移几度秋。",
-    "阁中帝子今何在？槛外长江空自流。",
-    "滕王高阁临江渚，佩玉鸣鸾罢歌舞。",
-    "画栋朝飞南浦云，珠帘暮卷西山雨。",
-    "闲云潭影日悠悠，物换星移几度秋。",
-    "阁中帝子今何在？槛外长江空自流。",
-    "滕王高阁临江渚，佩玉鸣鸾罢歌舞。",
-    "画栋朝飞南浦云，珠帘暮卷西山雨。",
-    "闲云潭影日悠悠，物换星移几度秋。",
-    "阁中帝子今何在？槛外长江空自流。",
-    "滕王高阁临江渚，佩玉鸣鸾罢歌舞。",
-    "画栋朝飞南浦云，珠帘暮卷西山雨。",
-    "闲云潭影日悠悠，物换星移几度秋。",
+    "abcdefg",
+    "1234567",
+    "!@#$%^&",
+    "QWERTYU",
 };
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -81,32 +71,80 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static int gui_view_get_other_view_descriptor_init(void)
 {
-    left_view = gui_view_descriptor_get("test_font_vector_bold_rendering");
-    right_view = gui_view_descriptor_get("test_font_bitmap_matrix_rendering");
+    left_view = gui_view_descriptor_get("test_font_vector_rendering_benchmark");
+    right_view = gui_view_descriptor_get("test_font_bitmap_rendering_benchmark");
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void ui_text_font(gui_view_t *view)
 {
-    gui_text_t *text[FONT_NUM];
+    gui_color_t color[FONT_NUM];
+    color[0] = APP_COLOR_WHITE;
+    color[1] = APP_COLOR_RED;
+    color[2] = APP_COLOR_GREEN;
+    color[3] = APP_COLOR_BLUE;
+    gui_text_t *text0[FONT_NUM];
+    gui_text_t *text1[FONT_NUM];
+    gui_text_t *text2[FONT_NUM];
+    gui_text_t *text3[FONT_NUM];
     struct gui_dispdev *dc = gui_get_dc();
     uint32_t font_size = 32;
 
+    /* Bold level 0 (normal) */
     for (int i = 0; i < FONT_NUM; i++)
     {
-        text[i] = gui_text_create(view, "text1", 0, font_size * i, 0, font_size);
-        gui_text_set(text[i], text_string[i], GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(text_string[i]),
+        text0[i] = gui_text_create(view, "text0", i % 2 * dc->screen_width / 2,
+                                   font_size * (i / 2) + font_size * FONT_NUM * 0 / 2, 300, font_size);
+        gui_text_set(text0[i], text_string[i], GUI_FONT_SRC_TTF, color[i], strlen(text_string[i]),
                      font_size);
-        gui_text_type_set(text[i], font32b2, FONT_SRC_MEMADDR);
+        gui_text_type_set(text0[i], font32vb4, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(text0[i], 2);
+        gui_text_bold_set(text0[i], 1, BOLD_HORIZONTAL);
+    }
+
+    /* Bold level 1 */
+    for (int i = 0; i < FONT_NUM; i++)
+    {
+        text1[i] = gui_text_create(view, "text1", i % 2 * dc->screen_width / 2,
+                                   font_size * (i / 2) + font_size * FONT_NUM * 1 / 2, 300, font_size);
+        gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_TTF, color[i], strlen(text_string[i]),
+                     font_size);
+        gui_text_type_set(text1[i], font32vb4, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(text1[i], 2);
+        gui_text_bold_set(text1[i], 1, BOLD_FULL);
+    }
+
+    /* Bold level 2 */
+    for (int i = 0; i < FONT_NUM; i++)
+    {
+        text2[i] = gui_text_create(view, "text2", i % 2 * dc->screen_width / 2,
+                                   font_size * (i / 2) + font_size * FONT_NUM * 2 / 2, 300, font_size);
+        gui_text_set(text2[i], text_string[i], GUI_FONT_SRC_TTF, color[i], strlen(text_string[i]),
+                     font_size);
+        gui_text_type_set(text2[i], font32vb4, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(text2[i], 2);
+        gui_text_bold_set(text2[i], 2, BOLD_FULL);
+    }
+
+    /* Bold level 3 */
+    for (int i = 0; i < FONT_NUM; i++)
+    {
+        text3[i] = gui_text_create(view, "text3", i % 2 * dc->screen_width / 2,
+                                   font_size * (i / 2) + font_size * FONT_NUM * 3 / 2, 300, font_size);
+        gui_text_set(text3[i], text_string[i], GUI_FONT_SRC_TTF, color[i], strlen(text_string[i]),
+                     font_size);
+        gui_text_type_set(text3[i], font32vb4, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(text3[i], 2);
+        gui_text_bold_set(text3[i], 3, BOLD_HORIZONTAL);
     }
 
     gui_text_t *test_name = gui_text_create(view, "test_name", 0, dc->screen_height - font_size,
                                             dc->screen_width, font_size);
-    gui_text_set(test_name, (void *)descriptor.name, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+    gui_text_set(test_name, (void *)descriptor.name, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(descriptor.name), font_size);
-    gui_text_type_set(test_name, font32b2, FONT_SRC_MEMADDR);
-
+    gui_text_type_set(test_name, font32vb4, FONT_SRC_MEMADDR);
+    gui_text_rendermode_set(test_name, 2);
 
     gui_view_switch_on_event(view, left_view->name, SWITCH_OUT_TO_RIGHT_USE_CUBE,
                              SWITCH_IN_FROM_LEFT_USE_CUBE, GUI_EVENT_TOUCH_MOVE_RIGHT);
@@ -117,5 +155,6 @@ static void ui_text_font(gui_view_t *view)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
 
 

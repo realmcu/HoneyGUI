@@ -616,6 +616,14 @@ void gui_text_rendermode_set(gui_text_t *this, uint8_t rendermode)
     };
 }
 
+void gui_text_bold_set(gui_text_t *this, uint8_t bold_weight, BOLD_MODE bold_mode)
+{
+    GUI_ASSERT(this != NULL);
+    this->bold_weight = bold_weight;
+    this->bold_mode = bold_mode;
+    this->layout_refresh = true;
+}
+
 void gui_text_set_min_scale(gui_text_t *this, float min_scale)
 {
     this->min_scale = min_scale;

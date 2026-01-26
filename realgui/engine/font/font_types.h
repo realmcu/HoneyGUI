@@ -52,6 +52,15 @@ typedef enum
     GUI_FONT_SRC_CUS = 0x20,    /**< Custom font */
 } FONT_SRC_TYPE;
 
+/**
+ * @brief Bold mode for text rendering (1-bit field)
+ */
+typedef enum
+{
+    BOLD_HORIZONTAL = 0,   /**< Horizontal only, ~3x faster than BOLD_FULL */
+    BOLD_FULL       = 1,   /**< Horizontal + vertical */
+} BOLD_MODE;
+
 #ifdef __cplusplus
 }
 #endif

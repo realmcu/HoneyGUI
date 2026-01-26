@@ -82,7 +82,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     left_view = gui_view_descriptor_get("test_font_vector_rendering");
-    right_view = gui_view_descriptor_get("test_font_bitmap_rendering_benchmark");
+    right_view = gui_view_descriptor_get("test_font_vector_bold_rendering");
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);

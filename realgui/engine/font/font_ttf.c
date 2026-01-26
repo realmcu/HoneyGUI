@@ -246,6 +246,144 @@ void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
     }
 }
 
+/**
+ * @brief Apply bold effect to bitmap by dilation
+ *
+ * This function applies morphological dilation to create a bold effect.
+ * BOLD_HORIZONTAL: Only horizontal dilation (fast, ~34ms vs 24ms baseline)
+ * BOLD_FULL: Bidirectional dilation (horizontal + vertical, ~93ms)
+ *
+ * @param bitmap      Pointer to the bitmap buffer (modified in place)
+ * @param width       Width of the bitmap
+ * @param height      Height of the bitmap
+ * @param bold_weight Bold weight (number of pixels to dilate in each direction)
+ * @param bold_mode   Bold mode (BOLD_HORIZONTAL or BOLD_FULL)
+ */
+static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uint8_t bold_weight,
+                                     uint8_t bold_mode)
+{
+    if (bold_weight == 0 || bitmap == NULL || width <= 0 || height <= 0)
+    {
+        return;
+    }
+
+    uint32_t size = width * height;
+    uint8_t *temp_buf = gui_malloc(size);
+    if (temp_buf == NULL)
+    {
+        return;
+    }
+
+    /* First pass: horizontal dilation */
+#ifdef font_ttf_USE_MVE
+    int padded_width = width + bold_weight * 2;
+    uint8_t *padded_buf = gui_malloc(padded_width);
+    if (padded_buf == NULL)
+    {
+        gui_free(temp_buf);
+        return;
+    }
+
+    memset(padded_buf, 0, bold_weight);
+    memset(padded_buf + bold_weight + width, 0, bold_weight);
+    uint8_t *row_buf = padded_buf + bold_weight;
+
+    for (int y = 0; y < height; y++)
+    {
+        uint8_t *row = bitmap + y * width;
+        memcpy(row_buf, row, width);
+
+        int x = 0;
+        for (; x + 16 <= width; x += 16)
+        {
+            uint8x16_t max_vec = vldrbq_u8(&row_buf[x]);
+            for (int b = 1; b <= bold_weight; b++)
+            {
+                uint8x16_t left_vec = vldrbq_u8(&row_buf[x - b]);
+                uint8x16_t right_vec = vldrbq_u8(&row_buf[x + b]);
+                max_vec = vmaxq_u8(max_vec, left_vec);
+                max_vec = vmaxq_u8(max_vec, right_vec);
+            }
+            vstrbq_u8(&row[x], max_vec);
+        }
+
+        for (; x < width; x++)
+        {
+            uint8_t max_val = row_buf[x];
+            for (int b = 1; b <= bold_weight; b++)
+            {
+                if (row_buf[x - b] > max_val) { max_val = row_buf[x - b]; }
+                if (row_buf[x + b] > max_val) { max_val = row_buf[x + b]; }
+            }
+            row[x] = max_val;
+        }
+    }
+    gui_free(padded_buf);
+#else
+    int padded_width = width + bold_weight * 2;
+    uint8_t *padded_buf = gui_malloc(padded_width);
+    if (padded_buf == NULL)
+    {
+        gui_free(temp_buf);
+        return;
+    }
+
+    memset(padded_buf, 0, bold_weight);
+    memset(padded_buf + bold_weight + width, 0, bold_weight);
+    uint8_t *row_buf = padded_buf + bold_weight;
+
+    for (int y = 0; y < height; y++)
+    {
+        uint8_t *row = bitmap + y * width;
+        memcpy(row_buf, row, width);
+
+        for (int x = 0; x < width; x++)
+        {
+            uint8_t max_val = row_buf[x];
+            for (int b = 1; b <= bold_weight; b++)
+            {
+                if (row_buf[x - b] > max_val) { max_val = row_buf[x - b]; }
+                if (row_buf[x + b] > max_val) { max_val = row_buf[x + b]; }
+            }
+            row[x] = max_val;
+        }
+    }
+    gui_free(padded_buf);
+#endif
+
+    /* Second pass: vertical dilation (only for BOLD_FULL) */
+    if (bold_mode == BOLD_FULL)
+    {
+        memcpy(temp_buf, bitmap, size);
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                uint8_t max_val = temp_buf[y * width + x];
+
+                for (int b = 1; b <= bold_weight; b++)
+                {
+                    if (y - b >= 0)
+                    {
+                        uint8_t val = temp_buf[(y - b) * width + x];
+                        if (val > max_val) { max_val = val; }
+                    }
+                    if (y + b < height)
+                    {
+                        uint8_t val = temp_buf[(y + b) * width + x];
+                        if (val > max_val) { max_val = val; }
+                    }
+                }
+
+                bitmap[y * width + x] = max_val;
+            }
+        }
+    }
+
+    gui_free(temp_buf);
+}
+
 
 void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
                                   gui_text_rect_t *rect,
@@ -1084,7 +1222,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
                 chr[chr_i].unicode = unicode_buf[uni_i];
                 chr[chr_i].h = text->font_height;
-                chr[chr_i].char_w = glyphData->advance * scale;
+                chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
                 chr[chr_i].char_h = text->font_height;
                 chr[chr_i].dot_addr = font_ptr;
             }
@@ -1114,7 +1252,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
                 chr[chr_i].unicode = unicode_buf[uni_i];
                 chr[chr_i].h = text->font_height;
-                chr[chr_i].char_w = glyphData->advance * scale;
+                chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
                 chr[chr_i].char_h = text->font_height;
                 chr[chr_i].dot_addr = dot_addr;
 
@@ -1154,7 +1292,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
                 chr[chr_i].unicode = unicode_buf[uni_i];
                 chr[chr_i].h = text->font_height;
-                chr[chr_i].char_w = glyphData->advance * scale;
+                chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
                 chr[chr_i].char_h = text->font_height;
                 chr[chr_i].dot_addr = dot_addr;
 
@@ -1419,6 +1557,10 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         GUI_ASSERT(line_count != 0);
         ttf_point *windingsf = gui_malloc(line_count * sizeof(ttf_point));
 
+        /* Calculate extra space needed for bold effect */
+        uint8_t bold_weight = text->bold_weight;
+        int bold_extra = bold_weight * raster_prec;
+
         switch (tm_type)
         {
         case FONT_HOMOGENEOUS:
@@ -1440,8 +1582,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 glyph_x1m *= raster_prec;
                 glyph_y1m *= raster_prec;
 
-                glyph_w = glyph_x1m - glyph_x0m + 1;
-                glyph_h = glyph_y1m - glyph_y0m + 1;
+                glyph_w = glyph_x1m - glyph_x0m + 1 + bold_extra * 2;
+                glyph_h = glyph_y1m - glyph_y0m + 1 + bold_extra * 2;
 
                 // gui_log("text out glyph_w %d  my0 %d out_w %d out_h %d\n",glyph_w,glyph_h);
 
@@ -1454,8 +1596,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 out_w = render_w / raster_prec;
                 out_h = render_h / raster_prec;
 
-                out_x0 = glyph_x0 + ROUNDING_OFFSET;
-                out_y0 = glyph_y0 + ROUNDING_OFFSET;
+                out_x0 = glyph_x0 + ROUNDING_OFFSET - bold_weight;
+                out_y0 = glyph_y0 + ROUNDING_OFFSET - bold_weight;
                 out_x1 = out_x0 + out_w - 1;
                 out_y1 = out_y0 + out_h - 1;
 
@@ -1485,8 +1627,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
-                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
+                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m + bold_extra;
+                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m + bold_extra;
                 }
                 gui_free(windingsd);
 #else
@@ -1510,8 +1652,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
-                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
+                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m + bold_extra;
+                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m + bold_extra;
                 }
                 gui_free(windingsfm);
                 gui_free(windingsd);
@@ -1533,8 +1675,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
-                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
+                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m + bold_extra;
+                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m + bold_extra;
                 }
                 gui_free(windingsfm);
 #endif
@@ -1553,8 +1695,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                                         tm->m, caseX, caseY,
                                         &glyph_x0m, &glyph_x1m, &glyph_y0m, &glyph_y1m);
 
-                glyph_w = glyph_x1m - glyph_x0m + 1;
-                glyph_h = glyph_y1m - glyph_y0m + 1;
+                glyph_w = glyph_x1m - glyph_x0m + 1 + bold_extra * 2;
+                glyph_h = glyph_y1m - glyph_y0m + 1 + bold_extra * 2;
 
                 render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
                 render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
@@ -1565,8 +1707,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 out_w = render_w / raster_prec;
                 out_h = render_h / raster_prec;
 
-                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET;
-                out_y0 = glyph_y0 / raster_prec + ROUNDING_OFFSET;
+                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET - bold_weight;
+                out_y0 = glyph_y0 / raster_prec + ROUNDING_OFFSET - bold_weight;
                 out_x1 = out_x0 + out_w - 1;
                 out_y1 = out_y0 + out_h - 1;
 
@@ -1595,8 +1737,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windingsfm[i].x - glyph_x0m;
-                    windingsf[i].y = windingsfm[i].y - glyph_y0m;
+                    windingsf[i].x = windingsfm[i].x - glyph_x0m + bold_extra;
+                    windingsf[i].y = windingsfm[i].y - glyph_y0m + bold_extra;
                 }
                 gui_free(windingsfm);
                 gui_free(windingsd);
@@ -1616,8 +1758,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windingsfm[i].x - glyph_x0m;
-                    windingsf[i].y = windingsfm[i].y - glyph_y0m;
+                    windingsf[i].x = windingsfm[i].x - glyph_x0m + bold_extra;
+                    windingsf[i].y = windingsfm[i].y - glyph_y0m + bold_extra;
                 }
                 gui_free(windingsfm);
                 gui_free(windingsd);
@@ -1634,8 +1776,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windingsfm[i].x - glyph_x0m;
-                    windingsf[i].y = windingsfm[i].y - glyph_y0m;
+                    windingsf[i].x = windingsfm[i].x - glyph_x0m + bold_extra;
+                    windingsf[i].y = windingsfm[i].y - glyph_y0m + bold_extra;
                 }
                 gui_free(windingsfm);
 #endif
@@ -1650,8 +1792,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 glyph_x1 = render_scale * glyphData->x1;
                 glyph_y1 = render_scale * glyphData->y1;
 
-                glyph_w = glyph_x1 - glyph_x0 + 1;
-                glyph_h = glyph_y1 - glyph_y0 + 1;
+                glyph_w = glyph_x1 - glyph_x0 + 1 + bold_extra * 2;
+                glyph_h = glyph_y1 - glyph_y0 + 1 + bold_extra * 2;
 
                 render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
                 render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
@@ -1662,8 +1804,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 out_w = render_w / raster_prec;
                 out_h = render_h / raster_prec;
 
-                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET;
-                out_y0 = glyph_y0 / raster_prec + ascent * scale + ROUNDING_OFFSET;
+                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET - bold_weight;
+                out_y0 = glyph_y0 / raster_prec + ascent * scale + ROUNDING_OFFSET - bold_weight;
                 out_x1 = out_x0 + out_w - 1;
                 out_y1 = out_y0 + out_h - 1;
 
@@ -1705,15 +1847,15 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale;
-                    windingsf[i].y = (- glyphData->y0 - windingsd[i].y) * render_scale;
+                    windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra;
+                    windingsf[i].y = (- glyphData->y0 - windingsd[i].y) * render_scale + bold_extra;
                 }
                 gui_free(windingsd);
 #else
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = (windings[i].x - glyphData->x0) * render_scale;
-                    windingsf[i].y = (- glyphData->y0 - windings[i].y) * render_scale;
+                    windingsf[i].x = (windings[i].x - glyphData->x0) * render_scale + bold_extra;
+                    windingsf[i].y = (- glyphData->y0 - windings[i].y) * render_scale + bold_extra;
                 }
 #endif
 #endif
@@ -1756,14 +1898,12 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
         for (int i = 0; i < lint_count_actual; i++)
         {
-            for (int y = line_list[i].y0; y < line_list[i].y1; y++)
+            int y_start = line_list[i].y0;
+            int y_end = line_list[i].y1;
+
+            for (int y = y_start; y < y_end; y++)
             {
-                float xi = line_list[i].x0 + line_list[i].dxy * y;
-                // GUI_ASSERT(xi >= 0)
-                // GUI_ASSERT(xi <= render_w)
-                // GUI_ASSERT(y >= 0)
-                // GUI_ASSERT(y <= render_h)
-                uint32_t xint = (uint32_t)(xi);
+                uint32_t xint = (uint32_t)(line_list[i].x0 + line_list[i].dxy * y);
                 img[y * line_word + xint / block_bit] ^= masks[xint % block_bit];
                 for (uint32_t li = xint / block_bit + 1; li < line_word; li++)
                 {
@@ -1773,7 +1913,14 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h, line_word, block_bit);
 
+        /* Apply bold effect before anti-aliasing adjustment */
+        if (bold_weight > 0)
+        {
+            font_ttf_bitmap_embolden(img_out, out_w, out_h, bold_weight, text->bold_mode);
+        }
+
         adjustImageBufferPrecision(img_out, out_size, raster_prec);
+
         font_ttf_draw_bitmap_classic(text, img_out, rect, mx0, my0, out_w, out_h);
 
         gui_free(windingsf);

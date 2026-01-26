@@ -106,16 +106,17 @@ typedef struct gui_text
     int16_t char_line_sum;
     int16_t offset_x;
     int16_t offset_y;
+    uint16_t font_height;
 
     TEXT_MODE mode;
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
     FONT_SRC_MODE font_mode;
-    uint16_t font_height;
     uint8_t emoji_size;
     uint8_t checksum;
     int8_t extra_letter_spacing;
     int8_t extra_line_spacing;
+    uint8_t bold_weight;
 
     bool layout_refresh   : 1;
     bool content_refresh  : 1;
@@ -128,6 +129,7 @@ typedef struct gui_text
     bool thai             : 1;
     bool hebrew           : 1;
     uint8_t rendermode    : 2;
+    uint8_t bold_mode     : 1;  /**< 0=BOLD_HORIZONTAL (fast), 1=BOLD_FULL */
 } gui_text_t;
 
 /** @brief Text line structure. */
@@ -269,6 +271,15 @@ void gui_text_use_matrix_by_img(gui_text_t *this_widget, bool use_img_blit);
  * @param rendermode Render mode. 1/2/4/8.
  */
 void gui_text_rendermode_set(gui_text_t *this_widget, uint8_t rendermode);
+
+/**
+ * @brief Set text bold weight and mode (only effective for vector fonts).
+ *
+ * @param this_widget Text box widget pointer.
+ * @param bold_weight Bold weight. 0 = normal, 1-8 = bold levels.
+ * @param bold_mode Bold mode: BOLD_HORIZONTAL (fast) or BOLD_FULL.
+ */
+void gui_text_bold_set(gui_text_t *this_widget, uint8_t bold_weight, BOLD_MODE bold_mode);
 
 /**
  * @brief Set text minimum scale.
