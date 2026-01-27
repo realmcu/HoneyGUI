@@ -80,7 +80,7 @@ static const uint8_t lookup_table_4b[16] =
 #define GUI_ENABLE_MVE      1
 #ifdef __ARM_FEATURE_MVE
 #if GUI_ENABLE_MVE
-#define font_ttf_USE_MVE
+#define FONT_TTF_USE_MVE
 #include "arm_mve.h"
 #endif
 #endif
@@ -275,7 +275,7 @@ static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uin
     }
 
     /* First pass: horizontal dilation */
-#ifdef font_ttf_USE_MVE
+#ifdef FONT_TTF_USE_MVE
     int padded_width = width + bold_weight * 2;
     uint8_t *padded_buf = gui_malloc(padded_width);
     if (padded_buf == NULL)
@@ -583,7 +583,7 @@ void adjustImageBufferPrecision(uint8_t *img_out, uint32_t out_size, uint8_t ras
     }
 
     uint32_t i = 0;
-#if defined font_ttf_USE_MVE && 1
+#if defined FONT_TTF_USE_MVE && 1
     //MVE CODE, quicker about 2ms
     for (; i + 16 <= out_size; i += 16)
     {
@@ -703,38 +703,11 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
                 {
                     continue;
                 }
-                img_out[y * out_w + ux * block_bit + 0] = (pixel1 >> 31) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 1] = (pixel1 >> 30) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 2] = (pixel1 >> 29) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 3] = (pixel1 >> 28) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 4] = (pixel1 >> 27) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 5] = (pixel1 >> 26) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 6] = (pixel1 >> 25) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 7] = (pixel1 >> 24) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 8] = (pixel1 >> 23) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 9] = (pixel1 >> 22) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 10] = (pixel1 >> 21) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 11] = (pixel1 >> 20) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 12] = (pixel1 >> 19) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 13] = (pixel1 >> 18) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 14] = (pixel1 >> 17) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 15] = (pixel1 >> 16) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 16] = (pixel1 >> 15) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 17] = (pixel1 >> 14) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 18] = (pixel1 >> 13) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 19] = (pixel1 >> 12) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 20] = (pixel1 >> 11) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 21] = (pixel1 >> 10) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 22] = (pixel1 >> 9) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 23] = (pixel1 >> 8) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 24] = (pixel1 >> 7) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 25] = (pixel1 >> 6) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 26] = (pixel1 >> 5) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 27] = (pixel1 >> 4) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 28] = (pixel1 >> 3) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 29] = (pixel1 >> 2) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 30] = (pixel1 >> 1) & 1 ? 0xff : 0;
-                img_out[y * out_w + ux * block_bit + 31] = (pixel1 >> 0) & 1 ? 0xff : 0;
+                int offset = y * out_w + ux * block_bit;
+                for (int i = 0; i < 32; i++)
+                {
+                    img_out[offset + i] = (pixel1 >> (31 - i)) & 1 ? 0xff : 0;
+                }
             }
         }
     }
@@ -1605,9 +1578,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                                         mx_offset + out_x1, my_offset + out_y1,
                                         tm->m, &mx0, &mx1, &my0, &my1);
 
-#if defined font_ttf_USE_MVE && 0
-                /*MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.*/
-                /*todo by luke*/
+#if defined FONT_TTF_USE_MVE && 0
+                /* MVE version: scalar load/store overhead cancels MVE benefit, not effective */
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
@@ -1720,7 +1692,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                                       tm->m, caseX, caseY,
                                       &mx0, &mx1, &my0, &my1);
 
-#if defined font_ttf_USE_MVE && 0
+#if defined FONT_TTF_USE_MVE && 0
                 //MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.
                 /*todo by luke*/
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
@@ -1814,33 +1786,32 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 my0 = out_y0 + chr[index].y;
                 my1 = out_y1 + chr[index].y;
 
-#if defined font_ttf_USE_MVE && 0
-                //MVE code time >= normal code.
-                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
-                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
-
-                uint32_t li = 0;
-
-                /*MVE Code Start*/
-                const float32x4_t addv = {-glyph_x0, -glyph_y0, -glyph_x0, -glyph_y0};
-                const float32x4_t mulv = {render_scale, -render_scale, render_scale, -render_scale};
-
-                for (; li + 1 < line_count; li += 2)
+#if defined FONT_TTF_USE_MVE && 0
+                /* MVE version: memcpy overhead cancels MVE benefit, not effective */
                 {
-                    int32x4_t resulti = vldrhq_s32(&windingsd[li].x);
-                    float32x4_t result = vcvtq_f32_s32(resulti);
+                    FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                    memcpy(windingsd, windings, line_count * sizeof(FontWindings));
 
-                    result = vmulq_f32(result, mulv);
-                    result = vaddq_f32(result, addv);
-                    vstrwq_f32(&windingsf[li].x, result);
+                    const float offset_x = -glyphData->x0 * render_scale + bold_extra;
+                    const float offset_y = -glyphData->y0 * render_scale + bold_extra;
+                    const float32x4_t v_mul = {render_scale, -render_scale, render_scale, -render_scale};
+                    const float32x4_t v_add = {offset_x, offset_y, offset_x, offset_y};
+
+                    int i = 0;
+                    for (; i + 1 < line_count; i += 2)
+                    {
+                        int32x4_t vi = vldrhq_s32((int16_t *)&windingsd[i].x);
+                        float32x4_t vf = vcvtq_f32_s32(vi);
+                        vf = vfmaq_f32(v_add, vf, v_mul);
+                        vstrwq_f32(&windingsf[i].x, vf);
+                    }
+                    for (; i < line_count; i++)
+                    {
+                        windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra;
+                        windingsf[i].y = (-glyphData->y0 - windingsd[i].y) * render_scale + bold_extra;
+                    }
+                    gui_free(windingsd);
                 }
-                /*MVE Code End*/
-                for (; li < line_count; li ++)
-                {
-                    windingsf[li].x = (windingsd[li].x - glyphData->x0) * render_scale;
-                    windingsf[li].y = (- glyphData->y0 - windingsd[li].y) * render_scale;
-                }
-                gui_free(windingsd);
 #else
 #if FIX_AUTO_VECTORIZE
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
