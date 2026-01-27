@@ -60,6 +60,8 @@ def main():
             f.write("CONFIG_REALTEK_BUILD_GUI_BOX2D=y\n")
             f.write("CONFIG_REALTEK_BUILD_LITE3D=y\n")
             f.write("CONFIG_REALTEK_BUILD_XML_LOADER=y\n")
+            if config_name == "REALTEK_BUILD_PARTICLE_DEMO":
+                f.write("CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM=y\n")
         
         # Clean
         subprocess.run(["scons", "-c"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
