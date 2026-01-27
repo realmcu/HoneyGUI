@@ -331,7 +331,7 @@ static void l3_test_ray_hit_on_triangle(l3_gltf_model_t *_this, l3_gltf_triangle
             def->has_hit = true;
             def->impact_center = hit_point;
 
-            // Calculate triangle normal
+            // Calculate triangle normal using cross product
             l3_3d_point_t edge1, edge2;
             edge1.x = world_v[1].x - world_v[0].x;
             edge1.y = world_v[1].y - world_v[0].y;
@@ -341,10 +341,27 @@ static void l3_test_ray_hit_on_triangle(l3_gltf_model_t *_this, l3_gltf_triangle
             edge2.y = world_v[2].y - world_v[0].y;
             edge2.z = world_v[2].z - world_v[0].z;
 
-            // Use ray direction as deformation direction (from camera toward object)
-            def->impact_normal.x = ray_dir->x;
-            def->impact_normal.y = ray_dir->y;
-            def->impact_normal.z = ray_dir->z;
+            // Cross product: normal = edge1 × edge2
+            l3_3d_point_t normal;
+            normal.x = edge1.y * edge2.z - edge1.z * edge2.y;
+            normal.y = edge1.z * edge2.x - edge1.x * edge2.z;
+            normal.z = edge1.x * edge2.y - edge1.y * edge2.x;
+
+            // Normalize the normal vector
+            float len = sqrtf(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+            if (len > 1e-6f)
+            {
+                def->impact_normal.x = normal.x / len;
+                def->impact_normal.y = normal.y / len;
+                def->impact_normal.z = normal.z / len;
+            }
+            else
+            {
+                // Fallback: use ray direction if normal calculation fails
+                def->impact_normal.x = ray_dir->x;
+                def->impact_normal.y = ray_dir->y;
+                def->impact_normal.z = ray_dir->z;
+            }
         }
     }
 }

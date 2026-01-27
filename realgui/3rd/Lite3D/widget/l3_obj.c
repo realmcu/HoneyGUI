@@ -235,10 +235,10 @@ l3_obj_model_t *l3_create_obj_model(void                 *desc_addr,
                 head->h = h;
                 head->type = LITE_I8;
 
-                // Write CLUT count
+                // Write CLUT count (store actual count - 1 in high 16 bits)
                 uint32_t *clut_count_ptr = (uint32_t *)((uint8_t *)this->base.combined_img->data + sizeof(
                                                             l3_img_head_t));
-                *clut_count_ptr = clut_count;
+                *clut_count_ptr = ((clut_count - 1) << 16);
 
                 // Initialize grayscale CLUT (256 levels) in ABGR format
                 uint32_t *clut = clut_count_ptr + 1;

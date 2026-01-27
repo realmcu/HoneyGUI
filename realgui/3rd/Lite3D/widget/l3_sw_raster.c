@@ -28,7 +28,8 @@
 
 void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
                           uint8_t *source_alpha,
-                          uintptr_t image_base, uint32_t image_off, char input_type)
+                          uintptr_t image_base, uint32_t image_off, char input_type,
+                          uint8_t *palette_data)
 {
     switch (input_type)
     {
@@ -66,6 +67,33 @@ void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *s
             *source_red = pixel->r;
             *source_green = pixel->g;
             *source_blue = pixel->b;
+            break;
+        }
+    case LITE_I8:
+        {
+            // I8: palette index format
+            uint8_t *pixel_index = (uint8_t *)(uintptr_t)image_base + image_off;
+            uint8_t index = *pixel_index;
+
+            if (palette_data != NULL)
+            {
+                // CLUT format: ABGR (4 bytes per entry)
+                uint32_t *clut = (uint32_t *)palette_data;
+                uint32_t color = clut[index];
+
+                *source_alpha = (color >> 24) & 0xFF;
+                *source_blue = (color >> 16) & 0xFF;
+                *source_green = (color >> 8) & 0xFF;
+                *source_red = color & 0xFF;
+            }
+            else
+            {
+                // Fallback: grayscale
+                *source_alpha = 0xFF;
+                *source_red = index;
+                *source_green = index;
+                *source_blue = index;
+            }
             break;
         }
     }
@@ -263,6 +291,19 @@ void gui_get_rle_pixel(l3_draw_rect_img_t *image, int x, int y, uint8_t *pixel)/
             memcpy(pixel, &(node->pixel32), sizeof(node->pixel32));
             break;
         }
+    case LITE_I8:
+        {
+            l3_imdc_u8_node_t *node = NULL;
+            do
+            {
+                node = (l3_imdc_u8_node_t *)(uintptr_t)line;
+                location += node->len;
+                line = line + sizeof(l3_imdc_u8_node_t);
+            }
+            while (location < (x + 1));
+            pixel[0] = node->value;
+            break;
+        }
     default:
         {
             return;
@@ -276,7 +317,7 @@ void do_raster_pixel(const gui_raster_params_t *params)
     uint8_t target_red, target_green, target_blue, target_alpha;
 
     gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
-                         params->image_base, params->image_off, params->input_type);
+                         params->image_base, params->image_off, params->input_type, params->palette_data);
 
     gui_get_target_color(&target_red, &target_green, &target_blue, &target_alpha,
                          params->writebuf, params->write_off, params->dc_bytes_per_pixel);

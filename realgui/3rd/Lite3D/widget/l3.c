@@ -175,5 +175,5 @@ bool l3_model_on_click(l3_model_base_t *_this, int x, int y)
 void l3_model_trigger_deformation(l3_model_base_t *_this, int16_t screen_x, int16_t screen_y,
                                   float radius, float depth, float duration)
 {
-    return _this->ops->trigger_deformation(_this, screen_x, screen_y, radius, depth, duration);
+    _this->ops->trigger_deformation(_this, screen_x, screen_y, radius, depth, duration);
 }

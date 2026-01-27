@@ -99,6 +99,11 @@ typedef struct l3_imdc_argb8888_node
     uint8_t len;
     uint32_t pixel32;    //argb8888
 } l3_imdc_argb8888_node_t;
+typedef struct l3_imdc_u8_node
+{
+    uint8_t len;
+    uint8_t value;  // I8 palette index or A8 alpha value
+} l3_imdc_u8_node_t;
 #pragma pack()
 
 typedef struct
@@ -111,6 +116,7 @@ typedef struct
     uint8_t dc_bytes_per_pixel;
     uint8_t opacity_value;
     uint32_t blend_mode;
+    uint8_t *palette_data;  // Pointer to CLUT data for I8 format
 } gui_raster_params_t;
 
 
@@ -120,7 +126,8 @@ bool l3_draw_img_target_area(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect
                              int32_t *x_start, int32_t *x_end, int32_t *y_start, int32_t *y_end);
 void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
                           uint8_t *source_alpha,
-                          uintptr_t image_base, uint32_t image_off, char input_type);
+                          uintptr_t image_base, uint32_t image_off, char input_type,
+                          uint8_t *palette_data);
 
 #ifdef __cplusplus
 }
