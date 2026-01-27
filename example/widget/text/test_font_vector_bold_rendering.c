@@ -1,16 +1,16 @@
 /**
 *****************************************************************************************
-*     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2026, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file test_font_vector_bold_rendering.c
   * @brief font vector bold rendering test
   * @details
   * @author luke_sun@realsil.com.cn
-  * @date 2025/04/16
+  * @date 2026/01/26
   * @version 1.0
   ***************************************************************************************
     * @attention
-  * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2026 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
   */
 

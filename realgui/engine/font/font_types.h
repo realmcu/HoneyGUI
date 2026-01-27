@@ -57,7 +57,7 @@ typedef enum
  */
 typedef enum
 {
-    BOLD_HORIZONTAL = 0,   /**< Horizontal only, ~3x faster than BOLD_FULL */
+    BOLD_HORIZONTAL = 0,   /**< Horizontal only, ~7x faster than BOLD_FULL */
     BOLD_FULL       = 1,   /**< Horizontal + vertical */
 } BOLD_MODE;
 
