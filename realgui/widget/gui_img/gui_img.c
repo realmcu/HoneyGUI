@@ -419,6 +419,34 @@ static void gui_img_ctor(gui_img_t            *_this,
         gui_obj_create_timer(obj, _this->gif->gce.delay * 10, true, gif_internal_timer_cb);
         gui_obj_start_timer(obj);
     }
+    else if ((head.type == GIF) && (storage_type == IMG_SRC_FILESYS))
+    {
+        const void *data = gui_vfs_get_file_address(path);
+        if (!data)
+        {
+            /* Fallback: read file into memory */
+            gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
+            GUI_ASSERT(f != NULL);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+            int size = gui_vfs_tell(f);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+            data = gui_malloc(size);
+            GUI_ASSERT(data != NULL);
+            gui_vfs_read(f, (void *)data, size);
+            gui_vfs_close(f);
+        }
+        _this->data = (uint8_t *)data;
+        gui_gif_file_head_t *gif_head = (gui_gif_file_head_t *)data;
+        _this->gif = gd_open_gif_from_memory(gif_head->gif, gif_head->size);
+        _this->gif_flag = true;
+        if (gd_get_frame(_this->gif) == 0)
+        {
+            gd_rewind(_this->gif);
+        }
+        gui_obj_create_timer(obj, _this->gif->gce.delay * 10, true, gif_internal_timer_cb);
+        gui_obj_start_timer(obj);
+        _this->storage_type = IMG_SRC_MEMADDR;
+    }
 }
 
 
