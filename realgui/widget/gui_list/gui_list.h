@@ -47,6 +47,7 @@ typedef enum
     LIST_FAN,              ///< Rotate like fan.
     LIST_HELIX,            ///< Rotate like helix.
     LIST_CURL,             ///< Rotate curly.
+    LIST_ZOOM_CYLINDER,    ///< Zoom center list with cylinder style.
 } LIST_STYLE;
 
 /* LIST_STYLE enum end*/

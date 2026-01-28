@@ -556,6 +556,69 @@ static void gui_list_note_zoom(gui_obj_t *obj)
     matrix_scale(scale, scale, obj->matrix);
     matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
 }
+static void gui_list_note_zoom_cylinder(gui_obj_t *obj)
+{
+    gui_list_t *list = (gui_list_t *)obj->parent;
+
+    matrix_translate(-obj->x, -obj->y, obj->matrix);
+
+    // =========================================================================
+    // Style: Zoom + Spacing Compensation (Cylinder Style)
+    // =========================================================================
+
+    float view_size = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
+    float list_center_coord = view_size / 2.0f;
+
+    float item_pos = (list->dir == HORIZONTAL) ? obj->x : obj->y;
+    float item_len = list->note_length;
+    float item_center = item_pos + item_len / 2.0f;
+
+    float diff = item_center - list_center_coord;
+    float normalized_dist = fabsf(diff) / (view_size / 2.0f);
+    if (normalized_dist > 1.0f) { normalized_dist = 1.0f; }
+
+    // =========================================================================
+    // Core Algorithm: Zoom + Precise Spacing Compensation
+    // =========================================================================
+
+    // 1. Calculate scale factor
+    float min_scale = 0.7f;
+    float scale_factor = cosf(normalized_dist * 1.57f);
+    float scale = min_scale + (1.0f - min_scale) * scale_factor;
+
+    // 2. Spacing Compensation: Eliminate visual gaps caused by scaling
+    //    When items shrink, they need to move toward the center to fill gaps
+    //    Compensation amount = (item_length * (1 - scale)) / 2 * direction
+    float size_loss = item_len * (1.0f - scale);
+    float compensation = size_loss * 0.5f;  // Compensate half on each side
+
+    // Determine movement direction based on which side of the center the item is on
+    float final_pos = item_pos;
+    if (diff > 0)
+    {
+        // Right/bottom of center: move left/up
+        final_pos -= compensation;
+    }
+    else
+    {
+        // Left/top of center: move right/down
+        final_pos += compensation;
+    }
+    if (list->dir == HORIZONTAL)
+    {
+        matrix_translate(final_pos, obj->y, obj->matrix);
+    }
+    else
+    {
+        matrix_translate(obj->x, final_pos, obj->matrix);
+    }
+
+    // Scale in place (using item center as scaling center)
+    matrix_translate(obj->w / 2.0f, obj->h / 2.0f, obj->matrix);
+    matrix_scale(scale, scale, obj->matrix);
+    matrix_translate(-obj->w / 2.0f, -obj->h / 2.0f, obj->matrix);
+}
+
 
 static void gui_list_note_card(gui_obj_t *obj)
 {
@@ -736,6 +799,9 @@ static void gui_list_note_transform(gui_obj_t *obj)
         break;
     case LIST_ZOOM:
         gui_list_note_zoom(obj);
+        break;
+    case LIST_ZOOM_CYLINDER:
+        gui_list_note_zoom_cylinder(obj);
         break;
     case LIST_CARD:
         gui_list_note_card(obj);
