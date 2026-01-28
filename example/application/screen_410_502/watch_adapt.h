@@ -16,7 +16,7 @@ extern "C" {
 /*============================================================================*
  *                           Types
  *============================================================================*/
-typedef struct gui_audio
+typedef struct gui_audio_ctrl
 {
     /* gui music */
     void (*music_load)(void *p);
@@ -34,7 +34,7 @@ typedef struct gui_audio
     void (*record_play)(void);
     void (*record_pause)(void);
     bool (*record_completion_status)(void);
-} gui_audio_t;
+} gui_audio_ctrl_t;
 
 typedef struct gui_control_board
 {
@@ -58,8 +58,8 @@ typedef struct gui_call
  *                         Functions
  *============================================================================*/
 /* Audio */
-void gui_audio_info_register(gui_audio_t *info);
-gui_audio_t *gui_get_audio(void);
+void gui_audio_ctrl_register(gui_audio_ctrl_t *info);
+gui_audio_ctrl_t *gui_get_audio_ctrl(void);
 
 
 /* Controlboard */

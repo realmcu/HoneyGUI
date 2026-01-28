@@ -16,6 +16,7 @@
 #include "gui_h264bsd.h"
 #include "gui_vfs.h"
 #include "acc_sw_jpeg.h"
+#include "gui_api.h"
 
 /*============================================================================*
  *                           Types
@@ -462,6 +463,23 @@ static void gui_video_draw(gui_obj_t *obj)
                     {
                         // to audio
                         // gui_log("audio chunk %d \n", i);
+                        uint8_t *audio_data = NULL;
+                        uint32_t audio_sz = 0;
+                        audio_sz = chunk[i].len;
+                        // gui_log(" %d  %d, sz %d \n", i, chunk[i].offset, audio_sz);
+
+                        audio_data = (uint8_t *)gui_malloc(audio_sz);
+                        if (!audio_data)
+                        {
+                            gui_log("gui_video_draw malloc error! \n");
+                            gui_vfs_close(fp);
+                            return ;
+                        }
+                        gui_vfs_seek(fp, (uintptr_t)chunk[i].offset, GUI_VFS_SEEK_SET);
+                        gui_vfs_read(fp, audio_data, audio_sz);
+
+                        gui_audio_decode_chunk(audio_data, audio_sz);
+                        gui_free(audio_data);
                     }
                 }
                 else
@@ -509,6 +527,14 @@ static void gui_video_draw(gui_obj_t *obj)
                     {
                         // to audio
                         // gui_log("audio chunk %d \n", i);
+                        uint8_t *audio_data = NULL;
+                        uint32_t audio_sz = 0;
+                        audio_sz = chunk[i].len;
+                        // gui_log(" %d  %d, sz %d \n", i, chunk[i].offset, audio_sz);
+
+                        audio_data = (uint8_t *)this->data + chunk[i].offset;
+
+                        gui_audio_decode_chunk(audio_data, audio_sz);
                     }
                 }
                 else
@@ -568,7 +594,23 @@ static void gui_video_draw(gui_obj_t *obj)
                     if (this->frame_cur == 0 || (frame_cnt == this->frame_cur))
                     {
                         // to audio
+                        // to audio
                         // gui_log("audio chunk %d \n", i);
+                        uint8_t *audio_data = NULL;
+                        uint32_t audio_sz = 0;
+                        audio_sz = chunk[i].len;
+                        // gui_log(" %d  %d, sz %d \n", i, chunk[i].offset, audio_sz);
+
+                        audio_data = (uint8_t *)gui_malloc(audio_sz);
+                        if (!audio_data)
+                        {
+                            gui_log("gui_video_draw malloc error! \n");
+                            return ;
+                        }
+                        gui_ftl_read(fp + chunk[i].offset, audio_data, audio_sz);
+
+                        gui_audio_decode_chunk(audio_data, audio_sz);
+                        gui_free(audio_data);
                     }
                 }
                 else
@@ -1238,7 +1280,8 @@ static int video_src_init_avi(gui_video_t  *this)
             WaveFormateX_t audio_stream_format;
             memcpy(&audio_stream_format, (img_data + pos), sizeof(WaveFormateX_t));
 
-            // ad_audio_open(&audio_stream_hdr, &audio_stream_format);
+            /* maybe some audio decoder need these info, process here */
+            // to audio decoder
         }
         while (0);
 

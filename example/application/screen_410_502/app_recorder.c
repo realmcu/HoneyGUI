@@ -123,7 +123,7 @@ static void click_to_recorder_cb(void *obj, gui_event_t e, void *param)
     {
         img->data = RECORD_STOP_BIN;
         gui_obj_stop_timer(GUI_BASE(o));
-        gui_audio_t *gui_audio = gui_get_audio();
+        gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         if (gui_audio->record_pause)
         {
             gui_audio->record_pause();
@@ -146,7 +146,7 @@ static void click_play_cb(void *obj, gui_event_t e, void *param)
     if (record_file_num == 0) { return; }
 
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
-    gui_audio_t *gui_audio = gui_get_audio();
+    gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
     if (img->data == RECORD_PLAY_BIN)
     {
         img->data = RECORD_PAUSE_BIN;
@@ -171,7 +171,7 @@ static void on_playing(void *p)
 {
     play_time += 1;
     gui_img_t *img = GUI_TYPE(gui_img_t, p);
-    gui_audio_t *gui_audio = gui_get_audio();
+    gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
     uint32_t duration = record_infor[play_index].time;
     uint32_t time = play_time;
 
@@ -216,7 +216,7 @@ static void click_file_play(void *obj, gui_event_t e, void *param)
     (void)e;
     (void)param;
     gui_list_note_t *note = (gui_list_note_t *)GUI_BASE(obj)->parent;
-    gui_audio_t *gui_audio = gui_get_audio();
+    gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "img_play", win_play)
     gui_img_t *img = GUI_TYPE(gui_img_t, o);
     if (play_index != note->index)
@@ -349,7 +349,7 @@ static void click_record_cb(void *obj, gui_event_t e, void *param)
     (void)e;
     (void)param;
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
-    gui_audio_t *gui_audio = gui_get_audio();
+    gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "record_time", win_recorder)
     if (img->data == RECORD_START_BIN)
     {
@@ -384,7 +384,7 @@ static void click_enter_file_win_cb(void *obj, gui_event_t e, void *param)
     if (img->data == RECORD_STOP_BIN)
     {
         img->data = RECORD_START_BIN;
-        gui_audio_t *gui_audio = gui_get_audio();
+        gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         if (gui_audio->record_stop)
         {
             gui_audio->record_stop();

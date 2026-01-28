@@ -441,7 +441,7 @@ private:
     {
         (void)p;
         play_time += 0.1f;
-        gui_audio_t *gui_audio = gui_get_audio();
+        gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         float duration = 0;
         if (gui_audio->music_length)
         {
@@ -496,7 +496,7 @@ private:
     {
         snprintf(music_name, sizeof(music_name), "%s", music_infor[music_index].music_name);
         gui_text_content_set(music_name_text, music_name, strlen(music_name));
-        gui_audio_t *gui_audio = gui_get_audio();
+        gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         float duration = 0;
         if (gui_audio->music_length)
         {
@@ -525,7 +525,7 @@ private:
         gui_obj_create_timer(GUI_BASE(param), 300, false, music_clicked_timer_cb);
         gui_obj_start_timer(GUI_BASE(param));
 
-        gui_audio_t *gui_audio = gui_get_audio();
+        gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         gui_list_note_t *note = (gui_list_note_t *)GUI_BASE(obj)->parent;
         if (music_index != note->index) //play this music
         {
@@ -610,7 +610,7 @@ private:
         (void)e;
         (void)param;
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
-        gui_audio_t *gui_audio = gui_get_audio();
+        gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         if (img->data == PLAY_BIN)
         {
             if (gui_audio->music_play)
@@ -651,7 +651,7 @@ private:
             play_button->data = PAUSE_BIN;
             music_switch_information();
 
-            gui_audio_t *gui_audio = gui_get_audio();
+            gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
             if (gui_audio->music_backward)
             {
                 gui_audio->music_backward();
@@ -680,7 +680,7 @@ private:
             play_button->data = PAUSE_BIN;
             music_switch_information();
 
-            gui_audio_t *gui_audio = gui_get_audio();
+            gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
             if (gui_audio->music_backward)
             {
                 gui_audio->music_backward();
@@ -747,7 +747,7 @@ private:
         gui_obj_add_event_cb(skip_fwd, skip_fwd_button_cb, GUI_EVENT_TOUCH_PRESSED, NULL);
 
         // Display artist, music, and album name
-        gui_audio_t *gui_audio = gui_get_audio();
+        gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         if (gui_audio->music_load)
         {
             gui_audio->music_load((void *)MP3_FILE);

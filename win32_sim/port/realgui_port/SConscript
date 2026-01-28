@@ -8,7 +8,12 @@ cwd = GetCurrentDir()
 inc = [cwd]
 src = Glob('*.c')
 
-objs = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = inc)
+CPPDEFINES = []
+
+if not GetDepend(['CONFIG_REALTEK_BUILD_AUDIO']):
+    SrcRemove(src, ['gui_port_audio.c'])
+
+objs = DefineGroup('rtk_gui', src, depend = [], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
 list = os.listdir(cwd)
 for d in list:
     path = os.path.join(cwd, d)

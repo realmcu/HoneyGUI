@@ -1,13 +1,11 @@
-#
-# Copyright (c) 2026, Realtek Semiconductor Corporation
-#
-# SPDX-License-Identifier: MIT
-#
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.10)
 
+
 # Define a variable for the library name
-if(1) #set to 1 to enable or variable to for dependency
+if(CONFIG_REALTEK_MINIMP3) #set to 1 to enable or variable to for dependency
 
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
@@ -30,13 +28,6 @@ if(1) #set to 1 to enable or variable to for dependency
     if(SOURCES AND HEADERS)
         target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
         target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
-
-    # Add compile definitions
-    if(CONFIG_REALTEK_BUILD_AUDIO)
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE
-            GUI_ENABLE_AUDIO
-        )
     endif()
 
     # Process subdirectories regardless

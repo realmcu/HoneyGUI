@@ -18,7 +18,7 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_audio_t *gui_audio = NULL;
+static gui_audio_ctrl_t *gui_audio = NULL;
 static gui_control_board_t *gui_control_board = NULL;
 static gui_call_t *gui_call = NULL;
 
@@ -27,12 +27,12 @@ static bool call_incoming_flag = false; // Flag to indicate if the call is incom
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_audio_info_register(gui_audio_t *info)
+void gui_audio_ctrl_register(gui_audio_ctrl_t *info)
 {
     gui_audio = info;
 }
 
-gui_audio_t *gui_get_audio(void)
+gui_audio_ctrl_t *gui_get_audio_ctrl(void)
 {
     return gui_audio;
 }

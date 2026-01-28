@@ -33,6 +33,7 @@ extern "C" {
 #include "def_fb.h"
 #include "def_engine.h"
 #include "def_msg.h"
+#include "def_audio.h"
 
 
 /*============================================================================*

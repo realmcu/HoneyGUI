@@ -83,7 +83,7 @@ const char *filename =
     "./example/application/screen_410_502/root_image/web/peripheral_simulation/json/simulation_data.json";
 #endif
 
-static gui_audio_t gui_audio_info = {0};
+static gui_audio_ctrl_t gui_audio_info = {0};
 
 /*============================================================================*
  *                           Private Functions
@@ -453,9 +453,9 @@ static int app_init(void)
 #endif
 #endif
 
-    if (gui_get_audio() == NULL)
+    if (gui_get_audio_ctrl() == NULL)
     {
-        gui_audio_info_register(&gui_audio_info);
+        gui_audio_ctrl_register(&gui_audio_info);
     }
     app_main_watch_ui_design();
     return 0;

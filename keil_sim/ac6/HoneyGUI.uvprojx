@@ -10,7 +10,7 @@
       <TargetName>gui_sim</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6220000::V6.22::.\ArmCompilerforEmbedded6.22</pCCUsed>
+      <pCCUsed>6220000::V6.22::..\..\AC\622</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -186,6 +186,7 @@
             <RvdsVP>3</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -337,9 +338,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>DRV_LCD_HEIGHT=480 DRV_LCD_WIDTH=480 DRV_PIXEL_BITS=16 ENABLE_HONEYGUI</Define>
+              <Define>DRV_LCD_WIDTH=480 DRV_PIXEL_BITS=16 ENABLE_HONEYGUI DRV_LCD_HEIGHT=480</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;..\..\realgui\example\root_image;gui_port;platform;..\..\realgui;..\..\realgui\3rd\cgltf;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\h264bsd;..\..\realgui\3rd\h264bsd\src;..\..\realgui\3rd\h264bsd\port;..\..\realgui\3rd\h264bsd\inc;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\font;..\..\realgui\engine\sw;..\..\realgui\engine\sw\idu;..\..\realgui\engine\sw\rle;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\misc\vfs;..\..\realgui\misc\vfs\romfs;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_glass;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_lite_geometry;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win;..\..\example\widget\glass_effect;..\..\example\widget\glass_effect\root_image;..\..\example\widget\image</IncludePath>
+              <IncludePath>.;.;..\..\realgui\example\root_image;gui_port;platform;..\..\realgui;..\..\realgui\3rd;..\..\realgui\3rd\cgltf;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\h264bsd;..\..\realgui\3rd\h264bsd\inc;..\..\realgui\3rd\h264bsd\port;..\..\realgui\3rd\h264bsd\src;..\..\realgui\3rd\nanosvg;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\accel_hal;..\..\realgui\engine\blit;..\..\realgui\engine\blit\color;..\..\realgui\engine\codec;..\..\realgui\engine\codec\idu;..\..\realgui\engine\codec\jpeg;..\..\realgui\engine\codec\rle;..\..\realgui\engine\draw;..\..\realgui\engine\font;..\..\realgui\engine\post_process;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\misc\vfs;..\..\realgui\misc\vfs\romfs;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_geometry;..\..\realgui\widget\gui_glass;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_lottie;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_svg;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win;..\..\example\application\hml_designer;..\..\example\widget\glass_effect;..\..\example\widget\glass_effect\root_image;..\..\example\widget\image</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -441,7 +442,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/3rd</GroupName>
+          <GroupName>3rd</GroupName>
           <Files>
             <File>
               <FileName>gifdec.c</FileName>
@@ -449,60 +450,10 @@
               <FilePath>..\..\realgui\3rd\gifdec\gifdec.c</FilePath>
             </File>
             <File>
-              <FileName>nanovg_port.c</FileName>
+              <FileName>h264bsd_port.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\base\nanovg_port.c</FilePath>
+              <FilePath>..\..\realgui\3rd\h264bsd\port\h264bsd_port.c</FilePath>
             </File>
-            <File>
-              <FileName>nanovg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\base\nanovg.c</FilePath>
-            </File>
-            <File>
-              <FileName>math.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\agge\math.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\agge\stroke.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke_features.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\agge\stroke_features.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>vector_rasterizer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\agge\vector_rasterizer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>nanovg_agge.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\agge\nanovg_agge.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>nanovg_vertex.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\realgui\3rd\nanovg\agge\nanovg_vertex.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stb_image.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\realgui\3rd\stb\stb_image.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>tjpgd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\3rd\tjpgd\tjpgd.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>realgui/3rd/h264bsd</GroupName>
-          <Files>
             <File>
               <FileName>YUV2RGB.c</FileName>
               <FileType>1</FileType>
@@ -649,14 +600,74 @@
               <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_vui.c</FilePath>
             </File>
             <File>
-              <FileName>h264bsd_port.c</FileName>
+              <FileName>math.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\realgui\3rd\nanovg\agge\math.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>nanovg_agge.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\realgui\3rd\nanovg\agge\nanovg_agge.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>nanovg_vertex.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\realgui\3rd\nanovg\agge\nanovg_vertex.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\realgui\3rd\nanovg\agge\stroke.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke_features.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\realgui\3rd\nanovg\agge\stroke_features.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>vector_rasterizer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\realgui\3rd\nanovg\agge\vector_rasterizer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>nanovg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\3rd\h264bsd\port\h264bsd_port.c</FilePath>
+              <FilePath>..\..\realgui\3rd\nanovg\base\nanovg.c</FilePath>
+            </File>
+            <File>
+              <FileName>nanovg_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\nanovg\base\nanovg_port.c</FilePath>
+            </File>
+            <File>
+              <FileName>stb_image.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\realgui\3rd\stb\stb_image.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>tjpgd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\tjpgd\tjpgd.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/dc</GroupName>
+          <GroupName>core</GroupName>
+          <Files>
+            <File>
+              <FileName>gui_math.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\core\gui_math.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_matrix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\core\gui_matrix.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>dc</GroupName>
           <Files>
             <File>
               <FileName>gui_fb.c</FileName>
@@ -666,42 +677,97 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/engine</GroupName>
+          <GroupName>engine</GroupName>
           <Files>
             <File>
               <FileName>acc_api.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\acc_api.c</FilePath>
+              <FilePath>..\..\realgui\engine\accel_hal\acc_api.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\blit\acc_sw.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_arm2d_blur.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\blit\acc_sw_arm2d_blur.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_raster.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\blit\acc_sw_raster.c</FilePath>
+            </File>
+            <File>
+              <FileName>a8_2_a8.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\blit\color\a8_2_a8.c</FilePath>
+            </File>
+            <File>
+              <FileName>a8_2_rgb565.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\blit\color\a8_2_rgb565.c</FilePath>
+            </File>
+            <File>
+              <FileName>argb8565_2_rgb565.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\blit\color\argb8565_2_rgb565.c</FilePath>
+            </File>
+            <File>
+              <FileName>rgb565_2_rgb565.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\blit\color\rgb565_2_rgb565.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_idu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\codec\idu\acc_sw_idu.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_jpeg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\codec\jpeg\acc_sw_jpeg.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_rle.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\codec\rle\acc_sw_rle.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_rle_bypass.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\codec\rle\acc_sw_rle_bypass.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_rle_cover.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\codec\rle\acc_sw_rle_cover.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_rle_filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\codec\rle\acc_sw_rle_filter.c</FilePath>
             </File>
             <File>
               <FileName>draw_font.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\draw_font.c</FilePath>
+              <FilePath>..\..\realgui\engine\draw\draw_font.c</FilePath>
             </File>
             <File>
               <FileName>draw_img.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\draw_img.c</FilePath>
-            </File>
-            <File>
-              <FileName>engine_gray.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\engine_gray.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_matrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\gui_matrix.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_post_process.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\gui_post_process.c</FilePath>
+              <FilePath>..\..\realgui\engine\draw\draw_img.c</FilePath>
             </File>
             <File>
               <FileName>font_custom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\engine\font\font_custom.c</FilePath>
+            </File>
+            <File>
+              <FileName>font_lib_manager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\font\font_lib_manager.c</FilePath>
             </File>
             <File>
               <FileName>font_mem.c</FileName>
@@ -734,69 +800,14 @@
               <FilePath>..\..\realgui\engine\font\font_ttf.c</FilePath>
             </File>
             <File>
-              <FileName>a8_2_a8.c</FileName>
+              <FileName>gui_post_process.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\a8_2_a8.c</FilePath>
-            </File>
-            <File>
-              <FileName>a8_2_rgb565.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\a8_2_rgb565.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\acc_sw.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_arm2d_blur.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\acc_sw_arm2d_blur.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_raster.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\acc_sw_raster.c</FilePath>
-            </File>
-            <File>
-              <FileName>argb8565_2_rgb565.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\argb8565_2_rgb565.c</FilePath>
-            </File>
-            <File>
-              <FileName>rgb565_2_rgb565.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\rgb565_2_rgb565.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_idu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\idu\acc_sw_idu.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_rle.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\rle\acc_sw_rle.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_rle_bypass.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\rle\acc_sw_rle_bypass.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_rle_cover.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\rle\acc_sw_rle_cover.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_rle_filter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\sw\rle\acc_sw_rle_filter.c</FilePath>
+              <FilePath>..\..\realgui\engine\post_process\gui_post_process.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/input</GroupName>
+          <GroupName>input</GroupName>
           <Files>
             <File>
               <FileName>kb_algo.c</FileName>
@@ -839,6 +850,11 @@
               <FilePath>..\..\realgui\misc\vfs\gui_vfs_posix.c</FilePath>
             </File>
             <File>
+              <FileName>gui_vfs_ramfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\misc\vfs\gui_vfs_ramfs.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_vfs_romfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\misc\vfs\gui_vfs_romfs.c</FilePath>
@@ -851,12 +867,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/server</GroupName>
+          <GroupName>server</GroupName>
           <Files>
             <File>
               <FileName>gui_api_acc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\server\gui_api_acc.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_api_audio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_api_audio.c</FilePath>
             </File>
             <File>
               <FileName>gui_api_color.c</FileName>
@@ -889,6 +910,11 @@
               <FilePath>..\..\realgui\server\gui_components_init.c</FilePath>
             </File>
             <File>
+              <FileName>gui_listener.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_listener.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_message.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\server\gui_message.c</FilePath>
@@ -906,7 +932,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/widget</GroupName>
+          <GroupName>widget</GroupName>
           <Files>
             <File>
               <FileName>gui_canvas.c</FileName>
@@ -914,34 +940,44 @@
               <FilePath>..\..\realgui\widget\gui_canvas\gui_canvas.c</FilePath>
             </File>
             <File>
-              <FileName>gui_canvas_arc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_canvas\gui_canvas_arc.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_canvas_img.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_canvas\gui_canvas_img.c</FilePath>
             </File>
             <File>
-              <FileName>gui_canvas_rect.c</FileName>
+              <FileName>gui_arc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_canvas\gui_canvas_rect.c</FilePath>
+              <FilePath>..\..\realgui\widget\gui_geometry\gui_arc.c</FilePath>
             </File>
             <File>
-              <FileName>gui_canvas_round_rect.c</FileName>
+              <FileName>gui_arc_group.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_canvas\gui_canvas_round_rect.c</FilePath>
+              <FilePath>..\..\realgui\widget\gui_geometry\gui_arc_group.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_circle.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_geometry\gui_circle.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_rect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_geometry\gui_rect.c</FilePath>
+            </File>
+            <File>
+              <FileName>lite_geometry.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_geometry\lite_geometry.c</FilePath>
+            </File>
+            <File>
+              <FileName>lite_geometry_math.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_geometry\lite_geometry_math.c</FilePath>
             </File>
             <File>
               <FileName>gui_glass.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_glass\gui_glass.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_gray.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_gray\gui_gray.c</FilePath>
             </File>
             <File>
               <FileName>gui_img.c</FileName>
@@ -969,29 +1005,9 @@
               <FilePath>..\..\realgui\widget\gui_list\gui_list_rotate_helix.c</FilePath>
             </File>
             <File>
-              <FileName>gui_lite_geometry_arc.c</FileName>
+              <FileName>gui_lottie.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_lite_geometry\gui_lite_geometry_arc.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_lite_geometry_circle.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_lite_geometry\gui_lite_geometry_circle.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_lite_geometry_round_rect.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_lite_geometry\gui_lite_geometry_round_rect.c</FilePath>
-            </File>
-            <File>
-              <FileName>lite_geometry.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_lite_geometry\lite_geometry.c</FilePath>
-            </File>
-            <File>
-              <FileName>lite_geometry_math.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_lite_geometry\lite_geometry_math.c</FilePath>
+              <FilePath>..\..\realgui\widget\gui_lottie\gui_lottie.c</FilePath>
             </File>
             <File>
               <FileName>gui_menu_cellular.c</FileName>
@@ -1042,6 +1058,11 @@
               <FileName>gui_soccer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_soccer\gui_soccer.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_svg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_svg\gui_svg.c</FilePath>
             </File>
             <File>
               <FileName>gui_scroll_text.c</FileName>
@@ -1109,9 +1130,9 @@
           <GroupName>realgui/demo</GroupName>
           <Files>
             <File>
-              <FileName>example_gui_img.c</FileName>
+              <FileName>example_img.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\example\widget\image\example_gui_img.c</FilePath>
+              <FilePath>..\..\example\widget\image\example_img.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1141,7 +1162,12 @@
           <targetInfo name="rtthread" versionMatchMode="fixed"/>
         </targetInfos>
       </package>
-      <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0">
+      <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.8.0">
+        <targetInfos>
+          <targetInfo name="gui_sim" versionMatchMode="fixed"/>
+        </targetInfos>
+      </package>
+      <package name="CMSIS" schemaVersion="1.7.36" url="https://www.keil.com/pack/" vendor="ARM" version="6.1.0">
         <targetInfos>
           <targetInfo name="gui_sim" versionMatchMode="fixed"/>
         </targetInfos>
@@ -1171,14 +1197,14 @@
       </api>
     </apis>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.1.0" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.7.36" url="https://www.keil.com/pack/" vendor="ARM" version="6.1.0"/>
         <targetInfos>
           <targetInfo name="gui_sim"/>
         </targetInfos>
       </component>
-      <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Library" Cvendor="ARM" Cversion="5.5.4" condition="RTOS2 RTX5">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
+      <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Library" Cvendor="ARM" Cversion="5.5.3" condition="RTOS2 RTX5">
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.8.0"/>
         <targetInfos>
           <targetInfo name="gui_sim"/>
         </targetInfos>
@@ -1211,16 +1237,16 @@
     <files>
       <file attr="config" category="source" name="CMSIS\RTOS2\RTX\Config\RTX_Config.c" version="5.1.1">
         <instance index="0">RTE\CMSIS\RTX_Config.c</instance>
-        <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Library" Cvendor="ARM" Cversion="5.5.4" condition="RTOS2 RTX5"/>
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
+        <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Library" Cvendor="ARM" Cversion="5.5.3" condition="RTOS2 RTX5"/>
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.8.0"/>
         <targetInfos>
           <targetInfo name="gui_sim"/>
         </targetInfos>
       </file>
       <file attr="config" category="header" name="CMSIS\RTOS2\RTX\Config\RTX_Config.h" version="5.5.2">
         <instance index="0">RTE\CMSIS\RTX_Config.h</instance>
-        <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Library" Cvendor="ARM" Cversion="5.5.4" condition="RTOS2 RTX5"/>
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
+        <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Library" Cvendor="ARM" Cversion="5.5.3" condition="RTOS2 RTX5"/>
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.8.0"/>
         <targetInfos>
           <targetInfo name="gui_sim"/>
         </targetInfos>

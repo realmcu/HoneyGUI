@@ -240,6 +240,18 @@ config REALTEK_BUILD_PARTICLE_SYSTEM
       The particle system core is independent and can be used
       without HoneyGUI.
 
+config REALTEK_MINIMP3
+    bool "Enable Minimp3"
+    default n
+    help
+      RTK GUI Enable Minimp3 decoder
+
+config REALTEK_BUILD_AUDIO
+    bool "Enable Audio"
+    default n
+    help
+      RTK GUI Enable Audio, depending on "Minimp3" for simulator 
+
 endmenu
 
 endif # CONFIG_REALTEK_HONEYGUI
