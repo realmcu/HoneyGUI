@@ -623,7 +623,6 @@ static Table *new_table(int key_size)
 
 /* Add table entry. Return value:
  *  0 on success
- *  +1 if key size must be incremented after this addition
  *  -1 if could not realloc table */
 static int add_entry(Table **tablep, uint16_t length, uint16_t prefix, uint8_t suffix)
 {
@@ -638,10 +637,6 @@ static int add_entry(Table **tablep, uint16_t length, uint16_t prefix, uint8_t s
     }
     table->entries[table->nentries] = (Entry) {length, prefix, suffix};
     table->nentries++;
-    if ((table->nentries & (table->nentries - 1)) == 0)
-    {
-        return 1;
-    }
     return 0;
 }
 
@@ -728,11 +723,11 @@ read_image_data(gd_GIF *gif, int interlace)
 {
     uint8_t sub_len, shift, byte;
     int init_key_size, key_size, table_is_full;
-    int frm_off, frm_size, str_len, i, p, x, y;
-    uint16_t key, clear, stop;
+    int frm_off, frm_size, str_len = 0, i, p, x, y;
+    uint16_t key, clear, stop, prev_key;
     int ret;
     Table *table;
-    Entry entry;
+    Entry entry = {0};
     long start, end;
 
     if (gif->is_mem)
@@ -744,8 +739,8 @@ read_image_data(gd_GIF *gif, int interlace)
         port_read(gif->source.fd, &byte, 1);
     }
 
-    key_size = (int) byte;
-    if (key_size < 2 || key_size > 8)
+    int min_code_size = (int) byte;
+    if (min_code_size < 2 || min_code_size > 8)
     {
         return -1;
     }
@@ -764,44 +759,105 @@ read_image_data(gd_GIF *gif, int interlace)
         end = port_lseek(gif->source.fd, 0, SEEK_CUR);
         port_lseek(gif->source.fd, start, SEEK_SET);
     }
-    clear = 1 << key_size;
+
+    clear = 1 << min_code_size;
     stop = clear + 1;
-    table = new_table(key_size);
-    key_size++;
+    table = new_table(min_code_size);
+    key_size = min_code_size + 1;
     init_key_size = key_size;
     sub_len = shift = 0;
-    key = get_key(gif, key_size, &sub_len, &shift, &byte); /* clear code */
     frm_off = 0;
     ret = 0;
     frm_size = gif->fw * gif->fh;
+    table_is_full = 0;
+    prev_key = 0xFFFF; 
+
     while (frm_off < frm_size)
     {
+        key = get_key(gif, key_size, &sub_len, &shift, &byte);
+
         if (key == clear)
         {
             key_size = init_key_size;
-            table->nentries = (1 << (key_size - 1)) + 2;
+            table->nentries = clear + 2;
             table_is_full = 0;
+            prev_key = 0xFFFF;
+            continue;
         }
-        else if (!table_is_full)
+
+        if (key == stop || key == 0x1000)
         {
-            ret = add_entry(&table, str_len + 1, key, entry.suffix);
-            if (ret == -1)
-            {
-                port_free(table);
-                return -1;
-            }
-            if (table->nentries == 0x1000)
-            {
-                ret = 0;
-                table_is_full = 1;
-            }
+            break;
         }
-        key = get_key(gif, key_size, &sub_len, &shift, &byte);
-        if (key == clear) { continue; }
-        if (key == stop || key == 0x1000) { break; }
-        if (ret == 1) { key_size++; }
+
+        if (key == table->nentries)
+        {
+            if (prev_key == 0xFFFF)
+            {
+                break;
+            }
+            entry = table->entries[prev_key];
+            while (entry.prefix != 0xFFF)
+            {
+                entry = table->entries[entry.prefix];
+            }
+            uint8_t first_char = entry.suffix;
+
+            if (!table_is_full)
+            {
+                ret = add_entry(&table, table->entries[prev_key].length + 1, prev_key, first_char);
+                if (ret == -1)
+                {
+                    port_free(table);
+                    return -1;
+                }
+                if (table->nentries == 0x1000)
+                {
+                    table_is_full = 1;
+                }
+                else if (table->nentries == (1 << key_size) && key_size < 12)
+                {
+                    key_size++;
+                }
+            }
+
+            entry = table->entries[key];
+            str_len = entry.length;
+            for (i = 0; i < str_len; i++)
+            {
+                p = frm_off + entry.length - 1;
+                x = p % gif->fw;
+                y = p / gif->fw;
+                if (interlace)
+                {
+                    y = interlaced_line_index((int) gif->fh, y);
+                }
+                if (!(gif->gce.transparency && (entry.suffix == gif->gce.tindex)))
+                {
+                    gif->frame[(gif->fy + y) * gif->width + gif->fx + x] = entry.suffix;
+                }
+                if (entry.prefix == 0xFFF)
+                {
+                    break;
+                }
+                else
+                {
+                    entry = table->entries[entry.prefix];
+                }
+            }
+            frm_off += str_len;
+            prev_key = key;
+            continue;
+        }
+
+        if (key >= table->nentries)
+        {
+            break;
+        }
+
         entry = table->entries[key];
         str_len = entry.length;
+
         for (i = 0; i < str_len; i++)
         {
             p = frm_off + entry.length - 1;
@@ -811,7 +867,7 @@ read_image_data(gd_GIF *gif, int interlace)
             {
                 y = interlaced_line_index((int) gif->fh, y);
             }
-            if (!(gif->gce.transparency && (entry.suffix == gif->gce.tindex)))  // add by wanghao
+            if (!(gif->gce.transparency && (entry.suffix == gif->gce.tindex)))
             {
                 gif->frame[(gif->fy + y) * gif->width + gif->fx + x] = entry.suffix;
             }
@@ -825,11 +881,35 @@ read_image_data(gd_GIF *gif, int interlace)
             }
         }
         frm_off += str_len;
-        if (key < table->nentries - 1 && !table_is_full)
+
+        if (prev_key != 0xFFFF && !table_is_full)
         {
-            table->entries[table->nentries - 1].suffix = entry.suffix;
+            Entry temp = table->entries[key];
+            while (temp.prefix != 0xFFF)
+            {
+                temp = table->entries[temp.prefix];
+            }
+            uint8_t first_char = temp.suffix;
+
+            ret = add_entry(&table, table->entries[prev_key].length + 1, prev_key, first_char);
+            if (ret == -1)
+            {
+                port_free(table);
+                return -1;
+            }
+            if (table->nentries == 0x1000)
+            {
+                table_is_full = 1;
+            }
+            else if (table->nentries == (1 << key_size) && key_size < 12)
+            {
+                key_size++;
+            }
         }
+
+        prev_key = key;
     }
+
     port_free(table);
     if (key == stop)
     {
