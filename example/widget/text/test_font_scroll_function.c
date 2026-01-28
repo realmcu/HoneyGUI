@@ -42,6 +42,9 @@ gui_scroll_text_t *scroll_x;
 gui_scroll_text_t *scroll_y;
 gui_scroll_text_t *scroll_x_reverse;
 gui_scroll_text_t *scroll_y_reverse;
+gui_scroll_text_t *test_left;
+gui_scroll_text_t *test_center;
+gui_scroll_text_t *test_right;
 
 /*============================================================================*
  *                           Private Functions
@@ -107,6 +110,7 @@ void text_font_scroll_function_test(void)
 {
     char *test_text =
         "Everyone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom. ";
+    char *short_text = "Short";
 
     scroll_x = gui_scroll_text_create(gui_obj_get_root(), "scroll_text", 40, 0, 400, 0);
     gui_scroll_text_set(scroll_x, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text), 32);
@@ -131,6 +135,28 @@ void text_font_scroll_function_test(void)
     gui_scroll_text_scroll_set(scroll_y_reverse, SCROLL_Y_REVERSE, 32, 32, 10000, 0);
     gui_scroll_text_type_set(scroll_y_reverse, font32b2, FONT_SRC_MEMADDR);
     gui_text_wordwrap_set(&scroll_y->base, true);
+
+    // Test non-scroll alignment modes with short text
+    test_left = gui_scroll_text_create(gui_obj_get_root(), "test_left", 200, 230, 200, 32);
+    gui_scroll_text_set(test_left, short_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(short_text),
+                        32);
+    gui_scroll_text_scroll_set(test_left, SCROLL_X, 0, 0, 10000, 0);
+    gui_scroll_text_type_set(test_left, font32b2, FONT_SRC_MEMADDR);
+    gui_scroll_text_non_scroll_align_set(test_left, LEFT);
+
+    test_center = gui_scroll_text_create(gui_obj_get_root(), "test_center", 200, 262, 200, 32);
+    gui_scroll_text_set(test_center, short_text, GUI_FONT_SRC_BMP, APP_COLOR_CYAN, strlen(short_text),
+                        32);
+    gui_scroll_text_scroll_set(test_center, SCROLL_X, 0, 0, 10000, 0);
+    gui_scroll_text_type_set(test_center, font32b2, FONT_SRC_MEMADDR);
+    gui_scroll_text_non_scroll_align_set(test_center, CENTER);
+
+    test_right = gui_scroll_text_create(gui_obj_get_root(), "test_right", 200, 294, 200, 32);
+    gui_scroll_text_set(test_right, short_text, GUI_FONT_SRC_BMP, APP_COLOR_TOMATO, strlen(short_text),
+                        32);
+    gui_scroll_text_scroll_set(test_right, SCROLL_X, 0, 0, 10000, 0);
+    gui_scroll_text_type_set(test_right, font32b2, FONT_SRC_MEMADDR);
+    gui_scroll_text_non_scroll_align_set(test_right, RIGHT);
 
 
 

@@ -328,6 +328,18 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             draw_rect.y1 = text->base.offset_y;
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
         }
+        else if (text->fallback_mode != LEFT)
+        {
+            if (text->fallback_mode == CENTER)
+            {
+                draw_rect.x1 = text->base.offset_x + (obj->w - offset) / 2;
+            }
+            else if (text->fallback_mode == RIGHT)
+            {
+                draw_rect.x1 = text->base.offset_x + obj->w - offset;
+            }
+            draw_rect.x2 = draw_rect.x1 + offset - 1;
+        }
     }
     else if (text->base.mode == SCROLL_X_REVERSE || text->base.mode == SCROLL_X_MID_REVERSE)
     {
@@ -340,6 +352,18 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             draw_rect.x2 = draw_rect.x1 + offset - 1;
             draw_rect.y1 = text->base.offset_y;
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
+        }
+        else if (text->fallback_mode != LEFT)
+        {
+            if (text->fallback_mode == CENTER)
+            {
+                draw_rect.x1 = text->base.offset_x + (obj->w - offset) / 2;
+            }
+            else if (text->fallback_mode == RIGHT)
+            {
+                draw_rect.x1 = text->base.offset_x + obj->w - offset;
+            }
+            draw_rect.x2 = draw_rect.x1 + offset - 1;
         }
     }
     else if (text->base.mode == SCROLL_Y)
@@ -464,6 +488,7 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *_this,
     root->has_destroy_cb = true;
 
     _this->init_time_ms = gui_ms_get();
+    _this->fallback_mode = CENTER;
 }
 
 /*============================================================================*
@@ -549,6 +574,11 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *_this,
     _this->end_value = end_value;
     _this->interval_time_ms = interval_time_ms;
     _this->duration_time_ms = duration_time_ms;
+}
+
+void gui_scroll_text_non_scroll_align_set(gui_scroll_text_t *_this, TEXT_MODE mode)
+{
+    _this->fallback_mode = mode;
 }
 
 gui_scroll_text_t *gui_scroll_text_create(void       *parent,
