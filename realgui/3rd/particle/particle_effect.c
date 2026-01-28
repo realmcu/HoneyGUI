@@ -18,7 +18,7 @@
 #define M_PI_F 3.14159265358979323846f
 
 /* ============================================================================
- * Firework Effect Implementation (Requirements 5.1-5.5)
+ * Firework Effect Implementation
  * ============================================================================ */
 
 particle_emitter_t *effect_firework_create(particle_platform_config_t *config,
@@ -29,7 +29,7 @@ particle_emitter_t *effect_firework_create(particle_platform_config_t *config,
         return NULL;
     }
 
-    /* Clamp particle count to valid range (Requirements 5.1: 20-100) */
+    /* Clamp particle count to valid range (20-100) */
     if (particle_count < 20)
     {
         particle_count = 20;
@@ -52,7 +52,7 @@ particle_emitter_t *effect_firework_create(particle_platform_config_t *config,
     shape.point.y = y;
     particle_emitter_set_shape(emitter, &shape);
 
-    /* Configure gravity trajectory (Requirements 5.3) */
+    /* Configure gravity trajectory */
     trajectory_config_t trajectory;
     trajectory_config_init(&trajectory);
     trajectory.type = TRAJECTORY_GRAVITY;
@@ -60,7 +60,7 @@ particle_emitter_t *effect_firework_create(particle_platform_config_t *config,
     trajectory.damping = 0.02f;   /* Light damping for air resistance */
     particle_emitter_set_trajectory(emitter, &trajectory);
 
-    /* Spherical burst pattern (Requirements 5.2) */
+    /* Spherical burst pattern */
     emitter->angle_min = 0.0f;
     emitter->angle_max = 2.0f * M_PI_F;  /* Full 360 degrees */
 
@@ -80,7 +80,7 @@ particle_emitter_t *effect_firework_create(particle_platform_config_t *config,
     emitter->life_min = 800;
     emitter->life_max = 1500;
 
-    /* Opacity fade from 100% to 0% (Requirements 5.4) */
+    /* Opacity fade from 100% to 0% */
     emitter->opacity_start = 255;
     emitter->opacity_end = 0;
 
@@ -96,7 +96,7 @@ particle_emitter_t *effect_firework_create(particle_platform_config_t *config,
 }
 
 /* ============================================================================
- * Trail Effect Implementation (Requirements 6.1-6.5)
+ * Trail Effect Implementation
  * ============================================================================ */
 
 particle_emitter_t *effect_trail_create(particle_platform_config_t *config)
@@ -122,7 +122,7 @@ particle_emitter_t *effect_trail_create(particle_platform_config_t *config)
     /* Enable follow mode */
     particle_emitter_enable_follow(emitter, 1);
 
-    /* Configure damping trajectory (Requirements 6.3) */
+    /* Configure damping trajectory */
     trajectory_config_t trajectory;
     trajectory_config_init(&trajectory);
     trajectory.type = TRAJECTORY_LINEAR;
@@ -149,13 +149,13 @@ particle_emitter_t *effect_trail_create(particle_platform_config_t *config)
     emitter->life_min = 400;
     emitter->life_max = 800;
 
-    /* Scale fade from 100% to 0% (Requirements 6.4) */
+    /* Scale fade from 100% to 0% */
     emitter->opacity_start = 255;
     emitter->opacity_end = 0;
     emitter->scale_start = 1.2f;
     emitter->scale_end = 0.2f;
 
-    /* Higher emission rate for denser trail (Requirements 6.1) */
+    /* Higher emission rate for denser trail */
     emitter->emit_rate = 60.0f;
     emitter->enabled = 0;  /* Start disabled, enable when moving */
 
@@ -190,7 +190,7 @@ void effect_trail_update(particle_emitter_t *emitter, float x, float y,
         return;
     }
 
-    /* Calculate angle opposite to movement direction (Requirements 6.2) */
+    /* Calculate angle opposite to movement direction */
     float move_angle = atan2f(dy, dx);
     float opposite_angle = move_angle + 3.14159f;  /* 180 degrees opposite */
 
@@ -199,7 +199,7 @@ void effect_trail_update(particle_emitter_t *emitter, float x, float y,
     emitter->angle_min = opposite_angle - spread;
     emitter->angle_max = opposite_angle + spread;
 
-    /* Adjust emission rate based on movement speed (Requirements 6.1) */
+    /* Adjust emission rate based on movement speed */
     float speed_factor = distance / 5.0f;  /* Normalize speed */
     if (speed_factor < 1.0f) { speed_factor = 1.0f; }
     if (speed_factor > 4.0f) { speed_factor = 4.0f; }
@@ -208,7 +208,7 @@ void effect_trail_update(particle_emitter_t *emitter, float x, float y,
 }
 
 /* ============================================================================
- * Touch Effect Implementation (Requirements 7.1-7.5)
+ * Touch Effect Implementation
  * ============================================================================ */
 
 particle_emitter_t *effect_touch_create(particle_platform_config_t *config)
@@ -241,11 +241,11 @@ particle_emitter_t *effect_touch_create(particle_platform_config_t *config)
     trajectory.damping = 0.05f;
     particle_emitter_set_trajectory(emitter, &trajectory);
 
-    /* Circular pattern around touch point (Requirements 7.2) */
+    /* Circular pattern around touch point */
     emitter->angle_min = 0.0f;
     emitter->angle_max = 2.0f * M_PI_F;
 
-    /* Configurable expansion speed (Requirements 7.4) */
+    /* Configurable expansion speed */
     emitter->speed_min = 50.0f;
     emitter->speed_max = 150.0f;
 
@@ -267,7 +267,7 @@ particle_emitter_t *effect_touch_create(particle_platform_config_t *config)
     emitter->scale_start = 1.0f;
     emitter->scale_end = 0.5f;
 
-    /* Emission rate for drag (Requirements 7.3) */
+    /* Emission rate for drag */
     emitter->emit_rate = 40.0f;
     emitter->enabled = 0;  /* Start disabled */
 
@@ -285,7 +285,7 @@ void effect_touch_tap(particle_emitter_t *emitter, particle_pool_t *pool,
     /* Set touch position */
     particle_emitter_set_follow_position(emitter, x, y);
 
-    /* Burst 5-20 particles (Requirements 7.1) */
+    /* Burst 5-20 particles */
     /* Use a random-ish count based on position */
     uint16_t count = 10 + ((uint16_t)(x + y) % 11);  /* 10-20 particles */
     if (count < 5) { count = 5; }
@@ -301,7 +301,7 @@ void effect_touch_drag(particle_emitter_t *emitter, float x, float y)
         return;
     }
 
-    /* Update position and enable continuous emission (Requirements 7.3) */
+    /* Update position and enable continuous emission */
     particle_emitter_set_follow_position(emitter, x, y);
     particle_emitter_enable(emitter, 1);
 }
@@ -324,7 +324,7 @@ void effect_touch_release(particle_emitter_t *emitter, particle_pool_t *pool,
     float orig_speed_min = emitter->speed_min;
     float orig_speed_max = emitter->speed_max;
 
-    /* Increase initial velocity for final burst (Requirements 7.5) */
+    /* Increase initial velocity for final burst */
     emitter->speed_min = orig_speed_min * 1.5f;
     emitter->speed_max = orig_speed_max * 1.5f;
 
@@ -337,7 +337,7 @@ void effect_touch_release(particle_emitter_t *emitter, particle_pool_t *pool,
 }
 
 /* ============================================================================
- * Snow Effect Implementation (Requirements 8.1-8.5)
+ * Snow Effect Implementation
  * ============================================================================ */
 
 particle_emitter_t *effect_snow_create(particle_platform_config_t *config,
@@ -354,7 +354,7 @@ particle_emitter_t *effect_snow_create(particle_platform_config_t *config,
         return NULL;
     }
 
-    /* Configure line emission from top edge (Requirements 8.1) */
+    /* Configure line emission from top edge */
     emitter_shape_config_t shape;
     shape.type = EMITTER_SHAPE_LINE;
     shape.line.x1 = 0.0f;
@@ -363,7 +363,7 @@ particle_emitter_t *effect_snow_create(particle_platform_config_t *config,
     shape.line.y2 = 0.0f;
     particle_emitter_set_shape(emitter, &shape);
 
-    /* Configure gravity with horizontal sway (Requirements 8.2) */
+    /* Configure gravity with horizontal sway */
     trajectory_config_t trajectory;
     trajectory_config_init(&trajectory);
     trajectory.type = TRAJECTORY_GRAVITY;
@@ -380,7 +380,7 @@ particle_emitter_t *effect_snow_create(particle_platform_config_t *config,
     emitter->speed_min = 10.0f;
     emitter->speed_max = 30.0f;
 
-    /* Visual properties - slow rotation for tumbling (Requirements 8.3) */
+    /* Visual properties - slow rotation for tumbling */
     emitter->scale_min = 0.3f;
     emitter->scale_max = 1.0f;
     emitter->rotation_min = 0.0f;
@@ -398,7 +398,7 @@ particle_emitter_t *effect_snow_create(particle_platform_config_t *config,
     emitter->scale_start = 1.0f;
     emitter->scale_end = 0.8f;
 
-    /* Configurable emission rate (Requirements 8.5) */
+    /* Configurable emission rate */
     emitter->emit_rate = 10.0f;
     emitter->enabled = 1;
 
@@ -416,18 +416,18 @@ void effect_snow_set_intensity(particle_emitter_t *emitter, float intensity)
     if (intensity < 0.0f) { intensity = 0.0f; }
     if (intensity > 1.0f) { intensity = 1.0f; }
 
-    /* Adjust emission rate based on intensity (Requirements 8.5) */
+    /* Adjust emission rate based on intensity */
     /* Range: 5-50 particles per second */
     float rate = 5.0f + intensity * 45.0f;
     particle_emitter_set_rate(emitter, rate);
 
-    /* Adjust particle size based on intensity (Requirements 8.5) */
+    /* Adjust particle size based on intensity */
     emitter->scale_min = 0.2f + intensity * 0.3f;
     emitter->scale_max = 0.5f + intensity * 0.8f;
 }
 
 /* ============================================================================
- * Bubble Effect Implementation (Requirements 9.1-9.5)
+ * Bubble Effect Implementation
  * ============================================================================ */
 
 particle_emitter_t *effect_bubble_create(particle_platform_config_t *config,
@@ -446,7 +446,7 @@ particle_emitter_t *effect_bubble_create(particle_platform_config_t *config,
         return NULL;
     }
 
-    /* Configure line emission from bottom edge (Requirements 9.1) */
+    /* Configure line emission from bottom edge */
     emitter_shape_config_t shape;
     shape.type = EMITTER_SHAPE_LINE;
     shape.line.x1 = 0.0f;
@@ -455,7 +455,7 @@ particle_emitter_t *effect_bubble_create(particle_platform_config_t *config,
     shape.line.y2 = screen_height;
     particle_emitter_set_shape(emitter, &shape);
 
-    /* Configure negative gravity and horizontal sway (Requirements 9.2) */
+    /* Configure negative gravity and horizontal sway */
     trajectory_config_t trajectory;
     trajectory_config_init(&trajectory);
     trajectory.type = TRAJECTORY_GRAVITY;
@@ -472,7 +472,7 @@ particle_emitter_t *effect_bubble_create(particle_platform_config_t *config,
     emitter->speed_min = 20.0f;
     emitter->speed_max = 60.0f;
 
-    /* Visual properties - subtle size pulsation (Requirements 9.3) */
+    /* Visual properties - subtle size pulsation */
     emitter->scale_min = 0.5f;
     emitter->scale_max = 1.5f;
     emitter->rotation_min = 0.0f;
