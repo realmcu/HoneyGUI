@@ -331,6 +331,18 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             draw_rect.y1 = text->base.offset_y;
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
         }
+        else if (text->fallback_mode != LEFT)
+        {
+            if (text->fallback_mode == CENTER)
+            {
+                draw_rect.x1 = text->base.offset_x + (obj->w - offset) / 2;
+            }
+            else if (text->fallback_mode == RIGHT)
+            {
+                draw_rect.x1 = text->base.offset_x + obj->w - offset;
+            }
+            draw_rect.x2 = draw_rect.x1 + offset - 1;
+        }
     }
     else if (text->base.mode == SCROLL_X_REVERSE || text->base.mode == SCROLL_X_MID_REVERSE)
     {
@@ -344,6 +356,18 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             draw_rect.x2 = draw_rect.x1 + offset - 1;
             draw_rect.y1 = text->base.offset_y;
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
+        }
+        else if (text->fallback_mode != LEFT)
+        {
+            if (text->fallback_mode == CENTER)
+            {
+                draw_rect.x1 = text->base.offset_x + (obj->w - offset) / 2;
+            }
+            else if (text->fallback_mode == RIGHT)
+            {
+                draw_rect.x1 = text->base.offset_x + obj->w - offset;
+            }
+            draw_rect.x2 = draw_rect.x1 + offset - 1;
         }
     }
     else if (text->base.mode == SCROLL_Y)

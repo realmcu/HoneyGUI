@@ -47,6 +47,7 @@ typedef struct gui_scroll_text
     uint32_t init_time_ms;
     uint32_t duration_time_ms;
     uint32_t interval_time_ms;
+    TEXT_MODE fallback_mode;
 } gui_scroll_text_t;
 
 
@@ -168,6 +169,13 @@ void gui_scroll_text_skip_frame_set(uint8_t skip_frame);
  */
 void gui_scroll_text_restart(gui_scroll_text_t *this);
 
+/**
+ * @brief Set non-scroll alignment mode when text width is less than textbox width
+ *
+ * @param _this the scroll text widget pointer
+ * @param mode the alignment mode to use when not scrolling (LEFT, CENTER, RIGHT, etc.)
+ */
+void gui_scroll_text_non_scroll_align_set(gui_scroll_text_t *_this, TEXT_MODE mode);
 
 #ifdef __cplusplus
 }
