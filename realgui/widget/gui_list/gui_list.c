@@ -164,6 +164,16 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
         hard_offset_min = soft_offset_min;
         hard_offset_max = soft_offset_max;
     }
+    else if (_this->style == LIST_ZOOM_CYLINDER)
+    {
+        int16_t center_padding = (temp - _this->note_length) / 2;
+
+        hard_offset_max = center_padding;
+        soft_offset_max = center_padding + _this->out_scope;
+
+        hard_offset_min = center_padding - (_this->total_length - _this->note_length);
+        soft_offset_min = hard_offset_min - _this->out_scope;
+    }
     if (!_this->inertia || _this->speed == 0)
     {
         if (!_this->loop && (_this->offset > hard_offset_max || _this->offset < hard_offset_min))
@@ -874,6 +884,14 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
 
     int offset_min = 0;
     int offset_max = 0;
+
+    int temp_view_size = (_this->dir == HORIZONTAL) ? obj->w : obj->h;
+    int16_t center_padding = 0;
+
+    if (_this->style == LIST_ZOOM_CYLINDER)
+    {
+        center_padding = (temp_view_size - _this->note_length) / 2;
+    }
     switch (_this->dir)
     {
     case HORIZONTAL:
@@ -889,6 +907,11 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
                 offset_max = obj->w - _this->note_length;
                 offset_min -= _this->card_stack_location;
             }
+            else if (_this->style == LIST_ZOOM_CYLINDER)
+            {
+                offset_max = center_padding + _this->out_scope;
+                offset_min = center_padding - (_this->total_length - _this->note_length) - _this->out_scope;
+            }
         }
         break;
     case VERTICAL:
@@ -903,6 +926,11 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
             {
                 offset_max = obj->h - _this->note_length;
                 offset_min -= _this->card_stack_location;
+            }
+            else if (_this->style == LIST_ZOOM_CYLINDER)
+            {
+                offset_max = center_padding + _this->out_scope;
+                offset_min = center_padding - (_this->total_length - _this->note_length) - _this->out_scope;
             }
         }
         break;
@@ -1197,6 +1225,12 @@ void gui_list_set_offset(gui_list_t *list, int16_t offset)
     {
         offset_max = temp - list->note_length;
         offset_min -= list->card_stack_location;
+    }
+    else if (list->style == LIST_ZOOM_CYLINDER)
+    {
+        int16_t center_padding = (temp - list->note_length) / 2;
+        offset_max = center_padding + list->out_scope;
+        offset_min = center_padding - (list->total_length - list->note_length) - list->out_scope;
     }
     if (offset > offset_max)
     {
