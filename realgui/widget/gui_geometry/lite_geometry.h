@@ -35,8 +35,6 @@
 
 #define LG_UNUSED(x) ((void)x)
 
-#define CANVAS_WIDTH   410
-#define CANVAS_HEIGHT  502
 
 typedef uint32_t PixelColor;
 

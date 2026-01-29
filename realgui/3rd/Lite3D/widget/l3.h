@@ -65,6 +65,8 @@ struct l3_model_base
     void *raw_data_from_ftl;
     l3_deformation_state_t deformation;
 
+    void *user_data;  // User-defined data pointer for custom usage
+
 };
 
 struct l3_model_ops
