@@ -511,6 +511,7 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *this,
     root->has_destroy_cb = true;
 
     this->init_time_ms = gui_ms_get();
+    this->fallback_mode = CENTER;
 }
 
 /*============================================================================*
@@ -569,6 +570,11 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
     this->end_value = end_value;
     this->interval_time_ms = interval_time_ms;
     this->duration_time_ms = duration_time_ms;
+}
+
+void gui_scroll_text_non_scroll_align_set(gui_scroll_text_t *this, TEXT_MODE mode)
+{
+    this->fallback_mode = mode;
 }
 
 gui_scroll_text_t *gui_scroll_text_create(void       *parent,
