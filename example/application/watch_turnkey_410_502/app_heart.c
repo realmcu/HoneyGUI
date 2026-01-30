@@ -753,7 +753,7 @@ static void heartrate_design(gui_view_t *view)
         time_text = gui_text_create(win_heart_menu, "date_text", -30, 33, 0, 0);
         gui_text_set(time_text, (void *)time_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(time_text_content), 28);
-        gui_text_type_set(time_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(time_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(time_text, RIGHT);
         gui_text_rendermode_set(time_text, 2);
     }
@@ -763,7 +763,7 @@ static void heartrate_design(gui_view_t *view)
         text_current = gui_text_create(win_heart, "txt_current", 31, 318, 0, font_size);
         gui_text_set(text_current, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
         gui_text_mode_set(text_current, LEFT);
-        gui_text_type_set(text_current, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(text_current, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(text_current, 2);
     }
     {
@@ -773,7 +773,7 @@ static void heartrate_design(gui_view_t *view)
         gui_text_set(text_heart_rate, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text),
                      font_size);
         gui_text_mode_set(text_heart_rate, LEFT);
-        gui_text_type_set(text_heart_rate, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(text_heart_rate, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(text_heart_rate, 2);
     }
     {
@@ -782,7 +782,7 @@ static void heartrate_design(gui_view_t *view)
         // text_bpm = gui_text_create(win_heart, "txt_bpm", 125, 380, 0, 96);
         // gui_text_set(text_bpm, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         // gui_text_mode_set(text_bpm, LEFT);
-        // gui_text_type_set(text_bpm, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        // gui_text_type_set(text_bpm, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         // gui_text_rendermode_set(text_bpm, 2);
     }
     {
@@ -792,7 +792,7 @@ static void heartrate_design(gui_view_t *view)
         gui_text_set(text_status, (void *)time_status_content, GUI_FONT_SRC_TTF, gui_rgb(150, 150, 150),
                      strlen(time_status_content), font_size);
         gui_text_mode_set(text_status, LEFT);
-        gui_text_type_set(text_status, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(text_status, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(text_status, 2);
     }
     {

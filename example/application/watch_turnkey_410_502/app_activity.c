@@ -251,7 +251,7 @@ void time_update_cb(void *p)
     // gui_text_t *time_text = gui_text_create(p, "time_text", -30, 33, 0, 0);
     gui_text_set(time_text, (void *)time_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(time_text_content), 36);
-    gui_text_type_set(time_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(time_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(time_text, RIGHT);
     gui_text_rendermode_set(time_text, 2);
 }
@@ -344,7 +344,7 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_text_set(t_day, text_today, GUI_FONT_SRC_TTF, gui_rgb(0xA0, 0x77, 0x83), strlen(text_today),
                          font_size);
             gui_text_mode_set(t_day, RIGHT);
-            gui_text_type_set(t_day, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(t_day, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_rendermode_set(t_day, 2);
 
             char *text = "No activities recorded today.";
@@ -352,7 +352,7 @@ static void note_design(gui_obj_t *obj, void *p)
                                             251, 0, font_size);
             gui_text_set(t, text, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(text), font_size);
             gui_text_mode_set(t, LEFT);
-            gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_rendermode_set(t, 2);
         }
     }
@@ -442,7 +442,7 @@ static void activity_design(gui_view_t *view)
     time_text = gui_text_create(win_menu_activity, "date_text", -30, 33, 0, 0);
     gui_text_set(time_text, (void *)time_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(time_text_content), 28);
-    gui_text_type_set(time_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(time_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(time_text, RIGHT);
     gui_text_rendermode_set(time_text, 2);
 

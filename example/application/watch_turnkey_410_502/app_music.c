@@ -96,7 +96,7 @@ static void note_design(gui_obj_t *obj, void *p)
                                                  60, 0, 0);
         gui_text_set(sport_text, "Music", GUI_FONT_SRC_TTF, gui_rgb(231, 31, 69),
                      strlen("Music"), 40);
-        gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(sport_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(sport_text, LEFT);
 
         gui_img_t *music_ctr = gui_img_create_from_mem(current_view, "music", MUSIC_CTR_ICON_BIN,
@@ -115,7 +115,7 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_text_t *sport_text = gui_text_create(rect_bg, "ac_text1", 130, 40, 0, 0);
             gui_text_set(sport_text, "Homepage", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                          strlen("Homepage"), 48);
-            gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(sport_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(sport_text, LEFT);
             gui_obj_add_event_cb(GUI_BASE(rect_bg), (gui_event_cb_t)music_homeapge_press_cb,
                                  GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -130,7 +130,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *sport_text = gui_text_create(rect_bg, "music_text1", 130, 40, 0, 0);
         gui_text_set(sport_text, "Broadcast", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("Broadcast"), 48);
-        gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(sport_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(sport_text, LEFT);
         gui_obj_add_event_cb(GUI_BASE(rect_bg), (gui_event_cb_t)music_broadcast_press_cb,
                              GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -145,7 +145,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *sport_text = gui_text_create(rect_bg, "music_text1", 130, 40, 0, 0);
         gui_text_set(sport_text, "Library", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("Library"), 48);
-        gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(sport_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(sport_text, LEFT);
         gui_obj_add_event_cb(GUI_BASE(rect_bg), (gui_event_cb_t)music_library_press_cb,
                              GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -220,7 +220,7 @@ static void music_view_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(parent, "time_b", 0, 0, SCREEN_WIDTH, 80);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(time_str), 60);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
 

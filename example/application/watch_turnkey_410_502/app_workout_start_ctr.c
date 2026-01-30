@@ -108,7 +108,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *finish_text = gui_text_create(obj, "ac_text1", 80, 210, 0, 0);
         gui_text_set(finish_text, "finish", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("finish"), 36);
-        gui_text_type_set(finish_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(finish_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(finish_text, LEFT);
         gui_obj_add_event_cb(GUI_BASE(workout_start_ctr_finish),
                              (gui_event_cb_t)workout_start_ctr_finish_press_cb,
@@ -144,7 +144,7 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_text_set(workout_stop_text, "stop", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                          strlen("stop"), 36);
         }
-        gui_text_type_set(workout_stop_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(workout_stop_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(workout_stop_text, LEFT);
         gui_obj_add_event_cb(GUI_BASE(workout_start_ctr_stop),
                              (gui_event_cb_t)workout_start_ctr_stop_press_cb,
@@ -159,7 +159,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *new_text = gui_text_create(obj, "ac_text1", 80, 210, 0, 0);
         gui_text_set(new_text, "add", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("add"), 36);
-        gui_text_type_set(new_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(new_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(new_text, LEFT);
 
         gui_img_t *workout_start_ctr_segment = gui_img_create_from_mem(obj, 0,
@@ -169,13 +169,13 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *segment_text0 = gui_text_create(workout_start_ctr_segment, "ac_text1", 70, 30, 0, 0);
         gui_text_set(segment_text0, "1", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("1"), 40);
-        gui_text_type_set(segment_text0, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(segment_text0, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(segment_text0, LEFT);
 
         gui_text_t *segment_text = gui_text_create(obj, "ac_text1", 260, 210, 0, 0);
         gui_text_set(segment_text, "segment", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("segment"), 36);
-        gui_text_type_set(segment_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(segment_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(segment_text, LEFT);
     }
     if (index == 2)
@@ -188,7 +188,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *disconnect_text = gui_text_create(obj, "ac_text1", 60, 210, 0, 0);
         gui_text_set(disconnect_text, "disconnect", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("disconnect"), 36);
-        gui_text_type_set(disconnect_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(disconnect_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(disconnect_text, LEFT);
 
         gui_img_t *workout_start_ctr_sfaty = gui_img_create_from_mem(obj, 0,
@@ -198,7 +198,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *sfaty_text = gui_text_create(obj, "ac_text1", 280, 210, 0, 0);
         gui_text_set(sfaty_text, "sfaty", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("sfaty"), 36);
-        gui_text_type_set(sfaty_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(sfaty_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(sfaty_text, LEFT);
     }
 
@@ -242,7 +242,7 @@ static void workout_start_ctr_design(gui_view_t *view)
             gui_text_set(sport_text, workout_text_array[g_selected_workout_index], GUI_FONT_SRC_TTF,
                          gui_rgb(217, 255, 0),
                          strlen(workout_text_array[g_selected_workout_index]), 40);
-            gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(sport_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(sport_text, RIGHT);
         }
 
@@ -250,7 +250,7 @@ static void workout_start_ctr_design(gui_view_t *view)
         gui_text_t *t_time = gui_text_create(workout_start_ctr_remind, 0, 0, 0, 370, 80);
         gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                      strlen(time_str), 34);
-        gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t_time, MID_RIGHT);
         gui_text_rendermode_set(t_time, 2);
         gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);

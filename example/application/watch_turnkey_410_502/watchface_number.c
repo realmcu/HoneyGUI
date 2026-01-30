@@ -121,14 +121,14 @@ void create_watchface_number(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(win, "t_time", -58, 10, 0, 0);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), 2,
                  250);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
 
     gui_text_t *t_min = gui_text_create(win, "t_min", -58, 200, 0, 0);
     gui_text_set(t_min, time_str + 3, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), 2,
                  250);
-    gui_text_type_set(t_min, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_min, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_min, RIGHT);
     gui_text_rendermode_set(t_min, 2);
 

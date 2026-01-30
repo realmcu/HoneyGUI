@@ -430,7 +430,7 @@ static void page_0_design(gui_obj_t *parent)
     sprintf(calories_str, "0");
     gui_text_set(calories_value, calories_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(calories_str), 85);
-    gui_text_type_set(calories_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(calories_value, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(calories_value, LEFT);
     gui_text_rendermode_set(calories_value, 2);
 
@@ -438,7 +438,7 @@ static void page_0_design(gui_obj_t *parent)
                                                 text_unit_offset_x, y_pos, 0, 0);
     gui_text_set(calories_unit, "kcal", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen("kcal"), 80);
-    gui_text_type_set(calories_unit, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(calories_unit, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(calories_unit, LEFT);
     gui_text_rendermode_set(calories_unit, 2);
 
@@ -450,7 +450,7 @@ static void page_0_design(gui_obj_t *parent)
     sprintf(heart_rate_str, "0");
     gui_text_set(heart_value, heart_rate_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(heart_rate_str), 85);
-    gui_text_type_set(heart_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(heart_value, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(heart_value, LEFT);
     gui_text_rendermode_set(heart_value, 2);
 
@@ -459,7 +459,7 @@ static void page_0_design(gui_obj_t *parent)
                                              text_unit_offset_x, y_pos, 0, 0);
     gui_text_set(heart_unit, "BPM", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen("BPM"), 80);
-    gui_text_type_set(heart_unit, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(heart_unit, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(heart_unit, LEFT);
     gui_text_rendermode_set(heart_unit, 2);
 
@@ -473,7 +473,7 @@ static void page_0_design(gui_obj_t *parent)
         sprintf(distance_str, "0.00");
         gui_text_set(distance_value, distance_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen(distance_str), 85);
-        gui_text_type_set(distance_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(distance_value, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(distance_value, LEFT);
         gui_text_rendermode_set(distance_value, 2);
 
@@ -482,7 +482,7 @@ static void page_0_design(gui_obj_t *parent)
                                                     text_unit_offset_x, y_pos, 0, 0);
         gui_text_set(distance_unit, "km", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("km"), 80);
-        gui_text_type_set(distance_unit, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(distance_unit, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(distance_unit, LEFT);
         gui_text_rendermode_set(distance_unit, 2);
     }
@@ -506,7 +506,7 @@ static void page_1_design(gui_obj_t *parent)
                                                  left_x, label_y_start, 0, 0);
     gui_text_set(activity_label, "Activity", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
                  strlen("Activity"), 28);
-    gui_text_type_set(activity_label, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(activity_label, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(activity_label, LEFT);
     gui_text_rendermode_set(activity_label, 2);
 
@@ -516,7 +516,7 @@ static void page_1_design(gui_obj_t *parent)
                                                  left_x, label_y_start + value_offset_y, 0, 0);
     gui_text_set(activity_value, activity_str, GUI_FONT_SRC_TTF, gui_rgb(255, 45, 85),
                  strlen(activity_str), 40);
-    gui_text_type_set(activity_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(activity_value, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(activity_value, LEFT);
     gui_text_rendermode_set(activity_value, 2);
 
@@ -525,7 +525,7 @@ static void page_1_design(gui_obj_t *parent)
                                                  left_x, label_y_start + line_spacing, 0, 0);
     gui_text_set(exercise_label, "Exercise", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
                  strlen("Exercise"), 28);
-    gui_text_type_set(exercise_label, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(exercise_label, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(exercise_label, LEFT);
     gui_text_rendermode_set(exercise_label, 2);
 
@@ -535,7 +535,7 @@ static void page_1_design(gui_obj_t *parent)
                                                  left_x, label_y_start + line_spacing + value_offset_y, 0, 0);
     gui_text_set(exercise_value, exercise_str, GUI_FONT_SRC_TTF, gui_rgb(185, 251, 79),
                  strlen(exercise_str), 40);
-    gui_text_type_set(exercise_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(exercise_value, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(exercise_value, LEFT);
     gui_text_rendermode_set(exercise_value, 2);
 
@@ -544,7 +544,7 @@ static void page_1_design(gui_obj_t *parent)
                                               left_x, label_y_start + line_spacing * 2, 0, 0);
     gui_text_set(stand_label, "Stand", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
                  strlen("Stand"), 28);
-    gui_text_type_set(stand_label, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(stand_label, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(stand_label, LEFT);
     gui_text_rendermode_set(stand_label, 2);
 
@@ -553,7 +553,7 @@ static void page_1_design(gui_obj_t *parent)
                                               left_x, label_y_start + line_spacing * 2 + value_offset_y, 0, 0);
     gui_text_set(stand_value, stand_str, GUI_FONT_SRC_TTF, gui_rgb(0, 255, 255),
                  strlen(stand_str), 40);
-    gui_text_type_set(stand_value, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(stand_value, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(stand_value, LEFT);
     gui_text_rendermode_set(stand_value, 2);
 
@@ -701,7 +701,7 @@ static void workout_start_design(gui_view_t *view)
         sprintf(countdown_str, "%d", countdown_value);
         gui_text_set(countdown_text, countdown_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen(countdown_str), 110);
-        gui_text_type_set(countdown_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(countdown_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(countdown_text, LEFT);
     }
 
@@ -751,14 +751,14 @@ static void workout_start_design(gui_view_t *view)
                                             0, 0);
         gui_text_set(workout_time_text, workout_time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 233, 0),
                      strlen(workout_time_str), 85);
-        gui_text_type_set(workout_time_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(workout_time_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(workout_time_text, LEFT);
 
         //------time-----------------//
         gui_text_t *t_time = gui_text_create(workout_start_remind, 0, 0, 0, 370, 80);
         gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                      strlen(time_str), 34);
-        gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t_time, MID_RIGHT);
         gui_text_rendermode_set(t_time, 2);
         gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);

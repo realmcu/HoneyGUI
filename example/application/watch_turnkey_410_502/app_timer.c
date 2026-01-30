@@ -20,6 +20,7 @@
 #include "gui_view_instance.h"
 #include "tp_algo.h"
 
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -475,7 +476,7 @@ static void note_active_single_design(gui_obj_t *obj, void *p)
     gui_text_t *t_act = gui_text_create(obj, 0, 0, 300, SCREEN_WIDTH, 26);
     gui_text_set(t_act, active_timer_str[index], GUI_FONT_SRC_TTF, gui_rgb(0xF1, 0x9A, 0x38),
                  strlen(active_timer_str[index]), 26);
-    gui_text_type_set(t_act, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_act, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_act, MID_CENTER);
     gui_text_rendermode_set(t_act, 2);
     update_timer_str(active_timer_rec_str[index], (uint32_t)active_timer_rec_val[index],
@@ -483,7 +484,7 @@ static void note_active_single_design(gui_obj_t *obj, void *p)
     gui_text_t *t_rec = gui_text_create(obj, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_text_set(t_rec, active_timer_rec_str[index], GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(active_timer_rec_str[index]), 72);
-    gui_text_type_set(t_rec, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_rec, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_rec, MID_CENTER);
     gui_text_rendermode_set(t_rec, 2);
 }
@@ -558,7 +559,7 @@ static void page_active_single_design(gui_obj_t *parent)
         gui_text_t *t_tip = gui_text_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         gui_text_set(t_tip, "No active timer", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                      strlen("No active timer"), 50);
-        gui_text_type_set(t_tip, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t_tip, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t_tip, MID_CENTER);
         gui_text_rendermode_set(t_tip, 2);
 
@@ -568,7 +569,7 @@ static void page_active_single_design(gui_obj_t *parent)
     gui_text_t *t_time = gui_text_create(parent, 0, 0, 30, SCREEN_WIDTH, 34);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);
@@ -756,13 +757,13 @@ static void note_active_multi_design(gui_obj_t *obj, void *p)
     gui_text_t *t_act = gui_text_create(bg, 0, 20, 26, 200, 45);
     gui_text_set(t_act, active_timer_str[index], GUI_FONT_SRC_TTF, gui_rgb(0xF1, 0x9A, 0x38),
                  strlen(active_timer_str[index]), 45);
-    gui_text_type_set(t_act, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_act, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_act, MID_LEFT);
     gui_text_rendermode_set(t_act, 2);
     gui_text_t *t_rec = gui_text_create(bg, 0, 20, 87, 300, 60);
     gui_text_set(t_rec, active_timer_rec_str[index], GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(active_timer_rec_str[index]), 60);
-    gui_text_type_set(t_rec, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_rec, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_rec, MID_LEFT);
     gui_text_rendermode_set(t_rec, 2);
     gui_obj_create_timer((void *)t_rec, 200, -1, active_multi_timer_cb);
@@ -816,7 +817,7 @@ static void page_active_multi_design(gui_obj_t *parent)
     gui_text_t *t_time = gui_text_create(parent, 0, 0, 30, SCREEN_WIDTH, 34);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);
@@ -840,19 +841,19 @@ static void page_timer_end_design(gui_obj_t *parent)
     gui_text_t *t_act = gui_text_create(parent, 0, 0, 300, SCREEN_WIDTH, 26);
     gui_text_set(t_act, timer_end_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(timer_end_str), 26);
-    gui_text_type_set(t_act, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_act, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_act, MID_CENTER);
     gui_text_rendermode_set(t_act, 2);
     gui_text_t *t_done = gui_text_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_text_set(t_done, "DONE", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 4, 72);
-    gui_text_type_set(t_done, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_done, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_done, MID_CENTER);
     gui_text_rendermode_set(t_done, 2);
 
     gui_text_t *t_time = gui_text_create(parent, 0, 0, 30, SCREEN_WIDTH, 34);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);
@@ -886,10 +887,10 @@ static void click_button_start(void *obj, gui_event_t e, void *param)
         for (uint8_t i = PRESET_TIMER_NUM_MAX - 1; i > 0; i--)
         {
             preset_timer_val[i - 1] = preset_timer_val[i];
-            memccpy(preset_timer_str[i - 1], preset_timer_str[i], 9, sizeof(char));
+            memcpy(preset_timer_str[i - 1], preset_timer_str[i], 9);
         }
-        preset_timer_val[preset_timer_num] = temp;
-        update_timer_str(preset_timer_str[preset_timer_num], temp, temp);
+        preset_timer_val[preset_timer_num - 1] = temp;
+        update_timer_str(preset_timer_str[preset_timer_num - 1], temp, temp);
     }
     else
     {
@@ -970,7 +971,7 @@ static void note_custom_add_timer_design(gui_obj_t *obj, void *p)
     index %= note_num;
     gui_text_t *t = gui_text_create(obj, 0, 0, 0, 110, 60);
     gui_text_set(t, (void *)(num_str + index * 2), GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 2, 60);
-    gui_text_type_set(t, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t, MID_CENTER);
     gui_text_rendermode_set(t, 2);
 
@@ -1011,12 +1012,12 @@ static void page_custom_add_timer_design(gui_obj_t *parent)
     gui_img_a8_recolor(list_cover, 0xFFFFFFFF);
     gui_text_t *t_common = gui_text_create(parent, 0, 130, 272, 16, 40);
     gui_text_set(t_common, ":", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 1, 40);
-    gui_text_type_set(t_common, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_common, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_common, MID_CENTER);
     gui_text_rendermode_set(t_common, 2);
     t_common = gui_text_create(parent, 0, 265, 272, 16, 40);
     gui_text_set(t_common, ":", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 1, 40);
-    gui_text_type_set(t_common, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_common, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_common, MID_CENTER);
     gui_text_rendermode_set(t_common, 2);
     gui_img_t *bg_unit_h = gui_img_create_from_mem(parent, 0, BG_ROUND_72_50_BIN, 35, 133, 0, 0);
@@ -1027,17 +1028,17 @@ static void page_custom_add_timer_design(gui_obj_t *parent)
     gui_img_a8_recolor(bg_unit_s, 0xFF59DD8A);
     gui_text_t *t_unit = gui_text_create(bg_unit_h, 0, 0, 0, 72, 50);
     gui_text_set(t_unit, "Hour", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 4, 25);
-    gui_text_type_set(t_unit, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_unit, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_unit, MID_CENTER);
     gui_text_rendermode_set(t_unit, 2);
     t_unit = gui_text_create(bg_unit_min, 0, 0, 0, 72, 50);
     gui_text_set(t_unit, "Min", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 3, 25);
-    gui_text_type_set(t_unit, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_unit, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_unit, MID_CENTER);
     gui_text_rendermode_set(t_unit, 2);
     t_unit = gui_text_create(bg_unit_s, 0, 0, 0, 72, 50);
     gui_text_set(t_unit, "Sec", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 3, 25);
-    gui_text_type_set(t_unit, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_unit, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_unit, MID_CENTER);
     gui_text_rendermode_set(t_unit, 2);
 
@@ -1047,14 +1048,14 @@ static void page_custom_add_timer_design(gui_obj_t *parent)
     gui_obj_add_event_cb((void *)bg_start, click_button_start, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_text_t *t_start = gui_text_create(bg_start, 0, 0, 0, 325, 90);
     gui_text_set(t_start, "Start", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF), 5, 50);
-    gui_text_type_set(t_start, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_start, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_start, MID_CENTER);
     gui_text_rendermode_set(t_start, 2);
 
     gui_text_t *t_time = gui_text_create(parent, 0, 0, 30, 382, 34);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_RIGHT);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);
@@ -1090,7 +1091,7 @@ static void click_button_page_all_timers(void *obj, gui_event_t e, void *param)
         for (uint8_t i = index; i < preset_timer_num; i++)
         {
             preset_timer_val[i] = preset_timer_val[i + 1];
-            memccpy(preset_timer_str[i], preset_timer_str[i + 1], 9, sizeof(char));
+            memcpy(preset_timer_str[i], preset_timer_str[i + 1], 9);
         }
         show_page((void *)gui_view_get_current());
         return;
@@ -1183,7 +1184,7 @@ static void note_all_timers_design(gui_obj_t *obj, void *p)
         gui_text_t *t = gui_text_create(obj, 0, 28, 125, 300, font_size);
         gui_text_set(t, "All Timers", GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                      strlen("All Timers"), font_size);
-        gui_text_type_set(t, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_LEFT);
         gui_text_rendermode_set(t, 2);
         return;
@@ -1199,7 +1200,7 @@ static void note_all_timers_design(gui_obj_t *obj, void *p)
         gui_text_t *t = gui_text_create(bg, 0, 0, 0, 200, 56);
         gui_text_set(t, content, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                      strlen(content), font_size);
-        gui_text_type_set(t, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_CENTER);
         gui_text_rendermode_set(t, 2);
         return;
@@ -1234,7 +1235,7 @@ static void note_all_timers_design(gui_obj_t *obj, void *p)
             gui_text_t *t_timer = gui_text_create(bg, 0, 0, 0, 172, 172);
             gui_text_set(t_timer, preset_timer_str[i], GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                          strlen(preset_timer_str[i]), font_size);
-            gui_text_type_set(t_timer, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(t_timer, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t_timer, MID_CENTER);
             gui_text_rendermode_set(t_timer, 2);
             if (!edit_mode)
@@ -1287,7 +1288,7 @@ static void page_all_timers_design(gui_obj_t *parent)
     gui_text_t *t_time = gui_text_create(win, 0, 0, 30, 382, 34);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_RIGHT);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);
@@ -1295,7 +1296,7 @@ static void page_all_timers_design(gui_obj_t *parent)
     gui_text_t *t_app = gui_text_create(win, 0, 0, 70, 382, 34);
     gui_text_set(t_app, "Timers", GUI_FONT_SRC_TTF, gui_rgb(0xF1, 0x9A, 0x38),
                  strlen("Timers"), 34);
-    gui_text_type_set(t_app, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_app, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_app, MID_RIGHT);
     gui_text_rendermode_set(t_app, 2);
 

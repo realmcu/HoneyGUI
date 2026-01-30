@@ -185,7 +185,7 @@ static void compass_design(gui_view_t *view)
     gui_text_t *infor_text = gui_text_create(info_img_bg, "compass_text", 0, 0, img_width, img_height);
     gui_text_set(infor_text, "i", GUI_FONT_SRC_TTF, gui_rgb(10, 10, 10),
                  strlen("i"), 48);
-    gui_text_type_set(infor_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(infor_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(infor_text, MID_CENTER);
     gui_text_rendermode_set(infor_text, 2);
 
@@ -204,7 +204,7 @@ static void compass_design(gui_view_t *view)
     sprintf(compass_display_str, "%s~%d°", get_direction_name(current_angle), current_angle);
     gui_text_set(compass_text, compass_display_str, GUI_FONT_SRC_TTF, gui_rgb(10, 10, 10),
                  strlen(compass_display_str), 60);
-    gui_text_type_set(compass_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(compass_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(compass_text, MID_CENTER);
     gui_text_rendermode_set(compass_text, 2);
 
@@ -213,7 +213,7 @@ static void compass_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(view, "time_b", 0, 0, 380, 80);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(10, 10, 10),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_RIGHT);
     gui_text_rendermode_set(t_time, 2);
 

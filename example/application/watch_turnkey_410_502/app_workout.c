@@ -205,7 +205,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *t = gui_text_create(obj, 0, offset_x_text, offset_y_text, 0, 0);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, gui_rgba(255, 255, 255, 255),
                      strlen(text), 36);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_CENTER);
 
         gui_obj_add_event_cb(obj, (gui_event_cb_t)note_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -383,7 +383,7 @@ static void workout_view_design(gui_view_t *view)
                                                 SCREEN_HEIGHT / 2 + 30,
                                                 SCREEN_WIDTH, 50);
     gui_text_set(selected_text, "", GUI_FONT_SRC_TTF, gui_rgba(255, 255, 255, 255), 0, 36);
-    gui_text_type_set(selected_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(selected_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(selected_text, MID_CENTER);
     gui_obj_show(GUI_BASE(selected_text), false);
 
@@ -433,7 +433,7 @@ static void workout_view_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(parent, "time_b", 0, 0, SCREEN_WIDTH, 80);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgba(255, 255, 255, 255),
                  strlen(time_str), 48);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
 

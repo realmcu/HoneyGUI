@@ -235,7 +235,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -245,7 +245,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         96);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -254,7 +254,7 @@ void resting_heartrate_design(gui_obj_t *obj)
         gui_text_t *t = gui_text_create(win_hb, "txt", 245, 380, 0, 96);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -263,7 +263,7 @@ void resting_heartrate_design(gui_obj_t *obj)
         gui_text_t *t = gui_text_create(win_hb, "txt", 40, 430, 0, 96);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, gui_rgb(150, 150, 150), strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -292,7 +292,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -302,7 +302,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -312,7 +312,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -322,7 +322,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -332,7 +332,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -342,7 +342,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     {
@@ -352,7 +352,7 @@ void resting_heartrate_design(gui_obj_t *obj)
                                         288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
     img_icon_information = gui_img_create_from_mem(win_hb, "icon_information",

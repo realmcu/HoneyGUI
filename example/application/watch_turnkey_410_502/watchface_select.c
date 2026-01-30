@@ -108,7 +108,7 @@ static void note_design(gui_obj_t *obj, void *p)
                                             40);
         gui_text_set(label, (void *)watchface_names[index], GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen(watchface_names[index]), 20);
-        gui_text_type_set(label, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(label, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(label, CENTER);
 
         gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED,

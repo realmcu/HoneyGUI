@@ -363,7 +363,7 @@ static void note_design(gui_obj_t *obj, void *p)
         int font_size = 42;
         gui_text_t *t = gui_text_create(note, "txt", 140, 0, 300, 100);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(text), font_size);
-        gui_text_type_set(t, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, INTER_24PT_REGULAR_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_LEFT);
         gui_text_rendermode_set(t, 2);
         if (design_p->click_cb[index] != NULL)

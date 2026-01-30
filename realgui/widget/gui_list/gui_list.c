@@ -1208,6 +1208,11 @@ void gui_list_set_factor(gui_list_t *list, float factor)
 
 void gui_list_set_auto_align(gui_list_t *list, bool auto_align)
 {
+    if (list->space != 0)
+    {
+        list->space = 0;
+        gui_log("warning: list space is set to 0 when auto_align is enabled!!!\n");
+    }
     list->auto_align = auto_align;
 }
 

@@ -164,7 +164,7 @@ void create_watchface_earth(gui_view_t *view)
     gui_text_t *text_weather = gui_text_create(win_main, "text_weather", -40, 35, 0, 0);
     gui_text_set(text_weather, weather_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(weather_content), 36);
-    gui_text_type_set(text_weather, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_weather, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_weather, RIGHT);
     gui_text_rendermode_set(text_weather, 2);
 
@@ -173,7 +173,7 @@ void create_watchface_earth(gui_view_t *view)
     gui_text_t *text = gui_text_create(win_main, "date_text", -40, 140, 0, 0);
     gui_text_set(text, (void *)date_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_text_content), 80);
-    gui_text_type_set(text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, RIGHT);
     gui_text_rendermode_set(text, 2);
 
@@ -181,7 +181,7 @@ void create_watchface_earth(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(win_main, "t_time", -40, 60, 0, 0);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(time_str), 80);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
 
@@ -190,7 +190,7 @@ void create_watchface_earth(gui_view_t *view)
     gui_text_t *text_compass = gui_text_create(win_main, "text_compass", -40, 400, 0, 0);
     gui_text_set(text_compass, compass_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(compass_content), 36);
-    gui_text_type_set(text_compass, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_compass, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_compass, RIGHT);
     gui_text_rendermode_set(text_compass, 2);
 

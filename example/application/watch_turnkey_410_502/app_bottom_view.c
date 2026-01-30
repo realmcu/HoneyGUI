@@ -152,7 +152,7 @@ static void draw_timecard(void *parent)
                  32);
 
 
-    gui_text_type_set(timecard_date_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(timecard_date_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_date_text, LEFT);
 
     gui_text_t *timecard_time_text = gui_text_create(rect_timecard, "time_s",  -10, 20, 0,
@@ -160,7 +160,7 @@ static void draw_timecard(void *parent)
     gui_text_set(timecard_time_text, (void *)time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(time_str),
                  32);
-    gui_text_type_set(timecard_time_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(timecard_time_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_time_text, RIGHT);
     GUI_BASE(win)->not_show = 1;
     gui_win_enable_blur(win, false);
@@ -436,14 +436,14 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_text_t *move_text = gui_text_create(rect_activity, "ac_move", 134, 20, 0, 0);
             gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_TTF, gui_rgb(230, 67, 79),
                          strlen(move_content), 24);
-            gui_text_type_set(move_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(move_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(move_text, LEFT);
 
             sprintf(ex_content, "0/60 min");
             gui_text_t *ex_text = gui_text_create(rect_activity, "ac_ex", 134, 57, 0, 0);
             gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_TTF, gui_rgb(186, 253, 79),
                          strlen(ex_content), 24);
-            gui_text_type_set(ex_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(ex_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(ex_text, LEFT);
 
 
@@ -451,7 +451,7 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_text_t *stand_text = gui_text_create(rect_activity, "ac_stand", 134, 94, 0, 0);
             gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_TTF, gui_rgb(117, 230, 229),
                          strlen(stand_content), 24);
-            gui_text_type_set(stand_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(stand_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(stand_text, LEFT);
             // activity arcs using gui_lite_arc
             {
@@ -540,7 +540,7 @@ static void note_design(gui_obj_t *obj, void *p)
             battery_text_widget = gui_text_create(arc_battery, "battery_text", 20, 13, 0, 0);
             gui_text_set(battery_text_widget, battery_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                          strlen(battery_content), 50);
-            gui_text_type_set(battery_text_widget, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(battery_text_widget, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(battery_text_widget, LEFT);
 
             // Create timer to update battery arc
@@ -567,7 +567,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_img_set_mode(rect_menu_bg, IMG_SRC_OVER_MODE);
         gui_text_t *text = gui_text_create(rect_menu_bg, 0, 70, 20, 0, 0);
         gui_text_set(text, "APP MENU", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("APP MENU"), 32);
-        gui_text_type_set(text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, LEFT);
         gui_obj_add_event_cb(rect_menu_bg, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     }
@@ -600,7 +600,7 @@ static void bottom_view_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(img_clock, "time_b", 0, 0, 190, 190);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(time_str), 60);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
 
@@ -608,7 +608,7 @@ static void bottom_view_design(gui_view_t *view)
     gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_content),
                  48);
-    gui_text_type_set(date_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(date_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, MULTI_LEFT);
 
     // Card list

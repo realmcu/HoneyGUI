@@ -224,7 +224,7 @@ void create_watchface_sport(gui_view_t *view)
     gui_text_set(t_time, time_text_content, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(time_text_content),
                  80);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
 
@@ -241,14 +241,14 @@ void create_watchface_sport(gui_view_t *view)
             move_text = gui_text_create(win, "ac_move", -25, 20 + 180, 0, 0);
             gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_TTF, gui_rgb(230, 67, 79),
                          strlen(move_content), 80);
-            gui_text_type_set(move_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(move_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(move_text, RIGHT);
 
             sprintf(ex_content, "0");
             gui_text_t *ex_text = gui_text_create(win, "ac_ex", -25, 57 + 200, 0, 0);
             gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_TTF, gui_rgb(186, 253, 79),
                          strlen(ex_content), 80);
-            gui_text_type_set(ex_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(ex_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(ex_text, RIGHT);
 
 
@@ -256,7 +256,7 @@ void create_watchface_sport(gui_view_t *view)
             gui_text_t *stand_text = gui_text_create(win, "ac_stand", -25, 94 + 220, 0, 0);
             gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_TTF, gui_rgb(117, 230, 229),
                          strlen(stand_content), 80);
-            gui_text_type_set(stand_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(stand_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(stand_text, RIGHT);
         }
         int image_h = 210;
@@ -298,7 +298,7 @@ void create_watchface_sport(gui_view_t *view)
         gui_text_t *heart_text = gui_text_create(win_heart, "heart_text", 45, 0, 0, 0);
         gui_text_set(heart_text, "64 bpm, 1m ago", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("64 bpm, 1m ago"), 32);
-        gui_text_type_set(heart_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(heart_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(heart_text, LEFT);
         gui_img_t *img_heart = gui_img_create_from_mem(win_heart, "heart_icon", APP_HEART_RATE_ICON_BIN, 0,
                                                        0, 0, 0);

@@ -135,7 +135,7 @@ static void battery_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(parent, "time_b", -40, 20, 0, 0);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(time_str), 42);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer(GUI_BASE(view), 30000, true, time_update_cb);
@@ -144,7 +144,7 @@ static void battery_design(gui_view_t *view)
     gui_text_t *sport_text = gui_text_create(parent, "ac_text1",  -40, 60, 0, 0);
     gui_text_set(sport_text, "Battery", GUI_FONT_SRC_TTF, title_color,
                  strlen("Battery"), 42);
-    gui_text_type_set(sport_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(sport_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(sport_text, RIGHT);
 
     // Battery arc display using gui_lite_arc
@@ -175,14 +175,14 @@ static void battery_design(gui_view_t *view)
                                               0, 0);
         gui_text_set(battery_remain_text, battery_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(battery_content), 85);
-        gui_text_type_set(battery_remain_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(battery_remain_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(battery_remain_text, LEFT);
 
         // Add "%" unit text next to the number
         gui_text_t *battery_unit_text = gui_text_create(parent, "battery_unit_text", center_x + 25,
                                                         center_y - 40, 0, 0);
         gui_text_set(battery_unit_text, "%", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("%"), 85);
-        gui_text_type_set(battery_unit_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(battery_unit_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(battery_unit_text, LEFT);
 
         // Create timer to update battery display
@@ -194,7 +194,7 @@ static void battery_design(gui_view_t *view)
         gui_text_t *battery_text = gui_text_create(battery_rect, "battery_text", 35, 20, 0, 0);
         gui_text_set(battery_text, "Low Power Mode", GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen("Low Power Mode"), 36);
-        gui_text_type_set(battery_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(battery_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(battery_text, LEFT);
     }
 

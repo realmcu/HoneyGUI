@@ -193,7 +193,7 @@ static void update_page_2_lap(gui_obj_t *parent)
     gui_text_t *t_lap = gui_text_create(win, 0, 0, 0, 100, 50);
     gui_text_set(t_lap, (void *)lap_str_array[index], GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen((void *)lap_str_array[index]), 22);
-    gui_text_type_set(t_lap, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_lap, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_lap, MID_LEFT);
     gui_text_rendermode_set(t_lap, 2);
 
@@ -204,7 +204,7 @@ static void update_page_2_lap(gui_obj_t *parent)
     gui_text_t *t_lap_count = gui_text_create(win, 0, 275, 0, 350, 50);
     gui_text_set(t_lap_count, count_str_array[index], GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(count_str_array[index]), 22);
-    gui_text_type_set(t_lap_count, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_lap_count, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_lap_count, MID_LEFT);
     gui_text_rendermode_set(t_lap_count, 2);
 }
@@ -519,7 +519,7 @@ static void page_0_design(gui_obj_t *parent)
     gui_text_t *t_count = gui_text_create(parent, 0, 125, 282, SCREEN_WIDTH, 48);
     gui_text_set(t_count, count_str, GUI_FONT_SRC_TTF, gui_rgb(0, 0, 0),
                  strlen(count_str), 48);
-    gui_text_type_set(t_count, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_count, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_count, MID_LEFT);
     gui_text_rendermode_set(t_count, 2);
 
@@ -568,7 +568,7 @@ static void page_1_design(gui_obj_t *parent)
     gui_text_t *t_count = gui_text_create(parent, 0, 60, 230, SCREEN_WIDTH, 80);
     gui_text_set(t_count, count_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(count_str), 80);
-    gui_text_type_set(t_count, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_count, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_count, MID_LEFT);
     gui_text_rendermode_set(t_count, 2);
 
@@ -594,14 +594,14 @@ static void page_1_design(gui_obj_t *parent)
     gui_text_t *t_base = gui_text_create(parent, 0, 336, 322, 50, 34);
     gui_text_set(t_base, base_str, GUI_FONT_SRC_TTF, gui_rgb(0xEC, 0x60, 0x2A),
                  strlen(base_str), 34);
-    gui_text_type_set(t_base, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_base, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_base, MID_LEFT);
     gui_text_rendermode_set(t_base, 2);
     int16_t x = 37;
     for (int8_t i = 0; i < DRAW_DOT_NUM; i++)
     {
         t_lap_array[i] = gui_text_create(parent, 0, x, 370, 24, 24);
-        gui_text_type_set(t_lap_array[i], SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(t_lap_array[i], INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t_lap_array[i], MID_CENTER);
         gui_text_rendermode_set(t_lap_array[i], 2);
         gui_text_set(t_lap_array[i], (char *)lap_str_array[0] + 4, GUI_FONT_SRC_TTF, gui_rgb(0xB7, 0xB7,
@@ -655,7 +655,7 @@ static void page_2_design(gui_obj_t *parent)
     gui_text_t *t_count = gui_text_create(parent, 0, 60, 89, SCREEN_WIDTH, 80);
     gui_text_set(t_count, count_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(count_str), 80);
-    gui_text_type_set(t_count, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_count, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_count, MID_LEFT);
     gui_text_rendermode_set(t_count, 2);
 
@@ -697,7 +697,7 @@ static void page_2_design(gui_obj_t *parent)
             gui_text_t *t_lap = gui_text_create(win, 0, 0, 0, 100, 50);
             gui_text_set(t_lap, (void *)lap_str_array[i], GUI_FONT_SRC_TTF, font_color,
                          strlen((void *)lap_str_array[i]), 22);
-            gui_text_type_set(t_lap, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(t_lap, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t_lap, MID_LEFT);
             gui_text_rendermode_set(t_lap, 2);
 
@@ -708,7 +708,7 @@ static void page_2_design(gui_obj_t *parent)
             gui_text_t *t_lap_count = gui_text_create(win, 0, 275, 0, 350, 50);
             gui_text_set(t_lap_count, count_str_array[i], GUI_FONT_SRC_TTF, font_color,
                          strlen(count_str_array[i]), 22);
-            gui_text_type_set(t_lap_count, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(t_lap_count, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t_lap_count, MID_LEFT);
             gui_text_rendermode_set(t_lap_count, 2);
         }
@@ -829,7 +829,7 @@ static void stopwatch_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(view, 0, 0, 0, 390, 42);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_RIGHT);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer((void *)t_time, 30000, -1, time_update_cb);

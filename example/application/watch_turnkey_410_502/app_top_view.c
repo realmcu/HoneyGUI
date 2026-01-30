@@ -64,7 +64,7 @@ static void clear_all_note_cb(gui_event_t *e)
     // }
     // gui_text_set(no_notification_text, "No notification", GUI_FONT_SRC_TTF,
     //              gui_rgb(200, 200, 200), strlen("No notification"), 36);
-    // gui_text_type_set(no_notification_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    // gui_text_type_set(no_notification_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     // gui_text_mode_set(no_notification_text, MID_CENTER);
 
 }
@@ -82,7 +82,7 @@ static void create_clear_note(void *parent)
     gui_text_set(clear_text, (void *)clear_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(clear_content),
                  32);
-    gui_text_type_set(clear_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(clear_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(clear_text, MID_CENTER);
 }
 static void note_design(gui_obj_t *obj, void *p)
@@ -110,13 +110,13 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_text_t *sport_text0 = gui_text_create(rect_bg, "ac_text0", 230, 10, 0, 0);
             gui_text_set(sport_text0, "1 hour ago", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
                          strlen("1 hour ago"), 24);
-            gui_text_type_set(sport_text0, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(sport_text0, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(sport_text0, LEFT);
 
             gui_text_t *sport_text = gui_text_create(rect_bg, "ac_text1", 30, 50, 0, 0);
             gui_text_set(sport_text, "come on", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                          strlen("come on"), 48);
-            gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_type_set(sport_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(sport_text, LEFT);
             gui_img_create_from_mem(rect_bg, "activity", APP_ACTIVITY_ICON_BIN, 20, -50, 0, 0);
         }
@@ -133,13 +133,13 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_t *sport_text0 = gui_text_create(rect_bg, "music_text0", 184, 10, 0, 0);
         gui_text_set(sport_text0, "45 mimute ago", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
                      strlen("45 mimute ago"), 24);
-        gui_text_type_set(sport_text0, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(sport_text0, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(sport_text0, LEFT);
 
         gui_text_t *sport_text = gui_text_create(rect_bg, "music_text1", 30, 50, 0, 0);
         gui_text_set(sport_text, "music", GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                      strlen("music"), 48);
-        gui_text_type_set(sport_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(sport_text, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(sport_text, LEFT);
     }
 }

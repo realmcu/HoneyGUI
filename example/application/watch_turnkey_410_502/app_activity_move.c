@@ -344,7 +344,7 @@ void activity_move_design(gui_obj_t *obj)
     gui_text_t *move_text = gui_text_create(obj, "move_text", -30, 70, 0, 0);
     gui_text_set(move_text, (void *)move_text_content, GUI_FONT_SRC_TTF, gui_rgb(0xE4, 0x36, 0x4B),
                  strlen(move_text_content), 36);
-    gui_text_type_set(move_text, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(move_text, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(move_text, RIGHT);
     gui_text_rendermode_set(move_text, 2);
 
@@ -352,7 +352,7 @@ void activity_move_design(gui_obj_t *obj)
     gui_text_t *text_cal = gui_text_create(obj, "cal_text", -230, 330, 0, 0);
     gui_text_set(text_cal, (void *)cal_text_content, GUI_FONT_SRC_TTF, gui_rgb(0xE4, 0x36, 0x4B),
                  strlen(cal_text_content), 90);
-    gui_text_type_set(text_cal, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_cal, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_cal, RIGHT);
     gui_text_rendermode_set(text_cal, 2);
 
@@ -361,7 +361,7 @@ void activity_move_design(gui_obj_t *obj)
     gui_text_set(text_cal_total, (void *)calTotal_text_content, GUI_FONT_SRC_TTF, gui_rgb(0xE4, 0x36,
                  0x4B),
                  strlen(calTotal_text_content), 42);
-    gui_text_type_set(text_cal_total, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_cal_total, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_cal_total, RIGHT);
     gui_text_rendermode_set(text_cal_total, 2);
 
@@ -370,7 +370,7 @@ void activity_move_design(gui_obj_t *obj)
     gui_text_set(text_cal_unit, (void *)calUnit_text_content, GUI_FONT_SRC_TTF, gui_rgb(0xE4, 0x36,
                  0x4B),
                  strlen(calUnit_text_content), 42);
-    gui_text_type_set(text_cal_unit, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_cal_unit, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_cal_unit, RIGHT);
     gui_text_rendermode_set(text_cal_unit, 2);
 
@@ -378,7 +378,7 @@ void activity_move_design(gui_obj_t *obj)
     gui_text_t *text_per = gui_text_create(obj, "per_text", -328, 430, 0, 0);
     gui_text_set(text_per, (void *)per_text_content, GUI_FONT_SRC_TTF, gui_rgb(0xA0, 0x77, 0x83),
                  strlen(per_text_content), 36);
-    gui_text_type_set(text_per, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_per, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_per, RIGHT);
     gui_text_rendermode_set(text_per, 2);
 
@@ -386,28 +386,28 @@ void activity_move_design(gui_obj_t *obj)
     gui_text_t *time_12AM = gui_text_create(obj, "12AM_text", -315, 290, 0, 0);
     gui_text_set(time_12AM, (void *)majorLabels[0], GUI_FONT_SRC_TTF, gui_rgb(0xA0, 0x77, 0x83),
                  strlen(majorLabels[0]), 28);
-    gui_text_type_set(time_12AM, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(time_12AM, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(time_12AM, RIGHT);
     gui_text_rendermode_set(time_12AM, 2);
 
     gui_text_t *time_6AM = gui_text_create(obj, "6AM_text", -225, 290, 0, 0);
     gui_text_set(time_6AM, (void *)majorLabels[1], GUI_FONT_SRC_TTF, gui_rgb(0xA0, 0x77, 0x83),
                  strlen(majorLabels[1]), 28);
-    gui_text_type_set(time_6AM, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(time_6AM, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(time_6AM, RIGHT);
     gui_text_rendermode_set(time_6AM, 2);
 
     gui_text_t *time_12PM = gui_text_create(obj, "12PM_text", -135, 290, 0, 0);
     gui_text_set(time_12PM, (void *)majorLabels[2], GUI_FONT_SRC_TTF, gui_rgb(0xA0, 0x77, 0x83),
                  strlen(majorLabels[2]), 28);
-    gui_text_type_set(time_12PM, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(time_12PM, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(time_12PM, RIGHT);
     gui_text_rendermode_set(time_12PM, 2);
 
     gui_text_t *time_6PM = gui_text_create(obj, "6PM_text", -45, 290, 0, 0);
     gui_text_set(time_6PM, (void *)majorLabels[3], GUI_FONT_SRC_TTF, gui_rgb(0xA0, 0x77, 0x83),
                  strlen(majorLabels[3]), 28);
-    gui_text_type_set(time_6PM, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(time_6PM, INTER_28PT_BOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(time_6PM, RIGHT);
     gui_text_rendermode_set(time_6PM, 2);
 

@@ -211,7 +211,7 @@ static void weather_time_update_cb(void *p)
 
     gui_text_set(text_time, (void *)text_time_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_time_content), 35);
-    gui_text_type_set(text_time, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_time, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_time, CENTER);
     gui_text_rendermode_set(text_time, 2);
 }
@@ -278,7 +278,7 @@ static void note1_design(gui_list_note_t *note)
     gui_text_t *text_city = gui_text_create(img_bg1, "text_city", 0, 130, 0, 0);
     gui_text_set(text_city, (void *)text_city_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_city_content), 43);
-    gui_text_type_set(text_city, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_city, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_city, CENTER);
     gui_text_rendermode_set(text_city, 2);
 
@@ -286,21 +286,21 @@ static void note1_design(gui_list_note_t *note)
     gui_text_t *text_temp = gui_text_create(img_bg1, "text_temp", 0, 170, 0, 0);
     gui_text_set(text_temp, (void *)text_temp_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_temp_content), 103);
-    gui_text_type_set(text_temp, SF_COMPACT_TEXT_LIGHT_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_temp, INTER_24PT_LIGHT_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_temp, CENTER);
     gui_text_rendermode_set(text_temp, 2);
 
     gui_text_t *text_temp_degree = gui_text_create(img_bg1, "text_temp_degree", 255, 170, 0, 0);
     gui_text_set(text_temp_degree, (void *)text_degree_symbol, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_degree_symbol), 83);
-    gui_text_type_set(text_temp_degree, SF_COMPACT_TEXT_LIGHT_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_temp_degree, INTER_24PT_LIGHT_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_rendermode_set(text_temp_degree, 2);
 
     // Condition Text
     gui_text_t *text_condition = gui_text_create(img_bg1, "text_condition", 0, 270, 0, 0);
     gui_text_set(text_condition, (void *)text_condition_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_condition_content), 33);
-    gui_text_type_set(text_condition, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_condition, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_condition, CENTER);
     gui_text_rendermode_set(text_condition, 2);
 
@@ -308,7 +308,7 @@ static void note1_design(gui_list_note_t *note)
     gui_text_t *text_temp_range = gui_text_create(img_bg1, "text_temp_range", 0, 310, 0, 0);
     gui_text_set(text_temp_range, (void *)text_temp_range_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_temp_range_content), 33);
-    gui_text_type_set(text_temp_range, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_temp_range, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_temp_range, CENTER);
     gui_text_rendermode_set(text_temp_range, 2);
 
@@ -331,14 +331,14 @@ static void note1_design(gui_list_note_t *note)
     gui_text_t *text_UVI_value = gui_text_create(img_UVI, "text_UVI_value", 0, 22, 0, 0);
     gui_text_set(text_UVI_value, (void *)text_UVI_content1, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_UVI_content1), 31);
-    gui_text_type_set(text_UVI_value, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_UVI_value, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_UVI_value, CENTER);
     gui_text_rendermode_set(text_UVI_value, 2);
 
     gui_text_t *text_UVI = gui_text_create(img_UVI, "text_UVI", 0, 50, 0, 0);
     gui_text_set(text_UVI, (void *)text_UVI_content2, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_UVI_content2), 16);
-    gui_text_type_set(text_UVI, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_UVI, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_UVI, CENTER);
     gui_text_rendermode_set(text_UVI, 2);
 
@@ -354,14 +354,14 @@ static void note1_design(gui_list_note_t *note)
 
     gui_text_set(text_MPH_value, (void *)text_MPH_content1, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_MPH_content1), 20);
-    gui_text_type_set(text_MPH_value, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_MPH_value, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_MPH_value, CENTER);
     gui_text_rendermode_set(text_MPH_value, 2);
 
     gui_text_t *text_MPH = gui_text_create(img_wind_blur, "text_AQI", 0, 23, 0, 0);
     gui_text_set(text_MPH, (void *)text_MPH_content2, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_MPH_content2), 15);
-    gui_text_type_set(text_MPH, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_MPH, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_MPH, CENTER);
     gui_text_rendermode_set(text_MPH, 2);
 
@@ -380,14 +380,14 @@ static void note1_design(gui_list_note_t *note)
     gui_text_t *text_AQI_value = gui_text_create(img_AQI, "text_AQI_value", 0, 22, 0, 0);
     gui_text_set(text_AQI_value, (void *)text_AQI_content1, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_AQI_content1), 31);
-    gui_text_type_set(text_AQI_value, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_AQI_value, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_AQI_value, CENTER);
     gui_text_rendermode_set(text_AQI_value, 2);
 
     gui_text_t *text_AQI = gui_text_create(img_AQI, "text_AQI", 0, 50, 0, 0);
     gui_text_set(text_AQI, (void *)text_AQI_content2, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_AQI_content2), 16);
-    gui_text_type_set(text_AQI, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_AQI, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_AQI, CENTER);
     gui_text_rendermode_set(text_AQI, 2);
 
@@ -417,21 +417,21 @@ static void note2_design(gui_list_note_t *note)
     gui_text_t *text_temp = gui_text_create(img_bg2, "text_temp", 0, 190, 0, 0);
     gui_text_set(text_temp, (void *)text_temp_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_temp_content), 83);
-    gui_text_type_set(text_temp, SF_COMPACT_TEXT_LIGHT_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_temp, INTER_24PT_LIGHT_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_temp, CENTER);
     gui_text_rendermode_set(text_temp, 2);
 
     gui_text_t *text_temp_degree = gui_text_create(img_bg2, "text_temp_degree", 245, 190, 0, 0);
     gui_text_set(text_temp_degree, (void *)text_degree_symbol, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_degree_symbol), 83);
-    gui_text_type_set(text_temp_degree, SF_COMPACT_TEXT_LIGHT_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_temp_degree, INTER_24PT_LIGHT_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_rendermode_set(text_temp_degree, 2);
 
     // Temperature Range Text
     gui_text_t *text_temp_range = gui_text_create(img_bg2, "text_temp_range", 0, 270, 0, 0);
     gui_text_set(text_temp_range, (void *)text_temp_range_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_temp_range_content), 23);
-    gui_text_type_set(text_temp_range, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_temp_range, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_temp_range, CENTER);
     gui_text_rendermode_set(text_temp_range, 2);
 
@@ -439,7 +439,7 @@ static void note2_design(gui_list_note_t *note)
     gui_text_t *text_condition = gui_text_create(img_bg2, "text_condition", 0, 440, 0, 0);
     gui_text_set(text_condition, (void *)text_condition_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_condition_content), 29);
-    gui_text_type_set(text_condition, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_condition, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_condition, CENTER);
     gui_text_rendermode_set(text_condition, 2);
 }
@@ -475,7 +475,7 @@ static void note3_design(gui_list_note_t *note)
         gui_text_set(text_weekday, (void *)weekly_weather_icon[index].weekday, GUI_FONT_SRC_TTF,
                      APP_COLOR_WHITE,
                      strlen(weekly_weather_icon[index].weekday), 31);
-        gui_text_type_set(text_weekday, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(text_weekday, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(text_weekday, 2);
 
         gui_img_t *img_weather = gui_img_create_from_mem(win_list_item, "img_weather",
@@ -487,14 +487,14 @@ static void note3_design(gui_list_note_t *note)
         gui_text_set(text_low_temp, (void *)weekly_weather_icon[index].low_temp, GUI_FONT_SRC_TTF,
                      gui_rgba(142, 185, 241, 255),
                      strlen(weekly_weather_icon[index].low_temp), 31);
-        gui_text_type_set(text_low_temp, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(text_low_temp, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(text_low_temp, 2);
 
         gui_text_t *text_high_temp = gui_text_create(win_list_item, "text_high_temp", 350, 0, 0, 0);
         gui_text_set(text_high_temp, (void *)weekly_weather_icon[index].high_temp, GUI_FONT_SRC_TTF,
                      APP_COLOR_WHITE,
                      strlen(weekly_weather_icon[index].high_temp), 31);
-        gui_text_type_set(text_high_temp, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(text_high_temp, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(text_high_temp, 2);
 
         gui_img_create_from_mem(win_list_item, "img_separator", WEATHER_SEPARATOR_BIN, 25, 45, 0, 0);
@@ -588,7 +588,7 @@ static void weather_design(gui_view_t *view)
     text_time = gui_text_create(win_weather_up, "text_time", 0, 14, 0, 0);
     gui_text_set(text_time, (void *)text_time_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(text_time_content), 35);
-    gui_text_type_set(text_time, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_time, INTER_24PT_SEMIBOLD_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_time, CENTER);
     gui_text_rendermode_set(text_time, 2);
 

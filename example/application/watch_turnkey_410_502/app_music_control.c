@@ -103,7 +103,7 @@ static void music_ctr_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(parent, "time_b", 0, 0, SCREEN_WIDTH, 80);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(time_str), 60);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
     gui_obj_create_timer(GUI_BASE(view), 30000, true, time_update_cb);
@@ -130,7 +130,7 @@ static void music_ctr_design(gui_view_t *view)
         img_music_text = gui_text_create(parent, "battery_text", 115, 340, 0, 0);
         gui_text_set(img_music_text, "Not played", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("Not played"),
                      42);
-        gui_text_type_set(img_music_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(img_music_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(img_music_text, LEFT);
     }
 

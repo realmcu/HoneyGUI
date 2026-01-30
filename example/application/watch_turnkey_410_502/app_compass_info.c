@@ -132,7 +132,7 @@ static void compass_info_design(gui_view_t *view)
     direction_text = gui_text_create(parent, "direction_text", 40, 200, 150, 80);
     gui_text_set(direction_text, direction_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0x66, 0x00),
                  strlen(direction_str), 60);
-    gui_text_type_set(direction_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(direction_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(direction_text, LEFT);
     gui_text_rendermode_set(direction_text, 2);
 
@@ -141,7 +141,7 @@ static void compass_info_design(gui_view_t *view)
     sprintf(angle_str, "~%d°", current_angle);
     gui_text_set(angle_text, angle_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(angle_str), 48);
-    gui_text_type_set(angle_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(angle_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(angle_text, LEFT);
     gui_text_rendermode_set(angle_text, 2);
 
@@ -149,7 +149,7 @@ static void compass_info_design(gui_view_t *view)
     altitude_label_text = gui_text_create(parent, "altitude_label", 40, 340, 150, 40);
     gui_text_set(altitude_label_text, altitude_label_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0x66, 0x00),
                  strlen(altitude_label_str), 28);
-    gui_text_type_set(altitude_label_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(altitude_label_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(altitude_label_text, LEFT);
     gui_text_rendermode_set(altitude_label_text, 2);
 
@@ -158,7 +158,7 @@ static void compass_info_design(gui_view_t *view)
     altitude_value_text = gui_text_create(parent, "altitude_value", 40, 380, 150, 60);
     gui_text_set(altitude_value_text, altitude_value_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
                  strlen(altitude_value_str), 48);
-    gui_text_type_set(altitude_value_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(altitude_value_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(altitude_value_text, LEFT);
     gui_text_rendermode_set(altitude_value_text, 2);
 
@@ -167,7 +167,7 @@ static void compass_info_design(gui_view_t *view)
     accuracy_text = gui_text_create(parent, "accuracy_text", 40, 440, 150, 40);
     gui_text_set(accuracy_text, accuracy_str, GUI_FONT_SRC_TTF, gui_rgb(0xCC, 0xCC, 0xCC),
                  strlen(accuracy_str), 24);
-    gui_text_type_set(accuracy_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(accuracy_text, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(accuracy_text, LEFT);
     gui_text_rendermode_set(accuracy_text, 2);
 
@@ -188,7 +188,7 @@ static void compass_info_design(gui_view_t *view)
     gui_text_t *t_time = gui_text_create(parent, "time_b", 0, 0, 380, 80);
     gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
                  strlen(time_str), 34);
-    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, INTER_24PT_MEDIUM_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_RIGHT);
     gui_text_rendermode_set(t_time, 2);
 
