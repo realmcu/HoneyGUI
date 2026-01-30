@@ -43,7 +43,7 @@ The :cpp:any:`gui_view_create` function can be used to establish a view widget.
 
 Set Switch View Event
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_view_switch_on_event` function can be used to set switch view event. Repeatable settings for a particular event will use the latest descriptor. Specific events include ``GUI_EVENT_TOUCH_CLICKED``, ``GUI_EVENT_KB_SHORT_CLICKED``, ``GUI_EVENT_TOUCH_MOVE_LEFT``, ``GUI_EVENT_TOUCH_MOVE_RIGHT`` and so on. The available switching styles include the following:
+The :cpp:any:`gui_view_switch_on_event` function can be used to set switch view event. Repeatable settings for a particular event will use the latest descriptor. Specific events include ``GUI_EVENT_TOUCH_CLICKED``, ``GUI_EVENT_KB_SHORT_PRESSED``, ``GUI_EVENT_TOUCH_MOVE_LEFT``, ``GUI_EVENT_TOUCH_MOVE_RIGHT`` and so on. The available switching styles include the following:
 
 .. literalinclude:: ../../../realgui/widget/gui_view/gui_view.h
    :language: c

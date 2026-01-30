@@ -278,8 +278,8 @@ static int app_init(void)
     gui_win_t *win_touch = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // gui_obj_add_event_cb(win_touch, touch_long_cb, GUI_EVENT_TOUCH_LONG, NULL);
     // gui_obj_add_event_cb(win_touch, tp_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_add_event_cb(win_touch, kb_click_cb, GUI_EVENT_KB_SHORT_CLICKED, NULL);
-    gui_obj_add_event_cb(win_touch, touch_long_cb, GUI_EVENT_KB_LONG_CLICKED, NULL);
+    gui_obj_add_event_cb(win_touch, kb_click_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+    gui_obj_add_event_cb(win_touch, touch_long_cb, GUI_EVENT_KB_LONG_PRESSED, NULL);
     gui_obj_create_timer(GUI_BASE(win_touch), 10, true, timer_touch_cb);
 
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);

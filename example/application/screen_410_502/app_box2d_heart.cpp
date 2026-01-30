@@ -354,7 +354,7 @@ extern "C" {
         // gui_win_t *win = gui_win_create(view, "win_heart", 0, 0, 0, 0);
         gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
         app_heart_particle::ui_design(obj);
     }
 }

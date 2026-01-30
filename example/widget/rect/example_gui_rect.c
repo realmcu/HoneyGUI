@@ -87,7 +87,7 @@ static void app_rect_round_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, "rect_view", SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
     gui_view_set_animate_step(view, 500);
     uint8_t alpha = 200;
     gui_rect_create(gui_obj_get_root(), "bg", 0, 0, 480, 480, 0, gui_rgba(255, 200, 200,

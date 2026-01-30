@@ -175,6 +175,6 @@ static void create_watchface_earth(gui_view_t *view)
 #endif
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
     // gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
 }

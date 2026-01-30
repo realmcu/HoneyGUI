@@ -66,10 +66,10 @@ static void gui_circle_input_prepare(gui_obj_t *obj)
         // Check if touch point is inside the arc
         if (is_point_in_circle(this, local_x, local_y))
         {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
         }
     }
 }

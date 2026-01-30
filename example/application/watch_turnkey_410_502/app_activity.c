@@ -373,21 +373,21 @@ static void activity_design(gui_view_t *view)
         gui_view_switch_on_event(current_view, "bottom_view",
                                  swtich_out,
                                  swtich_in,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     else if (strcmp(obj_name, "menu_view") == 0)
     {
         gui_view_switch_on_event(view, "menu_view",
                                  swtich_out,
                                  swtich_in,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     else
     {
         gui_view_switch_on_event(view, "watchface_view",
                                  swtich_out,
                                  swtich_in,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
 
     has_draw_bg = false;

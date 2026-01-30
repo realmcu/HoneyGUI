@@ -127,7 +127,7 @@ static void battery_design(gui_view_t *view)
         gui_view_switch_on_event(current_view, "bottom_view",
                                  SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     gui_obj_t *parent = GUI_BASE(view);
 

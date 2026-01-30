@@ -403,7 +403,7 @@ extern "C" {
         // gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
         gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
         app_box2d_ring::ui_design(obj);
     }
     static void close_box2d_ring(gui_view_t *view)

@@ -212,7 +212,7 @@ static void prism_thick_app(gui_view_t *view)
 {
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
     gui_view_set_animate_step(view, 1000);
 #ifdef DESC_PRISM_THICK_BIN
     gui_obj_t *obj = GUI_BASE(view);

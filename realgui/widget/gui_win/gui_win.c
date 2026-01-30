@@ -50,15 +50,15 @@ static void prepare(gui_obj_t *obj)
     GUI_UNUSED(this);
 
     matrix_translate(-this->compensate_x, -this->compensate_y, obj->matrix);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
-    gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
-    gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_CLICKED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_PRESSED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
     matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);
     if (obj->need_preprocess && blur_prepare != NULL)
     {

@@ -1376,7 +1376,7 @@ static void timers_design_init(gui_view_t *view)
     gui_view_switch_on_event(view, "menu_view",
                              SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
     if (gui_view_get_current()) { memset(active_timer_status, false, ACTIVE_TIMER_NUM_MAX); }
 
     if (!active_timer_str)

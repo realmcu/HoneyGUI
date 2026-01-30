@@ -637,7 +637,7 @@ static void app_menu_design(gui_view_t *view)
     gui_win_t *win = gui_win_create(view, "win_app_menu", 0, 0, 0, 0);
     gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
     extern bool return_to_watchface_flag;
     return_to_watchface_flag = false;

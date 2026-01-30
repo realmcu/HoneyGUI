@@ -84,13 +84,13 @@ static void gui_img_prepare(gui_obj_t *obj)
     _this->draw_img->bg_color_fix = _this->bg_color_fix;
 
 
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
-    // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, NULL);
+    // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED, NULL);
 
     memcpy(&_this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&_this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));

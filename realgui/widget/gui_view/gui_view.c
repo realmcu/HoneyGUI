@@ -460,22 +460,22 @@ static void gui_view_prepare(gui_obj_t *obj)
 
     if (!g_SurpressEvent && _this == g_CurrentView)
     {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
-        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
-        gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_CLICKED);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_PRESSED, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN, NULL);
         g_SwitchDone = false;
     }
 
     if (!g_SurpressTP && _this == g_CurrentView)
     {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
         gui_view_scroll_offset();
     }
 

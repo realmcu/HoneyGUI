@@ -687,7 +687,7 @@ static void workout_start_design(gui_view_t *view)
     gui_view_switch_on_event(current_view, "watchface_view",
                              SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
     // create countdown arc(initially full circle)
     if (!is_countdown_finished)
     {

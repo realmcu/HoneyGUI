@@ -308,21 +308,21 @@ static void workout_view_design(gui_view_t *view)
         gui_view_switch_on_event(current_view, "bottom_view",
                                  swtich_out,
                                  swtich_in,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     else if (strcmp(obj_name, "menu_view") == 0)
     {
         gui_view_switch_on_event(current_view, "menu_view",
                                  swtich_out,
                                  swtich_in,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     else
     {
         gui_view_switch_on_event(current_view, "watchface_view",
                                  swtich_out,
                                  swtich_in,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     gui_obj_t *parent = GUI_BASE(view);
     gui_rect_create(parent, "note", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(32, 36,

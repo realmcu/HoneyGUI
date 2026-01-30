@@ -112,9 +112,9 @@ static void gui_glass_prepare(gui_obj_t *obj)
 
     _this->draw_img->data = _this->data;
 
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     memcpy(&_this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&_this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));

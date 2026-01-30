@@ -196,7 +196,7 @@ static void butterfly_app(gui_view_t *view)
     gui_obj_t *obj = GUI_BASE(view);
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
 
     l3_model_base_t *butterfly_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,

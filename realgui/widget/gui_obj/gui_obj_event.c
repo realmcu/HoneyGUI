@@ -130,10 +130,12 @@ void gui_obj_add_event_cb(void           *obj,
 }
 
 
-void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
+void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event, const void *indev_name)
 {
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
+
+    GUI_UNUSED(indev_name);
 
     if (gui_obj_seek_event(obj, event) == false || obj->not_show == true)
     {
@@ -184,13 +186,13 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
             gui_obj_store_event(obj, event);
         }
         break;
-    case GUI_EVENT_KB_SHORT_CLICKED:
+    case GUI_EVENT_KB_SHORT_PRESSED:
         if (kb->type == KB_SHORT)
         {
             gui_obj_store_event(obj, event);
         }
         break;
-    case GUI_EVENT_KB_LONG_CLICKED:
+    case GUI_EVENT_KB_LONG_PRESSED:
         if (kb->type == KB_LONG)
         {
             gui_obj_store_event(obj, event);

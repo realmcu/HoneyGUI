@@ -321,7 +321,7 @@ static void app_main_watch_ui_design(gui_view_t *view)
                              GUI_EVENT_TOUCH_LONG);
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
     // select watchface
     if (current_watchface_type == WATCHFACE_BIG_NUM)

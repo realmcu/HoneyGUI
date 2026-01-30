@@ -43,7 +43,7 @@
 
 设置视图切换事件
 ~~~~~~~~~~~~~~~~~~
-使用 :cpp:any:`gui_view_switch_on_event` 设置视图切换事件，对某一个事件可以重复设置，会使用最新的描述子。具体的事件类型包括 ``GUI_EVENT_TOUCH_CLICKED`` 、 ``GUI_EVENT_KB_SHORT_CLICKED`` 、 ``GUI_EVENT_TOUCH_MOVE_LEFT``、 ``GUI_EVENT_TOUCH_MOVE_RIGHT`` 等。具体的切换风格请参考下列枚举：
+使用 :cpp:any:`gui_view_switch_on_event` 设置视图切换事件，对某一个事件可以重复设置，会使用最新的描述子。具体的事件类型包括 ``GUI_EVENT_TOUCH_CLICKED`` 、 ``GUI_EVENT_KB_SHORT_PRESSED`` 、 ``GUI_EVENT_TOUCH_MOVE_LEFT``、 ``GUI_EVENT_TOUCH_MOVE_RIGHT`` 等。具体的切换风格请参考下列枚举：
 
 
 .. literalinclude:: ../../../realgui/widget/gui_view/gui_view.h

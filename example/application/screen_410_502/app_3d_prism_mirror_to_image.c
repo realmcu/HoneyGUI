@@ -97,7 +97,7 @@ static void app_ui_view_image_design(gui_view_t *view)
     // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
     gui_img_t *image = NULL;
     if (face_flags_rotation == 0)

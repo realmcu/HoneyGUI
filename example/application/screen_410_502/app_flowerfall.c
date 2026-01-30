@@ -266,7 +266,7 @@ static void flower_app(gui_view_t *view)
     gui_dispdev_t *dc = gui_get_dc();
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
     // gui_img_t *background = gui_img_create_from_mem(obj, "flower_background", BACKGROUND_BIN, 0, 0, 0,
     //                                                 0);

@@ -164,7 +164,7 @@ static void create_watchface_labubu(gui_view_t *view)
         // gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
         gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     else
     {
@@ -173,6 +173,6 @@ static void create_watchface_labubu(gui_view_t *view)
                                  GUI_EVENT_TOUCH_CLICKED);
         gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
 }

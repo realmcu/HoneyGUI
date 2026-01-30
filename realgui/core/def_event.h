@@ -59,12 +59,8 @@ typedef enum
 
 
     /** keyboard device events*/
-    GUI_EVENT_KB_UP_PRESSED          = 0x0200,
-    GUI_EVENT_KB_UP_RELEASED,
-    GUI_EVENT_KB_DOWN_PRESSED,
-    GUI_EVENT_KB_DOWN_RELEASED,
-    GUI_EVENT_KB_SHORT_CLICKED,
-    GUI_EVENT_KB_LONG_CLICKED,
+    GUI_EVENT_KB_SHORT_PRESSED          = 0x0200,
+    GUI_EVENT_KB_LONG_PRESSED,
 
     GUI_EVENT_VIEW_SWITCH_DIRECT
     /** wheel device events*/

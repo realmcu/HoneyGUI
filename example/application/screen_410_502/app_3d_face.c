@@ -97,7 +97,7 @@ static void face_app(gui_view_t *view)
     gui_obj_t *obj = GUI_BASE(view);
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
     l3_model_base_t *face_3d = l3_create_model(DESC_FACE_BIN, L3_DRAW_FRONT_AND_SORT, 0, 0, 410, 502);
     l3_set_global_transform(face_3d, (l3_global_transform_cb)face_global_cb);

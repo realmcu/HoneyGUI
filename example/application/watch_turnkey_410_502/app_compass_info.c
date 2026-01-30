@@ -112,7 +112,7 @@ static void compass_info_design(gui_view_t *view)
         gui_view_switch_on_event(current_view, "watchface_view",
                                  swtich_out,
                                  swtich_in,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     gui_obj_t *parent = GUI_BASE(view);
 

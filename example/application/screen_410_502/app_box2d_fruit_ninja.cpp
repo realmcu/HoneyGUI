@@ -707,7 +707,7 @@ extern "C" {
         gui_obj_t *obj = GUI_BASE(view);
         gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_CLICKED);
+                                 GUI_EVENT_KB_SHORT_PRESSED);
         app_fruit_ninja::fruit_ninja_design(obj);
     }
     static void close_FN(gui_view_t *view)

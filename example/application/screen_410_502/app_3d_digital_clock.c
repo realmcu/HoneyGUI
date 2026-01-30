@@ -169,7 +169,7 @@ static void digital_clock_app(gui_view_t *view)
     gui_obj_t *obj = GUI_BASE(view);
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
     l3_model_base_t *digital_clock_3d = l3_create_model(DESC_DIGITAL_CLOCK_BIN, L3_DRAW_FRONT_AND_BACK,
                                                         0, 0,

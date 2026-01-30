@@ -93,7 +93,7 @@ static void robot_app(gui_view_t *view)
     gui_view_set_animate_step(view, 1000);
     gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+                             GUI_EVENT_KB_SHORT_PRESSED);
 
     l3_model_base_t *robot_3d = l3_create_model(GLTF_DESC_ROBOT_BIN, L3_DRAW_FRONT_AND_SORT, 0, 0, 410,
                                                 502);
