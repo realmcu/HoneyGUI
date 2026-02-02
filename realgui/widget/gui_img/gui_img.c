@@ -644,6 +644,11 @@ void gui_img_set_image_data(gui_img_t  *_this, const uint8_t *file_pointer)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(file_pointer != NULL);
+
+    /* Reset image data source to memory image */
+    _this->storage_type = IMG_SRC_MEMADDR;
+    _this->filename = NULL;
+    _this->ftl = NULL;
     _this->data = (void *)file_pointer;
 }
 const uint8_t *gui_img_get_image_data(gui_img_t  *_this)
