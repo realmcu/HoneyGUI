@@ -62,7 +62,7 @@ static void gui_server_entry(void *parameter)
         touch_info_t *tp = tp_algo_process(touchpad_get_data());
         GUI_UNUSED(tp);
 
-        kb_info_t *kb = kb_algo_process(kb_get_data());
+        kb_info_t *kb = kb_algo_process(gui_obj_get_kb_root());
         GUI_UNUSED(kb);
 
         touch_info_t *wheel = wheel_algo_process(wheel_get_data());
@@ -117,8 +117,8 @@ int gui_server_init(void)
     extern void gui_port_acc_init(void);
     extern void gui_port_audio_init(void);
     gui_port_os_init();
-    gui_port_indev_init();
     gui_port_dc_init();
+    gui_port_indev_init();
     gui_port_fs_init();
     gui_port_ftl_init();
     gui_port_acc_init();

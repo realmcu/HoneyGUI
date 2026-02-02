@@ -7,15 +7,14 @@
 /*
  * File      : kb_algo.c
  */
-//#include <string.h>
 #include "gui_server.h"
 #include "guidef.h"
 #include "gui_api.h"
-//#include <stdlib.h>
 #include "kb_algo.h"
+#include "gui_obj_focus.h"
 
 
-//#define RTK_KB_DEBUG
+#define RTK_KB_DEBUG
 
 #ifdef RTK_KB_DEBUG
 
@@ -27,128 +26,89 @@
 
 #endif
 
-static uint32_t start_tick = 0;
-static kb_info_t kb = {.type = KB_INVALID};
-static bool long_button_flag = false;
+static kb_info_t g_kb_info = {.type = TOUCH_INVALID};
 
-static uint32_t judge_timestamp_overflow(uint32_t timestamp, uint32_t timestamp_sub)
+
+kb_info_t *kb_algo_process(gui_obj_t *object)
 {
-    if (timestamp > timestamp_sub)
-    {
-        return timestamp - timestamp_sub;
-    }
-    else
-    {
-        return 0;
-    }
-}
+    gui_node_list_t *node = NULL;
 
-static bool kb_judge_short_press(struct gui_kb_port_data *kb_raw)
-{
-    struct gui_indev *indev = gui_get_indev();
-    if (judge_timestamp_overflow(kb_raw->timestamp_ms_release,
-                                 start_tick) > indev->kb_short_button_time_ms &&
-        (kb.pressed == true))
+    if (gui_obj_focus_get() == NULL)
     {
-        return true;
+        // KB_LOG("No focused object for keyboard event processing.\n");
+        g_kb_info.pressing = false;
+        return &g_kb_info;
     }
-    return false;
-}
 
-static bool kb_judge_long_press(struct gui_kb_port_data *kb_raw)
-{
-    struct gui_indev *indev = gui_get_indev();
-    if (judge_timestamp_overflow(kb_raw->timestamp_ms_pressing,
-                                 start_tick) > indev->kb_long_button_time_ms)
+    gui_list_for_each(node, &object->child_list)
     {
-        return true;
-    }
-    return false;
-}
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        gui_indev_kb_t *kb = (gui_indev_kb_t *)obj;
 
-static bool kb_judge_long_pressed(struct gui_kb_port_data *kb_raw)
-{
-    if (kb_judge_long_press(kb_raw) == true && (long_button_flag == false))
-    {
-        long_button_flag = true;
-        kb.type = KB_LONG;
-        KB_LOG("type = KB_LONG \n");
-        return true;
-    }
-    return false;
-}
-
-static bool kb_judge_short_click(struct gui_kb_port_data *kb_raw)
-{
-    if (kb_judge_short_press(kb_raw) == true && (long_button_flag == false))
-    {
-        kb.type = KB_SHORT;
-        KB_LOG("type = KB_SHORT \n");
-        return true;
-    }
-    return false;
-}
-
-struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
-{
-    GUI_ASSERT(kb_raw != NULL);
-
-    uint8_t flag = kb_raw->event;
-    if (flag == GUI_KB_EVENT_DOWN)
-    {
-        if (kb.pressed == false)
+        // Only process when key is released and not yet handled
+        if (*(kb->state) == false &&
+            *(kb->timestamp_ms_release) > *(kb->timestamp_ms_press) &&
+            *(kb->timestamp_ms_release) != kb->last_processed_release)
         {
-            start_tick = kb_raw->timestamp_ms_press;
-            kb.pressed = true;
-            long_button_flag = false;
-            KB_LOG("=====START DOWN====== tick = %d\n", start_tick);
-        }
-        if (kb_judge_long_pressed(kb_raw) == true)
-        {
+            uint32_t duration = *(kb->timestamp_ms_release) - *(kb->timestamp_ms_press);
 
-        }
-        else
-        {
-            // KB_LOG("not cache kb down \n");
-        }
-        kb.pressing = true;
-        kb.released = false;
-    }
-    else if (flag == GUI_KB_EVENT_UP)
-    {
-        if (kb.type != KB_INVALID)
-        {
-            kb.type = KB_INVALID;
-            KB_LOG("=====END UP====== tick = %d\n", kb_raw->timestamp_ms_release);
-        }
-        else
-        {
-            if (kb_judge_short_click(kb_raw) == true)
+            if (duration < 200)
             {
-
+                KB_LOG("short press detected: %s, duration: %d ms\n", obj->name, duration);
+                gui_obj_enable_event(gui_obj_focus_get(), GUI_EVENT_KB_SHORT_PRESSED, obj->name);
             }
             else
             {
-                // KB_LOG("not cache kb up \n");
+                KB_LOG("long press detected: %s, duration: %d ms\n", obj->name, duration);
+                gui_obj_enable_event(gui_obj_focus_get(), GUI_EVENT_KB_LONG_PRESSED, obj->name);
             }
+
+            kb->last_processed_release = *(kb->timestamp_ms_release);
         }
-        long_button_flag = false;
-        kb.pressing = false;
-        kb.pressed = false;
-        kb.released = true;
+
+        if (*(kb->state) == true)
+        {
+            // Update pressing timestamp periodically when key is pressed
+            // *(kb->timestamp_ms_pressing) = *(kb->timestamp_ms_press);
+            g_kb_info.pressing = true;
+        }
+        else
+        {
+            // Reset pressing timestamp when key is not pressed
+            // *(kb->timestamp_ms_pressing) = 0;
+            g_kb_info.pressing = false;
+        }
     }
-    else
-    {
-        //KB_LOG("not cache kb down and up, do keep \n");
-    }
-    //KB_LOG("kb.type:%d\n", kb.type);
-    memset(kb.string, 0x00, sizeof(kb.string));
-    memcpy(kb.string, kb_raw->name, sizeof(kb_raw->name));
-    return &kb;
+    return &g_kb_info;
 }
 
-kb_info_t *kb_get_info(void)
+
+gui_indev_kb_t *gui_kb_create(char *name, bool *state, uint32_t *timestamp_ms_press,
+                              uint32_t *timestamp_ms_release)
 {
-    return &kb;
+    gui_indev_kb_t *kb = gui_malloc(sizeof(gui_indev_kb_t));
+    GUI_ASSERT(kb != NULL);
+    if (kb == NULL) { return NULL; }
+    gui_obj_t *this = (gui_obj_t *)kb;
+    memset(kb, 0x00, sizeof(gui_indev_kb_t));
+
+    kb->base.name = name;
+    kb->base.magic = GUI_MAGIC_NUMBER;
+    kb->base.parent = gui_obj_get_kb_root();
+
+    gui_list_init(&(this->child_list));
+    if ((this->parent) != ((void *)0))
+    {
+        gui_list_insert_before(&(this->parent->child_list), &(this->brother_list));
+    }
+    this->create_done = true;
+
+    kb->state = state;
+    kb->timestamp_ms_press = timestamp_ms_press;
+    kb->timestamp_ms_release = timestamp_ms_release;
+    kb->last_processed_release = 0;
+
+    return kb;
 }
+
 

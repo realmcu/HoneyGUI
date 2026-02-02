@@ -44,8 +44,9 @@ static uint8_t event_cnt = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event)
+static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event, const void *indev_name)
 {
+    GUI_UNUSED(indev_name);
 
     if (event != GUI_EVENT_TOUCH_RELEASED)
     {
@@ -133,9 +134,6 @@ void gui_obj_add_event_cb(void           *obj,
 void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event, const void *indev_name)
 {
     touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
-
-    GUI_UNUSED(indev_name);
 
     if (gui_obj_seek_event(obj, event) == false || obj->not_show == true)
     {
@@ -152,86 +150,80 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event, const void *indev_n
     case GUI_EVENT_TOUCH_CLICKED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_LONG:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_LONG))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_DOUBLE_CLICKED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_DOUBLE))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         GUI_ASSERT(NULL != NULL);
         break;
     case GUI_EVENT_TOUCH_PRESSED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->pressed == true))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_RELEASED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->released == true))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_PRESSING:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->pressing == true))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_KB_SHORT_PRESSED:
-        if (kb->type == KB_SHORT)
-        {
-            gui_obj_store_event(obj, event);
-        }
+        gui_obj_store_event(obj, event, indev_name);
         break;
     case GUI_EVENT_KB_LONG_PRESSED:
-        if (kb->type == KB_LONG)
-        {
-            gui_obj_store_event(obj, event);
-        }
+        gui_obj_store_event(obj, event, indev_name);
         break;
     case GUI_EVENT_TOUCH_MOVE_LEFT:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->left_moved == true))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_MOVE_RIGHT:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->right_moved == true))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_MOVE_UP:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->up_moved == true))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_MOVE_DOWN:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->down_moved == true))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_SCROLL_HORIZONTAL:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_HOLD_X))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     case GUI_EVENT_TOUCH_SCROLL_VERTICAL:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_HOLD_Y))
         {
-            gui_obj_store_event(obj, event);
+            gui_obj_store_event(obj, event, indev_name);
         }
         break;
     default:

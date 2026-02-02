@@ -61,16 +61,6 @@ gui_touch_port_data_t *touchpad_get_data(void)
     return NULL;
 }
 
-gui_kb_port_data_t *kb_get_data(void)
-{
-    if (indev->kb_get_port_data)
-    {
-        return indev->kb_get_port_data();
-    }
-    GUI_ASSERT(NULL != NULL);
-    return NULL;
-}
-
 gui_wheel_port_data_t *wheel_get_data(void)
 {
     if (indev->wheel_get_port_data)

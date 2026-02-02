@@ -65,7 +65,11 @@ static int app_init(void)
 
     // gui_img_translate(img, 50, 50);
 
-    // gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+
+    // gui_obj_focus_set(img);
 
 
     // gui_obj_create_timer(&(img->base), 1000, true, test_timer_cb);

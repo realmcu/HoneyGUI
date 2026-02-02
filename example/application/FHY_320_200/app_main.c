@@ -96,49 +96,49 @@ static void button_2_view(uint8_t index)
 static void timer_touch_cb(void *param)
 {
     GUI_UNUSED(param);
-    kb_info_t *kb = kb_get_info();
-    touch_info_t *tp = tp_get_info();
+    // kb_info_t *kb = kb_get_info();
+    // touch_info_t *tp = tp_get_info();
 
-    if (tp_click_cnt != 0 && (gui_ms_get() - last_click_time) > 200)
-    {
-        switch (tp_click_cnt)
-        {
-        case 1 :
-            gui_log("tp click\n");
-            break;
-        case 2 :
-            gui_log("tp double click\n");
-            break;
-        case 3 :
-            gui_log("tp triple click\n");
-            break;
-        default:
-            break;
-        }
-        tp_click_cnt = 0;
-        return;
-    }
-    else if (kb_click_cnt != 0 && (gui_ms_get() - last_click_time) > 450)
-    {
-        switch (kb_click_cnt)
-        {
-        case 1 :
-            button_2_view(case_button_customize_index_array[0]);
-            break;
-        case 2 :
-            button_2_view(case_button_customize_index_array[1]);
-            break;
-        default:
-            break;
-        }
-        kb_click_cnt = 0;
-        return;
-    }
+    // if (tp_click_cnt != 0 && (gui_ms_get() - last_click_time) > 200)
+    // {
+    //     switch (tp_click_cnt)
+    //     {
+    //     case 1 :
+    //         gui_log("tp click\n");
+    //         break;
+    //     case 2 :
+    //         gui_log("tp double click\n");
+    //         break;
+    //     case 3 :
+    //         gui_log("tp triple click\n");
+    //         break;
+    //     default:
+    //         break;
+    //     }
+    //     tp_click_cnt = 0;
+    //     return;
+    // }
+    // else if (kb_click_cnt != 0 && (gui_ms_get() - last_click_time) > 450)
+    // {
+    //     switch (kb_click_cnt)
+    //     {
+    //     case 1 :
+    //         button_2_view(case_button_customize_index_array[0]);
+    //         break;
+    //     case 2 :
+    //         button_2_view(case_button_customize_index_array[1]);
+    //         break;
+    //     default:
+    //         break;
+    //     }
+    //     kb_click_cnt = 0;
+    //     return;
+    // }
 
-    if (tp->pressed || tp->pressing || kb->pressed || kb->released)
-    {
-        sleep_cnt = 0;
-    }
+    // if (tp->pressed || tp->pressing || kb->pressed || kb->released)
+    // {
+    //     sleep_cnt = 0;
+    // }
 }
 
 // Update the watch time

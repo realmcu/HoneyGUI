@@ -14,7 +14,7 @@
 
 static gui_obj_t *g_obj_focused = NULL;
 
-void gui_obj_focus_set(gui_obj_t *obj)
+void gui_obj_focus_set(void *obj)
 {
     g_obj_focused = obj;
 }

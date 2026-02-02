@@ -55,8 +55,6 @@ static void prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_PRESSED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_PRESSED, NULL);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
     matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);

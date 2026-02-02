@@ -14,6 +14,7 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include "sdl_driver.h"
+#include "sdl_driver_panel.h"
 #include "gui_api.h"
 
 static uint32_t simulator_width = 480;
@@ -41,7 +42,6 @@ static pthread_cond_t sdl_init_cond = PTHREAD_COND_INITIALIZER;
 static bool sdl_initialized = false;
 
 extern gui_touch_port_data_t tp_port_data;
-extern gui_kb_port_data_t kb_port_data;
 extern gui_wheel_port_data_t wheel_port_data;
 
 static void create_screen_mask(int w, int h, int radius)
@@ -213,15 +213,18 @@ void *sdl_driver_thread(void *arg)
                         SDL_Rect frameRect = {0, 0, windowSurface->w, windowSurface->h};
                         SDL_BlitScaled(frameSurface, NULL, windowSurface, &frameRect);
                     }
+                    sdl_panel_draw(windowSurface);
                 }
                 else if (scale_x != 1.0f || scale_y != 1.0f)
                 {
                     SDL_Rect dstRect = {0, 0, windowSurface->w, windowSurface->h};
                     SDL_BlitScaled(customSurface, NULL, windowSurface, &dstRect);
+                    sdl_panel_draw(windowSurface);
                 }
                 else
                 {
                     SDL_BlitSurface(customSurface, NULL, windowSurface, NULL);
+                    sdl_panel_draw(windowSurface);
                 }
                 SDL_UpdateWindowSurface(window);
             }
@@ -232,8 +235,11 @@ void *sdl_driver_thread(void *arg)
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            tp_port_data.event = GUI_TOUCH_EVENT_DOWN;
-            update_touch_coordinates(event.button.x, event.button.y);
+            if (!sdl_panel_check_click(event.button.x, event.button.y, true))
+            {
+                tp_port_data.event = GUI_TOUCH_EVENT_DOWN;
+                update_touch_coordinates(event.button.x, event.button.y);
+            }
             if (event.button.button == SDL_BUTTON_MIDDLE)
             {
                 wheel_port_data.event = GUI_WHEEL_BUTTON_DOWN;
@@ -241,8 +247,11 @@ void *sdl_driver_thread(void *arg)
             break;
 
         case SDL_MOUSEBUTTONUP:
-            tp_port_data.event = GUI_TOUCH_EVENT_UP;
-            update_touch_coordinates(event.button.x, event.button.y);
+            if (!sdl_panel_check_click(event.button.x, event.button.y, false))
+            {
+                tp_port_data.event = GUI_TOUCH_EVENT_UP;
+                update_touch_coordinates(event.button.x, event.button.y);
+            }
             if (event.button.button == SDL_BUTTON_MIDDLE)
             {
                 wheel_port_data.event = GUI_WHEEL_BUTTON_UP;
@@ -252,23 +261,6 @@ void *sdl_driver_thread(void *arg)
         case SDL_MOUSEWHEEL:
             wheel_port_data.delta = event.wheel.y;
             wheel_port_data.event = GUI_WHEEL_SCROLL;
-            break;
-
-        case SDL_KEYDOWN:
-            kb_port_data.event = GUI_KB_EVENT_DOWN;
-            kb_port_data.timestamp_ms_press = gui_ms_get();
-            kb_port_data.timestamp_ms_pressing = gui_ms_get();
-            memset(kb_port_data.name, 0x00, sizeof(kb_port_data.name));
-            strncpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
-                    sizeof(kb_port_data.name) - 1);
-            break;
-
-        case SDL_KEYUP:
-            kb_port_data.event = GUI_KB_EVENT_UP;
-            kb_port_data.timestamp_ms_release = gui_ms_get();
-            memset(kb_port_data.name, 0x00, sizeof(kb_port_data.name));
-            strncpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
-                    sizeof(kb_port_data.name) - 1);
             break;
 
         case SDL_WINDOWEVENT:
@@ -294,20 +286,23 @@ void *sdl_driver_thread(void *arg)
     }
 }
 
-void sdl_driver_set_canvas(int cw, int ch, int offset_x, int offset_y, int corner_radius,
-                           const char *frame_path)
+void sdl_driver_set_canvas(int cw, int ch, const char *frame_path)
 {
     canvas_mode = true;
     canvas_width = cw;
     canvas_height = ch;
-    screen_offset_x = offset_x;
-    screen_offset_y = offset_y;
-    screen_corner_radius = corner_radius;
 
     if (frame_path)
     {
         frameSurface = SDL_LoadBMP(frame_path);
     }
+}
+
+void sdl_driver_set_screen(int offset_x, int offset_y, int corner_radius)
+{
+    screen_offset_x = offset_x;
+    screen_offset_y = offset_y;
+    screen_corner_radius = corner_radius;
 }
 
 void sdl_driver_init(uint32_t width, uint32_t height, uint32_t pixel_bits)

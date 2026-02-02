@@ -66,13 +66,8 @@ gui_touch_port_data_t *port_touchpad_get_data()
     return &raw_data;
 }
 
-static gui_kb_port_data_t kb_port_data = {0};
 static gui_wheel_port_data_t wheel_port_data = {0};
 
-gui_kb_port_data_t *port_kb_get_data(void)
-{
-    return &kb_port_data;
-}
 gui_wheel_port_data_t *port_wheel_get_data(void)
 {
     return &wheel_port_data;
@@ -81,7 +76,6 @@ gui_wheel_port_data_t *port_wheel_get_data(void)
 static struct gui_indev indev =
 {
     .tp_get_data = port_touchpad_get_data,
-    .kb_get_port_data = port_kb_get_data,
     .wheel_get_port_data = port_wheel_get_data,
     .tp_height = 0,
     .tp_witdh = 0,

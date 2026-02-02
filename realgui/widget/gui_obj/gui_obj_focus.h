@@ -33,7 +33,7 @@ extern "C" {
  * @brief Set keyboard focus to an object
  * @param obj The object to focus, NULL to clear focus
  */
-void gui_obj_focus_set(gui_obj_t *obj);
+void gui_obj_focus_set(void *obj);
 
 /**
  * @brief Get the currently focused object

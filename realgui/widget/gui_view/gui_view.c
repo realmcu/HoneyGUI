@@ -449,11 +449,9 @@ static void gui_view_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
 
     GUI_UNUSED(dc);
     GUI_UNUSED(tp);
-    GUI_UNUSED(kb);
 
     gui_view_t *_this = (gui_view_t *)obj;
     obj->opacity_value = _this->opacity;
@@ -462,8 +460,6 @@ static void gui_view_prepare(gui_obj_t *obj)
     {
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_PRESSED, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_PRESSED, NULL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, NULL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, NULL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP, NULL);
