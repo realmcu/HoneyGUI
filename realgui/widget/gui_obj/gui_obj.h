@@ -68,6 +68,11 @@ gui_obj_t *gui_obj_get_root(void);
  */
 gui_obj_t *gui_obj_get_fake_root(void);
 
+/**
+ *
+ */
+gui_obj_t *gui_obj_get_kb_root(void);
+
 #ifndef DOXYGEN
 /**
   * @param _this pointer to the GUI image object.

@@ -68,6 +68,20 @@ static gui_obj_t fake_root =
     .matrix = &matrix,
 };
 
+static gui_obj_t kb_root =
+{
+    .name = "keyboard_root",
+    .parent = NULL,
+    .x = 0,
+    .y = 0,
+    .opacity_value = UINT8_MAX,
+    .magic = GUI_MAGIC_NUMBER,
+    .child_list = {&(kb_root.child_list), &(kb_root.child_list)},
+    .brother_list = {&(kb_root.brother_list), &(kb_root.brother_list)},
+    .create_done = true,
+    .matrix = &matrix,
+};
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -109,6 +123,11 @@ gui_obj_t *gui_obj_get_root(void)
 gui_obj_t *gui_obj_get_fake_root(void)
 {
     return &fake_root;
+}
+
+gui_obj_t *gui_obj_get_kb_root(void)
+{
+    return &kb_root;
 }
 
 void gui_obj_ctor(gui_obj_t  *_this,
