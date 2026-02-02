@@ -20,6 +20,7 @@
 #include "particle_types.h"
 #include "particle_pool.h"
 #include "particle_trajectory.h"
+#include "particle_effect.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,6 +35,7 @@ typedef enum
     EMITTER_SHAPE_LINE,       /**< Line emission (along a segment) */
     EMITTER_SHAPE_CIRCLE,     /**< Circle emission (within radius) */
     EMITTER_SHAPE_RECT,       /**< Rectangle emission (within bounds) */
+    EMITTER_SHAPE_RING,       /**< Ring emission (between inner/outer radius) */
 } emitter_shape_type_t;
 
 /**
@@ -50,6 +52,7 @@ typedef struct emitter_shape_config
         struct { float x1, y1, x2, y2; } line;          /**< Line: start and end points */
         struct { float cx, cy, radius; } circle;        /**< Circle: center and radius */
         struct { float x, y, w, h; } rect;              /**< Rectangle: position and size */
+        struct { float cx, cy, inner_r, outer_r; } ring;/**< Ring: center and radii */
     };
 } emitter_shape_config_t;
 
@@ -89,6 +92,17 @@ typedef struct particle_emitter
 
     /* Color configuration */
     uint32_t particle_color;            /**< Particle color in ARGB8888 format (0xAARRGGBB) */
+    particle_color_mode_t color_mode;   /**< Color mode (SOLID, RANDOM, GRADIENT, RAINBOW) */
+    uint32_t color_start;               /**< Start color for gradient mode */
+    uint32_t color_end;                 /**< End color for gradient mode */
+    uint32_t color_palette[8];          /**< Color palette for random mode */
+    uint8_t palette_size;               /**< Number of colors in palette */
+
+    /* Opacity easing */
+    uint8_t opacity_easing;             /**< Opacity easing function (particle_easing_t) */
+
+    /* Rotation alignment */
+    uint8_t align_velocity;             /**< Align rotation to velocity direction */
 
     /* Image resource */
     void *particle_image;               /**< Particle image (externally managed) */
@@ -97,6 +111,47 @@ typedef struct particle_emitter
     uint8_t enabled;                    /**< Whether emitter is active */
     float follow_x, follow_y;           /**< Follow position */
     uint8_t follow_enabled;             /**< Whether position following is enabled */
+
+    /* Burst mode */
+    uint8_t burst_enabled;              /**< Whether burst mode is enabled */
+    uint16_t burst_count;               /**< Number of particles per burst */
+    uint16_t burst_interval;            /**< Burst interval (ms), 0 = single burst */
+    uint32_t last_burst_time;           /**< Last burst time (ms) */
+
+    /* Lifecycle */
+    uint8_t auto_cleanup;               /**< Auto-remove emitter when done */
+    uint8_t loop;                       /**< Loop emission continuously */
+    uint32_t effect_duration;           /**< Effect duration (ms), 0 = infinite */
+    uint32_t start_time;                /**< Effect start time (ms) */
+
+    /* Boundary configuration */
+    particle_boundary_behavior_t boundary_behavior; /**< Boundary behavior */
+    float boundary_left;                /**< Left boundary */
+    float boundary_top;                 /**< Top boundary */
+    float boundary_right;               /**< Right boundary */
+    float boundary_bottom;              /**< Bottom boundary */
+    float boundary_reflect_damping;     /**< Reflection damping [0.0, 1.0] */
+
+    /* Behavior mode configuration */
+    particle_behavior_mode_t behavior_mode; /**< Behavior mode */
+    float pulse_frequency;              /**< Pulse frequency (Hz) */
+    float pulse_amplitude;              /**< Pulse amplitude */
+    float breathe_frequency;            /**< Breathe frequency (Hz) */
+    float prev_follow_x, prev_follow_y; /**< Previous follow position for trail mode */
+    uint8_t has_prev_position;          /**< Whether previous position is valid */
+
+    /* Render configuration */
+    particle_blend_mode_t blend_mode;   /**< Blend mode */
+    float base_size;                    /**< Base particle size (px) */
+
+    /* Callback functions (Requirements 17.1-17.9) */
+    particle_callback_fn on_particle_init;      /**< Called when particle is initialized */
+    particle_callback_fn on_particle_update;    /**< Called each frame update */
+    particle_callback_fn on_particle_render;    /**< Called before rendering */
+    particle_callback_fn on_particle_death;     /**< Called when particle dies */
+    emitter_callback_fn on_emitter_start;       /**< Called when emitter starts */
+    emitter_callback_fn on_emitter_stop;        /**< Called when emitter stops */
+    void *user_data;                            /**< User data passed to callbacks */
 
     /* Random number generator state */
     uint32_t random_seed;               /**< RNG seed for reproducibility */
@@ -108,6 +163,20 @@ typedef struct particle_emitter
  * @return Pointer to created emitter, or NULL on failure
  */
 particle_emitter_t *particle_emitter_create(particle_platform_config_t *config);
+
+/**
+ * @brief Create a particle emitter from effect configuration
+ *
+ * Creates and initializes an emitter with all parameters from the
+ * particle_effect_config_t structure.
+ *
+ * @param effect_config Effect configuration structure
+ * @param platform_config Platform configuration with memory functions
+ * @return Pointer to created emitter, or NULL on failure
+ */
+particle_emitter_t *particle_emitter_create_from_config(
+    const particle_effect_config_t *effect_config,
+    particle_platform_config_t *platform_config);
 
 /**
  * @brief Destroy a particle emitter

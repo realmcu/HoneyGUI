@@ -34,8 +34,28 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
+/** Effect handle type for managing effects */
+typedef uint32_t particle_effect_handle_t;
+
+/** Invalid effect handle constant */
+#define PARTICLE_INVALID_HANDLE 0
+
+/** Maximum number of effects per widget */
+#define PARTICLE_WIDGET_MAX_EFFECTS 16
+
 /** User update callback type */
 typedef void (*gui_particle_update_cb_t)(void *user_data);
+
+/**
+ * @brief Effect entry structure for tracking effects
+ */
+typedef struct particle_effect_entry
+{
+    particle_effect_handle_t handle;    /**< Effect handle */
+    particle_emitter_t *emitter;        /**< Associated emitter */
+    particle_behavior_mode_t behavior;  /**< Behavior mode */
+    uint8_t active;                     /**< Whether effect is active */
+} particle_effect_entry_t;
 
 /**
  * @brief Particle widget structure
@@ -47,6 +67,10 @@ typedef struct gui_particle_widget
     gui_obj_t base;                    /**< Base object structure (must be first) */
     particle_system_t *ps;             /**< Particle system instance */
     particle_platform_config_t config; /**< Platform configuration */
+
+    /* Effect management */
+    particle_effect_entry_t effects[PARTICLE_WIDGET_MAX_EFFECTS]; /**< Effect entries */
+    uint32_t next_handle;              /**< Next handle to assign */
 
     /* Trail effect state */
     particle_emitter_t *trail_emitter; /**< Trail effect emitter (if added) */
@@ -108,174 +132,6 @@ particle_system_t *gui_particle_widget_get_system(gui_particle_widget_t *widget)
  */
 void gui_particle_widget_set_default_image(gui_particle_widget_t *widget, void *image);
 
-/* ============================================================================
- * Convenience Interfaces for Preset Effects
- * ============================================================================ */
-
-/**
- * @brief Add a firework effect
- *
- * Creates and triggers a firework explosion at the specified position.
- *
- * @param widget Particle widget
- * @param x X coordinate of explosion center
- * @param y Y coordinate of explosion center
- * @param count Number of particles in burst (20-100 recommended)
- */
-void gui_particle_widget_add_firework(gui_particle_widget_t *widget,
-                                      float x, float y, uint8_t count);
-
-/**
- * @brief Add a firework effect with custom color
- *
- * Creates and triggers a firework explosion at the specified position with custom color.
- *
- * @param widget Particle widget
- * @param x X coordinate of explosion center
- * @param y Y coordinate of explosion center
- * @param count Number of particles in burst (20-100 recommended)
- * @param color Color in ARGB8888 format (0xAARRGGBB), e.g., 0xFFFF0000 for red
- */
-void gui_particle_widget_add_firework_color(gui_particle_widget_t *widget,
-                                            float x, float y, uint8_t count, uint32_t color);
-
-/**
- * @brief Add a trail effect
- *
- * Enables pointer/cursor trail effect. Call gui_particle_widget_update_trail()
- * to update the trail position.
- *
- * @param widget Particle widget
- */
-void gui_particle_widget_add_trail(gui_particle_widget_t *widget);
-
-/**
- * @brief Add a trail effect with custom color
- *
- * Enables pointer/cursor trail effect with custom color.
- *
- * @param widget Particle widget
- * @param color Color in ARGB8888 format (0xAARRGGBB)
- */
-void gui_particle_widget_add_trail_color(gui_particle_widget_t *widget, uint32_t color);
-
-/**
- * @brief Update trail effect position
- *
- * Updates the trail emitter with new position. Should be called when
- * pointer/cursor moves.
- *
- * @param widget Particle widget
- * @param x Current X position
- * @param y Current Y position
- */
-void gui_particle_widget_update_trail(gui_particle_widget_t *widget, float x, float y);
-
-/**
- * @brief Stop trail effect
- *
- * Stops the trail emitter and resets tracking state. Should be called when
- * pointer/cursor is released.
- *
- * @param widget Particle widget
- */
-void gui_particle_widget_stop_trail(gui_particle_widget_t *widget);
-
-/**
- * @brief Add a touch effect
- *
- * Enables touch interaction feedback effect.
- *
- * @param widget Particle widget
- */
-void gui_particle_widget_add_touch(gui_particle_widget_t *widget);
-
-/**
- * @brief Add a touch effect with custom color
- *
- * Enables touch interaction feedback effect with custom color.
- *
- * @param widget Particle widget
- * @param color Color in ARGB8888 format (0xAARRGGBB)
- */
-void gui_particle_widget_add_touch_color(gui_particle_widget_t *widget, uint32_t color);
-
-/**
- * @brief Trigger touch tap effect
- *
- * @param widget Particle widget
- * @param x Touch X coordinate
- * @param y Touch Y coordinate
- */
-void gui_particle_widget_touch_tap(gui_particle_widget_t *widget, float x, float y);
-
-/**
- * @brief Update touch drag effect
- *
- * @param widget Particle widget
- * @param x Current drag X coordinate
- * @param y Current drag Y coordinate
- */
-void gui_particle_widget_touch_drag(gui_particle_widget_t *widget, float x, float y);
-
-/**
- * @brief Trigger touch release effect
- *
- * @param widget Particle widget
- * @param x Release X coordinate
- * @param y Release Y coordinate
- */
-void gui_particle_widget_touch_release(gui_particle_widget_t *widget, float x, float y);
-
-/**
- * @brief Add a snow effect
- *
- * Enables falling snowflake effect across the widget area.
- *
- * @param widget Particle widget
- * @param intensity Snow intensity (0.0-1.0)
- */
-void gui_particle_widget_add_snow(gui_particle_widget_t *widget, float intensity);
-
-/**
- * @brief Add a snow effect with custom color
- *
- * Enables falling snowflake effect with custom color.
- *
- * @param widget Particle widget
- * @param intensity Snow intensity (0.0-1.0)
- * @param color Color in ARGB8888 format (0xAARRGGBB)
- */
-void gui_particle_widget_add_snow_color(gui_particle_widget_t *widget, float intensity,
-                                        uint32_t color);
-
-/**
- * @brief Set snow effect intensity
- *
- * @param widget Particle widget
- * @param intensity New intensity value (0.0-1.0)
- */
-void gui_particle_widget_set_snow_intensity(gui_particle_widget_t *widget, float intensity);
-
-/**
- * @brief Add a bubble effect
- *
- * Enables rising bubble effect from the bottom of the widget.
- *
- * @param widget Particle widget
- */
-void gui_particle_widget_add_bubble(gui_particle_widget_t *widget);
-
-/**
- * @brief Add a bubble effect with custom color
- *
- * Enables rising bubble effect with custom color.
- *
- * @param widget Particle widget
- * @param color Color in ARGB8888 format (0xAARRGGBB)
- */
-void gui_particle_widget_add_bubble_color(gui_particle_widget_t *widget, uint32_t color);
-
 /**
  * @brief Clear all particles
  *
@@ -307,6 +163,89 @@ uint16_t gui_particle_widget_get_active_count(gui_particle_widget_t *widget);
 void gui_particle_widget_set_update_cb(gui_particle_widget_t *widget,
                                        gui_particle_update_cb_t cb,
                                        void *user_data);
+
+/* ============================================================================
+ * Configuration-Driven Effect API (Requirements 14.1-14.5)
+ * ============================================================================ */
+
+/**
+ * @brief Add an effect from configuration
+ *
+ * Creates an emitter from the provided configuration and adds it to the
+ * particle system. Returns a handle for subsequent operations.
+ *
+ * The function automatically sets up touch event handling based on the
+ * behavior mode in the configuration.
+ *
+ * @param widget Particle widget
+ * @param config Effect configuration
+ * @return Effect handle, or PARTICLE_INVALID_HANDLE on failure
+ *
+ * @note Requirements: 14.1, 14.2, 14.4
+ */
+particle_effect_handle_t gui_particle_widget_add_effect(
+    gui_particle_widget_t *widget,
+    const particle_effect_config_t *config);
+
+/**
+ * @brief Remove an effect by handle
+ *
+ * Removes the effect associated with the given handle from the widget.
+ * The emitter is destroyed and all associated particles will expire naturally.
+ *
+ * @param widget Particle widget
+ * @param handle Effect handle returned by gui_particle_widget_add_effect()
+ *
+ * @note Requirements: 14.3
+ */
+void gui_particle_widget_remove_effect(gui_particle_widget_t *widget,
+                                       particle_effect_handle_t handle);
+
+/**
+ * @brief Trigger a burst for an effect
+ *
+ * Triggers an immediate burst of particles for the specified effect.
+ * Uses the burst_count from the effect's configuration.
+ *
+ * @param widget Particle widget
+ * @param handle Effect handle
+ *
+ * @note Requirements: 14.5
+ */
+void gui_particle_widget_trigger_burst(gui_particle_widget_t *widget,
+                                       particle_effect_handle_t handle);
+
+/**
+ * @brief Update effect position
+ *
+ * Updates the emitter position for effects that support position following
+ * (FOLLOW_TOUCH, TRAIL, TOUCH_FEEDBACK behavior modes).
+ *
+ * @param widget Particle widget
+ * @param handle Effect handle
+ * @param x New X position
+ * @param y New Y position
+ *
+ * @note Requirements: 14.5
+ */
+void gui_particle_widget_update_position(gui_particle_widget_t *widget,
+                                         particle_effect_handle_t handle,
+                                         float x, float y);
+
+/**
+ * @brief Stop an effect (disable emitter)
+ *
+ * Disables the emitter for the specified effect, stopping particle emission.
+ * Existing particles will continue to animate until they expire.
+ * The effect can be restarted by calling gui_particle_widget_update_position().
+ *
+ * @param widget Particle widget
+ * @param handle Effect handle
+ *
+ * @note Requirements: 14.5
+ */
+void gui_particle_widget_stop_effect(gui_particle_widget_t *widget,
+                                     particle_effect_handle_t handle);
 
 #ifdef __cplusplus
 }

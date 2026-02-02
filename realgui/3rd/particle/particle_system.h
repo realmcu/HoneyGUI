@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /** Maximum number of emitters per particle system */
-#define PARTICLE_SYSTEM_MAX_EMITTERS 8
+#define PARTICLE_SYSTEM_MAX_EMITTERS 16
 
 /** Default auto-throttle threshold (80% of pool capacity) */
 #define PARTICLE_SYSTEM_DEFAULT_THROTTLE_THRESHOLD (0.8f)

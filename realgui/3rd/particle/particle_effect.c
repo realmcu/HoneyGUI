@@ -1,502 +1,486 @@
-/*
+/**
  * Copyright (c) 2026 Realtek Semiconductor Corp.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
-* @file particle_effect.c
-* @brief Preset Particle Effects Implementation
-*/
+ * @file particle_effect.c
+ * @brief Particle Effect Configuration Implementation
+ */
 
 #include "particle_effect.h"
-#include <math.h>
 #include <string.h>
+#include <stdio.h>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
+#ifndef M_PI_F
+#define M_PI_F 3.14159265358979323846f
 #endif
 
-/* Float version of PI to avoid double-promotion warnings */
-#define M_PI_F 3.14159265358979323846f
+/*============================================================================*
+ *                           Helper Functions
+ *============================================================================*/
 
-/* ============================================================================
- * Firework Effect Implementation
- * ============================================================================ */
+float particle_config_clamp_gravity(float gravity)
+{
+    if (gravity < PARTICLE_GRAVITY_MIN)
+    {
+        return PARTICLE_GRAVITY_MIN;
+    }
+    if (gravity > PARTICLE_GRAVITY_MAX)
+    {
+        return PARTICLE_GRAVITY_MAX;
+    }
+    return gravity;
+}
 
-particle_emitter_t *effect_firework_create(particle_platform_config_t *config,
-                                           float x, float y, uint8_t particle_count)
+float particle_config_clamp_damping(float damping)
+{
+    if (damping < PARTICLE_DAMPING_MIN)
+    {
+        return PARTICLE_DAMPING_MIN;
+    }
+    if (damping > PARTICLE_DAMPING_MAX)
+    {
+        return PARTICLE_DAMPING_MAX;
+    }
+    return damping;
+}
+
+float particle_config_clamp_rate(float rate)
+{
+    if (rate < PARTICLE_RATE_MIN)
+    {
+        return PARTICLE_RATE_MIN;
+    }
+    if (rate > PARTICLE_RATE_MAX)
+    {
+        return PARTICLE_RATE_MAX;
+    }
+    return rate;
+}
+
+/*============================================================================*
+ *                           Configuration Initialization
+ *============================================================================*/
+
+void particle_effect_config_init(particle_effect_config_t *config)
 {
     if (config == NULL)
     {
-        return NULL;
+        return;
     }
 
-    /* Clamp particle count to valid range (20-100) */
-    if (particle_count < 20)
-    {
-        particle_count = 20;
-    }
-    else if (particle_count > 100)
-    {
-        particle_count = 100;
-    }
+    /* Clear entire structure */
+    memset(config, 0, sizeof(particle_effect_config_t));
 
-    particle_emitter_t *emitter = particle_emitter_create(config);
-    if (emitter == NULL)
-    {
-        return NULL;
-    }
+    /* Version control */
+    config->magic = PARTICLE_CONFIG_MAGIC;
+    config->version = PARTICLE_CONFIG_VERSION;
+    config->size = (uint16_t)sizeof(particle_effect_config_t);
+    config->flags = 0;
 
-    /* Configure point emission at explosion center */
-    emitter_shape_config_t shape;
-    shape.type = EMITTER_SHAPE_POINT;
-    shape.point.x = x;
-    shape.point.y = y;
-    particle_emitter_set_shape(emitter, &shape);
+    /* Shape: Point at origin */
+    config->shape.type = PARTICLE_SHAPE_POINT;
+    config->shape.point.x = 0.0f;
+    config->shape.point.y = 0.0f;
 
-    /* Configure gravity trajectory */
-    trajectory_config_t trajectory;
-    trajectory_config_init(&trajectory);
-    trajectory.type = TRAJECTORY_GRAVITY;
-    trajectory.gravity = 200.0f;  /* Moderate gravity for falling effect */
-    trajectory.damping = 0.02f;   /* Light damping for air resistance */
-    particle_emitter_set_trajectory(emitter, &trajectory);
+    /* Trajectory: Linear with no gravity */
+    config->trajectory.type = PARTICLE_TRAJECTORY_LINEAR;
+    config->trajectory.gravity = 0.0f;
+    config->trajectory.damping = 0.0f;
+    config->trajectory.wind_x = 0.0f;
+    config->trajectory.wind_y = 0.0f;
+    config->trajectory.orbit_cx = 0.0f;
+    config->trajectory.orbit_cy = 0.0f;
+    config->trajectory.orbit_speed = 0.0f;
 
-    /* Spherical burst pattern */
-    emitter->angle_min = 0.0f;
-    emitter->angle_max = 2.0f * M_PI_F;  /* Full 360 degrees */
+    /* Emission: 10 particles/second, full circle */
+    config->emission.angle_min = 0.0f;
+    config->emission.angle_max = 2.0f * M_PI_F;
+    config->emission.speed_min = 50.0f;
+    config->emission.speed_max = 100.0f;
+    config->emission.rate = 10.0f;
+    config->emission.burst_count = 10;
+    config->emission.burst_interval = 0;
+    config->emission.burst_enabled = 0;
 
-    /* Random velocity variation */
-    emitter->speed_min = 100.0f;
-    emitter->speed_max = 250.0f;
+    /* Lifecycle: 1000ms default */
+    config->lifecycle.life_min = 800;
+    config->lifecycle.life_max = 1200;
+    config->lifecycle.effect_duration = 0;  /* Infinite */
+    config->lifecycle.auto_cleanup = 1;
+    config->lifecycle.loop = 1;
 
-    /* Visual properties */
-    emitter->scale_min = 0.5f;
-    emitter->scale_max = 1.5f;
-    emitter->rotation_min = 0.0f;
-    emitter->rotation_max = 2.0f * M_PI_F;
-    emitter->rotation_speed_min = -1.0f;
-    emitter->rotation_speed_max = 1.0f;
+    /* Color: White solid */
+    config->color.mode = PARTICLE_COLOR_SOLID;
+    config->color.color_start = 0xFFFFFFFF;
+    config->color.color_end = 0xFFFFFFFF;
+    config->color.palette_size = 0;
 
-    /* Lifecycle */
-    emitter->life_min = 800;
-    emitter->life_max = 1500;
+    /* Opacity: Fade from full to transparent */
+    config->opacity.start = 255;
+    config->opacity.end = 0;
+    config->opacity.easing = PARTICLE_EASING_LINEAR;
 
-    /* Opacity fade from 100% to 0% */
-    emitter->opacity_start = 255;
-    emitter->opacity_end = 0;
+    /* Scale: 1.0 constant */
+    config->scale.start = 1.0f;
+    config->scale.end = 1.0f;
+    config->scale.min = 0.8f;
+    config->scale.max = 1.2f;
 
-    /* Scale remains constant for firework */
-    emitter->scale_start = 1.0f;
-    emitter->scale_end = 0.3f;
+    /* Rotation: None */
+    config->rotation.angle_min = 0.0f;
+    config->rotation.angle_max = 0.0f;
+    config->rotation.speed_min = 0.0f;
+    config->rotation.speed_max = 0.0f;
+    config->rotation.align_velocity = 0;
 
-    /* Disable continuous emission - firework is burst only */
-    emitter->emit_rate = 1.0f;
-    emitter->enabled = 0;
+    /* Boundary: None */
+    config->boundary.behavior = PARTICLE_BOUNDARY_NONE;
+    config->boundary.left = 0.0f;
+    config->boundary.top = 0.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
+    config->boundary.reflect_damping = 0.8f;
 
-    return emitter;
+    /* Behavior: None */
+    config->behavior.mode = PARTICLE_BEHAVIOR_NONE;
+    config->behavior.pulse_frequency = 1.0f;
+    config->behavior.pulse_amplitude = 0.5f;
+    config->behavior.breathe_frequency = 1.0f;
+
+    /* Render: Normal blend */
+    config->render.blend_mode = PARTICLE_BLEND_NORMAL;
+    config->render.texture = NULL;
+    config->render.base_size = 8.0f;
+
+    /* Callbacks: None */
+    config->callbacks.on_particle_init = NULL;
+    config->callbacks.on_particle_update = NULL;
+    config->callbacks.on_particle_render = NULL;
+    config->callbacks.on_particle_death = NULL;
+    config->callbacks.on_emitter_start = NULL;
+    config->callbacks.on_emitter_stop = NULL;
+    config->callbacks.user_data = NULL;
 }
 
-/* ============================================================================
- * Trail Effect Implementation
- * ============================================================================ */
+/*============================================================================*
+ *                           Configuration Validation
+ *============================================================================*/
 
-particle_emitter_t *effect_trail_create(particle_platform_config_t *config)
+particle_config_error_t particle_effect_config_validate(
+    const particle_effect_config_t *config)
 {
     if (config == NULL)
     {
-        return NULL;
+        return PARTICLE_CONFIG_ERR_MAGIC;
     }
 
-    particle_emitter_t *emitter = particle_emitter_create(config);
-    if (emitter == NULL)
+    /* Check magic number */
+    if (config->magic != PARTICLE_CONFIG_MAGIC)
     {
-        return NULL;
+        return PARTICLE_CONFIG_ERR_MAGIC;
     }
 
-    /* Configure point emission (will follow pointer) */
-    emitter_shape_config_t shape;
-    shape.type = EMITTER_SHAPE_POINT;
-    shape.point.x = 0.0f;
-    shape.point.y = 0.0f;
-    particle_emitter_set_shape(emitter, &shape);
+    /* Check version */
+    if (config->version > PARTICLE_CONFIG_VERSION)
+    {
+        return PARTICLE_CONFIG_ERR_VERSION;
+    }
 
-    /* Enable follow mode */
-    particle_emitter_enable_follow(emitter, 1);
+    /* Validate shape */
+    if (config->shape.type > PARTICLE_SHAPE_RING)
+    {
+        return PARTICLE_CONFIG_ERR_SHAPE;
+    }
 
-    /* Configure damping trajectory */
-    trajectory_config_t trajectory;
-    trajectory_config_init(&trajectory);
-    trajectory.type = TRAJECTORY_LINEAR;
-    trajectory.damping = 0.15f;  /* Smooth deceleration */
-    particle_emitter_set_trajectory(emitter, &trajectory);
+    /* Validate shape-specific parameters */
+    switch (config->shape.type)
+    {
+    case PARTICLE_SHAPE_CIRCLE:
+        if (config->shape.circle.radius < 0.0f)
+        {
+            return PARTICLE_CONFIG_ERR_SHAPE;
+        }
+        break;
+    case PARTICLE_SHAPE_RECT:
+        if (config->shape.rect.w < 0.0f || config->shape.rect.h < 0.0f)
+        {
+            return PARTICLE_CONFIG_ERR_SHAPE;
+        }
+        break;
+    case PARTICLE_SHAPE_RING:
+        if (config->shape.ring.inner_r < 0.0f ||
+            config->shape.ring.outer_r < 0.0f ||
+            config->shape.ring.inner_r > config->shape.ring.outer_r)
+        {
+            return PARTICLE_CONFIG_ERR_SHAPE;
+        }
+        break;
+    default:
+        break;
+    }
 
-    /* Initial velocity will be set by effect_trail_update */
-    emitter->speed_min = 30.0f;
-    emitter->speed_max = 80.0f;
+    /* Validate trajectory */
+    if (config->trajectory.type > PARTICLE_TRAJECTORY_ORBIT)
+    {
+        return PARTICLE_CONFIG_ERR_TRAJECTORY;
+    }
 
-    /* Angle will be set dynamically based on movement direction */
-    emitter->angle_min = 0.0f;
-    emitter->angle_max = 2.0f * M_PI_F;
+    /* Validate emission */
+    if (config->emission.speed_min < 0.0f ||
+        config->emission.speed_max < config->emission.speed_min)
+    {
+        return PARTICLE_CONFIG_ERR_EMISSION;
+    }
 
-    /* Visual properties - larger particles for better visibility */
-    emitter->scale_min = 1.0f;
-    emitter->scale_max = 1.8f;
-    emitter->rotation_min = 0.0f;
-    emitter->rotation_max = 0.0f;
-    emitter->rotation_speed_min = 0.0f;
-    emitter->rotation_speed_max = 0.0f;
+    /* Validate lifecycle */
+    if (config->lifecycle.life_max < config->lifecycle.life_min)
+    {
+        return PARTICLE_CONFIG_ERR_LIFECYCLE;
+    }
 
-    /* Longer lifecycle for longer trail */
-    emitter->life_min = 400;
-    emitter->life_max = 800;
+    /* Validate color */
+    if (config->color.mode > PARTICLE_COLOR_RAINBOW)
+    {
+        return PARTICLE_CONFIG_ERR_COLOR;
+    }
 
-    /* Scale fade from 100% to 0% */
-    emitter->opacity_start = 255;
-    emitter->opacity_end = 0;
-    emitter->scale_start = 1.2f;
-    emitter->scale_end = 0.2f;
+    if (config->color.mode == PARTICLE_COLOR_RANDOM &&
+        config->color.palette_size == 0)
+    {
+        return PARTICLE_CONFIG_ERR_COLOR;
+    }
 
-    /* Higher emission rate for denser trail */
-    emitter->emit_rate = 60.0f;
-    emitter->enabled = 0;  /* Start disabled, enable when moving */
+    /* Validate scale */
+    if (config->scale.min < 0.0f || config->scale.max < config->scale.min)
+    {
+        return PARTICLE_CONFIG_ERR_SCALE;
+    }
 
-    return emitter;
+    /* Validate boundary */
+    if (config->boundary.behavior > PARTICLE_BOUNDARY_WRAP)
+    {
+        return PARTICLE_CONFIG_ERR_BOUNDARY;
+    }
+
+    /* Validate behavior */
+    if (config->behavior.mode > PARTICLE_BEHAVIOR_BREATHE)
+    {
+        return PARTICLE_CONFIG_ERR_BEHAVIOR;
+    }
+
+    /* Validate render */
+    if (config->render.blend_mode > PARTICLE_BLEND_MULTIPLY)
+    {
+        return PARTICLE_CONFIG_ERR_RENDER;
+    }
+
+    if (config->render.base_size <= 0.0f)
+    {
+        return PARTICLE_CONFIG_ERR_RENDER;
+    }
+
+    return PARTICLE_CONFIG_OK;
 }
 
-void effect_trail_update(particle_emitter_t *emitter, float x, float y,
-                         float prev_x, float prev_y)
+/*============================================================================*
+ *                           Binary Format Loading
+ *============================================================================*/
+
+/**
+ * @brief Convert binary format to runtime config
+ */
+static void binary_to_runtime(particle_effect_config_t *config,
+                              const particle_effect_config_binary_t *binary)
 {
-    if (emitter == NULL)
-    {
-        return;
-    }
+    /* Copy version control */
+    config->magic = binary->magic;
+    config->version = binary->version;
+    config->size = (uint16_t)sizeof(particle_effect_config_t);
+    config->flags = binary->flags;
 
-    /* Calculate movement vector */
-    float dx = x - prev_x;
-    float dy = y - prev_y;
-    float distance = sqrtf(dx * dx + dy * dy);
+    /* Copy all pure-data sub-structures directly */
+    config->shape = binary->shape;
+    config->trajectory = binary->trajectory;
+    config->emission = binary->emission;
+    config->lifecycle = binary->lifecycle;
+    config->color = binary->color;
+    config->opacity = binary->opacity;
+    config->scale = binary->scale;
+    config->rotation = binary->rotation;
+    config->boundary = binary->boundary;
+    config->behavior = binary->behavior;
 
-    /* Update follow position */
-    particle_emitter_set_follow_position(emitter, x, y);
+    /* Convert render config (binary has no pointer) */
+    config->render.blend_mode = (particle_blend_mode_t)binary->render.blend_mode;
+    config->render.base_size = binary->render.base_size;
+    config->render.texture = NULL;  /* Runtime only */
 
-    /* Always enable when called - let the caller decide when to stop */
-    particle_emitter_enable(emitter, 1);
+    /* Clear callbacks (runtime only, not in binary) */
+    config->callbacks.on_particle_init = NULL;
+    config->callbacks.on_particle_update = NULL;
+    config->callbacks.on_particle_render = NULL;
+    config->callbacks.on_particle_death = NULL;
+    config->callbacks.on_emitter_start = NULL;
+    config->callbacks.on_emitter_stop = NULL;
+    config->callbacks.user_data = NULL;
 
-    if (distance < 0.5f)
-    {
-        /* Pointer barely moving - emit particles in all directions */
-        emitter->angle_min = 0.0f;
-        emitter->angle_max = 2.0f * 3.14159f;
-        particle_emitter_set_rate(emitter, 40.0f);
-        return;
-    }
-
-    /* Calculate angle opposite to movement direction */
-    float move_angle = atan2f(dy, dx);
-    float opposite_angle = move_angle + 3.14159f;  /* 180 degrees opposite */
-
-    /* Set emission angle range around opposite direction */
-    float spread = 3.14159f / 3.0f;  /* 60 degree spread */
-    emitter->angle_min = opposite_angle - spread;
-    emitter->angle_max = opposite_angle + spread;
-
-    /* Adjust emission rate based on movement speed */
-    float speed_factor = distance / 5.0f;  /* Normalize speed */
-    if (speed_factor < 1.0f) { speed_factor = 1.0f; }
-    if (speed_factor > 4.0f) { speed_factor = 4.0f; }
-
-    particle_emitter_set_rate(emitter, 40.0f * speed_factor);
+    /* Clear reserved */
+    memset(config->reserved, 0, sizeof(config->reserved));
 }
 
-/* ============================================================================
- * Touch Effect Implementation
- * ============================================================================ */
-
-particle_emitter_t *effect_touch_create(particle_platform_config_t *config)
+/**
+ * @brief Convert runtime config to binary format
+ */
+static void runtime_to_binary(particle_effect_config_binary_t *binary,
+                              const particle_effect_config_t *config)
 {
-    if (config == NULL)
-    {
-        return NULL;
-    }
+    /* Clear entire structure first */
+    memset(binary, 0, sizeof(particle_effect_config_binary_t));
 
-    particle_emitter_t *emitter = particle_emitter_create(config);
-    if (emitter == NULL)
-    {
-        return NULL;
-    }
+    /* Copy version control */
+    binary->magic = config->magic;
+    binary->version = config->version;
+    binary->size = PARTICLE_CONFIG_BINARY_SIZE;
+    binary->flags = config->flags;
 
-    /* Configure point emission at touch location */
-    emitter_shape_config_t shape;
-    shape.type = EMITTER_SHAPE_POINT;
-    shape.point.x = 0.0f;
-    shape.point.y = 0.0f;
-    particle_emitter_set_shape(emitter, &shape);
+    /* Copy all pure-data sub-structures directly */
+    binary->shape = config->shape;
+    binary->trajectory = config->trajectory;
+    binary->emission = config->emission;
+    binary->lifecycle = config->lifecycle;
+    binary->color = config->color;
+    binary->opacity = config->opacity;
+    binary->scale = config->scale;
+    binary->rotation = config->rotation;
+    binary->boundary = config->boundary;
+    binary->behavior = config->behavior;
 
-    /* Enable follow mode for drag */
-    particle_emitter_enable_follow(emitter, 1);
+    /* Convert render config (no pointer in binary) */
+    binary->render.blend_mode = (uint32_t)config->render.blend_mode;
+    binary->render.base_size = config->render.base_size;
+    binary->render.reserved = 0;
 
-    /* Configure linear trajectory with light damping */
-    trajectory_config_t trajectory;
-    trajectory_config_init(&trajectory);
-    trajectory.type = TRAJECTORY_LINEAR;
-    trajectory.damping = 0.05f;
-    particle_emitter_set_trajectory(emitter, &trajectory);
-
-    /* Circular pattern around touch point */
-    emitter->angle_min = 0.0f;
-    emitter->angle_max = 2.0f * M_PI_F;
-
-    /* Configurable expansion speed */
-    emitter->speed_min = 50.0f;
-    emitter->speed_max = 150.0f;
-
-    /* Visual properties */
-    emitter->scale_min = 0.5f;
-    emitter->scale_max = 1.0f;
-    emitter->rotation_min = 0.0f;
-    emitter->rotation_max = 2.0f * M_PI_F;
-    emitter->rotation_speed_min = -2.0f;
-    emitter->rotation_speed_max = 2.0f;
-
-    /* Lifecycle */
-    emitter->life_min = 300;
-    emitter->life_max = 600;
-
-    /* Fade out */
-    emitter->opacity_start = 255;
-    emitter->opacity_end = 0;
-    emitter->scale_start = 1.0f;
-    emitter->scale_end = 0.5f;
-
-    /* Emission rate for drag */
-    emitter->emit_rate = 40.0f;
-    emitter->enabled = 0;  /* Start disabled */
-
-    return emitter;
+    /* Callbacks are NOT saved - runtime only */
 }
 
-void effect_touch_tap(particle_emitter_t *emitter, particle_pool_t *pool,
-                      float x, float y)
+int particle_effect_config_load_mem(particle_effect_config_t *config,
+                                    const void *addr)
 {
-    if (emitter == NULL || pool == NULL)
+    if (config == NULL || addr == NULL)
     {
-        return;
+        return -1;
     }
 
-    /* Set touch position */
-    particle_emitter_set_follow_position(emitter, x, y);
+    /* Cast to binary format structure */
+    const particle_effect_config_binary_t *binary =
+        (const particle_effect_config_binary_t *)addr;
 
-    /* Burst 5-20 particles */
-    /* Use a random-ish count based on position */
-    uint16_t count = 10 + ((uint16_t)(x + y) % 11);  /* 10-20 particles */
-    if (count < 5) { count = 5; }
-    if (count > 20) { count = 20; }
+    /* Validate magic number */
+    if (binary->magic != PARTICLE_CONFIG_MAGIC)
+    {
+        return -1;
+    }
 
-    particle_emitter_burst(emitter, pool, count);
+    /* Validate version (must be compatible) */
+    if (binary->version > PARTICLE_CONFIG_VERSION)
+    {
+        return -1;
+    }
+
+    /* Validate size matches binary format */
+    if (binary->size != PARTICLE_CONFIG_BINARY_SIZE)
+    {
+        return -1;
+    }
+
+    /* Convert binary format to runtime config */
+    binary_to_runtime(config, binary);
+
+    return 0;
 }
 
-void effect_touch_drag(particle_emitter_t *emitter, float x, float y)
+int particle_effect_config_save(const particle_effect_config_t *config,
+                                void *buffer, size_t buffer_size)
 {
-    if (emitter == NULL)
+    if (config == NULL || buffer == NULL)
     {
-        return;
+        return -1;
     }
 
-    /* Update position and enable continuous emission */
-    particle_emitter_set_follow_position(emitter, x, y);
-    particle_emitter_enable(emitter, 1);
+    /* Check buffer size */
+    if (buffer_size < PARTICLE_CONFIG_BINARY_SIZE)
+    {
+        return -1;
+    }
+
+    /* Convert runtime config to binary format */
+    particle_effect_config_binary_t *binary =
+        (particle_effect_config_binary_t *)buffer;
+    runtime_to_binary(binary, config);
+
+    return PARTICLE_CONFIG_BINARY_SIZE;
 }
 
-void effect_touch_release(particle_emitter_t *emitter, particle_pool_t *pool,
-                          float x, float y)
+int particle_effect_config_load_fs(particle_effect_config_t *config,
+                                   const char *filepath)
 {
-    if (emitter == NULL || pool == NULL)
+#if defined(_WIN32) || defined(__linux__)
+    /* Simulator environment - use standard file I/O */
+    if (config == NULL || filepath == NULL)
     {
-        return;
+        return -1;
     }
 
-    /* Disable continuous emission */
-    particle_emitter_enable(emitter, 0);
+    FILE *fp = fopen(filepath, "rb");
+    if (fp == NULL)
+    {
+        return -1;
+    }
 
-    /* Set release position */
-    particle_emitter_set_follow_position(emitter, x, y);
+    /* Read binary format structure */
+    particle_effect_config_binary_t binary;
+    size_t read_size = fread(&binary, 1, sizeof(binary), fp);
+    fclose(fp);
 
-    /* Store original speed range */
-    float orig_speed_min = emitter->speed_min;
-    float orig_speed_max = emitter->speed_max;
+    if (read_size != sizeof(binary))
+    {
+        return -1;
+    }
 
-    /* Increase initial velocity for final burst */
-    emitter->speed_min = orig_speed_min * 1.5f;
-    emitter->speed_max = orig_speed_max * 1.5f;
+    /* Validate and convert */
+    if (binary.magic != PARTICLE_CONFIG_MAGIC)
+    {
+        return -1;
+    }
 
-    /* Final burst */
-    particle_emitter_burst(emitter, pool, 15);
+    if (binary.version > PARTICLE_CONFIG_VERSION)
+    {
+        return -1;
+    }
 
-    /* Restore original speed range */
-    emitter->speed_min = orig_speed_min;
-    emitter->speed_max = orig_speed_max;
+    if (binary.size != PARTICLE_CONFIG_BINARY_SIZE)
+    {
+        return -1;
+    }
+
+    binary_to_runtime(config, &binary);
+
+    return 0;
+#else
+    /* Embedded environment - use VFS API */
+    (void)config;
+    (void)filepath;
+    return -1;
+#endif
 }
 
-/* ============================================================================
- * Snow Effect Implementation
- * ============================================================================ */
-
-particle_emitter_t *effect_snow_create(particle_platform_config_t *config,
-                                       float screen_width)
+int particle_effect_config_load_ftl(particle_effect_config_t *config,
+                                    uint32_t ftl_addr)
 {
-    if (config == NULL)
-    {
-        return NULL;
-    }
-
-    particle_emitter_t *emitter = particle_emitter_create(config);
-    if (emitter == NULL)
-    {
-        return NULL;
-    }
-
-    /* Configure line emission from top edge */
-    emitter_shape_config_t shape;
-    shape.type = EMITTER_SHAPE_LINE;
-    shape.line.x1 = 0.0f;
-    shape.line.y1 = 0.0f;
-    shape.line.x2 = screen_width;
-    shape.line.y2 = 0.0f;
-    particle_emitter_set_shape(emitter, &shape);
-
-    /* Configure gravity with horizontal sway */
-    trajectory_config_t trajectory;
-    trajectory_config_init(&trajectory);
-    trajectory.type = TRAJECTORY_GRAVITY;
-    trajectory.gravity = 30.0f;   /* Light gravity for slow falling */
-    trajectory.wind_x = 10.0f;    /* Horizontal sway */
-    trajectory.damping = 0.0f;    /* No damping for constant fall */
-    particle_emitter_set_trajectory(emitter, &trajectory);
-
-    /* Downward emission with slight variation */
-    emitter->angle_min = M_PI_F / 2.0f - 0.3f;  /* Mostly downward */
-    emitter->angle_max = M_PI_F / 2.0f + 0.3f;
-
-    /* Slow initial speed */
-    emitter->speed_min = 10.0f;
-    emitter->speed_max = 30.0f;
-
-    /* Visual properties - slow rotation for tumbling */
-    emitter->scale_min = 0.3f;
-    emitter->scale_max = 1.0f;
-    emitter->rotation_min = 0.0f;
-    emitter->rotation_max = 2.0f * M_PI_F;
-    emitter->rotation_speed_min = -0.5f;
-    emitter->rotation_speed_max = 0.5f;
-
-    /* Long lifecycle for slow falling */
-    emitter->life_min = 5000;
-    emitter->life_max = 10000;
-
-    /* Slight fade */
-    emitter->opacity_start = 230;
-    emitter->opacity_end = 100;
-    emitter->scale_start = 1.0f;
-    emitter->scale_end = 0.8f;
-
-    /* Configurable emission rate */
-    emitter->emit_rate = 10.0f;
-    emitter->enabled = 1;
-
-    return emitter;
-}
-
-void effect_snow_set_intensity(particle_emitter_t *emitter, float intensity)
-{
-    if (emitter == NULL)
-    {
-        return;
-    }
-
-    /* Clamp intensity to valid range */
-    if (intensity < 0.0f) { intensity = 0.0f; }
-    if (intensity > 1.0f) { intensity = 1.0f; }
-
-    /* Adjust emission rate based on intensity */
-    /* Range: 5-50 particles per second */
-    float rate = 5.0f + intensity * 45.0f;
-    particle_emitter_set_rate(emitter, rate);
-
-    /* Adjust particle size based on intensity */
-    emitter->scale_min = 0.2f + intensity * 0.3f;
-    emitter->scale_max = 0.5f + intensity * 0.8f;
-}
-
-/* ============================================================================
- * Bubble Effect Implementation
- * ============================================================================ */
-
-particle_emitter_t *effect_bubble_create(particle_platform_config_t *config,
-                                         float screen_width, float screen_height)
-{
-    if (config == NULL)
-    {
-        return NULL;
-    }
-
-    (void)screen_height;  /* Used for boundary setup in particle system */
-
-    particle_emitter_t *emitter = particle_emitter_create(config);
-    if (emitter == NULL)
-    {
-        return NULL;
-    }
-
-    /* Configure line emission from bottom edge */
-    emitter_shape_config_t shape;
-    shape.type = EMITTER_SHAPE_LINE;
-    shape.line.x1 = 0.0f;
-    shape.line.y1 = screen_height;
-    shape.line.x2 = screen_width;
-    shape.line.y2 = screen_height;
-    particle_emitter_set_shape(emitter, &shape);
-
-    /* Configure negative gravity and horizontal sway */
-    trajectory_config_t trajectory;
-    trajectory_config_init(&trajectory);
-    trajectory.type = TRAJECTORY_GRAVITY;
-    trajectory.gravity = -50.0f;  /* Negative gravity for upward motion */
-    trajectory.wind_x = 15.0f;    /* Horizontal sway */
-    trajectory.damping = 0.01f;   /* Very light damping */
-    particle_emitter_set_trajectory(emitter, &trajectory);
-
-    /* Upward emission with variation */
-    emitter->angle_min = -M_PI_F / 2.0f - 0.4f;  /* Mostly upward */
-    emitter->angle_max = -M_PI_F / 2.0f + 0.4f;
-
-    /* Slow initial speed */
-    emitter->speed_min = 20.0f;
-    emitter->speed_max = 60.0f;
-
-    /* Visual properties - subtle size pulsation */
-    emitter->scale_min = 0.5f;
-    emitter->scale_max = 1.5f;
-    emitter->rotation_min = 0.0f;
-    emitter->rotation_max = 0.0f;  /* Bubbles don't rotate */
-    emitter->rotation_speed_min = 0.0f;
-    emitter->rotation_speed_max = 0.0f;
-
-    /* Long lifecycle for slow rising */
-    emitter->life_min = 4000;
-    emitter->life_max = 8000;
-
-    /* Slight transparency */
-    emitter->opacity_start = 180;
-    emitter->opacity_end = 100;
-
-    /* Scale pulsation effect (simulated through start/end) */
-    emitter->scale_start = 1.0f;
-    emitter->scale_end = 1.2f;  /* Slight growth */
-
-    /* Moderate emission rate */
-    emitter->emit_rate = 8.0f;
-    emitter->enabled = 1;
-
-    return emitter;
+    /* FTL mode is reserved for future implementation */
+    (void)config;
+    (void)ftl_addr;
+    return -1;
 }

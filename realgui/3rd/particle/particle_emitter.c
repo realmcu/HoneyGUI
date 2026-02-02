@@ -93,8 +93,18 @@ void particle_emitter_init(particle_emitter_t *emitter)
     emitter->scale_start = 1.0f;
     emitter->scale_end = 0.0f;
 
-    /* Default color: white */
+    /* Default color: white solid */
     emitter->particle_color = 0xFFFFFFFF;
+    emitter->color_mode = PARTICLE_COLOR_SOLID;
+    emitter->color_start = 0xFFFFFFFF;
+    emitter->color_end = 0xFFFFFFFF;
+    emitter->palette_size = 0;
+
+    /* Default opacity easing */
+    emitter->opacity_easing = PARTICLE_EASING_LINEAR;
+
+    /* Default rotation alignment */
+    emitter->align_velocity = 0;
 
     /* Default state */
     emitter->particle_image = NULL;
@@ -102,6 +112,48 @@ void particle_emitter_init(particle_emitter_t *emitter)
     emitter->follow_x = 0.0f;
     emitter->follow_y = 0.0f;
     emitter->follow_enabled = 0;
+
+    /* Default burst mode */
+    emitter->burst_enabled = 0;
+    emitter->burst_count = 10;
+    emitter->burst_interval = 0;
+    emitter->last_burst_time = 0;
+
+    /* Default lifecycle */
+    emitter->auto_cleanup = 1;
+    emitter->loop = 1;
+    emitter->effect_duration = 0;
+    emitter->start_time = 0;
+
+    /* Default boundary */
+    emitter->boundary_behavior = PARTICLE_BOUNDARY_NONE;
+    emitter->boundary_left = 0.0f;
+    emitter->boundary_top = 0.0f;
+    emitter->boundary_right = 0.0f;
+    emitter->boundary_bottom = 0.0f;
+    emitter->boundary_reflect_damping = 0.8f;
+
+    /* Default behavior mode */
+    emitter->behavior_mode = PARTICLE_BEHAVIOR_NONE;
+    emitter->pulse_frequency = 1.0f;
+    emitter->pulse_amplitude = 0.5f;
+    emitter->breathe_frequency = 1.0f;
+    emitter->prev_follow_x = 0.0f;
+    emitter->prev_follow_y = 0.0f;
+    emitter->has_prev_position = 0;
+
+    /* Default render */
+    emitter->blend_mode = PARTICLE_BLEND_NORMAL;
+    emitter->base_size = 8.0f;
+
+    /* Default callbacks (NULL = no callback) */
+    emitter->on_particle_init = NULL;
+    emitter->on_particle_update = NULL;
+    emitter->on_particle_render = NULL;
+    emitter->on_particle_death = NULL;
+    emitter->on_emitter_start = NULL;
+    emitter->on_emitter_stop = NULL;
+    emitter->user_data = NULL;
 
     /* Initialize random seed */
     emitter->random_seed = 12345;
@@ -138,7 +190,229 @@ void particle_emitter_destroy(particle_emitter_t *emitter, particle_platform_con
         return;
     }
 
+    /* Call on_emitter_stop callback if set */
+    if (emitter->on_emitter_stop != NULL)
+    {
+        emitter->on_emitter_stop(emitter, emitter->user_data);
+    }
+
     config->free_fn(emitter);
+}
+
+/* ============================================================================
+ * Create from Configuration
+ * ============================================================================ */
+
+/**
+ * @brief Convert particle_shape_config_t to emitter_shape_config_t
+ */
+static void convert_shape_config(const particle_shape_config_t *src,
+                                 emitter_shape_config_t *dst)
+{
+    switch (src->type)
+    {
+    case PARTICLE_SHAPE_POINT:
+        dst->type = EMITTER_SHAPE_POINT;
+        dst->point.x = src->point.x;
+        dst->point.y = src->point.y;
+        break;
+    case PARTICLE_SHAPE_LINE:
+        dst->type = EMITTER_SHAPE_LINE;
+        dst->line.x1 = src->line.x1;
+        dst->line.y1 = src->line.y1;
+        dst->line.x2 = src->line.x2;
+        dst->line.y2 = src->line.y2;
+        break;
+    case PARTICLE_SHAPE_CIRCLE:
+        dst->type = EMITTER_SHAPE_CIRCLE;
+        dst->circle.cx = src->circle.cx;
+        dst->circle.cy = src->circle.cy;
+        dst->circle.radius = src->circle.radius;
+        break;
+    case PARTICLE_SHAPE_RECT:
+        dst->type = EMITTER_SHAPE_RECT;
+        dst->rect.x = src->rect.x;
+        dst->rect.y = src->rect.y;
+        dst->rect.w = src->rect.w;
+        dst->rect.h = src->rect.h;
+        break;
+    case PARTICLE_SHAPE_RING:
+        dst->type = EMITTER_SHAPE_RING;
+        dst->ring.cx = src->ring.cx;
+        dst->ring.cy = src->ring.cy;
+        dst->ring.inner_r = src->ring.inner_r;
+        dst->ring.outer_r = src->ring.outer_r;
+        break;
+    default:
+        dst->type = EMITTER_SHAPE_POINT;
+        dst->point.x = 0.0f;
+        dst->point.y = 0.0f;
+        break;
+    }
+}
+
+/**
+ * @brief Convert particle_trajectory_config_t to trajectory_config_t
+ */
+static void convert_trajectory_config(const particle_trajectory_config_t *src,
+                                      trajectory_config_t *dst)
+{
+    switch (src->type)
+    {
+    case PARTICLE_TRAJECTORY_LINEAR:
+        dst->type = TRAJECTORY_LINEAR;
+        break;
+    case PARTICLE_TRAJECTORY_GRAVITY:
+        dst->type = TRAJECTORY_GRAVITY;
+        break;
+    case PARTICLE_TRAJECTORY_ORBIT:
+        dst->type = TRAJECTORY_SPIRAL;
+        break;
+    default:
+        dst->type = TRAJECTORY_LINEAR;
+        break;
+    }
+
+    dst->gravity = trajectory_clamp_gravity(src->gravity);
+    dst->damping = trajectory_clamp_damping(src->damping);
+    dst->wind_x = src->wind_x;
+    dst->wind_y = src->wind_y;
+    dst->spiral_cx = src->orbit_cx;
+    dst->spiral_cy = src->orbit_cy;
+    dst->spiral_speed = src->orbit_speed;
+    dst->custom_cb = NULL;
+    dst->custom_data = NULL;
+}
+
+particle_emitter_t *particle_emitter_create_from_config(
+    const particle_effect_config_t *effect_config,
+    particle_platform_config_t *platform_config)
+{
+    if (effect_config == NULL || platform_config == NULL ||
+        platform_config->malloc_fn == NULL)
+    {
+        return NULL;
+    }
+
+    /* Validate configuration first */
+    if (particle_effect_config_validate(effect_config) != PARTICLE_CONFIG_OK)
+    {
+        return NULL;
+    }
+
+    /* Allocate emitter */
+    particle_emitter_t *emitter = (particle_emitter_t *)platform_config->malloc_fn(
+                                      sizeof(particle_emitter_t));
+    if (emitter == NULL)
+    {
+        return NULL;
+    }
+
+    /* Initialize to defaults first */
+    particle_emitter_init(emitter);
+
+    /* Use time function for random seed if available */
+    if (platform_config->get_time_fn != NULL)
+    {
+        emitter->random_seed = platform_config->get_time_fn();
+        emitter->start_time = platform_config->get_time_fn();
+    }
+
+    /* Apply shape configuration */
+    convert_shape_config(&effect_config->shape, &emitter->shape);
+
+    /* Apply trajectory configuration */
+    convert_trajectory_config(&effect_config->trajectory, &emitter->trajectory);
+
+    /* Apply emission parameters */
+    emitter->angle_min = effect_config->emission.angle_min;
+    emitter->angle_max = effect_config->emission.angle_max;
+    emitter->speed_min = effect_config->emission.speed_min;
+    emitter->speed_max = effect_config->emission.speed_max;
+    emitter->emit_rate = particle_emitter_clamp_rate(effect_config->emission.rate);
+    emitter->burst_count = effect_config->emission.burst_count;
+    emitter->burst_interval = effect_config->emission.burst_interval;
+    emitter->burst_enabled = effect_config->emission.burst_enabled;
+
+    /* Apply lifecycle configuration */
+    emitter->life_min = effect_config->lifecycle.life_min;
+    emitter->life_max = effect_config->lifecycle.life_max;
+    emitter->effect_duration = effect_config->lifecycle.effect_duration;
+    emitter->auto_cleanup = effect_config->lifecycle.auto_cleanup;
+    emitter->loop = effect_config->lifecycle.loop;
+
+    /* Apply color configuration */
+    emitter->color_mode = effect_config->color.mode;
+    emitter->color_start = effect_config->color.color_start;
+    emitter->color_end = effect_config->color.color_end;
+    emitter->particle_color = effect_config->color.color_start;
+    emitter->palette_size = effect_config->color.palette_size;
+    for (int i = 0; i < 8 && i < effect_config->color.palette_size; i++)
+    {
+        emitter->color_palette[i] = effect_config->color.palette[i];
+    }
+
+    /* Apply opacity configuration */
+    emitter->opacity_start = effect_config->opacity.start;
+    emitter->opacity_end = effect_config->opacity.end;
+    emitter->opacity_easing = effect_config->opacity.easing;
+
+    /* Apply scale configuration */
+    emitter->scale_start = effect_config->scale.start;
+    emitter->scale_end = effect_config->scale.end;
+    emitter->scale_min = effect_config->scale.min;
+    emitter->scale_max = effect_config->scale.max;
+
+    /* Apply rotation configuration */
+    emitter->rotation_min = effect_config->rotation.angle_min;
+    emitter->rotation_max = effect_config->rotation.angle_max;
+    emitter->rotation_speed_min = effect_config->rotation.speed_min;
+    emitter->rotation_speed_max = effect_config->rotation.speed_max;
+    emitter->align_velocity = effect_config->rotation.align_velocity;
+
+    /* Apply boundary configuration */
+    emitter->boundary_behavior = effect_config->boundary.behavior;
+    emitter->boundary_left = effect_config->boundary.left;
+    emitter->boundary_top = effect_config->boundary.top;
+    emitter->boundary_right = effect_config->boundary.right;
+    emitter->boundary_bottom = effect_config->boundary.bottom;
+    emitter->boundary_reflect_damping = effect_config->boundary.reflect_damping;
+
+    /* Apply behavior mode configuration */
+    emitter->behavior_mode = effect_config->behavior.mode;
+    emitter->pulse_frequency = effect_config->behavior.pulse_frequency;
+    emitter->pulse_amplitude = effect_config->behavior.pulse_amplitude;
+    emitter->breathe_frequency = effect_config->behavior.breathe_frequency;
+
+    /* Apply render configuration */
+    emitter->blend_mode = effect_config->render.blend_mode;
+    emitter->particle_image = effect_config->render.texture;
+    emitter->base_size = effect_config->render.base_size;
+
+    /* Apply callback configuration */
+    emitter->on_particle_init = effect_config->callbacks.on_particle_init;
+    emitter->on_particle_update = effect_config->callbacks.on_particle_update;
+    emitter->on_particle_render = effect_config->callbacks.on_particle_render;
+    emitter->on_particle_death = effect_config->callbacks.on_particle_death;
+    emitter->on_emitter_start = effect_config->callbacks.on_emitter_start;
+    emitter->on_emitter_stop = effect_config->callbacks.on_emitter_stop;
+    emitter->user_data = effect_config->callbacks.user_data;
+
+    /* Set follow mode based on behavior */
+    if (emitter->behavior_mode == PARTICLE_BEHAVIOR_FOLLOW_TOUCH ||
+        emitter->behavior_mode == PARTICLE_BEHAVIOR_TRAIL ||
+        emitter->behavior_mode == PARTICLE_BEHAVIOR_TOUCH_FEEDBACK)
+    {
+        emitter->follow_enabled = 1;
+    }
+
+    /* Call on_emitter_start callback if set */
+    if (emitter->on_emitter_start != NULL)
+    {
+        emitter->on_emitter_start(emitter, emitter->user_data);
+    }
+
+    return emitter;
 }
 
 /* ============================================================================
@@ -288,6 +562,21 @@ void particle_emitter_get_emit_position(particle_emitter_t *emitter, float *out_
             break;
         }
 
+    case EMITTER_SHAPE_RING:
+        {
+            /* Random point within ring (between inner and outer radius) */
+            float angle = emitter_random_float(emitter) * 2.0f * M_PI_F;
+            float inner_r = emitter->shape.ring.inner_r;
+            float outer_r = emitter->shape.ring.outer_r;
+            /* Uniform distribution in ring area */
+            float r_sq = inner_r * inner_r +
+                         emitter_random_float(emitter) * (outer_r * outer_r - inner_r * inner_r);
+            float r = sqrtf(r_sq);
+            base_x = emitter->shape.ring.cx + r * cosf(angle);
+            base_y = emitter->shape.ring.cy + r * sinf(angle);
+            break;
+        }
+
     default:
         base_x = 0.0f;
         base_y = 0.0f;
@@ -357,11 +646,55 @@ static void emitter_init_particle(particle_emitter_t *emitter, particle_t *parti
     particle->scale_start = emitter->scale_start;
     particle->scale_end = emitter->scale_end;
 
-    /* Set color */
-    particle->color = emitter->particle_color;
+    /* Set color gradient properties (Requirements 6.3, 6.5) */
+    particle->color_start = emitter->color_start;
+    particle->color_end = emitter->color_end;
+    particle->color_mode = (uint8_t)emitter->color_mode;
+
+    /* Set opacity easing (Requirements 7.2, 7.5) */
+    particle->opacity_easing = (uint8_t)emitter->opacity_easing;
+
+    /* Set rotation alignment (Requirements 8.3, 8.4) */
+    particle->align_velocity = emitter->align_velocity;
+
+    /* Set emitter reference for callbacks */
+    particle->emitter_ref = emitter;
+
+    /* Set color based on color mode */
+    switch (emitter->color_mode)
+    {
+    case PARTICLE_COLOR_SOLID:
+        particle->color = emitter->color_start;
+        break;
+    case PARTICLE_COLOR_RANDOM:
+        if (emitter->palette_size > 0)
+        {
+            uint32_t idx = emitter_random(emitter) % emitter->palette_size;
+            particle->color = emitter->color_palette[idx];
+        }
+        else
+        {
+            particle->color = emitter->particle_color;
+        }
+        break;
+    case PARTICLE_COLOR_GRADIENT:
+    case PARTICLE_COLOR_RAINBOW:
+        /* Start with start color, will be interpolated during update */
+        particle->color = emitter->color_start;
+        break;
+    default:
+        particle->color = emitter->particle_color;
+        break;
+    }
 
     /* Set image */
     particle->image = emitter->particle_image;
+
+    /* Call on_particle_init callback if set (Requirements 17.1) */
+    if (emitter->on_particle_init != NULL)
+    {
+        emitter->on_particle_init(particle, emitter->user_data);
+    }
 }
 
 

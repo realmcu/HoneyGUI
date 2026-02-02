@@ -11,6 +11,7 @@
 #include "particle_system.h"
 #include "particle_trajectory.h"
 #include <string.h>
+#include <math.h>
 
 /* ============================================================================
  * Helper Functions
@@ -43,6 +44,106 @@ static uint8_t lerp_u8(uint8_t start, uint8_t end, float t)
     if (result < 0.0f) { return 0; }
     if (result > 255.0f) { return 255; }
     return (uint8_t)result;
+}
+
+/**
+ * @brief Apply easing function to a normalized time value
+ * @param t Normalized time [0, 1]
+ * @param easing Easing type (0=LINEAR, 1=EASE_IN, 2=EASE_OUT, 3=EASE_IN_OUT)
+ * @return Eased time value [0, 1]
+ */
+static float apply_easing(float t, uint8_t easing)
+{
+    switch (easing)
+    {
+    case 0: /* LINEAR */
+        return t;
+    case 1: /* EASE_IN - quadratic */
+        return t * t;
+    case 2: /* EASE_OUT - quadratic */
+        return 1.0f - (1.0f - t) * (1.0f - t);
+    case 3: /* EASE_IN_OUT - smooth step */
+        return t * t * (3.0f - 2.0f * t);
+    default:
+        return t;
+    }
+}
+
+/**
+ * @brief Interpolate between two ARGB8888 colors
+ * @param color_start Start color
+ * @param color_end End color
+ * @param t Interpolation factor [0, 1]
+ * @return Interpolated color
+ */
+static uint32_t lerp_color(uint32_t color_start, uint32_t color_end, float t)
+{
+    /* Extract ARGB components */
+    uint8_t a1 = (color_start >> 24) & 0xFF;
+    uint8_t r1 = (color_start >> 16) & 0xFF;
+    uint8_t g1 = (color_start >> 8) & 0xFF;
+    uint8_t b1 = color_start & 0xFF;
+
+    uint8_t a2 = (color_end >> 24) & 0xFF;
+    uint8_t r2 = (color_end >> 16) & 0xFF;
+    uint8_t g2 = (color_end >> 8) & 0xFF;
+    uint8_t b2 = color_end & 0xFF;
+
+    /* Interpolate each component */
+    uint8_t a = lerp_u8(a1, a2, t);
+    uint8_t r = lerp_u8(r1, r2, t);
+    uint8_t g = lerp_u8(g1, g2, t);
+    uint8_t b = lerp_u8(b1, b2, t);
+
+    /* Combine back to ARGB8888 */
+    return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
+}
+
+/**
+ * @brief Convert HSV to RGB color
+ * @param h Hue [0, 360)
+ * @param s Saturation [0, 1]
+ * @param v Value [0, 1]
+ * @return RGB color in ARGB8888 format (alpha = 255)
+ */
+static uint32_t hsv_to_rgb(float h, float s, float v)
+{
+    float c = v * s;
+    float x = c * (1.0f - fabsf(fmodf(h / 60.0f, 2.0f) - 1.0f));
+    float m = v - c;
+
+    float r_prime, g_prime, b_prime;
+
+    if (h < 60.0f)
+    {
+        r_prime = c; g_prime = x; b_prime = 0.0f;
+    }
+    else if (h < 120.0f)
+    {
+        r_prime = x; g_prime = c; b_prime = 0.0f;
+    }
+    else if (h < 180.0f)
+    {
+        r_prime = 0.0f; g_prime = c; b_prime = x;
+    }
+    else if (h < 240.0f)
+    {
+        r_prime = 0.0f; g_prime = x; b_prime = c;
+    }
+    else if (h < 300.0f)
+    {
+        r_prime = x; g_prime = 0.0f; b_prime = c;
+    }
+    else
+    {
+        r_prime = c; g_prime = 0.0f; b_prime = x;
+    }
+
+    uint8_t r = (uint8_t)((r_prime + m) * 255.0f);
+    uint8_t g = (uint8_t)((g_prime + m) * 255.0f);
+    uint8_t b = (uint8_t)((b_prime + m) * 255.0f);
+
+    return 0xFF000000 | ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
 }
 
 /* ============================================================================
@@ -209,10 +310,84 @@ void particle_system_remove_emitter(particle_system_t *ps, particle_emitter_t *e
  * ============================================================================ */
 
 /**
+ * @brief Call on_particle_update callback if set (Requirements 17.2)
+ *
+ * Safely invokes the on_particle_update callback for a particle,
+ * passing the user_data from the emitter.
+ *
+ * @param particle Particle to update
+ */
+static void particle_call_update_callback(particle_t *particle)
+{
+    if (particle == NULL || particle->emitter_ref == NULL)
+    {
+        return;
+    }
+
+    particle_emitter_t *emitter = (particle_emitter_t *)particle->emitter_ref;
+
+    /* Call on_particle_update callback if set (Requirements 17.2, 17.8) */
+    if (emitter->on_particle_update != NULL)
+    {
+        emitter->on_particle_update(particle, emitter->user_data);
+    }
+}
+
+/**
+ * @brief Call on_particle_death callback if set (Requirements 17.4)
+ *
+ * Safely invokes the on_particle_death callback for a particle,
+ * passing the user_data from the emitter.
+ *
+ * @param particle Particle that is dying
+ */
+static void particle_call_death_callback(particle_t *particle)
+{
+    if (particle == NULL || particle->emitter_ref == NULL)
+    {
+        return;
+    }
+
+    particle_emitter_t *emitter = (particle_emitter_t *)particle->emitter_ref;
+
+    /* Call on_particle_death callback if set (Requirements 17.4, 17.8) */
+    if (emitter->on_particle_death != NULL)
+    {
+        emitter->on_particle_death(particle, emitter->user_data);
+    }
+}
+
+/**
+ * @brief Call on_particle_render callback if set (Requirements 17.3)
+ *
+ * Safely invokes the on_particle_render callback for a particle,
+ * passing the user_data from the emitter.
+ *
+ * @param particle Particle to render
+ */
+static void particle_call_render_callback(particle_t *particle)
+{
+    if (particle == NULL || particle->emitter_ref == NULL)
+    {
+        return;
+    }
+
+    particle_emitter_t *emitter = (particle_emitter_t *)particle->emitter_ref;
+
+    /* Call on_particle_render callback if set (Requirements 17.3, 17.8) */
+    if (emitter->on_particle_render != NULL)
+    {
+        emitter->on_particle_render(particle, emitter->user_data);
+    }
+}
+
+/**
  * @brief Update particle lifecycle and gradients
  *
- * Updates particle life, opacity gradient, and scale gradient based on
- * remaining life ratio.
+ * Updates particle life, opacity gradient (with easing), scale gradient,
+ * color gradient, and velocity-aligned rotation based on remaining life ratio.
+ *
+ * Requirements: 6.5 (color gradient), 7.5 (opacity easing), 8.4 (velocity alignment)
  */
 static void particle_update_lifecycle(particle_t *particle, float dt_ms)
 {
@@ -242,15 +417,42 @@ static void particle_update_lifecycle(particle_t *particle, float dt_ms)
         life_ratio = (float)particle->life / (float)particle->max_life;
     }
 
-    /* Apply opacity gradient (linear interpolation) */
+    /* Calculate progress (0.0 = just born, 1.0 = dead) for easing */
+    float progress = 1.0f - life_ratio;
+
+    /* Apply opacity gradient with easing (Requirements 7.2, 7.5) */
     /* At life_ratio=1.0 (start), opacity = opacity_start */
     /* At life_ratio=0.0 (end), opacity = opacity_end */
-    particle->opacity = lerp_u8(particle->opacity_end, particle->opacity_start, life_ratio);
+    float eased_progress = apply_easing(progress, particle->opacity_easing);
+    particle->opacity = lerp_u8(particle->opacity_start, particle->opacity_end, eased_progress);
 
     /* Apply scale gradient (linear interpolation) */
     /* At life_ratio=1.0 (start), scale = scale_start */
     /* At life_ratio=0.0 (end), scale = scale_end */
-    particle->scale = lerp(particle->scale_end, particle->scale_start, life_ratio);
+    particle->scale = lerp(particle->scale_start, particle->scale_end, progress);
+
+    /* Apply color gradient based on color mode (Requirements 6.3, 6.5) */
+    switch (particle->color_mode)
+    {
+    case 0: /* SOLID - no change */
+        break;
+    case 1: /* RANDOM - color already set at init, no change */
+        break;
+    case 2: /* GRADIENT - interpolate from start to end color */
+        /* At life_ratio=1.0 (start), color = color_start */
+        /* At life_ratio=0.0 (end), color = color_end */
+        particle->color = lerp_color(particle->color_start, particle->color_end, progress);
+        break;
+    case 3: /* RAINBOW - cycle through hue over lifetime */
+        {
+            /* Hue cycles from 0 to 360 over particle lifetime */
+            float hue = progress * 360.0f;
+            particle->color = hsv_to_rgb(hue, 1.0f, 1.0f);
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 /**
@@ -260,76 +462,91 @@ static void particle_update_lifecycle(particle_t *particle, float dt_ms)
  */
 static uint8_t particle_check_boundary(particle_system_t *ps, particle_t *particle)
 {
-    if (ps == NULL || particle == NULL || !ps->bound_enabled)
+    if (ps == NULL || particle == NULL)
     {
         return 0;
     }
 
-    uint8_t out_of_bounds = 0;
-    uint8_t hit_left = particle->x < ps->bound_left;
-    uint8_t hit_right = particle->x > ps->bound_right;
-    uint8_t hit_top = particle->y < ps->bound_top;
-    uint8_t hit_bottom = particle->y > ps->bound_bottom;
-
-    if (hit_left || hit_right || hit_top || hit_bottom)
+    /* Get boundary config from particle's emitter */
+    particle_emitter_t *emitter = (particle_emitter_t *)particle->emitter_ref;
+    if (emitter == NULL || emitter->boundary_behavior == PARTICLE_BOUNDARY_NONE)
     {
-        out_of_bounds = 1;
+        /* Fall back to system-level boundary if no emitter or NONE behavior */
+        if (!ps->bound_enabled)
+        {
+            return 0;
+        }
+        /* Use system boundary with default KILL behavior */
+        if (particle->x < ps->bound_left || particle->x > ps->bound_right ||
+            particle->y < ps->bound_top || particle->y > ps->bound_bottom)
+        {
+            return 1;
+        }
+        return 0;
     }
 
-    if (!out_of_bounds)
+    /* Use emitter's boundary configuration */
+    float bound_left = emitter->boundary_left;
+    float bound_top = emitter->boundary_top;
+    float bound_right = emitter->boundary_right;
+    float bound_bottom = emitter->boundary_bottom;
+
+    uint8_t hit_left = particle->x < bound_left;
+    uint8_t hit_right = particle->x > bound_right;
+    uint8_t hit_top = particle->y < bound_top;
+    uint8_t hit_bottom = particle->y > bound_bottom;
+
+    if (!hit_left && !hit_right && !hit_top && !hit_bottom)
     {
         return 0;
     }
 
-    switch (ps->bound_behavior)
+    switch (emitter->boundary_behavior)
     {
-    case BOUNDARY_BEHAVIOR_KILL:
-        /* Kill particle when crossing boundary */
+    case PARTICLE_BOUNDARY_KILL:
         return 1;
 
-    case BOUNDARY_BEHAVIOR_REFLECT:
-        /* Reflect velocity on boundary collision */
+    case PARTICLE_BOUNDARY_REFLECT:
         if (hit_left)
         {
-            particle->x = ps->bound_left;
-            particle->vx = -particle->vx;
+            particle->x = bound_left;
+            particle->vx = -particle->vx * emitter->boundary_reflect_damping;
         }
         else if (hit_right)
         {
-            particle->x = ps->bound_right;
-            particle->vx = -particle->vx;
+            particle->x = bound_right;
+            particle->vx = -particle->vx * emitter->boundary_reflect_damping;
         }
 
         if (hit_top)
         {
-            particle->y = ps->bound_top;
-            particle->vy = -particle->vy;
+            particle->y = bound_top;
+            particle->vy = -particle->vy * emitter->boundary_reflect_damping;
         }
         else if (hit_bottom)
         {
-            particle->y = ps->bound_bottom;
-            particle->vy = -particle->vy;
+            particle->y = bound_bottom;
+            particle->vy = -particle->vy * emitter->boundary_reflect_damping;
         }
         return 0;
 
-    case BOUNDARY_BEHAVIOR_WRAP:
-        /* Wrap to opposite side */
+    case PARTICLE_BOUNDARY_WRAP:
         if (hit_left)
         {
-            particle->x = ps->bound_right;
+            particle->x = bound_right;
         }
         else if (hit_right)
         {
-            particle->x = ps->bound_left;
+            particle->x = bound_left;
         }
 
         if (hit_top)
         {
-            particle->y = ps->bound_bottom;
+            particle->y = bound_bottom;
         }
         else if (hit_bottom)
         {
-            particle->y = ps->bound_top;
+            particle->y = bound_top;
         }
         return 0;
 
@@ -390,6 +607,239 @@ static void particle_system_update_throttle(particle_system_t *ps)
 
 
 /* ============================================================================
+ * Behavior Mode Helper Functions (Requirements 10.1-10.7)
+ * ============================================================================ */
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+#define M_PI_F 3.14159265358979323846f
+
+/**
+ * @brief Update emitter behavior based on behavior mode
+ *
+ * Implements various behavior modes:
+ * - FOLLOW_TOUCH: Emitter position follows touch/pointer
+ * - TRAIL: Emission angle is opposite to movement direction
+ * - PULSE: Emission rate varies periodically
+ * - BREATHE: Opacity varies periodically
+ *
+ * Requirements: 10.1-10.7
+ *
+ * @param emitter Emitter to update
+ * @param dt Delta time in seconds
+ * @param current_time Current time in milliseconds
+ */
+static void update_emitter_behavior(particle_emitter_t *emitter, float dt, uint32_t current_time)
+{
+    if (emitter == NULL)
+    {
+        return;
+    }
+
+    (void)dt; /* May be used in future implementations */
+
+    switch (emitter->behavior_mode)
+    {
+    case PARTICLE_BEHAVIOR_NONE:
+        /* No special behavior */
+        break;
+
+    case PARTICLE_BEHAVIOR_FOLLOW_TOUCH:
+        /* Position following is handled externally via particle_emitter_set_follow_position */
+        /* The emitter shape position is updated based on follow_x, follow_y in emit function */
+        break;
+
+    case PARTICLE_BEHAVIOR_TRAIL:
+        /* Calculate emission angle opposite to movement direction (Requirements 10.7) */
+        if (emitter->has_prev_position)
+        {
+            float dx = emitter->follow_x - emitter->prev_follow_x;
+            float dy = emitter->follow_y - emitter->prev_follow_y;
+            float dist_sq = dx * dx + dy * dy;
+
+            if (dist_sq > 0.01f)  /* Only update if there's significant movement */
+            {
+                /* Calculate movement direction */
+                float move_angle = atan2f(dy, dx);
+
+                /* Emission angle is opposite to movement (180 degrees offset) */
+                float trail_angle = move_angle + M_PI_F;
+
+                /* Set emission angle range centered on trail angle with some spread */
+                float spread = 0.3f;  /* ~17 degrees spread */
+                emitter->angle_min = trail_angle - spread;
+                emitter->angle_max = trail_angle + spread;
+            }
+        }
+
+        /* Update previous position for next frame */
+        emitter->prev_follow_x = emitter->follow_x;
+        emitter->prev_follow_y = emitter->follow_y;
+        emitter->has_prev_position = 1;
+        break;
+
+    case PARTICLE_BEHAVIOR_TOUCH_FEEDBACK:
+        /* Touch feedback is handled externally via burst/continuous emission */
+        /* Tap: burst, Drag: continuous, Release: burst */
+        break;
+
+    case PARTICLE_BEHAVIOR_PULSE:
+        /* Periodic emission rate variation (Requirements 10.5) */
+        if (emitter->pulse_frequency > 0.0f)
+        {
+            float time_sec = (float)current_time / 1000.0f;
+            float phase = time_sec * emitter->pulse_frequency * 2.0f * M_PI_F;
+            float pulse_factor = 0.5f + 0.5f * sinf(phase);  /* Range [0, 1] */
+
+            /* Apply pulse amplitude to emission rate */
+            /* Base rate is modified by pulse_amplitude * pulse_factor */
+            /* Store original rate if not already stored */
+            float base_rate = emitter->emit_rate / (1.0f + emitter->pulse_amplitude * 0.5f);
+            emitter->emit_rate = base_rate * (1.0f + emitter->pulse_amplitude * pulse_factor);
+
+            /* Clamp to valid range */
+            emitter->emit_rate = particle_emitter_clamp_rate(emitter->emit_rate);
+        }
+        break;
+
+    case PARTICLE_BEHAVIOR_BREATHE:
+        /* Periodic opacity variation (Requirements 10.6) */
+        if (emitter->breathe_frequency > 0.0f)
+        {
+            float time_sec = (float)current_time / 1000.0f;
+            float phase = time_sec * emitter->breathe_frequency * 2.0f * M_PI_F;
+            float breathe_factor = 0.5f + 0.5f * sinf(phase);  /* Range [0, 1] */
+
+            /* Modify opacity start/end based on breathe factor */
+            /* This creates a breathing effect where particles fade in and out */
+            uint8_t base_opacity = 255;
+            emitter->opacity_start = (uint8_t)(base_opacity * breathe_factor);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+/* ============================================================================
+ * Auto-Cleanup Helper Functions (Requirements 5.2, 5.5)
+ * ============================================================================ */
+
+/**
+ * @brief Count active particles belonging to a specific emitter
+ * @param ps Particle system
+ * @param emitter Emitter to count particles for
+ * @return Number of active particles belonging to the emitter
+ */
+static uint16_t count_emitter_particles(particle_system_t *ps, particle_emitter_t *emitter)
+{
+    if (ps == NULL || ps->pool == NULL || emitter == NULL)
+    {
+        return 0;
+    }
+
+    uint16_t count = 0;
+    uint16_t capacity = particle_pool_get_capacity(ps->pool);
+
+    for (uint16_t i = 0; i < capacity; i++)
+    {
+        particle_t *particle = &ps->pool->particles[i];
+        if (particle->active && particle->emitter_ref == emitter)
+        {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+/**
+ * @brief Check and perform auto-cleanup for emitters
+ *
+ * Removes and destroys emitters that have auto_cleanup enabled and
+ * have no remaining active particles.
+ *
+ * Requirements: 5.2, 5.5
+ *
+ * @param ps Particle system
+ */
+static void particle_system_auto_cleanup(particle_system_t *ps)
+{
+    if (ps == NULL)
+    {
+        return;
+    }
+
+    /* Iterate backwards to safely remove emitters */
+    for (int i = ps->emitter_count - 1; i >= 0; i--)
+    {
+        particle_emitter_t *emitter = ps->emitters[i];
+        if (emitter == NULL)
+        {
+            continue;
+        }
+
+        /* Check if auto-cleanup is enabled for this emitter */
+        if (!emitter->auto_cleanup)
+        {
+            continue;
+        }
+
+        /* Check if emitter is disabled (stopped emitting) */
+        if (emitter->enabled)
+        {
+            /* Emitter is still active, check if it should be disabled */
+            /* based on effect_duration or loop settings */
+            if (emitter->effect_duration > 0 && !emitter->loop)
+            {
+                /* Check if effect duration has elapsed */
+                uint32_t current_time = 0;
+                if (ps->platform.get_time_fn != NULL)
+                {
+                    current_time = ps->platform.get_time_fn();
+                }
+                uint32_t elapsed = current_time - emitter->start_time;
+                if (elapsed >= emitter->effect_duration)
+                {
+                    /* Disable emitter - it will be cleaned up when particles expire */
+                    emitter->enabled = 0;
+                }
+            }
+            continue;
+        }
+
+        /* Emitter is disabled, check if all its particles have expired */
+        uint16_t particle_count = count_emitter_particles(ps, emitter);
+        if (particle_count == 0)
+        {
+            /* All particles expired, remove and destroy emitter */
+            /* Call on_emitter_stop callback if set */
+            if (emitter->on_emitter_stop != NULL)
+            {
+                emitter->on_emitter_stop(emitter, emitter->user_data);
+            }
+
+            /* Remove from emitter array */
+            for (int j = i; j < ps->emitter_count - 1; j++)
+            {
+                ps->emitters[j] = ps->emitters[j + 1];
+            }
+            ps->emitters[ps->emitter_count - 1] = NULL;
+            ps->emitter_count--;
+
+            /* Destroy the emitter */
+            if (ps->platform.free_fn != NULL)
+            {
+                ps->platform.free_fn(emitter);
+            }
+        }
+    }
+}
+
+/* ============================================================================
  * Main Update and Render Functions
  * ============================================================================ */
 
@@ -405,13 +855,24 @@ void particle_system_update(particle_system_t *ps, float dt)
     /* Update auto-throttle factor */
     particle_system_update_throttle(ps);
 
-    /* Emit particles from all emitters (with throttling) */
+    /* Get current time for behavior modes */
+    uint32_t current_time = 0;
+    if (ps->platform.get_time_fn != NULL)
+    {
+        current_time = ps->platform.get_time_fn();
+    }
+
+    /* Update emitter behaviors and emit particles (with throttling) */
     float throttled_dt = dt * ps->throttle_factor;
     for (int i = 0; i < ps->emitter_count; i++)
     {
         particle_emitter_t *emitter = ps->emitters[i];
         if (emitter != NULL && emitter->enabled)
         {
+            /* Update behavior mode (Requirements 10.1-10.7) */
+            update_emitter_behavior(emitter, dt, current_time);
+
+            /* Emit particles */
             particle_emitter_emit(emitter, ps->pool, throttled_dt);
         }
     }
@@ -449,12 +910,28 @@ void particle_system_update(particle_system_t *ps, float dt)
 
         trajectory_apply(particle, traj, dt);
 
+        /* Apply velocity-aligned rotation if enabled (Requirements 8.3, 8.4) */
+        if (particle->align_velocity)
+        {
+            /* Only align if particle has non-zero velocity */
+            float speed_sq = particle->vx * particle->vx + particle->vy * particle->vy;
+            if (speed_sq > 0.0001f)  /* Small threshold to avoid division by zero */
+            {
+                particle->rotation = atan2f(particle->vy, particle->vx);
+            }
+        }
+
         /* Update lifecycle and gradients */
         particle_update_lifecycle(particle, dt_ms);
+
+        /* Call on_particle_update callback (Requirements 17.2, 17.7, 17.8, 17.9) */
+        particle_call_update_callback(particle);
 
         /* Check if particle should be recycled (life ended) */
         if (particle->life == 0)
         {
+            /* Call on_particle_death callback before freeing (Requirements 17.4) */
+            particle_call_death_callback(particle);
             particle_pool_free(ps->pool, particle);
             continue;
         }
@@ -463,10 +940,15 @@ void particle_system_update(particle_system_t *ps, float dt)
         if (particle_check_boundary(ps, particle))
         {
             /* Particle crossed boundary and should be killed */
+            /* Call on_particle_death callback before freeing (Requirements 17.4) */
+            particle_call_death_callback(particle);
             particle_pool_free(ps->pool, particle);
             continue;
         }
     }
+
+    /* Perform auto-cleanup for emitters (Requirements 5.2, 5.5) */
+    particle_system_auto_cleanup(ps);
 }
 
 void particle_system_render(particle_system_t *ps)
@@ -484,6 +966,9 @@ void particle_system_render(particle_system_t *ps)
 
         if (particle->active)
         {
+            /* Call on_particle_render callback before rendering (Requirements 17.3, 17.7, 17.8, 17.9) */
+            particle_call_render_callback(particle);
+
             ps->render_cb(particle, ps->render_ctx);
         }
     }

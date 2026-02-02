@@ -10,6 +10,7 @@
  *                        Header Files
  *============================================================================*/
 #include <string.h>
+#include <math.h>
 #include "gui_particle_widget.h"
 #include "gui_obj.h"
 #include "gui_api.h"
@@ -469,6 +470,16 @@ static void gui_particle_widget_ctor(gui_particle_widget_t *widget,
         }
     }
 
+    /* Initialize effect management */
+    for (int i = 0; i < PARTICLE_WIDGET_MAX_EFFECTS; i++)
+    {
+        widget->effects[i].handle = PARTICLE_INVALID_HANDLE;
+        widget->effects[i].emitter = NULL;
+        widget->effects[i].behavior = PARTICLE_BEHAVIOR_NONE;
+        widget->effects[i].active = 0;
+    }
+    widget->next_handle = 1;  /* Start from 1, 0 is invalid */
+
     /* Initialize effect state */
     widget->trail_emitter = NULL;
     widget->touch_emitter = NULL;
@@ -532,308 +543,6 @@ void gui_particle_widget_set_default_image(gui_particle_widget_t *widget, void *
     widget->default_image = image;
 }
 
-void gui_particle_widget_add_firework(gui_particle_widget_t *widget,
-                                      float x, float y, uint8_t count)
-{
-    gui_particle_widget_add_firework_color(widget, x, y, count, 0xFFFFFFFF);
-}
-
-void gui_particle_widget_add_firework_color(gui_particle_widget_t *widget,
-                                            float x, float y, uint8_t count, uint32_t color)
-{
-    if (widget == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    /* Create firework emitter */
-    particle_emitter_t *emitter = effect_firework_create(&widget->config, x, y, count);
-    if (emitter == NULL)
-    {
-        return;
-    }
-
-    /* Set color */
-    particle_emitter_set_color(emitter, color);
-
-    /* Set default image if available */
-    if (widget->default_image != NULL)
-    {
-        particle_emitter_set_image(emitter, widget->default_image);
-    }
-
-    /* Add to system and trigger burst */
-    if (particle_system_add_emitter(widget->ps, emitter))
-    {
-        particle_emitter_burst(emitter, widget->ps->pool, count);
-        /* Disable continuous emission after burst */
-        particle_emitter_enable(emitter, 0);
-    }
-    else
-    {
-        /* Failed to add, destroy emitter */
-        particle_emitter_destroy(emitter, &widget->config);
-    }
-}
-
-void gui_particle_widget_add_trail(gui_particle_widget_t *widget)
-{
-    gui_particle_widget_add_trail_color(widget, 0xFFFFFFFF);
-}
-
-void gui_particle_widget_add_trail_color(gui_particle_widget_t *widget, uint32_t color)
-{
-    if (widget == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    /* Only add one trail emitter */
-    if (widget->trail_emitter != NULL)
-    {
-        return;
-    }
-
-    /* Create trail emitter */
-    widget->trail_emitter = effect_trail_create(&widget->config);
-    if (widget->trail_emitter == NULL)
-    {
-        return;
-    }
-
-    /* Set color */
-    particle_emitter_set_color(widget->trail_emitter, color);
-
-    /* Set default image if available */
-    if (widget->default_image != NULL)
-    {
-        particle_emitter_set_image(widget->trail_emitter, widget->default_image);
-    }
-
-    /* Add to system */
-    if (!particle_system_add_emitter(widget->ps, widget->trail_emitter))
-    {
-        particle_emitter_destroy(widget->trail_emitter, &widget->config);
-        widget->trail_emitter = NULL;
-    }
-}
-
-void gui_particle_widget_update_trail(gui_particle_widget_t *widget, float x, float y)
-{
-    if (widget == NULL || widget->trail_emitter == NULL)
-    {
-        return;
-    }
-
-    /* Always update follow position first */
-    particle_emitter_set_follow_position(widget->trail_emitter, x, y);
-    particle_emitter_enable(widget->trail_emitter, 1);
-
-    /* Update trail with current and previous positions */
-    if (widget->trail_active)
-    {
-        effect_trail_update(widget->trail_emitter, x, y, widget->prev_x, widget->prev_y);
-    }
-
-    /* Store current position for next update */
-    widget->prev_x = x;
-    widget->prev_y = y;
-    widget->trail_active = 1;
-}
-
-void gui_particle_widget_stop_trail(gui_particle_widget_t *widget)
-{
-    if (widget == NULL || widget->trail_emitter == NULL)
-    {
-        return;
-    }
-
-    /* Disable emitter and reset tracking state */
-    particle_emitter_enable(widget->trail_emitter, 0);
-    widget->trail_active = 0;
-}
-
-void gui_particle_widget_add_touch(gui_particle_widget_t *widget)
-{
-    gui_particle_widget_add_touch_color(widget, 0xFFFFFFFF);
-}
-
-void gui_particle_widget_add_touch_color(gui_particle_widget_t *widget, uint32_t color)
-{
-    if (widget == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    /* Only add one touch emitter */
-    if (widget->touch_emitter != NULL)
-    {
-        return;
-    }
-
-    /* Create touch emitter */
-    widget->touch_emitter = effect_touch_create(&widget->config);
-    if (widget->touch_emitter == NULL)
-    {
-        return;
-    }
-
-    /* Set color */
-    particle_emitter_set_color(widget->touch_emitter, color);
-
-    /* Set default image if available */
-    if (widget->default_image != NULL)
-    {
-        particle_emitter_set_image(widget->touch_emitter, widget->default_image);
-    }
-
-    /* Add to system */
-    if (!particle_system_add_emitter(widget->ps, widget->touch_emitter))
-    {
-        particle_emitter_destroy(widget->touch_emitter, &widget->config);
-        widget->touch_emitter = NULL;
-    }
-}
-
-void gui_particle_widget_touch_tap(gui_particle_widget_t *widget, float x, float y)
-{
-    if (widget == NULL || widget->touch_emitter == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    effect_touch_tap(widget->touch_emitter, widget->ps->pool, x, y);
-    widget->touch_active = 1;
-}
-
-void gui_particle_widget_touch_drag(gui_particle_widget_t *widget, float x, float y)
-{
-    if (widget == NULL || widget->touch_emitter == NULL)
-    {
-        return;
-    }
-
-    effect_touch_drag(widget->touch_emitter, x, y);
-}
-
-void gui_particle_widget_touch_release(gui_particle_widget_t *widget, float x, float y)
-{
-    if (widget == NULL || widget->touch_emitter == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    effect_touch_release(widget->touch_emitter, widget->ps->pool, x, y);
-    widget->touch_active = 0;
-}
-
-void gui_particle_widget_add_snow(gui_particle_widget_t *widget, float intensity)
-{
-    gui_particle_widget_add_snow_color(widget, intensity, 0xFFFFFFFF);
-}
-
-void gui_particle_widget_add_snow_color(gui_particle_widget_t *widget, float intensity,
-                                        uint32_t color)
-{
-    if (widget == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    gui_obj_t *obj = (gui_obj_t *)widget;
-
-    /* Create snow emitter */
-    particle_emitter_t *emitter = effect_snow_create(&widget->config, (float)obj->w);
-    if (emitter == NULL)
-    {
-        return;
-    }
-
-    /* Set intensity */
-    effect_snow_set_intensity(emitter, intensity);
-
-    /* Set color */
-    particle_emitter_set_color(emitter, color);
-
-    /* Set default image if available */
-    if (widget->default_image != NULL)
-    {
-        particle_emitter_set_image(emitter, widget->default_image);
-    }
-
-    /* Add to system */
-    if (!particle_system_add_emitter(widget->ps, emitter))
-    {
-        particle_emitter_destroy(emitter, &widget->config);
-    }
-}
-
-void gui_particle_widget_set_snow_intensity(gui_particle_widget_t *widget, float intensity)
-{
-    if (widget == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    /* Find snow emitter and update intensity */
-    /* Note: In a full implementation, we would track the snow emitter reference */
-    for (uint8_t i = 0; i < widget->ps->emitter_count; i++)
-    {
-        particle_emitter_t *emitter = widget->ps->emitters[i];
-        if (emitter != NULL)
-        {
-            /* Check if this looks like a snow emitter (emits from top) */
-            if (emitter->shape.type == EMITTER_SHAPE_LINE &&
-                emitter->shape.line.y1 < 10.0f && emitter->shape.line.y2 < 10.0f)
-            {
-                effect_snow_set_intensity(emitter, intensity);
-                break;
-            }
-        }
-    }
-}
-
-void gui_particle_widget_add_bubble(gui_particle_widget_t *widget)
-{
-    gui_particle_widget_add_bubble_color(widget, 0xFFFFFFFF);
-}
-
-void gui_particle_widget_add_bubble_color(gui_particle_widget_t *widget, uint32_t color)
-{
-    if (widget == NULL || widget->ps == NULL)
-    {
-        return;
-    }
-
-    gui_obj_t *obj = (gui_obj_t *)widget;
-
-    /* Create bubble emitter */
-    particle_emitter_t *emitter = effect_bubble_create(&widget->config,
-                                                       (float)obj->w, (float)obj->h);
-    if (emitter == NULL)
-    {
-        return;
-    }
-
-    /* Set color */
-    particle_emitter_set_color(emitter, color);
-
-    /* Set default image if available */
-    if (widget->default_image != NULL)
-    {
-        particle_emitter_set_image(emitter, widget->default_image);
-    }
-
-    /* Configure boundary reflection for bubbles */
-    particle_system_set_bound_behavior(widget->ps, BOUNDARY_BEHAVIOR_REFLECT);
-
-    /* Add to system */
-    if (!particle_system_add_emitter(widget->ps, emitter))
-    {
-        particle_emitter_destroy(emitter, &widget->config);
-    }
-}
-
 void gui_particle_widget_clear(gui_particle_widget_t *widget)
 {
     if (widget == NULL || widget->ps == NULL)
@@ -865,4 +574,237 @@ void gui_particle_widget_set_update_cb(gui_particle_widget_t *widget,
 
     widget->update_cb = cb;
     widget->update_cb_data = user_data;
+}
+
+/* ============================================================================
+ * Configuration-Driven Effect API Implementation
+ * ============================================================================ */
+
+/**
+ * @brief Find a free effect slot
+ */
+static int find_free_effect_slot(gui_particle_widget_t *widget)
+{
+    for (int i = 0; i < PARTICLE_WIDGET_MAX_EFFECTS; i++)
+    {
+        if (!widget->effects[i].active)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * @brief Find effect entry by handle
+ */
+static particle_effect_entry_t *find_effect_by_handle(gui_particle_widget_t *widget,
+                                                      particle_effect_handle_t handle)
+{
+    if (handle == PARTICLE_INVALID_HANDLE)
+    {
+        return NULL;
+    }
+
+    for (int i = 0; i < PARTICLE_WIDGET_MAX_EFFECTS; i++)
+    {
+        if (widget->effects[i].active && widget->effects[i].handle == handle)
+        {
+            return &widget->effects[i];
+        }
+    }
+    return NULL;
+}
+
+particle_effect_handle_t gui_particle_widget_add_effect(
+    gui_particle_widget_t *widget,
+    const particle_effect_config_t *config)
+{
+    if (widget == NULL || widget->ps == NULL || config == NULL)
+    {
+        return PARTICLE_INVALID_HANDLE;
+    }
+
+    /* Validate configuration */
+    if (particle_effect_config_validate(config) != PARTICLE_CONFIG_OK)
+    {
+        return PARTICLE_INVALID_HANDLE;
+    }
+
+    /* Find a free effect slot */
+    int slot = find_free_effect_slot(widget);
+    if (slot < 0)
+    {
+        return PARTICLE_INVALID_HANDLE;
+    }
+
+    /* Create emitter from configuration */
+    particle_emitter_t *emitter = particle_emitter_create_from_config(config, &widget->config);
+    if (emitter == NULL)
+    {
+        return PARTICLE_INVALID_HANDLE;
+    }
+
+    /* Set default image if available and no texture specified */
+    if (emitter->particle_image == NULL && widget->default_image != NULL)
+    {
+        emitter->particle_image = widget->default_image;
+    }
+
+    /* Add emitter to particle system */
+    if (!particle_system_add_emitter(widget->ps, emitter))
+    {
+        particle_emitter_destroy(emitter, &widget->config);
+        return PARTICLE_INVALID_HANDLE;
+    }
+
+    /* Assign handle and store effect entry */
+    particle_effect_handle_t handle = widget->next_handle++;
+    widget->effects[slot].handle = handle;
+    widget->effects[slot].emitter = emitter;
+    widget->effects[slot].behavior = config->behavior.mode;
+    widget->effects[slot].active = 1;
+
+    /* Handle wrap-around (skip 0 which is invalid) */
+    if (widget->next_handle == 0)
+    {
+        widget->next_handle = 1;
+    }
+
+    /* Set up touch event handling based on behavior mode (Requirements 14.4) */
+    switch (config->behavior.mode)
+    {
+    case PARTICLE_BEHAVIOR_FOLLOW_TOUCH:
+    case PARTICLE_BEHAVIOR_TRAIL:
+    case PARTICLE_BEHAVIOR_TOUCH_FEEDBACK:
+        /* Enable follow mode for touch-interactive behaviors */
+        particle_emitter_enable_follow(emitter, 1);
+        break;
+    default:
+        break;
+    }
+
+    /* If burst mode is enabled, trigger initial burst */
+    if (config->emission.burst_enabled && config->emission.burst_count > 0)
+    {
+        particle_emitter_burst(emitter, widget->ps->pool, config->emission.burst_count);
+        /* For single burst effects, disable continuous emission */
+        if (config->emission.burst_interval == 0 && !config->lifecycle.loop)
+        {
+            particle_emitter_enable(emitter, 0);
+        }
+    }
+
+    return handle;
+}
+
+void gui_particle_widget_remove_effect(gui_particle_widget_t *widget,
+                                       particle_effect_handle_t handle)
+{
+    if (widget == NULL || widget->ps == NULL)
+    {
+        return;
+    }
+
+    particle_effect_entry_t *entry = find_effect_by_handle(widget, handle);
+    if (entry == NULL)
+    {
+        return;
+    }
+
+    /* Remove emitter from particle system */
+    if (entry->emitter != NULL)
+    {
+        particle_system_remove_emitter(widget->ps, entry->emitter);
+        particle_emitter_destroy(entry->emitter, &widget->config);
+    }
+
+    /* Clear effect entry */
+    entry->handle = PARTICLE_INVALID_HANDLE;
+    entry->emitter = NULL;
+    entry->behavior = PARTICLE_BEHAVIOR_NONE;
+    entry->active = 0;
+}
+
+void gui_particle_widget_trigger_burst(gui_particle_widget_t *widget,
+                                       particle_effect_handle_t handle)
+{
+    if (widget == NULL || widget->ps == NULL)
+    {
+        return;
+    }
+
+    particle_effect_entry_t *entry = find_effect_by_handle(widget, handle);
+    if (entry == NULL || entry->emitter == NULL)
+    {
+        return;
+    }
+
+    /* Trigger burst using emitter's configured burst count */
+    particle_emitter_burst(entry->emitter, widget->ps->pool, entry->emitter->burst_count);
+}
+
+void gui_particle_widget_update_position(gui_particle_widget_t *widget,
+                                         particle_effect_handle_t handle,
+                                         float x, float y)
+{
+    if (widget == NULL)
+    {
+        return;
+    }
+
+    particle_effect_entry_t *entry = find_effect_by_handle(widget, handle);
+    if (entry == NULL || entry->emitter == NULL)
+    {
+        return;
+    }
+
+    /* Update follow position and enable emitter */
+    particle_emitter_set_follow_position(entry->emitter, x, y);
+    particle_emitter_enable(entry->emitter, 1);
+
+    /* For TRAIL mode, update trail direction based on movement */
+    if (entry->behavior == PARTICLE_BEHAVIOR_TRAIL)
+    {
+        if (entry->emitter->has_prev_position)
+        {
+            /* Calculate movement direction and set emission angle opposite to it */
+            float dx = x - entry->emitter->prev_follow_x;
+            float dy = y - entry->emitter->prev_follow_y;
+            float dist_sq = dx * dx + dy * dy;
+
+            if (dist_sq > 1.0f)  /* Only update if moved significantly */
+            {
+                float angle = atan2f(dy, dx);
+                /* Emit opposite to movement direction */
+                float opposite_angle = angle + 3.14159265358979323846f;
+                float spread = 0.5f;  /* ~30 degrees spread */
+                entry->emitter->angle_min = opposite_angle - spread;
+                entry->emitter->angle_max = opposite_angle + spread;
+            }
+        }
+
+        /* Store current position for next update */
+        entry->emitter->prev_follow_x = x;
+        entry->emitter->prev_follow_y = y;
+        entry->emitter->has_prev_position = 1;
+    }
+}
+
+void gui_particle_widget_stop_effect(gui_particle_widget_t *widget,
+                                     particle_effect_handle_t handle)
+{
+    if (widget == NULL)
+    {
+        return;
+    }
+
+    particle_effect_entry_t *entry = find_effect_by_handle(widget, handle);
+    if (entry == NULL || entry->emitter == NULL)
+    {
+        return;
+    }
+
+    /* Disable emitter to stop particle emission */
+    particle_emitter_enable(entry->emitter, 0);
 }
