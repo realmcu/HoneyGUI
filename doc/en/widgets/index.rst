@@ -53,6 +53,7 @@ Widgets
     Img <gui_img>
     Text <gui_text>
     3D Model <gui_3D>
+    Video <gui_video>
     View <gui_view>
     List <gui_list>
     Canvas <gui_canvas>

@@ -54,6 +54,7 @@
     图像 (Img) <gui_img>
     文本 (Text) <gui_text>
     3D 模型 (3D Model) <gui_3D>
+    视频 (Video) <gui_video>
     视图 (View) <gui_view>
     列表 (List) <gui_list>
     画布 (Canvas) <gui_canvas>

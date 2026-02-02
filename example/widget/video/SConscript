@@ -1,0 +1,42 @@
+# building script for HoneyGUI
+
+from building import *
+import menu_config
+from SCons.Script import Flatten
+import os
+
+cwd = GetCurrentDir()
+CPPPATH = [cwd]
+CPPPATH += [cwd + '\\root_image']
+src = Split("""
+""")
+
+objs = []
+
+CPPDEFINES = []
+
+
+if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_VIDEO_WIDGET'):
+
+    src += ['example_video.c']
+    CPPDEFINES = ['DRV_LCD_WIDTH=410']
+    CPPDEFINES += ['DRV_LCD_HEIGHT=502']
+    CPPDEFINES += ['DRV_PIXEL_BITS=16']
+    CPPDEFINES += ['DRV_LCD_CORNER_RADIUS=50']
+    if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
+        from honeygui import *
+        
+        print("Target arch is win32, attempting to add prebuilt binary object...")
+        BIN_SUBDIR = os.path.join(cwd, 'root_image')
+        BIN_FILE = os.path.join(BIN_SUBDIR, 'earth_420_410_502_40_lq.mjpg')
+        OBJ_FILE = os.path.join(BIN_SUBDIR, 'earth_420_410_502_40_lq_mjpg.o')
+        result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
+        if result_node:
+            additional_objs = []
+            additional_objs.append(result_node)
+            print(additional_objs)
+            src = Flatten(src + additional_objs)
+
+objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+Return('objs')
