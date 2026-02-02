@@ -144,7 +144,7 @@ typedef struct particle_emitter
     particle_blend_mode_t blend_mode;   /**< Blend mode */
     float base_size;                    /**< Base particle size (px) */
 
-    /* Callback functions (Requirements 17.1-17.9) */
+    /* Callback functions */
     particle_callback_fn on_particle_init;      /**< Called when particle is initialized */
     particle_callback_fn on_particle_update;    /**< Called each frame update */
     particle_callback_fn on_particle_render;    /**< Called before rendering */

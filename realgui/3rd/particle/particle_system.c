@@ -310,7 +310,7 @@ void particle_system_remove_emitter(particle_system_t *ps, particle_emitter_t *e
  * ============================================================================ */
 
 /**
- * @brief Call on_particle_update callback if set (Requirements 17.2)
+ * @brief Call on_particle_update callback if set
  *
  * Safely invokes the on_particle_update callback for a particle,
  * passing the user_data from the emitter.
@@ -326,7 +326,7 @@ static void particle_call_update_callback(particle_t *particle)
 
     particle_emitter_t *emitter = (particle_emitter_t *)particle->emitter_ref;
 
-    /* Call on_particle_update callback if set (Requirements 17.2, 17.8) */
+    /* Call on_particle_update callback if set */
     if (emitter->on_particle_update != NULL)
     {
         emitter->on_particle_update(particle, emitter->user_data);
@@ -334,7 +334,7 @@ static void particle_call_update_callback(particle_t *particle)
 }
 
 /**
- * @brief Call on_particle_death callback if set (Requirements 17.4)
+ * @brief Call on_particle_death callback if set
  *
  * Safely invokes the on_particle_death callback for a particle,
  * passing the user_data from the emitter.
@@ -350,7 +350,7 @@ static void particle_call_death_callback(particle_t *particle)
 
     particle_emitter_t *emitter = (particle_emitter_t *)particle->emitter_ref;
 
-    /* Call on_particle_death callback if set (Requirements 17.4, 17.8) */
+    /* Call on_particle_death callback if set */
     if (emitter->on_particle_death != NULL)
     {
         emitter->on_particle_death(particle, emitter->user_data);
@@ -358,7 +358,7 @@ static void particle_call_death_callback(particle_t *particle)
 }
 
 /**
- * @brief Call on_particle_render callback if set (Requirements 17.3)
+ * @brief Call on_particle_render callback if set
  *
  * Safely invokes the on_particle_render callback for a particle,
  * passing the user_data from the emitter.
@@ -374,7 +374,7 @@ static void particle_call_render_callback(particle_t *particle)
 
     particle_emitter_t *emitter = (particle_emitter_t *)particle->emitter_ref;
 
-    /* Call on_particle_render callback if set (Requirements 17.3, 17.8) */
+    /* Call on_particle_render callback if set */
     if (emitter->on_particle_render != NULL)
     {
         emitter->on_particle_render(particle, emitter->user_data);
@@ -420,7 +420,7 @@ static void particle_update_lifecycle(particle_t *particle, float dt_ms)
     /* Calculate progress (0.0 = just born, 1.0 = dead) for easing */
     float progress = 1.0f - life_ratio;
 
-    /* Apply opacity gradient with easing (Requirements 7.2, 7.5) */
+    /* Apply opacity gradient with easing */
     /* At life_ratio=1.0 (start), opacity = opacity_start */
     /* At life_ratio=0.0 (end), opacity = opacity_end */
     float eased_progress = apply_easing(progress, particle->opacity_easing);
@@ -431,7 +431,7 @@ static void particle_update_lifecycle(particle_t *particle, float dt_ms)
     /* At life_ratio=0.0 (end), scale = scale_end */
     particle->scale = lerp(particle->scale_start, particle->scale_end, progress);
 
-    /* Apply color gradient based on color mode (Requirements 6.3, 6.5) */
+    /* Apply color gradient based on color mode */
     switch (particle->color_mode)
     {
     case 0: /* SOLID - no change */
@@ -607,7 +607,7 @@ static void particle_system_update_throttle(particle_system_t *ps)
 
 
 /* ============================================================================
- * Behavior Mode Helper Functions (Requirements 10.1-10.7)
+ * Behavior Mode Helper Functions
  * ============================================================================ */
 
 #ifndef M_PI
@@ -652,7 +652,7 @@ static void update_emitter_behavior(particle_emitter_t *emitter, float dt, uint3
         break;
 
     case PARTICLE_BEHAVIOR_TRAIL:
-        /* Calculate emission angle opposite to movement direction (Requirements 10.7) */
+        /* Calculate emission angle opposite to movement direction */
         if (emitter->has_prev_position)
         {
             float dx = emitter->follow_x - emitter->prev_follow_x;
@@ -686,7 +686,7 @@ static void update_emitter_behavior(particle_emitter_t *emitter, float dt, uint3
         break;
 
     case PARTICLE_BEHAVIOR_PULSE:
-        /* Periodic emission rate variation (Requirements 10.5) */
+        /* Periodic emission rate variation */
         if (emitter->pulse_frequency > 0.0f)
         {
             float time_sec = (float)current_time / 1000.0f;
@@ -705,7 +705,7 @@ static void update_emitter_behavior(particle_emitter_t *emitter, float dt, uint3
         break;
 
     case PARTICLE_BEHAVIOR_BREATHE:
-        /* Periodic opacity variation (Requirements 10.6) */
+        /* Periodic opacity variation */
         if (emitter->breathe_frequency > 0.0f)
         {
             float time_sec = (float)current_time / 1000.0f;
@@ -725,7 +725,7 @@ static void update_emitter_behavior(particle_emitter_t *emitter, float dt, uint3
 }
 
 /* ============================================================================
- * Auto-Cleanup Helper Functions (Requirements 5.2, 5.5)
+ * Auto-Cleanup Helper Functions
  * ============================================================================ */
 
 /**
@@ -869,7 +869,7 @@ void particle_system_update(particle_system_t *ps, float dt)
         particle_emitter_t *emitter = ps->emitters[i];
         if (emitter != NULL && emitter->enabled)
         {
-            /* Update behavior mode (Requirements 10.1-10.7) */
+            /* Update behavior mode */
             update_emitter_behavior(emitter, dt, current_time);
 
             /* Emit particles */
@@ -910,7 +910,7 @@ void particle_system_update(particle_system_t *ps, float dt)
 
         trajectory_apply(particle, traj, dt);
 
-        /* Apply velocity-aligned rotation if enabled (Requirements 8.3, 8.4) */
+        /* Apply velocity-aligned rotation if enabled */
         if (particle->align_velocity)
         {
             /* Only align if particle has non-zero velocity */
@@ -924,13 +924,13 @@ void particle_system_update(particle_system_t *ps, float dt)
         /* Update lifecycle and gradients */
         particle_update_lifecycle(particle, dt_ms);
 
-        /* Call on_particle_update callback (Requirements 17.2, 17.7, 17.8, 17.9) */
+        /* Call on_particle_update callback */
         particle_call_update_callback(particle);
 
         /* Check if particle should be recycled (life ended) */
         if (particle->life == 0)
         {
-            /* Call on_particle_death callback before freeing (Requirements 17.4) */
+            /* Call on_particle_death callback before freeing */
             particle_call_death_callback(particle);
             particle_pool_free(ps->pool, particle);
             continue;
@@ -940,14 +940,14 @@ void particle_system_update(particle_system_t *ps, float dt)
         if (particle_check_boundary(ps, particle))
         {
             /* Particle crossed boundary and should be killed */
-            /* Call on_particle_death callback before freeing (Requirements 17.4) */
+            /* Call on_particle_death callback before freeing */
             particle_call_death_callback(particle);
             particle_pool_free(ps->pool, particle);
             continue;
         }
     }
 
-    /* Perform auto-cleanup for emitters (Requirements 5.2, 5.5) */
+    /* Perform auto-cleanup for emitters */
     particle_system_auto_cleanup(ps);
 }
 
@@ -966,7 +966,7 @@ void particle_system_render(particle_system_t *ps)
 
         if (particle->active)
         {
-            /* Call on_particle_render callback before rendering (Requirements 17.3, 17.7, 17.8, 17.9) */
+            /* Call on_particle_render callback before rendering */
             particle_call_render_callback(particle);
 
             ps->render_cb(particle, ps->render_ctx);

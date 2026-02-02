@@ -646,15 +646,15 @@ static void emitter_init_particle(particle_emitter_t *emitter, particle_t *parti
     particle->scale_start = emitter->scale_start;
     particle->scale_end = emitter->scale_end;
 
-    /* Set color gradient properties (Requirements 6.3, 6.5) */
+    /* Set color gradient properties */
     particle->color_start = emitter->color_start;
     particle->color_end = emitter->color_end;
     particle->color_mode = (uint8_t)emitter->color_mode;
 
-    /* Set opacity easing (Requirements 7.2, 7.5) */
+    /* Set opacity easing */
     particle->opacity_easing = (uint8_t)emitter->opacity_easing;
 
-    /* Set rotation alignment (Requirements 8.3, 8.4) */
+    /* Set rotation alignment */
     particle->align_velocity = emitter->align_velocity;
 
     /* Set emitter reference for callbacks */
@@ -690,7 +690,7 @@ static void emitter_init_particle(particle_emitter_t *emitter, particle_t *parti
     /* Set image */
     particle->image = emitter->particle_image;
 
-    /* Call on_particle_init callback if set (Requirements 17.1) */
+    /* Call on_particle_init callback if set */
     if (emitter->on_particle_init != NULL)
     {
         emitter->on_particle_init(particle, emitter->user_data);
@@ -724,7 +724,7 @@ void particle_emitter_emit(particle_emitter_t *emitter, particle_pool_t *pool, f
         particle_t *particle = particle_pool_alloc(pool);
         if (particle == NULL)
         {
-            /* Pool is full, stop emitting (Requirements 2.5) */
+            /* Pool is full, stop emitting */
             emitter->emit_accumulator = 0.0f;
             break;
         }
@@ -750,7 +750,7 @@ void particle_emitter_burst(particle_emitter_t *emitter, particle_pool_t *pool, 
         particle_t *particle = particle_pool_alloc(pool);
         if (particle == NULL)
         {
-            /* Pool is full, stop emitting (Requirements 2.5) */
+            /* Pool is full, stop emitting */
             break;
         }
 

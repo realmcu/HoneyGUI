@@ -98,15 +98,15 @@ typedef struct particle
     float scale_start;      /**< Starting scale for gradient */
     float scale_end;        /**< Ending scale for gradient */
 
-    /* Color gradient properties (Requirements 6.3, 6.5) */
+    /* Color gradient properties */
     uint32_t color_start;   /**< Starting color for gradient (ARGB8888) */
     uint32_t color_end;     /**< Ending color for gradient (ARGB8888) */
     uint8_t color_mode;     /**< Color mode (0=SOLID, 1=RANDOM, 2=GRADIENT, 3=RAINBOW) */
 
-    /* Opacity easing (Requirements 7.2, 7.5) */
+    /* Opacity easing */
     uint8_t opacity_easing; /**< Easing function (0=LINEAR, 1=EASE_IN, 2=EASE_OUT, 3=EASE_IN_OUT) */
 
-    /* Rotation alignment (Requirements 8.3, 8.4) */
+    /* Rotation alignment */
     uint8_t align_velocity; /**< Align rotation to velocity direction */
 
     /* Emitter reference for callbacks */
