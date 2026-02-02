@@ -65,6 +65,11 @@ static void gui_obj_destroy_cb(gui_obj_t *obj)
     {
         gui_free(obj->timer);
     }
+
+    if (obj->has_subscribe)
+    {
+        gui_msg_unsubscribe(obj, NULL);
+    }
 }
 
 static void gui_obj_tree_child_free(gui_obj_t *object)

@@ -33,6 +33,7 @@ void gui_msg_subscribe(gui_obj_t *obj, const char *topic, gui_listener_cb_t call
         return;
     }
 
+    obj->has_subscribe = true;
     sub->obj = obj;
     sub->callback = callback;
     memcpy(sub->topic, topic, topic_len);
@@ -42,22 +43,39 @@ void gui_msg_subscribe(gui_obj_t *obj, const char *topic, gui_listener_cb_t call
 
 void gui_msg_unsubscribe(gui_obj_t *obj, const char *topic)
 {
-    if (!obj || !topic)
+    if (!obj)
     {
         return;
     }
 
     subscription_t **pp = &sub_head;
-    while (*pp)
+    if (topic != NULL)
     {
-        subscription_t *cur = *pp;
-        if (cur->obj == obj && strcmp(cur->topic, topic) == 0)
+        while (*pp)
         {
-            *pp = cur->next;
-            gui_free(cur);
-            return;
+            subscription_t *cur = *pp;
+            if (cur->obj == obj && strcmp(cur->topic, topic) == 0)
+            {
+                *pp = cur->next;
+                gui_free(cur);
+                return;
+            }
+            pp = &cur->next;
         }
-        pp = &cur->next;
+    }
+    else
+    {
+        while (*pp)
+        {
+            subscription_t *cur = *pp;
+            if (cur->obj == obj)
+            {
+                *pp = cur->next;
+                gui_free(cur);
+            }
+            pp = &cur->next;
+        }
+        obj->has_subscribe = false;
     }
 }
 

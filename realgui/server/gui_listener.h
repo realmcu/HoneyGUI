@@ -34,7 +34,7 @@ void gui_msg_subscribe(gui_obj_t *obj, const char *topic, gui_listener_cb_t call
 /**
  * @brief Unsubscribe from a message topic
  * @param obj The widget object
- * @param topic Message topic string
+ * @param topic Message topic string, set NULL to unsubscribe all topics
  */
 void gui_msg_unsubscribe(gui_obj_t *obj, const char *topic);
 
