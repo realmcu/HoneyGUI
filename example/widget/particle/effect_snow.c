@@ -10,18 +10,8 @@
 
 #include "effect_snow.h"
 #include "gui_obj.h"
-
-#ifndef M_PI_F
-#define M_PI_F 3.14159265358979323846f
-#endif
-
-#ifndef DRV_LCD_WIDTH
-#define DRV_LCD_WIDTH  480
-#endif
-
-#ifndef DRV_LCD_HEIGHT
-#define DRV_LCD_HEIGHT 480
-#endif
+#include "gui_api_dc.h"
+#include "def_type.h"
 
 #define PARTICLE_POOL_SIZE 256
 
@@ -103,9 +93,12 @@ void effect_snow_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_snow_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     gui_particle_widget_t *widget = gui_particle_widget_create(root, "snow_demo",
-                                                               0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT,
+                                                               0, 0, screen_w, screen_h,
                                                                PARTICLE_POOL_SIZE);
     if (widget == NULL)
     {
@@ -121,7 +114,7 @@ gui_particle_widget_t *effect_snow_demo_init(void)
     /* Override line emission to match widget width */
     config.shape.line.x1 = 0.0f;
     config.shape.line.y1 = 0.0f;
-    config.shape.line.x2 = (float)DRV_LCD_WIDTH;
+    config.shape.line.x2 = (float)screen_w;
     config.shape.line.y2 = 0.0f;
 
     /* Adjust emission rate */
@@ -132,8 +125,8 @@ gui_particle_widget_t *effect_snow_demo_init(void)
     config.scale.max = 0.8f;
 
     /* Update boundary */
-    config.boundary.right = (float)DRV_LCD_WIDTH;
-    config.boundary.bottom = (float)DRV_LCD_HEIGHT;
+    config.boundary.right = (float)screen_w;
+    config.boundary.bottom = (float)screen_h;
 
     gui_particle_widget_add_effect(widget, &config);
 

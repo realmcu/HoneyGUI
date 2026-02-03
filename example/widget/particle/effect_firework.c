@@ -11,18 +11,8 @@
 #include "effect_firework.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
-
-#ifndef M_PI_F
-#define M_PI_F 3.14159265358979323846f
-#endif
-
-#ifndef DRV_LCD_WIDTH
-#define DRV_LCD_WIDTH  480
-#endif
-
-#ifndef DRV_LCD_HEIGHT
-#define DRV_LCD_HEIGHT 480
-#endif
+#include "gui_api_dc.h"
+#include "def_type.h"
 
 #define PARTICLE_POOL_SIZE 256
 
@@ -79,11 +69,15 @@ static void firework_update_cb(void *user_data)
     /* Trigger new firework every 1.5 seconds */
     if (current_time - s_firework_timer > 1500)
     {
+        gui_dispdev_t *dc = gui_get_dc();
+        int screen_w = dc->screen_width;
+        int screen_h = dc->screen_height;
+
         particle_effect_config_t config;
         effect_firework_config(&config);
 
-        config.shape.point.x = firework_rand_float(100.0f, (float)(DRV_LCD_WIDTH - 100));
-        config.shape.point.y = firework_rand_float(100.0f, (float)(DRV_LCD_HEIGHT / 2));
+        config.shape.point.x = firework_rand_float(100.0f, (float)(screen_w - 100));
+        config.shape.point.y = firework_rand_float(100.0f, (float)(screen_h / 2));
 
         uint32_t colors[] =
         {
@@ -95,8 +89,8 @@ static void firework_update_cb(void *user_data)
         config.emission.burst_count = 40 + (firework_rand() % 40);
         config.lifecycle.life_min = 1500;
         config.lifecycle.life_max = 2500;
-        config.boundary.right = (float)DRV_LCD_WIDTH;
-        config.boundary.bottom = (float)DRV_LCD_HEIGHT;
+        config.boundary.right = (float)screen_w;
+        config.boundary.bottom = (float)screen_h;
 
         gui_particle_widget_add_effect(s_firework_widget, &config);
         s_firework_timer = current_time;
@@ -171,9 +165,12 @@ void effect_firework_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_firework_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     s_firework_widget = gui_particle_widget_create(root, "firework_demo",
-                                                   0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT,
+                                                   0, 0, screen_w, screen_h,
                                                    PARTICLE_POOL_SIZE);
     if (s_firework_widget == NULL)
     {
@@ -185,14 +182,14 @@ gui_particle_widget_t *effect_firework_demo_init(void)
     particle_effect_config_t config;
     effect_firework_config(&config);
 
-    config.shape.point.x = (float)(DRV_LCD_WIDTH / 2);
-    config.shape.point.y = (float)(DRV_LCD_HEIGHT / 3);
+    config.shape.point.x = (float)(screen_w / 2);
+    config.shape.point.y = (float)(screen_h / 3);
     config.color.color_start = 0xFFFF0000;
     config.emission.burst_count = 60;
     config.lifecycle.life_min = 1500;
     config.lifecycle.life_max = 2500;
-    config.boundary.right = (float)DRV_LCD_WIDTH;
-    config.boundary.bottom = (float)DRV_LCD_HEIGHT;
+    config.boundary.right = (float)screen_w;
+    config.boundary.bottom = (float)screen_h;
 
     gui_particle_widget_add_effect(s_firework_widget, &config);
     s_firework_timer = gui_ms_get();

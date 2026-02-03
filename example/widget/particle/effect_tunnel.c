@@ -17,19 +17,9 @@
 #include "effect_tunnel.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
+#include "gui_api_dc.h"
 #include <string.h>
-
-#ifndef M_PI_F
-#define M_PI_F 3.14159265358979323846f
-#endif
-
-#ifndef DRV_LCD_WIDTH
-#define DRV_LCD_WIDTH  480
-#endif
-
-#ifndef DRV_LCD_HEIGHT
-#define DRV_LCD_HEIGHT 480
-#endif
+#include "def_type.h"
 
 #define PARTICLE_POOL_SIZE 512
 
@@ -51,12 +41,16 @@ void effect_tunnel_config(particle_effect_config_t *config)
         return;
     }
 
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
+
     particle_effect_config_init(config);
 
     /* Ring emission from center - very small for concentrated start point */
     config->shape.type = PARTICLE_SHAPE_RING;
-    config->shape.ring.cx = (float)(DRV_LCD_WIDTH / 2);
-    config->shape.ring.cy = (float)(DRV_LCD_HEIGHT / 2);
+    config->shape.ring.cx = (float)(screen_w / 2);
+    config->shape.ring.cy = (float)(screen_h / 2);
     config->shape.ring.inner_r = 3.0f;   /* Tiny center */
     config->shape.ring.outer_r = 10.0f;  /* Small variation */
 
@@ -101,8 +95,8 @@ void effect_tunnel_config(particle_effect_config_t *config)
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = (float)DRV_LCD_WIDTH;
-    config->boundary.bottom = (float)DRV_LCD_HEIGHT;
+    config->boundary.right = (float)screen_w;
+    config->boundary.bottom = (float)screen_h;
 
     /* Additive blending for bright glow effect */
     config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
@@ -112,9 +106,12 @@ void effect_tunnel_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_tunnel_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     s_tunnel_widget = gui_particle_widget_create(root, "tunnel_demo",
-                                                 0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT,
+                                                 0, 0, screen_w, screen_h,
                                                  PARTICLE_POOL_SIZE);
     if (s_tunnel_widget == NULL)
     {

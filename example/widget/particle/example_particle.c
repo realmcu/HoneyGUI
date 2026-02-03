@@ -22,6 +22,12 @@
 #include "effect_custom.h"
 #include "effect_tunnel.h"
 #include "effect_rocket.h"
+#include "effect_vortex.h"
+#include "effect_lightning.h"
+#include "effect_galaxy.h"
+#include "effect_fireflies.h"
+#include "effect_ripple.h"
+#include "effect_rain.h"
 
 /*============================================================================*
  *                    Application Entry Point
@@ -37,7 +43,7 @@ static int particle_demo_init(void)
     /* Uncomment ONE of the following demos: */
 
     /* Firework: Auto-burst at random positions, particles spread outward with gravity */
-    effect_firework_demo_init();
+    // effect_firework_demo_init();
 
     /* Trail: Drag to emit trailing particles in opposite direction of movement */
     // effect_trail_demo_init();
@@ -59,6 +65,24 @@ static int particle_demo_init(void)
 
     /* Rocket: Thruster exhaust with flame and smoke trail - drag to move */
     // effect_rocket_demo_init();
+
+    /* Vortex: Energy spiral - particles orbit inward toward center with rainbow colors */
+    // effect_vortex_demo_init();
+
+    /* Lightning: Electric arc discharge between two points with branching */
+    effect_lightning_demo_init();
+
+    /* Galaxy: Spiral galaxy with rotating arms and color gradient */
+    // effect_galaxy_demo_init();
+
+    /* Fireflies: Floating glowing dots with breathing opacity (RECT + BREATHE) */
+    // effect_fireflies_demo_init();
+
+    /* Ripple: Touch-triggered concentric rings with secondary waves (on_particle_death) */
+    // effect_ripple_demo_init();
+
+    /* Rain: Falling raindrops with splash on impact (LINE + BOUNDARY_KILL + on_death) */
+    // effect_rain_demo_init();
 
     gui_set_keep_active_time(0xFFFFFFFF);
     return 0;

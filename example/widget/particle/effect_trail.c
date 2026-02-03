@@ -10,19 +10,9 @@
 
 #include "effect_trail.h"
 #include "gui_obj.h"
+#include "gui_api_dc.h"
 #include "tp_algo.h"
-
-#ifndef M_PI_F
-#define M_PI_F 3.14159265358979323846f
-#endif
-
-#ifndef DRV_LCD_WIDTH
-#define DRV_LCD_WIDTH  480
-#endif
-
-#ifndef DRV_LCD_HEIGHT
-#define DRV_LCD_HEIGHT 480
-#endif
+#include "def_type.h"
 
 #define PARTICLE_POOL_SIZE 256
 
@@ -145,9 +135,12 @@ void effect_trail_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_trail_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     s_trail_widget = gui_particle_widget_create(root, "trail_demo",
-                                                0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT,
+                                                0, 0, screen_w, screen_h,
                                                 PARTICLE_POOL_SIZE);
     if (s_trail_widget == NULL)
     {

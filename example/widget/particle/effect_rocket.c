@@ -16,20 +16,10 @@
 #include "effect_rocket.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
+#include "gui_api_dc.h"
 #include "gui_img.h"
 #include "small_rocket.h"
-
-#ifndef M_PI_F
-#define M_PI_F 3.14159265358979323846f
-#endif
-
-#ifndef DRV_LCD_WIDTH
-#define DRV_LCD_WIDTH  480
-#endif
-
-#ifndef DRV_LCD_HEIGHT
-#define DRV_LCD_HEIGHT 480
-#endif
+#include "def_type.h"
 
 #define PARTICLE_POOL_SIZE 512
 
@@ -59,6 +49,10 @@ void effect_rocket_config(particle_effect_config_t *config)
     {
         return;
     }
+
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     particle_effect_config_init(config);
 
@@ -109,8 +103,8 @@ void effect_rocket_config(particle_effect_config_t *config)
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = (float)DRV_LCD_WIDTH;
-    config->boundary.bottom = (float)DRV_LCD_HEIGHT;
+    config->boundary.right = (float)screen_w;
+    config->boundary.bottom = (float)screen_h;
 
     /* Additive blending for bright glow */
     config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
@@ -126,6 +120,10 @@ static void effect_rocket_smoke_config(particle_effect_config_t *config)
     {
         return;
     }
+
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     particle_effect_config_init(config);
 
@@ -173,8 +171,8 @@ static void effect_rocket_smoke_config(particle_effect_config_t *config)
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = (float)DRV_LCD_WIDTH;
-    config->boundary.bottom = (float)DRV_LCD_HEIGHT;
+    config->boundary.right = (float)screen_w;
+    config->boundary.bottom = (float)screen_h;
 
     /* Normal blending for smoke */
     config->render.blend_mode = PARTICLE_BLEND_NORMAL;
@@ -184,9 +182,12 @@ static void effect_rocket_smoke_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_rocket_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     s_rocket_widget = gui_particle_widget_create(root, "rocket_demo",
-                                                 0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT,
+                                                 0, 0, screen_w, screen_h,
                                                  PARTICLE_POOL_SIZE);
     if (s_rocket_widget == NULL)
     {

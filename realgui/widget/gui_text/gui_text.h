@@ -182,21 +182,6 @@ void gui_text_set(gui_text_t    *this_widget,
                   uint16_t       font_size);
 
 /**
- * @brief Set animate.
- *
- * @param o Text widget.
- * @param dur Duration. Time length of the animate.
- * @param repeat_count 0: One shoot, -1: Endless.
- * @param callback Happens at every frame.
- * @param p Callback's parameter.
- */
-void gui_text_set_animate(void     *o,
-                          uint32_t  dur,
-                          int       repeat_count,
-                          void     *callback,
-                          void     *p);
-
-/**
  * @brief Set text mode of this_widget text widget.
  * @note If text line count was more than one, it will display on the left even if it was set left or right.
  * @param this_widget Text widget pointer.

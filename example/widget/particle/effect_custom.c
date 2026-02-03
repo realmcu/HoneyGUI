@@ -11,18 +11,8 @@
 #include <math.h>
 #include "effect_custom.h"
 #include "gui_obj.h"
-
-#ifndef M_PI_F
-#define M_PI_F 3.14159265358979323846f
-#endif
-
-#ifndef DRV_LCD_WIDTH
-#define DRV_LCD_WIDTH  480
-#endif
-
-#ifndef DRV_LCD_HEIGHT
-#define DRV_LCD_HEIGHT 480
-#endif
+#include "gui_api_dc.h"
+#include "def_type.h"
 
 #define PARTICLE_POOL_SIZE 256
 
@@ -139,9 +129,12 @@ void effect_custom_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_custom_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
     gui_particle_widget_t *widget = gui_particle_widget_create(root, "custom_demo",
-                                                               0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT,
+                                                               0, 0, screen_w, screen_h,
                                                                PARTICLE_POOL_SIZE);
     if (widget == NULL)
     {
@@ -152,12 +145,12 @@ gui_particle_widget_t *effect_custom_demo_init(void)
     effect_custom_config(&config);
 
     /* Override shape to match widget size */
-    config.shape.circle.cx = (float)(DRV_LCD_WIDTH / 2);
-    config.shape.circle.cy = (float)(DRV_LCD_HEIGHT / 2);
+    config.shape.circle.cx = (float)(screen_w / 2);
+    config.shape.circle.cy = (float)(screen_h / 2);
 
     /* Update boundary to match widget */
-    config.boundary.right = (float)DRV_LCD_WIDTH;
-    config.boundary.bottom = (float)DRV_LCD_HEIGHT;
+    config.boundary.right = (float)screen_w;
+    config.boundary.bottom = (float)screen_h;
 
     gui_particle_widget_add_effect(widget, &config);
 
