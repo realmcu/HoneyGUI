@@ -205,7 +205,7 @@ gui_particle_widget_t *effect_rocket_demo_init(void)
     effect_rocket_config(&flame_config);
     s_flame_handle = gui_particle_widget_add_effect(s_rocket_widget, &flame_config);
 
-    gui_img_t *img = gui_img_create_from_mem(root, "img", (void *)small_rocket,
+    gui_img_t *img = gui_img_create_from_mem(GUI_BASE(s_rocket_widget), "img", (void *)small_rocket,
                                              ROCKET_IMG_X, ROCKET_IMG_Y, 0, 0);
     gui_img_set_mode(img, IMG_FILTER_BLACK);
 

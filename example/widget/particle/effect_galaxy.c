@@ -277,13 +277,14 @@ gui_particle_widget_t *effect_galaxy_demo_init(void)
     gui_particle_widget_add_effect(s_galaxy_widget, &config);
     gui_particle_widget_set_update_cb(s_galaxy_widget, galaxy_widget_update, NULL);
 
-    gui_img_t *img = gui_img_create_from_mem(root, "img", (void *)galaxy, 0, 0, 0, 0);
+    gui_img_t *img = gui_img_create_from_mem(GUI_BASE(s_galaxy_widget), "img", (void *)galaxy, 0, 0, 0,
+                                             0);
     uint16_t img_w = gui_img_get_width(img);
     uint16_t img_h = gui_img_get_height(img);
     gui_img_set_attribute(img, "img", (void *)galaxy, (screen_w - img_w) / 2, (screen_h - img_h) / 2);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
-    s_galaxy_text = gui_text_create(root, "text", 0, 0, 0, 0);
+    s_galaxy_text = gui_text_create(GUI_BASE(s_galaxy_widget), "text", 0, 0, 0, 0);
     s_text_value = TEXT_VALUE_MIN;
     snprintf(s_text_buffer, sizeof(s_text_buffer), "%d%%", s_text_value);
     gui_text_set(s_galaxy_text, s_text_buffer, GUI_FONT_SRC_TTF, APP_COLOR_SILVER,

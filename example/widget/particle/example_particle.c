@@ -13,6 +13,9 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 
+/* Launcher with selection menu */
+#include "particle_launcher.h"
+
 /* Individual effect modules */
 #include "effect_firework.h"
 #include "effect_trail.h"
@@ -36,11 +39,21 @@
 /**
  * @brief Particle demo entry point
  *
- * Select one demo to run by uncommenting the desired initialization function.
+ * Two modes available:
+ * 1. USE_LAUNCHER (default): Shows a selection menu to choose effects
+ * 2. Direct load: Uncomment a specific effect to load it directly
  */
+
+/* Enable launcher mode by default - comment out to use direct load */
+#define USE_LAUNCHER
+
 static int particle_demo_init(void)
 {
-    /* Uncomment ONE of the following demos: */
+#ifdef USE_LAUNCHER
+    /* Launcher mode: Show selection menu */
+    particle_launcher_init();
+#else
+    /* Direct load mode: Uncomment ONE of the following demos */
 
     /* Firework: Auto-burst at random positions, particles spread outward with gravity */
     // effect_firework_demo_init();
@@ -83,6 +96,7 @@ static int particle_demo_init(void)
 
     /* Rain: Falling raindrops with splash on impact (LINE + BOUNDARY_KILL + on_death) */
     // effect_rain_demo_init();
+#endif
 
     gui_set_keep_active_time(0xFFFFFFFF);
     return 0;
