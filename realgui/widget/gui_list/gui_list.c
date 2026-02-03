@@ -98,22 +98,24 @@ static void gui_list_update_bar_data_cb(NVGcontext *vg)
 static void gui_list_update_bar(gui_obj_t *obj)
 {
     gui_list_t *_this = (gui_list_t *)obj;
+    int16_t w = _this->bar->base.w;
+    int16_t h = _this->bar->base.h;
+    int total_length = _this->total_length + (!_this->area_display) * (_this->dir == HORIZONTAL ?
+                                                                       obj->x : obj->y);
     if (_this->need_update_bar)
     {
         _this->need_update_bar = false;
         if (_this->dir == HORIZONTAL)
         {
-            int16_t w = obj->w;
-            g_Bar_Width = w * w / _this->total_length;
+            g_Bar_Width = w * w / total_length;
             g_Bar_Height = LIST_BAR_WIDTH;
-            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Width == w));
+            gui_obj_hidden(GUI_BASE(_this->bar), (total_length == w));
         }
         else
         {
-            int16_t h = obj->h;
             g_Bar_Width = LIST_BAR_WIDTH;
-            g_Bar_Height = h * h / _this->total_length;
-            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Height == h));
+            g_Bar_Height = h * h / total_length;
+            gui_obj_hidden(GUI_BASE(_this->bar), total_length == h);
         }
         g_Bar_Color = _this->bar_color;
         memset(_this->bar_data, 0, _this->bar->base.w * _this->bar->base.h * 4);
@@ -128,16 +130,16 @@ static void gui_list_update_bar(gui_obj_t *obj)
         float t_y = 0;
         float offset = (float)(_this->offset);
         offset = (offset > 0) ? 0 : offset;
-        if (_this->dir == HORIZONTAL && _this->total_length > obj->w)
+        if (_this->dir == HORIZONTAL && total_length > w)
         {
-            float range = (float)(obj->w - obj->x - g_Bar_Width);
-            t_x = offset * range / (_this->total_length - obj->w);
+            float range = (float)(w - g_Bar_Width);
+            t_x = offset * range / (total_length - w);
             t_x = (t_x > range) ? range : t_x;
         }
-        else if (_this->dir == VERTICAL && _this->total_length > obj->h)
+        else if (_this->dir == VERTICAL && total_length > h)
         {
-            float range = (float)(obj->h - g_Bar_Height);
-            t_y = -offset * range / (_this->total_length - obj->h);
+            float range = (float)(h - g_Bar_Height);
+            t_y = -offset * range / (total_length - h);
             t_y = (t_y > range) ? range : t_y;
         }
         gui_img_translate(_this->bar, t_x, t_y);
@@ -248,13 +250,13 @@ static void gui_list_free_notes(gui_obj_t *obj)
         {
             pos = obj->x + note->start_x + _this->offset;
             range = obj->x + obj->w;
-            temp = obj->x;
+            temp = obj->x * _this->area_display;
         }
         else
         {
             pos = obj->y + note->start_y + _this->offset;
             range = obj->y + obj->h;
-            temp = obj->y;
+            temp = obj->y * _this->area_display;
         }
         if (_this->style == LIST_CARD)
         {
@@ -342,12 +344,12 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         if (_this->dir == HORIZONTAL)
         {
             pos = obj->x + note->start_x + _this->offset;
-            temp = obj->x;
+            temp = obj->x * _this->area_display;
         }
         else
         {
             pos = obj->y + note->start_y + _this->offset;
-            temp = obj->y;
+            temp = obj->y * _this->area_display;
         }
         while (pos > _this->space + temp)
         {
@@ -999,26 +1001,28 @@ static void gui_list_create_bar(gui_list_t *_this,
                                 int16_t     w,
                                 int16_t     h)
 {
-    (void)x;
+    gui_dispdev_t *dc = gui_get_dc();
     int bar_x = x;
     int bar_y = y;
     int bar_w = 0;
     int bar_h = 0;
     if (_this->dir == HORIZONTAL)
     {
+        bar_x = x * _this->area_display;
         bar_y = y;
-        bar_w = w;
+        bar_w = _this->area_display ? w : dc->screen_width;
         bar_h = LIST_BAR_WIDTH;
     }
     else
     {
         bar_x = w - LIST_BAR_WIDTH;
+        bar_y = y * _this->area_display;
         bar_w = LIST_BAR_WIDTH;
-        bar_h = h;
+        bar_h = _this->area_display ? h : dc->screen_height;
     }
     int pixel_bytes = 4;
     size_t buffer_size = bar_h * bar_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-    _this->bar_data = gui_lower_malloc(buffer_size);
+    _this->bar_data = gui_malloc(buffer_size);
     memset(_this->bar_data, 0, buffer_size);
     _this->bar = gui_img_create_from_mem(_this->base.parent, "list_bar", _this->bar_data, bar_x, bar_y,
                                          bar_w, bar_h);
@@ -1109,7 +1113,6 @@ gui_list_t *gui_list_create(void       *parent,
                             bool        create_bar)
 {
     gui_list_t *_this = gui_malloc(sizeof(gui_list_t));
-    // gui_dispdev_t *dc = gui_get_dc();
     memset(_this, 0, sizeof(gui_list_t));
     if (w == 0)
     {
@@ -1270,4 +1273,15 @@ void gui_list_enable_loop(gui_list_t *list, bool loop)
         return;
     }
     list->loop = loop;
+}
+
+void gui_list_enable_area_display(gui_list_t *list, bool enable)
+{
+    list->area_display = enable;
+    if (list->bar)
+    {
+        gui_free(list->bar_data);
+        gui_obj_tree_free(list->bar);
+        gui_list_create_bar(list, list->base.x, list->base.y, list->base.w, list->base.h);
+    }
 }

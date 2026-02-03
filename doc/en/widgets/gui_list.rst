@@ -74,6 +74,9 @@ Set List Widget Loop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_list_enable_loop` function can be used to set list widget loop. When the total length of the list widget is greater than the width or height of the list widget, the loop effect will be enabled.
 
+Set List Widget Area Display
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_enable_area_display` function can be used to enable area display of list widget. When the starting point of the list widget is not at the edge of the screen, enabling area display can limit the note to a more reasonable area than the entire screen for dynamically creating.
 
 
 Example
