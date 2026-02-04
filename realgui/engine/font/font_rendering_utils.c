@@ -1037,6 +1037,100 @@ static void font_render_8bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
     }
 }
 
+#if FONT_RENDERING_MVE
+static void font_render_8bpp_to_ARGB8888_mve(draw_font_t *font, font_glyph_t *glyph)
+{
+    uint8_t *dots = glyph->data;
+    uint32_t *writebuf = (uint32_t *)font->target_buf;
+    uint32_t write_stride = font->target_buf_stride / 4;
+    uint32_t dots_stride = glyph->stride;
+
+    const int x_start = font->clip_rect.x1;
+    const int y_start = font->clip_rect.y1;
+    const int x_end = font->clip_rect.x2 + 1;
+    const int y_end = font->clip_rect.y2 + 1;
+
+    uint32_t loopCount = (x_end - x_start) / 4;
+    uint32_t loopsLeft = (x_end - x_start) % 4;
+
+    bool max_opacity = (font->color.color.rgba.a == 0xff);
+
+    for (int i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - font->target_rect.y1) * write_stride - font->target_rect.x1;
+        int dots_off = (i - glyph->pos_y) * dots_stride - glyph->pos_x;
+
+        /*helium code start*/
+        for (uint32_t loopc = 0; loopc < loopCount; loopc++)
+        {
+            uint16_t js = x_start + 4 * loopc;
+            uint32x4_t alphav = vldrbq_u32(&dots[dots_off + js]);
+
+            if (vaddvq_u32(alphav) == 0)
+            {
+                continue;
+            }
+            if (!max_opacity)
+            {
+                alphav = vmulq_n_u32(alphav, (uint32_t)font->color.color.rgba.a);
+                alphav = vrshrq_n_u32(alphav, 8);
+            }
+
+            uint32x4_t outrv = vmulq_n_u32(alphav, (uint32_t)font->color.color.rgba.r);
+            uint32x4_t outgv = vmulq_n_u32(alphav, (uint32_t)font->color.color.rgba.g);
+            uint32x4_t outbv = vmulq_n_u32(alphav, (uint32_t)font->color.color.rgba.b);
+
+            //read back color
+            uint32x4_t color_backv = vld1q_u32(&writebuf[write_off + js]);
+
+            uint32x4_t color_backr = vshrq_n_u32(color_backv, 16);
+            color_backr = vandq_u32(color_backr, vdupq_n_u32(0xff));
+            uint32x4_t color_backg = vshrq_n_u32(color_backv, 8);
+            color_backg = vandq_u32(color_backg, vdupq_n_u32(0xff));
+            uint32x4_t color_backb = vandq_u32(color_backv, vdupq_n_u32(0xff));
+
+            uint32x4_t alphabv = vdupq_n_u32(0xff);
+            alphabv = vsubq_u32(alphabv, alphav);
+
+            color_backr = vmulq_u32(color_backr, alphabv);
+            color_backg = vmulq_u32(color_backg, alphabv);
+            color_backb = vmulq_u32(color_backb, alphabv);
+
+            outrv = vaddq_u32(outrv, color_backr);
+            outgv = vaddq_u32(outgv, color_backg);
+            outbv = vaddq_u32(outbv, color_backb);
+
+            // Divide by 255 (approximate with >>8)
+            outrv = vshrq_n_u32(outrv, 8);
+            outgv = vshrq_n_u32(outgv, 8);
+            outbv = vshrq_n_u32(outbv, 8);
+
+            // Pack to ARGB8888: 0xff000000 | (r << 16) | (g << 8) | b
+            uint32x4_t resultv = vdupq_n_u32(0xff000000);
+            resultv = vorrq_u32(resultv, vshlq_n_u32(outrv, 16));
+            resultv = vorrq_u32(resultv, vshlq_n_u32(outgv, 8));
+            resultv = vorrq_u32(resultv, outbv);
+
+            vst1q_u32(&writebuf[write_off + js], resultv);
+        }
+        /*helium code end*/
+        for (int j = x_end - loopsLeft; j < x_end; j++)
+        {
+            uint8_t alpha = dots[dots_off + j];
+            if (alpha)
+            {
+                if (!max_opacity)
+                {
+                    alpha = _UI_UDIV255(font->color.color.rgba.a * alpha);
+                }
+                uint32_t color_back = writebuf[write_off + j];
+                writebuf[write_off + j] = alphaBlendRGBA(font->color, color_back, alpha);
+            }
+        }
+    }
+}
+#endif
+
 static void font_render_8bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t *glyph)
 {
     uint8_t *dots = glyph->data;
@@ -1195,7 +1289,15 @@ static void font_render_8bpp_to_RGB888(draw_font_t *font, font_glyph_t *glyph)
 }
 static void font_render_8bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
 {
+    /* Version performance markers:
+     * Stable   - 100% speed baseline
+     * MVE      - ~156% faster (1.56x speedup) expected
+     */
+#if FONT_RENDERING_MVE
+    font_render_8bpp_to_ARGB8888_mve(font, glyph);
+#elif FONT_RENDERING_STABLE
     font_render_8bpp_to_ARGB8888_stable(font, glyph);
+#endif
 }
 
 /*============================================================================*
