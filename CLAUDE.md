@@ -8,6 +8,21 @@ HoneyGUI is an embedded graphical user interface (GUI) library developed by Real
 
 Current version: v2.1.1.0
 
+## Versioning Scheme
+
+HoneyGUI uses a four-part semantic versioning scheme:
+
+**Format:** `v{MAJOR}.{MINOR}.{PATCH}.{BUILD}`
+
+- **MAJOR**: Major architectural changes or product-level updates
+- **MINOR**: API changes (including breaking API changes)
+- **PATCH**: Bug fixes and minor improvements
+- **BUILD**: Build number (typically 0)
+
+Special releases may include `.RVD` suffix for RVisualDesigner-specific builds.
+
+Version information is auto-generated via `tool/git_generate_version.py`.
+
 ## Build System
 
 HoneyGUI supports two build systems:

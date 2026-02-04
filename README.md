@@ -47,6 +47,38 @@ HoneyGUI currently supports the following two efficient APP development methods:
 
 The HoneyGUI framework has excellent portability and can run on various chips and operating systems. This release provides a PC Windows version.
 
+## Versioning
+
+HoneyGUI follows a four-part version numbering scheme:
+
+**Format:** `v{MAJOR}.{MINOR}.{PATCH}.{BUILD}`
+
+- **MAJOR**: Major architectural changes or product-level updates
+- **MINOR**: API changes (including breaking API changes)
+- **PATCH**: Bug fixes and minor improvements
+- **BUILD**: Build number (typically 0)
+
+**Current Version:** v2.1.1.0
+
+### Version Examples
+
+- `v2.1.1.0` - Current release
+- `v1.2.0.0` - Major feature updates
+- `v1.0.19.0` - Maintenance releases
+
+### Special Releases
+
+Some versions include the `.RVD` suffix (e.g., `v1.1.1.0.RVD`), indicating releases specifically tailored for the **RVisualDesigner** tool integration.
+
+### Version Information
+
+The project uses `tool/git_generate_version.py` to automatically generate version header files containing:
+- Version tag
+- Branch name
+- Commit hash
+- Build date
+- Repository status
+
 ## Software Architecture
 
 

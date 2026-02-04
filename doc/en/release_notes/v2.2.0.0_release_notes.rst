@@ -1,0 +1,149 @@
+.. _v2.2.0.0:
+========================
+v2.2.0.0 Release Notes
+========================
+
+Major Changes
+=================
+This release focuses on API improvements, new multimedia capabilities, and enhanced widget functionality. The changes are primarily categorized into Major Features, Major Bug Fixes, and Breaking Changes.
+
+- **Major Features**
+
+  * Add audio support. (80e9a91d4)
+  * Add video documentation and examples. (4737c631e)
+  * Add new particle effects with config-driven system. (6ab0b22cd, d3081dbfa, 8fb406f24)
+  * Add launcher with effect selection menu. (1c25e4e0a)
+  * Add LIST_ZOOM_CYLINDER style for list widget. (beca0b4a2)
+  * Add support for GIF in filesystem. (a3363cadd)
+  * Add A8 font MVE RGBA rendering. (9478ce27e)
+  * Add message listener for pub/sub pattern. (bb8b57e31)
+  * Add Timer App. (27421e7f5)
+  * Add gradient support for geometry widget. (7b7a8c168)
+  * Add gradient and VFS support for SVG. (16ac9f3f3)
+  * Add 3D donut demo. (1f63c51f0)
+  * Add turnkey demo. (d285a10a1)
+  * Add dashboard demo sim navigation. (ce58a0b5f)
+
+- **Major Bug Fixes**
+
+  * Fix hardfault due to list widget. (e62e92485)
+  * Fix rect widget vertical row missing issue. (b35893b35)
+  * Fix list LIST_ZOOM_CYLINDER. (bf4113a65)
+  * Fix rect and circle widget memory leak. (581c2c512)
+  * Fix XIP memory free issue in draw_img. (f0074d140)
+  * Fix rect widget opacity bug. (76fdfd191)
+  * Fix text widget checksum bug. (6ecd52318)
+  * Fix gui_circle matrix bug. (8cb799105)
+  * Fix arc opacity bug. (c8e05d6a5)
+
+- **Breaking Changes**
+
+  * Rename gui_event_t to gui_event_code_t. (6600c49fa)
+  * Rename event names. (0702e4a7c)
+  * Remove gui_vfs_load_file API. (8f298856c)
+  * Remove gui_gray widget. (29e8912cd)
+  * Delete canvas rect & arc widget. (468372b83)
+  * Unify A8 and I8 formats into U8 format. (4629e8dc7)
+
+Change Logs
+======================
+The following lists all changes categorized into Added, Changed, Fixed, and Removed.
+
+- **Added**
+
+  * Add audio support. (80e9a91d4)
+  * Add video doc & example. (4737c631e)
+  * Add new particle effects. (6ab0b22cd)
+  * Add launcher with effect selection menu. (1c25e4e0a)
+  * Add LIST_ZOOM_CYLINDER style. (beca0b4a2)
+  * Add support to GIF in filesystem. (a3363cadd)
+  * Add A8 font MVE RGBA render. (9478ce27e)
+  * Add particle system with preset effects. (8fb406f24)
+  * Add message listener for pub/sub. (bb8b57e31)
+  * Add Timer App. (27421e7f5)
+  * Add gradient for geometry widget. (7b7a8c168)
+  * Add gradient and VFS support for SVG. (16ac9f3f3)
+  * Add 3D donut demo. (1f63c51f0)
+  * Add turnkey demo. (d285a10a1)
+  * Add dashboard demo sim navi. (ce58a0b5f)
+  * Add touch event for rect/circle. (da82116a8)
+  * Add I8 compressed format. (c5a094913)
+  * Add default font bitmap. (e450ecc6d)
+  * Add linux gcc build script. (4f53fa53a)
+  * Add API to get video file size. (26ef42942)
+  * Add vector font pixel width function. (c97a26163)
+  * Add OpenGL code. (7aa1e1e86)
+  * Add HML video component support. (a2ea78f5e)
+  * Add FILESYS support for font engine. (4d7b80a77)
+  * Add non scroll align. (a4a0a64f1)
+  * Add func to unpublish from destroyed obj. (d434acc72)
+  * Add area display function of list widget. (5c0ac615c)
+  * Add kb root. (b635adb85)
+
+- **Changed**
+
+  * Refactor keyboard input handling system. (a589d86d5)
+  * Refactor particle system to config-driven. (d3081dbfa)
+  * Decouple h264bsd decoder and video widget. (7edd40a60)
+  * Use standard GIF LZW decode method. (4fc986271)
+  * Support crop and index. (37c3a2094)
+  * Set image widget source to mem. (58b766f8f)
+  * Lite3d add user data. (36024bf96)
+  * Lite3D support I8 raster. (f852a6ed5)
+  * Vector support bold. (53a746683)
+  * Optimization geometry widget. (d157a884d)
+  * Refactor font lib with unified manager. (cad3a146b)
+  * Optimization arc. (f703581b3)
+  * Geometry widget add matrix. (f5de2de85)
+  * Listener use dynamic linked list. (8689ef3fc)
+  * Refactor shell commands by category. (16133b6e7)
+  * Refactor engine directory structure. (406be1ce8)
+  * Unify SConscript files with CMakeLists. (8d3208c86)
+  * Refactor matrix and math modules. (21fffc543)
+  * Apply parent trans to 3D. (a7255fee3)
+  * Use h264bsd_malloc/free for memory management. (fd2eab751)
+  * Expand font size parameter range to uint16_t. (d6194ebb8)
+  * Change color table counter storage. (53201ffc4)
+  * Replace menu_config.h with Kconfig flow. (3017a69d0)
+  * Refactor header install in CMake. (37ed1f5f8, 2bea302b5)
+
+- **Fixed**
+
+  * Fix hardfault due to list widget. (e62e92485)
+  * Fix rect widget Vertical row missing issue. (b35893b35)
+  * Fix list LIST_ZOOM_CYLINDER. (bf4113a65)
+  * Fix rect and circle widget memory leak. (581c2c512)
+  * Fix XIP memory free issue in draw_img. (f0074d140)
+  * Fix rect widget opacity bug. (76fdfd191)
+  * Fix text widget checksum bug. (6ecd52318)
+  * Fix gui_circle matrix bug. (8cb799105)
+  * Fix arc opacity bug. (c8e05d6a5)
+  * Fix coverity issues. (992e4ca26, ca6095477)
+  * Fix static lib auto exe issue. (83910ba2e)
+  * Fix include issue. (81531bc4a)
+  * Fix d_type detection for MinGW. (096bcb3ce)
+  * Fix letter space bug. (f1b8d7f6d)
+  * Fix typedef redefinition in VFS adapter. (001383367)
+  * Fix fb clear 24 bit. (97a59b9a2)
+  * Fix gui_view.rst. (4cdfeca2b)
+  * Fix thai process bug. (281a03b03)
+  * Fix dashboard demo. (9ffb6a8ed)
+  * Fix bypass issue. (c5c8e9add)
+  * Fix nanovg agge install header. (e5f8addfe)
+  * Fix chargecase root addr generate. (53425ac40)
+  * Fix flag gltf model. (e45b7da7b)
+  * Fix compilation issues. (ee946c737)
+  * Fix auto compile issue. (3b4c04094)
+  * Fix include guards to match filenames. (8fadef344)
+  * Fix script about font. (6e34573ba)
+
+- **Removed**
+
+  * Remove gui_vfs_load_file API. (8f298856c)
+  * Remove gui_gray widget. (29e8912cd)
+  * Remove unused header files. (012c3d2f1)
+  * Remove python font convertor. (30f021677)
+  * Remove comments. (6828587b3)
+  * Remove requirement references from comments. (55721db18)
+  * Remove gui_gray.h. (a0f086514)
+  * Delete canvas rect & arc widget. (468372b83)
