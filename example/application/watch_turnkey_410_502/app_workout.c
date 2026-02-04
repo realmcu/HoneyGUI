@@ -166,8 +166,9 @@ static void note_click_cb(void *obj, gui_event_code_t e)
         GUI_WIDGET_POINTER_BY_NAME_ROOT(selected_text, "selected_workout_text", current_view);
         if (selected_icon)
         {
-            gui_img_set_image_data((gui_img_t *)selected_icon,
-                                   (const uint8_t *)design_p->img_data_array[selected_workout_index]);
+            gui_img_set_src((gui_img_t *)selected_icon,
+                            (const uint8_t *)design_p->img_data_array[selected_workout_index],
+                            ((gui_img_t *)selected_icon)->storage_type);
             gui_obj_show(selected_icon, true);
         }
         if (selected_text)

@@ -259,19 +259,19 @@ static void activity_move_timer_cb(void *obj)
     // uint8_t *img_ring_data = (void *)gui_img_get_image_data(img_ring);
     // gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, RADIUS_SCALE * 2, RADIUS_SCALE * 2,
     //                                   arc_activity_ring_cb, img_ring_data);
-    // gui_img_set_image_data(img_ring, img_ring_data);
+    // gui_img_set_src(img_ring, img_ring_data, img_ring->storage_type);
     // gui_img_refresh_size(img_ring);
 
     // dot img
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                       drawCircles_cb, img_dot_data);
-    gui_img_set_image_data(img_dot, img_dot_data);
+    gui_img_set_src(img_dot, img_dot_data, img_dot->storage_type);
     gui_img_refresh_size(img_dot);
 
     // chart img
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 366, 214,
                                       drawStepBarChart_cb, img_chart_data);
-    gui_img_set_image_data(img_chart, img_chart_data);
+    gui_img_set_src(img_chart, img_chart_data, img_chart->storage_type);
     gui_img_refresh_size(img_chart);
 
     if ((count >= COUNT_MAX) || arc_scale < 0.20f)

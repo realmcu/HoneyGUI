@@ -633,14 +633,14 @@ private:
     static void skip_back_timer_cb(void *p)
     {
         gui_img_t *img = GUI_TYPE(gui_img_t, p);
-        gui_img_set_image_data(img, (const uint8_t *)SKIPBACK_BIN);
+        gui_img_set_src(img, (const uint8_t *)SKIPBACK_BIN, img->storage_type);
     }
     static void skip_back_button_cb(void *obj, gui_event_t *e)
     {
         (void)e;
 
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
-        gui_img_set_image_data(img, (const uint8_t *)SKIPBACKHL_BIN);
+        gui_img_set_src(img, (const uint8_t *)SKIPBACKHL_BIN, img->storage_type);
         gui_obj_create_timer(GUI_BASE(img), 100, false, skip_back_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
 
@@ -662,14 +662,14 @@ private:
     static void skip_fwd_timer_cb(void *p)
     {
         gui_img_t *img = GUI_TYPE(gui_img_t, p);
-        gui_img_set_image_data(img, (const uint8_t *)SKIPFWD_BIN);
+        gui_img_set_src(img, (const uint8_t *)SKIPFWD_BIN, img->storage_type);
     }
     static void skip_fwd_button_cb(void *obj, gui_event_t *e)
     {
         (void)e;
 
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
-        gui_img_set_image_data(img, (const uint8_t *)SKIPFWDHL_BIN);
+        gui_img_set_src(img, (const uint8_t *)SKIPFWDHL_BIN, img->storage_type);
         gui_obj_create_timer(GUI_BASE(img), 100, false, skip_fwd_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
 

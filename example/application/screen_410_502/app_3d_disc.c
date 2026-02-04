@@ -174,11 +174,11 @@ static void switch_to_origin_img(void *param)
     gui_img_t *img = (gui_img_t *)param;
     if (strcmp(img->base.name, "music_backward") == 0)
     {
-        gui_img_set_image_data(img, MUSIC_BACKWARD_BIN);
+        gui_img_set_src(img, MUSIC_BACKWARD_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, MUSIC_FORWARD_BIN);
+        gui_img_set_src(img, MUSIC_FORWARD_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -189,11 +189,11 @@ static void switch_to_highlight_img(void *obj, gui_event_t *e)
     gui_img_t *img = (gui_img_t *)obj;
     if (strcmp(img->base.name, "music_backward") == 0)
     {
-        gui_img_set_image_data(img, MUSIC_BACKWARD_HIGHLIGHT_BIN);
+        gui_img_set_src(img, MUSIC_BACKWARD_HIGHLIGHT_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, MUSIC_FORWARD_HIGHLIGHT_BIN);
+        gui_img_set_src(img, MUSIC_FORWARD_HIGHLIGHT_BIN, IMG_SRC_MEMADDR);
     }
 
     gui_obj_create_timer(GUI_BASE(img), 200, false, switch_to_origin_img);
@@ -209,11 +209,11 @@ static void switch_to_play_pause_img(void *obj, gui_event_t *e)
     is_playing = !is_playing;
     if (is_playing == false)
     {
-        gui_img_set_image_data(img, MUSIC_PAUSE_BIN);
+        gui_img_set_src(img, MUSIC_PAUSE_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, MUSIC_PLAY_BIN);
+        gui_img_set_src(img, MUSIC_PLAY_BIN, IMG_SRC_MEMADDR);
     }
 }
 

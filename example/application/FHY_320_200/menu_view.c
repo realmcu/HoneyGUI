@@ -93,9 +93,9 @@ static void press_button_audio(void *obj)
     if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
         pressed_audio = true;
-        gui_img_set_image_data(icon, MENU_AUDIO_SCALE_BIN);
+        gui_img_set_src(icon, MENU_AUDIO_SCALE_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon);
-        gui_img_set_image_data(bg, MENU_BUTTON_BG_SCALE_BIN);
+        gui_img_set_src(bg, MENU_BUTTON_BG_SCALE_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(bg);
         gui_obj_move((void *)bg, BG_AUDIO_SCALE_X, BG_SCALE_Y);
         gui_obj_move((void *)icon, ICON_SCALE_POS, ICON_SCALE_POS);
@@ -103,9 +103,9 @@ static void press_button_audio(void *obj)
     else if (tp->pressing && pressed_audio && (tp->deltaX != 0 || tp->deltaY != 0))
     {
         pressed_audio = false;
-        gui_img_set_image_data(icon, MENU_AUDIO_BIN);
+        gui_img_set_src(icon, MENU_AUDIO_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon);
-        gui_img_set_image_data(bg, MENU_BUTTON_BG_BIN);
+        gui_img_set_src(bg, MENU_BUTTON_BG_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(bg);
         gui_obj_move((void *)bg, BG_AUDIO_X, BG_Y);
         gui_obj_move((void *)icon, ICON_POS, ICON_POS);
@@ -129,9 +129,9 @@ static void press_button_tools(void *obj)
     if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
         pressed_tools = true;
-        gui_img_set_image_data(icon, MENU_TOOLS_SCALE_BIN);
+        gui_img_set_src(icon, MENU_TOOLS_SCALE_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon);
-        gui_img_set_image_data(bg, MENU_BUTTON_BG_SCALE_BIN);
+        gui_img_set_src(bg, MENU_BUTTON_BG_SCALE_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(bg);
         gui_obj_move((void *)bg, BG_TOOLS_SCALE_X, BG_SCALE_Y);
         gui_obj_move((void *)icon, ICON_SCALE_POS, ICON_SCALE_POS);
@@ -139,9 +139,9 @@ static void press_button_tools(void *obj)
     else if (tp->pressing && pressed_tools && (tp->deltaX != 0 || tp->deltaY != 0))
     {
         pressed_tools = false;
-        gui_img_set_image_data(icon, MENU_TOOLS_BIN);
+        gui_img_set_src(icon, MENU_TOOLS_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon);
-        gui_img_set_image_data(bg, MENU_BUTTON_BG_BIN);
+        gui_img_set_src(bg, MENU_BUTTON_BG_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(bg);
         gui_obj_move((void *)bg, BG_TOOLS_X, BG_Y);
         gui_obj_move((void *)icon, ICON_POS, ICON_POS);
@@ -165,9 +165,9 @@ static void press_button_settings(void *obj)
     if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
         pressed_settings = true;
-        gui_img_set_image_data(icon, MENU_SETTINGS_SCALE_BIN);
+        gui_img_set_src(icon, MENU_SETTINGS_SCALE_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon);
-        gui_img_set_image_data(bg, MENU_BUTTON_BG_SCALE_BIN);
+        gui_img_set_src(bg, MENU_BUTTON_BG_SCALE_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(bg);
         gui_obj_move((void *)bg, BG_SETTINGS_SCALE_X, BG_SCALE_Y);
         gui_obj_move((void *)icon, ICON_SCALE_POS, ICON_SCALE_POS);
@@ -175,9 +175,9 @@ static void press_button_settings(void *obj)
     else if (tp->pressing && pressed_settings && (tp->deltaX != 0 || tp->deltaY != 0))
     {
         pressed_settings = false;
-        gui_img_set_image_data(icon, MENU_SETTINGS_BIN);
+        gui_img_set_src(icon, MENU_SETTINGS_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon);
-        gui_img_set_image_data(bg, MENU_BUTTON_BG_BIN);
+        gui_img_set_src(bg, MENU_BUTTON_BG_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(bg);
         gui_obj_move((void *)bg, BG_SETTINGS_X, BG_Y);
         gui_obj_move((void *)icon, ICON_POS, ICON_POS);

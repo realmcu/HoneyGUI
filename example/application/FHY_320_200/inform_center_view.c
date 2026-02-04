@@ -107,11 +107,11 @@ static void click_button(void *obj, gui_event_t *e)
     {
         if (*status)
         {
-            gui_img_set_image_data(icon, PAUSE_SMALL_BIN);
+            gui_img_set_src(icon, PAUSE_SMALL_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data(icon, PLAY_SMALL_BIN);
+            gui_img_set_src(icon, PLAY_SMALL_BIN, IMG_SRC_MEMADDR);
         }
         gui_img_refresh_size(icon);
         return;
@@ -279,7 +279,7 @@ static void function_icon_design(gui_obj_t *parent)
             }
             if (!f_status.auto_play_pause)
             {
-                gui_img_set_image_data(icon, PLAY_SMALL_BIN);
+                gui_img_set_src(icon, PLAY_SMALL_BIN, IMG_SRC_MEMADDR);
                 gui_img_refresh_size(icon);
             }
             x += 105;
@@ -290,11 +290,11 @@ static void function_icon_design(gui_obj_t *parent)
             gui_img_t *icon = gui_img_create_from_mem(bg, 0, ICON_ASC_BIN, 25, 14, 0, 0);
             if (ambient_sound_type == ANC)
             {
-                gui_img_set_image_data(icon, ICON_ASC_BIN);
+                gui_img_set_src(icon, ICON_ASC_BIN, IMG_SRC_MEMADDR);
             }
             else if (ambient_sound_type == TT)
             {
-                gui_img_set_image_data(icon, ICON_TT_BIN);
+                gui_img_set_src(icon, ICON_TT_BIN, IMG_SRC_MEMADDR);
             }
             if (f_status.headband_connect)
             {

@@ -103,19 +103,23 @@ static void time_update_cb(void *param)
         return;
     }
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", win_watch);
-    gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
+    gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
+                    ((gui_img_t *)img_hour_decimal)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_hour_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", win_watch);
-    gui_img_set_image_data((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10]);
+    gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
+                    ((gui_img_t *)img_hour_single)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_hour_single);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", win_watch);
-    gui_img_set_image_data((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10]);
+    gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
+                    ((gui_img_t *)img_minute_decimal)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_minute_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", win_watch);
-    gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10]);
+    gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
+                    ((gui_img_t *)img_minute_single)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_minute_single);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(date_text, "date_text", win_watch);
@@ -244,31 +248,31 @@ static void update_weather_image(cJSON *weather, uint8_t i)
     cJSON *condition = cJSON_GetObjectItemCaseSensitive(weather, key);
     if (strcmp(condition->valuestring, "Sunny") == 0)
     {
-        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_SUNNY_BIN);
+        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_SUNNY_BIN, IMG_SRC_MEMADDR);
     }
     else if (strcmp(condition->valuestring, "Light rain") == 0)
     {
-        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN);
+        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN, IMG_SRC_MEMADDR);
     }
     else if (strcmp(condition->valuestring, "Showers") == 0)
     {
-        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN);
+        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN, IMG_SRC_MEMADDR);
     }
     else if (strcmp(condition->valuestring, "Moderate rain") == 0)
     {
-        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_M_BIN);
+        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_M_BIN, IMG_SRC_MEMADDR);
     }
     else if (strcmp(condition->valuestring, "Heavy rain") == 0)
     {
-        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_L_BIN);
+        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_L_BIN, IMG_SRC_MEMADDR);
     }
     else if (strcmp(condition->valuestring, "Cloudy") == 0)
     {
-        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN);
+        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN, IMG_SRC_MEMADDR);
     }
     else // need to add more weather icon
     {
-        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN);
+        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN, IMG_SRC_MEMADDR);
     }
     gui_img_refresh_size((gui_img_t *)obj);
 }
@@ -591,7 +595,7 @@ static void activity_timer_cb(void *obj)
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_activity_cb, img_data);
-        gui_img_set_image_data(img, img_data);
+        gui_img_set_src(img, img_data, img->storage_type);
 
         json_refresh_flag &= 0b1011;
     }
@@ -606,7 +610,7 @@ static void temp_timer_cb(void *obj)
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_temperature_cb,
                                           img_data);
-        gui_img_set_image_data(img, img_data);
+        gui_img_set_src(img, img_data, img->storage_type);
         json_refresh_flag &= 0b1101;
     }
 }

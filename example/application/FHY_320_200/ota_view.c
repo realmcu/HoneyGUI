@@ -93,7 +93,7 @@ static void ota_cb(void *p)
         {
             gui_text_color_set(text, gui_rgb(0xFF, 0xFF, 0xFF));
             gui_text_content_set(text, "Complete!", 10);
-            gui_img_set_image_data(icon, ICON_OTA_COMPLETE_BIN);
+            gui_img_set_src(icon, ICON_OTA_COMPLETE_BIN, IMG_SRC_MEMADDR);
             gui_img_a8_mix_alpha(icon, 0xFF);
 
             gui_obj_create_timer(p, 2000, false, exit_wait);
@@ -111,7 +111,7 @@ static void ota_cb(void *p)
     {
         f_status.ota = OTA_DONE;
         GUI_BASE(text)->timer->interval_ms = 10;
-        gui_img_set_image_data(bg, OTA_BG_BIN);
+        gui_img_set_src(bg, OTA_BG_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
@@ -137,7 +137,7 @@ static void ota_cb(void *p)
         {
             bg_data = OTA_BG_BIN;
         }
-        gui_img_set_image_data(bg, bg_data);
+        gui_img_set_src(bg, bg_data, IMG_SRC_MEMADDR);
     }
 }
 
@@ -160,7 +160,7 @@ static void entrance_animation(void *p)
         gui_obj_move((void *)icon, 138, 60);
         gui_img_scale(icon, 1.f, 1.f);
         gui_img_set_focus(icon, 0, 0);
-        gui_img_set_image_data(icon, ICON_OTA_SMALL_BIN);
+        gui_img_set_src(icon, ICON_OTA_SMALL_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon);
 
         sprintf(ota_str, "%d%%", ota_val);

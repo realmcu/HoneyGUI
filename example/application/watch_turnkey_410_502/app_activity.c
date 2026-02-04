@@ -205,7 +205,7 @@ static void activity_timer_cb(void *obj)
     uint8_t *img_ring_data = (void *)gui_img_get_image_data(img_ring);
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, RADIUS * 2, RADIUS * 2,
                                       arc_activity_cb, img_ring_data);
-    gui_img_set_image_data(img_ring, img_ring_data);
+    gui_img_set_src(img_ring, img_ring_data, img_ring->storage_type);
     gui_img_set_mode(img_ring, IMG_SRC_OVER_MODE);
     gui_img_refresh_size(img_ring);
 
@@ -287,7 +287,7 @@ static void note_design(gui_obj_t *obj, void *p)
             //refresh dot img
             gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                               drawCircles_cb, img_dot_data);
-            gui_img_set_image_data(img_dot, img_dot_data);
+            gui_img_set_src(img_dot, img_dot_data, img_dot->storage_type);
             gui_img_set_mode(img_dot, IMG_SRC_OVER_MODE);
             gui_img_refresh_size(img_dot);
 
@@ -333,7 +333,7 @@ static void note_design(gui_obj_t *obj, void *p)
             time_update_cb(NULL);
             gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                               drawCircles_cb, img_dot_data);
-            gui_img_set_image_data(img_dot, img_dot_data);
+            gui_img_set_src(img_dot, img_dot_data, img_dot->storage_type);
             gui_img_set_mode(img_dot, IMG_SRC_OVER_MODE);
             gui_img_refresh_size(img_dot);
 

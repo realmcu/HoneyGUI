@@ -164,23 +164,23 @@ static void time_update_cb(void)
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "circle_hour_decimal",
                                         current_view);
-        gui_img_set_attribute((gui_img_t *)img_hour_decimal, img_hour_decimal->name,
-                              text_num_array[timeinfo->tm_hour / 10], img_hour_decimal->x, img_hour_decimal->y);
+        gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
+                        ((gui_img_t *)img_hour_decimal)->storage_type);
         gui_img_refresh_size((gui_img_t *)img_hour_decimal);
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "circle_hour_single",
                                         current_view);
-        gui_img_set_attribute((gui_img_t *)img_hour_single, img_hour_single->name,
-                              text_num_array[timeinfo->tm_hour % 10], img_hour_single->x, img_hour_single->y);
+        gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
+                        ((gui_img_t *)img_hour_single)->storage_type);
         gui_img_refresh_size((gui_img_t *)img_hour_single);
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "circle_minute_decimal",
                                         current_view);
-        gui_img_set_attribute((gui_img_t *)img_minute_decimal, img_minute_decimal->name,
-                              text_num_array[timeinfo->tm_min / 10], img_minute_decimal->x, img_minute_decimal->y);
+        gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
+                        ((gui_img_t *)img_minute_decimal)->storage_type);
         gui_img_refresh_size((gui_img_t *)img_minute_decimal);
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "circle_minute_single",
                                         current_view);
-        gui_img_set_attribute((gui_img_t *)img_minute_single, img_minute_single->name,
-                              text_num_array[timeinfo->tm_min % 10], img_minute_single->x, img_minute_single->y);
+        gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
+                        ((gui_img_t *)img_minute_single)->storage_type);
         gui_img_refresh_size((gui_img_t *)img_minute_single);
     }
 }

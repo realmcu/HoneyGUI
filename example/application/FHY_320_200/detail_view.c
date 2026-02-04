@@ -125,13 +125,13 @@ static void click_button_favorite(void *obj, gui_event_t *e)
     is_favorite = !is_favorite;
     if (is_favorite)
     {
-        gui_img_set_image_data(icon, ICON_IS_FAVORITE_BIN);
+        gui_img_set_src(icon, ICON_IS_FAVORITE_BIN, IMG_SRC_MEMADDR);
         page_add_in_favorite();
         gui_img_a8_recolor(icon, FG_WARNING.color.argb_full);
     }
     else
     {
-        gui_img_set_image_data(icon, ICON_NOT_FAVORITE_BIN);
+        gui_img_set_src(icon, ICON_NOT_FAVORITE_BIN, IMG_SRC_MEMADDR);
         page_delete_from_favorite();
         if (theme_bg_white)
         {
@@ -181,7 +181,7 @@ static void detail_view_design(gui_view_t *view)
                                                 6, 0, 0);
         if (page_in_favorite())
         {
-            gui_img_set_image_data(icon_favorite, ICON_IS_FAVORITE_BIN);
+            gui_img_set_src(icon_favorite, ICON_IS_FAVORITE_BIN, IMG_SRC_MEMADDR);
             is_favorite = true;
             gui_img_a8_recolor(icon_favorite, FG_WARNING.color.argb_full);
         }

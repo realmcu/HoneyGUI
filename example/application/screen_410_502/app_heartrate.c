@@ -247,11 +247,13 @@ static void draw_heartrate_graph(NVGcontext *vg)
         }
         // gui_log("number = %d\n", number);
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_decimal, "hr_content_decimal", win_hb);
-        gui_img_set_attribute((gui_img_t *)img_decimal, img_decimal->name,
-                              text_num_array[(number % 100) / 10], img_decimal->x, img_decimal->y);
+        gui_img_set_src((gui_img_t *)img_decimal, text_num_array[(number % 100) / 10],
+                        ((gui_img_t *)img_decimal)->storage_type);
+
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_single, "hr_content_single", win_hb);
-        gui_img_set_attribute((gui_img_t *)img_single, img_single->name, text_num_array[number % 10],
-                              img_single->x, img_single->y);
+        gui_img_set_src((gui_img_t *)img_single, text_num_array[number % 10],
+                        ((gui_img_t *)img_single)->storage_type);
+
     }
 
     draw_line_chart(vg, samples);
@@ -268,7 +270,7 @@ static void hr_timer_cb(void *obj)
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300,
                                           draw_heartrate_graph,
                                           img_data);
-        gui_img_set_image_data(img, img_data);
+        gui_img_set_src(img, img_data, img->storage_type);
     }
 }
 static void clear_heartrate_cache(gui_view_t *view)

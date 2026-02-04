@@ -294,7 +294,7 @@ static void click_button_r(void *obj, gui_event_t *e)
         {
             status = START;
             gui_img_a8_recolor((void *)bg_r, COLOR_STOP);
-            gui_img_set_image_data((void *)icon_r, STOPWATCH_BUTTON_STOP_BIN);
+            gui_img_set_src((void *)icon_r, STOPWATCH_BUTTON_STOP_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size((void *)icon_r);
             gui_obj_move(icon_r, ICON_STOP_X, ICON_STOP_Y);
             gui_img_a8_recolor((void *)bg_l, COLOR_MARK);
@@ -306,11 +306,11 @@ static void click_button_r(void *obj, gui_event_t *e)
         {
             status = STOP;
             gui_img_a8_recolor((void *)bg_r, COLOR_START);
-            gui_img_set_image_data((void *)icon_r, STOPWATCH_BUTTON_START_BIN);
+            gui_img_set_src((void *)icon_r, STOPWATCH_BUTTON_START_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size((void *)icon_r);
             gui_obj_move(icon_r, ICON_START_X, ICON_START_Y);
             gui_img_a8_recolor((void *)bg_l, COLOR_RESET);
-            gui_img_set_image_data((void *)icon_l, STOPWATCH_BUTTON_RESET_BIN);
+            gui_img_set_src((void *)icon_l, STOPWATCH_BUTTON_RESET_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size((void *)icon_l);
             gui_obj_move(icon_l, ICON_RESET_X, ICON_RESET_Y);
 
@@ -321,11 +321,11 @@ static void click_button_r(void *obj, gui_event_t *e)
         {
             status = START;
             gui_img_a8_recolor((void *)bg_r, COLOR_STOP);
-            gui_img_set_image_data((void *)icon_r, STOPWATCH_BUTTON_STOP_BIN);
+            gui_img_set_src((void *)icon_r, STOPWATCH_BUTTON_STOP_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size((void *)icon_r);
             gui_obj_move(icon_r, ICON_STOP_X, ICON_STOP_Y);
             gui_img_a8_recolor((void *)bg_l, COLOR_MARK);
-            gui_img_set_image_data((void *)icon_l, STOPWATCH_BUTTON_MARK_BIN);
+            gui_img_set_src((void *)icon_l, STOPWATCH_BUTTON_MARK_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size((void *)icon_l);
             gui_obj_move(icon_l, ICON_MARK_X, ICON_MARK_Y);
 

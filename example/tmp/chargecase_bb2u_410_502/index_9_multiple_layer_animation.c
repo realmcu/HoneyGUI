@@ -31,7 +31,7 @@ static void switch_widget_play_watchface(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_watchface_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_watchface_array[index], img->storage_type);
         //  gui_img_refresh_size(img);
         gui_log("switch index:%d\n", index);
 
@@ -54,7 +54,7 @@ static void switch_widget_play_watchface2(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_a1_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_a1_array[index], img->storage_type);
         //  gui_img_refresh_size(img);
         gui_log("switch index:%d\n", index);
 
@@ -77,7 +77,7 @@ static void switch_widget_play_watchface3(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_a2_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_a2_array[index], img->storage_type);
         //  gui_img_refresh_size(img);
         gui_log("switch index:%d\n", index);
 
@@ -100,7 +100,7 @@ static void switch_widget_play_watchface4(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_a3_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_a3_array[index], img->storage_type);
         //  gui_img_refresh_size(img);
         gui_log("switch index:%d\n", index);
 
@@ -123,7 +123,7 @@ static void switch_widget_play_watchface5(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_a4_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_a4_array[index], img->storage_type);
         //  gui_img_refresh_size(img);
         gui_log("switch index:%d\n", index);
 

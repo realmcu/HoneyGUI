@@ -652,7 +652,7 @@ static void note_design(gui_obj_t *obj, void *p)
             //refresh dot img
             gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                               heart_drawCircles_cb, img_dot_data);
-            gui_img_set_image_data(img_dot, img_dot_data);
+            gui_img_set_src(img_dot, img_dot_data, img_dot->storage_type);
             gui_img_refresh_size(img_dot);
 
         }

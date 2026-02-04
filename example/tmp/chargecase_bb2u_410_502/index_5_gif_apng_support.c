@@ -173,7 +173,7 @@ static void switch_widget_play(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -205,7 +205,7 @@ static void switch_widget_play_2(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -237,7 +237,7 @@ static void switch_widget_play_3(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -269,7 +269,7 @@ static void switch_widget_play_4(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -301,7 +301,7 @@ static void switch_widget_play_5(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -333,7 +333,7 @@ static void switch_widget_play_6(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -365,7 +365,7 @@ static void switch_widget_play_7(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -397,7 +397,7 @@ static void switch_widget_play_8(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -431,7 +431,7 @@ static void switch_widget_play_9(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -465,7 +465,7 @@ static void switch_widget_play_10(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[array_size - 1 - index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[array_size - 1 - index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
 
 
@@ -493,7 +493,7 @@ static void switch_widget_play2(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (const uint8_t *)gui_switch_array[index]);
+        gui_img_set_src(img, (const uint8_t *)gui_switch_array[index], IMG_SRC_MEMADDR);
         gui_img_refresh_size(img);
         gui_log("switch index:%d\n", index);
 

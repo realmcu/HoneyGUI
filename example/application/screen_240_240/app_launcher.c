@@ -66,12 +66,15 @@ void fire_live(void *param)
     if (fire_index < FIRE_E)
     {
         fire_index ++;
-        gui_img_set_attribute(img, "fire", frames[fire_index], 0, 0);
+        gui_img_set_pos(img, 0, 0);
+        gui_img_set_src(img, frames[fire_index], img->storage_type);
     }
     else
     {
         fire_index = FIRE_S;
-        gui_img_set_attribute(img, "fire", frames[fire_index], 0, 0);
+        gui_img_set_pos(img, 0, 0);
+        gui_img_set_src(img, frames[fire_index], img->storage_type);
+
     }
 }
 

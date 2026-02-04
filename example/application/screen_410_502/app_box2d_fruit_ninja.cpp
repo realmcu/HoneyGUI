@@ -393,7 +393,7 @@ static bool cut_judgment(gui_img_t *img, uint8_t index, void *pic_cut)
                                                           img_rotate_angle))
             {
                 if (img == img_bomb) {return true;}
-                gui_img_set_image_data(img, (const uint8_t *)pic_cut);
+                gui_img_set_src(img, (const uint8_t *)pic_cut, img->storage_type);
                 gui_img_refresh_size(img);
 
                 /* display other half fruit */ // smooth display at the first time
@@ -576,7 +576,8 @@ static void fruit_ninja_cb(void *p)
             if (position_refresh((int)(position.x * M2P - RADIUS_ST), (int)(position.y * M2P - RADIUS_ST),
                                  img_strawberry, body_st) == 1)
             {
-                gui_img_set_image_data(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN);
+                gui_img_set_src(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN,
+                                img_strawberry->storage_type);
                 gui_img_refresh_size(img_strawberry);
                 gui_img_set_focus(img_strawberry, img_strawberry->base.w / 2, img_strawberry->base.h / 2);
 
@@ -589,7 +590,7 @@ static void fruit_ninja_cb(void *p)
             if (position_refresh((int)(position.x * M2P - RADIUS_BA), (int)(position.y * M2P - RADIUS_BA),
                                  img_banana, body_ba) == 1)
             {
-                gui_img_set_image_data(img_banana, (const uint8_t *)FRUIT_NINJA_BANANA_BIN);
+                gui_img_set_src(img_banana, (const uint8_t *)FRUIT_NINJA_BANANA_BIN, img_banana->storage_type);
                 gui_img_refresh_size(img_banana);
                 gui_img_set_focus(img_banana, img_banana->base.w / 2, img_banana->base.h / 2);
 
@@ -601,7 +602,7 @@ static void fruit_ninja_cb(void *p)
             if (position_refresh((int)(position.x * M2P - RADIUS_PE), (int)(position.y * M2P - RADIUS_PE),
                                  img_peach, body_pe) == 1)
             {
-                gui_img_set_image_data(img_peach, (const uint8_t *)FRUIT_NINJA_PEACH_BIN);
+                gui_img_set_src(img_peach, (const uint8_t *)FRUIT_NINJA_PEACH_BIN, img_peach->storage_type);
                 gui_img_refresh_size(img_peach);
                 gui_img_set_focus(img_peach, img_peach->base.w / 2, img_peach->base.h / 2);
 
@@ -613,7 +614,8 @@ static void fruit_ninja_cb(void *p)
             if (position_refresh((int)(position.x * M2P - RADIUS_WM), (int)(position.y * M2P - RADIUS_WM),
                                  img_watermelon, body_wm))
             {
-                gui_img_set_image_data(img_watermelon, (const uint8_t *)FRUIT_NINJA_WATERMELON_BIN);
+                gui_img_set_src(img_watermelon, (const uint8_t *)FRUIT_NINJA_WATERMELON_BIN,
+                                img_watermelon->storage_type);
                 gui_img_refresh_size(img_watermelon);
                 gui_img_set_focus(img_watermelon, img_watermelon->base.w / 2, img_watermelon->base.h / 2);
 

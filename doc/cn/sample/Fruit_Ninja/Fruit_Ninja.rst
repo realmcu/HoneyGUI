@@ -99,7 +99,7 @@
       if (position_refresh((int)(position.x * M2P - RADIUS_ST), (int)(position.y * M2P - RADIUS_ST),
                            img_strawberry, body_st) == 1)
       {
-            gui_img_set_image_data(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN);
+            gui_img_set_src(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(img_strawberry);
             gui_img_set_focus(img_strawberry, img_strawberry->base.w / 2, img_strawberry->base.h / 2);
 
@@ -148,7 +148,7 @@
 
    .. code-block:: c
 
-      gui_img_set_image_data(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN);
+      gui_img_set_src(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN, IMG_SRC_MEMADDR);
       gui_img_refresh_size(img_strawberry);
       gui_img_set_focus(img_strawberry, img_strawberry->base.w / 2, img_strawberry->base.h / 2);
 

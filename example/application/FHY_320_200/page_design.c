@@ -481,7 +481,8 @@ static void press_button_page_volume(void *obj)
                 volume_val++;
                 gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
                 gui_obj_hidden((void *)progressbar, false);
-                gui_img_set_image_data((void *)progressbar, img_data_array[volume_val - 1]);
+                gui_img_set_src((gui_img_t *)progressbar, img_data_array[volume_val - 1],
+                                ((gui_img_t *)progressbar)->storage_type);
                 gui_img_refresh_size((void *)progressbar);
             }
             else if (pressed_l)
@@ -495,7 +496,8 @@ static void press_button_page_volume(void *obj)
                 else
                 {
                     gui_obj_hidden((void *)progressbar, false);
-                    gui_img_set_image_data((void *)progressbar, img_data_array[volume_val - 1]);
+                    gui_img_set_src((gui_img_t *)progressbar, img_data_array[volume_val - 1],
+                                    ((gui_img_t *)progressbar)->storage_type);
                     gui_img_refresh_size((void *)progressbar);
                 }
             }
@@ -565,13 +567,15 @@ static void press_button_page_voice_aware(void *obj)
             {
                 voice_aware_val++;
                 gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-                gui_img_set_image_data((void *)progressbar, img_data_array[voice_aware_val - 1]);
+                gui_img_set_src((gui_img_t *)progressbar, img_data_array[voice_aware_val - 1],
+                                ((gui_img_t *)progressbar)->storage_type);
             }
             else if (pressed_l)
             {
                 voice_aware_val--;
                 gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-                gui_img_set_image_data((void *)progressbar, img_data_array[voice_aware_val - 1]);
+                gui_img_set_src((gui_img_t *)progressbar, img_data_array[voice_aware_val - 1],
+                                ((gui_img_t *)progressbar)->storage_type);
             }
 
             if (voice_aware_val == compare)
@@ -639,13 +643,15 @@ static void press_button_page_equalizer(void *obj)
             {
                 euqalizer_type_index--;
                 GUI_WIDGET_POINTER_BY_NAME_ROOT(euqalizer_type, "euqalizer_type", o->parent);
-                gui_img_set_image_data((gui_img_t *)euqalizer_type, img_data_array[euqalizer_type_index]);
+                gui_img_set_src((gui_img_t *)euqalizer_type, img_data_array[euqalizer_type_index],
+                                ((gui_img_t *)euqalizer_type)->storage_type);
             }
             else if (pressed_r)
             {
                 euqalizer_type_index++;
                 GUI_WIDGET_POINTER_BY_NAME_ROOT(euqalizer_type, "euqalizer_type", o->parent);
-                gui_img_set_image_data((gui_img_t *)euqalizer_type, img_data_array[euqalizer_type_index]);
+                gui_img_set_src((gui_img_t *)euqalizer_type, img_data_array[euqalizer_type_index],
+                                ((gui_img_t *)euqalizer_type)->storage_type);
             }
 
             if (euqalizer_type_index == compare)
@@ -792,13 +798,15 @@ static void press_button_page_screen_brightness(void *obj)
             {
                 screen_brightness_val++;
                 gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-                gui_img_set_image_data((void *)progressbar, img_data_array[screen_brightness_val - 1]);
+                gui_img_set_src((gui_img_t *)progressbar, img_data_array[screen_brightness_val - 1],
+                                ((gui_img_t *)progressbar)->storage_type);
             }
             else if (pressed_l)
             {
                 screen_brightness_val--;
                 gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-                gui_img_set_image_data((void *)progressbar, img_data_array[screen_brightness_val - 1]);
+                gui_img_set_src((gui_img_t *)progressbar, img_data_array[screen_brightness_val - 1],
+                                ((gui_img_t *)progressbar)->storage_type);
             }
 
             if (screen_brightness_val == compare)
@@ -1218,13 +1226,13 @@ static void click_button_page_playback(void *obj, gui_event_t *e)
     {
         gui_scroll_text_resume(name);
         gui_scroll_text_resume(lyrics);
-        gui_img_set_image_data((gui_img_t *)o, PAUSE_BIN);
+        gui_img_set_src((gui_img_t *)o, PAUSE_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
         gui_scroll_text_pause(name);
         gui_scroll_text_pause(lyrics);
-        gui_img_set_image_data((gui_img_t *)o, PLAY_BIN);
+        gui_img_set_src((gui_img_t *)o, PLAY_BIN, IMG_SRC_MEMADDR);
     }
     gui_img_refresh_size((gui_img_t *)o);
 }
@@ -1391,7 +1399,8 @@ static void click_button_page_lock_screen(void *obj, gui_event_t *e)
     gui_img_a8_mix_alpha((void *)icon_r, icon_r->fg_color_set >> 24);
 
     gui_obj_t *img = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-    gui_img_set_image_data((gui_img_t *)img, img_data_array[wallpaper_index]);
+    gui_img_set_src((gui_img_t *)img, img_data_array[wallpaper_index],
+                    ((gui_img_t *)img)->storage_type);
 }
 
 static void click_button_page_quick_wake_up_screen(void *obj, gui_event_t *e)
@@ -1521,7 +1530,7 @@ static void click_button_settings_page_clock_settings(void *obj, gui_event_t *e)
             gui_img_a8_recolor((void *)min_bg, bg_theme3_mid_color.color.argb_full);
         }
         f_status.clock_settings = 0;
-        gui_img_set_image_data((void *)settings, ICON_SETTINGS_BIN);
+        gui_img_set_src((void *)settings, ICON_SETTINGS_BIN, IMG_SRC_MEMADDR);
         gui_img_a8_recolor((void *)add, fg_2_color.color.argb_full);
         gui_img_a8_recolor((void *)sub, fg_2_color.color.argb_full);
 
@@ -1535,7 +1544,7 @@ static void click_button_settings_page_clock_settings(void *obj, gui_event_t *e)
         gui_img_a8_recolor((void *)hour_bg, fg_1_color.color.argb_full);
 
         f_status.clock_settings = 1;
-        gui_img_set_image_data((void *)settings, ICON_SELECTED_BIN);
+        gui_img_set_src((void *)settings, ICON_SELECTED_BIN, IMG_SRC_MEMADDR);
         gui_img_a8_recolor((void *)add, fg_1_color.color.argb_full);
         gui_img_a8_recolor((void *)sub, fg_1_color.color.argb_full);
     }
@@ -1769,7 +1778,7 @@ static void click_button_scan_page_audio_source(void *obj, gui_event_t *e)
     bg->x = 40;
     gui_img_a8_recolor((void *)bg,
                        theme_bg_white ? BG_THEME1_MID_LIGHT.color.argb_full : BG_THEME1_MID_DARK.color.argb_full);
-    gui_img_set_image_data((void *)bg, BUTTON_BG_ELLIPSE_240_80_BIN);
+    gui_img_set_src((void *)bg, BUTTON_BG_ELLIPSE_240_80_BIN, IMG_SRC_MEMADDR);
     gui_img_refresh_size((void *)bg);
 
     gui_obj_create_timer(obj, 2000, true, scan_timer_page_audio_source);
@@ -1787,7 +1796,7 @@ static void click_button_connect_page_audio_source(void *obj, gui_event_t *e)
     audio_source.wait = true;
     gui_obj_t *win = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
     gui_obj_t *icon = gui_list_entry(win->child_list.next, gui_obj_t, brother_list);
-    gui_img_set_image_data((void *)icon, ICON_CONNECT_BIN);
+    gui_img_set_src((void *)icon, ICON_CONNECT_BIN, IMG_SRC_MEMADDR);
     gui_img_a8_mix_alpha((void *)icon, 75);
     gui_obj_create_timer(obj, 50, true, connect_timer_page_audio_source);
     gui_obj_start_timer(obj);
@@ -1862,7 +1871,7 @@ static void click_button_connect_page_tx_management(void *obj, gui_event_t *e)
     tx_management.wait = true;
     gui_obj_t *win = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
     gui_obj_t *icon = gui_list_entry(win->child_list.next, gui_obj_t, brother_list);
-    gui_img_set_image_data((void *)icon, ICON_CONNECT_BIN);
+    gui_img_set_src((void *)icon, ICON_CONNECT_BIN, IMG_SRC_MEMADDR);
     gui_img_a8_mix_alpha((void *)icon, 75);
     gui_obj_create_timer(obj, 50, true, connect_timer_page_tx_management);
     gui_obj_start_timer(obj);
@@ -1972,7 +1981,7 @@ static void timer_page_silentnow(void *obj)
         }
         else
         {
-            gui_img_set_image_data(icon, ICON_SILENT_BIN);
+            gui_img_set_src(icon, ICON_SILENT_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(icon);
             silent_time_val = 900;
             sprintf(page_str, "00: 15 :00");
@@ -2703,7 +2712,7 @@ static void note_design_page_audio_source(gui_obj_t *obj, void *p)
                 void *bg_data_new[2];
                 if (bg_data[0] == BUTTON_BG_ELLIPSE_312_56_BIN)
                 {
-                    gui_img_set_image_data(bg, BUTTON_BG_ELLIPSE_312_56_TOP_BIN);
+                    gui_img_set_src(bg, BUTTON_BG_ELLIPSE_312_56_TOP_BIN, IMG_SRC_MEMADDR);
                     bg_data_new[0] = BUTTON_BG_ELLIPSE_312_56_MID_BIN;
                     bg_data_new[1] = BUTTON_BG_ELLIPSE_312_56_BOT_BIN;
                 }
@@ -3659,7 +3668,7 @@ void page_playback_design(gui_obj_t *parent)
     {
         if (f_status.playback)
         {
-            gui_img_set_image_data(play, PAUSE_BIN);
+            gui_img_set_src(play, PAUSE_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(play);
         }
         else
@@ -3743,7 +3752,7 @@ void page_volume_design(gui_obj_t *parent)
     }
     else
     {
-        gui_img_set_image_data(progressbar, img_data_array[volume_val - 1]);
+        gui_img_set_src(progressbar, img_data_array[volume_val - 1], progressbar->storage_type);
         gui_img_refresh_size(progressbar);
     }
 
@@ -5780,7 +5789,7 @@ void page_silentnow_design(gui_obj_t *parent)
     {
         gui_img_a8_recolor(play_bg, bg_2_color.color.argb_full);
         gui_img_a8_mix_alpha(play_bg, play_bg->fg_color_set >> 24);
-        gui_img_set_image_data(play, ICON_CANCEL_BIN);
+        gui_img_set_src(play, ICON_CANCEL_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(play);
 
         gui_img_t *icon = gui_img_create_from_mem(control_bg, 0, ICON_SILENT_CIRCLE_BIN, 20, 29, 0, 0);

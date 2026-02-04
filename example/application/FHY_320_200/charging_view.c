@@ -113,7 +113,7 @@ static void entrance_animation(void *p)
         uint8_t index = 7 * (animation_cnt - cnt_max_2) / (cnt_max_3 - cnt_max_2);
         gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(icon_bg)->child_list.next, gui_obj_t,
                                                       brother_list);
-        gui_img_set_image_data(icon, icon_array[index]);
+        gui_img_set_src(icon, icon_array[index], IMG_SRC_MEMADDR);
     }
     else if (animation_cnt <= cnt_max_4) //move
     {

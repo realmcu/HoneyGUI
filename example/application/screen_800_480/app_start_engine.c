@@ -66,7 +66,7 @@ static void press_start(void *obj, gui_event_t *e)
     (void)e;
 
     gui_img_t *img = (gui_img_t *)obj;
-    gui_img_set_image_data(img, START_ENGINE_PRESS_BIN);
+    gui_img_set_src(img, START_ENGINE_PRESS_BIN, IMG_SRC_MEMADDR);
 }
 
 static void release_start(void *obj, gui_event_t *e)
@@ -74,7 +74,7 @@ static void release_start(void *obj, gui_event_t *e)
     (void)e;
 
     gui_img_t *img = (gui_img_t *)obj;
-    gui_img_set_image_data(img, START_ENGINE_RELEASE_BIN);
+    gui_img_set_src(img, START_ENGINE_RELEASE_BIN, IMG_SRC_MEMADDR);
 
     touch_info_t *tp = tp_get_info();
     gui_obj_t *parent = GUI_BASE(GUI_BASE(obj)->parent);

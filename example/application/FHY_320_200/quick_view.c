@@ -305,7 +305,7 @@ void status_bar_design(gui_obj_t *parent)
     {
         if (f_status.bt == 0)
         {
-            gui_img_set_image_data(bt, ICON_BT_DISCONNECT_BIN);
+            gui_img_set_src(bt, ICON_BT_DISCONNECT_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(bt);
             gui_img_a8_recolor(bt, font_color.color.argb_full);
         }

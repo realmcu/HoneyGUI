@@ -87,11 +87,11 @@ void switch_bt(bool state)
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_1)
     {
-        gui_img_set_image_data(img, CONTROL_BT_ON_BIN);
+        gui_img_set_src(img, CONTROL_BT_ON_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, CONTROL_BT_OFF_BIN);
+        gui_img_set_src(img, CONTROL_BT_OFF_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -102,11 +102,11 @@ void switch_local_play(bool state)
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_2)
     {
-        gui_img_set_image_data(img, CONTROL_PLAY_ON_BIN);
+        gui_img_set_src(img, CONTROL_PLAY_ON_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, CONTROL_PLAY_OFF_BIN);
+        gui_img_set_src(img, CONTROL_PLAY_OFF_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -117,13 +117,13 @@ void switch_phone(bool state)
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_3)
     {
-        gui_img_set_image_data(img, CONTROL_PHONE_ON_BIN);
-        gui_img_set_image_data(img_capsule_phone, PHONE_ON_ICON_BIN);
+        gui_img_set_src(img, CONTROL_PHONE_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_phone, PHONE_ON_ICON_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, CONTROL_PHONE_OFF_BIN);
-        gui_img_set_image_data(img_capsule_phone, PHONE_OFF_ICON_BIN);
+        gui_img_set_src(img, CONTROL_PHONE_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_phone, PHONE_OFF_ICON_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -134,11 +134,11 @@ void switch_earphone(bool state)
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_4)
     {
-        gui_img_set_image_data(img, CONTROL_EARPHONE_ON_BIN);
+        gui_img_set_src(img, CONTROL_EARPHONE_ON_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, CONTROL_EARPHONE_OFF_BIN);
+        gui_img_set_src(img, CONTROL_EARPHONE_OFF_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -149,13 +149,13 @@ void switch_mute(bool state)
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_5)
     {
-        gui_img_set_image_data(img, CONTROL_MUTE_ON_BIN);
-        gui_img_set_image_data(img_capsule_mute, MUTE_ON_ICON_BIN);
+        gui_img_set_src(img, CONTROL_MUTE_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_mute, MUTE_ON_ICON_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, CONTROL_MUTE_OFF_BIN);
-        gui_img_set_image_data(img_capsule_mute, MUTE_OFF_ICON_BIN);
+        gui_img_set_src(img, CONTROL_MUTE_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_mute, MUTE_OFF_ICON_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -166,13 +166,13 @@ void switch_nobother(bool state)
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_6)
     {
-        gui_img_set_image_data(img, CONTROL_NOBOTHER_ON_BIN);
-        gui_img_set_image_data(img_capsule_nobother, NOBOTHER_ON_ICON_BIN);
+        gui_img_set_src(img, CONTROL_NOBOTHER_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_nobother, NOBOTHER_ON_ICON_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, CONTROL_NOBOTHER_OFF_BIN);
-        gui_img_set_image_data(img_capsule_nobother, NOBOTHER_OFF_ICON_BIN);
+        gui_img_set_src(img, CONTROL_NOBOTHER_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_nobother, NOBOTHER_OFF_ICON_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -281,30 +281,30 @@ static void control_board_design(gui_view_t *view)
 
     if (sw_state.sw_1)
     {
-        gui_img_set_image_data(sw_bt, CONTROL_BT_ON_BIN);
+        gui_img_set_src(sw_bt, CONTROL_BT_ON_BIN, IMG_SRC_MEMADDR);
     }
     if (sw_state.sw_2)
     {
-        gui_img_set_image_data(sw_local_play, CONTROL_PLAY_ON_BIN);
+        gui_img_set_src(sw_local_play, CONTROL_PLAY_ON_BIN, IMG_SRC_MEMADDR);
     }
     if (sw_state.sw_3)
     {
-        gui_img_set_image_data(sw_phone, CONTROL_PHONE_ON_BIN);
-        gui_img_set_image_data(img_capsule_phone, PHONE_ON_ICON_BIN);
+        gui_img_set_src(sw_phone, CONTROL_PHONE_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_phone, PHONE_ON_ICON_BIN, IMG_SRC_MEMADDR);
     }
     if (sw_state.sw_4)
     {
-        gui_img_set_image_data(sw_earphone, CONTROL_EARPHONE_ON_BIN);
+        gui_img_set_src(sw_earphone, CONTROL_EARPHONE_ON_BIN, IMG_SRC_MEMADDR);
     }
     if (sw_state.sw_5)
     {
-        gui_img_set_image_data(sw_mute, CONTROL_MUTE_ON_BIN);
-        gui_img_set_image_data(img_capsule_mute, MUTE_ON_ICON_BIN);
+        gui_img_set_src(sw_mute, CONTROL_MUTE_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_mute, MUTE_ON_ICON_BIN, IMG_SRC_MEMADDR);
     }
     if (sw_state.sw_6)
     {
-        gui_img_set_image_data(sw_nobother, CONTROL_NOBOTHER_ON_BIN);
-        gui_img_set_image_data(img_capsule_nobother, NOBOTHER_ON_ICON_BIN);
+        gui_img_set_src(sw_nobother, CONTROL_NOBOTHER_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(img_capsule_nobother, NOBOTHER_ON_ICON_BIN, IMG_SRC_MEMADDR);
     }
 }
 

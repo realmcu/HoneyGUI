@@ -124,7 +124,7 @@ static void pressing_tab(void *obj)
         if (y <= 0)
         {
             y = 0;
-            gui_img_set_image_data(img, press_bg);
+            gui_img_set_src(img, press_bg, img->storage_type);
             gui_obj_t *icon = gui_list_entry(img->base.child_list.next, gui_obj_t, brother_list);
             gui_obj_hidden(icon, false);
             gui_obj_stop_timer(GUI_BASE(img));
@@ -137,7 +137,7 @@ static void pressing_tab(void *obj)
     }
     else
     {
-        gui_img_set_image_data(img, press_bg);
+        gui_img_set_src(img, press_bg, img->storage_type);
         gui_obj_t *icon = gui_list_entry(img->base.child_list.next, gui_obj_t, brother_list);
         gui_obj_hidden(icon, false);
         gui_obj_stop_timer(GUI_BASE(img));
@@ -187,7 +187,7 @@ static void press_tab(void *obj, gui_event_t *e)
 
 
     gui_img_t *img = (gui_img_t *)obj;
-    gui_img_set_image_data(img, ICON_PRESSING_BIN);
+    gui_img_set_src(img, ICON_PRESSING_BIN, IMG_SRC_MEMADDR);
     gui_img_scale(img, 0.8f, 0.8f);
     gui_obj_create_timer(GUI_BASE(img), 10, true, tab_scale);
     gui_obj_start_timer(GUI_BASE(img));

@@ -188,13 +188,13 @@ static void activity_stand_timer_cb(void *obj)
     // dot img
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                       drawCircles_cb, img_dot_data);
-    gui_img_set_image_data(img_dot, img_dot_data);
+    gui_img_set_src(img_dot, img_dot_data, img_dot->storage_type);
     gui_img_refresh_size(img_dot);
 
     // chart img
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 366, 214,
                                       drawStepBarChart_cb, img_chart_data);
-    gui_img_set_image_data(img_chart, img_chart_data);
+    gui_img_set_src(img_chart, img_chart_data, img_chart->storage_type);
     gui_img_refresh_size(img_chart);
 
     if ((count >= COUNT_MAX) || arc_scale < 0.20f)

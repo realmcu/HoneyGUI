@@ -332,7 +332,8 @@ static void view_switch_in_camera(gui_view_t *view)
 void update_video_image(uint8_t *jpeg_disp_image)
 {
     extern gui_img_t *video_image;
-    gui_img_set_attribute(video_image, "jpeg_image", jpeg_disp_image, 0, 0);
+    gui_img_set_pos(video_image, 0, 0);
+    gui_img_set_src(video_image, jpeg_disp_image, video_image->storage_type);
 
     // gui_img_set_attribute(video_image, "jpeg_image", video_logo_image, 466 / 2 - 410 / 2, 466 / 2 - 240 / 2);
     // Print first 20 bytes of jpeg_disp_image for debugging
@@ -606,8 +607,8 @@ static void view_switch_in_keyboard(gui_view_t *view)
             gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
             if (enter_img)
             {
-                gui_img_set_image_data(enter_img,
-                                       (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN));
+                gui_img_set_src(enter_img,
+                                (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN), enter_img->storage_type);
             }
         }
     }
@@ -638,7 +639,7 @@ static void switch_widget_play(void *p)
     {
 
         gui_img_t *img = (gui_img_t *)obj;
-        gui_img_set_image_data(img, (void *)FILE_POINTER(switch_array[index]));
+        gui_img_set_src(img, (void *)FILE_POINTER(switch_array[index]), img->storage_type);
         gui_img_refresh_size(img);
         gui_log("switch index:%d\n", index);
     }
@@ -702,14 +703,18 @@ static void switch_widget_play_watchface(void *p)
     int index_min_units = watchface_minute % 10;
     GUI_UNUSED(p);
 
-    gui_img_set_image_data(view_switch_in_watchfaceimg1,
-                           (void *)FILE_POINTER(watchface_digit_array[index_hour_tens]));
-    gui_img_set_image_data(view_switch_in_watchfaceimg2,
-                           (void *)FILE_POINTER(watchface_digit_array[index_hour_units]));
-    gui_img_set_image_data(view_switch_in_watchfaceimg3,
-                           (void *)FILE_POINTER(watchface_digit_array[index_min_tens]));
-    gui_img_set_image_data(view_switch_in_watchfaceimg4,
-                           (void *)FILE_POINTER(watchface_digit_array[index_min_units]));
+    gui_img_set_src(view_switch_in_watchfaceimg1,
+                    (void *)FILE_POINTER(watchface_digit_array[index_hour_tens]),
+                    view_switch_in_watchfaceimg1->storage_type);
+    gui_img_set_src(view_switch_in_watchfaceimg2,
+                    (void *)FILE_POINTER(watchface_digit_array[index_hour_units]),
+                    view_switch_in_watchfaceimg2->storage_type);
+    gui_img_set_src(view_switch_in_watchfaceimg3,
+                    (void *)FILE_POINTER(watchface_digit_array[index_min_tens]),
+                    view_switch_in_watchfaceimg3->storage_type);
+    gui_img_set_src(view_switch_in_watchfaceimg4,
+                    (void *)FILE_POINTER(watchface_digit_array[index_min_units]),
+                    view_switch_in_watchfaceimg4->storage_type);
     static bool watchface_visible = true;
     if (watchface_visible)
     {
@@ -844,8 +849,8 @@ static void press_setting_cb_key(void *obj, gui_event_t *e)
 
     // gui_obj_t *o = GUI_BASE(obj);
     size_t index = (size_t)param;
-    gui_img_set_image_data((gui_img_t *)obj,
-                           (void *)FILE_POINTER(key_highlight_array[index]));
+    gui_img_set_src((gui_img_t *)obj,
+                    (void *)FILE_POINTER(key_highlight_array[index]), ((gui_img_t *)obj)->storage_type);
     IMPORT_GUI_TOUCHPAD
     gui_log("press key win tpy:%d,%d\n", tp->y, tp->deltaY);
 }
@@ -860,8 +865,8 @@ static void press_setting_cb_enter(void *obj, gui_event_t *e)
     GUI_UNUSED(e);
 
 
-    gui_img_set_image_data((gui_img_t *)obj,
-                           (void *)FILE_POINTER(IP_INPUT_FIELD_PRESS_BIN));
+    gui_img_set_src((gui_img_t *)obj,
+                    (void *)FILE_POINTER(IP_INPUT_FIELD_PRESS_BIN), ((gui_img_t *)obj)->storage_type);
 }
 static void release_setting_cb_enter(void *obj, gui_event_t *e)
 {
@@ -873,8 +878,8 @@ static void release_setting_cb_enter(void *obj, gui_event_t *e)
     GUI_UNUSED(e);
 
 
-    gui_img_set_image_data((gui_img_t *)obj,
-                           (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN));
+    gui_img_set_src((gui_img_t *)obj,
+                    (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN), ((gui_img_t *)obj)->storage_type);
     IMPORT_GUI_TOUCHPAD
     if (_UI_ABS(tp->deltaY) < 5 && _UI_ABS(tp->deltaX) < 5)
     {
@@ -1079,8 +1084,8 @@ static void release_setting_cb_key_win(void *obj, gui_event_t *e)
 
     for (size_t i = 0; i < sizeof(key_obj_array) / sizeof(key_obj_array[0]); i++)
     {
-        gui_img_set_image_data((gui_img_t *)key_obj_array[i],
-                               (void *)FILE_POINTER(key_array[i]));
+        gui_img_set_src((gui_img_t *)key_obj_array[i],
+                        (void *)FILE_POINTER(key_array[i]), ((gui_img_t *)key_obj_array[i])->storage_type);
     }
     IMPORT_GUI_TOUCHPAD
     gui_log("release key win tpy:%d,%d\n", tp->y, tp->deltaY);
@@ -1098,8 +1103,8 @@ static void press_setting_cb_key_win_timer(void *p)
             press_setting_cb_key_win_flag = 0;
             for (size_t i = 0; i < sizeof(key_obj_array) / sizeof(key_obj_array[0]); i++)
             {
-                gui_img_set_image_data((gui_img_t *)key_obj_array[i],
-                                       (void *)FILE_POINTER(key_array[i]));
+                gui_img_set_src((gui_img_t *)key_obj_array[i],
+                                (void *)FILE_POINTER(key_array[i]), ((gui_img_t *)key_obj_array[i])->storage_type);
             }
         }
     }
@@ -1120,13 +1125,13 @@ static void release_setting_cb_key(void *obj, gui_event_t *e)
 
     // gui_obj_t *o = GUI_BASE(obj);
     size_t index = (size_t)param;
-    gui_img_set_image_data((gui_img_t *)obj,
-                           (void *)FILE_POINTER(key_array[index]));
+    gui_img_set_src((gui_img_t *)obj,
+                    (void *)FILE_POINTER(key_array[index]), ((gui_img_t *)obj)->storage_type);
 
     for (size_t i = 0; i < sizeof(key_obj_array) / sizeof(key_obj_array[0]); i++)
     {
-        gui_img_set_image_data((gui_img_t *)key_obj_array[i],
-                               (void *)FILE_POINTER(key_array[i]));
+        gui_img_set_src((gui_img_t *)key_obj_array[i],
+                        (void *)FILE_POINTER(key_array[i]), ((gui_img_t *)key_obj_array[i])->storage_type);
     }
 
     gui_log("release key\n");
@@ -1157,8 +1162,8 @@ static void release_setting_cb_key(void *obj, gui_event_t *e)
                         gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
                         if (enter_img)
                         {
-                            gui_img_set_image_data(enter_img,
-                                                   (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN));
+                            gui_img_set_src(enter_img,
+                                            (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN), enter_img->storage_type);
                         }
                     }
                     else if (count < 3 || (count == 3 && ipstring[strlen(ipstring) - 1] == '.'))
@@ -1168,8 +1173,8 @@ static void release_setting_cb_key(void *obj, gui_event_t *e)
                         gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
                         if (enter_img)
                         {
-                            gui_img_set_image_data(enter_img,
-                                                   (void *)FILE_POINTER(ENTER_WIFI_BIN));
+                            gui_img_set_src(enter_img,
+                                            (void *)FILE_POINTER(ENTER_WIFI_BIN), enter_img->storage_type);
                         }
                     }
                 }

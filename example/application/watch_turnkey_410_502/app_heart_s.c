@@ -187,7 +187,7 @@ static void hr_timer_cb(void *obj)
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300,
                                           draw_heartrate_graph,
                                           img_data);
-        gui_img_set_image_data(img, img_data);
+        gui_img_set_src(img, img_data, img->storage_type);
     }
 }
 static void clear_heartrate_cache(gui_view_t *view)

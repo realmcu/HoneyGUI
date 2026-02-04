@@ -684,11 +684,11 @@ static void press_icon(void *obj, gui_event_t *e)
     gui_img_t *img = (gui_img_t *)obj;
     if (strcmp(img->base.name, "switch_icon") == 0)
     {
-        gui_img_set_image_data(img, SWITCHICON_PRESS_BIN);
+        gui_img_set_src(img, SWITCHICON_PRESS_BIN, IMG_SRC_MEMADDR);
     }
     else
     {
-        gui_img_set_image_data(img, OFFICON_PRESS_BIN);
+        gui_img_set_src(img, OFFICON_PRESS_BIN, IMG_SRC_MEMADDR);
     }
 }
 
@@ -702,7 +702,7 @@ static void release_icon(void *obj, gui_event_t *e)
                                                   tp->y + tp->deltaY - GUI_BASE(obj)->y) == true);
     if (strcmp(img->base.name, "switch_icon") == 0)
     {
-        gui_img_set_image_data(img, SWITCHICON_RELEASE_BIN);
+        gui_img_set_src(img, SWITCHICON_RELEASE_BIN, IMG_SRC_MEMADDR);
         if (valid_touch && !animate_flag)
         {
             //change_scene
@@ -724,7 +724,7 @@ static void release_icon(void *obj, gui_event_t *e)
     }
     else
     {
-        gui_img_set_image_data(img, OFFICON_RELEASE_BIN);
+        gui_img_set_src(img, OFFICON_RELEASE_BIN, IMG_SRC_MEMADDR);
         if (valid_touch && scene_flag && !animate_flag)
         {
             if (scene_flag == 1)
@@ -863,37 +863,37 @@ static void dashboard_entrance_animation(void *p)
     {
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led2), LED2_ON_BIN);
-        gui_img_set_image_data(((gui_img_t *)led5), LED5_ON_BIN);
+        gui_img_set_src(((gui_img_t *)led2), LED2_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led5), LED5_ON_BIN, IMG_SRC_MEMADDR);
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN);
-        gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN);
+        gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 2 * cnt_max / 7))
     {
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led1), LED1_ON_BIN);
-        gui_img_set_image_data(((gui_img_t *)led4), LED4_ON_BIN);
+        gui_img_set_src(((gui_img_t *)led1), LED1_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led4), LED4_ON_BIN, IMG_SRC_MEMADDR);
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN);
-        gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN);
+        gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 3 * cnt_max / 7))
     {
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led0), LED0_ON_BIN);
-        gui_img_set_image_data(((gui_img_t *)led3), LED3_ON_BIN);
+        gui_img_set_src(((gui_img_t *)led0), LED0_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led3), LED3_ON_BIN, IMG_SRC_MEMADDR);
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN);
-        gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN);
+        gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 4 * cnt_max / 7))
     {
@@ -918,44 +918,44 @@ static void dashboard_entrance_animation(void *p)
     {
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led0), LED0_OFF_BIN);
-        gui_img_set_image_data(((gui_img_t *)led3), LED3_OFF_BIN);
+        gui_img_set_src(((gui_img_t *)led0), LED0_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led3), LED3_OFF_BIN, IMG_SRC_MEMADDR);
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN);
-        gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN);
+        gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 6 * cnt_max / 7))
     {
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led1), LED1_OFF_BIN);
-        gui_img_set_image_data(((gui_img_t *)led4), LED4_OFF_BIN);
+        gui_img_set_src(((gui_img_t *)led1), LED1_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led4), LED4_OFF_BIN, IMG_SRC_MEMADDR);
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN);
-        gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN);
+        gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 7 * cnt_max / 7))
     {
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led2), LED2_OFF_BIN);
-        gui_img_set_image_data(((gui_img_t *)led5), LED5_OFF_BIN);
+        gui_img_set_src(((gui_img_t *)led2), LED2_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led5), LED5_OFF_BIN, IMG_SRC_MEMADDR);
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN);
-        gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN);
+        gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
 
         map_design(); //show map
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(switch_icon, "switch_icon", GUI_BASE(win_common));
         GUI_WIDGET_POINTER_BY_NAME_ROOT(off_icon, "off_icon", GUI_BASE(win_common));
-        gui_img_set_image_data(((gui_img_t *)switch_icon), SWITCHICON_RELEASE_BIN);
-        gui_img_set_image_data(((gui_img_t *)off_icon), OFFICON_RELEASE_BIN);
+        gui_img_set_src(((gui_img_t *)switch_icon), SWITCHICON_RELEASE_BIN, IMG_SRC_MEMADDR);
+        gui_img_set_src(((gui_img_t *)off_icon), OFFICON_RELEASE_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt >= (cnt_max + 8 * cnt_max / 7))
     {
@@ -1057,17 +1057,17 @@ static void update_inform(void *p)
             {
                 if (((gui_img_t *)led_turn_l)->data == TURNLEFT_OFF_BIN)
                 {
-                    gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN);
+                    gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
                 }
                 else
                 {
-                    gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN);
+                    gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
                 }
             }
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->led_turn_r_status)
         {
@@ -1075,72 +1075,72 @@ static void update_inform(void *p)
             {
                 if (((gui_img_t *)led_turn_r)->data == TURNRIGHT_OFF_BIN)
                 {
-                    gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN);
+                    gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
                 }
                 else
                 {
-                    gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN);
+                    gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
                 }
             }
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->led0_status)
         {
-            gui_img_set_image_data(((gui_img_t *)led0), LED0_ON_BIN);
+            gui_img_set_src(((gui_img_t *)led0), LED0_ON_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led0), LED0_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led0), LED0_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->led1_status)
         {
-            gui_img_set_image_data(((gui_img_t *)led1), LED1_ON_BIN);
+            gui_img_set_src(((gui_img_t *)led1), LED1_ON_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led1), LED1_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led1), LED1_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->led2_status)
         {
-            gui_img_set_image_data(((gui_img_t *)led2), LED2_ON_BIN);
+            gui_img_set_src(((gui_img_t *)led2), LED2_ON_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led2), LED2_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led2), LED2_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->led3_status)
         {
-            gui_img_set_image_data(((gui_img_t *)led3), LED3_ON_BIN);
+            gui_img_set_src(((gui_img_t *)led3), LED3_ON_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led3), LED3_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led3), LED3_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->led4_status)
         {
-            gui_img_set_image_data(((gui_img_t *)led4), LED4_ON_BIN);
+            gui_img_set_src(((gui_img_t *)led4), LED4_ON_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led4), LED4_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led4), LED4_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->led5_status)
         {
-            gui_img_set_image_data(((gui_img_t *)led5), LED5_ON_BIN);
+            gui_img_set_src(((gui_img_t *)led5), LED5_ON_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data(((gui_img_t *)led5), LED5_OFF_BIN);
+            gui_img_set_src(((gui_img_t *)led5), LED5_OFF_BIN, IMG_SRC_MEMADDR);
         }
         if (dashboard_info->map_data_update)
         {
             dashboard_info->map_data_update = 0;
             GUI_WIDGET_POINTER_BY_NAME_ROOT(map, "map", GUI_BASE(win_map));
-            gui_img_set_image_data(((gui_img_t *)map),
-                                   dashboard_info->map_data[dashboard_info->map_data_index]);
+            gui_img_set_src(((gui_img_t *)map),
+                            dashboard_info->map_data[dashboard_info->map_data_index], ((gui_img_t *)map)->storage_type);
         }
     }
     else

@@ -64,7 +64,8 @@ static void click_button_back(void *obj, gui_event_t *e)
 
     f_status.password = !f_status.password; // do not restart auracast
     if (!descriptor_rec) { return; }
-    gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, (const char *)descriptor_rec,
+                           SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
@@ -76,7 +77,8 @@ static void click_button_restart(void *obj, gui_event_t *e)
 
     // to do: Restart Auracast
     if (!descriptor_rec) { return; }
-    gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    gui_view_switch_direct(current_view, (const char *)descriptor_rec,
+                           SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
@@ -114,7 +116,7 @@ static void auracast_view_design(gui_view_t *view)
 {
     if (gui_view_get_current())
     {
-        descriptor_rec = gui_view_get_current()->descriptor->name;
+        descriptor_rec = (gui_view_descriptor_t *)(gui_view_get_current()->descriptor->name);
     }
 
     gui_view_set_animate_step(view, 10);

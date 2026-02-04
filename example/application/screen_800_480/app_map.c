@@ -123,15 +123,15 @@ static void run_animation(void *p)
         int16_t x_diff = x_offset_array[(offset_index + 1) % size] - x_offset_array[(offset_index) % size];
         if (x_diff < 0)
         {
-            gui_img_set_image_data((gui_img_t *)dir, ARROW_RIGHT_BIN);
+            gui_img_set_src((gui_img_t *)dir, ARROW_RIGHT_BIN, IMG_SRC_MEMADDR);
         }
         else if (x_diff > 0)
         {
-            gui_img_set_image_data((gui_img_t *)dir, ARROW_LEFT_BIN);
+            gui_img_set_src((gui_img_t *)dir, ARROW_LEFT_BIN, IMG_SRC_MEMADDR);
         }
         else
         {
-            gui_img_set_image_data((gui_img_t *)dir, ARROW_DIRECT_BIN);
+            gui_img_set_src((gui_img_t *)dir, ARROW_DIRECT_BIN, IMG_SRC_MEMADDR);
         }
     }
 
@@ -323,7 +323,7 @@ static void map_update_timer(void *p)
 
             if (icon_data != NULL)
             {
-                gui_img_set_image_data(navi_icon_img, icon_data);
+                gui_img_set_src(navi_icon_img, icon_data, navi_icon_img->storage_type);
             }
         }
 
@@ -453,7 +453,7 @@ void app_map_update_navi_icon(const uint8_t *image_data)
 
     if (image_data != NULL)
     {
-        gui_img_set_image_data(navi_icon_img, image_data);
+        gui_img_set_src(navi_icon_img, image_data, navi_icon_img->storage_type);
         gui_log("Map: Navigation icon updated\n");
     }
 }

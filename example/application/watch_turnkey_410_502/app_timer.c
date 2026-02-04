@@ -307,13 +307,13 @@ static void click_button_stop(void *obj, gui_event_t *e)
         active_timer_status[index] = !active_timer_status[index];
         if (!active_timer_status[index])
         {
-            gui_img_set_image_data(icon, STOPWATCH_BUTTON_START_BIN);
+            gui_img_set_src(icon, STOPWATCH_BUTTON_START_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(icon);
             gui_img_a8_recolor(icon, 0xFFFFFFFF);
         }
         else
         {
-            gui_img_set_image_data(icon, TIMER_BUTTON_STOP_BIN);
+            gui_img_set_src(icon, TIMER_BUTTON_STOP_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(icon);
             gui_img_a8_recolor(icon, 0xFF000000);
         }
@@ -326,13 +326,13 @@ static void click_button_stop(void *obj, gui_event_t *e)
         active_timer_status[index] = !active_timer_status[index];
         if (!active_timer_status[index])
         {
-            gui_img_set_image_data(icon, STOPWATCH_BUTTON_START_BIN);
+            gui_img_set_src(icon, STOPWATCH_BUTTON_START_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(icon);
             gui_img_a8_recolor(icon, 0xFFFFFFFF);
         }
         else
         {
-            gui_img_set_image_data(icon, TIMER_BUTTON_STOP_BIN);
+            gui_img_set_src(icon, TIMER_BUTTON_STOP_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size(icon);
             gui_img_a8_recolor(icon, COLOR_THEME);
         }
@@ -500,13 +500,13 @@ static void page_active_list_timer(void *obj)
         GUI_WIDGET_POINTER_BY_NAME_ROOT(icon, "stop", list->base.parent);
         if (!active_timer_status[index_rec])
         {
-            gui_img_set_image_data((void *)icon, STOPWATCH_BUTTON_START_BIN);
+            gui_img_set_src((void *)icon, STOPWATCH_BUTTON_START_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size((void *)icon);
             gui_img_a8_recolor((void *)icon, 0xFFFFFFFF);
         }
         else
         {
-            gui_img_set_image_data((void *)icon, TIMER_BUTTON_STOP_BIN);
+            gui_img_set_src((void *)icon, TIMER_BUTTON_STOP_BIN, IMG_SRC_MEMADDR);
             gui_img_refresh_size((void *)icon);
             gui_img_a8_recolor((void *)icon, 0xFF000000);
         }
@@ -775,7 +775,7 @@ static void note_active_multi_design(gui_obj_t *obj, void *p)
     gui_img_t *icon_stop = gui_img_create_from_mem(bg_stop, 0, TIMER_BUTTON_STOP_BIN, 23, 20, 0, 0);
     if (!active_timer_status[index])
     {
-        gui_img_set_image_data(icon_stop, STOPWATCH_BUTTON_START_BIN);
+        gui_img_set_src(icon_stop, STOPWATCH_BUTTON_START_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size(icon_stop);
         gui_img_a8_recolor(icon_stop, 0xFFFFFFFF);
     }

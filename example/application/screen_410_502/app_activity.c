@@ -232,7 +232,7 @@ static void activity_timer_cb(void *obj)
     uint8_t *img_data = (void *)gui_img_get_image_data(img);
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, RADIUS * 2, RADIUS * 2,
                                       arc_activity_cb, img_data);
-    gui_img_set_image_data(img, img_data);
+    gui_img_set_src(img, img_data, img->storage_type);
     gui_img_refresh_size(img);
     if (count >= COUNT_MAX)
     {

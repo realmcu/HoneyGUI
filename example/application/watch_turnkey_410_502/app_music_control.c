@@ -84,12 +84,12 @@ static void music_ctr_press_cb(void *p)
     is_playing = !is_playing;
     if (is_playing)
     {
-        gui_img_set_image_data(img_music_ctr, PAUSE_BIN);
+        gui_img_set_src(img_music_ctr, PAUSE_BIN, IMG_SRC_MEMADDR);
         gui_text_content_set(img_music_text, "Now playing", strlen("Now playing"));
     }
     else
     {
-        gui_img_set_image_data(img_music_ctr, PLAY_BIN);
+        gui_img_set_src(img_music_ctr, PLAY_BIN, IMG_SRC_MEMADDR);
         gui_text_content_set(img_music_text, "Not played", strlen("Not played"));
     }
     gui_img_refresh_size(img_music_ctr);

@@ -81,7 +81,7 @@ static void click_button_left(void *obj, gui_event_t *e)
     if (f_status.timer)
     {
         gui_obj_start_timer(ring);
-        gui_img_set_image_data((void *)icon, TIMER_PAUSE_BIN);
+        gui_img_set_src((void *)icon, TIMER_PAUSE_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size((void *)icon);
         if (theme_bg_white)
         {
@@ -97,7 +97,7 @@ static void click_button_left(void *obj, gui_event_t *e)
     else
     {
         gui_obj_stop_timer(ring);
-        gui_img_set_image_data((void *)icon, TIMER_PLAY_BIG_BIN);
+        gui_img_set_src((void *)icon, TIMER_PLAY_BIG_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size((void *)icon);
         if (theme_bg_white)
         {
@@ -130,7 +130,8 @@ static void timer_cb(void *p)
     if (timer_val != 0)
     {
         uint16_t max = timer_max_min_val * 60;
-        gui_img_set_image_data((void *)ring, ring_data_array[49 * (max - timer_val) / max]);
+        gui_img_set_src((void *)ring, ring_data_array[49 * (max - timer_val) / max],
+                        ((gui_img_t *)ring)->storage_type);
         gui_text_content_set((void *)text, timer_str, strlen(timer_str));
     }
     else
@@ -144,7 +145,7 @@ static void timer_cb(void *p)
 
         gui_obj_t *icon_bg = gui_list_entry(text->brother_list.next, gui_obj_t, brother_list);
         gui_obj_t *icon = gui_list_entry(icon_bg->child_list.next, gui_obj_t, brother_list);
-        gui_img_set_image_data((void *)icon, TIMER_RESET_BIN);
+        gui_img_set_src((void *)icon, TIMER_RESET_BIN, IMG_SRC_MEMADDR);
         gui_img_refresh_size((void *)icon);
         gui_img_t *bell_2 = gui_img_create_from_mem(ring->parent, 0, ICON_BELL_PART_2_BIN, 156, 59, 0, 0);
         gui_img_t *bell_1 = gui_img_create_from_mem(ring->parent, 0, ICON_BELL_PART_1_BIN, 149, 47, 0, 0);
@@ -251,7 +252,7 @@ static void timer_view_design(gui_view_t *view)
     if (f_status.timer)
     {
         uint16_t max = timer_max_min_val * 60;
-        gui_img_set_image_data(ring, ring_data_array[49 * (max - timer_val) / max]);
+        gui_img_set_src(ring, ring_data_array[49 * (max - timer_val) / max], ring->storage_type);
     }
     else
     {

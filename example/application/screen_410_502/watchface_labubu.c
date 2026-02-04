@@ -93,20 +93,23 @@ static void time_update_cb(void *p)
     }
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", current_view);
-    gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_black_array[timeinfo->tm_hour / 10]);
+    gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_black_array[timeinfo->tm_hour / 10],
+                    ((gui_img_t *)img_hour_decimal)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_hour_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", current_view);
-    gui_img_set_image_data((gui_img_t *)img_hour_single, text_num_black_array[timeinfo->tm_hour % 10]);
+    gui_img_set_src((gui_img_t *)img_hour_single, text_num_black_array[timeinfo->tm_hour % 10],
+                    ((gui_img_t *)img_hour_single)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_hour_single);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", current_view);
-    gui_img_set_image_data((gui_img_t *)img_minute_decimal,
-                           text_num_black_array[timeinfo->tm_min / 10]);
+    gui_img_set_src((gui_img_t *)img_minute_decimal,
+                    text_num_black_array[timeinfo->tm_min / 10], ((gui_img_t *)img_minute_decimal)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_minute_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", current_view);
-    gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_black_array[timeinfo->tm_min % 10]);
+    gui_img_set_src((gui_img_t *)img_minute_single, text_num_black_array[timeinfo->tm_min % 10],
+                    ((gui_img_t *)img_minute_single)->storage_type);
     gui_img_refresh_size((gui_img_t *)img_minute_single);
 }
 
