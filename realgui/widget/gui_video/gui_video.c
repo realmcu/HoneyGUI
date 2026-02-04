@@ -13,7 +13,7 @@
 #include "gui_video.h"
 #include "acc_api.h"
 #include <math.h>
-#include "gui_h264bsd.h"
+// #include "gui_h264bsd.h"
 #include "gui_vfs.h"
 #include "acc_sw_jpeg.h"
 #include "gui_api.h"
@@ -53,6 +53,19 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+
+__attribute__((weak))  int gui_h264bsd_get_frame(void *gui_decoder, uint8_t *frame_buff,
+                                                 uint32_t buff_size) {GUI_UNUSED(gui_decoder); GUI_UNUSED(frame_buff); GUI_UNUSED(buff_size); gui_log("h264bsd decoder is not enabled\n"); return 0;};
+__attribute__((weak))  int gui_h264bsd_rewind(void *gui_decoder) {GUI_UNUSED(gui_decoder); return 0;};
+__attribute__((weak))  int gui_h264bsd_destroy_decoder(void *gui_decoder) {GUI_UNUSED(gui_decoder); return 0;};
+__attribute__((weak))  void *gui_h264bsd_create_decoder(uint8_t *fileData,
+                                                        long fileSize) {GUI_UNUSED(fileData); GUI_UNUSED(fileSize); gui_log("h264bsd decoder is not enabled\n"); return NULL;};
+extern int gui_h264bsd_get_frame(void *gui_decoder, uint8_t *frame_buff, uint32_t buff_size);
+extern int gui_h264bsd_rewind(void *gui_decoder);
+extern int gui_h264bsd_destroy_decoder(void *gui_decoder);
+extern void *gui_h264bsd_create_decoder(uint8_t *fileData, long fileSize);
+
+
 
 static bool is_mjpeg(uint8_t *pdata)
 {
@@ -281,7 +294,7 @@ static void gui_video_draw(gui_obj_t *obj)
     if (this->frame_cur == this->frame_last && this->frame_buff)
     {
         // gui_log("draw from cache %d 0x%x\n", this->frame_cur, this->frame_buff);
-        gui_img_set_image_data(this->img, this->frame_buff);
+        gui_img_set_src(this->img, this->frame_buff, IMG_SRC_MEMADDR);
         gui_img_refresh_draw_data(this->img);
         return;
     }
@@ -773,7 +786,7 @@ static void gui_video_draw(gui_obj_t *obj)
         }
     }
 
-    gui_img_set_image_data(this->img, this->frame_buff);
+    gui_img_set_src(this->img, this->frame_buff, IMG_SRC_MEMADDR);
     gui_img_refresh_draw_data(this->img);
     this->frame_last = this->frame_cur;
 }
@@ -828,7 +841,7 @@ static void gui_video_prepare(gui_obj_t *obj)
     gui_video_t *this = (gui_video_t *)obj;
 
     // gui_log("gui_video_prepare  %d %d", this->frame_cur, this->frame_last);
-    gui_img_set_image_data(this->img, (const uint8_t *) & (this->header));
+    gui_img_set_src(this->img, (const uint8_t *) & (this->header), IMG_SRC_MEMADDR);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, NULL);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
@@ -2206,7 +2219,7 @@ static void gui_img_video_ctor(gui_video_t  *this,
                                         (void *)&this->header,
                                         0, 0, w, h);
     gui_img_set_mode(this->img, IMG_BYPASS_MODE);
-    gui_img_set_image_data(this->img, (const uint8_t *) & (this->header));
+    gui_img_set_src(this->img, (const uint8_t *) & (this->header), IMG_SRC_MEMADDR);
     gui_img_refresh_size(this->img);
     gui_obj_create_timer((gui_obj_t *)this, this->frame_time, true, gui_video_play_cb);
 }
@@ -2274,7 +2287,10 @@ void gui_video_set_frame_step(gui_video_t *this, uint32_t step)
 {
     if (!this) { return; }
 
-    this->frame_step = step;
+    if (this->storage_type != VIDEO_TYPE_H264)
+    {
+        this->frame_step = step;
+    }
 }
 
 uint32_t gui_video_get_frame_step(gui_video_t *this)

@@ -353,20 +353,7 @@ static void gui_img_ctor(gui_img_t            *_this,
     obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
-    if (storage_type == IMG_SRC_FILESYS)
-    {
-        _this->data = (void *)path;
-        _this->filename = (void *)path;
-    }
-    else if (storage_type == IMG_SRC_MEMADDR)
-    {
-        _this->data = (void *)path;
-    }
-    else if (storage_type == IMG_SRC_FTL)
-    {
-        _this->data = (void *)path;
-        _this->ftl = (void *)path;
-    }
+    _this->data = (void *)path;
 
     _this->opacity_value = 255;
     _this->blend_mode = IMG_FILTER_BLACK;
@@ -619,38 +606,43 @@ void gui_img_set_attribute(gui_img_t  *_this,
                            int16_t     x,
                            int16_t     y)
 {
+    GUI_UNUSED(_this);
+    GUI_UNUSED(name);
+    GUI_UNUSED(path);
+    GUI_UNUSED(x);
+    GUI_UNUSED(y);
+    gui_log("gui_img_set_attribute: Deprecated! \r\nUse 'void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type)' instead.\n");
+    gui_log("Use 'void gui_img_set_pos(gui_img_t  *_this, int16_t x, int16_t y)' instead.\n");
+    GUI_ASSERT(0);
+}
+void gui_img_set_pos(gui_img_t  *_this,
+                     int16_t     x,
+                     int16_t     y)
+{
     GUI_ASSERT(_this != NULL);
-
-    if ((!name) && (!path))
-    {
-        return;
-    }
 
     _this->base.x = x;
     _this->base.y = y;
-
-    if (name != NULL)
-    {
-        _this->base.name = name;
-    }
-    else
-    {
-        _this->base.name = "gui_img_set_attribute";
-    }
-
-    _this->data = path;
 }
+
 void gui_img_set_image_data(gui_img_t  *_this, const uint8_t *file_pointer)
+{
+    GUI_UNUSED(_this);
+    GUI_UNUSED(file_pointer);
+    gui_log("gui_img_set_image_data: Deprecated! \r\nUse 'void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type)' instead.\n");
+    GUI_ASSERT(0);
+}
+
+void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(file_pointer != NULL);
+    GUI_ASSERT(storage_type <= IMG_SRC_FTL);
 
-    /* Reset image data source to memory image */
-    _this->storage_type = IMG_SRC_MEMADDR;
-    _this->filename = NULL;
-    _this->ftl = NULL;
+    _this->storage_type = storage_type;
     _this->data = (void *)file_pointer;
 }
+
 const uint8_t *gui_img_get_image_data(gui_img_t  *_this)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);

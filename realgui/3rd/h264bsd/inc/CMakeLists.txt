@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Define a variable for the library name
-if(CONFIG_REALTEK_H264_DECODER) #set to 1 to enable or variable to for dependency
+if(CONFIG_REALTEK_H264BSD) #set to 1 to enable or variable to for dependency
 
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")

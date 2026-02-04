@@ -110,6 +110,11 @@ config REALTEK_BUILD_EXAMPLE_GLASS_EFFECT_WIDGET
     help
       RTK GUI Glass Effect Demo
 
+config REALTEK_BUILD_EXAMPLE_VIDEO_WIDGET
+    bool "Video Widget Demo"
+    help
+      RTK GUI Video Widget Demo
+
 config REALTEK_BUILD_REAL_PAINTENGINE
     bool "Paint Engine Demo"
     help

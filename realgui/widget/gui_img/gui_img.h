@@ -46,11 +46,6 @@ typedef struct gui_img
     float t_y;                         /* Translation in Y direction. */
 
     void *data;                        /* Image data (address or filesystem path). */
-    union
-    {
-        void *filename;               /* Filepath for partial draw. */
-        void *ftl;                    /* FTL address. */
-    };
     gd_GIF *gif;                        /* GIF data */
     uint32_t fg_color_set;  //A8 image set color
     uint32_t bg_color_fix;  //bg color fix for A8 image
@@ -118,19 +113,26 @@ void gui_img_refresh_draw_data(gui_img_t  *_this);
 void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode);
 
 /**
- * @brief Set image attributes (name, path, position).
- *
- * @param this Image widget pointer.
- * @param name Widget name.
- * @param addr Image address/path.
- * @param x X-axis coordinate.
- * @param y Y-axis coordinate.
+ * @brief Deprecated!
+ * Use 'void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type)' instead.
+ * Use 'void gui_img_set_pos(gui_img_t  *_this, int16_t x, int16_t y)' instead.
  */
 void gui_img_set_attribute(gui_img_t  *_this,
                            const char *name,
                            void       *addr,
                            int16_t     x,
                            int16_t     y);
+
+/**
+ * @brief Set image position.
+ *
+ * @param this Image widget pointer.
+ * @param x X-axis coordinate.
+ * @param y Y-axis coordinate.
+ */
+void gui_img_set_pos(gui_img_t  *_this,
+                     int16_t     x,
+                     int16_t     y);
 
 /**
  * @brief Rotate the image around its center.
@@ -338,6 +340,12 @@ float gui_img_get_t_y(gui_img_t *_this);
  *                            The data should persist as long as the widget needs it or until it is explicitly updated.
  */
 void gui_img_set_image_data(gui_img_t *_this, const uint8_t *image_data_pointer);
+
+/**
+ * @brief Deprecated!
+ * Use 'void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type)' instead.
+ */
+void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type);
 
 /**
  * @brief Gets the image data from a specified image widget.
