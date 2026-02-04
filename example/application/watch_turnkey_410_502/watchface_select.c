@@ -50,10 +50,10 @@ static const char *watchface_names[] =
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void switch_app_cb(void *obj, gui_event_t e, void *param)
+static void switch_app_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
-    GUI_UNUSED(e);
+    void *param = e->user_data;
     int16_t index = *((int16_t *)param) - 1;
     switch (index)
     {

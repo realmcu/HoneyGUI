@@ -125,7 +125,7 @@ void gui_win_press(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
  * @brief Register a callback function for the release event of the win widget.
  *
  * @param _this Win pointer.
- * @param callback Callback func (void *obj, gui_event_t e, void *param).
+ * @param callback Callback func (void *obj, gui_event_code_t e, void *param).
  * @param parameter Callback parameter.
  */
 void gui_win_release(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
@@ -143,7 +143,7 @@ void gui_win_long(gui_win_t *_this, void *callback, void *parameter);
  * @brief Register a callback function for a click event of the win widget.
  *
  * @param _this Win pointer.
- * @param callback Callback func (void *obj, gui_event_t e, void *param).
+ * @param callback Callback func (void *obj, gui_event_code_t e, void *param).
  * @param parameter Callback parameter.
  */
 void gui_win_click(gui_win_t *_this, gui_event_cb_t callback, void *parameter);

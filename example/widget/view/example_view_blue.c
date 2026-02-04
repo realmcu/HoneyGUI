@@ -26,11 +26,11 @@ static void switch_out_cb(gui_view_t *view);
 
 GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, true, switch_in_cb, switch_out_cb);
 
-static void img_cb(void *obj, gui_event_t e, void *param)
+static void img_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(gui_view_get("blue_view"), "white_view",
                            SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);

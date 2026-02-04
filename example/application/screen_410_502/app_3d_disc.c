@@ -81,6 +81,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void update_disc_animation(void *param)
 {
+    (void)param;
+
     gui_lite3d_t *lite3d_disc = (gui_lite3d_t *)param;
     touch_info_t *tp = tp_get_info();
 
@@ -167,6 +169,8 @@ static l3_4x4_matrix_t disc_cube_face_cb(l3_model_base_t *this, size_t face_inde
 
 static void switch_to_origin_img(void *param)
 {
+    (void)param;
+
     gui_img_t *img = (gui_img_t *)param;
     if (strcmp(img->base.name, "music_backward") == 0)
     {
@@ -178,10 +182,10 @@ static void switch_to_origin_img(void *param)
     }
 }
 
-static void switch_to_highlight_img(void *obj, gui_event_t e, void *param)
+static void switch_to_highlight_img(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = (gui_img_t *)obj;
     if (strcmp(img->base.name, "music_backward") == 0)
     {
@@ -196,10 +200,10 @@ static void switch_to_highlight_img(void *obj, gui_event_t e, void *param)
     gui_obj_start_timer(GUI_BASE(img));
 }
 
-static void switch_to_play_pause_img(void *obj, gui_event_t e, void *param)
+static void switch_to_play_pause_img(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = (gui_img_t *)obj;
 
     is_playing = !is_playing;

@@ -115,10 +115,10 @@ static void video_enter_cb(void *p)
         gui_obj_stop_timer(GUI_BASE(p));
     }
 }
-static void earth_change_cb(void *obj, gui_event_t e, void *param)
+static void earth_change_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     {
         if (!obj)
         {

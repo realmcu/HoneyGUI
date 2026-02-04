@@ -1177,11 +1177,11 @@ static void press_button_page_language(void *obj)
     }
 }
 
-static void click_button_page_ambient_sound(void *obj, gui_event_t e, void *param)
+static void click_button_page_ambient_sound(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (control_invalid) { return; }
     gui_obj_t *o = GUI_BASE(obj);
     if (strcmp(o->name, "l") == 0)
@@ -1203,11 +1203,11 @@ static void click_button_page_ambient_sound(void *obj, gui_event_t e, void *para
                          button_move);
 }
 
-static void click_button_page_playback(void *obj, gui_event_t e, void *param)
+static void click_button_page_playback(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
     f_status.playback = !f_status.playback;
     gui_scroll_text_t *lyrics = (void *)gui_list_entry(o->parent->brother_list.prev, gui_obj_t,
@@ -1229,11 +1229,11 @@ static void click_button_page_playback(void *obj, gui_event_t e, void *param)
     gui_img_refresh_size((gui_img_t *)o);
 }
 
-static void click_button_page_smart_talk(void *obj, gui_event_t e, void *param)
+static void click_button_page_smart_talk(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (control_invalid) { return; }
     gui_obj_t *o = GUI_BASE(obj);
     if (strcmp(o->name, "l") == 0)
@@ -1255,12 +1255,11 @@ static void click_button_page_smart_talk(void *obj, gui_event_t e, void *param)
                          button_move);
 }
 #if SS_WITH_HEAD_TRACKING
-static void click_button_page_spatial_sound_with_head_tracking(void *obj, gui_event_t e,
-                                                               void *param)
+static void click_button_page_spatial_sound_with_head_tracking(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
     if (strcmp(o->name, "l") == 0)
     {
@@ -1292,12 +1291,12 @@ static void click_button_page_spatial_sound_with_head_tracking(void *obj, gui_ev
                          button_move);
 }
 #else
-static void click_button_page_spatial_sound_without_head_tracking(void *obj, gui_event_t e,
+static void click_button_page_spatial_sound_without_head_tracking(void *obj, gui_event_code_t e,
                                                                   void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (control_invalid) { return; }
     gui_obj_t *o = GUI_BASE(obj);
     if (strcmp(o->name, "l") == 0)
@@ -1320,11 +1319,11 @@ static void click_button_page_spatial_sound_without_head_tracking(void *obj, gui
 }
 #endif
 
-static void click_button_page_dark_light(void *obj, gui_event_t e, void *param)
+static void click_button_page_dark_light(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
     theme_bg_white = !theme_bg_white;
     if (theme_bg_white)
@@ -1339,22 +1338,22 @@ static void click_button_page_dark_light(void *obj, gui_event_t e, void *param)
                          button_move);
 }
 
-static void click_wallpaper_page_lock_screen(void *obj, gui_event_t e, void *param)
+static void click_wallpaper_page_lock_screen(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     switch_from_lock_screen = true;
     gui_view_set_animate_step(gui_view_get_current(), 400);
     gui_view_switch_direct(gui_view_get_current(), LOCK_VIEW, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
-static void click_button_page_lock_screen(void *obj, gui_event_t e, void *param)
+static void click_button_page_lock_screen(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
     gui_img_t *icon_l;
     gui_img_t *icon_r;
@@ -1395,11 +1394,11 @@ static void click_button_page_lock_screen(void *obj, gui_event_t e, void *param)
     gui_img_set_image_data((gui_img_t *)img, img_data_array[wallpaper_index]);
 }
 
-static void click_button_page_quick_wake_up_screen(void *obj, gui_event_t e, void *param)
+static void click_button_page_quick_wake_up_screen(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (control_invalid) { return; }
     gui_obj_t *o = GUI_BASE(obj);
     if (strcmp(o->name, "l") == 0)
@@ -1421,11 +1420,11 @@ static void click_button_page_quick_wake_up_screen(void *obj, gui_event_t e, voi
                          button_move);
 }
 
-static void click_button_page_clock_settings(void *obj, gui_event_t e, void *param)
+static void click_button_page_clock_settings(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (f_status.clock_settings == 0) { return; }
 
     gui_obj_t *o = GUI_BASE(obj);
@@ -1479,11 +1478,11 @@ static void click_button_page_clock_settings(void *obj, gui_event_t e, void *par
     }
 }
 
-static void click_button_settings_page_clock_settings(void *obj, gui_event_t e, void *param)
+static void click_button_settings_page_clock_settings(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_color_t fg_1_color;
     gui_color_t fg_2_color;
@@ -1544,11 +1543,11 @@ static void click_button_settings_page_clock_settings(void *obj, gui_event_t e, 
     gui_img_a8_mix_alpha((void *)sub, ((gui_img_t *)sub)->fg_color_set >> 24);
 }
 
-static void click_button_page_time_format(void *obj, gui_event_t e, void *param)
+static void click_button_page_time_format(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
     time_format_24 = !time_format_24;
     if (time_format_24)
@@ -1563,42 +1562,42 @@ static void click_button_page_time_format(void *obj, gui_event_t e, void *param)
                          button_move);
 }
 
-static void click_button_page_timer(void *obj, gui_event_t e, void *param)
+static void click_button_page_timer(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     f_status.timer = 0;
     gui_view_switch_direct(gui_view_get_current(), TIMER_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
-static void click_button_page_flashlight(void *obj, gui_event_t e, void *param)
+static void click_button_page_flashlight(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     f_status.timer = 0;
     gui_view_set_animate_step(gui_view_get_current(), 400);
     gui_view_switch_direct(gui_view_get_current(), FLASHLIGHT_VIEW, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
-static void click_button_page_silentnow(void *obj, gui_event_t e, void *param)
+static void click_button_page_silentnow(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     f_status.silentnow = !f_status.silentnow;
     msg_2_regenerate_current_view();
 }
 
-static void click_button_page_case_button_customize(void *obj, gui_event_t e, void *param)
+static void click_button_page_case_button_customize(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
-    int16_t index = *((int16_t *)param);
+
+    int16_t index = *((int16_t *)e->user_data);
     case_button_customize_type_index = index % 3;
     if (index < 3)
     {
@@ -1626,11 +1625,11 @@ static void click_button_page_case_button_customize(void *obj, gui_event_t e, vo
     }
 }
 
-static void click_button_page_reorder_quick_access(void *obj, gui_event_t e, void *param)
+static void click_button_page_reorder_quick_access(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
     gui_obj_t *parent = o->parent;
     if (control_invalid || parent->y <= -10) { return; }
@@ -1649,13 +1648,13 @@ static void click_button_page_reorder_quick_access(void *obj, gui_event_t e, voi
     }
 }
 
-static void click_button_page_information_center_customize(void *obj, gui_event_t e, void *param)
+static void click_button_page_information_center_customize(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
-    int16_t index = *((int16_t *)param);
+    int16_t index = *((int16_t *)e->user_data);
     uint8_t add;
     if (strcmp(o->name, "l") == 0)
     {
@@ -1701,11 +1700,11 @@ static void click_button_page_information_center_customize(void *obj, gui_event_
     msg_2_regenerate_current_view();
 }
 
-static void click_button_disconnect_page_audio_source(void *obj, gui_event_t e, void *param)
+static void click_button_disconnect_page_audio_source(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (audio_source.wait) { return; }
     // to do : disconnect audio source clicked
     audio_source.wait = true;
@@ -1714,12 +1713,11 @@ static void click_button_disconnect_page_audio_source(void *obj, gui_event_t e, 
     gui_obj_start_timer(obj);
 }
 
-static void click_button_sub_channel_connect_page_audio_source(void *obj, gui_event_t e,
-                                                               void *param)
+static void click_button_sub_channel_connect_page_audio_source(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (audio_source.wait) { return; }
     if (audio_source.auracast_streaming_index == 1)
     {
@@ -1734,11 +1732,11 @@ static void click_button_sub_channel_connect_page_audio_source(void *obj, gui_ev
     msg_2_regenerate_current_view();
 }
 
-static void click_button_pair_page_audio_source(void *obj, gui_event_t e, void *param)
+static void click_button_pair_page_audio_source(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (audio_source.wait) { return; }
     // to do : pair device
 
@@ -1754,11 +1752,11 @@ static void click_button_pair_page_audio_source(void *obj, gui_event_t e, void *
     gui_obj_start_timer(obj);
 }
 
-static void click_button_scan_page_audio_source(void *obj, gui_event_t e, void *param)
+static void click_button_scan_page_audio_source(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (audio_source.wait) { return; }
     // to do : scan device
 
@@ -1778,11 +1776,11 @@ static void click_button_scan_page_audio_source(void *obj, gui_event_t e, void *
     gui_obj_start_timer(obj);
 }
 
-static void click_button_connect_page_audio_source(void *obj, gui_event_t e, void *param)
+static void click_button_connect_page_audio_source(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (audio_source.wait) { return; }
     // to do : connect device
 
@@ -1795,11 +1793,11 @@ static void click_button_connect_page_audio_source(void *obj, gui_event_t e, voi
     gui_obj_start_timer(obj);
 }
 
-static void click_button_connect_auracast_page_audio_source(void *obj, gui_event_t e, void *param)
+static void click_button_connect_auracast_page_audio_source(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (audio_source.wait) { return; }
     // to do : connect auracast device
 
@@ -1808,11 +1806,11 @@ static void click_button_connect_auracast_page_audio_source(void *obj, gui_event
     gui_obj_start_timer(obj);
 }
 
-static void click_button_delete_page_audio_source(void *obj, gui_event_t e, void *param)
+static void click_button_delete_page_audio_source(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (audio_source.wait) { return; }
     // to do : delete paired device
 
@@ -1821,11 +1819,11 @@ static void click_button_delete_page_audio_source(void *obj, gui_event_t e, void
     gui_obj_start_timer(obj);
 }
 
-static void click_button_pair_page_tx_management(void *obj, gui_event_t e, void *param)
+static void click_button_pair_page_tx_management(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_obj_t *bg = GUI_BASE(obj);
     gui_obj_t *text = gui_list_entry(bg->child_list.next, gui_obj_t, brother_list);
@@ -1853,11 +1851,11 @@ static void click_button_pair_page_tx_management(void *obj, gui_event_t e, void 
     }
 }
 
-static void click_button_connect_page_tx_management(void *obj, gui_event_t e, void *param)
+static void click_button_connect_page_tx_management(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (tx_management.wait) { return; }
     // to do : connect device
 
@@ -1870,11 +1868,11 @@ static void click_button_connect_page_tx_management(void *obj, gui_event_t e, vo
     gui_obj_start_timer(obj);
 }
 
-static void click_button_delete_page_tx_management(void *obj, gui_event_t e, void *param)
+static void click_button_delete_page_tx_management(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (tx_management.wait) { return; }
     // to do : delete paired device
 
@@ -1883,11 +1881,11 @@ static void click_button_delete_page_tx_management(void *obj, gui_event_t e, voi
     gui_obj_start_timer(obj);
 }
 
-static void click_button_disconnect_page_tx_management(void *obj, gui_event_t e, void *param)
+static void click_button_disconnect_page_tx_management(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (tx_management.wait) { return; }
     // to do : disconnect headphone
     tx_management.wait = true;
@@ -1896,11 +1894,11 @@ static void click_button_disconnect_page_tx_management(void *obj, gui_event_t e,
     gui_obj_start_timer(obj);
 }
 
-static void click_button_discovered_page_tx_management(void *obj, gui_event_t e, void *param)
+static void click_button_discovered_page_tx_management(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (tx_management.wait) { return; }
     // to do : connect auracast device
 
@@ -1909,13 +1907,13 @@ static void click_button_discovered_page_tx_management(void *obj, gui_event_t e,
     gui_obj_start_timer(obj);
 }
 
-static void click_toggle_cb(void *obj, gui_event_t e, void *param)
+static void click_toggle_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
-    bool *status = param;
+    bool *status = e->user_data;
     gui_obj_t *toggle = gui_list_entry(o->child_list.next, gui_obj_t, brother_list);
 
     *status = !(*status);
@@ -1931,11 +1929,11 @@ static void click_toggle_cb(void *obj, gui_event_t e, void *param)
     gui_obj_create_timer(toggle, 10, true, toggle_move);
 }
 
-static void click_button_page_support(void *obj, gui_event_t e, void *param)
+static void click_button_page_support(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *o = GUI_BASE(obj);
     gui_obj_t *bg = gui_list_entry(o->child_list.next, gui_obj_t, brother_list);
     extern bool support_reset;
@@ -1953,11 +1951,11 @@ static void click_button_page_support(void *obj, gui_event_t e, void *param)
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
-static void click_button_no_action(void *obj, gui_event_t e, void *param)
+static void click_button_no_action(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 }
 
 static void timer_page_silentnow(void *obj)

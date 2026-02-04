@@ -60,6 +60,8 @@ static void frames_init(void)
 
 void fire_live(void *param)
 {
+    (void)param;
+
     gui_img_t *img = (gui_img_t *)param;
     if (fire_index < FIRE_E)
     {

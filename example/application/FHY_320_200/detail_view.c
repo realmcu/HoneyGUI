@@ -104,21 +104,21 @@ static void page_delete_from_favorite(void)
     quick_page_design_func_array[--quick_page_num] = NULL;
 }
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     f_status.silentnow = 0;
     gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
-static void click_button_favorite(void *obj, gui_event_t e, void *param)
+static void click_button_favorite(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t,
                                                   brother_list);

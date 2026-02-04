@@ -19,6 +19,12 @@
  *                           Types
  *============================================================================*/
 
+typedef struct
+{
+    gui_event_cb_t cb;
+    gui_event_t event;
+    void *obj;
+} pending_event_t;
 
 /*============================================================================*
  *                           Constants
@@ -35,16 +41,13 @@
  *                            Variables
  *============================================================================*/
 
-static gui_event_cb_t event_cb[MAX_EVENT_CNT];
-static gui_event_t event_code[MAX_EVENT_CNT];
-static void *event_cb_param[MAX_EVENT_CNT];
-static void *event_obj[MAX_EVENT_CNT];
+static pending_event_t pending_events[MAX_EVENT_CNT];
 static uint8_t event_cnt = 0;
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event, const void *indev_name)
+static void gui_obj_store_event(gui_obj_t *obj, gui_event_code_t event, const void *indev_name)
 {
     GUI_UNUSED(indev_name);
 
@@ -52,14 +55,11 @@ static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event, const void *i
     {
         for (uint32_t i = 0; i < event_cnt; i++)
         {
-            if (event_code[i] == event)
+            if (pending_events[i].event.code == event)
             {
                 for (uint32_t j = i; j < event_cnt; j++)
                 {
-                    event_cb[j] = event_cb[j + 1];
-                    event_code[j] = event_code[j + 1];
-                    event_cb_param[j] = event_cb_param[j + 1];
-                    event_obj[j] = event_obj[j + 1];
+                    pending_events[j] = pending_events[j + 1];
                 }
                 event_cnt--;
                 break;
@@ -72,10 +72,10 @@ static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event, const void *i
         gui_event_dsc_t *event_dsc = obj->event_dsc + i;
         if (event_dsc->filter == event && event_cnt < MAX_EVENT_CNT)
         {
-            event_cb[event_cnt] = event_dsc->event_cb;
-            event_code[event_cnt] = event;
-            event_cb_param[event_cnt] = event_dsc->user_data;
-            event_obj[event_cnt] = obj;
+            pending_events[event_cnt].cb = event_dsc->event_cb;
+            pending_events[event_cnt].event.code = event;
+            pending_events[event_cnt].event.user_data = event_dsc->user_data;
+            pending_events[event_cnt].obj = obj;
             event_cnt++;
         }
     }
@@ -85,7 +85,7 @@ static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event, const void *i
 *                           Public Functions
 *============================================================================*/
 
-static bool gui_obj_seek_event(gui_obj_t *obj, gui_event_t event)
+static bool gui_obj_seek_event(gui_obj_t *obj, gui_event_code_t event)
 {
     for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
     {
@@ -108,7 +108,7 @@ static bool gui_obj_seek_event(gui_obj_t *obj, gui_event_t event)
  */
 void gui_obj_add_event_cb(void           *obj,
                           gui_event_cb_t  event_cb,
-                          gui_event_t     filter,
+                          gui_event_code_t filter,
                           void           *user_data)
 {
     if (gui_obj_seek_event(obj, filter) == true)
@@ -131,7 +131,7 @@ void gui_obj_add_event_cb(void           *obj,
 }
 
 
-void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event, const void *indev_name)
+void gui_obj_enable_event(gui_obj_t *obj, gui_event_code_t event, const void *indev_name)
 {
     touch_info_t *tp = tp_get_info();
 
@@ -238,7 +238,7 @@ void gui_obj_event_dispatch(bool enable_event)
     {
         for (uint32_t i = 0; i < event_cnt; i++)
         {
-            event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
+            pending_events[i].cb(pending_events[i].obj, &pending_events[i].event);
         }
     }
     event_cnt = 0;

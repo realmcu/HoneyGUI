@@ -57,22 +57,22 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     f_status.password = !f_status.password; // do not restart auracast
     if (!descriptor_rec) { return; }
     gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
-static void click_button_restart(void *obj, gui_event_t e, void *param)
+static void click_button_restart(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     // to do: Restart Auracast
     if (!descriptor_rec) { return; }

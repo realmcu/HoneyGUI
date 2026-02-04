@@ -523,7 +523,7 @@ void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
     (void)this;
     (void)event_cb;
     (void)parameter;
-    //gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_CLICK, parameter);
+    //gui_obj_add_event_cb(this, event_cb, (gui_event_code_t)TXT_EVENT_CLICK, parameter);
     GUI_ASSERT(0);
 }
 void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
@@ -531,7 +531,7 @@ void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *paramet
     (void)this;
     (void)event_cb;
     (void)parameter;
-    //gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_PSWD_DONE, parameter);
+    //gui_obj_add_event_cb(this, event_cb, (gui_event_code_t)TXT_EVENT_PSWD_DONE, parameter);
     GUI_ASSERT(0);
 }
 

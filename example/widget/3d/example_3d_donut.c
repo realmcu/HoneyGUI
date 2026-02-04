@@ -24,6 +24,8 @@ static float animation_time = 0.0f;
 
 static void update_donut_animation(void *param)
 {
+    (void)param;
+
     gui_lite3d_t *this = (gui_lite3d_t *)param;
     GUI_UNUSED(this);
     touch_info_t *tp = tp_get_info();

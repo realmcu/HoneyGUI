@@ -134,9 +134,11 @@ static void koi_pos_init(void)
 
 static void koi_animate_cb(void *param)
 {
+    (void)param;
+
     swing_time += 0.4f;
     swing_angle = 3.0f * sinf(swing_time);
-    (void)param;
+
 
     for (int i = 0; i < KOI_COUNT; i++)
     {
@@ -183,10 +185,10 @@ static void koi_animate_cb(void *param)
 
 }
 
-static void koi_click_cb(void *obj, gui_event_t e, void *param)
+static void koi_click_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_lite3d_t *this = (gui_lite3d_t *)obj;
 
     for (int i = 0; i < KOI_COUNT; i++)
@@ -233,6 +235,8 @@ static void lotus_leaf_animate_cb(void *param)
 
 static void wave_animate_cb(void *param)
 {
+    (void)param;
+
     touch_info_t *tp = tp_get_info();
     gui_img_t *wave_img = (gui_img_t *)param;
 

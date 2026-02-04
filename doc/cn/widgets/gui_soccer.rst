@@ -63,7 +63,7 @@
       SOCCER_P0020_MORE_BIN,
    };
 
-   static void app_soccer_cb(void *obj, gui_event_t e, void *param)
+   static void app_soccer_cb(void *obj, gui_event_code_t e, void *param)
    {
       gui_soccer_t *soccer = (gui_soccer_t *)obj;
       int index = soccer->press_face;

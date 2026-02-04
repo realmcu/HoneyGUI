@@ -25,6 +25,8 @@ static float rot_y_angle = 0.0f;
 static void update_earth_animation(void *param)
 {
     (void)param;
+
+
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)

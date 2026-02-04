@@ -49,11 +49,11 @@ static void *func_array[] =
 };
 static bool index5_play_flag = 1;
 static uint64_t ms_start  = 0;
-static void click_switch_widget_cb(void *obj, gui_event_t e, void *param)
+static void click_switch_widget_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     //gui_obj_t *o = GUI_BASE(obj);
     ms_start  = 0;
     if (index5_play_flag)

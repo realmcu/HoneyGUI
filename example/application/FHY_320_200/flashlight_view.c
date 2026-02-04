@@ -49,11 +49,11 @@ static int gui_view_descriptor_register_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 
-static void click_cancel(void *obj, gui_event_t e, void *param)
+static void click_cancel(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     screen_brightness_val = brightness_val_rec;
     gui_view_set_animate_step(current_view, 400);
     gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_NONE_ANIMATION,

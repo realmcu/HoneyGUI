@@ -24,11 +24,11 @@ static void app_ui_view_white_design(gui_view_t *view);
 
 GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_white_design, NULL);
 
-static void img_cb(void *obj, gui_event_t e, void *param)
+static void img_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(gui_view_get("white_view"), "blue_view",
                            SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);

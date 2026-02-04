@@ -196,11 +196,11 @@ static void entrance_wait(void *p)
     gui_obj_create_timer(GUI_BASE(icon), 10, true, entrance_animation);
 }
 
-static void click_2_make_ota_fail(void *obj, gui_event_t e, void *param)
+static void click_2_make_ota_fail(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (f_status.ota == OTA_DOING)
     {
         f_status.ota = OTA_FAIL;
@@ -208,11 +208,11 @@ static void click_2_make_ota_fail(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void click_button_retry(void *obj, gui_event_t e, void *param)
+static void click_button_retry(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     // to do: OTA retry
     ota_val = 0;

@@ -65,37 +65,21 @@ typedef enum
     GUI_EVENT_VIEW_SWITCH_DIRECT
     /** wheel device events*/
 
+} gui_event_code_t;
+
+typedef struct _gui_event_t
+{
+    gui_event_code_t code;
+    void *user_data;
 } gui_event_t;
 
-typedef void (*gui_event_cb_t)(void *obj, gui_event_t e, void *param);
-/**
- * @brief The parameters for a GUI event callback function.
- *
- * This macro defines the parameters that a GUI event callback function should receive.
- * It includes an object pointer, an event type, and an additional parameter.
- *
- * @param obj Pointer to the object associated with the event.
- * @param e The event type (an enumeration or integer representing the event).
- * @param param Additional event-specific data passed to the callback function.
- */
-#define GUI_EVENT_CALLBACK_PARAMETER void *obj, gui_event_t e, void *param
+typedef void (*gui_event_cb_t)(void *obj, gui_event_t *e);
 
-/**
- * @brief Callback function definition for GUI events.
- *
- * This macro defines the structure of a GUI event callback function.
- * The function signature includes an object pointer, an event type, and an additional parameter.
- *
- * @param function_name The name of the function to be defined.
- *
- * @note The function defined by this macro must match the specified signature.
- */
-#define GUI_EVENT_CALLBACK_FUNCTION_DEFINE(function_name) void function_name(GUI_EVENT_CALLBACK_PARAMETER)
 typedef struct _gui_event_dsc_t
 {
     gui_event_cb_t event_cb;
     void *user_data;
-    gui_event_t filter;
+    gui_event_code_t filter;
 } gui_event_dsc_t;
 
 #ifdef __cplusplus

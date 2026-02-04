@@ -98,20 +98,20 @@ static void switch_call_view(void *msg)
     }
 }
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(current_view, QUICK_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
-static void click_button_cancel(void *obj, gui_event_t e, void *param)
+static void click_button_cancel(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // to do: cancel call
     if (gui_call && gui_call->call_end)
     {
@@ -127,11 +127,11 @@ static void click_button_cancel(void *obj, gui_event_t e, void *param)
                            SWITCH_IN_NONE_ANIMATION);
 }
 
-static void click_button_take(void *obj, gui_event_t e, void *param)
+static void click_button_take(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // to do: take call
     if (gui_call && gui_call->call_start)
     {
@@ -141,11 +141,11 @@ static void click_button_take(void *obj, gui_event_t e, void *param)
     msg_2_regenerate_current_view();
 }
 
-static void click_button_mute(void *obj, gui_event_t e, void *param)
+static void click_button_mute(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // to do: mute
     f_status.mute = !f_status.mute;
     if (gui_call && gui_call->call_set_speaker)

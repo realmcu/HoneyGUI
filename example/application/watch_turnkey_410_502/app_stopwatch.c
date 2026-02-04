@@ -209,11 +209,11 @@ static void update_page_2_lap(gui_obj_t *parent)
     gui_text_rendermode_set(t_lap_count, 2);
 }
 
-static void click_button_l(void *obj, gui_event_t e, void *param)
+static void click_button_l(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_obj_t *bg_l = obj;
     gui_obj_t *list = gui_list_entry(bg_l->parent->child_list.next, gui_obj_t, brother_list);
@@ -274,11 +274,11 @@ static void click_button_l(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void click_button_r(void *obj, gui_event_t e, void *param)
+static void click_button_r(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_t *bg_r = obj;
     gui_obj_t *list = gui_list_entry(bg_r->parent->child_list.next, gui_obj_t, brother_list);
     if (list->child_list.next != list->child_list.prev) { return; }

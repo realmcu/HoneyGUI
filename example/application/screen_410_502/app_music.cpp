@@ -518,9 +518,9 @@ private:
     {
         gui_obj_hidden(GUI_BASE(p), true);
     }
-    static void music_clicked(void *obj, gui_event_t e, void *param)
+    static void music_clicked(void *obj, gui_event_t *e)
     {
-        (void)e;
+        void *param = e->user_data;
         gui_obj_hidden(GUI_BASE(param), false);
         gui_obj_create_timer(GUI_BASE(param), 300, false, music_clicked_timer_cb);
         gui_obj_start_timer(GUI_BASE(param));
@@ -605,10 +605,10 @@ private:
         }
     }
 
-    static void play_button_cb(void *obj, gui_event_t e, void *param)
+    static void play_button_cb(void *obj, gui_event_t *e)
     {
         (void)e;
-        (void)param;
+
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         if (img->data == PLAY_BIN)
@@ -635,10 +635,10 @@ private:
         gui_img_t *img = GUI_TYPE(gui_img_t, p);
         gui_img_set_image_data(img, (const uint8_t *)SKIPBACK_BIN);
     }
-    static void skip_back_button_cb(void *obj, gui_event_t e, void *param)
+    static void skip_back_button_cb(void *obj, gui_event_t *e)
     {
         (void)e;
-        (void)param;
+
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_img_set_image_data(img, (const uint8_t *)SKIPBACKHL_BIN);
         gui_obj_create_timer(GUI_BASE(img), 100, false, skip_back_timer_cb);
@@ -664,10 +664,10 @@ private:
         gui_img_t *img = GUI_TYPE(gui_img_t, p);
         gui_img_set_image_data(img, (const uint8_t *)SKIPFWD_BIN);
     }
-    static void skip_fwd_button_cb(void *obj, gui_event_t e, void *param)
+    static void skip_fwd_button_cb(void *obj, gui_event_t *e)
     {
         (void)e;
-        (void)param;
+
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_img_set_image_data(img, (const uint8_t *)SKIPFWDHL_BIN);
         gui_obj_create_timer(GUI_BASE(img), 100, false, skip_fwd_timer_cb);
@@ -687,11 +687,11 @@ private:
             }
         }
     }
-    static void win_clicked_cb(void *obj, gui_event_t e, void *param)
+    static void win_clicked_cb(void *obj, gui_event_t *e)
     {
         (void)obj;
         (void)e;
-        (void)param;
+
         // stop music list clicked event
     }
 

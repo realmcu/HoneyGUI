@@ -198,20 +198,20 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(current_view, DETAIL_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
-static void click_button_reset(void *obj, gui_event_t e, void *param)
+static void click_button_reset(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_child_free((void *)current_view);
     resetting_design((void *)current_view);
 }

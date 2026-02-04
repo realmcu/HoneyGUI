@@ -95,7 +95,9 @@ static void button_2_view(uint8_t index)
 
 static void timer_touch_cb(void *param)
 {
-    GUI_UNUSED(param);
+    (void)param;
+
+
     // kb_info_t *kb = kb_get_info();
     // touch_info_t *tp = tp_get_info();
 
@@ -144,7 +146,9 @@ static void timer_touch_cb(void *param)
 // Update the watch time
 static void time_update_cb(void *param)
 {
-    GUI_UNUSED(param);
+    (void)param;
+
+
 
     sleep_cnt++;
     if (f_status.timer && timer_val != 0)
@@ -193,19 +197,19 @@ static void time_update_cb(void *param)
     }
 }
 
-static void touch_long_cb(void *obj, gui_event_t e, void *param)
+static void touch_long_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     button_2_view(case_button_customize_index_array[2]);
 }
 
-static void tp_click_cb(void *obj, gui_event_t e, void *param)
+static void tp_click_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_touch_port_data_t *touch_data = touchpad_get_data();
     if (tp_click_cnt == 0)
     {
@@ -219,11 +223,11 @@ static void tp_click_cb(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void kb_click_cb(void *obj, gui_event_t e, void *param)
+static void kb_click_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_touch_port_data_t *touch_data = touchpad_get_data();
     if (kb_click_cnt == 0)
     {

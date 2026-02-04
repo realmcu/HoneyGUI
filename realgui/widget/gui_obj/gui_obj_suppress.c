@@ -37,7 +37,7 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void gui_obj_suppress_child_event(gui_obj_t *obj, gui_event_t filter)
+static void gui_obj_suppress_child_event(gui_obj_t *obj, gui_event_code_t filter)
 {
     gui_node_list_t *node = NULL;
     gui_node_list_t *tmp = NULL;
@@ -64,7 +64,7 @@ static void gui_obj_suppress_child_event(gui_obj_t *obj, gui_event_t filter)
 *                           Public Functions
 *============================================================================*/
 
-void gui_obj_suppress_set(gui_obj_t *object, gui_event_t filter)
+void gui_obj_suppress_set(gui_obj_t *object, gui_event_code_t filter)
 {
     /**
      * This object is added to the suppression list of the parent object that has the same event.
@@ -91,7 +91,7 @@ void gui_obj_suppress_set(gui_obj_t *object, gui_event_t filter)
 }
 
 
-bool gui_obj_event_is_suppressed(gui_obj_t *object, gui_event_t event)
+bool gui_obj_event_is_suppressed(gui_obj_t *object, gui_event_code_t event)
 {
     touch_info_t *tp = tp_get_info();
     for (uint8_t i = 0; i < object->suppress_conflict_obj_cnt; i++)

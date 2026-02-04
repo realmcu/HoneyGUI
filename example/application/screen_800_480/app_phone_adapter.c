@@ -186,23 +186,23 @@ void app_dashboard_data_update_phone_status(uint8_t key, const uint8_t *phone_nu
 /**
  * @brief Accept button callback
  */
-static void on_accept_call(void *obj, gui_event_t e, void *param)
+static void on_accept_call(void *obj, gui_event_t *e)
 {
 //    gui_log("Phone: Accept button clicked\n");
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     app_dashboard_data_set_accept_call();
 }
 
 /**
  * @brief Reject button callback
  */
-static void on_reject_call(void *obj, gui_event_t e, void *param)
+static void on_reject_call(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 //    gui_log("Phone: Reject button clicked\n");
     app_dashboard_data_set_reject_end_call();
 }

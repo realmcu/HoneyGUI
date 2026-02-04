@@ -276,10 +276,10 @@ void expand_animation_cb(void *param)
     }
 }
 
-void win_press_callback(void *obj, gui_event_t e, void *param)
+void win_press_callback(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     (void)obj;
     touch_info_t *tp = tp_get_info();
 

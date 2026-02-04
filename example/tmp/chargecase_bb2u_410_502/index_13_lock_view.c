@@ -180,11 +180,11 @@ static void tab_scale(void *obj)
     }
 }
 
-static void press_tab(void *obj, gui_event_t e, void *param)
+static void press_tab(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_img_t *img = (gui_img_t *)obj;
     gui_img_set_image_data(img, ICON_PRESSING_BIN);

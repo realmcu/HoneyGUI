@@ -24,6 +24,8 @@ const float DEFAULT_DURATION = 0.6f;
 
 static void update_pikachu_animation(void *param)
 {
+    (void)param;
+
     gui_lite3d_t *lite3d_pikachu = (gui_lite3d_t *)param;
     touch_info_t *tp = tp_get_info();
 

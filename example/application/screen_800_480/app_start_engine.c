@@ -61,18 +61,18 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-static void press_start(void *obj, gui_event_t e, void *param)
+static void press_start(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = (gui_img_t *)obj;
     gui_img_set_image_data(img, START_ENGINE_PRESS_BIN);
 }
 
-static void release_start(void *obj, gui_event_t e, void *param)
+static void release_start(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = (gui_img_t *)obj;
     gui_img_set_image_data(img, START_ENGINE_RELEASE_BIN);
 

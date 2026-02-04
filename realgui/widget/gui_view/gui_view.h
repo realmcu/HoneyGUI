@@ -108,7 +108,7 @@ typedef struct gui_view
     uint8_t opacity;
 
     VIEW_SWITCH_STYLE current_transition_style;
-    gui_event_t current_event;
+    gui_event_code_t current_event;
     const struct gui_view_descriptor *descriptor;
     void *blur_param;
 
@@ -138,7 +138,7 @@ typedef struct gui_view_on_event
     const gui_view_descriptor_t *descriptor;
     VIEW_SWITCH_STYLE switch_out_style;
     VIEW_SWITCH_STYLE switch_in_style;
-    gui_event_t event;
+    gui_event_code_t event;
 } gui_view_on_event_t;
 
 /*============================================================================*
@@ -215,7 +215,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
                               const char *target_view_name,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
-                              gui_event_t event);
+                              gui_event_code_t event);
 
 /**
  * @brief Switches directly the current GUI view to a new view through animation.

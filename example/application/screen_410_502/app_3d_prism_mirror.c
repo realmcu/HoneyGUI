@@ -49,7 +49,7 @@ typedef struct
 static void gui_prism_mirror3d_swap_states(void);
 static void prism_mirror3d_render_animate_cb(void *param);
 static void gui_prism_mirror3d_enter_animate(gui_lite3d_t *lite3d_prism_mirror);
-static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param);
+static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t *e);
 static void prism_mirror3d_update_angle_cb(void *param);
 static void prism_view_switch_to_other_view(void);
 /*============================================================================*
@@ -181,6 +181,8 @@ static void gui_prism_mirror3d_update_face_flags(void)
 }
 static void prism_mirror3d_render_animate_cb(void *param)
 {
+    (void)param;
+
     gui_lite3d_t *lite3d_prism_mirror = (gui_lite3d_t *)param;
 
     if (progress_percent < 1.0f)
@@ -219,10 +221,10 @@ static void prism_mirror3d_render_animate_cb(void *param)
     }
 }
 
-static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param)
+static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     GUI_ASSERT(obj != NULL);
     gui_lite3d_t *lite3d_prism_mirror = (gui_lite3d_t *)obj;
 

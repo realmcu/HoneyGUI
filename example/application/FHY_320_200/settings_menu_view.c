@@ -83,11 +83,11 @@ static int gui_view_descriptor_register_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(current_view, MENU_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
@@ -99,13 +99,13 @@ static void note_timer_cb(void *p)
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
-static void switch_page(void *obj, gui_event_t e, void *param)
+static void switch_page(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     if (GUI_BASE(obj)->y < -28) { return; }
-    detail_page_design_func = param;
+    detail_page_design_func = e->user_data;
     gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
     gui_obj_hidden((void *)bg_note, false);
     gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);

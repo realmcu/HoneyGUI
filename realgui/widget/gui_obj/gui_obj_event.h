@@ -55,7 +55,7 @@ extern "C" {
   */
 void gui_obj_add_event_cb(void           *obj,
                           gui_event_cb_t  event_cb,
-                          gui_event_t     filter,
+                          gui_event_code_t filter,
                           void           *user_data);
 
 /**
@@ -71,7 +71,7 @@ void gui_obj_add_event_cb(void           *obj,
   * }
   * \endcode
   */
-void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code, const void *indev_name);
+void gui_obj_enable_event(gui_obj_t *obj, gui_event_code_t event_code, const void *indev_name);
 
 /**
  * @brief This API only for Widget, not for Application.

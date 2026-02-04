@@ -159,11 +159,11 @@ static void font_file_init(void)
  * @param e Event type
  * @param param Event parameters
  */
-static void test_event_cb(void *obj, gui_event_t e, void *param)
+static void test_event_cb(void *obj, gui_event_t *e)
 {
     gui_obj_t *this = (gui_obj_t *)obj;
-    GUI_UNUSED(param);
-    gui_log("Event test obj name = %s, e = 0x%x !\n", this->name, e);
+
+    gui_log("Event test obj name = %s, e = 0x%x !\n", this->name, e->code);
 }
 
 
@@ -173,8 +173,10 @@ static void test_event_cb(void *obj, gui_event_t e, void *param)
  */
 static void test_timer_cb(void *param)
 {
+    (void)param;
+
     gui_log("timer cb test!\n");
-    GUI_UNUSED(param);
+
 }
 
 /**
@@ -238,12 +240,10 @@ static void font_destroy(gui_text_t *text)
     gui_font_mem_destroy(text);
 }
 
-static void free_widget_cb(void *obj, gui_event_t e, void *param)
+static void free_widget_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
-    gui_obj_tree_free((gui_obj_t *)param);
+    gui_obj_tree_free((gui_obj_t *)e->user_data);
 }
 
 static void custom_font_rendering_demo(void)

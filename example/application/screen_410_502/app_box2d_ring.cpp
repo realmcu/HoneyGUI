@@ -145,11 +145,11 @@ static void app_box2d_cb(void *obj)
     }
 }
 
-static void win_press_callback(void *obj, gui_event_t e, void *param)
+static void win_press_callback(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     touch_info_t *touch = tp_get_info();
     int mouseX = touch->x;
     int mouseY = touch->y;

@@ -103,8 +103,10 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void update_applist_animation(void *param)
 {
-    touch_info_t *tp = tp_get_info();
     (void)param;
+
+    touch_info_t *tp = tp_get_info();
+
 
     if (tp->pressed)
     {

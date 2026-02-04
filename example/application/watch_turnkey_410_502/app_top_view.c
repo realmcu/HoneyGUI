@@ -53,7 +53,7 @@ static bool is_cleared  = false;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void clear_all_note_cb(gui_event_t *e)
+static void clear_all_note_cb(gui_event_code_t *e)
 {
     (void)e;
     is_cleared = true;

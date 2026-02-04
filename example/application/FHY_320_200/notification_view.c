@@ -63,11 +63,11 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (detail)
     {
         detail = 0;
@@ -88,11 +88,11 @@ static void note_timer_cb(void *p)
     msg_2_regenerate_current_view();
 }
 
-static void switch_page(void *obj, gui_event_t e, void *param)
+static void switch_page(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     if (GUI_BASE(obj)->y < -28) { return; }
     gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
     gui_obj_hidden((void *)bg_note, false);

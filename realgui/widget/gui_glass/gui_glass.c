@@ -564,17 +564,15 @@ static void gui_glass_end(gui_obj_t *obj)
 }
 
 static int16_t previous_deltaX, previous_deltaY;
-static void gui_glass_pressing_cb(void *obj, gui_event_t e, void *param)
+static void gui_glass_pressing_cb(void *obj, gui_event_t *e)
 {
     gui_glass_t *glass = (gui_glass_t *)obj;
-    (void)e;
-    (void)param;
     // gui_log("g_Offset %d\n", g_Offset);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     (void)dc;
     (void)tp;
-    switch (e)
+    switch (e->code)
     {
     case GUI_EVENT_TOUCH_PRESSED:
         previous_deltaX = tp->deltaX;

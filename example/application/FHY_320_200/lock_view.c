@@ -102,11 +102,11 @@ static void pressing_tab(void *obj)
     }
 }
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     switch_from_lock_screen = false;
     gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);

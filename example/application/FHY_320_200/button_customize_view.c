@@ -71,20 +71,20 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(current_view, DETAIL_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
-static void click_note(void *obj, gui_event_t e, void *param)
+static void click_note(void *obj, gui_event_t *e)
 {
     (void)obj;
-    (void)e;
-    (void)param;
+    void *param = e->user_data;
+
     int16_t index = *((int16_t *)param);
     if (case_button_customize_type_index != 2 && index == 2) { return; }
     case_button_customize_index_array[case_button_customize_type_index] = index;

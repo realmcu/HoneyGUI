@@ -178,21 +178,21 @@ static void hebrew_render_test(void)
     gui_text_mode_set(single_text, RTL_MULTI_RIGHT);
 }
 
-static void return_language_list(void *obj, gui_event_t e, void *param)
+static void return_language_list(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_obj_hidden((gui_obj_t *)return_text, true);
     gui_obj_hidden((gui_obj_t *)list, false);
     gui_obj_tree_free((gui_obj_t *)single_text);
 }
 
-static void single_language_test(void *obj, gui_event_t e, void *param)
+static void single_language_test(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     uint16_t index = ((gui_list_note_t *)obj)->index;
     char *isoCode = languages[index].isoCode;
     gui_obj_hidden((gui_obj_t *)list, true);

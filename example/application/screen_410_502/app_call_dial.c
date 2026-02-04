@@ -114,10 +114,10 @@ static void draw_tab_bg(NVGcontext *vg)
     nvgFill(vg);
 }
 
-static void click_call_end_cb(void *obj, gui_event_t e, void *param)
+static void click_call_end_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_call_t *call = gui_get_call();
     if (call && call->call_end)
     {
@@ -159,11 +159,11 @@ static void call_wait_cb(void *p)
     }
 }
 
-static void win_scroll_cb(void *obj, gui_event_t e, void *param)
+static void win_scroll_cb(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     // Disable view scroll
 }
 
@@ -200,12 +200,12 @@ static void app_call_wait_design(void)
     gui_obj_add_event_cb(img_call_reject, click_call_end_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 }
 
-static void click_call_dail_cb(void *obj, gui_event_t e, void *param)
+static void click_call_dail_cb(void *obj, gui_event_t *e)
 {
     // TODO: Add functionality to turn on CALL
     (void)obj;
     (void)e;
-    (void)param;
+
     if (strlen(dial_number_display) == 0) { return; }
     gui_call_t *call = gui_get_call();
     if (call && call->call_dail)
@@ -216,10 +216,10 @@ static void click_call_dail_cb(void *obj, gui_event_t e, void *param)
     app_call_wait_design();
 }
 
-static void click_number_tab_cb(void *o, gui_event_t e, void *param)
+static void click_number_tab_cb(void *o, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_obj_t *obj = GUI_BASE(o);
 
     if (dial_index < DIAL_BUFFER_LENGTH - 1)
@@ -235,11 +235,11 @@ static void click_number_tab_cb(void *o, gui_event_t e, void *param)
     gui_text_content_set((gui_text_t *)text, dial_number_display, strlen(dial_number_display));
 }
 
-static void click_back_cb(void *o, gui_event_t e, void *param)
+static void click_back_cb(void *o, gui_event_t *e)
 {
     (void)o;
     (void)e;
-    (void)param;
+
     if (dial_index > 0)
     {
         dial_number[--dial_index] = '\0';

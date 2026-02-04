@@ -21,6 +21,8 @@ static void *desc_buffer = NULL;
 static void update_face_animation(void *param)
 {
     (void)param;
+
+
     current_rot_angle += ANIMATION_SPEED;
     // float diff = target_rot_angle - current_rot_angle;
 

@@ -96,6 +96,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void time_update_cb(void *param)
 {
     (void)param;
+
+
     if (!timeinfo)
     {
         return;
@@ -274,6 +276,8 @@ static void update_weather_image(cJSON *weather, uint8_t i)
 static void weather_cb(void *param)
 {
     (void)param;
+
+
     if (!(json_refresh_flag & 0x01))
     {
         return;
@@ -490,6 +494,8 @@ static void arc_temperature_cb(NVGcontext *vg)
 static void compass_cb(void *param)
 {
     (void)param;
+
+
     if (!(json_refresh_flag & 0x08))
     {
         return;
@@ -605,28 +611,28 @@ static void temp_timer_cb(void *obj)
     }
 }
 
-static void switch_heartrate(void *obj, gui_event_t e, void *param)
+static void switch_heartrate(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(gui_view_get_current(), heartrate_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_call_incoming(void *obj, gui_event_t e, void *param)
+static void switch_call_incoming(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     *gui_call_incoming_flag_get() = true;
 }
 
-static void switch_menu(void *obj, gui_event_t e, void *param)
+static void switch_menu(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(gui_view_get_current(), menu_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }

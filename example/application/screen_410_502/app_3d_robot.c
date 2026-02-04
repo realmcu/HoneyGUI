@@ -68,7 +68,9 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void update_robot_animation(void *param)
 {
-    GUI_UNUSED(param);
+    (void)param;
+
+
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)

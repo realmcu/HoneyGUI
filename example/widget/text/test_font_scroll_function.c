@@ -40,9 +40,9 @@ gui_scroll_text_t *test_right;
  *                           Private Functions
  *============================================================================*/
 
-static void stop_cb(void *obj, gui_event_t e, void *param)
+static void stop_cb(void *obj, gui_event_t *e)
 {
-    GUI_UNUSED(param);
+
     GUI_UNUSED(e);
     GUI_UNUSED(obj);
 
@@ -53,9 +53,9 @@ static void stop_cb(void *obj, gui_event_t e, void *param)
     gui_log("stop_cb\n");
 }
 
-static void reset_cb(void *obj, gui_event_t e, void *param)
+static void reset_cb(void *obj, gui_event_t *e)
 {
-    GUI_UNUSED(param);
+
     GUI_UNUSED(e);
     GUI_UNUSED(obj);
 
@@ -66,9 +66,9 @@ static void reset_cb(void *obj, gui_event_t e, void *param)
     gui_log("reset_cb\n");
 }
 
-static void pause_cb(void *obj, gui_event_t e, void *param)
+static void pause_cb(void *obj, gui_event_t *e)
 {
-    GUI_UNUSED(param);
+
     GUI_UNUSED(e);
     GUI_UNUSED(obj);
 
@@ -79,9 +79,9 @@ static void pause_cb(void *obj, gui_event_t e, void *param)
     gui_log("pause_cb\n");
 }
 
-static void resume_cb(void *obj, gui_event_t e, void *param)
+static void resume_cb(void *obj, gui_event_t *e)
 {
-    GUI_UNUSED(param);
+
     GUI_UNUSED(e);
     GUI_UNUSED(obj);
 

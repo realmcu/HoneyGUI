@@ -179,11 +179,11 @@ static void clear_mem(gui_view_t *view)
     }
 }
 
-static void click_button_cancel(void *obj, gui_event_t e, void *param)
+static void click_button_cancel(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     if (timer_page == ACTIVE_SINGLE)
     {
@@ -229,11 +229,11 @@ static void click_button_cancel(void *obj, gui_event_t e, void *param)
     show_page((void *)gui_view_get_current());
 }
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (timer_page == ACTIVE_SINGLE)
     {
         timer_page = ACTIVE_MULTI;
@@ -245,20 +245,20 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     show_page((void *)gui_view_get_current());
 }
 
-static void click_button_add(void *obj, gui_event_t e, void *param)
+static void click_button_add(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     timer_page = ALL_TIMERS;
     show_page((void *)gui_view_get_current());
 }
 
-static void click_button_reset(void *obj, gui_event_t e, void *param)
+static void click_button_reset(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     timer_page = ACTIVE_SINGLE;
     active_timer_rec_val[active_timer_num] = timer_end_val;
     active_timer_num++;
@@ -266,11 +266,11 @@ static void click_button_reset(void *obj, gui_event_t e, void *param)
     show_page((void *)gui_view_get_current());
 }
 
-static void click_button_delete(void *obj, gui_event_t e, void *param)
+static void click_button_delete(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_img_t *bg = (void *)gui_list_entry(GUI_BASE(obj)->brother_list.next, gui_obj_t, brother_list);
     if (bg->t_x > -153.f) { return; }
 
@@ -291,11 +291,11 @@ static void click_button_delete(void *obj, gui_event_t e, void *param)
     show_page((void *)gui_view_get_current());
 }
 
-static void click_button_stop(void *obj, gui_event_t e, void *param)
+static void click_button_stop(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (timer_page == ACTIVE_SINGLE)
     {
         gui_list_t *list = (void *)gui_list_entry(GUI_BASE(obj)->parent->child_list.next, gui_obj_t,
@@ -702,11 +702,11 @@ static void move_bg(void *p)
     }
 }
 
-static void click_bg_page_active_multi(void *obj, gui_event_t e, void *param)
+static void click_bg_page_active_multi(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_list_note_t *note = (void *)GUI_BASE(obj)->parent;
     page_active_single_list_offset_his = -note->index * SCREEN_HEIGHT;
     timer_page = ACTIVE_SINGLE;
@@ -874,11 +874,11 @@ static void page_timer_end_design(gui_obj_t *parent)
 }
 
 /* Page custom add timer */
-static void click_button_start(void *obj, gui_event_t e, void *param)
+static void click_button_start(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     timer_page = active_timer_num ? ACTIVE_MULTI : ACTIVE_SINGLE;
     uint32_t temp = hour_index * 3600 + min_index * 60 + sec_index;
 
@@ -1069,18 +1069,18 @@ static void page_custom_add_timer_design(gui_obj_t *parent)
 }
 
 /* Page all timers */
-static void click_button_edit(void *obj, gui_event_t e, void *param)
+static void click_button_edit(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     edit_mode = !edit_mode;
     show_page((void *)gui_view_get_current());
 }
 
-static void click_button_page_all_timers(void *obj, gui_event_t e, void *param)
+static void click_button_page_all_timers(void *obj, gui_event_t *e)
 {
-    GUI_UNUSED(e);
+    void *param = e->user_data;
     gui_obj_t *o = obj;
     int16_t index = (*((int16_t *)param) - 1) * 2;
     if (o->x == 210 || o->parent->x == 210) { index += 1; }

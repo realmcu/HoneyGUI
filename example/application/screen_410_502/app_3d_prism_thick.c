@@ -94,6 +94,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void update_prism_thick_angle(void *param)
 {
     (void)param;
+
+
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)
@@ -142,6 +144,8 @@ static void gui_prism_thick_swap_states(void)
 
 static void prism_thick_render_animate_cb(void *param)
 {
+    (void)param;
+
     gui_lite3d_t *lite3d_prism_thick = (gui_lite3d_t *)param;
 
     if (progress_percent < 1.0f)
@@ -185,10 +189,10 @@ static void gui_prism_thick_enter_animate(gui_lite3d_t *lite3d_prism_thick)
 
 }
 
-static void prism_thick_on_face_click_cb(void *obj, gui_event_t e, void *param)
+static void prism_thick_on_face_click_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     GUI_ASSERT(obj != NULL);
     gui_lite3d_t *lite3d_prism_thick = (gui_lite3d_t *)obj;
 

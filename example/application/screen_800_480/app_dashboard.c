@@ -677,10 +677,10 @@ static void dashboard_dail_design(gui_obj_t *parent)
 
 
 // Dashboard common part functions
-static void press_icon(void *obj, gui_event_t e, void *param)
+static void press_icon(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = (gui_img_t *)obj;
     if (strcmp(img->base.name, "switch_icon") == 0)
     {
@@ -692,10 +692,10 @@ static void press_icon(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void release_icon(void *obj, gui_event_t e, void *param)
+static void release_icon(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = (gui_img_t *)obj;
     touch_info_t *tp = tp_get_info();
     bool valid_touch = (gui_obj_point_in_obj_rect(obj, tp->x + tp->deltaX - GUI_BASE(obj)->x,

@@ -151,10 +151,9 @@ static void gui_view_animate_timer_cb(void *obj)
  *         next is the private function for on event cb
  *============================================================================*/
 
-static void gui_view_released_cb(void *obj, gui_event_t e, void *param)
+static void gui_view_released_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
 
     touch_info_t *tp = tp_get_info();
     gui_view_t *_this = (gui_view_t *)obj;
@@ -228,15 +227,14 @@ static void gui_view_released_cb(void *obj, gui_event_t e, void *param)
     g_Offset = 0;
 }
 
-static void gui_view_pressing_cb(void *obj, gui_event_t e, void *param)
+static void gui_view_pressing_cb(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
     // gui_log("g_Offset %d\n", g_Offset);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    gui_event_t trigger_event = g_CurrentView->current_event;
+    gui_event_code_t trigger_event = g_CurrentView->current_event;
 
     if (trigger_event == GUI_EVENT_TOUCH_MOVE_LEFT)
     {
@@ -316,7 +314,7 @@ static void gui_view_transition(gui_view_t *_this, int16_t release)
     }
 }
 
-static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
+static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_code_t e,
                                               gui_view_on_event_t *on_event)
 {
     // gui_log("enter event_trigger_move_cb \n");
@@ -348,7 +346,7 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
     // gui_log("gui_view_on_event_trigger_move_cb next view name = %s\n", g_NextView->base.name);
 }
 
-static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t e,
+static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_code_t e,
                                         gui_view_on_event_t *on_event)
 {
     gui_view_not_show(g_NextView);
@@ -702,7 +700,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
                               const char *target_view_name,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
-                              gui_event_t event)
+                              gui_event_code_t event)
 {
     const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(target_view_name);
 

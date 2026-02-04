@@ -39,39 +39,39 @@ typedef struct note_design_param
  *============================================================================*/
 static void app_menu_design(gui_view_t *view);
 static void clear_menu(gui_view_t *view);
-static void switch_app_heart_rate(void *obj, gui_event_t e, void *param);
-static void switch_app_fruit_ninja(void *obj, gui_event_t e, void *param);
-static void switch_app_box2d_ring(void *obj, gui_event_t e, void *param);
-static void switch_app_activity(void *obj, gui_event_t e, void *param);
-static void switch_app_soccer(void *obj, gui_event_t e, void *param);
-static void switch_app_weather(void *obj, gui_event_t e, void *param);
-static void switch_app_flower(void *obj, gui_event_t e, void *param);
-static void switch_app_butterfly(void *obj, gui_event_t e, void *param);
-static void switch_app_applist(void *obj, gui_event_t e, void *param);
-static void switch_app_disc(void *obj, gui_event_t e, void *param);
-static void switch_app_face(void *obj, gui_event_t e, void *param);
-static void switch_app_earth(void *obj, gui_event_t e, void *param);
-static void switch_app_robot(void *obj, gui_event_t e, void *param);
-static void switch_app_flag(void *obj, gui_event_t e, void *param);
-static void switch_app_prism_thick(void *obj, gui_event_t e, void *param);
-static void switch_app_prism_mirror(void *obj, gui_event_t e, void *param);
-static void switch_app_windmill(void *obj, gui_event_t e, void *param);
-static void switch_app_pandkoi(void *obj, gui_event_t e, void *param);
-static void switch_app_seawater(void *obj, gui_event_t e, void *param);
-static void switch_app_firefly(void *obj, gui_event_t e, void *param);
-static void switch_app_rainbow_digital(void *obj, gui_event_t e, void *param);
-static void switch_app_koiclock(void *obj, gui_event_t e, void *param);
-static void switch_app_digital_clock(void *obj, gui_event_t e, void *param);
-static void switch_app_countdown(void *obj, gui_event_t e, void *param);
-static void switch_app_firework(void *obj, gui_event_t e, void *param);
-static void switch_app_heart_particle(void *obj, gui_event_t e, void *param);
-static void switch_app_butterfly_particle(void *obj, gui_event_t e, void *param);
-static void switch_app_butterflys(void *obj, gui_event_t e, void *param);
-static void switch_app_earth_clock(void *obj, gui_event_t e, void *param);
-static void switch_app_labubu_digital(void *obj, gui_event_t e, void *param);
-static void switch_app_flower_clock(void *obj, gui_event_t e, void *param);
-static void switch_app_rainbow_analog(void *obj, gui_event_t e, void *param);
-static void switch_app_glass(void *obj, gui_event_t e, void *param);
+static void switch_app_heart_rate(void *obj, gui_event_t *e);
+static void switch_app_fruit_ninja(void *obj, gui_event_t *e);
+static void switch_app_box2d_ring(void *obj, gui_event_t *e);
+static void switch_app_activity(void *obj, gui_event_t *e);
+static void switch_app_soccer(void *obj, gui_event_t *e);
+static void switch_app_weather(void *obj, gui_event_t *e);
+static void switch_app_flower(void *obj, gui_event_t *e);
+static void switch_app_butterfly(void *obj, gui_event_t *e);
+static void switch_app_applist(void *obj, gui_event_t *e);
+static void switch_app_disc(void *obj, gui_event_t *e);
+static void switch_app_face(void *obj, gui_event_t *e);
+static void switch_app_earth(void *obj, gui_event_t *e);
+static void switch_app_robot(void *obj, gui_event_t *e);
+static void switch_app_flag(void *obj, gui_event_t *e);
+static void switch_app_prism_thick(void *obj, gui_event_t *e);
+static void switch_app_prism_mirror(void *obj, gui_event_t *e);
+static void switch_app_windmill(void *obj, gui_event_t *e);
+static void switch_app_pandkoi(void *obj, gui_event_t *e);
+static void switch_app_seawater(void *obj, gui_event_t *e);
+static void switch_app_firefly(void *obj, gui_event_t *e);
+static void switch_app_rainbow_digital(void *obj, gui_event_t *e);
+static void switch_app_koiclock(void *obj, gui_event_t *e);
+static void switch_app_digital_clock(void *obj, gui_event_t *e);
+static void switch_app_countdown(void *obj, gui_event_t *e);
+static void switch_app_firework(void *obj, gui_event_t *e);
+static void switch_app_heart_particle(void *obj, gui_event_t *e);
+static void switch_app_butterfly_particle(void *obj, gui_event_t *e);
+static void switch_app_butterflys(void *obj, gui_event_t *e);
+static void switch_app_earth_clock(void *obj, gui_event_t *e);
+static void switch_app_labubu_digital(void *obj, gui_event_t *e);
+static void switch_app_flower_clock(void *obj, gui_event_t *e);
+static void switch_app_rainbow_analog(void *obj, gui_event_t *e);
+static void switch_app_glass(void *obj, gui_event_t *e);
 
 /*============================================================================*
  *                            Variables
@@ -229,329 +229,329 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-static void switch_app_box2d_ring(void *obj, gui_event_t e, void *param)
+static void switch_app_box2d_ring(void *obj, gui_event_t *e)
 {
     (void)obj;//not used
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, box2d_ring_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_fruit_ninja(void *obj, gui_event_t e, void *param)
+static void switch_app_fruit_ninja(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, fruit_ninja_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_heart_rate(void *obj, gui_event_t e, void *param)
+static void switch_app_heart_rate(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, heartrate_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_music(void *obj, gui_event_t e, void *param)
+static void switch_app_music(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, music_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_activity(void *obj, gui_event_t e, void *param)
+static void switch_app_activity(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, activity_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_soccer(void *obj, gui_event_t e, void *param)
+static void switch_app_soccer(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, soccer_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_flower(void *obj, gui_event_t e, void *param)
+static void switch_app_flower(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, flower_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_weather(void *obj, gui_event_t e, void *param)
+static void switch_app_weather(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, weather_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_butterfly(void *obj, gui_event_t e, void *param)
+static void switch_app_butterfly(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, butterfly_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_applist(void *obj, gui_event_t e, void *param)
+static void switch_app_applist(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, applist_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_disc(void *obj, gui_event_t e, void *param)
+static void switch_app_disc(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, disc_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_glass(void *obj, gui_event_t e, void *param)
+static void switch_app_glass(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, glass_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_face(void *obj, gui_event_t e, void *param)
+static void switch_app_face(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, face_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
     gui_obj_hidden(GUI_BASE(current_view), true);
 }
 
-static void switch_app_earth(void *obj, gui_event_t e, void *param)
+static void switch_app_earth(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, earth_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_robot(void *obj, gui_event_t e, void *param)
+static void switch_app_robot(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, robot_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_flag(void *obj, gui_event_t e, void *param)
+static void switch_app_flag(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, flag_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_prism_thick(void *obj, gui_event_t e, void *param)
+static void switch_app_prism_thick(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, prism_thick_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_prism_mirror(void *obj, gui_event_t e, void *param)
+static void switch_app_prism_mirror(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, prism3d_mirror_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_windmill(void *obj, gui_event_t e, void *param)
+static void switch_app_windmill(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, windmill_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_pandkoi(void *obj, gui_event_t e, void *param)
+static void switch_app_pandkoi(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, pandkoi_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_seawater(void *obj, gui_event_t e, void *param)
+static void switch_app_seawater(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, seawater_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_firefly(void *obj, gui_event_t e, void *param)
+static void switch_app_firefly(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, firefly_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_rainbow_digital(void *obj, gui_event_t e, void *param)
+static void switch_app_rainbow_digital(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, rainbow_digital_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_koiclock(void *obj, gui_event_t e, void *param)
+static void switch_app_koiclock(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, koiclock_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_digital_clock(void *obj, gui_event_t e, void *param)
+static void switch_app_digital_clock(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, digital_clock_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_countdown(void *obj, gui_event_t e, void *param)
+static void switch_app_countdown(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, box2d_countdown_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_firework(void *obj, gui_event_t e, void *param)
+static void switch_app_firework(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, fireworks_clock_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_heart_particle(void *obj, gui_event_t e, void *param)
+static void switch_app_heart_particle(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, heart_particle_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_butterfly_particle(void *obj, gui_event_t e, void *param)
+static void switch_app_butterfly_particle(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, butterfly_particle_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-static void switch_app_butterflys(void *obj, gui_event_t e, void *param)
+static void switch_app_butterflys(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, butterflys_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_app_earth_clock(void *obj, gui_event_t e, void *param)
+static void switch_app_earth_clock(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, earth_clock_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_cast(void *obj, gui_event_t e, void *param)
+static void switch_app_cast(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, cast_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_labubu_digital(void *obj, gui_event_t e, void *param)
+static void switch_app_labubu_digital(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, labubu_digital_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
-static void switch_app_flower_clock(void *obj, gui_event_t e, void *param)
+static void switch_app_flower_clock(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, flower_clock_view->name, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_app_rainbow_analog(void *obj, gui_event_t e, void *param)
+static void switch_app_rainbow_analog(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_view_switch_direct(current_view, rainbow_analog_view->name, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
+static void switch_menu_style_cb(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     if (gui_view_get_next() != NULL) { return; }
 
     gui_obj_t *parent = GUI_BASE(current_view)->parent;

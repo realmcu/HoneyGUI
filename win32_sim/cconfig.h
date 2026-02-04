@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2026, Realtek Semiconductor Corporation
- *
- * SPDX-License-Identifier: MIT
- */
-
 #ifndef CCONFIG_H__
 #define CCONFIG_H__
 /* Automatically generated file; DO NOT EDIT. */

@@ -54,20 +54,20 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static void click_button_back(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(current_view, timer_descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
-static void click_button_left(void *obj, gui_event_t e, void *param)
+static void click_button_left(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     if (reset_flag)
     {
         reset_flag = 0;
@@ -112,11 +112,11 @@ static void click_button_left(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void click_button_right(void *obj, gui_event_t e, void *param)
+static void click_button_right(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     f_status.timer = 0;
     gui_view_switch_direct(current_view, timer_descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);

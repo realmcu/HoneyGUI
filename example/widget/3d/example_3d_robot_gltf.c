@@ -23,7 +23,9 @@ static float rot_angle = 0.0f;
 
 static void update_robot_animation(void *param)
 {
-    GUI_UNUSED(param);
+    (void)param;
+
+
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)

@@ -81,23 +81,23 @@ static void time_update_cb(void *obj)
     gui_text_content_set((gui_text_t *)obj, date_str, strlen(date_str));
 }
 
-static void click_button_message(void *obj, gui_event_t e, void *param)
+static void click_button_message(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_view_switch_direct(current_view, NOTIFICATION_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
-static void click_button(void *obj, gui_event_t e, void *param)
+static void click_button(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
 
-    bool *status = param;
+
+    bool *status = e->user_data;
     *status = !(*status);
     gui_img_t *bg = (gui_img_t *)obj;
     gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
@@ -147,50 +147,50 @@ static void click_button(void *obj, gui_event_t e, void *param)
     gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
 }
 
-static void click_button_flashlight(void *obj, gui_event_t e, void *param)
+static void click_button_flashlight(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_set_animate_step(gui_view_get_current(), 400);
     gui_view_switch_direct(gui_view_get_current(), FLASHLIGHT_VIEW, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
-static void click_button_dark_light_mode(void *obj, gui_event_t e, void *param)
+static void click_button_dark_light_mode(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
-    bool *status = param;
+
+    bool *status = e->user_data;
     *status = !(*status);
     msg_2_regenerate_current_view();
 }
 
-static void click_button_timer(void *obj, gui_event_t e, void *param)
+static void click_button_timer(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_view_switch_direct(current_view, TIMER_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
-static void click_button_call(void *obj, gui_event_t e, void *param)
+static void click_button_call(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     gui_view_switch_direct(current_view, CALL_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
-static void click_button_2_info_center(void *obj, gui_event_t e, void *param)
+static void click_button_2_info_center(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     detail_page_design_func = page_information_center_customize_design;
     gui_view_switch_direct(current_view, DETAIL_VIEW, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,

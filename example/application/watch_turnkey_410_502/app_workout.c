@@ -96,7 +96,7 @@ static void back_to_list_view(void)
     if (selected_text) { gui_obj_show(selected_text, false); }
 }
 
-static void workout_ctr_win_slide_cb(void *obj, gui_event_t e)
+static void workout_ctr_win_slide_cb(void *obj, gui_event_code_t e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
@@ -147,7 +147,7 @@ char *workout_text_array[] =
     "stretch",               // index 17
 };
 const int WORKOUT_TEXT_ARRAY_SIZE = sizeof(workout_text_array) / sizeof(workout_text_array[0]);
-static void note_click_cb(void *obj, gui_event_t e)
+static void note_click_cb(void *obj, gui_event_code_t e)
 {
     GUI_UNUSED(e);
     gui_list_note_t *note = (gui_list_note_t *)obj;

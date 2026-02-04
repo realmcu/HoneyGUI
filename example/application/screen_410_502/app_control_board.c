@@ -176,10 +176,10 @@ void switch_nobother(bool state)
     }
 }
 
-static void switch_cb(void *obj, gui_event_t e, void *param)
+static void switch_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = (gui_img_t *)obj;
     gui_control_board_t *control_board = gui_get_control_board();
     if (strcmp(img->base.name, "sw_bt") == 0)

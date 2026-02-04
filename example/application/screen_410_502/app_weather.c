@@ -95,6 +95,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void update_panel_animation(void *param)
 {
+    (void)param;
+
     // touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
     gui_list_note_t *note = (gui_list_note_t *)param;

@@ -79,7 +79,7 @@
     gui_img_t *hour;
     gui_img_t *minute;
     gui_img_t *second;
-    void show_clock(void *obj, gui_event_t e)
+    void show_clock(void *obj, gui_event_code_t e)
     {
         if (GET_BASE(hour) == false)
         {
@@ -96,7 +96,7 @@
             gui_img_set_attribute((gui_img_t *)home_bg, "home_bg", home[0], 0, 0);
         }
     }
-    void enter_homelist(void *obj, gui_event_t e)
+    void enter_homelist(void *obj, gui_event_code_t e)
     {
         gui_log("enter_tablist \n");
     }

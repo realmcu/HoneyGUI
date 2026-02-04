@@ -113,10 +113,10 @@ static void time_update_cb(void *p)
     gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10]);
 }
 
-static void flower_change_cb(void *obj, gui_event_t e, void *param)
+static void flower_change_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     {
         if (!obj)
         {

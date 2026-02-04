@@ -160,14 +160,14 @@ static gui_view_descriptor_t gui_view_descriptor_image_466_466_about =
     .on_switch_in = view_switch_in_about,
     .on_switch_out = view_switch_out_about,
 };
-static void press_setting_cb_key(void *obj, gui_event_t e, void *param);
-static void release_setting_cb_key(void *obj, gui_event_t e, void *param);
-static void press_setting_cb_enter(void *obj, gui_event_t e, void *param);
-static void release_setting_cb_enter(void *obj, gui_event_t e, void *param);
-static void press_setting_cb_about(void *obj, gui_event_t e, void *param);
-static void release_setting_cb_about(void *obj, gui_event_t e, void *param);
-static void release_setting_cb_key_win(void *obj, gui_event_t e, void *param);
-static void press_setting_cb_key_win(void *obj, gui_event_t e, void *param);
+static void press_setting_cb_key(void *obj, gui_event_t *e);
+static void release_setting_cb_key(void *obj, gui_event_t *e);
+static void press_setting_cb_enter(void *obj, gui_event_t *e);
+static void release_setting_cb_enter(void *obj, gui_event_t *e);
+static void press_setting_cb_about(void *obj, gui_event_t *e);
+static void release_setting_cb_about(void *obj, gui_event_t *e);
+static void release_setting_cb_key_win(void *obj, gui_event_t *e);
+static void press_setting_cb_key_win(void *obj, gui_event_t *e);
 static void press_setting_cb_key_win_timer(void *p);
 static gui_img_t *view_switch_in_watchfaceimg1 = NULL;
 static gui_img_t *view_switch_in_watchfaceimg2 = NULL;
@@ -270,7 +270,9 @@ extern const unsigned char _binary_root_0x00950000_bin_size[];
 // Update the watch time and the JSON data
 static void time_update_cb(void *param)
 {
-    GUI_UNUSED(param);
+    (void)param;
+
+
     gui_log("Time update callback triggered.\n");
 }
 static void view_switch_in(gui_view_t *view);
@@ -758,20 +760,20 @@ static void release_setting_cb_timer(void *p)
     GUI_UNUSED(obj);
     gui_log("release_setting_cb_timer\n");
 }
-static void click_switch_widget_cb(void *obj, gui_event_t e, void *param)
+static void click_switch_widget_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // gui_obj_t *o = GUI_BASE(obj);
     gui_obj_create_timer(obj, 1, true, switch_widget_play);
     switch_playing = true;
 }
-static void press_setting_cb(void *obj, gui_event_t e, void *param)
+static void press_setting_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // gui_obj_create_timer(obj, 1, true, press_setting_cb_timer);
     // gui_obj_start_timer(obj);
     gui_obj_t *o = GUI_BASE(obj);
@@ -801,11 +803,11 @@ static void press_setting_cb(void *obj, gui_event_t e, void *param)
         }
     }
 }
-static void press_setting_cb_about(void *obj, gui_event_t e, void *param)
+static void press_setting_cb_about(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_obj_t *o = GUI_BASE(obj);
     IMPORT_GUI_TOUCHPAD
@@ -835,11 +837,11 @@ static void press_setting_cb_about(void *obj, gui_event_t e, void *param)
         }
     }
 }
-static void press_setting_cb_key(void *obj, gui_event_t e, void *param)
+static void press_setting_cb_key(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
+    void *param = e->user_data;
+
     // gui_obj_t *o = GUI_BASE(obj);
     size_t index = (size_t)param;
     gui_img_set_image_data((gui_img_t *)obj,
@@ -847,7 +849,7 @@ static void press_setting_cb_key(void *obj, gui_event_t e, void *param)
     IMPORT_GUI_TOUCHPAD
     gui_log("press key win tpy:%d,%d\n", tp->y, tp->deltaY);
 }
-static void press_setting_cb_enter(void *obj, gui_event_t e, void *param)
+static void press_setting_cb_enter(void *obj, gui_event_t *e)
 {
     if (!password_flag)
     {
@@ -856,12 +858,12 @@ static void press_setting_cb_enter(void *obj, gui_event_t e, void *param)
 
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_img_set_image_data((gui_img_t *)obj,
                            (void *)FILE_POINTER(IP_INPUT_FIELD_PRESS_BIN));
 }
-static void release_setting_cb_enter(void *obj, gui_event_t e, void *param)
+static void release_setting_cb_enter(void *obj, gui_event_t *e)
 {
     if (!password_flag)
     {
@@ -869,7 +871,7 @@ static void release_setting_cb_enter(void *obj, gui_event_t e, void *param)
     }
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
 
     gui_img_set_image_data((gui_img_t *)obj,
                            (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN));
@@ -1068,11 +1070,11 @@ static char *ip4_string[] =
 
 };
 static bool press_setting_cb_key_win_flag = 0;
-static void release_setting_cb_key_win(void *obj, gui_event_t e, void *param)
+static void release_setting_cb_key_win(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // gui_obj_t *o = GUI_BASE(obj);
 
     for (size_t i = 0; i < sizeof(key_obj_array) / sizeof(key_obj_array[0]); i++)
@@ -1102,20 +1104,20 @@ static void press_setting_cb_key_win_timer(void *p)
         }
     }
 }
-static void press_setting_cb_key_win(void *obj, gui_event_t e, void *param)
+static void press_setting_cb_key_win(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // gui_obj_t *o = GUI_BASE(obj);
 
     press_setting_cb_key_win_flag = 1;
 }
-static void release_setting_cb_key(void *obj, gui_event_t e, void *param)
+static void release_setting_cb_key(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
+    void *param = e->user_data;
+
     // gui_obj_t *o = GUI_BASE(obj);
     size_t index = (size_t)param;
     gui_img_set_image_data((gui_img_t *)obj,
@@ -1181,11 +1183,11 @@ static void release_setting_cb_key(void *obj, gui_event_t e, void *param)
         }
     }
 }
-static void release_setting_cb(void *obj, gui_event_t e, void *param)
+static void release_setting_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // gui_obj_create_timer(obj, 1, true, release_setting_cb_timer);
     // gui_obj_start_timer(obj);
     gui_obj_t *o = GUI_BASE(obj);
@@ -1233,11 +1235,11 @@ static void release_setting_cb(void *obj, gui_event_t e, void *param)
         buttons[i].pressed = false;
     }
 }
-static void release_setting_cb_about(void *obj, gui_event_t e, void *param)
+static void release_setting_cb_about(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
+
     // gui_obj_create_timer(obj, 1, true, release_setting_cb_timer);
     // gui_obj_start_timer(obj);
 

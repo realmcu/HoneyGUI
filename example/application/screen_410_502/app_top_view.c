@@ -121,10 +121,10 @@ static void canvas_color_change_cb(void *p)
     gui_rect_set_color((gui_rounded_rect_t *)p, gui_rgb(39, 43, 44));
 }
 
-static void view_more_click_cb(void *widget, gui_event_t e, void *param)
+static void view_more_click_cb(void *widget, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_obj_t *obj = GUI_BASE(widget);
     if (strcmp(obj->name, "cancel") == 0)
     {
@@ -136,21 +136,20 @@ static void view_more_click_cb(void *widget, gui_event_t e, void *param)
     gui_obj_start_timer(obj);
 }
 
-static void view_more_event_cb(void *widget, gui_event_t e, void *param)
+static void view_more_event_cb(void *widget, gui_event_t *e)
 {
     (void)widget;
     (void)e;
-    (void)param;
+
     // This function is intentionally left empty.
 }
 
-static void create_view_more(void *obj, gui_event_t e, void *param)
+static void create_view_more(void *obj, gui_event_t *e)
 {
     (void)obj;
-    (void)e;
     if (in_view_more) {return;}
     in_view_more = true;
-    information_t *inform = (information_t *)param;
+    information_t *inform = (information_t *)e->user_data;
     const char *informer = inform->informer;
     const char *content = inform->content;
     const char *time = inform->time;
@@ -407,6 +406,8 @@ static void create_inform_note(gui_obj_t *obj, void *param)
 static void list_timer_cb(void *param)
 {
     (void)param;
+
+
     gui_view_t *next_view = gui_view_get_next();
     if (!note_dur_animation && !clear_flag &&
         (next_view == current_view || next_view == NULL))
@@ -466,10 +467,10 @@ static void clear_all_timer_cb(void *widget)
     }
 }
 
-static void clear_all_note_cb(void *obj, gui_event_t e, void *param)
+static void clear_all_note_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     if (in_view_more || list->note_num == 0) {return;}
     gui_obj_create_timer(GUI_BASE(obj), 10, true, clear_all_timer_cb);
     gui_obj_start_timer(GUI_BASE(obj));

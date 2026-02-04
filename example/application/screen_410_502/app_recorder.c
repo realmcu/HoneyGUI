@@ -109,11 +109,11 @@ static void format_time(uint32_t seconds, char *str)
     sprintf(str, "%02u:%02u:%02u", h, m, s);
 }
 
-static void click_to_recorder_cb(void *obj, gui_event_t e, void *param)
+static void click_to_recorder_cb(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     gui_obj_hidden(GUI_BASE(win_recorder), false);
     gui_obj_tree_free_async(win_play);
 
@@ -131,18 +131,18 @@ static void click_to_recorder_cb(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void click_canvas_cb(void *obj, gui_event_t e, void *param)
+static void click_canvas_cb(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     return;
 }
 
-static void click_play_cb(void *obj, gui_event_t e, void *param)
+static void click_play_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     if (record_file_num == 0) { return; }
 
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
@@ -203,18 +203,18 @@ static void on_playing(void *p)
     }
 }
 
-static void win_scroll_cb(void *obj, gui_event_t e, void *param)
+static void win_scroll_cb(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     // Disable view horizontal scroll
 }
 
-static void click_file_play(void *obj, gui_event_t e, void *param)
+static void click_file_play(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_list_note_t *note = (gui_list_note_t *)GUI_BASE(obj)->parent;
     gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "img_play", win_play)
@@ -344,10 +344,10 @@ static void create_recorder_play(void)
     gui_text_rendermode_set(text, 2);
 }
 
-static void click_record_cb(void *obj, gui_event_t e, void *param)
+static void click_record_cb(void *obj, gui_event_t *e)
 {
     (void)e;
-    (void)param;
+
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "record_time", win_recorder)
@@ -373,11 +373,11 @@ static void click_record_cb(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void click_enter_file_win_cb(void *obj, gui_event_t e, void *param)
+static void click_enter_file_win_cb(void *obj, gui_event_t *e)
 {
     (void)obj;
     (void)e;
-    (void)param;
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "img_record", win_recorder)
 
     gui_img_t *img = GUI_TYPE(gui_img_t, o);

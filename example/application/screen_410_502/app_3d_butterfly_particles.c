@@ -211,6 +211,8 @@ static void update_butterfly_wing_bg(l3_model_base_t *model)
 
 static void update_butterfly(void *param)
 {
+    (void)param;
+
     gui_lite3d_t *lite3d_butterfly_particle = (gui_lite3d_t *)param;
     touch_info_t *tp = tp_get_info();
     uint32_t current_time = gui_ms_get();

@@ -118,8 +118,10 @@ static void update_bubbles(void)
 
 static void update_windmill_animation(void *param)
 {
-    touch_info_t *tp = tp_get_info();
     (void)param;
+
+    touch_info_t *tp = tp_get_info();
+
 
     if (tp->pressed || tp->pressing)
     {
