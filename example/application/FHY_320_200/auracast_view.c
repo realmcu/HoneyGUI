@@ -44,7 +44,8 @@ static gui_view_descriptor_t const descriptor =
 static char warning_str[] = "You're about to restart\nAuracast to enable\npassword.";
 static char title[] = "Restart Auracast";
 
-static gui_view_descriptor_t *descriptor_rec = NULL;
+static const char *descriptor_rec = NULL;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/

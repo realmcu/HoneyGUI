@@ -124,26 +124,23 @@ static void gui_list_update_bar(gui_obj_t *obj)
                                           _this->bar_data);
     }
 
-    if (_this->bar)
+    float t_x = 0;
+    float t_y = 0;
+    float offset = (float)(_this->offset);
+    offset = (offset > 0) ? 0 : offset;
+    if (_this->dir == HORIZONTAL && total_length > w)
     {
-        float t_x = 0;
-        float t_y = 0;
-        float offset = (float)(_this->offset);
-        offset = (offset > 0) ? 0 : offset;
-        if (_this->dir == HORIZONTAL && total_length > w)
-        {
-            float range = (float)(w - g_Bar_Width);
-            t_x = offset * range / (total_length - w);
-            t_x = (t_x > range) ? range : t_x;
-        }
-        else if (_this->dir == VERTICAL && total_length > h)
-        {
-            float range = (float)(h - g_Bar_Height);
-            t_y = -offset * range / (total_length - h);
-            t_y = (t_y > range) ? range : t_y;
-        }
-        gui_img_translate(_this->bar, t_x, t_y);
+        float range = (float)(w - g_Bar_Width);
+        t_x = offset * range / (total_length - w);
+        t_x = (t_x > range) ? range : t_x;
     }
+    else if (_this->dir == VERTICAL && total_length > h)
+    {
+        float range = (float)(h - g_Bar_Height);
+        t_y = -offset * range / (total_length - h);
+        t_y = (t_y > range) ? range : t_y;
+    }
+    gui_img_translate(_this->bar, t_x, t_y);
 }
 
 // Add inertia effect while tp released
@@ -395,7 +392,10 @@ static void gui_list_prepare(gui_obj_t *obj)
     }
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
 
-    gui_list_update_bar(obj); // Update the scrollbar
+    if (_this->bar)
+    {
+        gui_list_update_bar(obj); // Update the scrollbar
+    }
 
     uint8_t last = _this->checksum;
     _this->checksum = 0;
