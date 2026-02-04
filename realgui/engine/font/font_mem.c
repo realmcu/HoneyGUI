@@ -85,6 +85,50 @@ int32_t font_index_bsearch_bmp(uintptr_t table_offset, uint32_t index_area_size,
 }
 
 /**
+ * @brief Binary search for unicode in offset+crop index table
+ * Index format: [unicode(2B), file_offset(4B)] per entry, 6 bytes total
+ * @param table_offset Start address of index table
+ * @param index_area_size Size of index area in bytes
+ * @param unicode Unicode value to search for
+ * @return File offset if found, 0xFFFFFFFF if not found
+ */
+static uint32_t font_index_bsearch_crop_offset(uintptr_t table_offset, uint32_t index_area_size,
+                                               uint32_t unicode)
+{
+    if (index_area_size == 0)
+    {
+        return 0xFFFFFFFF;
+    }
+
+    uint32_t entry_size = 6; // unicode(2B) + offset(4B)
+    uint32_t count = index_area_size / entry_size;
+    int32_t left = 0;
+    int32_t right = (int32_t)count - 1;
+
+    while (left <= right)
+    {
+        int32_t mid = left + (right - left) / 2;
+        uint16_t mid_unicode = *(uint16_t *)(uintptr_t)(table_offset + mid * entry_size);
+
+        if (mid_unicode == unicode)
+        {
+            // Found: return the file offset (4 bytes after unicode)
+            return *(uint32_t *)(uintptr_t)(table_offset + mid * entry_size + 2);
+        }
+        else if (mid_unicode < unicode)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return 0xFFFFFFFF;
+}
+
+/**
  * @brief Read font data from filesystem
  * @param node Font library node
  * @param offset Offset in font file
@@ -354,7 +398,120 @@ void gui_font_get_dot_info(gui_text_t *text)
             break;
         case 1: //offset
             {
-                //todo by luke
+                uint32_t index_area_size = font->index_area_size;
+                for (uni_i = 0; uni_i < unicode_len; uni_i++)
+                {
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].w = 0;
+                    chr[chr_i].h = text->font_height;
+                    uint32_t offset = 0;
+                    if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
+                    {
+                        chr[chr_i].char_w = text->font_height / 4;
+                        chr[chr_i].char_h = text->font_height / 4;
+                    }
+                    else if (chr[chr_i].unicode == 0x0A)
+                    {
+                        line_flag ++;
+                        chr[chr_i].char_w = 0;
+                        chr[chr_i].char_h = 0;
+                    }
+                    else if (chr[chr_i].unicode >= 0x10000)
+                    {
+                        if (text->emoji_path)
+                        {
+                            char file_path[100];
+                            memset(file_path, 0, 100);
+                            snprintf(file_path, sizeof(file_path), "%s", text->emoji_path);
+                            uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
+                                                                                               unicode_len - uni_i, file_path);
+                            if (multi_unicode_len != 0)
+                            {
+                                chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
+                                if (chr[chr_i].dot_addr != NULL)
+                                {
+                                    chr[chr_i].char_w = text->font_height;
+                                    chr[chr_i].char_h = text->font_height;
+                                }
+                                else
+                                {
+                                    chr[chr_i].char_w = 0;
+                                    chr[chr_i].char_h = 0;
+                                }
+                                uni_i += multi_unicode_len - 1;
+                            }
+                            else
+                            {
+                                gui_log("No valid emoji\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Binary search for unicode in offset+crop index table
+                        offset = font_index_bsearch_crop_offset(table_offset, index_area_size, chr[chr_i].unicode);
+                        if (offset == 0xFFFFFFFF) { continue; }
+                        if (text->font_mode == FONT_SRC_MEMADDR)
+                        {
+                            chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
+                            chr[chr_i].char_w = (uint8_t)(*(chr[chr_i].dot_addr - 2));
+                            chr[chr_i].char_y = (uint8_t)(*(chr[chr_i].dot_addr - 4));
+                            chr[chr_i].char_h = (uint8_t)(*(chr[chr_i].dot_addr - 1)) - chr[chr_i].char_y;
+                            line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
+                            chr[chr_i].w = line_byte * 8 / render_mode;
+                        }
+                        else if (text->font_mode == FONT_SRC_FTL)
+                        {
+                            chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
+                            uint8_t header[4];
+                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 4, header, 4);
+
+                            chr[chr_i].char_y = header[0];
+                            chr[chr_i].char_w = header[2];
+                            chr[chr_i].char_h = header[3] - chr[chr_i].char_y;
+                            line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
+                            chr[chr_i].w = line_byte * 8 / render_mode;
+
+                            uint32_t dot_size = line_byte * chr[chr_i].char_h;
+                            uint8_t *dot_buf = gui_malloc(dot_size);
+                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
+
+                            chr[chr_i].dot_addr = dot_buf;
+                        }
+                        else if (text->font_mode == FONT_SRC_FILESYS)
+                        {
+                            uint32_t file_offset = offset;
+                            uint8_t header[4];
+                            int ret = font_fs_read(node, file_offset, header, 4);
+                            if (ret < 0)
+                            {
+                                continue;
+                            }
+
+                            chr[chr_i].char_y = header[0];
+                            chr[chr_i].char_w = header[2];
+                            chr[chr_i].char_h = header[3] - chr[chr_i].char_y;
+                            line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
+                            chr[chr_i].w = line_byte * 8 / render_mode;
+
+                            uint32_t dot_size = line_byte * chr[chr_i].char_h;
+                            uint8_t *dot_buf = gui_malloc(dot_size);
+                            if (dot_buf == NULL)
+                            {
+                                continue;
+                            }
+                            ret = font_fs_read(node, file_offset + 4, dot_buf, dot_size);
+                            if (ret < 0)
+                            {
+                                gui_free(dot_buf);
+                                continue;
+                            }
+                            chr[chr_i].dot_addr = dot_buf;
+                        }
+                    }
+                    all_char_w += chr[chr_i].char_w;
+                    chr_i ++;
+                }
             }
             break;
         default:
@@ -1428,7 +1585,27 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
         case 1: //offset
             for (uint32_t i = 0; i < unicode_len; i++)
             {
-                //todo by luke
+                uint32_t offset = 0;
+                uint16_t char_w = 0;
+                if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
+                {
+                    char_w = font->font_size / 4;
+                }
+                else if (unicode_buffer[i] == 0x0A)
+                {
+                    line_flag ++;
+                    char_w = 0;
+                }
+                else
+                {
+                    // Binary search for unicode in offset+crop index table
+                    offset = font_index_bsearch_crop_offset(table_offset, font->index_area_size,
+                                                            unicode_buffer[i]);
+                    if (offset == 0xFFFFFFFF) { continue; }
+                    uint8_t *dot_addr = (uint8_t *)font_bin_addr + offset + 4;
+                    char_w = (uint8_t)(*(dot_addr - 2));
+                }
+                all_char_w += char_w;
             }
             break;
         default:

@@ -217,8 +217,8 @@ int gui_default_font_init(void)
 {
     /* Register default font to font library */
     FONT_LIB_NODE *node = gui_font_lib_register(
-                              (uint8_t *)default_font_size16_bits1_bitmap,
-                              16,  /* font size */
+                              (uint8_t *)default_font_bitmap,
+                              24,  /* font size */
                               FONT_SRC_MEMADDR,
                               GUI_FONT_SRC_BMP,
                               NULL,  /* no cached data for MEM mode */
