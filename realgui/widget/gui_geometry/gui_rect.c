@@ -810,10 +810,10 @@ static void gui_rect_prepare(gui_obj_t *obj)
         matrix_translate(-center_x, -center_y, obj->matrix);
     }
 
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
 
     // Calculate checksum only for key properties (exclude pointers)
     uint8_t new_checksum = 0;

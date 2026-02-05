@@ -14,7 +14,7 @@
 #include "gui_obj_focus.h"
 
 
-#define RTK_KB_DEBUG
+// #define RTK_KB_DEBUG
 
 #ifdef RTK_KB_DEBUG
 

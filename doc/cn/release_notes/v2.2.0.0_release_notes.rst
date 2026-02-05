@@ -82,6 +82,7 @@ v2.2.0.0 版本说明
 
 - **变更**
 
+  * 更改为新的图像设置源 API。(ca1f506c3)
   * 重构键盘输入处理系统。(a589d86d5)
   * 重构粒子系统为配置驱动。(d3081dbfa)
   * 解耦 h264bsd 解码器和视频组件。(7edd40a60)
@@ -147,3 +148,54 @@ v2.2.0.0 版本说明
   * 从注释中移除需求引用。(55721db18)
   * 移除 gui_gray.h。(a0f086514)
   * 删除画布矩形和弧形组件。(468372b83)
+
+API 迁移指南
+======================
+
+图像组件 API 变更
+-----------------
+
+图像组件 API 进行了重构，以提供更清晰和显式的参数控制。旧 API 已被弃用但仍可用于向后兼容。
+
+**已弃用的 API：**
+
+- ``gui_img_set_attribute(gui_img_t *_this, const char *name, void *addr, int16_t x, int16_t y)``
+- ``gui_img_set_image_data(gui_img_t *_this, const uint8_t *image_data_pointer)``
+
+**新 API：**
+
+- ``gui_img_set_src(gui_img_t *_this, const uint8_t *file_pointer, uint32_t storage_type)`` - 设置图像源并显式指定存储类型
+- ``gui_img_set_pos(gui_img_t *_this, int16_t x, int16_t y)`` - 设置图像位置
+
+**存储类型：**
+
+- ``IMG_SRC_MEMADDR`` - RAM 或 Flash 内存中的图像数据
+- ``IMG_SRC_FILESYS`` - 来自文件系统的图像
+- ``IMG_SRC_FTL`` - 来自 Flash 转换层的图像
+
+**迁移示例：**
+
+旧代码：
+
+.. code-block:: c
+
+   gui_img_set_attribute((gui_img_t *)home_bg, "home_bg", home[0], 0, 0);
+
+新代码：
+
+.. code-block:: c
+
+   gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
+   gui_img_set_src((gui_img_t *)home_bg, home[0], ((gui_img_t *)home_bg)->storage_type);
+
+旧代码：
+
+.. code-block:: c
+
+   gui_img_set_image_data(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN);
+
+新代码：
+
+.. code-block:: c
+
+   gui_img_set_src(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN, IMG_SRC_MEMADDR);

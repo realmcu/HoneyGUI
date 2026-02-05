@@ -455,20 +455,20 @@ static void gui_view_prepare(gui_obj_t *obj)
 
     if (!g_SurpressEvent && _this == g_CurrentView)
     {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN, "touch");
         g_SwitchDone = false;
     }
 
     if (!g_SurpressTP && _this == g_CurrentView)
     {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
         gui_view_scroll_offset();
     }
 

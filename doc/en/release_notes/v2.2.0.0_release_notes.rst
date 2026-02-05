@@ -82,6 +82,7 @@ The following lists all changes categorized into Added, Changed, Fixed, and Remo
 
 - **Changed**
 
+  * Change to new image set src API. (ca1f506c3)
   * Refactor keyboard input handling system. (a589d86d5)
   * Refactor particle system to config-driven. (d3081dbfa)
   * Decouple h264bsd decoder and video widget. (7edd40a60)
@@ -147,3 +148,54 @@ The following lists all changes categorized into Added, Changed, Fixed, and Remo
   * Remove requirement references from comments. (55721db18)
   * Remove gui_gray.h. (a0f086514)
   * Delete canvas rect & arc widget. (468372b83)
+
+API Migration Guide
+======================
+
+Image Widget API Changes
+-------------------------
+
+The image widget APIs have been refactored for better clarity and explicit parameter control. The old APIs are deprecated but still available for backward compatibility.
+
+**Deprecated APIs:**
+
+- ``gui_img_set_attribute(gui_img_t *_this, const char *name, void *addr, int16_t x, int16_t y)``
+- ``gui_img_set_image_data(gui_img_t *_this, const uint8_t *image_data_pointer)``
+
+**New APIs:**
+
+- ``gui_img_set_src(gui_img_t *_this, const uint8_t *file_pointer, uint32_t storage_type)`` - Sets the image source with explicit storage type
+- ``gui_img_set_pos(gui_img_t *_this, int16_t x, int16_t y)`` - Sets the image position
+
+**Storage Types:**
+
+- ``IMG_SRC_MEMADDR`` - Image data in RAM or Flash memory
+- ``IMG_SRC_FILESYS`` - Image from filesystem
+- ``IMG_SRC_FTL`` - Image from Flash Translation Layer
+
+**Migration Examples:**
+
+Old code:
+
+.. code-block:: c
+
+   gui_img_set_attribute((gui_img_t *)home_bg, "home_bg", home[0], 0, 0);
+
+New code:
+
+.. code-block:: c
+
+   gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
+   gui_img_set_src((gui_img_t *)home_bg, home[0], ((gui_img_t *)home_bg)->storage_type);
+
+Old code:
+
+.. code-block:: c
+
+   gui_img_set_image_data(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN);
+
+New code:
+
+.. code-block:: c
+
+   gui_img_set_src(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN, IMG_SRC_MEMADDR);

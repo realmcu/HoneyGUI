@@ -49,8 +49,6 @@ static uint8_t event_cnt = 0;
  *============================================================================*/
 static void gui_obj_store_event(gui_obj_t *obj, gui_event_code_t event, const void *indev_name)
 {
-    GUI_UNUSED(indev_name);
-
     if (event != GUI_EVENT_TOUCH_RELEASED)
     {
         for (uint32_t i = 0; i < event_cnt; i++)
@@ -75,6 +73,7 @@ static void gui_obj_store_event(gui_obj_t *obj, gui_event_code_t event, const vo
             pending_events[event_cnt].cb = event_dsc->event_cb;
             pending_events[event_cnt].event.code = event;
             pending_events[event_cnt].event.user_data = event_dsc->user_data;
+            pending_events[event_cnt].event.indev_name = indev_name;
             pending_events[event_cnt].obj = obj;
             event_cnt++;
         }

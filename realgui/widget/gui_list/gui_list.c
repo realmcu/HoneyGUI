@@ -383,14 +383,14 @@ static void gui_list_prepare(gui_obj_t *obj)
     {
         if (_this->dir == HORIZONTAL)
         {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
         }
         else
         {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, "touch");
         }
     }
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
 
     if (_this->bar)
     {
@@ -834,15 +834,15 @@ static void gui_list_note_prepare(gui_obj_t *obj)
     // matrix_translate(-list->base.x, -list->base.y,
     //                  obj->matrix); //eliminate list offsets if x\y is not 0
 
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     if (list->dir == VERTICAL)
     {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
     }
     else
     {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, "touch");
     }
 
     gui_list_note_transform(obj);

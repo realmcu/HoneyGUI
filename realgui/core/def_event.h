@@ -71,6 +71,7 @@ typedef struct _gui_event_t
 {
     gui_event_code_t code;
     void *user_data;
+    const void *indev_name;
 } gui_event_t;
 
 typedef void (*gui_event_cb_t)(void *obj, gui_event_t *e);

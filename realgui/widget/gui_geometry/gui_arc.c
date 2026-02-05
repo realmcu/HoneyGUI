@@ -116,7 +116,7 @@ static void gui_arc_prepare(gui_arc_t *this)
     // Translate back
     matrix_translate(-center_x, -center_y, obj->matrix);
 
-    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED, "touch");
     // Check if we need to re-render
     if (!this->buffer_valid || is_arc_dirty(this))
     {

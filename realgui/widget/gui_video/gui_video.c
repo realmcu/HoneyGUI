@@ -842,9 +842,9 @@ static void gui_video_prepare(gui_obj_t *obj)
 
     // gui_log("gui_video_prepare  %d %d", this->frame_cur, this->frame_last);
     gui_img_set_src(this->img, (const uint8_t *) & (this->header), IMG_SRC_MEMADDR);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
 }
 
 

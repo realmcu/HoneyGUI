@@ -9,6 +9,7 @@
 #include "gui_win.h"
 #include "gui_img.h"
 #include "gui_obj.h"
+#include "gui_obj_focus.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -28,7 +29,8 @@
 void test_event_cb(void *obj, gui_event_t *e)
 {
     gui_obj_t *this = (gui_obj_t *)obj;
-    gui_log("Event test obj name = %s, e = 0x%x !\n", this->name, e->code);
+    const char *dev_name = e->indev_name ? (const char *)e->indev_name : "unknown";
+    gui_log("Event test obj name = %s, e = 0x%x, indev = %s !\n", this->name, e->code, dev_name);
 }
 
 void test_timer_cb(void *param)
@@ -69,7 +71,7 @@ static int app_init(void)
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
 
-    // gui_obj_focus_set(img);
+    gui_obj_focus_set(img);
 
 
     // gui_obj_create_timer(&(img->base), 1000, true, test_timer_cb);

@@ -34,7 +34,7 @@ static void gui_lite3d_prepare(gui_obj_t *obj)
         if (l3_model_on_click(this->model, tp->x, tp->y) == true)
         {
             gui_log("l3_model_on_click\n");
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
         }
     }
 
