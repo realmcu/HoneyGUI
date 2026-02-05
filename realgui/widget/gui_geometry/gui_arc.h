@@ -57,6 +57,7 @@ typedef struct
     float cached_end_angle;
     float cached_line_width;
     gui_color_t cached_color;
+    uint32_t cached_not_show;
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */

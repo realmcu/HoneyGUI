@@ -66,10 +66,10 @@ static void gui_circle_input_prepare(gui_obj_t *obj)
         // Check if touch point is inside the arc
         if (is_point_in_circle(this, local_x, local_y))
         {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
         }
     }
 }
@@ -683,6 +683,9 @@ static void gui_circle_prepare(gui_obj_t *obj)
                                     sizeof(this->use_gradient));
     new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->gradient_type,
                                     sizeof(this->gradient_type));
+    // Handle bit-field not_show with temporary variable
+    uint32_t not_show_val = obj->not_show;
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&not_show_val, sizeof(not_show_val));
 
     // Include gradient data if present
     if (this->gradient != NULL)

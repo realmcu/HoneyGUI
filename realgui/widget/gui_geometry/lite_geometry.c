@@ -1417,18 +1417,12 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
         }
     }
 
-    // Also include quadrants containing the cap centers
-    // Start cap quadrant
-    int start_cap_quad = (start_cap_x >= center_x) ?
-                         ((start_cap_y >= center_y) ? 0 : 3) :
-                         ((start_cap_y >= center_y) ? 1 : 2);
-    quadrants[start_cap_quad] = true;
+    // Determine which quadrant should draw each cap (to avoid double-drawing)
+    // Start cap quadrant - based on start angle
+    int start_cap_quad = start_angle_deg / 90;
 
-    // End cap quadrant
-    int end_cap_quad = (end_cap_x >= center_x) ?
-                       ((end_cap_y >= center_y) ? 0 : 3) :
-                       ((end_cap_y >= center_y) ? 1 : 2);
-    quadrants[end_cap_quad] = true;
+    // End cap quadrant - based on end angle
+    int end_cap_quad = end_angle_deg / 90;
 
     // Extract color components
     uint8_t color_a = (stroke_color >> 24) & 0xFF;
@@ -1460,12 +1454,12 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
 
         switch (quad)
         {
-        case 0: // Q1: x >= center, y >= center (angles 0-90)
+        case 0: // Q0: x >= center, y >= center (angles 0-90)
             qx_start = center_x_int;
             qx_end = (int)(center_x + outer_radius + aa_width + cap_expand);
             qy_start = center_y_int;
             qy_end = (int)(center_y + outer_radius + aa_width + cap_expand);
-            // Extend for caps that cross into adjacent quadrants
+            // Extend boundaries only if cap belongs to this quadrant (by angle, not position)
             if (has_start_cap)
             {
                 qx_start = LG_MIN(qx_start, (int)(start_cap_x - cap_expand));
@@ -1477,12 +1471,12 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 qy_start = LG_MIN(qy_start, (int)(end_cap_y - cap_expand));
             }
             break;
-        case 1: // Q2: x < center, y >= center (angles 90-180)
+        case 1: // Q1: x < center, y >= center (angles 90-180)
             qx_start = (int)(center_x - outer_radius - aa_width - cap_expand);
             qx_end = center_x_int - 1;
             qy_start = center_y_int;
             qy_end = (int)(center_y + outer_radius + aa_width + cap_expand);
-            // Extend for caps
+            // Extend boundaries only if cap belongs to this quadrant
             if (has_start_cap)
             {
                 qx_end = LG_MAX(qx_end, (int)(start_cap_x + cap_expand));
@@ -1494,12 +1488,12 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 qy_start = LG_MIN(qy_start, (int)(end_cap_y - cap_expand));
             }
             break;
-        case 2: // Q3: x < center, y < center (angles 180-270)
+        case 2: // Q2: x < center, y < center (angles 180-270)
             qx_start = (int)(center_x - outer_radius - aa_width - cap_expand);
             qx_end = center_x_int - 1;
             qy_start = (int)(center_y - outer_radius - aa_width - cap_expand);
             qy_end = center_y_int - 1;
-            // Extend for caps
+            // Extend boundaries only if cap belongs to this quadrant
             if (has_start_cap)
             {
                 qx_end = LG_MAX(qx_end, (int)(start_cap_x + cap_expand));
@@ -1511,12 +1505,12 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 qy_end = LG_MAX(qy_end, (int)(end_cap_y + cap_expand));
             }
             break;
-        case 3: // Q4: x >= center, y < center (angles 270-360)
+        case 3: // Q3: x >= center, y < center (angles 270-360)
             qx_start = center_x_int;
             qx_end = (int)(center_x + outer_radius + aa_width + cap_expand);
             qy_start = (int)(center_y - outer_radius - aa_width - cap_expand);
             qy_end = center_y_int - 1;
-            // Extend for caps
+            // Extend boundaries only if cap belongs to this quadrant
             if (has_start_cap)
             {
                 qx_start = LG_MIN(qx_start, (int)(start_cap_x - cap_expand));
@@ -1619,17 +1613,29 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                         }
                         else
                         {
-                            uint16_t inv_alpha = 256 - final_alpha;
+                            // Check if background is same color (to avoid double-draw artifacts)
                             uint8_t bg_r = (bg >> 16) & 0xFF;
                             uint8_t bg_g = (bg >> 8) & 0xFF;
                             uint8_t bg_b = bg & 0xFF;
 
-                            uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
+                            // If same color, use MAX alpha instead of ADD to prevent transparency stacking
+                            if (bg_r == color_r && bg_g == color_g && bg_b == color_b)
+                            {
+                                uint8_t max_alpha = (final_alpha > bg_a) ? final_alpha : bg_a;
+                                *pixel_ptr = (max_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
+                            }
+                            else
+                            {
+                                // Different color, use standard alpha blending
+                                uint16_t inv_alpha = 256 - final_alpha;
 
-                            *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
+                                uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
+                                uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
+                                uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
+                                uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
+
+                                *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
+                            }
                         }
                     }
                 }

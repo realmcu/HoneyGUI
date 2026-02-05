@@ -810,10 +810,10 @@ static void gui_rect_prepare(gui_obj_t *obj)
         matrix_translate(-center_x, -center_y, obj->matrix);
     }
 
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
 
     // Calculate checksum only for key properties (exclude pointers)
     uint8_t new_checksum = 0;
@@ -834,6 +834,9 @@ static void gui_rect_prepare(gui_obj_t *obj)
                                     sizeof(this->gradient_dir));
     new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->base.w, sizeof(this->base.w));
     new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->base.h, sizeof(this->base.h));
+    // Handle bit-field not_show with temporary variable
+    uint32_t not_show_val = obj->not_show;
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&not_show_val, sizeof(not_show_val));
 
     if (this->gradient != NULL)
     {
