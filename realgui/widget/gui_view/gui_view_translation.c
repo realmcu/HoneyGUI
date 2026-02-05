@@ -27,8 +27,8 @@ void gui_view_translation(gui_view_t *_this, int16_t release)
     int16_t h = obj->h;
 
     int16_t offset_x, offset_y;
-    if (_this->current_event == GUI_EVENT_TOUCH_MOVE_LEFT ||
-        _this->current_event == GUI_EVENT_TOUCH_MOVE_RIGHT)
+    if (_this->current_event_code == GUI_EVENT_TOUCH_MOVE_LEFT ||
+        _this->current_event_code == GUI_EVENT_TOUCH_MOVE_RIGHT)
     {
         offset_x = release;
         offset_y = release * (h / w);

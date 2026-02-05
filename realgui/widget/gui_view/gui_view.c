@@ -234,7 +234,7 @@ static void gui_view_pressing_cb(void *obj, gui_event_t *e)
     // gui_log("g_Offset %d\n", g_Offset);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    gui_event_code_t trigger_event = g_CurrentView->current_event;
+    gui_event_code_t trigger_event = g_CurrentView->current_event_code;
 
     if (trigger_event == GUI_EVENT_TOUCH_MOVE_LEFT)
     {
@@ -314,8 +314,7 @@ static void gui_view_transition(gui_view_t *_this, int16_t release)
     }
 }
 
-static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_code_t e,
-                                              gui_view_on_event_t *on_event)
+static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
 {
     // gui_log("enter event_trigger_move_cb \n");
     g_SurpressTP = false;
@@ -325,6 +324,7 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_code_t e
     // }
 
     gui_view_t *next_view_rec = g_NextView;
+    gui_view_on_event_t *on_event = e->user_data;
     g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
     if (g_NextView != next_view_rec) {gui_view_not_show(next_view_rec);}
 
@@ -337,8 +337,8 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_code_t e
 
     gui_obj_hidden(GUI_BASE(g_NextView), true);
 
-    g_NextView->current_event = e;
-    g_CurrentView->current_event = e;
+    g_NextView->current_event_code = e->code;
+    g_CurrentView->current_event_code = e->code;
 
     g_TriggerMove = true;
     g_OffsetNeedUpdate = false;
@@ -346,18 +346,17 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_code_t e
     // gui_log("gui_view_on_event_trigger_move_cb next view name = %s\n", g_NextView->base.name);
 }
 
-static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_code_t e,
-                                        gui_view_on_event_t *on_event)
+static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
 {
     gui_view_not_show(g_NextView);
-
+    gui_view_on_event_t *on_event = e->user_data;
     g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
 
     g_NextView->current_transition_style = on_event->switch_in_style;
     g_CurrentView->current_transition_style = on_event->switch_out_style;
 
-    g_NextView->current_event = e;
-    g_CurrentView->current_event = e;
+    g_NextView->current_event_code = e->code;
+    g_CurrentView->current_event_code = e->code;
 
     gui_obj_create_timer(obj, 10, true, gui_view_animate_timer_cb);
     gui_obj_start_timer(obj);
@@ -700,7 +699,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
                               const char *target_view_name,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
-                              gui_event_code_t event)
+                              gui_event_code_t event_code)
 {
     const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(target_view_name);
 
@@ -711,8 +710,8 @@ void gui_view_switch_on_event(gui_view_t *_this,
         return;
     }
 
-    bool update_event_dec = false; //update same event or new event flag
-    bool update_on_event = false; //update same event or new event flag
+    bool update_event_dec = false; //update same event_code or new event_code flag
+    bool update_on_event = false; //update same event_code or new event_code flag
 
     gui_obj_t *obj = (gui_obj_t *)_this;
     gui_event_dsc_t *event_dsc = NULL;
@@ -725,7 +724,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
     for (i = 0; i < obj->event_dsc_cnt; i++)
     {
         event_dsc = obj->event_dsc + i;
-        if (event_dsc->filter == event)
+        if (event_dsc->filter == event_code)
         {
             update_event_dec = true;
             break;
@@ -736,7 +735,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
     for (j = 0; j < _this->on_event_num; j++)
     {
         on_event = _this->on_event[j];
-        if (on_event->event == event)
+        if (on_event->event_code == event_code)
         {
             update_on_event = true;
             break;
@@ -750,9 +749,14 @@ void gui_view_switch_on_event(gui_view_t *_this,
         _this->on_event[j]->switch_in_style = switch_in_style;
         _this->on_event[j]->descriptor = descriptor;
 
-        if (event == 0)
+        if (event_code == 0)
         {
-            gui_view_on_event_change_cb(obj, event, on_event);
+            gui_event_t e =
+            {
+                .code = event_code,
+                .user_data = on_event
+            };
+            gui_view_on_event_change_cb(obj, &e);
         }
         return;
     }
@@ -761,33 +765,39 @@ void gui_view_switch_on_event(gui_view_t *_this,
     on_event->descriptor = descriptor;
     on_event->switch_out_style = switch_out_style;
     on_event->switch_in_style = switch_in_style;
-    on_event->event = event;
+    on_event->event_code = event_code;
     _this->on_event = gui_realloc(_this->on_event,
                                   sizeof(gui_view_on_event_t *) * (_this->on_event_num + 1));
     _this->on_event[_this->on_event_num] = on_event;
     _this->on_event_num++;
     GUI_ASSERT(_this->on_event_num < EVENT_NUM_MAX);
 
-    if (event == 0)
+    if (event_code == 0)
     {
-        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_change_cb, event, on_event);
-        gui_view_on_event_change_cb(obj, event, on_event);
+        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_change_cb, event_code, on_event);
+        gui_event_t e =
+        {
+            .code = event_code,
+            .user_data = on_event
+        };
+        gui_view_on_event_change_cb(obj, &e);
         return;
     }
 
-    if (event == GUI_EVENT_TOUCH_MOVE_DOWN ||
-        event == GUI_EVENT_TOUCH_MOVE_UP ||
-        event == GUI_EVENT_TOUCH_MOVE_LEFT ||
-        event == GUI_EVENT_TOUCH_MOVE_RIGHT)
+    if (event_code == GUI_EVENT_TOUCH_MOVE_DOWN ||
+        event_code == GUI_EVENT_TOUCH_MOVE_UP ||
+        event_code == GUI_EVENT_TOUCH_MOVE_LEFT ||
+        event_code == GUI_EVENT_TOUCH_MOVE_RIGHT)
     {
         gui_obj_add_event_cb(_this, gui_view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
         gui_obj_add_event_cb(_this, gui_view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
         gui_obj_add_event_cb(_this, gui_view_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
-        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_trigger_move_cb, event, on_event);
+        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_trigger_move_cb, event_code,
+                             on_event);
     }
     else
     {
-        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_change_cb, event, on_event);
+        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_change_cb, event_code, on_event);
     }
 }
 

@@ -108,7 +108,7 @@ typedef struct gui_view
     uint8_t opacity;
 
     VIEW_SWITCH_STYLE current_transition_style;
-    gui_event_code_t current_event;
+    gui_event_code_t current_event_code;
     const struct gui_view_descriptor *descriptor;
     void *blur_param;
 
@@ -138,7 +138,7 @@ typedef struct gui_view_on_event
     const gui_view_descriptor_t *descriptor;
     VIEW_SWITCH_STYLE switch_out_style;
     VIEW_SWITCH_STYLE switch_in_style;
-    gui_event_code_t event;
+    gui_event_code_t event_code;
 } gui_view_on_event_t;
 
 /*============================================================================*
