@@ -89,19 +89,17 @@ static void effect_stop(void);
  *                           Callbacks
  *============================================================================*/
 
-static void on_effect_click(void *obj, gui_event_t e, void *param)
+static void on_effect_click(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    int index = (int)(intptr_t)param;
+    int index = (int)(intptr_t)e->user_data;
     effect_start(index);
 }
 
-static void on_back_click(void *obj, gui_event_t e, void *param)
+static void on_back_click(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
-    GUI_UNUSED(param);
     effect_stop();
 }
 
@@ -123,18 +121,18 @@ static void note_design(gui_obj_t *obj, void *param)
     /* Background rect with alternating colors */
     gui_color_t bg_color = (index % 2 == 0) ?
                            gui_rgba(40, 40, 50, 220) : gui_rgba(50, 50, 60, 220);
-    gui_rounded_rect_t *bg = gui_rect_create(obj, "bg", 10, 2, s_screen_w - 20, 56, 8, bg_color);
+    gui_rounded_rect_t *bg = gui_rect_create(obj, "bg", 10, 2, s_screen_w - 20, 76, 8, bg_color);
     gui_rect_on_click(bg, on_effect_click, (void *)(intptr_t)index);
 
     /* Effect name */
-    gui_text_t *name_text = gui_text_create(obj, "name", 20, 10, s_screen_w - 40, 20);
+    gui_text_t *name_text = gui_text_create(obj, "name", 20, 10, s_screen_w - 40, 28);
     gui_text_set(name_text, (void *)s_effects[index].name, GUI_FONT_SRC_BMP,
-                 APP_COLOR_WHITE, strlen(s_effects[index].name), 16);
+                 APP_COLOR_WHITE, strlen(s_effects[index].name), 24);
 
     /* Effect description */
-    gui_text_t *desc_text = gui_text_create(obj, "desc", 20, 35, s_screen_w - 40, 20);
+    gui_text_t *desc_text = gui_text_create(obj, "desc", 20, 42, s_screen_w - 40, 28);
     gui_text_set(desc_text, (void *)s_effects[index].desc, GUI_FONT_SRC_BMP,
-                 gui_rgba(180, 180, 180, 255), strlen(s_effects[index].desc), 16);
+                 gui_rgba(180, 180, 180, 255), strlen(s_effects[index].desc), 24);
 }
 
 /*============================================================================*
@@ -165,7 +163,7 @@ static void launcher_show(void)
     gui_text_mode_set(title, CENTER);
 
     /* Create list - with bar to avoid crash */
-    int note_height = 60;
+    int note_height = 80;
     int space = 0;
     gui_list_t *list = gui_list_create(s_launcher_win, "effect_list",
                                        0, 40, s_screen_w, s_screen_h - 40,
