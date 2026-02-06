@@ -247,12 +247,16 @@ gui_particle_widget_t *effect_galaxy_demo_init(void)
     int screen_w = dc->screen_width;
     int screen_h = dc->screen_height;
 
-    /* Update center coordinates */
+    int widget_y = 50;
+    int widget_h = screen_h - 100;  /* Trim 50px top + 50px bottom */
+
+    /* Center coordinates in widget local space */
     s_galaxy_center_x = (float)(screen_w / 2);
-    s_galaxy_center_y = (float)(screen_h / 2);
+    s_galaxy_center_y = (float)(screen_h / 2) - widget_y;
 
     s_galaxy_widget = gui_particle_widget_create(root, "galaxy_demo",
-                                                 0, 0, screen_w, screen_h,
+                                                 0, widget_y,
+                                                 screen_w, widget_h,
                                                  PARTICLE_POOL_SIZE);
     if (s_galaxy_widget == NULL)
     {
@@ -263,25 +267,22 @@ gui_particle_widget_t *effect_galaxy_demo_init(void)
     particle_effect_config_t config;
     effect_galaxy_config(&config);
 
-    /* Update ring position for screen size */
+    /* Update ring position for widget local coordinates */
     config.shape.ring.cx = s_galaxy_center_x;
     config.shape.ring.cy = s_galaxy_center_y;
-
-    /* Adjust ring radius based on screen size */
-    float min_dim = (float)(screen_w < screen_h ? screen_w : screen_h);
-    config.shape.ring.outer_r = min_dim * 0.40f;
-    config.shape.ring.inner_r = min_dim * 0.35f;
 
     config.emission.rate = 30.0f;
 
     gui_particle_widget_add_effect(s_galaxy_widget, &config);
     gui_particle_widget_set_update_cb(s_galaxy_widget, galaxy_widget_update, NULL);
 
+    /* Image position in widget local coordinates */
     gui_img_t *img = gui_img_create_from_mem(GUI_BASE(s_galaxy_widget), "img", (void *)galaxy, 0, 0, 0,
                                              0);
     uint16_t img_w = gui_img_get_width(img);
     uint16_t img_h = gui_img_get_height(img);
-    gui_img_set_pos(img, (screen_w - img_w) / 2, (screen_h - img_h) / 2);
+    gui_img_set_pos(img, (screen_w - img_w) / 2,
+                    (screen_h - img_h) / 2 - widget_y);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
     s_galaxy_text = gui_text_create(GUI_BASE(s_galaxy_widget), "text", 0, 0, 0, 0);

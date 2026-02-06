@@ -11,7 +11,7 @@
  * - Provides render callback that uses gui_img for particle rendering
  * - Convenience interfaces for adding preset effects
  *
- * Copyright (c) 2024 Realtek Semiconductor Corp.
+ * Copyright (c) 2026 Realtek Semiconductor Corp.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,8 +31,48 @@ extern "C" {
 #include "particle_effect.h"
 
 /*============================================================================*
+ *                         Macros
+ *============================================================================*/
+
+/**
+ * @brief Enable particle performance profiling
+ *
+ * When enabled, the particle widget will collect timing statistics for:
+ * - Particle update (physics simulation)
+ * - Particle rendering (drawing to buffer and blit)
+ *
+ * Statistics are printed at the end of each frame via gui_log().
+ */
+// #define GUI_PARTICLE_PERF_ENABLE
+
+/*============================================================================*
  *                         Types
  *============================================================================*/
+
+/** @brief Particle rendering mode (default: DIRECT) */
+typedef enum gui_particle_render_mode
+{
+    PARTICLE_RENDER_DIRECT   = 0,  /**< Strip-based rendering, low memory, avoids PSRAM bottleneck */
+    PARTICLE_RENDER_BUFFERED = 1,  /**< Full-frame cache, fast blit, higher memory usage */
+} gui_particle_render_mode_t;
+
+#ifdef GUI_PARTICLE_PERF_ENABLE
+/**
+ * @brief Performance statistics for particle rendering
+ */
+typedef struct gui_particle_perf_stats
+{
+    uint32_t update_time_us;      /**< Time spent in particle_system_update() */
+    uint32_t render_time_us;      /**< Time spent rendering particles and blit */
+    uint32_t prepare_time_us;     /**< Time spent in prepare_cb */
+    uint32_t draw_time_us;        /**< Time spent in draw_cb */
+    uint32_t end_time_us;         /**< Time spent in end_cb */
+    uint16_t draw_cb_count;       /**< Number of draw_cb calls (sections in DC_RAMLESS) */
+    uint16_t strips_rendered;     /**< Number of strips actually rendered */
+    uint16_t strips_skipped;      /**< Number of strips skipped (no particles) */
+    uint16_t active_particles;    /**< Number of active particles */
+} gui_particle_perf_stats_t;
+#endif
 
 /** Effect handle type for managing effects */
 typedef uint32_t particle_effect_handle_t;
@@ -88,6 +128,20 @@ typedef struct gui_particle_widget
     /* User update callback */
     gui_particle_update_cb_t update_cb; /**< User update callback */
     void *update_cb_data;               /**< User data for update callback */
+
+    /* Rendering mode selection */
+    gui_particle_render_mode_t render_mode; /**< Rendering mode (DIRECT or BUFFERED) */
+
+    /* Buffered mode: full frame cache */
+    uint8_t *ramless_cache;             /**< Full frame cache for buffered mode */
+    uint8_t ramless_cache_valid;        /**< Whether cache is valid for current frame */
+    struct draw_img *draw_img;          /**< Pre-allocated draw_img (computed in prepare) */
+
+#ifdef GUI_PARTICLE_PERF_ENABLE
+    /* Performance profiling */
+    gui_particle_perf_stats_t perf_stats; /**< Performance statistics */
+    uint32_t cb_start_us;                 /**< Callback start timestamp */
+#endif
 } gui_particle_widget_t;
 
 /*============================================================================*
@@ -148,6 +202,13 @@ void gui_particle_widget_clear(gui_particle_widget_t *widget);
  * @return Number of active particles
  */
 uint16_t gui_particle_widget_get_active_count(gui_particle_widget_t *widget);
+
+/** @brief Set rendering mode (DIRECT or BUFFERED) */
+void gui_particle_widget_set_render_mode(gui_particle_widget_t *widget,
+                                         gui_particle_render_mode_t mode);
+
+/** @brief Get current rendering mode */
+gui_particle_render_mode_t gui_particle_widget_get_render_mode(gui_particle_widget_t *widget);
 
 /**
  * @brief Set user update callback

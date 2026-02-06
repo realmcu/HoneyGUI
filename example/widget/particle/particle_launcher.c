@@ -17,6 +17,7 @@
 #include "gui_text.h"
 #include "gui_api_dc.h"
 #include "gui_api_os.h"
+#include "gui_fb.h"
 
 /* Effect headers */
 #include "effect_firework.h"
@@ -49,6 +50,7 @@ typedef struct
 
 static const effect_entry_t s_effects[] =
 {
+    {"Galaxy",     "Spiral galaxy rotation",          effect_galaxy_demo_init},
     {"Firework",   "Burst particles with gravity",    effect_firework_demo_init},
     {"Trail",      "Drag to emit trailing particles", effect_trail_demo_init},
     {"Touch",      "Touch feedback burst effect",     effect_touch_demo_init},
@@ -59,7 +61,6 @@ static const effect_entry_t s_effects[] =
     {"Rocket",     "Thruster exhaust with flame",     effect_rocket_demo_init},
     {"Vortex",     "Energy spiral to center",         effect_vortex_demo_init},
     {"Lightning",  "Electric arc discharge",          effect_lightning_demo_init},
-    {"Galaxy",     "Spiral galaxy rotation",          effect_galaxy_demo_init},
     {"Fireflies",  "Floating glowing dots",           effect_fireflies_demo_init},
     {"Ripple",     "Touch-triggered rings",           effect_ripple_demo_init},
     {"Rain",       "Raindrops with splash",           effect_rain_demo_init},
@@ -76,6 +77,10 @@ static gui_particle_widget_t *s_current_effect = NULL;
 static gui_win_t *s_effect_win = NULL;
 static int s_screen_w = 0;
 static int s_screen_h = 0;
+
+/* FPS display */
+static gui_text_t *s_fps_text = NULL;
+static char s_fps_buffer[16];
 
 /*============================================================================*
  *                           Forward Declarations
@@ -101,6 +106,21 @@ static void on_back_click(void *obj, gui_event_t *e)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     effect_stop();
+}
+
+/**
+ * @brief Timer callback - update FPS display
+ */
+static void fps_timer_cb(void *user_data)
+{
+    GUI_UNUSED(user_data);
+    if (s_fps_text == NULL)
+    {
+        return;
+    }
+    uint32_t fps_num = gui_fps();
+    snprintf(s_fps_buffer, sizeof(s_fps_buffer), "FPS:%d", (int)fps_num);
+    gui_text_content_set(s_fps_text, s_fps_buffer, strlen(s_fps_buffer));
 }
 
 /*============================================================================*
@@ -199,16 +219,33 @@ static void effect_start(int index)
     /* Start effect */
     s_current_effect = s_effects[index].init();
 
-    /* Back button - centered at top for round screen */
+    /* Back button - use larger win for touch area, rect for visual only */
     int btn_w = 80;
-    int btn_x = (s_screen_w - btn_w) / 2;
-    gui_rounded_rect_t *back_btn = gui_rect_create(s_effect_win, "back_btn",
-                                                   btn_x, 10, btn_w, 35, 8, gui_rgba(80, 80, 100, 200));
-    gui_rect_on_click(back_btn, on_back_click, NULL);
+    int touch_w = 200;
+    int touch_h = 100;
+    int touch_x = (s_screen_w - touch_w) / 2;
+    int touch_y = 0;
 
-    gui_text_t *back_text = gui_text_create(s_effect_win, "back_text", btn_x, 18, btn_w, 20);
+    /* Larger invisible touch area */
+    gui_win_t *back_touch = gui_win_create(s_effect_win, "back_touch",
+                                           touch_x, touch_y, touch_w, touch_h);
+    gui_obj_add_event_cb(back_touch, on_back_click, GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    /* Visual button (no click handler) */
+    gui_rect_create(back_touch, "back_btn",
+                    (touch_w - btn_w) / 2, 10, btn_w, 35, 8, gui_rgba(80, 80, 100, 200));
+
+    gui_text_t *back_text = gui_text_create(back_touch, "back_text",
+                                            (touch_w - btn_w) / 2, 18, btn_w, 20);
     gui_text_set(back_text, (void *)"Back", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 4, 16);
     gui_text_mode_set(back_text, CENTER);
+
+    /* FPS display at bottom center */
+    s_fps_text = gui_text_create(s_effect_win, "fps_text", 0, s_screen_h - 24, 0, 24);
+    snprintf(s_fps_buffer, sizeof(s_fps_buffer), "FPS:%d", (int)gui_fps());
+    gui_text_set(s_fps_text, s_fps_buffer, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(s_fps_buffer), 24);
+    gui_text_mode_set(s_fps_text, CENTER);
+    gui_obj_create_timer((gui_obj_t *)s_fps_text, 500, true, fps_timer_cb);
 }
 
 static void effect_stop(void)
@@ -220,11 +257,12 @@ static void effect_stop(void)
         s_current_effect = NULL;
     }
 
-    /* Clean up effect window */
+    /* Clean up effect window (includes FPS text) */
     if (s_effect_win != NULL)
     {
         gui_obj_tree_free((gui_obj_t *)s_effect_win);
         s_effect_win = NULL;
+        s_fps_text = NULL;
     }
 
     /* Show launcher */

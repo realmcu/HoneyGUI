@@ -55,6 +55,9 @@ static int particle_demo_init(void)
 #else
     /* Direct load mode: Uncomment ONE of the following demos */
 
+    /* Galaxy: Spiral galaxy with rotating arms and color gradient (default) */
+    effect_galaxy_demo_init();
+
     /* Firework: Auto-burst at random positions, particles spread outward with gravity */
     // effect_firework_demo_init();
 
@@ -83,10 +86,7 @@ static int particle_demo_init(void)
     // effect_vortex_demo_init();
 
     /* Lightning: Electric arc discharge between two points with branching */
-    effect_lightning_demo_init();
-
-    /* Galaxy: Spiral galaxy with rotating arms and color gradient */
-    // effect_galaxy_demo_init();
+    // effect_lightning_demo_init();
 
     /* Fireflies: Floating glowing dots with breathing opacity (RECT + BREATHE) */
     // effect_fireflies_demo_init();
