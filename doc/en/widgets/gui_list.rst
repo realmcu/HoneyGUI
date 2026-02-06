@@ -82,7 +82,7 @@ The :cpp:any:`gui_list_enable_area_display` function can be used to enable area 
 Example
 ---------
 
-.. literalinclude:: ../../../example/widget/list/example_gui_list.c
+.. literalinclude:: ../../../example/widget/list/example_list.c
    :language: c
    :start-after: /* gui list widget example start*/
    :end-before: /* gui list widget example end*/

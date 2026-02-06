@@ -57,7 +57,7 @@ different parsing code is used to find text data and dot matrix data in the font
 
 The purpose of the font library parsing code is to populate the ``chr`` structure array, which is structured as follows:
 
-.. literalinclude:: ../../../realgui/engine/draw_font.h
+.. literalinclude:: ../../../realgui/engine/draw/draw_font.h
    :language: c
    :start-after: /* Memory char struct start */
    :end-before: /* Memory char struct end */
@@ -104,7 +104,7 @@ Each layout mode has a different layout logic; however, all depend on the glyph 
 
 The ``rect`` struct array is structured as follows:
 
-.. literalinclude:: ../../../realgui/engine/draw_font.h
+.. literalinclude:: ../../../realgui/engine/draw/draw_font.h
    :language: c
    :start-after: /* Text rect struct start */
    :end-before: /* Text rect struct end */

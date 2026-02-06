@@ -82,7 +82,7 @@
 示例
 -----
 
-.. literalinclude:: ../../../example/widget/list/example_gui_list.c
+.. literalinclude:: ../../../example/widget/list/example_list.c
    :language: c
    :start-after: /* gui list widget example start*/
    :end-before: /* gui list widget example end*/

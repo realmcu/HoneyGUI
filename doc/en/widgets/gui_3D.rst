@@ -325,7 +325,7 @@ This model consists of 1454 triangular faces and is filled with a default materi
 
 To run this example, enable the Kconfig option via ``menuconfig`` and save to ``win32_sim/.config``. The model consists of 774 triangular surfaces and supports filling with a custom material base color.
 
-.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_dog.c
+.. literalinclude:: ../../../example/widget/3d/example_3d_dog.c
    :language: c
    :start-after: /* 3d dog demo start*/
    :end-before: /* 3d dog demo end*/
@@ -363,7 +363,7 @@ This interface consists of 6 3D application icons. By calling the function ``l3_
 
 This model is in GLTF format with skeletal animation. Lite3D plays this animation in a loop by default.
 
-.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_robot_gltf.c
+.. literalinclude:: ../../../example/widget/3d/example_3d_robot_gltf.c
    :language: c
    :start-after: /* 3d robot demo start*/
    :end-before: /* 3d robot demo end*/

@@ -21,7 +21,7 @@
 --------
 蜂窝菜单控件的开发示例如下，首先使用画布控件绘制一组纯色图标，再将这些图标传递给蜂窝菜单控件进行显示：
 
-.. literalinclude:: ../../../example/widget/menu_cellular/example_gui_menu_cellular.c
+.. literalinclude:: ../../../example/widget/menu_cellular/example_menu_cellular.c
    :language: c
    :start-after: /* gui menu cellular widget example start*/
    :end-before: /* gui menu cellular widget example end*/

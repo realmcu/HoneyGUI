@@ -210,7 +210,7 @@ EMOJI 表情
 
 简单文本控件
 ~~~~~~~~~~~~~
-.. literalinclude:: ../../../example/widget/text/example_gui_text.c
+.. literalinclude:: ../../../example/widget/text/example_text.c
    :language: c
    :start-after: /* gui text widget example start*/
    :end-before: /* gui text widget example end*/

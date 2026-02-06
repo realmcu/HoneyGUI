@@ -108,7 +108,7 @@ Enable the Kconfig option via ``menuconfig`` to run this example:
 
 Select ``Canvas Demo`` (``CONFIG_REALTEK_BUILD_REAL_CANVAS``), then save to ``win32_sim/.config``.
 
-.. literalinclude:: ../../../example/widget/canvas/example_gui_canvas.c
+.. literalinclude:: ../../../example/widget/canvas/example_canvas.c
    :language: c
    :start-after: /* canvas example start */
    :end-before: /* canvas example end */

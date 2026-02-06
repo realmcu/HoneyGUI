@@ -77,7 +77,7 @@
 示例
 ----
 
-.. literalinclude:: ../../../example/widget/image/example_gui_img.c
+.. literalinclude:: ../../../example/widget/image/example_img.c
     :language: c
     :start-after: /* gui image widget example start*/
     :end-before: /* gui image widget example end*/

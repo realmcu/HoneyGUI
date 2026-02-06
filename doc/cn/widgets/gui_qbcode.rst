@@ -28,7 +28,7 @@
 示例
 -----
 
-.. literalinclude:: ../../../example/widget/qbcode/example_gui_qbcode.c
+.. literalinclude:: ../../../example/widget/qbcode/example_qbcode.c
    :language: c
    :start-after: /* gui qbcode widget example start*/
    :end-before: /* gui qbcode widget example end*/

@@ -24,7 +24,7 @@ Development Example
 ---------------------
 The development example of cellular menu widget is as follows. First, use the canvas widget to draw a set of solid-color icons, and then pass these icons to the cellular menu widget to display.
 
-.. literalinclude:: ../../../example/widget/menu_cellular/example_gui_menu_cellular.c
+.. literalinclude:: ../../../example/widget/menu_cellular/example_menu_cellular.c
    :language: c
    :start-after: /* gui menu cellular widget example start*/
    :end-before: /* gui menu cellular widget example end*/

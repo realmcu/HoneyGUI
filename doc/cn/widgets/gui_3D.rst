@@ -324,7 +324,7 @@ HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 控件，使�
 
 请通过 ``menuconfig`` 启用 Kconfig 选项并保存到 ``win32_sim/.config`` 来运行该示例。该模型由 774 个三角形面组成，支持自定义材质基础色的填充。
 
-.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_dog.c
+.. literalinclude:: ../../../example/widget/3d/example_3d_dog.c
    :language: c
    :start-after: /* 3d dog demo start*/
    :end-before: /* 3d dog demo end*/
@@ -362,7 +362,7 @@ HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 控件，使�
 
 该模型为 GLTF 格式，带骨骼动画，Lite3D 默认循环播放该动画。
 
-.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_robot_gltf.c
+.. literalinclude:: ../../../example/widget/3d/example_3d_robot_gltf.c
    :language: c
    :start-after: /* 3d robot demo start*/
    :end-before: /* 3d robot demo end*/

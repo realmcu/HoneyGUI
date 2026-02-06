@@ -45,6 +45,7 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
 
 }
 
+/* gui_dispdev example define start */
 static struct gui_dispdev dc =
 {
 #ifdef USE_DC_PFB
@@ -64,6 +65,7 @@ static struct gui_dispdev dc =
     .lcd_update = port_gui_lcd_update,
 
 };
+/* gui_dispdev example define end */
 
 
 /* Button state variables for keyboard and panel buttons */

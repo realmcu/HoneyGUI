@@ -19,7 +19,7 @@ C 应用程序
 
 - 使用 ``GUI_INIT_APP_EXPORT`` 宏可以将应用程序的设计函数添加到初始化函数表。这个函数会在应用程序启动时被调用，以初始化和配置控件树。
 
-.. literalinclude:: ../../../../example/widget/image/example_gui_img.c
+.. literalinclude:: ../../../../example/widget/image/example_img.c
     :language: c
     :start-after: /* gui image widget example start*/
     :end-before: /* gui image widget example end*/

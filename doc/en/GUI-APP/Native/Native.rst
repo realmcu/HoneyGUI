@@ -20,7 +20,7 @@ Create C Application Widget Tree
 
 - Use the ``GUI_INIT_APP_EXPORT`` macro to add the application's design function to the initialization function table. This function is called when the application starts to initialize and configure the widget tree.
 
-.. literalinclude:: ../../../../example/widget/image/example_gui_img.c
+.. literalinclude:: ../../../../example/widget/image/example_img.c
     :language: c
     :start-after: /* gui image widget example start*/
     :end-before: /* gui image widget example end*/

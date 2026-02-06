@@ -35,6 +35,7 @@ typedef enum t_gui_pfb_type
 } T_GUI_PFB_TYPE;
 
 
+/* gui_dispdev struct define start */
 typedef struct gui_dispdev
 {
     /* width and height */
@@ -75,6 +76,7 @@ typedef struct gui_dispdev
     bool fb_measure_enable;
     bool cache_need_clean;
 } gui_dispdev_t;
+/* gui_dispdev struct define end */
 
 
 #ifdef __cplusplus

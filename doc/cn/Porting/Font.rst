@@ -53,7 +53,7 @@
 
 字库解析代码的目的是填充 ``chr`` 结构体数组，其结构如下：
 
-.. literalinclude:: ../../../realgui/engine/draw_font.h
+.. literalinclude:: ../../../realgui/engine/draw/draw_font.h
    :language: c
    :start-after: /* Memory char struct start */
    :end-before: /* Memory char struct end */
@@ -97,7 +97,7 @@
 
 ``rect`` 结构体数组结构如下：
 
-.. literalinclude:: ../../../realgui/engine/draw_font.h
+.. literalinclude:: ../../../realgui/engine/draw/draw_font.h
    :language: c
    :start-after: /* Text rect struct start */
    :end-before: /* Text rect struct end */

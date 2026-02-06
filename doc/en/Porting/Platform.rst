@@ -34,48 +34,29 @@ Acceleration
 - Define the accelerated drawing interface depending on the platform model, generally ``hw_acc_blit`` or ``sw_acc_blit``.
 - The structure definition is as follows:
 
-  .. code-block:: c
-
-    typedef struct acc_engine
-    {
-        void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
-    } acc_engine_t;
+  .. literalinclude:: ../../../realgui/core/def_engine.h
+     :language: c
+     :start-after: /* acc_engine_t struct define start */
+     :end-before: /* acc_engine_t struct define end */
 
 Display Device
 --------------
 
 - Refer to ``guidef.h`` and ``gui_port_dc.c``.
-- Define the screen width and height, framebuffer address and mode, whether the resolution is scaled, and implement the refresh function. Refer to ``guidef.h`` for the structure definition.
-- A typical ``gui_dispdev`` structure initialization declaration is as follows:
+- Define the screen width and height, framebuffer address and mode, whether the resolution is scaled, and implement the refresh function.
+- The structure definition is as follows:
 
-  .. code-block:: c
+  .. literalinclude:: ../../../realgui/core/def_fb.h
+     :language: c
+     :start-after: /* gui_dispdev struct define start */
+     :end-before: /* gui_dispdev struct define end */
 
-    static struct gui_dispdev dc =
-    {
-        .bit_depth = DRV_PIXEL_BITS,
-        .fb_width = DRV_LCD_WIDTH,
-        .fb_height = FB_HEIGHT,
-        .screen_width =  DRV_LCD_WIDTH,
-        .screen_height = DRV_LCD_HEIGHT,
-        .dc.disp_buf_1 = disp_write_buff1_port,
-        .dc.disp_buf_2 = disp_write_buff2_port,
-        .driver_ic_fps = 60,
-        .driver_ic_hfp = 10,
-        .driver_ic_hbp = 10,
-        .driver_ic_active_width = DRV_LCD_WIDTH,
-        .type = DC_RAMLESS,
-        .adaption = false,
-        .section = {0, 0, 0, 0},
-        .section_count = 0,
-        .lcd_update = port_gui_lcd_update,
-        .flash_seq_trans_disable = flash_boost_disable,
-        .flash_seq_trans_enable = flash_boost_enable,
-        .reset_lcd_timer = reset_vendor_counter,
-        .get_lcd_us = read_vendor_counter_no_display,
-        .lcd_te_wait = port_lcd_te_wait,
-        .dc.scale_x = 1,
-        .dc.scale_y = 1,
-    };
+- A typical ``gui_dispdev`` structure initialization example:
+
+  .. literalinclude:: ../../../win32_sim/port/realgui_port/gui_port_dc.c
+     :language: c
+     :start-after: /* gui_dispdev example define start */
+     :end-before: /* gui_dispdev example define end */
 
 - In ``DC_SINGLE`` mode, the framebuffer size is ``screen_width * screen_height * bit_depth / 8``.
 - In ``DC_RAMLESS`` mode, two partial framebuffers are used, with size ``fb_width * fb_height * bit_depth / 8``, where ``fb_height`` is the segmented height.

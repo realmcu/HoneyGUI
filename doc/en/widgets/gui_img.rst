@@ -79,7 +79,7 @@ The :cpp:any:`gui_img_tree_convert_to_img` can be used to save a fullscreen scre
 Example
 -------
 
-.. literalinclude:: ../../../example/widget/image/example_gui_img.c
+.. literalinclude:: ../../../example/widget/image/example_img.c
     :language: c
     :start-after: /* gui image widget example start*/
     :end-before: /* gui image widget example end*/
