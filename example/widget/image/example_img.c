@@ -33,6 +33,27 @@ void test_event_cb(void *obj, gui_event_t *e)
     gui_log("Event test obj name = %s, e = 0x%x, indev = %s !\n", this->name, e->code, dev_name);
 }
 
+void test_event_0_cb(void *obj, gui_event_t *e)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    gui_log("Single clicked!\n");
+}
+
+void test_event_1_cb(void *obj, gui_event_t *e)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    gui_log("Double clicked!\n");
+}
+
+void test_event_2_cb(void *obj, gui_event_t *e)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    gui_log("Triple clicked!\n");
+}
+
 void test_timer_cb(void *param)
 {
     (void)param;
@@ -67,7 +88,9 @@ static int app_init(void)
 
     // gui_img_translate(img, 50, 50);
 
-    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_0_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_1_cb, GUI_EVENT_TOUCH_DOUBLE_CLICKED, NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_2_cb, GUI_EVENT_TOUCH_TRIPLE_CLICKED, NULL);
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
 

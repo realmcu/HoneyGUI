@@ -87,10 +87,11 @@ static void gui_img_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TRIPLE_CLICKED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, "touch");
-    // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED, "touch");
 
     memcpy(&_this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&_this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));

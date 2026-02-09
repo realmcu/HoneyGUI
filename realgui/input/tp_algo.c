@@ -53,6 +53,8 @@ static touch_info_t tp;
 
 static uint32_t up_cnt = 0;
 static uint32_t down_cnt = 0;
+static uint32_t click_cnt = 0;
+static uint32_t click_time_rec = 0;
 static bool long_button_flag = false;
 
 
@@ -105,7 +107,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
             tp.pressing = false;
             TP_LOG("=====END UP====== tick = %d\n", raw_data->timestamp_ms);
         }
-        if (up_cnt == 2)
+        if (up_cnt == 2 && click_cnt == 0)
         {
             tp_do_reset();
         }
@@ -427,7 +429,9 @@ static bool tp_judge_short_click(struct gui_touch_port_data *raw_data)
 {
     if ((tp_judge_same_point() == true) && (tp_judge_short_press(raw_data) == true))
     {
-        tp.type = TOUCH_SHORT;
+        // tp.type = TOUCH_SHORT;
+        click_cnt++;
+        click_time_rec = gui_ms_get();
         TP_LOG("type = TOUCH_SHORT \n");
         return true;
     }
@@ -608,6 +612,26 @@ struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
     }
     else
     {
+        struct gui_indev *indev = gui_get_indev();
+        if (click_cnt && gui_ms_get() - click_time_rec > indev->short_button_time_ms / 3)
+        {
+            switch (click_cnt)
+            {
+            case 1:
+                tp.type = TOUCH_SHORT;
+                break;
+            case 2:
+                tp.type = TOUCH_DOUBLE;
+                break;
+            case 3:
+                tp.type = TOUCH_TRIPLE;
+                break;
+            default:
+                gui_log("Click too many times!!!\n");
+                break;
+            }
+            click_cnt = 0;
+        }
         //TP_LOG("not cache tp down and up, do keep \n");
     }
     //gui_log("tp.type:%d\n",tp.type);
