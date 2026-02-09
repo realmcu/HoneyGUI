@@ -140,11 +140,6 @@ config REALTEK_BUILD_GUI_WATCH_TURNKEY_410_502_DEMO
     help
       RTK GUI Demo 410x502 Watch Turnkey
 
-config REALTEK_BUILD_GUI_FHY_320_200_DEMO
-    bool "FHY Demo 320x200"
-    help
-      RTK GUI Demo for 320x200 resolution
-
 config REALTEK_BUILD_GUI_466_466_DEMO
     bool "GUI Demo 466x466"
     help
