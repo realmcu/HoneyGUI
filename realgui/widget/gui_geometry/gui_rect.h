@@ -69,10 +69,6 @@ typedef struct
     gui_matrix_t last_matrix;   /**< Cached matrix for change detection. */
 } gui_rounded_rect_t;
 
-/*============================================================================*
- *                         Macros
- *============================================================================*/
-#define BLOCK_SIZE 100           /**< Tile size for block-based rendering. */
 
 /*============================================================================*
  *                         Functions

@@ -71,10 +71,6 @@ typedef struct
     bool use_gradient;          /**< Flag to enable gradient rendering. */
 } gui_arc_t;
 
-/*============================================================================*
- *                         Macros
- *============================================================================*/
-#define BLOCK_SIZE 100           /**< Tile size for block-based rendering. */
 
 /*============================================================================*
  *                         Functions

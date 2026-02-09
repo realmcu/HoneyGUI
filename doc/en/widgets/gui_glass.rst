@@ -87,7 +87,7 @@ Basic Operations
 4. Click OK to preview display effects and support drag functionality
 
 Vector Graphics
-********
+****************
 
 
 **Custom Path Usage Instructions:**
