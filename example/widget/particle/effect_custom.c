@@ -62,10 +62,10 @@ void effect_custom_config(particle_effect_config_t *config)
 
     particle_effect_config_init(config);
 
-    /* Shape: Circle at center */
+    /* Shape: Circle at center (caller must set cx/cy) */
     config->shape.type = PARTICLE_SHAPE_CIRCLE;
-    config->shape.circle.cx = 200.0f;
-    config->shape.circle.cy = 200.0f;
+    config->shape.circle.cx = 0.0f;
+    config->shape.circle.cy = 0.0f;
     config->shape.circle.radius = 50.0f;
 
     /* Trajectory: Upward gravity with wind */
@@ -109,12 +109,12 @@ void effect_custom_config(particle_effect_config_t *config)
     config->rotation.speed_max = 1.0f;
     config->rotation.align_velocity = 0;
 
-    /* Boundary: Wrap around */
+    /* Boundary: Wrap around (caller must set right/bottom) */
     config->boundary.behavior = PARTICLE_BOUNDARY_WRAP;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = 400.0f;
-    config->boundary.bottom = 400.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
 
     /* Render: Additive blending */
     config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;

@@ -29,10 +29,10 @@
 #define RIPPLE_SECONDARY_WAVES 2
 
 static gui_particle_widget_t *s_ripple_widget = NULL;
-static float s_ripple_center_x = 240.0f;
-static float s_ripple_center_y = 240.0f;
-static int s_screen_w = 480;
-static int s_screen_h = 480;
+static float s_ripple_center_x = 0.0f;
+static float s_ripple_center_y = 0.0f;
+static int s_screen_w = 0;
+static int s_screen_h = 0;
 static uint8_t s_touch_active = 0;
 static uint32_t s_last_ripple_time = 0;
 static int s_ripple_wave_count = 0;

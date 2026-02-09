@@ -24,11 +24,12 @@ void effect_bubble_config(particle_effect_config_t *config)
 
     particle_effect_config_init(config);
 
+    /* Shape: Line at bottom of screen (caller must set y1/y2 to screen height, x2 to screen width) */
     config->shape.type = PARTICLE_SHAPE_LINE;
-    config->shape.line.x1 = 50.0f;
-    config->shape.line.y1 = 400.0f;
-    config->shape.line.x2 = 350.0f;
-    config->shape.line.y2 = 400.0f;
+    config->shape.line.x1 = 0.0f;
+    config->shape.line.y1 = 0.0f;
+    config->shape.line.x2 = 0.0f;
+    config->shape.line.y2 = 0.0f;
 
     config->trajectory.type = PARTICLE_TRAJECTORY_GRAVITY;
     config->trajectory.gravity = -50.0f;
@@ -60,11 +61,12 @@ void effect_bubble_config(particle_effect_config_t *config)
     config->scale.min = 0.5f;
     config->scale.max = 1.5f;
 
+    /* Boundary: Reflect (caller must set right/bottom) */
     config->boundary.behavior = PARTICLE_BOUNDARY_REFLECT;
     config->boundary.left = 0.0f;
-    config->boundary.top = -50.0f;
-    config->boundary.right = 400.0f;
-    config->boundary.bottom = 450.0f;
+    config->boundary.top = -40.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
     config->boundary.reflect_damping = 0.9f;
 
     config->render.blend_mode = PARTICLE_BLEND_NORMAL;
@@ -99,7 +101,7 @@ gui_particle_widget_t *effect_bubble_demo_init(void)
     config.shape.line.y2 = (float)screen_h;
 
     config.boundary.right = (float)screen_w;
-    config.boundary.bottom = (float)screen_h + 50.0f;
+    config.boundary.bottom = (float)screen_h + 40.0f;
     config.emission.rate = 8.0f;
     config.scale.min = 0.5f;
     config.scale.max = 1.5f;

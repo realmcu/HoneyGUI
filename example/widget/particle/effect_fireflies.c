@@ -25,8 +25,8 @@
 #define FIREFLY_DRIFT_SPEED 15.0f
 
 static gui_particle_widget_t *s_fireflies_widget = NULL;
-static int s_screen_w = 480;
-static int s_screen_h = 480;
+static int s_screen_w = 0;
+static int s_screen_h = 0;
 
 static uint32_t firefly_rand(void)
 {

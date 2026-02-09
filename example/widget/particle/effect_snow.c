@@ -28,11 +28,11 @@ void effect_snow_config(particle_effect_config_t *config)
 
     particle_effect_config_init(config);
 
-    /* Shape: Line at top of screen */
+    /* Shape: Line at top of screen (caller must set x2 to screen width) */
     config->shape.type = PARTICLE_SHAPE_LINE;
     config->shape.line.x1 = 0.0f;
     config->shape.line.y1 = 0.0f;
-    config->shape.line.x2 = 400.0f;
+    config->shape.line.x2 = 0.0f;
     config->shape.line.y2 = 0.0f;
 
     /* Trajectory: Light gravity with wind */
@@ -77,12 +77,12 @@ void effect_snow_config(particle_effect_config_t *config)
     config->rotation.speed_min = -0.5f;
     config->rotation.speed_max = 0.5f;
 
-    /* Boundary: Kill outside extended area */
+    /* Boundary: Kill outside extended area (caller must set right/bottom) */
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
-    config->boundary.left = -50.0f;
-    config->boundary.top = -50.0f;
-    config->boundary.right = 450.0f;
-    config->boundary.bottom = 450.0f;
+    config->boundary.left = -8.0f;
+    config->boundary.top = -8.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
     config->boundary.reflect_damping = 0.8f;
 
     /* Render: Normal blending */
@@ -125,8 +125,10 @@ gui_particle_widget_t *effect_snow_demo_init(void)
     config.scale.max = 0.8f;
 
     /* Update boundary */
-    config.boundary.right = (float)screen_w;
-    config.boundary.bottom = (float)screen_h;
+    config.boundary.left = -8.0f;
+    config.boundary.top = -8.0f;
+    config.boundary.right = (float)screen_w + 8.0f;
+    config.boundary.bottom = (float)screen_h + 8.0f;
 
     gui_particle_widget_add_effect(widget, &config);
 

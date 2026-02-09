@@ -31,10 +31,19 @@
 #include "effect_fireflies.h"
 #include "effect_ripple.h"
 #include "effect_rain.h"
+#include "effect_magic_circle.h"
+#include "effect_light_beam.h"
 
 /*============================================================================*
  *                    Application Entry Point
  *============================================================================*/
+
+#ifdef _HONEYGUI_SIMULATOR_
+unsigned char *resource_root = NULL;
+extern const unsigned char _binary_root_0x704D1400_bin_start[];
+extern const unsigned char _binary_root_0x704D1400_bin_end[];
+extern const unsigned char _binary_root_0x704D1400_bin_size[];
+#endif
 
 /**
  * @brief Particle demo entry point
@@ -49,6 +58,9 @@
 
 static int particle_demo_init(void)
 {
+#ifdef _HONEYGUI_SIMULATOR_
+    resource_root = (unsigned char *)_binary_root_0x704D1400_bin_start;
+#endif
 #ifdef USE_LAUNCHER
     /* Launcher mode: Show selection menu */
     particle_launcher_init();
@@ -96,6 +108,12 @@ static int particle_demo_init(void)
 
     /* Rain: Falling raindrops with splash on impact (LINE + BOUNDARY_KILL + on_death) */
     // effect_rain_demo_init();
+
+    /* MagicCircle: Rotating inner/outer circle images with upward floating sparks */
+    // effect_magic_circle_demo_init();
+
+    /* LightBeam: Reflecting laser beam bouncing off screen edges */
+    // effect_light_beam_demo_init();
 #endif
 
     gui_set_keep_active_time(0xFFFFFFFF);

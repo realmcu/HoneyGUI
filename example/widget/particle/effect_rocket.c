@@ -18,24 +18,14 @@
 #include "gui_api_os.h"
 #include "gui_api_dc.h"
 #include "gui_img.h"
-#include "small_rocket.h"
 #include "def_type.h"
+#include "root_image/ui_resource.h"
 
 #define PARTICLE_POOL_SIZE 512
 
-/* Rocket image position and size */
-#define ROCKET_IMG_X      100
-#define ROCKET_IMG_Y      100
-#define ROCKET_IMG_SIZE   240
-
-/* Rocket nozzle position (bottom of rocket image, where exhaust comes out) */
-#define ROCKET_NOZZLE_X   (ROCKET_IMG_X + 75)
-#define ROCKET_NOZZLE_Y   (ROCKET_IMG_Y + 215)
-
-#define WIDGET_X          60
-#define WIDGET_Y          285
-#define WIDGET_W          140
-#define WIDGET_H          170
+/* Rocket image: nozzle offset within the image (fixed, image-relative) */
+#define ROCKET_NOZZLE_OFFSET_X   75
+#define ROCKET_NOZZLE_OFFSET_Y   215
 
 /* Exhaust direction: lower-left, opposite to rocket flight direction */
 /* In this coordinate system: 0°=right, 90°=down, 180°=left, 270°=up */
@@ -48,6 +38,14 @@ static gui_particle_widget_t *s_rocket_widget = NULL;
 static particle_effect_handle_t s_flame_handle = PARTICLE_INVALID_HANDLE;
 static particle_effect_handle_t s_smoke_handle = PARTICLE_INVALID_HANDLE;
 
+/* Computed at runtime from screen size */
+static int s_widget_x = 0;
+static int s_widget_y = 0;
+static int s_widget_w = 0;
+static int s_widget_h = 0;
+static float s_nozzle_local_x = 0.0f;  /* Nozzle position in widget-local coords */
+static float s_nozzle_local_y = 0.0f;
+
 void effect_rocket_config(particle_effect_config_t *config)
 {
     if (config == NULL)
@@ -59,8 +57,8 @@ void effect_rocket_config(particle_effect_config_t *config)
 
     /* Point emission from rocket nozzle (local coordinates relative to widget) */
     config->shape.type = PARTICLE_SHAPE_POINT;
-    config->shape.point.x = (float)(ROCKET_NOZZLE_X - WIDGET_X);
-    config->shape.point.y = (float)(ROCKET_NOZZLE_Y - WIDGET_Y);
+    config->shape.point.x = s_nozzle_local_x;
+    config->shape.point.y = s_nozzle_local_y;
 
     /* Linear trajectory with slight gravity pull */
     config->trajectory.type = PARTICLE_TRAJECTORY_LINEAR;
@@ -104,8 +102,8 @@ void effect_rocket_config(particle_effect_config_t *config)
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = (float)WIDGET_W;
-    config->boundary.bottom = (float)WIDGET_H;
+    config->boundary.right = (float)s_widget_w;
+    config->boundary.bottom = (float)s_widget_h;
 
     /* Additive blending for bright glow */
     config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
@@ -126,8 +124,8 @@ static void effect_rocket_smoke_config(particle_effect_config_t *config)
 
     /* Point emission slightly behind the flame (local coordinates) */
     config->shape.type = PARTICLE_SHAPE_POINT;
-    config->shape.point.x = (float)(ROCKET_NOZZLE_X - WIDGET_X);
-    config->shape.point.y = (float)(ROCKET_NOZZLE_Y - WIDGET_Y) + 15.0f;
+    config->shape.point.x = s_nozzle_local_x;
+    config->shape.point.y = s_nozzle_local_y + 15.0f;
 
     /* Linear with more spread and slower speed */
     config->trajectory.type = PARTICLE_TRAJECTORY_LINEAR;
@@ -168,8 +166,8 @@ static void effect_rocket_smoke_config(particle_effect_config_t *config)
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = (float)WIDGET_W;
-    config->boundary.bottom = (float)WIDGET_H;
+    config->boundary.right = (float)s_widget_w;
+    config->boundary.bottom = (float)s_widget_h;
 
     /* Normal blending for smoke */
     config->render.blend_mode = PARTICLE_BLEND_NORMAL;
@@ -179,11 +177,39 @@ static void effect_rocket_smoke_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_rocket_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
+    gui_dispdev_t *dc = gui_get_dc();
+    int screen_w = dc->screen_width;
+    int screen_h = dc->screen_height;
 
-    /* Use calculated bounds instead of full screen to optimize rendering */
+    /* Get rocket image dimensions */
+    gui_img_t *tmp_img = gui_img_create_from_mem(root, "tmp", ROCKET_BIN, 0, 0, 0, 0);
+    int img_w = gui_img_get_width(tmp_img);
+    int img_h = gui_img_get_height(tmp_img);
+    gui_obj_tree_free(GUI_BASE(tmp_img));
+
+    /* Center rocket image on screen */
+    int img_x = (screen_w - img_w) / 2;
+    int img_y = (screen_h - img_h) / 2;
+
+    /* Nozzle position in screen coordinates */
+    int nozzle_x = img_x + ROCKET_NOZZLE_OFFSET_X;
+    int nozzle_y = img_y + ROCKET_NOZZLE_OFFSET_Y;
+
+    /* Widget covers the exhaust area below-left of nozzle */
+    s_widget_x = nozzle_x - 80;
+    s_widget_y = nozzle_y;
+    s_widget_w = screen_w - s_widget_x;
+    s_widget_h = screen_h - s_widget_y;
+    if (s_widget_x < 0) { s_widget_x = 0; }
+    if (s_widget_w > screen_w) { s_widget_w = screen_w; }
+
+    /* Nozzle in widget-local coordinates */
+    s_nozzle_local_x = (float)(nozzle_x - s_widget_x);
+    s_nozzle_local_y = 0.0f;
+
     s_rocket_widget = gui_particle_widget_create(root, "rocket_demo",
-                                                 WIDGET_X, WIDGET_Y,
-                                                 WIDGET_W, WIDGET_H,
+                                                 s_widget_x, s_widget_y,
+                                                 s_widget_w, s_widget_h,
                                                  PARTICLE_POOL_SIZE);
     if (s_rocket_widget == NULL)
     {
@@ -201,10 +227,10 @@ gui_particle_widget_t *effect_rocket_demo_init(void)
     effect_rocket_config(&flame_config);
     s_flame_handle = gui_particle_widget_add_effect(s_rocket_widget, &flame_config);
 
-    /* Add rocket image as child of particle widget (relative coordinates) */
-    gui_img_t *img = gui_img_create_from_mem(GUI_BASE(s_rocket_widget), "img", (void *)small_rocket,
-                                             ROCKET_IMG_X - WIDGET_X,
-                                             ROCKET_IMG_Y - WIDGET_Y, 0, 0);
+    /* Add rocket image as child (position relative to widget) */
+    gui_img_t *img = gui_img_create_from_mem(GUI_BASE(s_rocket_widget), "img", ROCKET_BIN,
+                                             img_x - s_widget_x,
+                                             img_y - s_widget_y, 0, 0);
     gui_img_set_mode(img, IMG_FILTER_BLACK);
 
     gui_log("Rocket: Demo initialized\n");

@@ -25,25 +25,30 @@
 #include <stdlib.h>
 #include "gui_text.h"
 
-#include "galaxy.h"
-#include "../../assets/font/NotoSans_Regular_vector.h"
+#include "root_image/ui_resource.h"
 
 #define PARTICLE_POOL_SIZE   600
-#define GALAXY_OUTER_R       200.0f
-#define GALAXY_INNER_R       180.0f
-#define GALAXY_CORE_R        80.0f     /* Larger core to match halo image */
-#define GALAXY_PULL_SPEED    12.0f     /* Increased inward pull */
+#define GALAXY_OUTER_RATIO   0.49f   /* outer_r / min(screen) */
+#define GALAXY_INNER_RATIO   0.44f   /* inner_r / min(screen) */
+#define GALAXY_CORE_RATIO    0.20f   /* core_r  / min(screen) */
+#define GALAXY_PULL_SPEED    12.0f   /* Increased inward pull */
 #define GALAXY_SPIN_SPEED    2.0f
 #define GALAXY_NUM_ARMS      3
+#define GALAXY_WIDGET_MARGIN 0.10f   /* Top/bottom margin ratio */
 
 #define TEXT_VALUE_MIN       60
 #define TEXT_VALUE_MAX       89
 #define TEXT_UPDATE_INTERVAL 1000  /* 1 second in ms */
 
 static gui_particle_widget_t *s_galaxy_widget = NULL;
-static float s_galaxy_center_x = 240.0f;
-static float s_galaxy_center_y = 240.0f;
+static float s_galaxy_center_x = 0.0f;
+static float s_galaxy_center_y = 0.0f;
 static float s_galaxy_rotation = 0.0f;
+
+/* Computed at runtime from screen size */
+static float s_galaxy_outer_r = 0.0f;
+static float s_galaxy_inner_r = 0.0f;
+static float s_galaxy_core_r = 0.0f;
 
 static gui_text_t *s_galaxy_text = NULL;
 static int s_text_value = TEXT_VALUE_MIN;
@@ -65,12 +70,12 @@ static void galaxy_particle_init(particle_t *p, void *user_data)
     float arm_angle = (float)arm * 2.0f * M_PI_F / GALAXY_NUM_ARMS;
 
     /* Random distance from center */
-    float dist = GALAXY_INNER_R + (float)(rand() % 100) / 100.0f *
-                 (GALAXY_OUTER_R - GALAXY_INNER_R);
+    float dist = s_galaxy_inner_r + (float)(rand() % 100) / 100.0f *
+                 (s_galaxy_outer_r - s_galaxy_inner_r);
 
     /* Spiral offset: angle increases as distance decreases (logarithmic spiral) */
     float spiral_angle = arm_angle + s_galaxy_rotation +
-                         logf(dist / GALAXY_CORE_R) * 0.8f;
+                         logf(dist / s_galaxy_core_r) * 0.8f;
 
     /* Position on spiral arm with some spread */
     float spread = ((float)(rand() % 100) / 100.0f - 0.5f) * 0.3f;
@@ -101,7 +106,7 @@ static void galaxy_particle_update(particle_t *p, void *user_data)
     float dist = sqrtf(dx * dx + dy * dy);
 
     /* Core - particle absorbed */
-    if (dist < GALAXY_CORE_R)
+    if (dist < s_galaxy_core_r)
     {
         p->life = 0;
         return;
@@ -116,11 +121,11 @@ static void galaxy_particle_update(particle_t *p, void *user_data)
     float ty = nx;
 
     /* Spin faster as particle gets closer to center */
-    float spin_factor = 1.0f + (GALAXY_OUTER_R - dist) / GALAXY_OUTER_R * 3.0f;
+    float spin_factor = 1.0f + (s_galaxy_outer_r - dist) / s_galaxy_outer_r * 3.0f;
     float spin_speed = GALAXY_SPIN_SPEED * spin_factor;
 
     /* Pull gradually stronger as particle gets closer */
-    float pull_factor = 1.0f + (GALAXY_OUTER_R - dist) / GALAXY_OUTER_R * 1.5f;
+    float pull_factor = 1.0f + (s_galaxy_outer_r - dist) / s_galaxy_outer_r * 1.5f;
     float pull_speed = GALAXY_PULL_SPEED * pull_factor;
 
     /* Combine inward pull + tangential spin */
@@ -128,7 +133,7 @@ static void galaxy_particle_update(particle_t *p, void *user_data)
     p->vy = -ny * pull_speed + ty * spin_speed * dist * 0.3f;
 
     /* Color based on distance: blue/purple (outer) -> white/pink (inner) */
-    float dist_ratio = dist / GALAXY_OUTER_R;
+    float dist_ratio = dist / s_galaxy_outer_r;
     if (dist_ratio > 1.0f) { dist_ratio = 1.0f; }
     if (dist_ratio < 0.0f) { dist_ratio = 0.0f; }
 
@@ -159,8 +164,8 @@ void effect_galaxy_config(particle_effect_config_t *config)
     config->shape.type = PARTICLE_SHAPE_RING;
     config->shape.ring.cx = s_galaxy_center_x;
     config->shape.ring.cy = s_galaxy_center_y;
-    config->shape.ring.inner_r = GALAXY_INNER_R;
-    config->shape.ring.outer_r = GALAXY_OUTER_R;
+    config->shape.ring.inner_r = s_galaxy_inner_r;
+    config->shape.ring.outer_r = s_galaxy_outer_r;
 
     /* Linear trajectory - motion handled by callback */
     config->trajectory.type = PARTICLE_TRAJECTORY_LINEAR;
@@ -247,8 +252,14 @@ gui_particle_widget_t *effect_galaxy_demo_init(void)
     int screen_w = dc->screen_width;
     int screen_h = dc->screen_height;
 
-    int widget_y = 50;
-    int widget_h = screen_h - 100;  /* Trim 50px top + 50px bottom */
+    int widget_y = (int)(screen_h * GALAXY_WIDGET_MARGIN);
+    int widget_h = screen_h - widget_y * 2;
+
+    /* Compute radii from shorter dimension of widget area */
+    float min_dim = (float)(screen_w < widget_h ? screen_w : widget_h);
+    s_galaxy_outer_r = min_dim * GALAXY_OUTER_RATIO;
+    s_galaxy_inner_r = min_dim * GALAXY_INNER_RATIO;
+    s_galaxy_core_r  = min_dim * GALAXY_CORE_RATIO;
 
     /* Center coordinates in widget local space */
     s_galaxy_center_x = (float)(screen_w / 2);
@@ -277,8 +288,8 @@ gui_particle_widget_t *effect_galaxy_demo_init(void)
     gui_particle_widget_set_update_cb(s_galaxy_widget, galaxy_widget_update, NULL);
 
     /* Image position in widget local coordinates */
-    gui_img_t *img = gui_img_create_from_mem(GUI_BASE(s_galaxy_widget), "img", (void *)galaxy, 0, 0, 0,
-                                             0);
+    gui_img_t *img = gui_img_create_from_mem(GUI_BASE(s_galaxy_widget), "img", GALAXY_CIRCLE_BIN, 0, 0,
+                                             0, 0);
     uint16_t img_w = gui_img_get_width(img);
     uint16_t img_h = gui_img_get_height(img);
     gui_img_set_pos(img, (screen_w - img_w) / 2,
@@ -290,7 +301,7 @@ gui_particle_widget_t *effect_galaxy_demo_init(void)
     snprintf(s_text_buffer, sizeof(s_text_buffer), "%d%%", s_text_value);
     gui_text_set(s_galaxy_text, s_text_buffer, GUI_FONT_SRC_TTF, APP_COLOR_SILVER,
                  strlen(s_text_buffer), 90);
-    gui_text_type_set(s_galaxy_text, (void *)_acNotoSans_Regular_vector, FONT_SRC_MEMADDR);
+    gui_text_type_set(s_galaxy_text, NOTOSANS_REGULAR_VECTOR_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(s_galaxy_text, MID_CENTER);
     gui_obj_create_timer((gui_obj_t *)s_galaxy_text, TEXT_UPDATE_INTERVAL, true,
                          galaxy_text_timer_cb);

@@ -25,13 +25,14 @@
 #define RAIN_SPEED_MIN 300.0f
 #define RAIN_SPEED_MAX 450.0f
 #define RAIN_ANGLE_DEG 15.0f
+#define RAIN_ANGLE_RAD ((90.0f + RAIN_ANGLE_DEG) * M_PI_F / 180.0f)
 #define SPLASH_PARTICLES 5
 #define SPLASH_SPEED 80.0f
 
 static gui_particle_widget_t *s_rain_widget = NULL;
-static int s_screen_w = 480;
-static int s_screen_h = 480;
-static float s_ground_y = 450.0f;
+static int s_screen_w = 0;
+static int s_screen_h = 0;
+static float s_ground_y = 0.0f;
 
 static uint32_t rain_rand(void)
 {
@@ -124,10 +125,9 @@ static void rain_particle_init(particle_t *p, void *user_data)
     }
 
     /* Diagonal downward velocity */
-    float angle_rad = (90.0f + RAIN_ANGLE_DEG) * M_PI_F / 180.0f;
     float speed = rain_rand_float(RAIN_SPEED_MIN, RAIN_SPEED_MAX);
-    p->vx = cosf(angle_rad) * speed;
-    p->vy = sinf(angle_rad) * speed;
+    p->vx = cosf(RAIN_ANGLE_RAD) * speed;
+    p->vy = sinf(RAIN_ANGLE_RAD) * speed;
 
     /* Slight blue tint variation */
     uint8_t b = 255;
@@ -139,7 +139,7 @@ static void rain_particle_init(particle_t *p, void *user_data)
     p->scale = rain_rand_float(0.8f, 1.2f);
 
     /* Align rotation to fall direction */
-    p->rotation = angle_rad - M_PI_F / 2.0f;
+    p->rotation = RAIN_ANGLE_RAD - M_PI_F / 2.0f;
 }
 
 /**
@@ -194,11 +194,11 @@ void effect_rain_config(particle_effect_config_t *config)
 
     particle_effect_config_init(config);
 
-    /* Line emission from top edge */
+    /* Line emission from top edge (caller must set x1/x2 with drift margin) */
     config->shape.type = PARTICLE_SHAPE_LINE;
-    config->shape.line.x1 = -50.0f;
+    config->shape.line.x1 = 0.0f;
     config->shape.line.y1 = -20.0f;
-    config->shape.line.x2 = (float)s_screen_w + 50.0f;
+    config->shape.line.x2 = 0.0f;
     config->shape.line.y2 = -20.0f;
 
     /* Gravity trajectory */
@@ -209,9 +209,8 @@ void effect_rain_config(particle_effect_config_t *config)
     config->trajectory.damping = 0.0f;
 
     /* Emission settings */
-    float angle_rad = (90.0f + RAIN_ANGLE_DEG) * M_PI_F / 180.0f;
-    config->emission.angle_min = angle_rad - 0.1f;
-    config->emission.angle_max = angle_rad + 0.1f;
+    config->emission.angle_min = RAIN_ANGLE_RAD - 0.1f;
+    config->emission.angle_max = RAIN_ANGLE_RAD + 0.1f;
     config->emission.speed_min = RAIN_SPEED_MIN;
     config->emission.speed_max = RAIN_SPEED_MAX;
     config->emission.rate = 50.0f;
@@ -241,12 +240,12 @@ void effect_rain_config(particle_effect_config_t *config)
     /* Rotation aligned to velocity */
     config->rotation.align_velocity = 1;
 
-    /* Kill at boundary (handled by callback for splash) */
+    /* Kill at boundary (caller must set with drift margin) */
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
-    config->boundary.left = -100.0f;
-    config->boundary.top = -50.0f;
-    config->boundary.right = (float)s_screen_w + 100.0f;
-    config->boundary.bottom = s_ground_y + 50.0f;
+    config->boundary.left = 0.0f;
+    config->boundary.top = -20.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
 
     /* Normal blending */
     config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
@@ -279,10 +278,19 @@ gui_particle_widget_t *effect_rain_demo_init(void)
     particle_effect_config_t config;
     effect_rain_config(&config);
 
-    /* Update line for actual screen size */
-    config.shape.line.x2 = (float)s_screen_w + 50.0f;
-    config.boundary.right = (float)s_screen_w + 100.0f;
-    config.boundary.bottom = s_ground_y + 50.0f;
+    /* Horizontal drift = tan(angle) * screen_height */
+    float drift = tanf(RAIN_ANGLE_DEG * M_PI_F / 180.0f)
+                  * (float)s_screen_h;
+    float splash_margin = 10.0f;
+
+    /* Emission line covers screen + drift overshoot */
+    config.shape.line.x1 = -drift;
+    config.shape.line.x2 = (float)s_screen_w + drift;
+
+    /* Boundary with drift margin */
+    config.boundary.left = -drift;
+    config.boundary.right = (float)s_screen_w + drift;
+    config.boundary.bottom = s_ground_y + splash_margin;
 
     gui_particle_widget_add_effect(s_rain_widget, &config);
 

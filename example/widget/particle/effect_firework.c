@@ -107,8 +107,8 @@ void effect_firework_config(particle_effect_config_t *config)
     particle_effect_config_init(config);
 
     config->shape.type = PARTICLE_SHAPE_POINT;
-    config->shape.point.x = 200.0f;
-    config->shape.point.y = 200.0f;
+    config->shape.point.x = 0.0f;
+    config->shape.point.y = 0.0f;
 
     config->trajectory.type = PARTICLE_TRAJECTORY_GRAVITY;
     config->trajectory.gravity = 200.0f;
@@ -151,11 +151,12 @@ void effect_firework_config(particle_effect_config_t *config)
     config->rotation.angle_min = 0.0f;
     config->rotation.angle_max = 2.0f * M_PI_F;
 
+    /* Boundary: Kill (caller must set right/bottom) */
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = 400.0f;
-    config->boundary.bottom = 400.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
     config->boundary.reflect_damping = 0.8f;
 
     config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;

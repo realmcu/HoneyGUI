@@ -34,6 +34,8 @@
 #include "effect_fireflies.h"
 #include "effect_ripple.h"
 #include "effect_rain.h"
+#include "effect_magic_circle.h"
+#include "effect_light_beam.h"
 
 /*============================================================================*
  *                           Effect Registry
@@ -64,6 +66,8 @@ static const effect_entry_t s_effects[] =
     {"Fireflies",  "Floating glowing dots",           effect_fireflies_demo_init},
     {"Ripple",     "Touch-triggered rings",           effect_ripple_demo_init},
     {"Rain",       "Raindrops with splash",           effect_rain_demo_init},
+    {"MagicCircle", "Rotating magic circle sparks",  effect_magic_circle_demo_init},
+    {"LightBeam",   "Reflecting laser beam",         effect_light_beam_demo_init},
 };
 
 #define EFFECT_COUNT (sizeof(s_effects) / sizeof(s_effects[0]))

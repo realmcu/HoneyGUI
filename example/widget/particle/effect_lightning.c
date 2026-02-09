@@ -50,10 +50,10 @@ static lightning_bolt_t s_bolts[MAX_BOLTS];
 static int s_bolt_count = 0;
 
 static gui_particle_widget_t *s_lightning_widget = NULL;
-static float s_lightning_start_x = 100.0f;
-static float s_lightning_start_y = 80.0f;
-static float s_lightning_end_x = 300.0f;
-static float s_lightning_end_y = 350.0f;
+static float s_lightning_start_x = 0.0f;
+static float s_lightning_start_y = 0.0f;
+static float s_lightning_end_x = 0.0f;
+static float s_lightning_end_y = 0.0f;
 static uint32_t s_lightning_timer = 0;
 static uint32_t s_last_bolt_time = 0;
 
@@ -334,7 +334,7 @@ static void lightning_update_cb(void *user_data)
 
         gui_dispdev_t *dc = gui_get_dc();
         s_lightning_end_x = s_lightning_start_x + lightning_rand_float(-100.0f, 100.0f);
-        s_lightning_end_y = (float)(dc->screen_height - 50);
+        s_lightning_end_y = (float)dc->screen_height * 0.9f;
 
         generate_lightning_strike(s_lightning_start_x, s_lightning_start_y,
                                   s_lightning_end_x, s_lightning_end_y, 0);
@@ -392,9 +392,9 @@ gui_particle_widget_t *effect_lightning_demo_init(void)
     int screen_h = dc->screen_height;
 
     s_lightning_start_x = (float)(screen_w / 2);
-    s_lightning_start_y = 30.0f;
+    s_lightning_start_y = (float)screen_h * 0.1f;
     s_lightning_end_x = (float)(screen_w / 2);
-    s_lightning_end_y = (float)(screen_h - 50);
+    s_lightning_end_y = (float)screen_h * 0.9f;
 
     s_lightning_widget = gui_particle_widget_create(root, "lightning_demo",
                                                     0, 0, screen_w, screen_h,
