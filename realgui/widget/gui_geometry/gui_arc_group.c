@@ -296,6 +296,9 @@ static void gui_arc_group_draw(gui_arc_group_t *this)
     {
         gui_obj_t *obj = (gui_obj_t *)this;
 
+        // Update opacity value to consider parent's opacity (like gui_img does)
+        this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
+
         if (obj->matrix != NULL)
         {
             memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));

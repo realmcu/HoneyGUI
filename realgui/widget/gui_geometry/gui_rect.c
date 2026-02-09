@@ -810,10 +810,10 @@ static void gui_rect_prepare(gui_obj_t *obj)
         matrix_translate(-center_x, -center_y, obj->matrix);
     }
 
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
 
     // Calculate checksum only for key properties (exclude pointers)
     uint8_t new_checksum = 0;
@@ -1003,13 +1003,44 @@ static void gui_rect_draw(gui_obj_t *obj)
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
-    if (this->rect_0 != NULL) { gui_acc_blit_to_dc(this->rect_0, dc, NULL); }
-    if (this->rect_1 != NULL) { gui_acc_blit_to_dc(this->rect_1, dc, NULL); }
-    if (this->rect_2 != NULL) { gui_acc_blit_to_dc(this->rect_2, dc, NULL); }
-    if (this->circle_00 != NULL) { gui_acc_blit_to_dc(this->circle_00, dc, NULL); }
-    if (this->circle_01 != NULL) { gui_acc_blit_to_dc(this->circle_01, dc, NULL); }
-    if (this->circle_10 != NULL) { gui_acc_blit_to_dc(this->circle_10, dc, NULL); }
-    if (this->circle_11 != NULL) { gui_acc_blit_to_dc(this->circle_11, dc, NULL); }
+    // Update opacity value to consider parent's opacity (like gui_img does)
+    uint8_t final_opacity = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
+
+    if (this->rect_0 != NULL)
+    {
+        this->rect_0->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->rect_0, dc, NULL);
+    }
+    if (this->rect_1 != NULL)
+    {
+        this->rect_1->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->rect_1, dc, NULL);
+    }
+    if (this->rect_2 != NULL)
+    {
+        this->rect_2->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->rect_2, dc, NULL);
+    }
+    if (this->circle_00 != NULL)
+    {
+        this->circle_00->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->circle_00, dc, NULL);
+    }
+    if (this->circle_01 != NULL)
+    {
+        this->circle_01->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->circle_01, dc, NULL);
+    }
+    if (this->circle_10 != NULL)
+    {
+        this->circle_10->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->circle_10, dc, NULL);
+    }
+    if (this->circle_11 != NULL)
+    {
+        this->circle_11->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->circle_11, dc, NULL);
+    }
 }
 static void gui_rect_end(gui_obj_t *obj)
 {

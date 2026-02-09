@@ -66,10 +66,10 @@ static void gui_circle_input_prepare(gui_obj_t *obj)
         // Check if touch point is inside the arc
         if (is_point_in_circle(this, local_x, local_y))
         {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, NULL);
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, NULL);
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, NULL);
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, NULL);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
         }
     }
 }
@@ -887,11 +887,34 @@ static void gui_circle_draw(gui_obj_t *obj)
     gui_circle_t *this = (gui_circle_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
-    if (this->center_rect != NULL) { gui_acc_blit_to_dc(this->center_rect, dc, NULL); }
-    if (this->arc_left != NULL) { gui_acc_blit_to_dc(this->arc_left, dc, NULL); }
-    if (this->arc_right != NULL) { gui_acc_blit_to_dc(this->arc_right, dc, NULL); }
-    if (this->arc_top != NULL) { gui_acc_blit_to_dc(this->arc_top, dc, NULL); }
-    if (this->arc_bottom != NULL) { gui_acc_blit_to_dc(this->arc_bottom, dc, NULL); }
+    // Update opacity value to consider parent's opacity (like gui_img does)
+    uint8_t final_opacity = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
+
+    if (this->center_rect != NULL)
+    {
+        this->center_rect->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->center_rect, dc, NULL);
+    }
+    if (this->arc_left != NULL)
+    {
+        this->arc_left->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->arc_left, dc, NULL);
+    }
+    if (this->arc_right != NULL)
+    {
+        this->arc_right->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->arc_right, dc, NULL);
+    }
+    if (this->arc_top != NULL)
+    {
+        this->arc_top->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->arc_top, dc, NULL);
+    }
+    if (this->arc_bottom != NULL)
+    {
+        this->arc_bottom->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->arc_bottom, dc, NULL);
+    }
 }
 
 /** End phase processing - Memory management */

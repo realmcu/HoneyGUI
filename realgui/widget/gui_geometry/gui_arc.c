@@ -120,7 +120,7 @@ static void gui_arc_prepare(gui_arc_t *this)
     // Translate back
     matrix_translate(-center_x, -center_y, obj->matrix);
 
-    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED, "touch");
     // Check if we need to re-render
     if (!this->buffer_valid || is_arc_dirty(this))
     {
@@ -146,6 +146,9 @@ static void gui_arc_draw(gui_arc_t *this)
         // The arc is rendered at the center of the buffer
         // We just need to position the buffer at the widget's location
         // No offset needed since arc->x, arc->y are already relative to the bounding box
+
+        // Update opacity value to consider parent's opacity (like gui_img does)
+        this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
 
         // Initialize with identity matrix or copy user's matrix
         if (obj->matrix != NULL)
