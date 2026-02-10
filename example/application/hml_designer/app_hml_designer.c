@@ -21,6 +21,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "hml_loader.h"
+#include "hml_view_instance.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -81,36 +82,18 @@ static int app_init(void)
 #endif
 
     // Scan and register all views
-    hml_scan_views("/hml/ui");
+    int view_count = hml_scan_views("/hml/ui");
 
-    // Load HML from project.json
-    char *hml_path = get_main_hml_path();
-    if (!hml_path)
+    if (view_count <= 0)
     {
-        gui_log("[ERROR] Failed to read mainHmlFile from project.json\n");
+        gui_log("[ERROR] Failed to scan HML views\n");
         gui_text_t *error_text = gui_text_create(gui_obj_get_root(), "error", 10, 10, 460, 50);
         gui_color_t red = {.color.argb_full = 0xFFFF0000};
-        gui_text_set(error_text, "Failed to read project.json", GUI_FONT_SRC_BMP, red, 17, 16);
+        gui_text_set(error_text, "Failed to scan HML views", GUI_FONT_SRC_BMP, red, 17, 16);
         return -1;
     }
 
-    gui_obj_t *ui = hml_load(gui_obj_get_root(), hml_path);
-    gui_free(hml_path);
-
-    if (ui)
-    {
-        gui_log("[OK] HML loaded successfully\n");
-    }
-    else
-    {
-        gui_log("[ERROR] Failed to load HML\n");
-
-        // Fallback: show error message
-        gui_text_t *error_text = gui_text_create(gui_obj_get_root(), "error", 10, 10, 460, 50);
-        gui_color_t red = {.color.argb_full = 0xFFFF0000};
-        gui_text_set(error_text, "Failed to load UI", GUI_FONT_SRC_BMP,
-                     red, 17, 16);
-    }
+    gui_log("[OK] Scanned %d views, lazy loading enabled\n", view_count);
 
     return 0;
 }

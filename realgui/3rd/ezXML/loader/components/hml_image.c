@@ -6,9 +6,8 @@
 #include "../hml_component.h"
 #include "../hml_utils.h"
 #include "gui_img.h"
-#include "gui_vfs.h"
-#include "gui_api.h"
 #include <stdio.h>
+#include <string.h>
 
 gui_obj_t *hml_create_image(gui_obj_t *parent, ezxml_t node)
 {
@@ -19,37 +18,26 @@ gui_obj_t *hml_create_image(gui_obj_t *parent, ezxml_t node)
 
     if (!src)
     {
-        gui_log("hml_image: missing 'src' attribute\n");
+        gui_log("[HML] Image: Missing 'src' attribute\n");
         return NULL;
     }
 
-    // Resolve asset path: assets/xxx.png → /xxx.bin
+    // Resolve asset path: assets/xxx.png → /hml/xxx.bin
     char bin_path[128];
     hml_resolve_asset_path(src, bin_path, sizeof(bin_path));
 
-    // Load from romfs
-    const void *img_data = gui_vfs_get_file_address(bin_path);
-    if (!img_data)
+    // Allocate persistent memory for path string
+    size_t path_len = strlen(bin_path) + 1;
+    char *path_copy = gui_malloc(path_len);
+    if (!path_copy)
     {
-        /* Fallback: read file into memory */
-        gui_vfs_file_t *f = gui_vfs_open(bin_path, GUI_VFS_READ);
-        if (f)
-        {
-            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
-            int size = gui_vfs_tell(f);
-            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
-            void *buf = gui_malloc(size);
-            if (buf) { gui_vfs_read(f, buf, size); img_data = buf; }
-            gui_vfs_close(f);
-        }
-    }
-
-    if (!img_data)
-    {
-        gui_log("hml_image: failed to load '%s'\n", bin_path);
+        gui_log("[HML] Image: Failed to allocate memory for path\n");
         return NULL;
     }
+    memcpy(path_copy, bin_path, path_len);
 
-    gui_img_t *img = gui_img_create_from_mem(parent, id, (void *)img_data, x, y, 0, 0);
+    // Create image from file path (let gui_img handle file loading)
+    gui_img_t *img = gui_img_create_from_fs(parent, id, (void *)path_copy, x, y, 0, 0);
+
     return (gui_obj_t *)img;
 }

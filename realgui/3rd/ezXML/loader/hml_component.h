@@ -6,6 +6,7 @@
 #ifndef HML_COMPONENT_H
 #define HML_COMPONENT_H
 
+#include "gui_api.h"
 #include "gui_obj.h"
 #include "ezxml.h"
 
@@ -20,21 +21,6 @@ extern "C" {
  * @return Created GUI object, NULL on failure
  */
 typedef gui_obj_t *(*hml_component_creator_t)(gui_obj_t *parent, ezxml_t node);
-
-/**
- * @brief Component registration entry
- */
-typedef struct
-{
-    const char *tag;                    // Component tag name (e.g., "hg_view")
-    hml_component_creator_t creator;    // Creator function
-} hml_component_entry_t;
-
-/**
- * @brief Register all built-in components
- * @return Component registry array (NULL-terminated)
- */
-const hml_component_entry_t *hml_get_component_registry(void);
 
 // Component creators (implemented in components/*.c)
 gui_obj_t *hml_create_view(gui_obj_t *parent, ezxml_t node);
