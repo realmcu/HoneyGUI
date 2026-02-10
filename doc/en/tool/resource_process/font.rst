@@ -1,6 +1,13 @@
+.. _Font Convert Tool:
+
 ==================
 Font Convert Tool
 ==================
+
+.. note::
+
+   This chapter introduces the **standalone font conversion tool** (exe program), which needs to be downloaded and run separately.
+
 
 Font conversion tool functionality: Obtain all characters to be converted and their corresponding Unicode codes from a standard internal code page file, custom Unicode code page (or supplementary code page .txt file, custom .cst file). Find the corresponding character's vector font data from the font file (such as .ttf) based on the Unicode encoding. Convert it into bitmap format fonts or pre-processed vector fonts, and output as a .bin file.
 
@@ -103,6 +110,8 @@ Setting.ini Parameter Description
    +--------------+--------+-------------------------------------------------------------------------------------------------------+
    | rotate       | 0      | Font Rotation Angle. 0: No rotation. 1: Rotate 90° clockwise. 2: Rotate 90° counterclockwise.         |
    +--------------+--------+-------------------------------------------------------------------------------------------------------+
+
+.. _Font Size Evaluation:
 
 Font Size Evaluation
 ---------------------
