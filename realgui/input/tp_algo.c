@@ -53,10 +53,14 @@ static touch_info_t tp;
 
 static uint32_t up_cnt = 0;
 static uint32_t down_cnt = 0;
-static uint32_t click_cnt = 0;
-static uint32_t click_time_rec = 0;
 static bool long_button_flag = false;
 
+#define MULTI_CLICK_INTERVAL_MS   300  // Maximum time between clicks
+#define MULTI_CLICK_POSITION_THR  20  // Maximum position deviation between clicks
+static uint32_t click_cnt = 0;
+static uint32_t last_click_time = 0;
+static int16_t last_click_x = 0;
+static int16_t last_click_y = 0;
 
 static bool tp_left_moved_flag = false;
 static bool tp_right_moved_flag = false;
@@ -107,7 +111,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
             tp.pressing = false;
             TP_LOG("=====END UP====== tick = %d\n", raw_data->timestamp_ms);
         }
-        if (up_cnt == 2 && click_cnt == 0)
+        if (up_cnt == 2)
         {
             tp_do_reset();
         }
@@ -429,12 +433,28 @@ static bool tp_judge_short_click(struct gui_touch_port_data *raw_data)
 {
     if ((tp_judge_same_point() == true) && (tp_judge_short_press(raw_data) == true))
     {
-        // tp.type = TOUCH_SHORT;
-        click_cnt++;
-        click_time_rec = gui_ms_get();
+        if (click_cnt == 0)
+        {
+            last_click_x = tp.x;
+            last_click_y = tp.y;
+            click_cnt++;
+        }
+        else if ((abs(tp.x - last_click_x) <= MULTI_CLICK_POSITION_THR) &&
+                 (abs(tp.y - last_click_y) <= MULTI_CLICK_POSITION_THR)) // Is same click position
+        {
+            click_cnt++;
+        }
+        else // Not same click position, a new click
+        {
+            click_cnt = 1;
+            last_click_x = tp.x;
+            last_click_y = tp.y;
+        }
+        last_click_time = gui_ms_get();
         TP_LOG("type = TOUCH_SHORT \n");
         return true;
     }
+    click_cnt = 0;
     return false;
 }
 
@@ -610,11 +630,12 @@ struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
             TP_LOG("not cache tp up \n");
         }
     }
-    else
+    else // When no touch, judge continous click
     {
-        struct gui_indev *indev = gui_get_indev();
-        if (click_cnt && gui_ms_get() - click_time_rec > indev->short_button_time_ms / 3)
+        if (click_cnt && gui_ms_get() - last_click_time >= MULTI_CLICK_INTERVAL_MS)
         {
+            tp.x = last_click_x;
+            tp.y = last_click_y;
             switch (click_cnt)
             {
             case 1:
@@ -632,7 +653,11 @@ struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
             }
             click_cnt = 0;
         }
-        //TP_LOG("not cache tp down and up, do keep \n");
+        else
+        {
+            tp.x = 0;
+            tp.y = 0;
+        }
     }
     //gui_log("tp.type:%d\n",tp.type);
     return &tp;

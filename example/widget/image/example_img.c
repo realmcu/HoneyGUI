@@ -54,6 +54,13 @@ void test_event_2_cb(void *obj, gui_event_t *e)
     gui_log("Triple clicked!\n");
 }
 
+void test_event_3_cb(void *obj, gui_event_t *e)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    gui_log("Touch long!\n");
+}
+
 void test_timer_cb(void *param)
 {
     (void)param;
@@ -91,6 +98,7 @@ static int app_init(void)
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_0_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_1_cb, GUI_EVENT_TOUCH_DOUBLE_CLICKED, NULL);
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_2_cb, GUI_EVENT_TOUCH_TRIPLE_CLICKED, NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_3_cb, GUI_EVENT_TOUCH_LONG, NULL);
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
 

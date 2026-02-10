@@ -28,7 +28,7 @@ extern "C" {
 /* VIEW_SWITCH_STYLE enum start*/
 typedef enum
 {
-    SWITCH_INIT_STATE = 0x0000, ///< Switch out to left.
+    SWITCH_INIT_STATE = 0x0000, ///< Default status.
     SWITCH_IN_STILL_USE_BLUR,   ///< Switch in still with gauss blur.
     SWITCH_OUT_STILL_USE_BLUR,  ///< Switch out still with gauss blur.
 
