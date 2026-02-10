@@ -63,4 +63,5 @@ Widgets
     Geometry Arc <gui_arc>
     Geometry Rounded Rectangle <gui_rect>
     Geometry Circle <gui_circle>
+    Particle <gui_particle>
 

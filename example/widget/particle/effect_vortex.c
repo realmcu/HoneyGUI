@@ -5,13 +5,13 @@
 
 /**
  * @file effect_vortex.c
- * @brief Energy Vortex Particle Effect - Spiral Inward Effect
+ * @brief Energy Vortex Particle Effect - Spiral Orbit Effect
  *
  * This example demonstrates:
  * 1. Ring emission shape (particles emit from outer ring)
- * 2. Orbital trajectory (particles spiral toward center)
+ * 2. Orbital trajectory (particles spiral around center)
  * 3. Rainbow color mode (hue cycles over lifetime)
- * 4. Custom update callback for inward spiral motion
+ * 4. Custom update callback for spiral motion
  */
 
 #include "effect_vortex.h"
@@ -24,7 +24,7 @@
 #define PARTICLE_POOL_SIZE 300
 #define VORTEX_OUTER_RATIO 0.475f  /* 95% diameter / 2 */
 #define VORTEX_INNER_RATIO 0.425f  /* 85% diameter / 2 */
-#define VORTEX_PULL_SPEED  60.0f   /* Inward pull speed */
+#define VORTEX_PULL_SPEED  60.0f   /* Radial speed */
 #define VORTEX_SPIN_SPEED  2.5f    /* Angular velocity (rad/s) */
 
 static gui_particle_widget_t *s_vortex_widget = NULL;
@@ -36,7 +36,7 @@ static float s_vortex_inner_r = 0.0f;
 /**
  * @brief Custom particle update callback for spiral motion
  *
- * Overrides default linear/gravity motion with orbital + inward pull
+ * Overrides default linear/gravity motion with orbital + radial pull
  */
 static void vortex_particle_update(particle_t *p, void *user_data)
 {
@@ -66,7 +66,7 @@ static void vortex_particle_update(particle_t *p, void *user_data)
     float tx = -ny;
     float ty = nx;
 
-    /* Combine inward pull + tangential spin */
+    /* Combine radial pull + tangential spin */
     /* Spin faster as particle gets closer to center */
     float spin_factor = 1.0f + (s_vortex_outer_r - dist) / s_vortex_outer_r * 2.0f;
     float spin_speed = VORTEX_SPIN_SPEED * spin_factor;
@@ -126,7 +126,7 @@ void effect_vortex_config(particle_effect_config_t *config)
     config->opacity.end = 100;
     config->opacity.easing = PARTICLE_EASING_EASE_IN;
 
-    /* Scale: shrink as particles spiral inward */
+    /* Scale: shrink as particles spiral */
     config->scale.start = 1.5f;
     config->scale.end = 0.2f;
     config->scale.min = 1.0f;

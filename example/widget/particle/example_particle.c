@@ -91,10 +91,10 @@ static int particle_demo_init(void)
     /* Tunnel: Warp speed effect - particles radiate from center outward (binary load demo) */
     // effect_tunnel_demo_init();
 
-    /* Rocket: Thruster exhaust with flame and smoke trail - drag to move */
+    /* Rocket: Thruster exhaust with flame and smoke trail */
     // effect_rocket_demo_init();
 
-    /* Vortex: Energy spiral - particles orbit inward toward center with rainbow colors */
+    /* Vortex: Energy spiral - particles orbit with rainbow colors */
     // effect_vortex_demo_init();
 
     /* Lightning: Electric arc discharge between two points with branching */

@@ -64,4 +64,5 @@
     圆弧 (Geometry Arc) <gui_arc>
     圆角矩形 (Geometry Rounded Rectangle) <gui_rect>
     圆 (Geometry Circle) <gui_circle>
+    粒子特效 (Particle) <gui_particle>
 

@@ -1,5 +1,10 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /**
- * @file gui_particle_widget.h
  * @brief Particle System Widget Adapter for HoneyGUI
  *
  * This module provides the HoneyGUI widget wrapper for the particle system.
@@ -11,8 +16,6 @@
  * - Provides render callback that uses gui_img for particle rendering
  * - Convenience interfaces for adding preset effects
  *
- * Copyright (c) 2026 Realtek Semiconductor Corp.
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef GUI_PARTICLE_WIDGET_H

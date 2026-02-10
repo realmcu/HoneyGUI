@@ -61,7 +61,7 @@ static const effect_entry_t s_effects[] =
     {"Custom",     "Custom callback behaviors",       effect_custom_demo_init},
     {"Tunnel",     "Warp speed radial effect",        effect_tunnel_demo_init},
     {"Rocket",     "Thruster exhaust with flame",     effect_rocket_demo_init},
-    {"Vortex",     "Energy spiral to center",         effect_vortex_demo_init},
+    {"Vortex",     "Energy spiral with rainbow",       effect_vortex_demo_init},
     {"Lightning",  "Electric arc discharge",          effect_lightning_demo_init},
     {"Fireflies",  "Floating glowing dots",           effect_fireflies_demo_init},
     {"Ripple",     "Touch-triggered rings",           effect_ripple_demo_init},

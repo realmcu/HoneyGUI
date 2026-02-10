@@ -5,7 +5,7 @@
 
 /**
  * @file effect_vortex.h
- * @brief Energy Vortex Particle Effect - Spiral Inward Effect
+ * @brief Energy Vortex Particle Effect - Spiral Orbit Effect
  *
  * Vortex effect characteristics:
  * - Ring emission from outer edge
