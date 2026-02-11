@@ -69,10 +69,10 @@ static void touch_update_cb(void *user_data)
 }
 
 /*============================================================================*
- *                           Public Functions
+ *                           Static Configuration
  *============================================================================*/
 
-void effect_touch_config(particle_effect_config_t *config)
+static void effect_touch_config(particle_effect_config_t *config)
 {
     if (config == NULL)
     {
@@ -141,15 +141,15 @@ void effect_touch_config(particle_effect_config_t *config)
     config->render.base_size = 10.0f;
 }
 
-gui_particle_widget_t *effect_touch_demo_init(void)
-{
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    int screen_w = dc->screen_width;
-    int screen_h = dc->screen_height;
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
-    s_touch_widget = gui_particle_widget_create(root, "touch_demo",
-                                                0, 0, screen_w, screen_h,
+gui_particle_widget_t *effect_touch_create(gui_obj_t *parent, const char *name,
+                                           int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    s_touch_widget = gui_particle_widget_create(parent, name,
+                                                x, y, w, h,
                                                 PARTICLE_POOL_SIZE);
     if (s_touch_widget == NULL)
     {
@@ -174,9 +174,8 @@ gui_particle_widget_t *effect_touch_demo_init(void)
     config.lifecycle.auto_cleanup = 0;
 
     /* Update boundary to match actual widget size */
-    gui_obj_t *base = GUI_BASE(s_touch_widget);
-    config.boundary.right = (float)base->w;
-    config.boundary.bottom = (float)base->h;
+    config.boundary.right = (float)w;
+    config.boundary.bottom = (float)h;
 
     s_touch_handle = gui_particle_widget_add_effect(s_touch_widget, &config);
 

@@ -15,7 +15,11 @@
 
 #define PARTICLE_POOL_SIZE 256
 
-void effect_bubble_config(particle_effect_config_t *config)
+/*============================================================================*
+ *                           Static Configuration
+ *============================================================================*/
+
+static void effect_bubble_config(particle_effect_config_t *config)
 {
     if (config == NULL)
     {
@@ -73,15 +77,15 @@ void effect_bubble_config(particle_effect_config_t *config)
     config->render.base_size = 12.0f;
 }
 
-gui_particle_widget_t *effect_bubble_demo_init(void)
-{
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    int screen_w = dc->screen_width;
-    int screen_h = dc->screen_height;
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
-    gui_particle_widget_t *widget = gui_particle_widget_create(root, "bubble_demo",
-                                                               0, 0, screen_w, screen_h,
+gui_particle_widget_t *effect_bubble_create(gui_obj_t *parent, const char *name,
+                                            int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    gui_particle_widget_t *widget = gui_particle_widget_create(parent, name,
+                                                               x, y, w, h,
                                                                PARTICLE_POOL_SIZE);
     if (widget == NULL)
     {
@@ -91,22 +95,14 @@ gui_particle_widget_t *effect_bubble_demo_init(void)
     particle_effect_config_t config;
     effect_bubble_config(&config);
 
-    config.color.mode = PARTICLE_COLOR_GRADIENT;
-    config.color.color_start = 0xFF88DDFF;
-    config.color.color_end = 0xFF44AAFF;
-
+    /* Adapt to widget size */
     config.shape.line.x1 = 0.0f;
-    config.shape.line.y1 = (float)screen_h;
-    config.shape.line.x2 = (float)screen_w;
-    config.shape.line.y2 = (float)screen_h;
+    config.shape.line.y1 = (float)h;
+    config.shape.line.x2 = (float)w;
+    config.shape.line.y2 = (float)h;
 
-    gui_obj_t *base = GUI_BASE(widget);
-    config.boundary.right = (float)base->w;
-    config.boundary.bottom = (float)base->h + 40.0f;
-    config.emission.rate = 8.0f;
-    config.scale.min = 0.5f;
-    config.scale.max = 1.5f;
-    config.render.base_size = 10.0f;
+    config.boundary.right = (float)w;
+    config.boundary.bottom = (float)h + 40.0f;
 
     gui_particle_widget_add_effect(widget, &config);
 

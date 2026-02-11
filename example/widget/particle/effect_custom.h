@@ -5,7 +5,7 @@
 
 /**
  * @file effect_custom.h
- * @brief Custom Particle Effect with Callbacks Demo
+ * @brief Custom Particle Effect with Callbacks
  *
  * Custom effect characteristics:
  * - Circle emission from center
@@ -26,16 +26,21 @@ extern "C" {
 #endif
 
 /**
- * @brief Load custom effect configuration
- * @param config Pointer to configuration to fill
- */
-void effect_custom_config(particle_effect_config_t *config);
-
-/**
- * @brief Initialize custom demo
+ * @brief Create custom callback particle effect
+ *
+ * Creates a particle widget with custom init/update callbacks
+ * demonstrating sine wave motion and rainbow colors.
+ *
+ * @param parent Parent widget to attach to
+ * @param name Widget name
+ * @param x X coordinate relative to parent
+ * @param y Y coordinate relative to parent
+ * @param w Widget width
+ * @param h Widget height
  * @return Created widget pointer, NULL on failure
  */
-gui_particle_widget_t *effect_custom_demo_init(void);
+gui_particle_widget_t *effect_custom_create(gui_obj_t *parent, const char *name,
+                                            int16_t x, int16_t y, int16_t w, int16_t h);
 
 #ifdef __cplusplus
 }

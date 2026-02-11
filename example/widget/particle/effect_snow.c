@@ -16,10 +16,10 @@
 #define PARTICLE_POOL_SIZE 256
 
 /*============================================================================*
- *                           Public Functions
+ *                           Static Configuration
  *============================================================================*/
 
-void effect_snow_config(particle_effect_config_t *config)
+static void effect_snow_config(particle_effect_config_t *config)
 {
     if (config == NULL)
     {
@@ -90,15 +90,15 @@ void effect_snow_config(particle_effect_config_t *config)
     config->render.base_size = 4.0f;
 }
 
-gui_particle_widget_t *effect_snow_demo_init(void)
-{
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    int screen_w = dc->screen_width;
-    int screen_h = dc->screen_height;
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
-    gui_particle_widget_t *widget = gui_particle_widget_create(root, "snow_demo",
-                                                               0, 0, screen_w, screen_h,
+gui_particle_widget_t *effect_snow_create(gui_obj_t *parent, const char *name,
+                                          int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    gui_particle_widget_t *widget = gui_particle_widget_create(parent, name,
+                                                               x, y, w, h,
                                                                PARTICLE_POOL_SIZE);
     if (widget == NULL)
     {
@@ -108,30 +108,25 @@ gui_particle_widget_t *effect_snow_demo_init(void)
     particle_effect_config_t config;
     effect_snow_config(&config);
 
-    /* Customize snow appearance */
-    config.color.color_start = 0xFFCCEEFF;
-
-    /* Override line emission to match widget width */
+    /* Adapt to widget size */
     config.shape.line.x1 = 0.0f;
     config.shape.line.y1 = 0.0f;
-    config.shape.line.x2 = (float)screen_w;
+    config.shape.line.x2 = (float)w;
     config.shape.line.y2 = 0.0f;
 
-    /* Adjust emission rate */
     config.emission.rate = 25.0f;
-
-    /* Adjust particle size variation */
+    config.color.color_start = 0xFFCCEEFF;
     config.scale.min = 0.3f;
     config.scale.max = 0.8f;
 
-    /* Update boundary */
     config.boundary.left = -8.0f;
     config.boundary.top = -8.0f;
-    gui_obj_t *base = GUI_BASE(widget);
-    config.boundary.right = (float)base->w + 8.0f;
-    config.boundary.bottom = (float)base->h + 8.0f;
+    config.boundary.right = (float)w + 8.0f;
+    config.boundary.bottom = (float)h + 8.0f;
 
     gui_particle_widget_add_effect(widget, &config);
 
     return widget;
 }
+
+

@@ -8,10 +8,10 @@
  * @brief Magic Circle Particle Effect - Doctor Strange Style
  *
  * Magic circle effect characteristics:
- * - Inner and outer circle images rotating in opposite directions
- * - Particles float upward from the circle edges and center
+ * - Particles float upward from ring edges and center
  * - Orange-gold color palette with additive glow
- * - Images placed at screen center
+ * - Pure particle effect (no images)
+ * - For the full demo with rotating images, use effect_magic_circle_demo_init()
  */
 
 #ifndef EFFECT_MAGIC_CIRCLE_H
@@ -25,16 +25,22 @@ extern "C" {
 #endif
 
 /**
- * @brief Load magic circle effect configuration
- * @param config Pointer to configuration to fill
- */
-void effect_magic_circle_config(particle_effect_config_t *config);
-
-/**
- * @brief Initialize magic circle demo
+ * @brief Create magic circle particle effect
+ *
+ * Creates orange-gold sparks floating upward from a ring area.
+ * Pure particle effect with no image resources. For the full demo
+ * with rotating inner/outer circle images, use effect_magic_circle_demo_init().
+ *
+ * @param parent Parent widget to attach to
+ * @param name Widget name
+ * @param x X coordinate relative to parent
+ * @param y Y coordinate relative to parent
+ * @param w Widget width
+ * @param h Widget height
  * @return Created widget pointer, NULL on failure
  */
-gui_particle_widget_t *effect_magic_circle_demo_init(void);
+gui_particle_widget_t *effect_magic_circle_create(gui_obj_t *parent, const char *name,
+                                                  int16_t x, int16_t y, int16_t w, int16_t h);
 
 #ifdef __cplusplus
 }

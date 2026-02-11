@@ -5,7 +5,7 @@
 
 /**
  * @file effect_touch.h
- * @brief Touch Feedback Particle Effect Configuration and Demo
+ * @brief Touch Feedback Particle Effect
  *
  * Touch effect characteristics:
  * - Point emission at touch position
@@ -26,16 +26,21 @@ extern "C" {
 #endif
 
 /**
- * @brief Load touch feedback effect configuration
- * @param config Pointer to configuration to fill
- */
-void effect_touch_config(particle_effect_config_t *config);
-
-/**
- * @brief Initialize touch demo
+ * @brief Create touch feedback particle effect
+ *
+ * Creates a particle widget that responds to touch input with
+ * burst effects on press and continuous emission while dragging.
+ *
+ * @param parent Parent widget to attach to
+ * @param name Widget name
+ * @param x X coordinate relative to parent
+ * @param y Y coordinate relative to parent
+ * @param w Widget width
+ * @param h Widget height
  * @return Created widget pointer, NULL on failure
  */
-gui_particle_widget_t *effect_touch_demo_init(void);
+gui_particle_widget_t *effect_touch_create(gui_obj_t *parent, const char *name,
+                                           int16_t x, int16_t y, int16_t w, int16_t h);
 
 #ifdef __cplusplus
 }

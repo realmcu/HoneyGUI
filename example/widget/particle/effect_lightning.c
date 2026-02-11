@@ -56,6 +56,8 @@ static float s_lightning_end_x = 0.0f;
 static float s_lightning_end_y = 0.0f;
 static uint32_t s_lightning_timer = 0;
 static uint32_t s_last_bolt_time = 0;
+static int16_t s_lightning_w = 0;
+static int16_t s_lightning_h = 0;
 
 static uint32_t lightning_rand(void)
 {
@@ -300,11 +302,7 @@ static void lightning_particle_update(particle_t *p, void *user_data)
 
     float life_ratio = (float)p->life / (float)p->max_life;
 
-    if (life_ratio > 0.7f)
-    {
-        /* Bright flash phase - keep opacity */
-    }
-    else
+    if (life_ratio <= 0.7f)
     {
         p->opacity = (uint8_t)(255 * life_ratio / 0.7f);
     }
@@ -326,15 +324,12 @@ static void lightning_update_cb(void *user_data)
 
     uint32_t current_time = gui_ms_get();
 
-    /* Let particle system handle updates - just trigger new strikes */
-
     if (current_time - s_lightning_timer > LIGHTNING_DISCHARGE_MS)
     {
         s_bolt_count = 0;
 
-        gui_dispdev_t *dc = gui_get_dc();
         s_lightning_end_x = s_lightning_start_x + lightning_rand_float(-100.0f, 100.0f);
-        s_lightning_end_y = (float)dc->screen_height * 0.9f;
+        s_lightning_end_y = (float)s_lightning_h * 0.9f;
 
         generate_lightning_strike(s_lightning_start_x, s_lightning_start_y,
                                   s_lightning_end_x, s_lightning_end_y, 0);
@@ -352,10 +347,13 @@ static void lightning_update_cb(void *user_data)
 
     uint32_t since_strike = current_time - s_last_bolt_time;
     GUI_UNUSED(since_strike);
-    /* Re-flash effect removed to avoid direct pool access */
 }
 
-void effect_lightning_config(particle_effect_config_t *config)
+/*============================================================================*
+ *                           Static Configuration
+ *============================================================================*/
+
+static void effect_lightning_config(particle_effect_config_t *config)
 {
     if (config == NULL)
     {
@@ -384,24 +382,25 @@ void effect_lightning_config(particle_effect_config_t *config)
     config->callbacks.on_particle_update = lightning_particle_update;
 }
 
-gui_particle_widget_t *effect_lightning_demo_init(void)
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+gui_particle_widget_t *effect_lightning_create(gui_obj_t *parent, const char *name,
+                                               int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    int screen_w = dc->screen_width;
-    int screen_h = dc->screen_height;
+    s_lightning_w = w;
+    s_lightning_h = h;
+    s_lightning_start_x = (float)(w / 2);
+    s_lightning_start_y = (float)h * 0.1f;
+    s_lightning_end_x = (float)(w / 2);
+    s_lightning_end_y = (float)h * 0.9f;
 
-    s_lightning_start_x = (float)(screen_w / 2);
-    s_lightning_start_y = (float)screen_h * 0.1f;
-    s_lightning_end_x = (float)(screen_w / 2);
-    s_lightning_end_y = (float)screen_h * 0.9f;
-
-    s_lightning_widget = gui_particle_widget_create(root, "lightning_demo",
-                                                    0, 0, screen_w, screen_h,
+    s_lightning_widget = gui_particle_widget_create(parent, name,
+                                                    x, y, w, h,
                                                     PARTICLE_POOL_SIZE);
     if (s_lightning_widget == NULL)
     {
-        gui_log("Lightning: Failed to create widget\n");
         return NULL;
     }
 
@@ -419,6 +418,5 @@ gui_particle_widget_t *effect_lightning_demo_init(void)
     s_lightning_timer = gui_ms_get();
     s_last_bolt_time = s_lightning_timer;
 
-    gui_log("Lightning: Demo initialized - realistic electric arc\n");
     return s_lightning_widget;
 }

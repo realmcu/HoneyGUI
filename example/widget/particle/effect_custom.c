@@ -50,10 +50,10 @@ static void custom_particle_update_cb(particle_t *particle, void *user_data)
 }
 
 /*============================================================================*
- *                           Public Functions
+ *                           Static Configuration
  *============================================================================*/
 
-void effect_custom_config(particle_effect_config_t *config)
+static void effect_custom_config(particle_effect_config_t *config)
 {
     if (config == NULL)
     {
@@ -126,15 +126,15 @@ void effect_custom_config(particle_effect_config_t *config)
     config->callbacks.user_data = NULL;
 }
 
-gui_particle_widget_t *effect_custom_demo_init(void)
-{
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    int screen_w = dc->screen_width;
-    int screen_h = dc->screen_height;
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
-    gui_particle_widget_t *widget = gui_particle_widget_create(root, "custom_demo",
-                                                               0, 0, screen_w, screen_h,
+gui_particle_widget_t *effect_custom_create(gui_obj_t *parent, const char *name,
+                                            int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    gui_particle_widget_t *widget = gui_particle_widget_create(parent, name,
+                                                               x, y, w, h,
                                                                PARTICLE_POOL_SIZE);
     if (widget == NULL)
     {
@@ -144,14 +144,11 @@ gui_particle_widget_t *effect_custom_demo_init(void)
     particle_effect_config_t config;
     effect_custom_config(&config);
 
-    /* Override shape to match widget size */
-    config.shape.circle.cx = (float)(screen_w / 2);
-    config.shape.circle.cy = (float)(screen_h / 2);
-
-    /* Update boundary to match widget */
-    gui_obj_t *base = GUI_BASE(widget);
-    config.boundary.right = (float)base->w;
-    config.boundary.bottom = (float)base->h;
+    /* Adapt to widget size */
+    config.shape.circle.cx = (float)(w / 2);
+    config.shape.circle.cy = (float)(h / 2);
+    config.boundary.right = (float)w;
+    config.boundary.bottom = (float)h;
 
     gui_particle_widget_add_effect(widget, &config);
 

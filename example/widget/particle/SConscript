@@ -12,15 +12,25 @@ objs = []
 CPPDEFINES = []
 src = []
 
+# Effect files: depend on particle system core
+if GetDepend('CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM'):
+    src += [os.path.join(cwd, f) for f in os.listdir(cwd)
+            if f.startswith('effect_') and f.endswith('.c')]
+
+# Demo, launcher, example: depend on particle demo selection
 if GetDepend('CONFIG_REALTEK_BUILD_PARTICLE_DEMO'):
     CPPDEFINES = ['DRV_LCD_WIDTH=410']
     CPPDEFINES += ['DRV_LCD_HEIGHT=502']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
-    src += Glob('*.c')
+    src += [os.path.join(cwd, f) for f in [
+        'particle_demo.c',
+        'particle_launcher.c',
+        'example_particle.c',
+    ]]
 
     if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
         from honeygui import *
-        
+
         print("Target arch is win32, attempting to add prebuilt binary object...")
         BIN_SUBDIR = os.path.join(cwd, 'root_image')
         BIN_FILE = os.path.join(BIN_SUBDIR, 'root_0x704D1400.bin')
@@ -33,5 +43,5 @@ if GetDepend('CONFIG_REALTEK_BUILD_PARTICLE_DEMO'):
             src = Flatten(src + additional_objs)
 
 objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
-    
+
 Return('objs')

@@ -5,7 +5,7 @@
 
 /**
  * @file effect_trail.h
- * @brief Trail Particle Effect Configuration and Demo
+ * @brief Trail Particle Effect
  *
  * Trail effect characteristics:
  * - Point emission following position
@@ -26,16 +26,21 @@ extern "C" {
 #endif
 
 /**
- * @brief Load trail effect configuration
- * @param config Pointer to configuration to fill
- */
-void effect_trail_config(particle_effect_config_t *config);
-
-/**
- * @brief Initialize trail demo
+ * @brief Create trail particle effect
+ *
+ * Creates a touch-following trail effect. Particles emit from
+ * the touch position and fade out with damping.
+ *
+ * @param parent Parent widget to attach to
+ * @param name Widget name
+ * @param x X coordinate relative to parent
+ * @param y Y coordinate relative to parent
+ * @param w Widget width
+ * @param h Widget height
  * @return Created widget pointer, NULL on failure
  */
-gui_particle_widget_t *effect_trail_demo_init(void);
+gui_particle_widget_t *effect_trail_create(gui_obj_t *parent, const char *name,
+                                           int16_t x, int16_t y, int16_t w, int16_t h);
 
 #ifdef __cplusplus
 }

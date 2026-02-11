@@ -40,9 +40,6 @@ static float firefly_rand_float(float min, float max)
     return min + (float)(firefly_rand() % 1000) / 1000.0f * (max - min);
 }
 
-/**
- * @brief Custom particle init - random slow drift direction
- */
 static void firefly_particle_init(particle_t *p, void *user_data)
 {
     GUI_UNUSED(user_data);
@@ -51,28 +48,21 @@ static void firefly_particle_init(particle_t *p, void *user_data)
         return;
     }
 
-    /* Random drift direction */
     float angle = firefly_rand_float(0.0f, 2.0f * M_PI_F);
     float speed = firefly_rand_float(5.0f, FIREFLY_DRIFT_SPEED);
     p->vx = cosf(angle) * speed;
     p->vy = sinf(angle) * speed;
 
-    /* Random initial phase for breathing (store in rotation as phase offset) */
     p->rotation = firefly_rand_float(0.0f, 2.0f * M_PI_F);
 
-    /* Warm yellow-green color with variation */
     uint8_t g = (uint8_t)(200 + firefly_rand() % 55);
     uint8_t r = (uint8_t)(180 + firefly_rand() % 75);
     uint8_t b = (uint8_t)(50 + firefly_rand() % 50);
     p->color = (0xFFU << 24) | (r << 16) | (g << 8) | b;
 
-    /* Random size */
     p->scale = firefly_rand_float(0.8f, 1.5f);
 }
 
-/**
- * @brief Custom particle update - breathing glow + boundary wrap
- */
 static void firefly_particle_update(particle_t *p, void *user_data)
 {
     GUI_UNUSED(user_data);
@@ -81,13 +71,10 @@ static void firefly_particle_update(particle_t *p, void *user_data)
         return;
     }
 
-    /* Breathing effect using sine wave */
-    /* Use rotation field as phase offset for varied timing */
     float time_factor = (float)(p->max_life - p->life) / 500.0f;
     float breath = 0.5f + 0.5f * sinf(time_factor * 3.0f + p->rotation);
     p->opacity = (uint8_t)(80 + breath * 175);
 
-    /* Slight random direction change for organic movement */
     if (firefly_rand() % 60 == 0)
     {
         float angle_change = firefly_rand_float(-0.5f, 0.5f);
@@ -97,7 +84,6 @@ static void firefly_particle_update(particle_t *p, void *user_data)
         p->vy = sinf(angle) * speed;
     }
 
-    /* Manual boundary wrap */
     float margin = 20.0f;
     if (p->x < -margin)
     {
@@ -117,7 +103,11 @@ static void firefly_particle_update(particle_t *p, void *user_data)
     }
 }
 
-void effect_fireflies_config(particle_effect_config_t *config)
+/*============================================================================*
+ *                           Static Configuration
+ *============================================================================*/
+
+static void effect_fireflies_config(particle_effect_config_t *config, int16_t w, int16_t h)
 {
     if (config == NULL)
     {
@@ -126,18 +116,15 @@ void effect_fireflies_config(particle_effect_config_t *config)
 
     particle_effect_config_init(config);
 
-    /* Rectangle emission - full screen random spawn */
     config->shape.type = PARTICLE_SHAPE_RECT;
     config->shape.rect.x = 0.0f;
     config->shape.rect.y = 0.0f;
-    config->shape.rect.w = (float)s_screen_w;
-    config->shape.rect.h = (float)s_screen_h;
+    config->shape.rect.w = (float)w;
+    config->shape.rect.h = (float)h;
 
-    /* Linear trajectory - motion handled by callback */
     config->trajectory.type = PARTICLE_TRAJECTORY_LINEAR;
     config->trajectory.damping = 0.0f;
 
-    /* Slow emission to maintain steady count */
     config->emission.angle_min = 0.0f;
     config->emission.angle_max = 2.0f * M_PI_F;
     config->emission.speed_min = 5.0f;
@@ -147,69 +134,58 @@ void effect_fireflies_config(particle_effect_config_t *config)
     config->emission.burst_count = 30;
     config->emission.burst_interval = 0;
 
-    /* Long lifetime for persistent fireflies */
     config->lifecycle.life_min = 8000;
     config->lifecycle.life_max = 15000;
     config->lifecycle.auto_cleanup = 0;
     config->lifecycle.loop = 1;
 
-    /* Breathing behavior mode */
     config->behavior.mode = PARTICLE_BEHAVIOR_BREATHE;
     config->behavior.breathe_frequency = 1.5f;
 
-    /* Warm yellow-green base color */
     config->color.mode = PARTICLE_COLOR_SOLID;
     config->color.color_start = 0xFFDDFF66;
 
-    /* Opacity controlled by callback */
     config->opacity.start = 200;
     config->opacity.end = 100;
     config->opacity.easing = PARTICLE_EASING_LINEAR;
 
-    /* Small glowing dots */
     config->scale.start = 1.0f;
     config->scale.end = 1.0f;
     config->scale.min = 0.8f;
     config->scale.max = 1.5f;
 
-    /* No boundary - handled by callback for wrap effect */
     config->boundary.behavior = PARTICLE_BOUNDARY_NONE;
 
-    /* Additive blending for glow */
     config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
     config->render.base_size = 6.0f;
 
-    /* Register callbacks */
     config->callbacks.on_particle_init = firefly_particle_init;
     config->callbacks.on_particle_update = firefly_particle_update;
     config->callbacks.user_data = NULL;
 }
 
-gui_particle_widget_t *effect_fireflies_demo_init(void)
-{
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    s_screen_w = dc->screen_width;
-    s_screen_h = dc->screen_height;
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
-    s_fireflies_widget = gui_particle_widget_create(root, "fireflies_demo",
-                                                    0, 0, s_screen_w, s_screen_h,
+gui_particle_widget_t *effect_fireflies_create(gui_obj_t *parent, const char *name,
+                                               int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    s_screen_w = w;
+    s_screen_h = h;
+
+    s_fireflies_widget = gui_particle_widget_create(parent, name,
+                                                    x, y, w, h,
                                                     PARTICLE_POOL_SIZE);
     if (s_fireflies_widget == NULL)
     {
-        gui_log("Fireflies: Failed to create widget\n");
         return NULL;
     }
 
     particle_effect_config_t config;
-    effect_fireflies_config(&config);
-
-    /* Update rect for actual screen size */
-    config.shape.rect.w = (float)s_screen_w;
-    config.shape.rect.h = (float)s_screen_h;
+    effect_fireflies_config(&config, w, h);
 
     gui_particle_widget_add_effect(s_fireflies_widget, &config);
 
-    gui_log("Fireflies: Demo initialized - breathing glow effect\n");
     return s_fireflies_widget;
 }

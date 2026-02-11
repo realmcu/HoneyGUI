@@ -34,16 +34,14 @@ static gui_particle_widget_t *s_beam_widget = NULL;
 static int s_screen_w = 0;
 static int s_screen_h = 0;
 
-/* Per-beam state */
 typedef struct
 {
     float head_x, head_y;
     float vx, vy;
     uint32_t next_change_time;
-    uint32_t color_core;    /* Bright core color (near white) */
-    uint32_t color_mid;     /* Saturated mid color */
-    uint32_t color_tail;    /* Dimmer tail color */
-    /* History ring buffer */
+    uint32_t color_core;
+    uint32_t color_mid;
+    uint32_t color_tail;
     float hist_x[64];
     float hist_y[64];
     int hist_head;
@@ -64,9 +62,6 @@ static float beam_rand_float(float min, float max)
     return min + (float)(beam_rand() % 1000) / 1000.0f * (max - min);
 }
 
-/**
- * @brief Push position into beam's history buffer
- */
 static void beam_history_push(beam_state_t *b, float x, float y)
 {
     b->hist_x[b->hist_head] = x;
@@ -78,9 +73,6 @@ static void beam_history_push(beam_state_t *b, float x, float y)
     }
 }
 
-/**
- * @brief Get position from beam's history (0 = most recent)
- */
 static int beam_history_get(beam_state_t *b, int age, float *x, float *y)
 {
     if (age >= b->hist_count)
@@ -93,9 +85,6 @@ static int beam_history_get(beam_state_t *b, int age, float *x, float *y)
     return 1;
 }
 
-/**
- * @brief Reflect beam off screen boundaries, return 1 if bounced
- */
 static int reflect_beam(beam_state_t *b)
 {
     int bounced = 0;
@@ -129,9 +118,6 @@ static int reflect_beam(beam_state_t *b)
     return bounced;
 }
 
-/**
- * @brief Randomly change beam direction
- */
 static void maybe_change_direction(beam_state_t *b, uint32_t now)
 {
     if (now < b->next_change_time)
@@ -150,9 +136,6 @@ static void maybe_change_direction(beam_state_t *b, uint32_t now)
                           beam_rand() % DIRECTION_CHANGE_JITTER;
 }
 
-/**
- * @brief Emit bounce flash particles at beam head position
- */
 static void emit_bounce_flash(beam_state_t *b)
 {
     if (s_beam_widget == NULL || s_beam_widget->ps == NULL ||
@@ -176,12 +159,12 @@ static void emit_bounce_flash(beam_state_t *b)
 
         p->x = b->head_x;
         p->y = b->head_y;
-        p->user_data = NULL;  /* Not a trail particle, don't recycle */
+        p->user_data = NULL;
         p->vx = cosf(angle) * speed;
         p->vy = sinf(angle) * speed;
         p->ax = 0.0f;
         p->ay = 0.0f;
-        p->color = 0xFFFFFFFF;  /* White flash */
+        p->color = 0xFFFFFFFF;
         float flash_scale = beam_rand_float(1.5f, 3.5f);
         p->scale_start = flash_scale;
         p->scale_end = 0.0f;
@@ -195,9 +178,6 @@ static void emit_bounce_flash(beam_state_t *b)
     }
 }
 
-/**
- * @brief Emit beam trail particles for one beam
- */
 static void emit_beam_trail(beam_state_t *b)
 {
     if (s_beam_widget == NULL || s_beam_widget->ps == NULL ||
@@ -243,11 +223,10 @@ static void emit_beam_trail(beam_state_t *b)
 
         float t = (float)i / (float)(BEAM_LENGTH - 1);
 
-        /* Continuous color interpolation: core -> mid -> tail */
         uint32_t c;
         if (t < 0.5f)
         {
-            float u = t * 2.0f;  /* 0..1 over first half */
+            float u = t * 2.0f;
             uint8_t r0 = (b->color_core >> 16) & 0xFF;
             uint8_t g0 = (b->color_core >> 8) & 0xFF;
             uint8_t b0 = b->color_core & 0xFF;
@@ -261,7 +240,7 @@ static void emit_beam_trail(beam_state_t *b)
         }
         else
         {
-            float u = (t - 0.5f) * 2.0f;  /* 0..1 over second half */
+            float u = (t - 0.5f) * 2.0f;
             uint8_t r0 = (b->color_mid >> 16) & 0xFF;
             uint8_t g0 = (b->color_mid >> 8) & 0xFF;
             uint8_t b0 = b->color_mid & 0xFF;
@@ -276,7 +255,6 @@ static void emit_beam_trail(beam_state_t *b)
 
         p->color = c;
 
-        /* Smooth scale and opacity taper */
         float sc = 1.5f * (1.0f - t * 0.2f);
         uint8_t op = (uint8_t)(255.0f * (1.0f - t * 0.2f));
         p->scale_start = sc;
@@ -292,9 +270,6 @@ static void emit_beam_trail(beam_state_t *b)
     }
 }
 
-/**
- * @brief Widget update callback - move all beams and emit particles
- */
 static void beam_update_cb(void *user_data)
 {
     GUI_UNUSED(user_data);
@@ -339,41 +314,6 @@ static void beam_update_cb(void *user_data)
     }
 }
 
-void effect_light_beam_config(particle_effect_config_t *config)
-{
-    if (config == NULL)
-    {
-        return;
-    }
-
-    particle_effect_config_init(config);
-
-    config->shape.type = PARTICLE_SHAPE_POINT;
-    config->emission.rate = 0.0f;
-    config->emission.burst_enabled = 0;
-
-    config->lifecycle.life_min = 40;
-    config->lifecycle.life_max = 40;
-    config->lifecycle.auto_cleanup = 1;
-    config->lifecycle.loop = 0;
-
-    config->color.mode = PARTICLE_COLOR_SOLID;
-    config->color.color_start = 0xFFFFFFFF;
-
-    config->opacity.start = 255;
-    config->opacity.end = 0;
-    config->opacity.easing = PARTICLE_EASING_LINEAR;
-
-    config->boundary.behavior = PARTICLE_BOUNDARY_NONE;
-
-    /* Additive blending is key for laser glow */
-    config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
-    config->render.base_size = 5.0f;
-}
-
-/**
- * @brief Initialize a single beam with color and random direction
- */
 static void init_beam(beam_state_t *b, uint32_t core, uint32_t mid, uint32_t tail,
                       float start_x, float start_y)
 {
@@ -398,58 +338,43 @@ static void init_beam(beam_state_t *b, uint32_t core, uint32_t mid, uint32_t tai
     }
 }
 
-gui_particle_widget_t *effect_light_beam_demo_init(void)
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+gui_particle_widget_t *effect_light_beam_create(gui_obj_t *parent, const char *name,
+                                                int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    s_screen_w = dc->screen_width;
-    s_screen_h = dc->screen_height;
+    s_screen_w = w;
+    s_screen_h = h;
 
-    float cx = (float)(s_screen_w / 2);
-    float cy = (float)(s_screen_h / 2);
-
-    /*
-     * Beam colors - highly saturated for laser look:
-     *   core = near-white tinted version (head glow)
-     *   mid  = full saturated color (beam body)
-     *   tail = slightly dimmer (beam tail)
-     *
-     * With ADDITIVE blending, where beams cross they'll
-     * naturally blend to brighter colors.
-     */
+    float cx = (float)(w / 2);
+    float cy = (float)(h / 2);
 
     /* Red laser */
     init_beam(&s_beams[0],
-              0xFFFF0000,   /* core: pure red */
-              0xFFDD0000,   /* mid: deep red */
-              0xFFBB0000,   /* tail: darker red */
+              0xFFFF0000, 0xFFDD0000, 0xFFBB0000,
               cx - 30.0f, cy);
 
     /* Green laser */
     init_beam(&s_beams[1],
-              0xFF00FF00,   /* core: pure green */
-              0xFF00DD00,   /* mid: deep green */
-              0xFF00BB00,   /* tail: darker green */
+              0xFF00FF00, 0xFF00DD00, 0xFF00BB00,
               cx, cy - 30.0f);
 
     /* Blue laser */
     init_beam(&s_beams[2],
-              0xFF0000FF,   /* core: pure blue */
-              0xFF0020FF,   /* mid: intense blue */
-              0xFF0010DD,   /* tail: deep blue */
+              0xFF0000FF, 0xFF0020FF, 0xFF0010DD,
               cx + 30.0f, cy);
 
-    s_beam_widget = gui_particle_widget_create(root, "light_beam_demo",
-                                               0, 0, s_screen_w, s_screen_h,
+    s_beam_widget = gui_particle_widget_create(parent, name,
+                                               x, y, w, h,
                                                PARTICLE_POOL_SIZE);
     if (s_beam_widget == NULL)
     {
-        gui_log("LightBeam: Failed to create widget\n");
         return NULL;
     }
 
     gui_particle_widget_set_update_cb(s_beam_widget, beam_update_cb, NULL);
 
-    gui_log("LightBeam: Multi-beam laser demo initialized (%d beams)\n", BEAM_COUNT);
     return s_beam_widget;
 }

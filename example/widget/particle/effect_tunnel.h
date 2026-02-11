@@ -38,28 +38,13 @@ extern "C" {
  * Generated from effect_tunnel_config() with the following parameters:
  * - Shape: RING (center 240,240, inner_r=3, outer_r=10)
  * - Trajectory: LINEAR (no gravity, no damping)
- * - Emission: 360°, speed 300-500 px/s, rate 40/s
+ * - Emission: 360deg, speed 300-500 px/s, rate 40/s
  * - Lifecycle: 500-800ms, loop enabled
  * - Color: SOLID white (0xFFFFFFFF)
  * - Opacity: 255->0, LINEAR easing
  * - Scale: 0.5->2.5
  * - Boundary: KILL at screen edges (480x480)
  * - Render: ADDITIVE blend, base_size=3
- *
- * Binary format layout (320 bytes total):
- *   Offset   0: Header (12 bytes) - magic, version, size, flags
- *   Offset  12: Shape (32 bytes) - RING at center 240,240
- *   Offset  44: Trajectory (40 bytes) - LINEAR, no gravity
- *   Offset  84: Emission (32 bytes) - 360°, speed 300-500, rate 40
- *   Offset 116: Lifecycle (16 bytes) - life 500-800ms, loop=1
- *   Offset 132: Color (48 bytes) - SOLID white
- *   Offset 180: Opacity (8 bytes) - 255->0, LINEAR easing
- *   Offset 188: Scale (20 bytes) - 0.5->2.5
- *   Offset 208: Rotation (20 bytes) - align_velocity=1
- *   Offset 228: Boundary (24 bytes) - KILL at 480x480
- *   Offset 252: Behavior (20 bytes) - NONE
- *   Offset 272: Render (12 bytes) - ADDITIVE, base_size=3
- *   Offset 284: Reserved (36 bytes)
  */
 static const uint8_t tunnel_effect_binary_data[320] =
 {
@@ -136,16 +121,21 @@ static const uint8_t tunnel_effect_binary_data[320] =
 #define TUNNEL_EFFECT_BINARY_SIZE sizeof(tunnel_effect_binary_data)
 
 /**
- * @brief Load tunnel effect configuration
- * @param config Pointer to configuration to fill
- */
-void effect_tunnel_config(particle_effect_config_t *config);
-
-/**
- * @brief Initialize tunnel demo
+ * @brief Create tunnel warp speed particle effect
+ *
+ * Creates a "hyperspace" effect with particles shooting outward
+ * from center. Tries binary config first, falls back to direct config.
+ *
+ * @param parent Parent widget to attach to
+ * @param name Widget name
+ * @param x X coordinate relative to parent
+ * @param y Y coordinate relative to parent
+ * @param w Widget width
+ * @param h Widget height
  * @return Created widget pointer, NULL on failure
  */
-gui_particle_widget_t *effect_tunnel_demo_init(void);
+gui_particle_widget_t *effect_tunnel_create(gui_obj_t *parent, const char *name,
+                                            int16_t x, int16_t y, int16_t w, int16_t h);
 
 /**
  * @brief Get pre-saved binary configuration data

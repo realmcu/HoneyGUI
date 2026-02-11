@@ -20,6 +20,7 @@
 #include "gui_fb.h"
 
 /* Effect headers */
+#include "particle_demo.h"
 #include "effect_firework.h"
 #include "effect_trail.h"
 #include "effect_touch.h"

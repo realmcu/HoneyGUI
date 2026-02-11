@@ -31,6 +31,75 @@ static float firework_rand_float(float min, float max)
     return min + (float)(firework_rand() % 1000) / 1000.0f * (max - min);
 }
 
+/*============================================================================*
+ *                           Static Configuration
+ *============================================================================*/
+
+static void effect_firework_config(particle_effect_config_t *config)
+{
+    if (config == NULL)
+    {
+        return;
+    }
+
+    particle_effect_config_init(config);
+
+    config->shape.type = PARTICLE_SHAPE_POINT;
+    config->shape.point.x = 0.0f;
+    config->shape.point.y = 0.0f;
+
+    config->trajectory.type = PARTICLE_TRAJECTORY_GRAVITY;
+    config->trajectory.gravity = 200.0f;
+    config->trajectory.damping = 0.02f;
+
+    config->emission.angle_min = 0.0f;
+    config->emission.angle_max = 2.0f * M_PI_F;
+    config->emission.speed_min = 100.0f;
+    config->emission.speed_max = 200.0f;
+    config->emission.rate = 50.0f;
+    config->emission.burst_count = 30;
+    config->emission.burst_interval = 0;
+    config->emission.burst_enabled = 1;
+
+    config->lifecycle.life_min = 800;
+    config->lifecycle.life_max = 1500;
+    config->lifecycle.auto_cleanup = 1;
+    config->lifecycle.loop = 0;
+
+    config->color.mode = PARTICLE_COLOR_RANDOM;
+    config->color.palette[0] = 0xFFFF0000;
+    config->color.palette[1] = 0xFFFFFF00;
+    config->color.palette[2] = 0xFF00FF00;
+    config->color.palette[3] = 0xFF00FFFF;
+    config->color.palette[4] = 0xFF0000FF;
+    config->color.palette[5] = 0xFFFF00FF;
+    config->color.palette[6] = 0xFFFFAA00;
+    config->color.palette[7] = 0xFFFFFFFF;
+    config->color.palette_size = 8;
+
+    config->opacity.start = 255;
+    config->opacity.end = 0;
+    config->opacity.easing = PARTICLE_EASING_EASE_OUT;
+
+    config->scale.start = 1.0f;
+    config->scale.end = 0.3f;
+    config->scale.min = 0.8f;
+    config->scale.max = 1.2f;
+
+    config->rotation.angle_min = 0.0f;
+    config->rotation.angle_max = 2.0f * M_PI_F;
+
+    config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
+    config->boundary.left = 0.0f;
+    config->boundary.top = 0.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
+    config->boundary.reflect_damping = 0.8f;
+
+    config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
+    config->render.base_size = 6.0f;
+}
+
 static void firework_update_cb(void *user_data)
 {
     GUI_UNUSED(user_data);
@@ -95,81 +164,15 @@ static void firework_update_cb(void *user_data)
     }
 }
 
-void effect_firework_config(particle_effect_config_t *config)
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+gui_particle_widget_t *effect_firework_create(gui_obj_t *parent, const char *name,
+                                              int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    if (config == NULL)
-    {
-        return;
-    }
-
-    particle_effect_config_init(config);
-
-    config->shape.type = PARTICLE_SHAPE_POINT;
-    config->shape.point.x = 0.0f;
-    config->shape.point.y = 0.0f;
-
-    config->trajectory.type = PARTICLE_TRAJECTORY_GRAVITY;
-    config->trajectory.gravity = 200.0f;
-    config->trajectory.damping = 0.02f;
-
-    config->emission.angle_min = 0.0f;
-    config->emission.angle_max = 2.0f * M_PI_F;
-    config->emission.speed_min = 100.0f;
-    config->emission.speed_max = 200.0f;
-    config->emission.rate = 50.0f;
-    config->emission.burst_count = 30;
-    config->emission.burst_interval = 0;
-    config->emission.burst_enabled = 1;
-
-    config->lifecycle.life_min = 800;
-    config->lifecycle.life_max = 1500;
-    config->lifecycle.auto_cleanup = 1;
-    config->lifecycle.loop = 0;
-
-    config->color.mode = PARTICLE_COLOR_RANDOM;
-    config->color.palette[0] = 0xFFFF0000;
-    config->color.palette[1] = 0xFFFFFF00;
-    config->color.palette[2] = 0xFF00FF00;
-    config->color.palette[3] = 0xFF00FFFF;
-    config->color.palette[4] = 0xFF0000FF;
-    config->color.palette[5] = 0xFFFF00FF;
-    config->color.palette[6] = 0xFFFFAA00;
-    config->color.palette[7] = 0xFFFFFFFF;
-    config->color.palette_size = 8;
-
-    config->opacity.start = 255;
-    config->opacity.end = 0;
-    config->opacity.easing = PARTICLE_EASING_EASE_OUT;
-
-    config->scale.start = 1.0f;
-    config->scale.end = 0.3f;
-    config->scale.min = 0.8f;
-    config->scale.max = 1.2f;
-
-    config->rotation.angle_min = 0.0f;
-    config->rotation.angle_max = 2.0f * M_PI_F;
-
-    /* Boundary: Kill (caller must set right/bottom) */
-    config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
-    config->boundary.left = 0.0f;
-    config->boundary.top = 0.0f;
-    config->boundary.right = 0.0f;
-    config->boundary.bottom = 0.0f;
-    config->boundary.reflect_damping = 0.8f;
-
-    config->render.blend_mode = PARTICLE_BLEND_ADDITIVE;
-    config->render.base_size = 6.0f;
-}
-
-gui_particle_widget_t *effect_firework_demo_init(void)
-{
-    gui_obj_t *root = gui_obj_get_root();
-    gui_dispdev_t *dc = gui_get_dc();
-    int screen_w = dc->screen_width;
-    int screen_h = dc->screen_height;
-
-    s_firework_widget = gui_particle_widget_create(root, "firework_demo",
-                                                   0, 0, screen_w, screen_h,
+    s_firework_widget = gui_particle_widget_create(parent, name,
+                                                   x, y, w, h,
                                                    PARTICLE_POOL_SIZE);
     if (s_firework_widget == NULL)
     {
@@ -181,15 +184,14 @@ gui_particle_widget_t *effect_firework_demo_init(void)
     particle_effect_config_t config;
     effect_firework_config(&config);
 
-    gui_obj_t *base = GUI_BASE(s_firework_widget);
-    config.shape.point.x = (float)(base->w / 2);
-    config.shape.point.y = (float)(base->h / 3);
+    config.shape.point.x = (float)(w / 2);
+    config.shape.point.y = (float)(h / 3);
     config.color.color_start = 0xFFFF0000;
     config.emission.burst_count = 60;
     config.lifecycle.life_min = 1500;
     config.lifecycle.life_max = 2500;
-    config.boundary.right = (float)base->w;
-    config.boundary.bottom = (float)base->h;
+    config.boundary.right = (float)w;
+    config.boundary.bottom = (float)h;
 
     gui_particle_widget_add_effect(s_firework_widget, &config);
     s_firework_timer = gui_ms_get();

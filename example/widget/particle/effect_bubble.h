@@ -5,7 +5,7 @@
 
 /**
  * @file effect_bubble.h
- * @brief Bubble Particle Effect Configuration and Demo
+ * @brief Bubble Particle Effect
  *
  * Bubble effect characteristics:
  * - Line emission from bottom
@@ -26,16 +26,21 @@ extern "C" {
 #endif
 
 /**
- * @brief Load bubble effect configuration
- * @param config Pointer to configuration to fill
- */
-void effect_bubble_config(particle_effect_config_t *config);
-
-/**
- * @brief Initialize bubble demo
+ * @brief Create bubble particle effect
+ *
+ * Creates rising bubble particles from the bottom edge.
+ * No external resources required.
+ *
+ * @param parent Parent widget to attach to
+ * @param name Widget name
+ * @param x X coordinate relative to parent
+ * @param y Y coordinate relative to parent
+ * @param w Widget width (bubble emission line width)
+ * @param h Widget height (bubble rise distance)
  * @return Created widget pointer, NULL on failure
  */
-gui_particle_widget_t *effect_bubble_demo_init(void);
+gui_particle_widget_t *effect_bubble_create(gui_obj_t *parent, const char *name,
+                                            int16_t x, int16_t y, int16_t w, int16_t h);
 
 #ifdef __cplusplus
 }
