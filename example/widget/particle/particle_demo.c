@@ -57,10 +57,6 @@ gui_particle_widget_t *effect_snow_demo_init(void)
  *                           Rocket Demo
  *============================================================================*/
 
-/* Rocket image: nozzle offset within the image (fixed, image-relative) */
-#define ROCKET_NOZZLE_OFFSET_X   75
-#define ROCKET_NOZZLE_OFFSET_Y   215
-
 gui_particle_widget_t *effect_rocket_demo_init(void)
 {
     gui_obj_t *root = gui_obj_get_root();
@@ -68,26 +64,19 @@ gui_particle_widget_t *effect_rocket_demo_init(void)
     int screen_w = dc->screen_width;
     int screen_h = dc->screen_height;
 
-    /* Get rocket image dimensions */
-    gui_img_t *tmp_img = gui_img_create_from_mem(root, "tmp", ROCKET_BIN, 0, 0, 0, 0);
-    int img_w = gui_img_get_width(tmp_img);
-    int img_h = gui_img_get_height(tmp_img);
-    gui_obj_tree_free(GUI_BASE(tmp_img));
+    /* Image Size*/
+    int img_w = 240;
+    int img_h = 240;
 
     /* Center rocket image on screen */
     int img_x = (screen_w - img_w) / 2;
     int img_y = (screen_h - img_h) / 2;
 
-    /* Nozzle position in screen coordinates */
-    int nozzle_x = img_x + ROCKET_NOZZLE_OFFSET_X;
-    int nozzle_y = img_y + ROCKET_NOZZLE_OFFSET_Y;
+    int widget_w = 100;
+    int widget_h = 100;
 
-    /* Widget: position so nozzle default (70% w, 10% h) aligns with rocket nozzle */
-    int widget_w = screen_w;
-    int widget_h = screen_h - nozzle_y;
-    int widget_x = nozzle_x - (int)((float)widget_w * 0.7f);
-    int widget_y = nozzle_y - (int)((float)widget_h * 0.1f);
-    if (widget_x < 0) { widget_x = 0; }
+    int widget_x = 66;
+    int widget_y = 334;
 
     gui_particle_widget_t *widget = effect_rocket_create(root, "rocket_demo",
                                                          widget_x, widget_y,

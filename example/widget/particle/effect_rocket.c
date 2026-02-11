@@ -171,8 +171,8 @@ static void effect_rocket_smoke_config(particle_effect_config_t *config,
 gui_particle_widget_t *effect_rocket_create(gui_obj_t *parent, const char *name,
                                             int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    /* Default nozzle at upper-right area (70% w, 10% h) */
-    float nozzle_x = (float)w * 0.7f;
+    /* Default nozzle at upper-right area (90% w, 10% h) */
+    float nozzle_x = (float)w * 0.9f;
     float nozzle_y = (float)h * 0.1f;
 
     gui_particle_widget_t *widget = gui_particle_widget_create(parent, name,
