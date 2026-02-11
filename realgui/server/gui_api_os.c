@@ -306,6 +306,24 @@ void gui_free(void *rmem)
     }
 }
 
+char *gui_strdup(const char *s)
+{
+    if (s == NULL)
+    {
+        return NULL;
+    }
+
+    size_t len = strlen(s) + 1;
+    char *dup = (char *)gui_malloc(len);
+
+    if (dup != NULL)
+    {
+        memcpy(dup, s, len);
+    }
+
+    return dup;
+}
+
 void gui_mem_debug(void)
 {
     total_used_size = 0;

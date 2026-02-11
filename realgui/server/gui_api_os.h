@@ -96,6 +96,7 @@ void *gui_calloc(size_t num, size_t size);
 void *gui_realloc(void *ptr_old, size_t n);
 void gui_free(void *rmem);
 void gui_mem_debug(void);
+char *gui_strdup(const char *s);
 
 void *gui_lower_malloc(size_t n);
 void *gui_lower_realloc(void *ptr_old, size_t n);

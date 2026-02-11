@@ -92,14 +92,14 @@ static void click_speaker_cb(void *obj, gui_event_t *e)
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_call_t *call = gui_get_call();
     bool status = true;
-    if (img->data == SPEAKER_ON_ICON_BIN)
+    if (img->src.data == SPEAKER_ON_ICON_BIN)
     {
-        img->data = SPEAKER_OFF_ICON_BIN;
+        img->src.data = SPEAKER_OFF_ICON_BIN;
         status = false;
     }
     else
     {
-        img->data = SPEAKER_ON_ICON_BIN;
+        img->src.data = SPEAKER_ON_ICON_BIN;
     }
     if (call && call->call_set_speaker)
     {
@@ -114,14 +114,14 @@ static void click_mic_cb(void *obj, gui_event_t *e)
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_call_t *call = gui_get_call();
     bool status = true;
-    if (img->data == MIC_ON_ICON_BIN)
+    if (img->src.data == MIC_ON_ICON_BIN)
     {
-        img->data = MIC_OFF_ICON_BIN;
+        img->src.data = MIC_OFF_ICON_BIN;
         status = false;
     }
     else
     {
-        img->data = MIC_ON_ICON_BIN;
+        img->src.data = MIC_ON_ICON_BIN;
     }
     if (call && call->call_set_mic)
     {

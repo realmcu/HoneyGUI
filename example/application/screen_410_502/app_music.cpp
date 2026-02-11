@@ -486,7 +486,7 @@ private:
             }
             else
             {
-                play_button->data = PLAY_BIN;
+                play_button->src.data = PLAY_BIN;
                 gui_obj_stop_timer(GUI_BASE(play_button));
             }
         }
@@ -535,19 +535,19 @@ private:
                 gui_audio->music_play((void *)MP3_FILE);
             }
             music_switch_information();
-            play_button->data = PAUSE_BIN;
+            play_button->src.data = PAUSE_BIN;
             gui_obj_start_timer(GUI_BASE(play_button));
         }
         else
         {
             gui_img_t *img = play_button;
-            if (img->data == PLAY_BIN)
+            if (img->src.data == PLAY_BIN)
             {
                 if (gui_audio->music_play)
                 {
                     gui_audio->music_play((void *)MP3_FILE);
                 }
-                img->data = PAUSE_BIN;
+                img->src.data = PAUSE_BIN;
                 gui_obj_start_timer(GUI_BASE(img));
             }
             else
@@ -556,7 +556,7 @@ private:
                 {
                     gui_audio->music_stop();
                 }
-                img->data = PLAY_BIN;
+                img->src.data = PLAY_BIN;
                 gui_obj_stop_timer(GUI_BASE(img));
             }
         }
@@ -611,13 +611,13 @@ private:
 
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
-        if (img->data == PLAY_BIN)
+        if (img->src.data == PLAY_BIN)
         {
             if (gui_audio->music_play)
             {
                 gui_audio->music_play((void *)MP3_FILE);
             }
-            img->data = PAUSE_BIN;
+            img->src.data = PAUSE_BIN;
             gui_obj_start_timer(GUI_BASE(obj));
         }
         else
@@ -626,7 +626,7 @@ private:
             {
                 gui_audio->music_stop();
             }
-            img->data = PLAY_BIN;
+            img->src.data = PLAY_BIN;
             gui_obj_stop_timer(GUI_BASE(obj));
         }
     }
@@ -648,7 +648,7 @@ private:
         {
             music_index--;
             gui_obj_start_timer(GUI_BASE(play_button));
-            play_button->data = PAUSE_BIN;
+            play_button->src.data = PAUSE_BIN;
             music_switch_information();
 
             gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
@@ -677,7 +677,7 @@ private:
         {
             music_index++;
             gui_obj_start_timer(GUI_BASE(play_button));
-            play_button->data = PAUSE_BIN;
+            play_button->src.data = PAUSE_BIN;
             music_switch_information();
 
             gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();

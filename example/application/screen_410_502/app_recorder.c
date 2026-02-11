@@ -119,9 +119,9 @@ static void click_to_recorder_cb(void *obj, gui_event_t *e)
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "img_play", win_play)
     gui_img_t *img = GUI_TYPE(gui_img_t, o);
-    if (img->data == RECORD_PAUSE_BIN)
+    if (img->src.data == RECORD_PAUSE_BIN)
     {
-        img->data = RECORD_STOP_BIN;
+        img->src.data = RECORD_STOP_BIN;
         gui_obj_stop_timer(GUI_BASE(o));
         gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         if (gui_audio->record_pause)
@@ -147,9 +147,9 @@ static void click_play_cb(void *obj, gui_event_t *e)
 
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
-    if (img->data == RECORD_PLAY_BIN)
+    if (img->src.data == RECORD_PLAY_BIN)
     {
-        img->data = RECORD_PAUSE_BIN;
+        img->src.data = RECORD_PAUSE_BIN;
         gui_obj_start_timer(GUI_BASE(obj));
         if (gui_audio->record_play)
         {
@@ -158,7 +158,7 @@ static void click_play_cb(void *obj, gui_event_t *e)
     }
     else
     {
-        img->data = RECORD_PLAY_BIN;
+        img->src.data = RECORD_PLAY_BIN;
         gui_obj_stop_timer(GUI_BASE(obj));
         if (gui_audio->record_pause)
         {
@@ -194,7 +194,7 @@ static void on_playing(void *p)
     }
     if (completion_status)
     {
-        img->data = RECORD_PLAY_BIN;
+        img->src.data = RECORD_PLAY_BIN;
         gui_obj_stop_timer(GUI_BASE(img));
         if (gui_audio->record_pause)
         {
@@ -227,7 +227,7 @@ static void click_file_play(void *obj, gui_event_t *e)
         {
             gui_audio->record_play();
         }
-        img->data = RECORD_PAUSE_BIN;
+        img->src.data = RECORD_PAUSE_BIN;
         GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas, "time_bar", win_play)
         gui_rect_set_size((gui_rounded_rect_t *)canvas, 1, 3);
         gui_obj_start_timer(o);
@@ -351,11 +351,11 @@ static void click_record_cb(void *obj, gui_event_t *e)
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "record_time", win_recorder)
-    if (img->data == RECORD_START_BIN)
+    if (img->src.data == RECORD_START_BIN)
     {
         sprintf(record_time_str, "00:00:00");
         record_time = 0;
-        img->data = RECORD_STOP_BIN;
+        img->src.data = RECORD_STOP_BIN;
         gui_obj_start_timer(GUI_BASE(o));
         if (gui_audio->record_start)
         {
@@ -364,7 +364,7 @@ static void click_record_cb(void *obj, gui_event_t *e)
     }
     else
     {
-        img->data = RECORD_START_BIN;
+        img->src.data = RECORD_START_BIN;
         gui_obj_stop_timer(GUI_BASE(o));
         if (gui_audio->record_stop)
         {
@@ -381,9 +381,9 @@ static void click_enter_file_win_cb(void *obj, gui_event_t *e)
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "img_record", win_recorder)
 
     gui_img_t *img = GUI_TYPE(gui_img_t, o);
-    if (img->data == RECORD_STOP_BIN)
+    if (img->src.data == RECORD_STOP_BIN)
     {
-        img->data = RECORD_START_BIN;
+        img->src.data = RECORD_START_BIN;
         gui_audio_ctrl_t *gui_audio = gui_get_audio_ctrl();
         if (gui_audio->record_stop)
         {

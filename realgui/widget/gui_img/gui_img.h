@@ -45,7 +45,14 @@ typedef struct gui_img
     float t_x;                         /* Translation in X direction. */
     float t_y;                         /* Translation in Y direction. */
 
-    void *data;                        /* Image data (address or filesystem path). */
+    union
+    {
+        void *xip_addr;                /* Direct memory address (ROM/RAM). */
+        void *ftl_addr;                /* FTL storage pointer. */
+        char *fs_path;                 /* File system path (heap allocated). */
+        void *data;                    /* Generic pointer (for backward compatibility). */
+    } src;                             /* Image source union. */
+
     gd_GIF *gif;                        /* GIF data */
     uint32_t fg_color_set;  //A8 image set color
     uint32_t bg_color_fix;  //bg color fix for A8 image
@@ -329,21 +336,22 @@ float gui_img_get_t_y(gui_img_t *_this);
 
 
 /**
- * @brief Sets the image data for a specified image widget.
- *
- * This function assigns the given image data to the specified image widget.
- * The image data might correspond to various formats, and the format
- * should be compatible with the handling of `gui_img_t`.
- *
- * @param _this Pointer to the image widget (`gui_img_t`) for which the image data is to be set.
- * @param image_data_pointer Pointer to the image data to be set to the widget.
- *                            The data should persist as long as the widget needs it or until it is explicitly updated.
+ * @brief Deprecated!
+ * Use 'void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type)' instead.
  */
 void gui_img_set_image_data(gui_img_t *_this, const uint8_t *image_data_pointer);
 
 /**
- * @brief Deprecated!
- * Use 'void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type)' instead.
+ * @brief Sets the image source for a specified image widget.
+ *
+ * This function updates the image source and storage type for the widget.
+ * For filesystem sources (IMG_SRC_FILESYS), the path string is automatically
+ * duplicated. The old source is properly cleaned up if it was previously
+ * allocated.
+ *
+ * @param _this Pointer to the image widget.
+ * @param file_pointer Pointer to the image data or file path string.
+ * @param storage_type Storage type: IMG_SRC_MEMADDR, IMG_SRC_FTL, or IMG_SRC_FILESYS.
  */
 void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type);
 

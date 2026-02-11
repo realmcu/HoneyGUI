@@ -24,10 +24,10 @@ void hml_parse_children(gui_obj_t *parent, ezxml_t node);
 
 typedef struct
 {
-    const char *view_name;
-    char *xml_content;
+    char view_name[32];  // Fixed-size buffer, no dynamic allocation needed
+    char *xml_content;   // Keep XML content alive for component strings
     size_t xml_len;
-    bool is_entry;  // Track if this is an entry view
+    bool is_entry;       // Track if this is an entry view
 } hml_view_instance_t;
 
 #define HML_MAX_VIEWS 32
@@ -179,7 +179,7 @@ static void hml_view_on_switch_in(gui_view_t *view)
         }
     }
 
-    // Create children
+    // Create children (strings point directly to xml_content)
     gui_log("[HML] switch_in: creating children\n");
     hml_parse_children((gui_obj_t *)view, view_node);
     gui_log("[HML] switch_in: done\n");
@@ -204,25 +204,32 @@ static void hml_scan_node_for_views(ezxml_t node, int *count, char *xml_content,
 
             if (id)
             {
-                size_t len = strlen(id) + 1;
-                char *name_copy = gui_malloc(len);
+                // Check view name length
+                if (strlen(id) >= sizeof(hml_view_instance_map[0].view_name))
+                {
+                    gui_log("[HML] View name too long (max %zu): %s\n",
+                            sizeof(hml_view_instance_map[0].view_name) - 1, id);
+                    continue;
+                }
+
                 gui_view_descriptor_t *desc = gui_malloc(sizeof(gui_view_descriptor_t));
                 gui_view_t **pView = gui_malloc(sizeof(gui_view_t *));
 
-                if (desc && name_copy && pView && hml_view_instance_count < HML_MAX_VIEWS)
+                if (desc && pView && hml_view_instance_count < HML_MAX_VIEWS)
                 {
-                    memcpy(name_copy, id, len);
                     *pView = NULL;
 
-                    // Store XML content in global map
-                    hml_view_instance_map[hml_view_instance_count].view_name = name_copy;
-                    hml_view_instance_map[hml_view_instance_count].xml_content = xml_content;
-                    hml_view_instance_map[hml_view_instance_count].xml_len = xml_len;
-                    hml_view_instance_map[hml_view_instance_count].is_entry = is_entry;
+                    // Copy view name to fixed-size buffer
+                    hml_view_instance_t *instance = &hml_view_instance_map[hml_view_instance_count];
+                    strncpy(instance->view_name, id, sizeof(instance->view_name) - 1);
+                    instance->view_name[sizeof(instance->view_name) - 1] = '\0';
+                    instance->xml_content = xml_content;  // Keep alive for string pointers
+                    instance->xml_len = xml_len;
+                    instance->is_entry = is_entry;
                     hml_view_instance_count++;
 
                     memset(desc, 0, sizeof(gui_view_descriptor_t));
-                    desc->name = name_copy;
+                    desc->name = instance->view_name;  // Point to fixed buffer
                     desc->pView = pView;
                     desc->on_switch_in = hml_view_on_switch_in;
                     gui_view_descriptor_register(desc);
@@ -231,10 +238,15 @@ static void hml_scan_node_for_views(ezxml_t node, int *count, char *xml_content,
                     // Remember the first entry view
                     if (is_entry && !hml_entry_view_name)
                     {
-                        hml_entry_view_name = name_copy;
+                        hml_entry_view_name = instance->view_name;
                     }
 
                     (*count)++;
+                }
+                else
+                {
+                    gui_free(desc);
+                    gui_free(pView);
                 }
             }
         }
@@ -328,4 +340,19 @@ int hml_scan_views(const char *dir_path)
     }
 
     return count;
+}
+
+void hml_cleanup(void)
+{
+    for (int i = 0; i < hml_view_instance_count; i++)
+    {
+        if (hml_view_instance_map[i].xml_content)
+        {
+            gui_free(hml_view_instance_map[i].xml_content);
+            hml_view_instance_map[i].xml_content = NULL;
+        }
+        // view_name is fixed buffer, no need to free
+    }
+    hml_view_instance_count = 0;
+    hml_entry_view_name = NULL;
 }

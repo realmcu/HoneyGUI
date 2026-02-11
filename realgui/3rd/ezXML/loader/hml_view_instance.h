@@ -17,6 +17,11 @@ extern "C" {
  */
 int hml_scan_views(const char *dir_path);
 
+/**
+ * @brief Cleanup all HML resources (call on app exit)
+ */
+void hml_cleanup(void);
+
 #ifdef __cplusplus
 }
 #endif

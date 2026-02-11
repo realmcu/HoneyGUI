@@ -1055,7 +1055,7 @@ static void update_inform(void *p)
         {
             if (cnt % 10 == 0)
             {
-                if (((gui_img_t *)led_turn_l)->data == TURNLEFT_OFF_BIN)
+                if (((gui_img_t *)led_turn_l)->src.data == TURNLEFT_OFF_BIN)
                 {
                     gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
                 }
@@ -1073,7 +1073,7 @@ static void update_inform(void *p)
         {
             if (cnt % 10 == 0)
             {
-                if (((gui_img_t *)led_turn_r)->data == TURNRIGHT_OFF_BIN)
+                if (((gui_img_t *)led_turn_r)->src.data == TURNRIGHT_OFF_BIN)
                 {
                     gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
                 }

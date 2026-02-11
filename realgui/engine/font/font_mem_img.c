@@ -62,9 +62,9 @@ void gui_font_scale_destroy(gui_text_t *text)
 {
     if (text->scale_img != NULL)
     {
-        if (text->scale_img->data != NULL)
+        if (text->scale_img->src.data != NULL)
         {
-            FONT_FREE_PSRAM(text->scale_img->data);
+            FONT_FREE_PSRAM(text->scale_img->src.data);
         }
     }
 }
