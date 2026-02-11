@@ -125,12 +125,12 @@ void effect_touch_config(particle_effect_config_t *config)
     config->rotation.speed_min = -1.0f;
     config->rotation.speed_max = 1.0f;
 
-    /* Boundary: Kill at edges */
+    /* Boundary: Defaults to 0, should be overridden with actual widget size */
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = 400.0f;
-    config->boundary.bottom = 400.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
     config->boundary.reflect_damping = 0.8f;
 
     /* Behavior: Touch feedback mode */
@@ -173,9 +173,10 @@ gui_particle_widget_t *effect_touch_demo_init(void)
     /* Disable auto_cleanup so emitter persists */
     config.lifecycle.auto_cleanup = 0;
 
-    /* Update boundary */
-    config.boundary.right = (float)screen_w;
-    config.boundary.bottom = (float)screen_h;
+    /* Update boundary to match actual widget size */
+    gui_obj_t *base = GUI_BASE(s_touch_widget);
+    config.boundary.right = (float)base->w;
+    config.boundary.bottom = (float)base->h;
 
     s_touch_handle = gui_particle_widget_add_effect(s_touch_widget, &config);
 

@@ -288,8 +288,9 @@ gui_particle_widget_t *effect_rain_demo_init(void)
     config.shape.line.x2 = (float)s_screen_w + drift;
 
     /* Boundary with drift margin */
+    gui_obj_t *base = GUI_BASE(s_rain_widget);
     config.boundary.left = -drift;
-    config.boundary.right = (float)s_screen_w + drift;
+    config.boundary.right = (float)base->w + drift;
     config.boundary.bottom = s_ground_y + splash_margin;
 
     gui_particle_widget_add_effect(s_rain_widget, &config);

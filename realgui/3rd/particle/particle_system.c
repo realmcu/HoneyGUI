@@ -890,22 +890,15 @@ void particle_system_update(particle_system_t *ps, float dt)
         }
 
         /* Apply trajectory (position, velocity, rotation) */
-        /* Find the emitter's trajectory config for this particle */
-        /* For simplicity, we use a default linear trajectory if no emitter match */
+        /* Use the particle's own emitter trajectory, fall back to default */
         trajectory_config_t default_traj;
         trajectory_config_init(&default_traj);
 
-        /* Try to find matching emitter trajectory */
         trajectory_config_t *traj = &default_traj;
-        for (int e = 0; e < ps->emitter_count; e++)
+        if (particle->emitter_ref != NULL)
         {
-            if (ps->emitters[e] != NULL)
-            {
-                /* Use first emitter's trajectory as default */
-                /* In a more complex system, particles would store their emitter reference */
-                traj = &ps->emitters[e]->trajectory;
-                break;
-            }
+            particle_emitter_t *p_emitter = (particle_emitter_t *)particle->emitter_ref;
+            traj = &p_emitter->trajectory;
         }
 
         trajectory_apply(particle, traj, dt);

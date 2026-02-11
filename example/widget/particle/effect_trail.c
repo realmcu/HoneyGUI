@@ -116,12 +116,12 @@ void effect_trail_config(particle_effect_config_t *config)
     config->scale.min = 0.5f;
     config->scale.max = 1.0f;
 
-    /* Boundary: Kill at edges */
+    /* Boundary: Defaults to 0, should be overridden with actual widget size */
     config->boundary.behavior = PARTICLE_BOUNDARY_KILL;
     config->boundary.left = 0.0f;
     config->boundary.top = 0.0f;
-    config->boundary.right = 400.0f;
-    config->boundary.bottom = 400.0f;
+    config->boundary.right = 0.0f;
+    config->boundary.bottom = 0.0f;
     config->boundary.reflect_damping = 0.8f;
 
     /* Behavior: Trail mode */
@@ -155,6 +155,11 @@ gui_particle_widget_t *effect_trail_demo_init(void)
     config.color.color_start = 0xFF00FFFF;
     config.color.color_end = 0xFF0088FF;
     config.render.base_size = 6.0f;
+
+    /* Set boundary to match actual widget size */
+    gui_obj_t *base = GUI_BASE(s_trail_widget);
+    config.boundary.right = (float)base->w;
+    config.boundary.bottom = (float)base->h;
 
     s_trail_handle = gui_particle_widget_add_effect(s_trail_widget, &config);
 

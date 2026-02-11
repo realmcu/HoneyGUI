@@ -100,8 +100,9 @@ gui_particle_widget_t *effect_bubble_demo_init(void)
     config.shape.line.x2 = (float)screen_w;
     config.shape.line.y2 = (float)screen_h;
 
-    config.boundary.right = (float)screen_w;
-    config.boundary.bottom = (float)screen_h + 40.0f;
+    gui_obj_t *base = GUI_BASE(widget);
+    config.boundary.right = (float)base->w;
+    config.boundary.bottom = (float)base->h + 40.0f;
     config.emission.rate = 8.0f;
     config.scale.min = 0.5f;
     config.scale.max = 1.5f;

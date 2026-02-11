@@ -127,8 +127,9 @@ gui_particle_widget_t *effect_snow_demo_init(void)
     /* Update boundary */
     config.boundary.left = -8.0f;
     config.boundary.top = -8.0f;
-    config.boundary.right = (float)screen_w + 8.0f;
-    config.boundary.bottom = (float)screen_h + 8.0f;
+    gui_obj_t *base = GUI_BASE(widget);
+    config.boundary.right = (float)base->w + 8.0f;
+    config.boundary.bottom = (float)base->h + 8.0f;
 
     gui_particle_widget_add_effect(widget, &config);
 

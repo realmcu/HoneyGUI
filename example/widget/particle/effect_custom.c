@@ -149,8 +149,9 @@ gui_particle_widget_t *effect_custom_demo_init(void)
     config.shape.circle.cy = (float)(screen_h / 2);
 
     /* Update boundary to match widget */
-    config.boundary.right = (float)screen_w;
-    config.boundary.bottom = (float)screen_h;
+    gui_obj_t *base = GUI_BASE(widget);
+    config.boundary.right = (float)base->w;
+    config.boundary.bottom = (float)base->h;
 
     gui_particle_widget_add_effect(widget, &config);
 

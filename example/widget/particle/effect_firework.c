@@ -69,15 +69,13 @@ static void firework_update_cb(void *user_data)
     /* Trigger new firework every 1.5 seconds */
     if (current_time - s_firework_timer > 1500)
     {
-        gui_dispdev_t *dc = gui_get_dc();
-        int screen_w = dc->screen_width;
-        int screen_h = dc->screen_height;
-
         particle_effect_config_t config;
         effect_firework_config(&config);
 
-        config.shape.point.x = firework_rand_float(100.0f, (float)(screen_w - 100));
-        config.shape.point.y = firework_rand_float(100.0f, (float)(screen_h / 2));
+        gui_obj_t *fw_base = GUI_BASE(s_firework_widget);
+
+        config.shape.point.x = firework_rand_float(100.0f, (float)(fw_base->w - 100));
+        config.shape.point.y = firework_rand_float(100.0f, (float)(fw_base->h / 2));
 
         uint32_t colors[] =
         {
@@ -89,8 +87,8 @@ static void firework_update_cb(void *user_data)
         config.emission.burst_count = 40 + (firework_rand() % 40);
         config.lifecycle.life_min = 1500;
         config.lifecycle.life_max = 2500;
-        config.boundary.right = (float)screen_w;
-        config.boundary.bottom = (float)screen_h;
+        config.boundary.right = (float)fw_base->w;
+        config.boundary.bottom = (float)fw_base->h;
 
         gui_particle_widget_add_effect(s_firework_widget, &config);
         s_firework_timer = current_time;
@@ -183,14 +181,15 @@ gui_particle_widget_t *effect_firework_demo_init(void)
     particle_effect_config_t config;
     effect_firework_config(&config);
 
-    config.shape.point.x = (float)(screen_w / 2);
-    config.shape.point.y = (float)(screen_h / 3);
+    gui_obj_t *base = GUI_BASE(s_firework_widget);
+    config.shape.point.x = (float)(base->w / 2);
+    config.shape.point.y = (float)(base->h / 3);
     config.color.color_start = 0xFFFF0000;
     config.emission.burst_count = 60;
     config.lifecycle.life_min = 1500;
     config.lifecycle.life_max = 2500;
-    config.boundary.right = (float)screen_w;
-    config.boundary.bottom = (float)screen_h;
+    config.boundary.right = (float)base->w;
+    config.boundary.bottom = (float)base->h;
 
     gui_particle_widget_add_effect(s_firework_widget, &config);
     s_firework_timer = gui_ms_get();
