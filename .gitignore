@@ -65,7 +65,25 @@ lib/RTE/*
 lib/build/*
 lib/gui_engine.uvguix.*
 *.dblite
+
+# Generated config headers
 win32_sim/hgconfig.h
+win32_sim/cconfig.h
+hgconfig.h
+
+# Build artifacts
+*.map
+*.bin
+gui
+gui.exe
+
+# Python cache
+__pycache__/
+*.pyc
+
+# SCons build files
+.sconsign.dblite
+.sconf_temp/
 
 doc/doxyxml/html
 doc/doxyxml/xml
@@ -77,11 +95,20 @@ doxygen_graphviz/_build
 
 # editor config
 .vscode/
+
+# Build output directories
+win32_sim/build/
+keil_sim/ac5/build/
+keil_sim/ac6/build/
+lib/build/
+doc/build/
+doc/_build/
+doxygen_graphviz/_build/
+
+# Executables and binaries
 win32_sim/gui.bin
 win32_sim/gui
-
-# example
-win32_sim/build/
+win32_sim/gui.exe
 
 # tool
 tool/D2XML/MasterGo_plugin/node_modules/
