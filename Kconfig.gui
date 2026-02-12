@@ -145,11 +145,6 @@ config REALTEK_BUILD_GUI_466_466_DEMO
     help
       RTK GUI Demo for 466x466 resolution
 
-config REALTEK_BUILD_CHARGECASE_410_502_DEMO
-    bool "Charge Case Demo 410x502"
-    help
-      RTK GUI Charge Case Demo
-
 config REALTEK_BUILD_TEST
     bool "GUI Test"
     help
