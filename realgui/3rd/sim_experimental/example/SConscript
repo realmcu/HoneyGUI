@@ -12,7 +12,7 @@ if GetDepend(['CONFIG_REALTEK_BUILD_TVG']):
     src += ['NanoVG-demo.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_GUI_USE_ARM2D']):
-    src += ['Arm2D-demo.c']
+    src += ['Arm2D-demo.c', 'Arm2D-TEST.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D']):
     src += ['Lite3D-demo-Earth.c']

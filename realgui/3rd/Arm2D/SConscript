@@ -5,8 +5,17 @@ import sys
 from building import *
 
 cwd = GetCurrentDir()
+
 inc = [cwd]
-src = Glob('*.c') + Glob('*.cpp')
+inc += [os.path.join(cwd, 'Library/Include')]
+inc += [os.path.join(cwd, 'platform')]
+inc += [os.path.join(cwd, 'platform/math')]
+
+src = Glob('*.c')
+src += Glob('*.cpp')
+src += Glob('Library/Source/*.c')
+src += Glob('platform/math/*.c')
+
 
 if GetDepend(['CONFIG_REALTEK_BUILD_GUI_USE_ARM2D']):
     objs = DefineGroup('3rd', src, depend = [''], CPPPATH = inc)
