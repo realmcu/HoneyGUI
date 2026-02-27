@@ -7,14 +7,11 @@
 #define HML_LOADER_H
 
 #include "gui_obj.h"
+#include "ezxml.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Forward declarations */
-struct ezxml;
-typedef struct ezxml *ezxml_t;
 
 /**
  * @brief Callback function type
