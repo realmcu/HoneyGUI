@@ -758,12 +758,12 @@ static void gui_list_note_fade(gui_obj_t *obj)
     {
         if (list->dir == HORIZONTAL)
         {
-            obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->x - list->base.x) / obj->w;
+            obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->x) / obj->w;
             obj->matrix->m[0][2] = list->base.x;
         }
         else
         {
-            obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->y - list->base.y) / obj->h;
+            obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->y) / obj->h;
             obj->matrix->m[1][2] = list->base.y;
 
         }
