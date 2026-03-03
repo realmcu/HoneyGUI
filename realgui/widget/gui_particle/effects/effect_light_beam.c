@@ -17,7 +17,6 @@
 #include "effect_light_beam.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include "def_type.h"
 #include <math.h>
 
@@ -31,8 +30,6 @@
 #define BOUNCE_FLASH_SPEED      120.0f
 
 static gui_particle_widget_t *s_beam_widget = NULL;
-static int s_screen_w = 0;
-static int s_screen_h = 0;
 
 typedef struct
 {
@@ -88,6 +85,7 @@ static int beam_history_get(beam_state_t *b, int age, float *x, float *y)
 static int reflect_beam(beam_state_t *b)
 {
     int bounced = 0;
+    gui_obj_t *base = GUI_BASE(s_beam_widget);
 
     if (b->head_x <= 0.0f)
     {
@@ -95,9 +93,9 @@ static int reflect_beam(beam_state_t *b)
         b->vx = -b->vx;
         bounced = 1;
     }
-    else if (b->head_x >= (float)s_screen_w)
+    else if (b->head_x >= (float)base->w)
     {
-        b->head_x = (float)s_screen_w;
+        b->head_x = (float)base->w;
         b->vx = -b->vx;
         bounced = 1;
     }
@@ -108,9 +106,9 @@ static int reflect_beam(beam_state_t *b)
         b->vy = -b->vy;
         bounced = 1;
     }
-    else if (b->head_y >= (float)s_screen_h)
+    else if (b->head_y >= (float)base->h)
     {
-        b->head_y = (float)s_screen_h;
+        b->head_y = (float)base->h;
         b->vy = -b->vy;
         bounced = 1;
     }
@@ -345,9 +343,6 @@ static void init_beam(beam_state_t *b, uint32_t core, uint32_t mid, uint32_t tai
 gui_particle_widget_t *effect_light_beam_create(gui_obj_t *parent, const char *name,
                                                 int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    s_screen_w = w;
-    s_screen_h = h;
-
     float cx = (float)(w / 2);
     float cy = (float)(h / 2);
 

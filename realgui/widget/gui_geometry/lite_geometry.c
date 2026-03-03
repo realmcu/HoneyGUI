@@ -854,7 +854,7 @@ void fill_rounded_rect_df_aa(DrawContext *ctx,
                           radius, fill_color);
 }
 
-void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
+void fill_circle_df_aa(DrawContext *ctx, float center_x, float center_y, int radius,
                        PixelColor fill_color)
 {
     if (radius > 50)
@@ -867,13 +867,17 @@ void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
     // Use same AA width as arc drawing for consistent appearance
     float aa_width = 2.0f;
 
+    /* Round center to nearest int for inner rect placement */
+    int cx_i = (int)floorf(center_x);
+    int cy_i = (int)floorf(center_y);
+
     int inner_radius = radius * M_SQRT1_2 - 2;
     int inner_size = inner_radius * 2;
 
     Rect inner_rect =
     {
-        center_x - inner_radius,
-        center_y - inner_radius,
+        cx_i - inner_radius,
+        cy_i - inner_radius,
         inner_size,
         inner_size
     };
@@ -888,10 +892,10 @@ void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
     float outer_radius_sq = (radius + aa_width) * (radius + aa_width);
 
     // Calculate the boundary region to be processed (excluding inscribed rectangles).
-    int start_x = (int)(center_x - radius - 2);
-    int end_x = (int)(center_x + radius + 2);
-    int start_y = (int)(center_y - radius - 2);
-    int end_y = (int)(center_y + radius + 2);
+    int start_x = (int)floorf(center_x - radius - 2);
+    int end_x = (int)ceilf(center_x + radius + 2);
+    int start_y = (int)floorf(center_y - radius - 2);
+    int end_y = (int)ceilf(center_y + radius + 2);
 
     start_x = LG_MAX(LG_MAX(start_x, 0), ctx->clip_rect.x);
     end_x = LG_MIN(LG_MIN(end_x, ctx->width - 1), ctx->clip_rect.x + ctx->clip_rect.w - 1);
@@ -904,13 +908,37 @@ void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
     }
 
     // Boundary of the inscribed rectangle
-    int inner_start_x = (center_x - inner_radius);
-    int inner_end_x = (center_x + inner_radius);
-    int inner_start_y = (center_y - inner_radius);
-    int inner_end_y = (center_y + inner_radius);
+    int inner_start_x = (cx_i - inner_radius);
+    int inner_end_x = (cx_i + inner_radius);
+    int inner_start_y = (cy_i - inner_radius);
+    int inner_end_y = (cy_i + inner_radius);
 
     /* Only skip inner rect pixels when the rect was actually filled */
     bool skip_inner = (inner_rect.w > 0 && inner_rect.h > 0);
+
+    /* Compute the actual filled region of inner_rect after clipping */
+    int clipped_inner_start_x = inner_start_x;
+    int clipped_inner_end_x = inner_end_x;
+    int clipped_inner_start_y = inner_start_y;
+    int clipped_inner_end_y = inner_end_y;
+    if (skip_inner)
+    {
+        int clip_x2 = ctx->clip_rect.x + ctx->clip_rect.w - 1;
+        int clip_y2 = ctx->clip_rect.y + ctx->clip_rect.h - 1;
+        int rect_end_x = inner_rect.x + inner_rect.w;
+        int rect_end_y = inner_rect.y + inner_rect.h;
+
+        clipped_inner_start_x = LG_MAX(inner_rect.x, LG_MAX(0, ctx->clip_rect.x));
+        clipped_inner_start_y = LG_MAX(inner_rect.y, LG_MAX(0, ctx->clip_rect.y));
+        clipped_inner_end_x = LG_MIN(rect_end_x, LG_MIN(ctx->width - 1, clip_x2));
+        clipped_inner_end_y = LG_MIN(rect_end_y, LG_MIN(ctx->height - 1, clip_y2));
+
+        if (clipped_inner_start_x > clipped_inner_end_x ||
+            clipped_inner_start_y > clipped_inner_end_y)
+        {
+            skip_inner = false;
+        }
+    }
 
     for (int py = start_y; py <= end_y; py++)
     {
@@ -918,8 +946,8 @@ void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
         {
             // Skip the inscribed rectangle area (which is already filled).
             if (skip_inner &&
-                px >= inner_start_x && px <= inner_end_x &&
-                py >= inner_start_y && py <= inner_end_y)
+                px >= clipped_inner_start_x && px <= clipped_inner_end_x &&
+                py >= clipped_inner_start_y && py <= clipped_inner_end_y)
             {
                 continue;
             }
@@ -952,12 +980,13 @@ void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
         }
     }
 }
-void fill_circle_no_aa(DrawContext *ctx, int center_x, int center_y, int radius, PixelColor color)
+void fill_circle_no_aa(DrawContext *ctx, float center_x, float center_y, int radius,
+                       PixelColor color)
 {
     if (radius <= 0) { return; }
 
-    int cx = center_x;
-    int cy = center_y;
+    int cx = (int)floorf(center_x);
+    int cy = (int)floorf(center_y);
     int r = radius;
 
     int inner_size = (int)(radius * M_SQRT1_2);

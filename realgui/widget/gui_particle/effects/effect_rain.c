@@ -16,8 +16,6 @@
 
 #include "effect_rain.h"
 #include "gui_obj.h"
-#include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include "def_type.h"
 #include <math.h>
 
@@ -30,8 +28,6 @@
 #define SPLASH_SPEED 80.0f
 
 static gui_particle_widget_t *s_rain_widget = NULL;
-static int s_screen_w = 0;
-static int s_screen_h = 0;
 static float s_ground_y = 0.0f;
 
 static uint32_t rain_rand(void)
@@ -155,7 +151,7 @@ static void rain_particle_update(particle_t *p, void *user_data)
         p->life = 0;
     }
 
-    float depth = p->x / (float)s_screen_w;
+    float depth = p->x / (float)GUI_BASE(s_rain_widget)->w;
     p->opacity = (uint8_t)(180 + depth * 75);
 }
 
@@ -232,8 +228,6 @@ static void effect_rain_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_rain_create(gui_obj_t *parent, const char *name,
                                           int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    s_screen_w = w;
-    s_screen_h = h;
     s_ground_y = (float)(h - 30);
 
     s_rain_widget = gui_particle_widget_create(parent, name,

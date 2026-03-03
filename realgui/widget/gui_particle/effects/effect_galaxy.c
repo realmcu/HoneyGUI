@@ -17,8 +17,6 @@
 
 #include "effect_galaxy.h"
 #include "gui_obj.h"
-#include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include "def_type.h"
 #include <math.h>
 #include <stdlib.h>

@@ -18,7 +18,6 @@
 #include "effect_lightning.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include "def_type.h"
 #include <math.h>
 
@@ -56,8 +55,6 @@ static float s_lightning_end_x = 0.0f;
 static float s_lightning_end_y = 0.0f;
 static uint32_t s_lightning_timer = 0;
 static uint32_t s_last_bolt_time = 0;
-static int16_t s_lightning_w = 0;
-static int16_t s_lightning_h = 0;
 
 static uint32_t lightning_rand(void)
 {
@@ -329,7 +326,7 @@ static void lightning_update_cb(void *user_data)
         s_bolt_count = 0;
 
         s_lightning_end_x = s_lightning_start_x + lightning_rand_float(-100.0f, 100.0f);
-        s_lightning_end_y = (float)s_lightning_h * 0.9f;
+        s_lightning_end_y = (float)GUI_BASE(s_lightning_widget)->h * 0.9f;
 
         generate_lightning_strike(s_lightning_start_x, s_lightning_start_y,
                                   s_lightning_end_x, s_lightning_end_y, 0);
@@ -389,8 +386,6 @@ static void effect_lightning_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_lightning_create(gui_obj_t *parent, const char *name,
                                                int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    s_lightning_w = w;
-    s_lightning_h = h;
     s_lightning_start_x = (float)(w / 2);
     s_lightning_start_y = (float)h * 0.1f;
     s_lightning_end_x = (float)(w / 2);

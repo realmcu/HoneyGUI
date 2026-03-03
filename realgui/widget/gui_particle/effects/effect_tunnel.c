@@ -17,7 +17,6 @@
 #include "effect_tunnel.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include <string.h>
 #include "def_type.h"
 

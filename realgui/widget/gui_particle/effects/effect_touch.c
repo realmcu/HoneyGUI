@@ -10,7 +10,6 @@
 
 #include "effect_touch.h"
 #include "gui_obj.h"
-#include "gui_api_dc.h"
 #include "tp_algo.h"
 #include "def_type.h"
 

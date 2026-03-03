@@ -166,8 +166,9 @@ void fill_rounded_rect_no_aa(DrawContext *ctx,
                              float radius, PixelColor fill_color);
 void fill_circle(DrawContext *ctx, float center_x, float center_y, float radius,
                  PixelColor fill_color);
-void fill_circle_no_aa(DrawContext *ctx, int center_x, int center_y, int radius, PixelColor color);
-void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
+void fill_circle_no_aa(DrawContext *ctx, float center_x, float center_y, int radius,
+                       PixelColor color);
+void fill_circle_df_aa(DrawContext *ctx, float center_x, float center_y, int radius,
                        PixelColor fill_color);
 
 void draw_arc(DrawContext *ctx, float center_x, float center_y,

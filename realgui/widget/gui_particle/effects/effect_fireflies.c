@@ -16,8 +16,6 @@
 
 #include "effect_fireflies.h"
 #include "gui_obj.h"
-#include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include "def_type.h"
 #include <math.h>
 
@@ -25,8 +23,6 @@
 #define FIREFLY_DRIFT_SPEED 15.0f
 
 static gui_particle_widget_t *s_fireflies_widget = NULL;
-static int s_screen_w = 0;
-static int s_screen_h = 0;
 
 static uint32_t firefly_rand(void)
 {
@@ -85,19 +81,20 @@ static void firefly_particle_update(particle_t *p, void *user_data)
     }
 
     float margin = 20.0f;
+    gui_obj_t *base = GUI_BASE(s_fireflies_widget);
     if (p->x < -margin)
     {
-        p->x = (float)s_screen_w + margin;
+        p->x = (float)base->w + margin;
     }
-    else if (p->x > (float)s_screen_w + margin)
+    else if (p->x > (float)base->w + margin)
     {
         p->x = -margin;
     }
     if (p->y < -margin)
     {
-        p->y = (float)s_screen_h + margin;
+        p->y = (float)base->h + margin;
     }
-    else if (p->y > (float)s_screen_h + margin)
+    else if (p->y > (float)base->h + margin)
     {
         p->y = -margin;
     }
@@ -171,9 +168,6 @@ static void effect_fireflies_config(particle_effect_config_t *config, int16_t w,
 gui_particle_widget_t *effect_fireflies_create(gui_obj_t *parent, const char *name,
                                                int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    s_screen_w = w;
-    s_screen_h = h;
-
     s_fireflies_widget = gui_particle_widget_create(parent, name,
                                                     x, y, w, h,
                                                     PARTICLE_POOL_SIZE);

@@ -17,7 +17,6 @@
 #include "effect_ripple.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include "tp_algo.h"
 #include "def_type.h"
 #include <math.h>
@@ -31,8 +30,6 @@
 static gui_particle_widget_t *s_ripple_widget = NULL;
 static float s_ripple_center_x = 0.0f;
 static float s_ripple_center_y = 0.0f;
-static int s_screen_w = 0;
-static int s_screen_h = 0;
 static uint8_t s_touch_active = 0;
 static uint32_t s_last_ripple_time = 0;
 static int s_ripple_wave_count = 0;
@@ -159,8 +156,9 @@ static void ripple_update_cb(void *user_data)
     /* Auto-trigger ripple for demo if no touch for 3 seconds */
     if (!s_touch_active && now - s_last_ripple_time > 3000)
     {
-        s_ripple_center_x = (float)(s_screen_w / 2);
-        s_ripple_center_y = (float)(s_screen_h / 2);
+        gui_obj_t *base = GUI_BASE(s_ripple_widget);
+        s_ripple_center_x = (float)(base->w / 2);
+        s_ripple_center_y = (float)(base->h / 2);
         s_ripple_wave_count = 0;
         emit_ripple_ring(s_ripple_center_x, s_ripple_center_y, 5.0f, 255, 1.0f);
         s_last_ripple_time = now;
@@ -226,8 +224,6 @@ static void effect_ripple_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_ripple_create(gui_obj_t *parent, const char *name,
                                             int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    s_screen_w = w;
-    s_screen_h = h;
     s_ripple_center_x = (float)(w / 2);
     s_ripple_center_y = (float)(h / 2);
 

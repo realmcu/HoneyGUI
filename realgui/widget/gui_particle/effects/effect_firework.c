@@ -11,7 +11,6 @@
 #include "effect_firework.h"
 #include "gui_obj.h"
 #include "gui_api_os.h"
-#include "gui_api_dc.h"
 #include "def_type.h"
 
 #define PARTICLE_POOL_SIZE 256
