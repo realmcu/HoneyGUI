@@ -21,7 +21,7 @@ extern "C" {
 #include "draw_img.h"
 #include "gui_matrix.h"
 #include "gui_obj.h"
-#include "gifdec.h"
+
 
 /*============================================================================*
  *                         Types
@@ -53,7 +53,7 @@ typedef struct gui_img
         void *data;                    /* Generic pointer (for backward compatibility). */
     } src;                             /* Image source union. */
 
-    gd_GIF *gif;                        /* GIF data */
+
     uint32_t fg_color_set;  //A8 image set color
     uint32_t bg_color_fix;  //bg color fix for A8 image
 
@@ -62,7 +62,6 @@ typedef struct gui_img
     uint32_t storage_type  : 3;        /* Storage type: e.g., file system, flash, etc. */
     uint32_t high_quality  : 1;        /* High quality rendering flag. */
     uint32_t need_clip     : 1;        /* Clipping flag. */
-    uint32_t gif_flag      : 1;        /* gif flag. */
     uint8_t checksum;                  /* Checksum for change detection. */
     uint8_t animate_array_length;      /* Animation array length. */
 } gui_img_t;

@@ -113,35 +113,7 @@ static void gui_img_prepare(gui_obj_t *obj)
     }
 }
 
-static void change_gif_to_palette(gui_img_t *_this, gui_palette_file_t *palette)
-{
-    if (_this->gif == NULL)
-    {
-        return;
-    }
-    if (_this->gif_flag == false)
-    {
-        return;
-    }
 
-
-    palette->img_header.scan = 0; // no scan for palette
-    palette->img_header.align = 0;
-    palette->img_header.resize = 0; // no resize for palette
-    palette->img_header.compress = false; // no compression for palette
-    palette->img_header.rsvd = 0; // reserved field
-    palette->img_header.jpeg = false; // not a JPEG
-
-    palette->img_header.type = PALETTE;
-    palette->img_header.w = _this->draw_img->img_w;
-    palette->img_header.h = _this->draw_img->img_h;
-    palette->img_header.version = 0; // version number
-    palette->img_header.rsvd2 = 0; // reserved field
-
-    palette->palette_data = _this->gif->palette->colors;
-    palette->palette_index = _this->gif->frame;
-    _this->draw_img->data = palette;
-}
 /**
  * @brief Callback function for drawing the GUI image.
  *
@@ -162,8 +134,6 @@ static void gui_img_draw_cb(gui_obj_t *obj)
     // cache img to buffer
 
     draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src.data);
-    gui_palette_file_t palette = {0};
-    change_gif_to_palette(_this, &palette);
 
     if (_this->need_clip)
     {
@@ -238,14 +208,7 @@ static void gui_img_destroy(gui_obj_t *obj)
         _this->src.fs_path = NULL;
     }
 
-    if (_this->gif_flag == true)
-    {
-        if (_this->gif != NULL)
-        {
-            gd_close_gif(_this->gif);
-            _this->gif = NULL;
-        }
-    }
+
 }
 static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
 {
@@ -312,19 +275,7 @@ static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static void gif_internal_timer_cb(void *param)
-{
-    gui_img_t *_this = (gui_img_t *)param;
-    gui_obj_t *obj = (gui_obj_t *)param;
-    GUI_ASSERT(_this != NULL);
-    if (gd_get_frame(_this->gif) == 0)
-    {
-        gd_rewind(_this->gif);
-    }
-    obj->timer->interval_ms = _this->gif->gce.delay * 10; // 10ms per frame
-    obj->timer->expire_time = gui_ms_get() + obj->timer->interval_ms;
-    gui_fb_change();
-}
+
 
 static void gui_img_ctor(gui_img_t            *_this,
                          gui_obj_t            *parent,
@@ -392,52 +343,7 @@ static void gui_img_ctor(gui_img_t            *_this,
         gui_log("resize image!! \n");
     }
 
-    if ((head.type == GIF) && (storage_type == IMG_SRC_MEMADDR))
-    {
-        gui_gif_file_head_t *gif_head = (gui_gif_file_head_t *)_this->src.xip_addr;
-        _this->gif = gd_open_gif_from_memory(gif_head->gif, gif_head->size);
-        _this->gif_flag = true;
-        if (gd_get_frame(_this->gif) == 0)
-        {
-            gd_rewind(_this->gif);
-        }
-        gui_obj_create_timer(obj, _this->gif->gce.delay * 10, true, gif_internal_timer_cb);
-        gui_obj_start_timer(obj);
-    }
-    else if ((head.type == GIF) && (storage_type == IMG_SRC_FILESYS))
-    {
-        const void *data = gui_vfs_get_file_address(path);
-        if (!data)
-        {
-            /* Fallback: read file into memory */
-            gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
-            GUI_ASSERT(f != NULL);
-            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
-            int size = gui_vfs_tell(f);
-            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
-            data = gui_malloc(size);
-            GUI_ASSERT(data != NULL);
-            gui_vfs_read(f, (void *)data, size);
-            gui_vfs_close(f);
-        }
 
-        if (_this->src.fs_path != NULL)
-        {
-            gui_free(_this->src.fs_path);
-        }
-
-        _this->src.xip_addr = (void *)data;
-        gui_gif_file_head_t *gif_head = (gui_gif_file_head_t *)data;
-        _this->gif = gd_open_gif_from_memory(gif_head->gif, gif_head->size);
-        _this->gif_flag = true;
-        if (gd_get_frame(_this->gif) == 0)
-        {
-            gd_rewind(_this->gif);
-        }
-        gui_obj_create_timer(obj, _this->gif->gce.delay * 10, true, gif_internal_timer_cb);
-        gui_obj_start_timer(obj);
-        _this->storage_type = IMG_SRC_MEMADDR;
-    }
 }
 
 

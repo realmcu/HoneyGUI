@@ -19,7 +19,6 @@
 #include "../../assets/tiger_blue.txt"
 #include "jpeg.txt"
 #include "green.txt"
-#include "gif_demo.txt"
 #include "nanovg_generate_pixel.txt"
 #include "test_png.txt"
 #include "clock3_Vector.txt"
@@ -75,7 +74,6 @@ static int app_init(void)
 
     void *addr = (void *)_actiger_blue;
     // void *addr = (void *)_acgreen;
-    // void *addr = (void *)_acgif_demo;
 
     // gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", _achour, 0, 0, 0, 0);
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);

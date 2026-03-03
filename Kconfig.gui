@@ -25,6 +25,11 @@ config REALTEK_BUILD_EXAMPLE_SVG_WIDGET
     help
       RTK GUI Base Demo - SVG Widget
 
+config REALTEK_BUILD_EXAMPLE_GIF_WIDGET
+    bool "GIF Widget Demo"
+    help
+      RTK GUI Base Demo - GIF Widget (Animated GIF support)
+
 config REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
     bool "Text Widget Demo"
     help

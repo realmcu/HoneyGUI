@@ -1,0 +1,27 @@
+# building script for HoneyGUI
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c')
+inc = [cwd]
+
+objs = []
+CPPDEFINES = ['DRV_LCD_WIDTH=480']
+CPPDEFINES += ['DRV_LCD_HEIGHT=480']
+CPPDEFINES += ['DRV_PIXEL_BITS=16']
+
+if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_GIF_WIDGET'):
+    objs = DefineGroup('realgui/demo', src, depend=[''], CPPPATH=inc, CPPDEFINES=CPPDEFINES)
+
+Return('objs')
+import os
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c')
+inc = [cwd]
+
+group = DefineGroup('gif_animation_example', src, depend=[''], CPPPATH=inc)
+
+Return('group')
