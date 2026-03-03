@@ -100,9 +100,29 @@ static gui_obj_t *hml_create_component(gui_obj_t *parent, ezxml_t node)
     {
         return hml_create_text(parent, node);
     }
+    else if (strcmp(tag, "hg_label") == 0)
+    {
+        return hml_create_label(parent, node);
+    }
     else if (strcmp(tag, "hg_canvas") == 0 || strcmp(tag, "hg_rect") == 0)
     {
         return hml_create_canvas(parent, node);
+    }
+    else if (strcmp(tag, "hg_arc") == 0)
+    {
+        return hml_create_arc(parent, node);
+    }
+    else if (strcmp(tag, "hg_circle") == 0)
+    {
+        return hml_create_circle(parent, node);
+    }
+    else if (strcmp(tag, "hg_list") == 0)
+    {
+        return hml_create_list(parent, node);
+    }
+    else if (strcmp(tag, "hg_list_item") == 0)
+    {
+        return hml_create_list_item(parent, node);
     }
     else if (strcmp(tag, "hg_button") == 0)
     {
@@ -111,6 +131,11 @@ static gui_obj_t *hml_create_component(gui_obj_t *parent, ezxml_t node)
     else if (strcmp(tag, "hg_video") == 0)
     {
         return hml_create_video(parent, node);
+    }
+
+    else if (strcmp(tag, "hg_time_label") == 0)
+    {
+        return hml_create_time_label(parent, node);
     }
 
     return NULL;

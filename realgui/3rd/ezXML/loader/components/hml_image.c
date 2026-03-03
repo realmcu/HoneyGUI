@@ -5,6 +5,7 @@
 
 #include "../hml_component.h"
 #include "../hml_utils.h"
+#include "../hml_event.h"
 #include "gui_img.h"
 #include "gui_api.h"
 #include <stdio.h>
@@ -29,6 +30,9 @@ gui_obj_t *hml_create_image(gui_obj_t *parent, ezxml_t node)
     hml_resolve_asset_path(src, bin_path, sizeof(bin_path));
 
     gui_img_t *img = gui_img_create_from_fs(parent, "hml_image", (void *)bin_path, x, y, 0, 0);
+
+    // Bind events
+    hml_bind_obj_events((gui_obj_t *)img, node);
 
     return (gui_obj_t *)img;
 }
