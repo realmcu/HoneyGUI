@@ -909,12 +909,16 @@ void fill_circle_df_aa(DrawContext *ctx, int center_x, int center_y, int radius,
     int inner_start_y = (center_y - inner_radius);
     int inner_end_y = (center_y + inner_radius);
 
+    /* Only skip inner rect pixels when the rect was actually filled */
+    bool skip_inner = (inner_rect.w > 0 && inner_rect.h > 0);
+
     for (int py = start_y; py <= end_y; py++)
     {
         for (int px = start_x; px <= end_x; px++)
         {
             // Skip the inscribed rectangle area (which is already filled).
-            if (px >= inner_start_x && px <= inner_end_x &&
+            if (skip_inner &&
+                px >= inner_start_x && px <= inner_end_x &&
                 py >= inner_start_y && py <= inner_end_y)
             {
                 continue;
