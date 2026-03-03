@@ -60,6 +60,12 @@ if(DEFINED CONFIG_REALTEK_H264_DECODER AND CONFIG_REALTEK_H264_DECODER)
     list(APPEND HEADER_FILES ${TMP_HEADERS})
 endif()
 
+# Particle system headers - conditionally included based on config
+if(DEFINED CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM AND CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM)
+    file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/particle/*.h")
+    list(APPEND HEADER_FILES ${TMP_HEADERS})
+endif()
+
 # Letter shell headers - conditionally included based on config
 if(DEFINED CONFIG_REALTEK_BUILD_LETTER_SHELL AND CONFIG_REALTEK_BUILD_LETTER_SHELL)
     file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/letter_shell/*.h")

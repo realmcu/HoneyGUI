@@ -21,22 +21,6 @@
 
 /* Effect headers */
 #include "particle_demo.h"
-#include "effect_firework.h"
-#include "effect_trail.h"
-#include "effect_touch.h"
-#include "effect_snow.h"
-#include "effect_bubble.h"
-#include "effect_custom.h"
-#include "effect_tunnel.h"
-#include "effect_rocket.h"
-#include "effect_vortex.h"
-#include "effect_lightning.h"
-#include "effect_galaxy.h"
-#include "effect_fireflies.h"
-#include "effect_ripple.h"
-#include "effect_rain.h"
-#include "effect_magic_circle.h"
-#include "effect_light_beam.h"
 
 /*============================================================================*
  *                           Effect Registry

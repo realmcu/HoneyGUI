@@ -38,7 +38,7 @@ if(CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM) #set to 1 to enable or variable to for 
     file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
 
     foreach(subdir ${SUBDIRS})
-        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir} AND NOT subdir STREQUAL "test")
             if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
                 add_subdirectory(${subdir})
             else()

@@ -7,15 +7,11 @@ import menu_config
 cwd = GetCurrentDir()
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image']
+CPPPATH += [os.path.join(cwd, '..', '..', '..', 'realgui', 'widget', 'gui_particle', 'effects')]
 
 objs = []
 CPPDEFINES = []
 src = []
-
-# Effect files: depend on particle system core
-if GetDepend('CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM'):
-    src += [os.path.join(cwd, f) for f in os.listdir(cwd)
-            if f.startswith('effect_') and f.endswith('.c')]
 
 # Demo, launcher, example: depend on particle demo selection
 if GetDepend('CONFIG_REALTEK_BUILD_PARTICLE_DEMO'):

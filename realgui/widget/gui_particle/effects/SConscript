@@ -1,0 +1,14 @@
+# for module compiling
+import os
+from building import *
+
+cwd = GetCurrentDir()
+inc = [cwd, cwd + '/../../../3rd/particle', cwd + '/..']
+src = Glob('*.c') + Glob('*.cpp')
+
+if GetDepend(['CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM']):
+    objs = DefineGroup('effects', src, depend = [''], CPPPATH = inc)
+else:
+    objs = []
+
+Return('objs')
