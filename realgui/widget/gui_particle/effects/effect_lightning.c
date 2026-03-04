@@ -196,7 +196,7 @@ static void emit_segment_particles(gui_particle_widget_t *widget,
             uint8_t b = 255;
             uint8_t g = (uint8_t)(180 + lightning_rand() % 75);
             uint8_t r = (uint8_t)(100 + lightning_rand() % 100);
-            p->color = (0xFFU << 24) | (b << 16) | (g << 8) | r;
+            p->color = (0xFFU << 24) | (r << 16) | (g << 8) | b;
             p->scale = lightning_rand_float(2.0f, 4.0f) * brightness;
             p->opacity = (uint8_t)((150 + lightning_rand() % 50) * brightness);
             p->life = LIGHTNING_FLASH_MS + LIGHTNING_FADE_MS + lightning_rand() % 100;
