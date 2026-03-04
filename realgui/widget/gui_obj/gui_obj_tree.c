@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "gui_obj.h"
 #include "gui_obj_tree.h"
+#include "gui_obj_focus.h"
 #include "gui_api.h"
 #include "gui_message.h"
 
@@ -69,6 +70,11 @@ static void gui_obj_destroy_cb(gui_obj_t *obj)
     if (obj->has_subscribe)
     {
         gui_msg_unsubscribe(obj, NULL);
+    }
+
+    if (gui_obj_focus_is_focused(obj))
+    {
+        gui_obj_focus_set(NULL);
     }
 }
 
