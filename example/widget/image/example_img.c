@@ -76,7 +76,10 @@ static int app_init(void)
     // void *addr = (void *)_acgreen;
 
     // gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", _achour, 0, 0, 0, 0);
+    // gui_img_t *img = gui_img_create_from_fs(gui_obj_get_root(),  "img_1_test", "/pc/example/application/screen_410_502/root_image/root/UI/cellular_menu_card.bin", 0, 0, 0, 0);
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
+
+
 
     gui_img_a8_recolor(img, GUI_COLOR_ARGB8888(255, 0, 0, 0));
 

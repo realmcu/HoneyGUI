@@ -38,21 +38,16 @@ typedef struct gui_gif
     float t_x;                         /* Translation in X direction. */
     float t_y;                         /* Translation in Y direction. */
 
-    union
-    {
-        void *xip_addr;                /* Direct memory address (ROM/RAM). */
-        void *ftl_addr;                /* FTL storage pointer. */
-        char *fs_path;                 /* File system path (heap allocated). */
-        void *data;                    /* Generic pointer (for backward compatibility). */
-    } src;                             /* Image source union. */
+    void *src_data;                    /* Image source pointer (type determined by storage_type). */
 
     gd_GIF *gif;                        /* GIF decoder data */
 
-    uint32_t opacity_value : 8;        /* Opacity value (0-255). */
-    uint32_t blend_mode    : 5;        /* Blend mode. */
-    uint32_t storage_type  : 3;        /* Storage type: e.g., file system, flash, etc. */
-    uint32_t high_quality  : 1;        /* High quality rendering flag. */
-    uint32_t need_clip     : 1;        /* Clipping flag. */
+    uint32_t opacity_value    : 8;        /* Opacity value (0-255). */
+    uint32_t blend_mode       : 5;        /* Blend mode. */
+    uint32_t storage_type     : 3;        /* Storage type: e.g., file system, flash, etc. */
+    uint32_t high_quality     : 1;        /* High quality rendering flag. */
+    uint32_t need_clip        : 1;        /* Clipping flag. */
+    uint32_t free_on_destroy  : 1;        /* Free src_data on destroy if true. */
     uint8_t checksum;                  /* Checksum for change detection. */
 } gui_gif_t;
 

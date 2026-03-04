@@ -75,11 +75,11 @@ static gui_rgb_data_head_t gui_gif_get_header(gui_gif_t *_this)
 
     if (_this->storage_type == IMG_SRC_FILESYS)
     {
-        gui_vfs_file_t *fd = gui_vfs_open(_this->src.fs_path, GUI_VFS_READ);
+        gui_vfs_file_t *fd = gui_vfs_open(_this->src_data, GUI_VFS_READ);
 
         if (fd == NULL)
         {
-            gui_log("open file fail:%s !\n", _this->src.fs_path);
+            gui_log("open file fail:%s !\n", (char *)_this->src_data);
         }
 
         gui_vfs_read(fd, &head, sizeof(head));
@@ -87,12 +87,12 @@ static gui_rgb_data_head_t gui_gif_get_header(gui_gif_t *_this)
     }
     else if (_this->storage_type == IMG_SRC_FTL)
     {
-        uintptr_t base = (uintptr_t)_this->src.ftl_addr;
+        uintptr_t base = (uintptr_t)_this->src_data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
     }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
-        memcpy(&head, _this->src.xip_addr, sizeof(head));
+        memcpy(&head, _this->src_data, sizeof(head));
     }
 
     return head;
@@ -126,7 +126,7 @@ static void gui_gif_prepare(gui_obj_t *obj)
     _this->draw_img = gui_malloc(sizeof(draw_img_t));
     memset(_this->draw_img, 0x00, sizeof(draw_img_t));
 
-    _this->draw_img->data = _this->src.data;
+    _this->draw_img->data = _this->src_data;
     _this->draw_img->blend_mode = _this->blend_mode;
     _this->draw_img->high_quality = _this->high_quality;
     _this->draw_img->opacity_value = obj->parent->opacity_value * _this->opacity_value / UINT8_MAX;
@@ -169,7 +169,7 @@ static void gui_gif_draw_cb(gui_obj_t *obj)
     struct gui_dispdev *dc = gui_get_dc();
 
     // cache img to buffer
-    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src.data);
+    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
     gui_palette_file_t palette = {0};
     change_gif_to_palette(_this, &palette);
 
@@ -185,7 +185,7 @@ static void gui_gif_draw_cb(gui_obj_t *obj)
     }
 
     // release img if cached
-    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src.data);
+    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
 }
 
 /**
@@ -216,10 +216,11 @@ static void gui_gif_destroy(gui_obj_t *obj)
     gui_gif_t *_this = (gui_gif_t *)obj;
     GUI_UNUSED(_this);
 
-    if (_this->storage_type == IMG_SRC_FILESYS && _this->src.fs_path != NULL)
+    if (_this->free_on_destroy && _this->src_data != NULL)
     {
-        gui_free(_this->src.fs_path);
-        _this->src.fs_path = NULL;
+        gui_free(_this->src_data);
+        _this->src_data = NULL;
+        _this->free_on_destroy = false;
     }
 
     if (_this->gif != NULL)
@@ -284,6 +285,7 @@ static void gui_gif_ctor(gui_gif_t            *_this,
     gui_obj_t *obj = (gui_obj_t *)_this;
 
     _this->storage_type = storage_type;
+    _this->free_on_destroy = false;  /* Default: external memory, don't free */
     _this->f_x = 0;
     _this->f_y = 0;
     _this->t_x = 0;
@@ -304,7 +306,7 @@ static void gui_gif_ctor(gui_gif_t            *_this,
     obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM; // GIF uses IMAGE_FROM_MEM type
 
-    _this->src.data = (void *)path;
+    _this->src_data = (void *)path;
 
     _this->opacity_value = 255;
     _this->blend_mode = IMG_FILTER_BLACK;
@@ -316,7 +318,7 @@ static void gui_gif_ctor(gui_gif_t            *_this,
     // Initialize GIF decoder based on storage type
     if (storage_type == IMG_SRC_MEMADDR)
     {
-        gui_gif_file_head_t *gif_head = (gui_gif_file_head_t *)_this->src.xip_addr;
+        gui_gif_file_head_t *gif_head = (gui_gif_file_head_t *)_this->src_data;
         _this->gif = gd_open_gif_from_memory(gif_head->gif, gif_head->size);
         if (gd_get_frame(_this->gif) == 0)
         {
@@ -340,14 +342,20 @@ static void gui_gif_ctor(gui_gif_t            *_this,
             GUI_ASSERT(data != NULL);
             gui_vfs_read(f, (void *)data, size);
             gui_vfs_close(f);
-        }
 
-        if (_this->src.fs_path != NULL)
+            _this->free_on_destroy = true;  /* Allocated memory, must free */
+        }
+        else
         {
-            gui_free(_this->src.fs_path);
+            _this->free_on_destroy = false;  /* XIP memory, don't free */
         }
 
-        _this->src.xip_addr = (void *)data;
+        if (_this->src_data != NULL && _this->free_on_destroy)
+        {
+            gui_free(_this->src_data);
+        }
+
+        _this->src_data = (void *)data;
         gui_gif_file_head_t *gif_head = (gui_gif_file_head_t *)data;
         _this->gif = gd_open_gif_from_memory(gif_head->gif, gif_head->size);
         if (gd_get_frame(_this->gif) == 0)

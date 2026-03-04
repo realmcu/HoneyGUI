@@ -76,7 +76,7 @@ static void gui_img_prepare(gui_obj_t *obj)
     _this->draw_img = gui_malloc(sizeof(draw_img_t));
     memset(_this->draw_img, 0x00, sizeof(draw_img_t));
 
-    _this->draw_img->data = _this->src.data;
+    _this->draw_img->data = _this->src_data;
     _this->draw_img->blend_mode = _this->blend_mode;
     _this->draw_img->high_quality = _this->high_quality;
     _this->draw_img->opacity_value = obj->parent->opacity_value * _this->opacity_value / UINT8_MAX;
@@ -133,7 +133,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
     // cache img to buffer
 
-    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src.data);
+    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
 
     if (_this->need_clip)
     {
@@ -151,7 +151,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
 
     // release img if cached
-    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src.data);
+    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
 
 }
 /**
@@ -202,10 +202,11 @@ static void gui_img_destroy(gui_obj_t *obj)
     gui_img_t *_this = (gui_img_t *)obj;
     GUI_UNUSED(_this);
 
-    if (_this->storage_type == IMG_SRC_FILESYS && _this->src.fs_path != NULL)
+    if (_this->free_on_destroy && _this->src_data != NULL)
     {
-        gui_free(_this->src.fs_path);
-        _this->src.fs_path = NULL;
+        gui_free(_this->src_data);
+        _this->src_data = NULL;
+        _this->free_on_destroy = false;
     }
 
 
@@ -216,11 +217,11 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
 
     if (_this->storage_type == IMG_SRC_FILESYS)
     {
-        gui_vfs_file_t *fd = gui_vfs_open(_this->src.fs_path, GUI_VFS_READ);
+        gui_vfs_file_t *fd = gui_vfs_open(_this->src_data, GUI_VFS_READ);
 
         if (fd == NULL)
         {
-            gui_log("open file fail:%s !\n", _this->src.fs_path);
+            gui_log("open file fail:%s !\n", (char *)_this->src_data);
         }
 
         gui_vfs_read(fd, &head, sizeof(head));
@@ -228,12 +229,12 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
     }
     else if (_this->storage_type == IMG_SRC_FTL)
     {
-        uintptr_t base = (uintptr_t)_this->src.ftl_addr;
+        uintptr_t base = (uintptr_t)_this->src_data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
     }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
-        memcpy(&head, _this->src.xip_addr, sizeof(head));
+        memcpy(&head, _this->src_data, sizeof(head));
     }
 
     return head;
@@ -290,6 +291,7 @@ static void gui_img_ctor(gui_img_t            *_this,
     gui_obj_t *obj = (gui_obj_t *)_this;
 
     _this->storage_type = storage_type;
+    _this->free_on_destroy = false;  /* Default: external memory, don't free */
     _this->f_x = 0;
     _this->f_y = 0;
     _this->t_x = 0;
@@ -312,7 +314,7 @@ static void gui_img_ctor(gui_img_t            *_this,
     obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
-    _this->src.data = (void *)path;
+    _this->src_data = (void *)path;
 
     _this->opacity_value = 255;
     _this->blend_mode = IMG_FILTER_BLACK;
@@ -342,7 +344,39 @@ static void gui_img_ctor(gui_img_t            *_this,
         gui_img_scale(_this, 10.0f / 8.0f, 10.0f / 8.0f);
         gui_log("resize image!! \n");
     }
+    if (storage_type == IMG_SRC_FILESYS)
+    {
+        const void *data = gui_vfs_get_file_address(path);
+        if (!data)
+        {
+            /* Fallback: read file into memory */
+            gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
+            GUI_ASSERT(f != NULL);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+            int size = gui_vfs_tell(f);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+            data = gui_malloc(size);
+            GUI_ASSERT(data != NULL);
+            gui_vfs_read(f, (void *)data, size);
+            gui_vfs_close(f);
 
+            _this->storage_type =
+                IMG_SRC_MEMADDR;  /* Changed from FILESYS_CACHE - free_on_destroy handles ownership */
+            _this->free_on_destroy = true;  /* Allocated memory, must free */
+        }
+        else
+        {
+            _this->free_on_destroy = false;  /* XIP memory, don't free */
+        }
+
+        if (_this->src_data != NULL && _this->free_on_destroy)
+        {
+            gui_free(_this->src_data);
+        }
+
+        _this->src_data = (void *)data;
+
+    }
 
 }
 
@@ -436,11 +470,11 @@ uint16_t gui_img_get_width(gui_img_t *_this)
     {
         struct gui_rgb_data_head head;
         head.w = 0;
-        gui_vfs_file_t *fd = gui_vfs_open(_this->src.fs_path, GUI_VFS_READ);
+        gui_vfs_file_t *fd = gui_vfs_open(_this->src_data, GUI_VFS_READ);
 
         if (fd == NULL)
         {
-            gui_log("open file fail:%s !\n", _this->src.fs_path);
+            gui_log("open file fail:%s !\n", (char *)_this->src_data);
         }
 
         gui_vfs_read(fd, &head, sizeof(head));
@@ -450,13 +484,13 @@ uint16_t gui_img_get_width(gui_img_t *_this)
     else if (_this->storage_type == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
-        uintptr_t base = (uintptr_t)_this->src.ftl_addr;
+        uintptr_t base = (uintptr_t)_this->src_data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.w;
     }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->src.xip_addr;
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->src_data;
         return head->w;
     }
 
@@ -469,11 +503,11 @@ uint16_t gui_img_get_height(gui_img_t *_this)
     {
         struct gui_rgb_data_head head;
         head.h = 0;
-        gui_vfs_file_t *fd = gui_vfs_open(_this->src.fs_path, GUI_VFS_READ);
+        gui_vfs_file_t *fd = gui_vfs_open(_this->src_data, GUI_VFS_READ);
 
         if (fd == NULL)
         {
-            gui_log("open file fail:%s !\n", _this->src.fs_path);
+            gui_log("open file fail:%s !\n", (char *)_this->src_data);
         }
 
         gui_vfs_read(fd, &head, sizeof(head));
@@ -483,13 +517,13 @@ uint16_t gui_img_get_height(gui_img_t *_this)
     else if (_this->storage_type == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
-        uintptr_t base = (uintptr_t)_this->src.ftl_addr;
+        uintptr_t base = (uintptr_t)_this->src_data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.h;
     }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->src.xip_addr;
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->src_data;
         return head->h;
     }
 
@@ -506,8 +540,8 @@ void gui_img_refresh_size(gui_img_t *_this)
 void gui_img_refresh_draw_data(gui_img_t  *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    GUI_ASSERT(this->src.data != NULL);
-    this->draw_img->data = this->src.data;
+    GUI_ASSERT(this->src_data != NULL);
+    this->draw_img->data = this->src_data;
 }
 
 void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)
@@ -563,20 +597,23 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
     GUI_ASSERT(file_pointer != NULL);
     GUI_ASSERT(storage_type <= IMG_SRC_FTL);
 
-    if (_this->storage_type == IMG_SRC_FILESYS && _this->src.fs_path != NULL)
+    /* Free old src_data if we own it */
+    if (_this->free_on_destroy && _this->src_data != NULL)
     {
-        gui_free(_this->src.fs_path);
-        _this->src.fs_path = NULL;
+        gui_free(_this->src_data);
+        _this->src_data = NULL;
     }
 
     if (storage_type == IMG_SRC_FILESYS)
     {
-        _this->src.fs_path = gui_strdup((const char *)file_pointer);
-        GUI_ASSERT(_this->src.fs_path != NULL);
+        _this->src_data = gui_strdup((const char *)file_pointer);
+        GUI_ASSERT(_this->src_data != NULL);
+        _this->free_on_destroy = true;  /* We own the strdup'd memory */
     }
     else
     {
-        _this->src.data = (void *)file_pointer;
+        _this->src_data = (void *)file_pointer;
+        _this->free_on_destroy = false;  /* External pointer */
     }
 
     _this->storage_type = storage_type;
@@ -585,7 +622,7 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
 const uint8_t *gui_img_get_image_data(gui_img_t  *_this)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->src.data;
+    return _this->src_data;
 }
 void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)
 {

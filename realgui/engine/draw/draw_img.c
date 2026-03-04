@@ -317,7 +317,7 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *p
     {
         gui_free(img->data);
     }
-    if (src_mode == IMG_SRC_MEMADDR)
+    else if (src_mode == IMG_SRC_MEMADDR)
     {
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
         if (head->jpeg)
