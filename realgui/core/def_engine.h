@@ -68,6 +68,7 @@ typedef struct acc_engine
     void *(* idu_load)(void *input);
     void (* idu_free)(void *);
     bool enable_async;
+    bool enable_thread_sync;
     void *hw_acc_cache_mem; //for hardware acceleration cache memory
     uint32_t hw_acc_cache_size; //for hardware acceleration cache memory size
 
