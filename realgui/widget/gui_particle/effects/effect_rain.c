@@ -228,7 +228,7 @@ static void effect_rain_config(particle_effect_config_t *config)
 gui_particle_widget_t *effect_rain_create(gui_obj_t *parent, const char *name,
                                           int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    s_ground_y = (float)(h - 30);
+    s_ground_y = (float)(h - 5);
 
     s_rain_widget = gui_particle_widget_create(parent, name,
                                                x, y, w, h,
