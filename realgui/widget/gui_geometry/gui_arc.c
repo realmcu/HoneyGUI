@@ -102,14 +102,23 @@ static void gui_arc_prepare(gui_arc_t *this)
     {
         obj->matrix = gui_malloc(sizeof(gui_matrix_t));
         GUI_ASSERT(obj->matrix != NULL);
-        matrix_identity(obj->matrix);
     }
+
+    // Reset matrix to identity before applying transformations
+    matrix_identity(obj->matrix);
+
+    // Get absolute position of widget
+    int abs_x, abs_y;
+    gui_obj_absolute_xy(obj, &abs_x, &abs_y);
+
+    // Translate to absolute position first
+    matrix_translate(abs_x, abs_y, obj->matrix);
 
     // Apply transformations (like gui_img_prepare does)
     float center_x = obj->w / 2.0f;
     float center_y = obj->h / 2.0f;
 
-    // Apply offset first
+    // Apply offset
     matrix_translate(this->offset_x, this->offset_y, obj->matrix);
     // Translate to center
     matrix_translate(center_x, center_y, obj->matrix);
@@ -425,9 +434,18 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
 void gui_arc_set_position(gui_arc_t *arc, int x, int y)
 {
     GUI_ASSERT(arc != NULL);
-    arc->x = x;
-    arc->y = y;
-    arc->buffer_valid = false;
+
+    // Calculate widget bounding box size
+    float outer_r = arc->radius + arc->line_width / 2 + 2;
+    int box_size = (int)(outer_r * 2) + 4;
+
+    // Update widget position (top-left corner relative to parent)
+    arc->base.x = x - box_size / 2;
+    arc->base.y = y - box_size / 2;
+
+    arc->base.w = box_size;
+    arc->base.h = box_size;
+
 }
 
 void gui_arc_set_radius(gui_arc_t *arc, int radius)
