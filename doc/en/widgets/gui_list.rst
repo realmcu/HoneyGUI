@@ -56,6 +56,11 @@ Set Card Style Stacking Position
 The :cpp:any:`gui_list_set_card_stack_location` function can be used to set card style stacking position.
 
 
+Set Circle Style Radius
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_circle_radius` function can be used to set circle style radius.
+
+
 Set List Widget Out Scope
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_list_set_out_scope` function can be used to set list widget out scope.

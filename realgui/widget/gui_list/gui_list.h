@@ -28,7 +28,7 @@ extern "C" {
 /* LIST_STYLE enum start*/
 typedef enum
 {
-    LIST_CLASSIC = 0, ///< Classic list.
+    LIST_CLASSIC = 0,      ///< Classic list.
     LIST_CIRCLE,           ///< Circle list.
     LIST_ZOOM,             ///< Zoom center list.
     LIST_CARD,             ///< Stack like card.
@@ -60,6 +60,7 @@ typedef struct gui_list
     uint32_t note_num        : 8; // number of whole notes.
     uint32_t space           : 8;
     uint32_t area_display    : 1; // 0:disable area display, 1:enable area display.
+    uint16_t circle_radius;    // Circle radius. Only support CIRCLE style.
 
     uint16_t note_length;        // List note length.
     int16_t speed;
@@ -189,6 +190,13 @@ void gui_list_set_note_num(gui_list_t *list, uint16_t num);
  * @param location Distance from stack location to the screen bottom of right.
  */
 void gui_list_set_card_stack_location(gui_list_t *list, int16_t location);
+
+/**
+ * @brief Set circle radius, only valid when list style is LIST_CIRCLE, default is half of list width or height.
+ * @param list Pointer to the list widget.
+ * @param radius Circle radius.
+ */
+void gui_list_set_circle_radius(gui_list_t *list, uint16_t radius);
 
 /**
  * @brief Set out scope of list, which is the distance that can be slightly exceeded when scrolling.

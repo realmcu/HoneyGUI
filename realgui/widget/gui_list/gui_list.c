@@ -524,12 +524,11 @@ static void gui_list_note_circle(gui_obj_t *obj)
     gui_list_t *list = (gui_list_t *)obj->parent;
     matrix_translate(-obj->x, -obj->y, obj->matrix);
 
-    int32_t r = (list->dir == HORIZONTAL) ? list->base.h : list->base.w;
-    r *= 2;
+    int32_t r = list->circle_radius;
     int32_t diff = (list->dir == HORIZONTAL)
                    ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
                    : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
-    int32_t coord = diff >= r ? r : r - (int)sqrt(r * r - diff * diff);
+    int32_t coord = abs(diff) >= r ? r : r - (int)sqrt(r * r - diff * diff);
     if (list->dir == HORIZONTAL)
     {
         obj->y = coord;
@@ -1133,10 +1132,12 @@ gui_list_t *gui_list_create(void       *parent,
     if (dir == HORIZONTAL)
     {
         _this->total_length = w;
+        _this->circle_radius = _this->base.h;
     }
     else
     {
         _this->total_length = h;
+        _this->circle_radius = _this->base.w;
     }
     GET_BASE(_this)->obj_cb = gui_list_cb;
     GET_BASE(_this)->has_input_prepare_cb = true;
@@ -1259,6 +1260,10 @@ void gui_list_set_bar_color(gui_list_t *list, gui_color_t color)
 void gui_list_set_card_stack_location(gui_list_t *list, int16_t location)
 {
     list->card_stack_location = location;
+}
+void gui_list_set_circle_radius(gui_list_t *list, uint16_t radius)
+{
+    list->circle_radius = radius;
 }
 
 void gui_list_enable_loop(gui_list_t *list, bool loop)
