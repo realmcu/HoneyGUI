@@ -5,159 +5,18 @@
  */
 
 /*============================================================================*
- *                        Header Files
+ *                           Header Files
  *============================================================================*/
-#include "string.h"
-#include "stdio.h"
-#include "stdlib.h"
-
-#include "guidef.h"
-#include "gui_obj.h"
-#include "gui_server.h"
-#include "gui_components_init.h"
-#include "gui_text.h"
-#include "gui_scroll_text.h"
-#include "gui_view.h"
 #include "test_font.h"
-
-#include "font_mem.h"
-#include "font_custom.h"
-
-/*============================================================================*
- *                           Types
- *============================================================================*/
-
-
-/*============================================================================*
- *                           Constants
- *============================================================================*/
-
-
-/*============================================================================*
- *                            Macros
- *============================================================================*/
-#define FONT_MEM_POOL_SIZE (1024 * 1024 * 100)
-uint8_t s_font_mem_pool[FONT_MEM_POOL_SIZE];
-static size_t s_font_mem_offset = 0;
-
-/*============================================================================*
- *                            Variables
- *============================================================================*/
-
-void *font32b1;
-void *font32b2;
-void *font32b4;
-void *font32b8;
-void *font32vb4;
-
-void *font32b4index1;
-void *font32vb4index1;
-
-void *fontnoto;
-void *fontnotoarabic;
-void *fontnotojp;
-void *fontnotokr;
-void *fontnotothai;
-void *fontnotohebrew;
-void *fontharmonysc;
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
 
 /**
- * @brief Load file into memory
- * @param path File path
- * @param out_size [out] Optional output parameter for file size
- * @return Pointer to allocated memory, NULL on failure
- */
-static void *load_file_to_memory(const char *path, size_t *out_size)
-{
-    FILE *fp = fopen(path, "rb");
-    if (!fp)
-    {
-        gui_log("Failed to open file: %s\n", path);
-        return NULL;
-    }
-
-    fseek(fp, 0, SEEK_END);
-    long file_size = ftell(fp);
-    rewind(fp);
-
-    if (file_size <= 0)
-    {
-        fclose(fp);
-        return NULL;
-    }
-
-    if (s_font_mem_offset + file_size > FONT_MEM_POOL_SIZE)
-    {
-        gui_log("Font memory pool overflow!\n");
-        fclose(fp);
-        return NULL;
-    }
-
-    void *buffer = &s_font_mem_pool[s_font_mem_offset];
-    s_font_mem_offset += file_size;
-
-    if (fread(buffer, 1, file_size, fp) != (size_t)file_size)
-    {
-        // Note: buffer is from static memory pool, no need to free
-        // Rollback the offset instead
-        s_font_mem_offset -= file_size;
-        fclose(fp);
-        return NULL;
-    }
-
-    fclose(fp);
-
-    if (out_size)
-    {
-        *out_size = (size_t)file_size;
-    }
-
-    return buffer;
-}
-
-
-/**
- * @brief Initialize font files
- */
-static void font_file_init(void)
-{
-    s_font_mem_offset = 0;
-
-    font32b1 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits1_font.bin", NULL);
-    font32b2 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits2_font.bin", NULL);
-    font32b4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_font.bin", NULL);
-    font32b8 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits8_font.bin", NULL);
-    font32vb4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_vfont.bin", NULL);
-
-    font32b4index1 = load_file_to_memory("./example/assets/font/NotoSans_Regular_size32_bits4_font.bin",
-                                         NULL);
-    font32vb4index1 =
-        load_file_to_memory("./example/assets/font/NotoSans_Regular_size32_bits4_vfont.bin", NULL);
-
-    fontnoto = load_file_to_memory("./example/assets/font/NotoSans_size32_bits2_font.bin", NULL);
-    fontnotoarabic = load_file_to_memory("./example/assets/font/NotoSansArabic_size32_bits2_font.bin",
-                                         NULL);
-    fontnotojp = load_file_to_memory("./example/assets/font/NotoSansJP_size32_bits2_font.bin", NULL);
-    fontnotokr = load_file_to_memory("./example/assets/font/NotoSansKR_size32_bits2_font.bin", NULL);
-    fontnotothai = load_file_to_memory("./example/assets/font/NotoSansThai_size32_bits2_font.bin",
-                                       NULL);
-    fontnotohebrew = load_file_to_memory("./example/assets/font/NotoSansHebrew_size32_bits2_font.bin",
-                                         NULL);
-    fontharmonysc = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits2_font.bin", NULL);
-
-    gui_font_mem_init(font32b2);
-}
-
-
-/**
  * @brief Test event callback
  * @param obj Event source object
  * @param e Event type
- * @param param Event parameters
  */
 static void test_event_cb(void *obj, gui_event_t *e)
 {
@@ -165,7 +24,6 @@ static void test_event_cb(void *obj, gui_event_t *e)
 
     gui_log("Event test obj name = %s, e = 0x%x !\n", this->name, e->code);
 }
-
 
 /**
  * @brief Timer callback
@@ -176,98 +34,17 @@ static void test_timer_cb(void *param)
     (void)param;
 
     gui_log("timer cb test!\n");
-
 }
 
-/**
- * @brief Create and configure a horizontal and a vertical scroll text widget example
- */
-/* gui scroll text widget example start*/
-static void scroll_text_widget_example(void)
-{
-    char *test_text =
-        "Everyone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom, either alone or in community with others and in public or private, to manifest his religion or belief in teaching, practice, worship and observance. ";
-
-    gui_scroll_text_t *scroll_text_x = gui_scroll_text_create(gui_obj_get_root(), "scroll_text", 0, 200,
-                                                              300, 200);
-    gui_scroll_text_set(scroll_text_x, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
-                        32);
-    gui_scroll_text_scroll_set(scroll_text_x, SCROLL_X, 300, 100, 40000, 0);
-    gui_scroll_text_type_set(scroll_text_x, font32b2, FONT_SRC_MEMADDR);
-
-    gui_scroll_text_t *scroll_text_y = gui_scroll_text_create(gui_obj_get_root(), "scroll_text", 50,
-                                                              250, 300, 100);
-    gui_scroll_text_set(scroll_text_y, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
-                        32);
-    gui_scroll_text_scroll_set(scroll_text_y, SCROLL_Y, 100, 100, 10000, 0);
-    gui_scroll_text_type_set(scroll_text_y, font32b2, FONT_SRC_MEMADDR);
-    gui_text_wordwrap_set(&scroll_text_y->base, true);
-}
-/* gui scroll text widget example end*/
-
-/* gui custom font rendiring demo start*/
-static void font_load(gui_text_t *text, gui_text_rect_t *rect)
-{
-    GUI_UNUSED(text);
-    GUI_UNUSED(rect);
-
-    gui_log("font_load\n");
-    gui_font_mem_load(text, rect);
-}
-
-static void font_draw(gui_text_t *text, gui_text_rect_t *rect)
-{
-    GUI_UNUSED(text);
-    GUI_UNUSED(rect);
-
-    gui_log("font_draw\n");
-    gui_font_mem_draw(text, rect);
-}
-
-static void font_unload(gui_text_t *text)
-{
-    GUI_UNUSED(text);
-
-    gui_log("font_unload\n");
-    gui_font_mem_unload(text);
-}
-
-static void font_destroy(gui_text_t *text)
-{
-    GUI_UNUSED(text);
-
-    gui_log("font_destroy\n");
-    gui_font_mem_destroy(text);
-}
-
-static void free_widget_cb(void *obj, gui_event_t *e)
-{
-    GUI_UNUSED(obj);
-    gui_obj_tree_free((gui_obj_t *)e->user_data);
-}
-
-static void custom_font_rendering_demo(void)
-{
-    gui_log("custom_font_rendering_demo\n");
-    gui_font_custom_set_callbacks(font_load, font_draw, font_unload, font_destroy);
-
-    gui_text_t *text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
-    gui_text_set(text, "HoneyGUI", GUI_FONT_SRC_CUS, APP_COLOR_WHITE, 8, 32);
-    gui_text_type_set(text, font32b1, FONT_SRC_MEMADDR);
-
-    gui_text_t *free_text = gui_text_create(gui_obj_get_root(), "free_text", 0, 430, 0, 48);
-    gui_text_set(free_text, "DESTROY", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 7, 48);
-    gui_text_type_set(free_text, font32vb4, FONT_SRC_MEMADDR);
-    gui_text_mode_set(free_text, RIGHT);
-    gui_obj_add_event_cb(free_text, free_widget_cb, GUI_EVENT_TOUCH_CLICKED, text);
-}
-/* gui custom font rendiring demo end*/
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 /**
  * @brief Create and configure a text widget example
  */
 /* gui text widget example start*/
-static void text_widget_example(void)
+void text_widget_example(void)
 {
     gui_text_t *text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
     gui_text_set(text, "HoneyGUI", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 8, 32);
@@ -280,39 +57,42 @@ static void text_widget_example(void)
 }
 /* gui text widget example end*/
 
+/**
+ * @brief Text widget demo application entry
+ *
+ * Uncomment the desired test case(s) below to run.
+ * Only one test case should be active at a time to
+ * avoid UI conflicts.
+ *
+ * @note Available test cases:
+ *
+ * | # | Function                         | Description                                                              |
+ * |---|----------------------------------|--------------------------------------------------------------------------|
+ * | 1 | text_widget_example()            | Basic text widget with click event and periodic timer callback           |
+ * | 2 | scroll_text_widget_example()     | Horizontal (SCROLL_X) and vertical (SCROLL_Y) auto-scrolling text        |
+ * | 3 | custom_font_rendering_demo()     | Custom font engine with user-defined load/draw/unload/destroy            |
+ * | 4 | text_font_rendering_test()       | Swipeable views: bitmap(1/2/4/8-bit), vector, bold, matrix, img, bench   |
+ * | 5 | text_font_layout_test()          | Swipeable views: single-line, multi-line, scroll, vertical, RTL          |
+ * | 6 | text_multi_language_test()       | Language list with per-language rendering (AR, EN, ZH, TH, HE)           |
+ * | 7 | text_font_scroll_function_test() | Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes      |
+ * | 8 | text_font_source_mode_test()     | 3x4 grid: source(MEMADDR/FTL/FILESYS) x type(BMP/IMG/MAT/TTF)            |
+ *
+ * @return 0 on success
+ */
 static int app_init(void)
 {
     font_file_init();
 
-    /* gui text widget example */
-    text_widget_example();
-
-    /* gui scroll text widget example */
-    // scroll_text_widget_example();
-
-    /* gui custom font rendiring demo */
-    // custom_font_rendering_demo();
-
-    /* gui text font rendering test */
-    // text_font_rendering_test();
-
-    /* gui text font layout test */
-    // text_font_layout_test();
-
-    /* gui text multi language test */
-    // text_multi_language_test();
-
-    /* gui text font scroll function test */
-    // text_font_scroll_function_test();
-
-    /* gui text font source mode test */
-    // text_font_source_mode_test();
+    text_widget_example();              /* [1] Basic text widget       */
+    // scroll_text_widget_example();    /* [2] Scroll text             */
+    // custom_font_rendering_demo();    /* [3] Custom font rendering   */
+    // text_font_rendering_test();      /* [4] Font rendering styles   */
+    // text_font_layout_test();         /* [5] Text layout modes       */
+    // text_multi_language_test();      /* [6] Multi-language support  */
+    // text_font_scroll_function_test();/* [7] Scroll function control */
+    // text_font_source_mode_test();    /* [8] Font source modes       */
 
     return 0;
 }
 
 GUI_INIT_APP_EXPORT(app_init);
-
-/*============================================================================*
- *                           Public Functions
- *============================================================================*/

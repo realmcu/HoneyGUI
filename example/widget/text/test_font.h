@@ -69,6 +69,12 @@ extern void *fontharmonysc;
  *                           Functions
  *============================================================================*/
 
+void font_file_init(void);
+
+void text_widget_example(void);
+void scroll_text_widget_example(void);
+void custom_font_rendering_demo(void);
+
 void text_font_rendering_test(void);
 void text_font_layout_test(void);
 void text_multi_language_test(void);
