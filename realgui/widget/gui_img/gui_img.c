@@ -366,6 +366,7 @@ static void gui_img_ctor(gui_img_t            *_this,
         }
         else
         {
+            _this->storage_type = IMG_SRC_MEMADDR;  /* XIP is also direct memory access */
             _this->free_on_destroy = false;  /* XIP memory, don't free */
         }
 
