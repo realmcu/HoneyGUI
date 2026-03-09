@@ -60,6 +60,8 @@ typedef struct gui_list
     uint32_t note_num        : 8; // number of whole notes.
     uint32_t space           : 8;
     uint32_t area_display    : 1; // 0:disable area display, 1:enable area display.
+    uint32_t keep_note_alive  : 1;
+
     uint16_t circle_radius;    // Circle radius. Only support CIRCLE style.
 
     uint16_t note_length;        // List note length.
@@ -232,6 +234,13 @@ void gui_list_enable_loop(gui_list_t *list, bool loop);
  * @param enable True: enable area display, false: disable area display. Default is false.
  */
 void gui_list_enable_area_display(gui_list_t *list, bool enable);
+
+/**
+ * @brief Set keep note alive, which is used to keep notes alive in memory when the list is scrolled. Can't enable keep note alive when list enables loop.
+ * @param list Pointer to the list widget.
+ * @param enable True: enable keep note alive, false: disable keep note alive. Default is false.
+ */
+void gui_list_keep_note_alive(gui_list_t *list, bool enable);
 
 #ifdef __cplusplus
 }

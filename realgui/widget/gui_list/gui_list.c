@@ -195,7 +195,7 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
             int16_t distance;
             int16_t half_grid = grid_size / 2;
             int16_t abs_remainder = abs(remainder);
-            if (abs_remainder > half_grid)
+            if (abs_remainder > half_grid && (_this->offset > temp - _this->total_length))
             {
                 distance = g_move_indicator * (grid_size - abs_remainder);
             }
@@ -292,6 +292,18 @@ static void gui_list_input_prepare(gui_obj_t *obj)
     if (!tp->pressing)
     {
         gui_list_inertia_motion(obj);
+    }
+
+    if (_this->keep_note_alive == true)
+    {
+        if (obj->child_list.next == &obj->child_list)
+        {
+            for (int i = 0; i < _this->note_num; i++)
+            {
+                gui_list_add_note(_this, i);
+            }
+        }
+        return;
     }
 
     gui_list_free_notes(obj);
@@ -1210,11 +1222,6 @@ void gui_list_set_factor(gui_list_t *list, float factor)
 
 void gui_list_set_auto_align(gui_list_t *list, bool auto_align)
 {
-    if (list->space != 0)
-    {
-        list->space = 0;
-        gui_log("warning: list space is set to 0 when auto_align is enabled!!!\n");
-    }
     list->auto_align = auto_align;
 }
 
@@ -1269,11 +1276,15 @@ void gui_list_set_circle_radius(gui_list_t *list, uint16_t radius)
 void gui_list_enable_loop(gui_list_t *list, bool loop)
 {
     int16_t temp = list->dir == HORIZONTAL ? list->base.w : list->base.h;
-    if (list->total_length <= temp)
+    if (list->total_length <= temp || list->style == LIST_CARD || list->keep_note_alive)
     {
-        gui_log("warning: list loop is disabled");
+        gui_log("warning: list loop is disabled!!!\n");
         list->loop = false;
         return;
+    }
+    if (list->out_scope > 0)
+    {
+        list->out_scope = 0;
     }
     list->loop = loop;
 }
@@ -1287,4 +1298,15 @@ void gui_list_enable_area_display(gui_list_t *list, bool enable)
         gui_obj_tree_free(list->bar);
         gui_list_create_bar(list, list->base.x, list->base.y, list->base.w, list->base.h);
     }
+}
+
+void gui_list_keep_note_alive(gui_list_t *list, bool enable)
+{
+    if (list->loop)
+    {
+        gui_log("warning: keep note alive is disabled when list enables loop!!!\n");
+        list->keep_note_alive = false;
+        return;
+    }
+    list->keep_note_alive = enable;
 }

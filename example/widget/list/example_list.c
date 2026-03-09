@@ -16,11 +16,11 @@
 #include "gui_list.h"
 
 /* Use the following macro to checkout the different style lists */
-// #define RUN_VERTICAL_CIRCLE_STYLE
+#define RUN_VERTICAL_CIRCLE_STYLE
 // #define RUN_VERTICAL_CARD_STYLE
 // #define RUN_HORIZONTAL_ZOOM_STYLE
 // #define RUN_VERTICAL_FAN_STYLE
-#define RUN_VERTICAL_HELIX_STYLE
+// #define RUN_VERTICAL_HELIX_STYLE
 // #define RUN_VERTICAL_CURL_STYLE
 // #define RUN_VERTICAL_CLASSIC_STYLE
 // #define RUN_VERTICAL_FADE_STYLE
@@ -45,11 +45,11 @@ static void note_design(gui_obj_t *obj, void *p)
     };
     uint16_t index = ((gui_list_note_t *)obj)->index % (sizeof(color) / sizeof(gui_color_t));
 #ifdef RUN_VERTICAL_CIRCLE_STYLE
-    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 480, 100, 0, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 480, length, 0, color[index]);
 #endif
 
 #ifdef RUN_HORIZONTAL_ZOOM_STYLE
-    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 100, 480, 0, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, length, 480, 0, color[index]);
 #endif
 
 #ifdef RUN_VERTICAL_CARD_STYLE
@@ -88,23 +88,28 @@ static void note_design(gui_obj_t *obj, void *p)
 #endif
 
 #ifdef RUN_VERTICAL_FADE_STYLE
-    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 480, 480, 0, color[index]);
+    gui_rounded_rect_t *canvas = gui_rect_create(obj, "note", 0, 0, 480, 460, 0, color[index]);
 #endif
     GUI_UNUSED(canvas);
 }
 
 static int app_init(void)
 {
-    uint16_t space = 0;
+    uint16_t space = 10;
 
     /* VERTICAL CIRCLE STYLE */
 #ifdef RUN_VERTICAL_CIRCLE_STYLE
 
-    gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
+    gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 480, length, space,
+                                       VERTICAL,
                                        note_design, NULL, false);
     gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_CIRCLE);
     gui_list_set_out_scope(list, 100);
+    gui_list_set_circle_radius(list, 240);
+    gui_list_set_auto_align(list, true);
+    // gui_list_keep_note_alive(list, true);
+    gui_list_enable_loop(list, true);
     return 0;
 #endif
 
@@ -128,6 +133,9 @@ static int app_init(void)
                                        HORIZONTAL, note_design, NULL, false);
     gui_list_set_style(list, LIST_ZOOM);
     gui_list_set_note_num(list, NOTE_NUM);
+    gui_list_set_out_scope(list, 100);
+    gui_list_set_auto_align(list, true);
+    gui_list_enable_loop(list, true);
     return 0;
 #endif
 

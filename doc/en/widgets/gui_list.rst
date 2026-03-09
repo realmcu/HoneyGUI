@@ -84,6 +84,11 @@ Set List Widget Area Display
 The :cpp:any:`gui_list_enable_area_display` function can be used to enable area display of list widget. When the starting point of the list widget is not at the edge of the screen, enabling area display can limit the note to a more reasonable area than the entire screen for dynamically creating.
 
 
+Set List Widget Keep Note Alive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_keep_note_alive` function can be used to set list widget keep note alive. By default, the parameter is set to ``false`` for dynamic creating, and the memory and CPU usage will be saved.
+
+
 Example
 ---------
 
