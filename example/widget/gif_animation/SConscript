@@ -15,13 +15,3 @@ if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_GIF_WIDGET'):
     objs = DefineGroup('realgui/demo', src, depend=[''], CPPPATH=inc, CPPDEFINES=CPPDEFINES)
 
 Return('objs')
-import os
-from building import *
-
-cwd = GetCurrentDir()
-src = Glob('*.c')
-inc = [cwd]
-
-group = DefineGroup('gif_animation_example', src, depend=[''], CPPPATH=inc)
-
-Return('group')
