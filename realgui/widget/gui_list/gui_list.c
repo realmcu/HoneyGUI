@@ -771,12 +771,13 @@ static void gui_list_note_fade(gui_obj_t *obj)
         {
             obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->x) / obj->w;
             obj->matrix->m[0][2] = list->base.x;
+            obj->x = list->base.x;
         }
         else
         {
             obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->y) / obj->h;
             obj->matrix->m[1][2] = list->base.y;
-
+            obj->y = list->base.y;
         }
         flag = obj->opacity_value > UINT8_MAX / 2;
     }
