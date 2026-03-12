@@ -133,25 +133,6 @@ void gui_font_mem_unload(gui_text_t *text);
 void gui_font_mem_destroy(gui_text_t *text);
 
 /**
- * @brief Get the pixel width of the text in the current font file.
- *
- * @param content Text pointer.
- * @param font_bin_addr Font file address.
- * @param charset Text encoding format.
- * @return Character width.
- */
-uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset);
-
-/**
- * @brief Get the pixel width of the utf-8 text in the current font file.
- *
- * @param content Text pointer.
- * @param font_bin_addr Font file address.
- * @return Character width.
- */
-uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
-
-/**
  * @brief Get the font library node by size.
  *
  * @param font_size Font size.

@@ -764,6 +764,33 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
     this->font_type = GUI_FONT_SRC_IMG;
 }
 
+void gui_text_layout_measure(gui_text_t *this_widget)
+{
+    if (this_widget == NULL || this_widget->len == 0)
+    {
+        return;
+    }
+
+    gui_text_rect_t rect = {0};
+    rect.x1 = 0;
+    rect.y1 = 0;
+    rect.x2 = this_widget->base.w - 1;
+    rect.y2 = this_widget->base.h - 1;
+    rect.xboundleft = 0;
+    rect.xboundright = 32767;
+    rect.yboundtop = 0;
+    rect.yboundbottom = 32767;
+
+    this_widget->content_refresh = true;
+    this_widget->layout_refresh = true;
+
+    gui_text_font_load(this_widget, &rect);
+    gui_text_font_unload(this_widget);
+
+    this_widget->content_refresh = true;
+    this_widget->layout_refresh = true;
+}
+
 gui_text_t *gui_text_create(void       *parent,
                             const char *name,
                             int16_t     x,

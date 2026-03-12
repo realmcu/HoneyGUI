@@ -360,6 +360,19 @@ gui_text_t *gui_text_create(void       *parent,
                             int16_t     w,
                             int16_t     h);
 
+/**
+ * @brief Perform text layout measurement without rendering.
+ *
+ * Triggers the full font loading and layout pipeline using the widget's
+ * current properties, then writes results back to the widget's fields:
+ * char_width_sum, char_height_sum, char_line_sum, active_font_len, font_len.
+ *
+ * Can be called right after gui_text_set() / gui_text_mode_set() etc.,
+ * before any draw cycle.
+ *
+ * @param this_widget Text widget pointer (must have content and font set).
+ */
+void gui_text_layout_measure(gui_text_t *this_widget);
 
 gui_inline bool gui_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
 {

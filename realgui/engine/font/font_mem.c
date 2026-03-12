@@ -835,6 +835,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     break;
                 }
             }
+            char_height_sum = text->font_height;
             break;
         }
     case MULTI_LEFT:
@@ -960,6 +961,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     break;
                 }
             }
+            char_height_sum = text->font_height;
             break;
         }
     case SCROLL_Y:
@@ -1530,153 +1532,3 @@ uint8_t gui_font_mem_delete(uint8_t *font_bin_addr)
     return 0;
 }
 
-uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr)
-{
-    return gui_get_mem_char_width(content, font_bin_addr, UTF_8);
-}
-
-uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset)
-{
-    GUI_FONT_HEAD_BMP *font = (GUI_FONT_HEAD_BMP *)font_bin_addr;
-    uint32_t string_len = strlen(content);
-    uintptr_t table_offset = (uintptr_t)((uint8_t *)font_bin_addr + font->head_length);
-    uintptr_t dot_offset = table_offset + font->index_area_size;
-
-    uint8_t aliened_font_size = font->font_size;
-    if (font->font_size % 8 != 0)
-    {
-        aliened_font_size = 8 - font->font_size % 8 + font->font_size;
-    }
-    uint32_t font_area = aliened_font_size * font->font_size / 8 * font->render_mode + 4;
-    uint8_t index_unit_length = 4; //now set to 4 , todo
-    uint32_t *unicode_buffer = NULL;
-    uint16_t unicode_len = 0;
-    unicode_len = process_content_by_charset(charset, content, string_len, &unicode_buffer);
-    if (content_has_ap_unicode(unicode_buffer, unicode_len))
-    {
-        unicode_len = process_ap_unicode(unicode_buffer, unicode_len);
-    }
-
-    uint32_t all_char_w = 0;
-    uint32_t line_flag = 0;
-
-    if (font->crop)
-    {
-        switch (font->index_method)
-        {
-        case 0: //address
-            for (uint32_t i = 0; i < unicode_len; i++)
-            {
-                uint32_t offset = 0;
-                uint16_t char_w = 0;
-                if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
-                {
-                    char_w = font->font_size / 4;
-                }
-                else if (unicode_buffer[i] == 0x0A)
-                {
-                    line_flag ++;
-                    char_w = 0;
-                }
-                else
-                {
-                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + unicode_buffer[i] *
-                                                         index_unit_length);
-                    offset = *offset_addr;
-                    if (offset == 0xFFFFFFFF) { continue; }
-                    uint8_t *dot_addr = (uint8_t *)font_bin_addr + offset + 4;
-                    char_w = (uint8_t)(*(dot_addr - 2));
-                }
-                all_char_w += char_w;
-            }
-            break;
-        case 1: //offset
-            for (uint32_t i = 0; i < unicode_len; i++)
-            {
-                uint32_t offset = 0;
-                uint16_t char_w = 0;
-                if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
-                {
-                    char_w = font->font_size / 4;
-                }
-                else if (unicode_buffer[i] == 0x0A)
-                {
-                    line_flag ++;
-                    char_w = 0;
-                }
-                else
-                {
-                    // Binary search for unicode in offset+crop index table
-                    offset = font_index_bsearch_crop_offset(table_offset, font->index_area_size,
-                                                            unicode_buffer[i]);
-                    if (offset == 0xFFFFFFFF) { continue; }
-                    uint8_t *dot_addr = (uint8_t *)font_bin_addr + offset + 4;
-                    char_w = (uint8_t)(*(dot_addr - 2));
-                }
-                all_char_w += char_w;
-            }
-            break;
-        default:
-            break;
-        }
-    }
-    else
-    {
-        switch (font->index_method)
-        {
-        case 0: //address
-            for (uint32_t i = 0; i < unicode_len; i++)
-            {
-                uint16_t offset = 0;
-                uint16_t char_w = 0;
-                if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
-                {
-                    char_w = font->font_size / 4;
-                }
-                else if (unicode_buffer[i] == 0x0A)
-                {
-                    line_flag ++;
-                    char_w = 0;
-                }
-                else
-                {
-                    offset = *(uint16_t *)(uintptr_t)(unicode_buffer[i] * 2 + table_offset);
-                    if (offset == 0xFFFF) { continue; }
-                    uint8_t *dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
-                    char_w = (int16_t)(*(dot_addr - 2));
-                }
-                all_char_w += char_w;
-            }
-            break;
-        case 1: //offset
-            for (uint32_t i = 0; i < unicode_len; i++)
-            {
-                uint16_t char_w = 0;
-                if (unicode_buffer[i] == 0x0A)
-                {
-                    line_flag ++;
-                    char_w = 0;
-                }
-                else if (unicode_buffer[i] == 0x20)
-                {
-                    char_w = font->font_size / 4;
-                }
-                else
-                {
-                    int32_t index = font_index_bsearch_bmp(table_offset, font->index_area_size, unicode_buffer[i]);
-                    if (index >= 0)
-                    {
-                        uint8_t *dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
-                        char_w = (int16_t)(*(dot_addr - 2));
-                    }
-                }
-                all_char_w += char_w;
-            }
-            break;
-        default:
-            break;
-        }
-    }
-    gui_free(unicode_buffer);
-    return all_char_w;
-}

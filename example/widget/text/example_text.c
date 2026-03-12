@@ -78,6 +78,7 @@ void text_widget_example(void)
  * | 7 | text_font_scroll_function_test() | Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes      |
  * | 8 | text_font_source_mode_test()     | 3x4 grid: source(MEMADDR/FTL/FILESYS) x type(BMP/IMG/MAT/TTF)            |
  * | 9 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
+ * |10 | text_measure_test()              | Layout measure: BMP/TTF, single-line/multi-line metrics                  |
  *
  * @return 0 on success
  */
@@ -94,6 +95,7 @@ static int app_init(void)
     // text_font_scroll_function_test();/* [7] Scroll function control */
     // text_font_source_mode_test();    /* [8] Font source modes       */
     // text_wordwrap_test();            /* [9] Word-wrap & break test  */
+    // text_measure_test();             /* [10] Layout measure test    */
 
     return 0;
 }
