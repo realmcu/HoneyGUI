@@ -52,7 +52,7 @@ kb_info_t *kb_algo_process(gui_obj_t *object)
         {
             uint32_t duration = *(kb->timestamp_ms_release) - *(kb->timestamp_ms_press);
 
-            if (duration < 200)
+            if (duration < 2000)
             {
                 KB_LOG("short press detected: %s, duration: %d ms\n", obj->name, duration);
                 gui_obj_enable_event(gui_obj_focus_get(), GUI_EVENT_KB_SHORT_PRESSED, obj->name);
