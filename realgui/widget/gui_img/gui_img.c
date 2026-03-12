@@ -360,20 +360,16 @@ static void gui_img_ctor(gui_img_t            *_this,
             gui_vfs_read(f, (void *)data, size);
             gui_vfs_close(f);
 
-            _this->storage_type =
-                IMG_SRC_MEMADDR;  /* Changed from FILESYS_CACHE - free_on_destroy handles ownership */
             _this->free_on_destroy = true;  /* Allocated memory, must free */
         }
         else
         {
-            _this->storage_type = IMG_SRC_MEMADDR;  /* XIP is also direct memory access */
             _this->free_on_destroy = false;  /* XIP memory, don't free */
         }
 
-        if (_this->src_data != NULL && _this->free_on_destroy)
-        {
-            gui_free(_this->src_data);
-        }
+        _this->storage_type = IMG_SRC_MEMADDR;  /* XIP is also direct memory access */
+
+        gui_free(_this->src_data);
 
         _this->src_data = (void *)data;
 
