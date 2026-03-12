@@ -80,6 +80,7 @@ void text_font_layout_test(void);
 void text_multi_language_test(void);
 void text_font_scroll_function_test(void);
 void text_font_source_mode_test(void);
+void text_wordwrap_test(void);
 
 #ifdef __cplusplus
 }

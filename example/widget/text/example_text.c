@@ -46,8 +46,9 @@ static void test_timer_cb(void *param)
 /* gui text widget example start*/
 void text_widget_example(void)
 {
+    char *text_string = "HoneyGUI";
     gui_text_t *text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
-    gui_text_set(text, "HoneyGUI", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 8, 32);
+    gui_text_set(text, text_string, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(text_string), 32);
     gui_text_type_set(text, font32b1, FONT_SRC_MEMADDR);
 
     gui_obj_add_event_cb(text, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -76,6 +77,7 @@ void text_widget_example(void)
  * | 6 | text_multi_language_test()       | Language list with per-language rendering (AR, EN, ZH, TH, HE)           |
  * | 7 | text_font_scroll_function_test() | Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes      |
  * | 8 | text_font_source_mode_test()     | 3x4 grid: source(MEMADDR/FTL/FILESYS) x type(BMP/IMG/MAT/TTF)            |
+ * | 9 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
  *
  * @return 0 on success
  */
@@ -91,6 +93,7 @@ static int app_init(void)
     // text_multi_language_test();      /* [6] Multi-language support  */
     // text_font_scroll_function_test();/* [7] Scroll function control */
     // text_font_source_mode_test();    /* [8] Font source modes       */
+    // text_wordwrap_test();            /* [9] Word-wrap & break test  */
 
     return 0;
 }
