@@ -195,9 +195,16 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
             int16_t distance;
             int16_t half_grid = grid_size / 2;
             int16_t abs_remainder = abs(remainder);
-            if (abs_remainder > half_grid && (_this->offset > temp - _this->total_length))
+            if (abs_remainder > half_grid)
             {
-                distance = g_move_indicator * (grid_size - abs_remainder);
+                if (!_this->loop && _this->offset <= temp - _this->total_length)
+                {
+                    distance = -remainder;
+                }
+                else
+                {
+                    distance = g_move_indicator * (grid_size - abs_remainder);
+                }
             }
             else
             {
