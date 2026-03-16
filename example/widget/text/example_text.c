@@ -76,9 +76,10 @@ void text_widget_example(void)
  * | 5 | text_font_layout_test()          | Swipeable views: single-line, multi-line, scroll, vertical, RTL          |
  * | 6 | text_multi_language_test()       | Language list with per-language rendering (AR, EN, ZH, TH, HE)           |
  * | 7 | text_font_scroll_function_test() | Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes      |
- * | 8 | text_font_source_mode_test()     | 3x4 grid: source(MEMADDR/FTL/FILESYS) x type(BMP/IMG/MAT/TTF)            |
- * | 9 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
- * |10 | text_measure_test()              | Layout measure: BMP/TTF, single-line/multi-line metrics                  |
+ * | 8 | text_font_scroll_loop_test()     | Scroll loop (marquee) for X/Y forward and reverse directions             |
+ * | 9 | text_font_source_mode_test()     | 3x4 grid: source(MEMADDR/FTL/FILESYS) x type(BMP/IMG/MAT/TTF)            |
+ * |10 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
+ * |11 | text_measure_test()              | Layout measure: BMP/TTF, single-line/multi-line metrics                  |
  *
  * @return 0 on success
  */
@@ -93,9 +94,10 @@ static int app_init(void)
     // text_font_layout_test();         /* [5] Text layout modes       */
     // text_multi_language_test();      /* [6] Multi-language support  */
     // text_font_scroll_function_test();/* [7] Scroll function control */
-    // text_font_source_mode_test();    /* [8] Font source modes       */
-    // text_wordwrap_test();            /* [9] Word-wrap & break test  */
-    // text_measure_test();             /* [10] Layout measure test    */
+    // text_font_scroll_loop_test();    /* [8] Scroll loop (marquee)   */
+    // text_font_source_mode_test();    /* [9] Font source modes       */
+    // text_wordwrap_test();            /* [10] Word-wrap & break test */
+    // text_measure_test();             /* [11] Layout measure test    */
 
     return 0;
 }

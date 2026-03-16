@@ -283,6 +283,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     int32_t offset;
     uint32_t index;
     gui_text_rect_t draw_rect = {0};
+    int16_t loop_shift_x = 0, loop_shift_y = 0;
 
     if (text->base.len == 0)
     {
@@ -294,7 +295,20 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     {
         text->cur_time_ms = gui_ms_get();
     }
-    index = (text->cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+    if (text->cur_time_ms == 0)
+    {
+        text->cur_time_ms = text->init_time_ms;
+    }
+    if (text->scroll_pause_ms > 0)
+    {
+        uint32_t cycle = text->interval_time_ms + text->scroll_pause_ms;
+        uint32_t elapsed = (text->cur_time_ms - text->init_time_ms) % cycle;
+        index = (elapsed < text->interval_time_ms) ? elapsed : 0;
+    }
+    else
+    {
+        index = (text->cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+    }
 
     draw_rect.x1 = text->base.offset_x;
     draw_rect.y1 = text->base.offset_y;
@@ -311,9 +325,19 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset = text->base.char_width_sum;
         if (offset > obj->w)
         {
-            text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
-                              text->interval_time_ms;
-            draw_rect.x1 = text->base.offset_x - text->cnt_value + text->start_value;
+            if (text->loop)
+            {
+                uint32_t total_scroll = offset + text->loop_gap;
+                text->cnt_value = total_scroll * index / text->interval_time_ms;
+                draw_rect.x1 = text->base.offset_x - text->cnt_value;
+                loop_shift_x = (int16_t)total_scroll;
+            }
+            else
+            {
+                text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
+                                  text->interval_time_ms;
+                draw_rect.x1 = text->base.offset_x - text->cnt_value + text->start_value;
+            }
             draw_rect.x2 = draw_rect.x1 + offset - 1;
             draw_rect.y1 = text->base.offset_y;
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
@@ -336,9 +360,19 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset = text->base.char_width_sum;
         if (offset > obj->w)
         {
-            text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
-                              text->interval_time_ms;
-            draw_rect.x1 = text->base.offset_x + text->cnt_value - text->start_value - offset + obj->w;
+            if (text->loop)
+            {
+                uint32_t total_scroll = offset + text->loop_gap;
+                text->cnt_value = total_scroll * index / text->interval_time_ms;
+                draw_rect.x1 = text->base.offset_x + text->cnt_value - offset + obj->w;
+                loop_shift_x = -(int16_t)total_scroll;
+            }
+            else
+            {
+                text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
+                                  text->interval_time_ms;
+                draw_rect.x1 = text->base.offset_x + text->cnt_value - text->start_value - offset + obj->w;
+            }
             draw_rect.x2 = draw_rect.x1 + offset - 1;
             draw_rect.y1 = text->base.offset_y;
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
@@ -362,11 +396,21 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset += (text->base.char_line_sum - 1) * text->base.extra_line_spacing;
         if (offset > obj->h || offset == 0)
         {
-            text->cnt_value = (text->end_value + text->start_value + offset) * index
-                              / text->interval_time_ms;
+            if (text->loop)
+            {
+                uint32_t total_scroll = offset + text->loop_gap;
+                text->cnt_value = total_scroll * index / text->interval_time_ms;
+                draw_rect.y1 = text->base.offset_y - text->cnt_value;
+                loop_shift_y = (int16_t)total_scroll;
+            }
+            else
+            {
+                text->cnt_value = (text->end_value + text->start_value + offset) * index
+                                  / text->interval_time_ms;
+                draw_rect.y1 = text->base.offset_y - text->cnt_value + text->start_value;
+            }
             draw_rect.x1 = text->base.offset_x;
             draw_rect.x2 = draw_rect.x1 + obj->w - 1;
-            draw_rect.y1 = text->base.offset_y - text->cnt_value + text->start_value;
             draw_rect.y2 = draw_rect.y1 + offset - 1;
         }
     }
@@ -375,18 +419,40 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset = text->base.char_height_sum;
         if (offset > obj->h || offset == 0)
         {
-            text->cnt_value = (text->end_value + text->start_value + offset) * index
-                              / text->interval_time_ms;
+            if (text->loop)
+            {
+                uint32_t total_scroll = offset + text->loop_gap;
+                text->cnt_value = total_scroll * index / text->interval_time_ms;
+                draw_rect.y2 = text->base.offset_y + obj->h + text->cnt_value;
+                loop_shift_y = -(int16_t)total_scroll;
+            }
+            else
+            {
+                text->cnt_value = (text->end_value + text->start_value + offset) * index
+                                  / text->interval_time_ms;
+                draw_rect.y2 = text->base.offset_y + obj->h + text->cnt_value;
+            }
             draw_rect.x1 = text->base.offset_x;
             draw_rect.x2 = draw_rect.x1 + obj->w - 1;
-            draw_rect.y2 = text->base.offset_y + obj->h + text->cnt_value;
             draw_rect.y1 = draw_rect.y2 - offset - 1;
         }
     }
 
     if (dc->section_count == 0)
     {
+        if (text->loop)
+        {
+            draw_rect.xboundright = draw_rect.x2;
+            draw_rect.yboundbottom = draw_rect.y2;
+        }
         gui_scroll_text_font_load(&text->base, &draw_rect);
+        if (text->loop)
+        {
+            draw_rect.xboundleft = text->base.offset_x;
+            draw_rect.xboundright = text->base.offset_x + obj->w - 1;
+            draw_rect.yboundtop = text->base.offset_y;
+            draw_rect.yboundbottom = text->base.offset_y + obj->h - 1;
+        }
     }
     if (text->base.font_type == GUI_FONT_SRC_TTF)
     {
@@ -404,6 +470,16 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         gui_scroll_text_rect_hit(&draw_rect, &dc->section))
     {
         gui_scroll_text_font_draw(&text->base, &draw_rect);
+    }
+
+    /* loop mode: draw the second copy of text for seamless marquee */
+    if (loop_shift_x != 0 || loop_shift_y != 0)
+    {
+        mem_char_t *chr = text->base.data;
+        uint16_t i, len = text->base.active_font_len;
+        for (i = 0; i < len; i++) { chr[i].x += loop_shift_x; chr[i].y += loop_shift_y; }
+        gui_scroll_text_font_draw(&text->base, &draw_rect);
+        for (i = 0; i < len; i++) { chr[i].x -= loop_shift_x; chr[i].y -= loop_shift_y; }
     }
 
     if (dc->section_count == dc->section_total - 1)
@@ -519,6 +595,7 @@ void gui_scroll_text_reset(gui_scroll_text_t *_this)
     _this->base.content_refresh = true;
     _this->scrolling = true;
     _this->init_time_ms = gui_ms_get();
+    _this->cur_time_ms = 0;
     gui_fb_change();
 }
 
@@ -570,6 +647,18 @@ void gui_scroll_text_non_scroll_align_set(gui_scroll_text_t *_this, TEXT_MODE mo
 {
     _this->fallback_mode = mode;
 }
+
+void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint32_t gap_pixel)
+{
+    _this->loop = enable;
+    _this->loop_gap = gap_pixel;
+}
+
+void gui_scroll_text_scroll_pause_set(gui_scroll_text_t *_this, uint32_t pause_ms)
+{
+    _this->scroll_pause_ms = pause_ms;
+}
+
 
 gui_scroll_text_t *gui_scroll_text_create(void       *parent,
                                           const char *name,

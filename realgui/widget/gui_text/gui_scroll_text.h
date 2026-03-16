@@ -36,8 +36,11 @@ typedef struct gui_scroll_text
     uint32_t cur_time_ms;
     uint32_t duration_time_ms;
     uint32_t interval_time_ms;
+    uint32_t loop_gap;
+    uint32_t scroll_pause_ms;
     TEXT_MODE fallback_mode;
     bool scrolling;
+    bool loop;
 } gui_scroll_text_t;
 
 
@@ -194,6 +197,27 @@ void gui_scroll_text_start(gui_scroll_text_t *_this);
  * @param mode the alignment mode to use when not scrolling (LEFT, CENTER, RIGHT, etc.)
  */
 void gui_scroll_text_non_scroll_align_set(gui_scroll_text_t *_this, TEXT_MODE mode);
+
+/**
+ * @brief Enable marquee-style loop scrolling
+ * @note When enabled, text wraps around seamlessly like a marquee.
+ *       The gap_pixel parameter controls the spacing between the tail and head of the text.
+ *
+ * @param _this the scroll text widget pointer
+ * @param enable true to enable loop scrolling, false to disable
+ * @param gap_pixel pixel gap between the end and the repeated start of the text
+ */
+void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint32_t gap_pixel);
+
+/**
+ * @brief Set pause time between scroll cycles
+ * @note After each complete scroll cycle, the text pauses for the specified duration
+ *       before starting the next cycle. Default is 0 (no pause).
+ *
+ * @param _this the scroll text widget pointer
+ * @param pause_ms pause duration in milliseconds, 0 means no pause
+ */
+void gui_scroll_text_scroll_pause_set(gui_scroll_text_t *_this, uint32_t pause_ms);
 
 #ifdef __cplusplus
 }

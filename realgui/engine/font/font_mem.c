@@ -1040,6 +1040,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     chr[i].y = chr[i - 1].y - chr[i].char_h - 2;
                 }
             }
+            char_height_sum = font_len * chr[0].char_h + (font_len - 1) * 2;
             break;
         }
     case VERTICAL_LEFT_TOP:
