@@ -106,6 +106,17 @@
 ^^^^^^^^^^^^
 对于 TTF 矢量字体，开发者可以使用函数 :cpp:any:`gui_text_rendermode_set` 设置光栅化渲染模式（1/2/4/8）。
 
+字体源模式
+^^^^^^^^^^
+开发者可以使用函数 :cpp:any:`gui_text_font_mode_set` 设置字体的源模式，例如从内存地址、FTL 或文件系统加载字体。
+
+粗体设置
+^^^^^^^^
+开发者可以使用函数 :cpp:any:`gui_text_bold_set` 设置文本的粗体权重和粗体模式。粗体权重范围为 0（正常）到 8（最粗），粗体模式支持水平加粗（快速）和全方向加粗两种方式。
+
+.. note::
+    粗体功能仅对 TTF 矢量字体有效，点阵字体不支持此设置。
+
 EMOJI 表情
 ^^^^^^^^^^
 开发者可以使用函数 :cpp:any:`gui_text_emoji_set` 设置 EMOJI 表情图像文件的路径和大小。需要配合文件系统使用。
@@ -204,12 +215,70 @@ EMOJI 表情
 ^^^^^^^^
 开发者可以调用函数 :cpp:any:`gui_text_move` 将文本控件移动到指定位置。
 
+文本排版测量
+^^^^^^^^^^^^
+开发者可以调用 :cpp:any:`gui_text_layout_measure` 在渲染之前获取文本的排版信息。该函数会触发完整的字体加载和排版流程，将结果写入控件的以下字段：
+
+- ``char_width_sum`` ：文本内容的像素总宽度（单行模式为文本宽度，多行模式为所有字符宽度之和）
+- ``char_height_sum`` ：排版后所有行的像素总高度
+- ``char_line_sum`` ：排版后的行数
+- ``active_font_len`` ：在文本框范围内可见的字符数
+- ``font_len`` ：总字符数（包括被裁剪的）
+
+该函数支持所有字体类型（BMP/TTF/STB/MAT）和所有排版模式，并且正确处理自动换行、断词保护、字符间距、行间距以及阿拉伯语、泰语、希伯来语等复杂文本的排版。
+
+.. note::
+    必须在设置文本内容和字体属性（如 ``gui_text_set`` 、 ``gui_text_mode_set`` 等）之后调用。
+
 
 示例
 ------
 
-简单文本控件
-~~~~~~~~~~~~~
+文本控件提供了多个示例和测试用例，位于 ``example/widget/text/`` 目录下，在 ``example_text.c`` 的 ``app_init`` 中选择启用。
+
+.. list-table:: 示例列表
+   :widths: 5 35 60
+   :header-rows: 1
+   :align: center
+
+   * - #
+     - 函数
+     - 说明
+   * - 1
+     - ``text_widget_example()``
+     - 基础文本控件，包含点击事件和定时器回调
+   * - 2
+     - ``scroll_text_widget_example()``
+     - 水平（SCROLL_X）和垂直（SCROLL_Y）自动滚动文本
+   * - 3
+     - ``custom_font_rendering_demo()``
+     - 自定义字体引擎，用户自定义加载/绘制/卸载/销毁
+   * - 4
+     - ``text_font_rendering_test()``
+     - 滑动视图：点阵（1/2/4/8位）、矢量、粗体、矩阵、图片、性能
+   * - 5
+     - ``text_font_layout_test()``
+     - 滑动视图：单行、多行、滚动、竖排、RTL 排版模式
+   * - 6
+     - ``text_multi_language_test()``
+     - 多语言列表渲染（阿拉伯语、英语、中文、泰语、希伯来语）
+   * - 7
+     - ``text_font_scroll_function_test()``
+     - 滚动控制：停止/重置/暂停/恢复及对齐模式
+   * - 8
+     - ``text_font_source_mode_test()``
+     - 字体源模式：MEMADDR/FTL/FILESYS × BMP/IMG/MAT/TTF
+   * - 9
+     - ``text_wordwrap_test()``
+     - 自动换行与超长单词断词保护
+   * - 10
+     - ``text_measure_test()``
+     - 排版测量：BMP/TTF 字体的单行和多行排版信息获取
+
+简单文本控件（示例 1：text_widget_example）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+基础文本控件示例，包含点击事件和定时器回调。
+
 .. literalinclude:: ../../../example/widget/text/example_text.c
    :language: c
    :start-after: /* gui text widget example start*/

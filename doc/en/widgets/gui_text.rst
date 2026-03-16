@@ -210,11 +210,68 @@ Text Move
 
 It is possible to use this function :cpp:any:`gui_text_move` to move text to a specified location.
 
+Text Layout Measurement
+^^^^^^^^^^^^^^^^^^^^^^^^
+Developers can call :cpp:any:`gui_text_layout_measure` to obtain text layout information before rendering. This function triggers the full font loading and layout pipeline, writing results back to the following widget fields:
+
+- ``char_width_sum``: Total pixel width of text content (single-line width or sum of all character widths in multi-line mode)
+- ``char_height_sum``: Total pixel height of all laid-out lines
+- ``char_line_sum``: Number of lines after layout
+- ``active_font_len``: Number of characters visible within the bounding box
+- ``font_len``: Total character count (including clipped ones)
+
+This function supports all font types (BMP/TTF/STB/MAT) and all layout modes, correctly handling word wrap, word break protection, letter spacing, line spacing, and complex text shaping for Arabic, Thai, Hebrew, etc.
+
+.. note::
+    Must be called after setting text content and font attributes (e.g., ``gui_text_set``, ``gui_text_mode_set``, etc.).
+
 Example
 --------
 
-Simple Text Widget
-~~~~~~~~~~~~~~~~~~~~~
+The text widget provides multiple examples and test cases located in ``example/widget/text/``. Enable the desired test in ``app_init`` of ``example_text.c``.
+
+.. list-table:: Example List
+   :widths: 5 35 60
+   :header-rows: 1
+   :align: center
+
+   * - #
+     - Function
+     - Description
+   * - 1
+     - ``text_widget_example()``
+     - Basic text widget with click event and timer callback
+   * - 2
+     - ``scroll_text_widget_example()``
+     - Horizontal (SCROLL_X) and vertical (SCROLL_Y) auto-scroll
+   * - 3
+     - ``custom_font_rendering_demo()``
+     - Custom font engine with user-defined load/draw/unload/destroy
+   * - 4
+     - ``text_font_rendering_test()``
+     - Swipeable views: bitmap (1/2/4/8-bit), vector, bold, matrix
+   * - 5
+     - ``text_font_layout_test()``
+     - Swipeable views: single-line, multi-line, scroll, vertical
+   * - 6
+     - ``text_multi_language_test()``
+     - Multi-language rendering (Arabic, English, Chinese, Thai, HE)
+   * - 7
+     - ``text_font_scroll_function_test()``
+     - Scroll control: stop/reset/pause/resume and alignment modes
+   * - 8
+     - ``text_font_source_mode_test()``
+     - Font source modes: MEMADDR/FTL/FILESYS × BMP/IMG/MAT/TTF
+   * - 9
+     - ``text_wordwrap_test()``
+     - Word wrap with oversized word break protection
+   * - 10
+     - ``text_measure_test()``
+     - Layout measure: BMP/TTF single-line and multi-line metrics
+
+Simple Text Widget (Example 1: text_widget_example)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Basic text widget with click event and periodic timer callback.
 
 .. literalinclude:: ../../../example/widget/text/example_text.c
    :language: c
