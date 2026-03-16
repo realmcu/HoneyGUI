@@ -367,7 +367,7 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
     g_SurpressEvent = true;
     g_SurpressTP = true;
 
-    if (e == GUI_EVENT_INVALID)
+    if (e->code == GUI_EVENT_INVALID)
     {
         g_NextView->base.x = gui_get_screen_width();
     }
