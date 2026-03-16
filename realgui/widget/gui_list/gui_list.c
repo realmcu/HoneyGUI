@@ -345,7 +345,7 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         }
         while (pos < range - _this->space)
         {
-            if (++index >= _this->note_num * (_this->loop + 1)) {break;}
+            if (++index >= _this->note_num * (_this->loop * 2 + 1)) {break;}
             gui_list_add_note(_this, index);
             pos += (_this->note_length + _this->space);
         }
@@ -1254,13 +1254,16 @@ void gui_list_set_offset(gui_list_t *list, int16_t offset)
         offset_max = center_padding + list->out_scope;
         offset_min = center_padding - (list->total_length - list->note_length) - list->out_scope;
     }
-    if (offset > offset_max)
+    if (!list->loop)
     {
-        offset = offset_max;
-    }
-    else if (offset < offset_min)
-    {
-        offset = offset_min;
+        if (offset > offset_max)
+        {
+            offset = offset_max;
+        }
+        else if (offset < offset_min)
+        {
+            offset = offset_min;
+        }
     }
 
     list->offset = offset;
