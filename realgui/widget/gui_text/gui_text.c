@@ -286,11 +286,6 @@ static void gui_text_input_prepare(gui_obj_t *obj)
 }
 static void gui_text_prepare(gui_obj_t *obj)
 {
-    if (obj->not_show)
-    {
-        return;
-    }
-
     gui_text_t *this = (void *)obj;
     // touch_info_t *tp = tp_get_info();
     gui_point3f_t point = {0, 0, 1};
