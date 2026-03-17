@@ -59,7 +59,7 @@ static int app_init(void)
     }
     int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
     gui_menu_cellular_t *menu = gui_menu_cellular_create(gui_obj_get_root(), ICON_SIZE, img_data_array,
-                                                         array_size);
+                                                         array_size, IMG_SRC_MEMADDR);
     GUI_UNUSED(menu);
 
     return 0;

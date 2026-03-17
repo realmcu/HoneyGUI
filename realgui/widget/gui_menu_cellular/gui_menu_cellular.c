@@ -207,7 +207,8 @@ static void gui_menu_cellular_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
                                               int       icon_size,
                                               uint32_t *icon_array[],
-                                              int       array_size)
+                                              int       array_size,
+                                              IMG_SOURCE_MODE_TYPE src_mode)
 {
 
     gui_menu_cellular_t *this = gui_malloc(sizeof(gui_menu_cellular_t));
@@ -233,6 +234,23 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
 #define INIT_OFFSET_X (icon_size / 2)
 #define INIT_OFFSET_Y (0)
 #define FOCUS_OFFSET (icon_size / 2)
+    gui_img_t *(*create_img_func)(void *parent, const char *name, void *addr, int16_t x, int16_t y,
+                                  int16_t w, int16_t h) = NULL;
+    switch (src_mode)
+    {
+    case IMG_SRC_MEMADDR:
+        create_img_func = gui_img_create_from_mem;
+        break;
+    case IMG_SRC_FILESYS:
+        create_img_func = gui_img_create_from_fs;
+        break;
+    case IMG_SRC_FTL:
+        create_img_func = gui_img_create_from_ftl;
+        break;
+    default:
+        create_img_func = gui_img_create_from_mem;
+        break;
+    }
     uint8_t index = 0;
     uint8_t index_offset = 0;
     for (size_t i = 0; i < (unsigned int)array_size; i++)
@@ -244,14 +262,14 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
         if (index < 3)
         {
             start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2) + FOCUS_OFFSET;
-            img = gui_img_create_from_mem(this, 0, icon_array[i],
-                                          WIDTH_GAP * index + INIT_OFFSET_X * 1 + FOCUS_OFFSET, start_y, 0, 0);
+            img = create_img_func(this, 0, icon_array[i],
+                                  WIDTH_GAP * index + INIT_OFFSET_X * 1 + FOCUS_OFFSET, start_y, 0, 0);
         }
         else
         {
             start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2 + 1) + FOCUS_OFFSET;
-            img = gui_img_create_from_mem(this, 0, icon_array[i],
-                                          WIDTH_GAP * (index - 3) + INIT_OFFSET_X * 0 + FOCUS_OFFSET, start_y, 0, 0);
+            img = create_img_func(this, 0, icon_array[i],
+                                  WIDTH_GAP * (index - 3) + INIT_OFFSET_X * 0 + FOCUS_OFFSET, start_y, 0, 0);
         }
         gui_img_set_focus(img, FOCUS_OFFSET, FOCUS_OFFSET);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);

@@ -522,5 +522,6 @@ static void animation_case(gui_view_t *this, float pro)
  *============================================================================*/
 void view_transition_animation(void *obj, float pro)
 {
+    gui_obj_move(obj, 0, 0);
     animation_case((gui_view_t *)obj, pro);
 }

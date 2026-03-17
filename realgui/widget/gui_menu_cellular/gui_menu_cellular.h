@@ -18,6 +18,7 @@ extern "C" {
  *============================================================================*/
 #include "guidef.h"
 #include "gui_fb.h"
+#include "gui_img.h"
 
 /*============================================================================*
  *                         Types
@@ -62,24 +63,17 @@ struct gui_menu_cellular_gesture_parameter
  *============================================================================*/
 
 /**
- * @brief Create a menu_cellular widget.
- * @param parent Father widget it nested in.
- * @param icon_size Size of icon.
- * @param icon_array Icons' image data address array.
- * @param array_size Size of array.
- * @return Menu_cellular pointer.
- */
-gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
-                                              int       icon_size,
-                                              uint32_t *icon_array[],
-                                              int       array_size);
-/**
  * @brief Config offset.
  * @param menu_cellular Menu_cellular pointer.
  * @param offset_x X-axis offset.
  * @param offset_y Y-axis offset.
+ * @param src_mode Image source mode, support file system and memory address.
  */
-void gui_menu_cellular_offset(gui_menu_cellular_t *menu_cellular, int offset_x, int offset_y);
+gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
+                                              int       icon_size,
+                                              uint32_t *icon_array[],
+                                              int       array_size,
+                                              IMG_SOURCE_MODE_TYPE src_mode);
 
 /**
  * @brief Add click events on images based on the cellular menu.

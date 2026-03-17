@@ -831,7 +831,7 @@ static void app_menu_design(gui_view_t *view)
         gui_rect_create(GUI_BASE(win), "background", 0, 0,
                         SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(76, 76, 76, 255));
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, icon_size, cellilar_img_data_array,
-                                                             array_size);
+                                                             array_size, IMG_SRC_MEMADDR);
         menu_cellular = menu;
         gui_menu_cellular_offset(menu, cellular_offset_x, cellular_offset_y);
         {
