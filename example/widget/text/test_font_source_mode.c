@@ -10,6 +10,7 @@
 #include "test_font.h"
 #include "gui_api_dc.h"
 #include "font_mem.h"
+#include "font_glyph_cache.h"
 
 /*============================================================================*
  *                           Constants
@@ -56,6 +57,10 @@ void text_font_source_mode_test(void)
 
     uint16_t screen_width = dc->screen_width;
     gui_log("Font source mode test - Screen: %dx%d\n", screen_width, dc->screen_height);
+
+    /* Initialize glyph cache pool */
+    static uint8_t glyph_pool[32 * 1024];
+    font_glyph_cache_init(glyph_pool, sizeof(glyph_pool));
 
     /* Initialize filesystem font */
     uint8_t fs_font_idx = gui_font_mem_init_fs(fs_font_path);
@@ -183,6 +188,11 @@ void text_font_source_mode_test(void)
         gui_text_type_set(t3, fs_ttf_path, FONT_SRC_FILESYS);
         create_label(root, "TTF+FS", start_x + col_width * 2, y + FONT_SIZE + LABEL_OFFSET_Y);
     }
+
+    /* Print glyph cache stats */
+    uint32_t hit, miss, used, total;
+    font_glyph_cache_stats(&hit, &miss, &used, &total);
+    gui_log("Glyph cache: hit=%u miss=%u used=%u/%u\n", hit, miss, used, total);
 
     gui_log("Font source mode test completed\n");
 }

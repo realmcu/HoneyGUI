@@ -10,6 +10,7 @@
 #include "font_lib_manager.h"
 #include "font_rendering_utils.h"
 #include "gui_vfs.h"
+#include "font_glyph_cache.h"
 
 /*============================================================================*
  *                      Font Library Access Functions
@@ -170,6 +171,192 @@ static int font_fs_read(FONT_LIB_NODE *node, uint32_t offset, uint8_t *buf, uint
     return read_size;
 }
 
+/**
+ * @brief Load crop-mode glyph (4-byte header) from FTL or FS with cache
+ *
+ * Header format: [char_y, reserved, char_w, char_h_end]
+ * char_h = char_h_end - char_y
+ *
+ * @return 0 on success, -1 on failure (caller should skip this char)
+ */
+static int load_dot_crop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *node,
+                         FONT_SRC_MODE font_mode, uint32_t offset,
+                         uint8_t render_mode, int32_t *line_byte)
+{
+    const uint32_t hdr_size = 4;
+
+    /* Try cache first */
+    uint32_t cached_size = 0;
+    uint8_t *cached = font_glyph_cache_get(font_path, chr->unicode,
+                                           FONT_GLYPH_CACHE_BMP_DOT, &cached_size);
+    if (cached)
+    {
+        chr->char_y = cached[0];
+        chr->char_w = cached[2];
+        chr->char_h = cached[3] - chr->char_y;
+        *line_byte = (chr->char_w * render_mode + 8 - 1) / 8;
+        chr->w = *line_byte * 8 / render_mode;
+        chr->dot_addr = cached + hdr_size;
+        return 0;
+    }
+
+    /* Read header */
+    uint8_t header[4];
+    if (font_mode == FONT_SRC_FTL)
+    {
+        gui_ftl_read((uintptr_t)font_path + offset, header, hdr_size);
+    }
+    else
+    {
+        if (font_fs_read(node, offset, header, hdr_size) < 0) { return -1; }
+    }
+
+    chr->char_y = header[0];
+    chr->char_w = header[2];
+    chr->char_h = header[3] - chr->char_y;
+    *line_byte = (chr->char_w * render_mode + 8 - 1) / 8;
+    chr->w = *line_byte * 8 / render_mode;
+
+    uint32_t dot_size = *line_byte * chr->char_h;
+    uint8_t *dot_buf = gui_malloc(dot_size);
+    if (dot_buf == NULL) { return -1; }
+
+    /* Read dot data */
+    if (font_mode == FONT_SRC_FTL)
+    {
+        gui_ftl_read((uintptr_t)font_path + offset + hdr_size, dot_buf, dot_size);
+    }
+    else
+    {
+        if (font_fs_read(node, offset + hdr_size, dot_buf, dot_size) < 0)
+        {
+            gui_free(dot_buf);
+            return -1;
+        }
+    }
+
+    /* Try cache put */
+    uint8_t *pool_ptr = font_glyph_cache_put(font_path, chr->unicode,
+                                             FONT_GLYPH_CACHE_BMP_DOT,
+                                             header, hdr_size, dot_buf, dot_size);
+    if (pool_ptr)
+    {
+        gui_free(dot_buf);
+        chr->dot_addr = pool_ptr + hdr_size;
+    }
+    else
+    {
+        chr->dot_addr = dot_buf;
+    }
+    return 0;
+}
+
+/**
+ * @brief Load non-crop glyph (2-byte header) from FTL or FS with cache
+ *
+ * Header format: [char_w, char_h]
+ *
+ * @return 0 on success, -1 on failure (caller should skip this char)
+ */
+static int load_dot_nocrop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *node,
+                           FONT_SRC_MODE font_mode, uint32_t data_offset,
+                           uint32_t dot_size)
+{
+    const uint32_t hdr_size = 2;
+
+    /* Try cache first */
+    uint32_t cached_size = 0;
+    uint8_t *cached = font_glyph_cache_get(font_path, chr->unicode,
+                                           FONT_GLYPH_CACHE_BMP_DOT, &cached_size);
+    if (cached)
+    {
+        chr->char_w = (int16_t)cached[0];
+        chr->char_h = (int16_t)cached[1];
+        chr->dot_addr = cached + hdr_size;
+        return 0;
+    }
+
+    /* Read header (2 bytes before dot data: at data_offset + 2) */
+    uint8_t header[2];
+    if (font_mode == FONT_SRC_FTL)
+    {
+        gui_ftl_read(data_offset + 2, header, hdr_size);
+    }
+    else
+    {
+        if (font_fs_read(node, data_offset + 2, header, hdr_size) < 0) { return -1; }
+    }
+    chr->char_w = (int16_t)header[0];
+    chr->char_h = (int16_t)header[1];
+
+    /* Read dot data (at data_offset + 4) */
+    uint8_t *dot_buf = gui_malloc(dot_size);
+    if (dot_buf == NULL) { return -1; }
+
+    if (font_mode == FONT_SRC_FTL)
+    {
+        gui_ftl_read(data_offset + 4, dot_buf, dot_size);
+    }
+    else
+    {
+        if (font_fs_read(node, data_offset + 4, dot_buf, dot_size) < 0)
+        {
+            gui_free(dot_buf);
+            return -1;
+        }
+    }
+
+    /* Try cache put */
+    uint8_t *pool_ptr = font_glyph_cache_put(font_path, chr->unicode,
+                                             FONT_GLYPH_CACHE_BMP_DOT,
+                                             header, hdr_size, dot_buf, dot_size);
+    if (pool_ptr)
+    {
+        gui_free(dot_buf);
+        chr->dot_addr = pool_ptr + hdr_size;
+    }
+    else
+    {
+        chr->dot_addr = dot_buf;
+    }
+    return 0;
+}
+
+/**
+ * @brief Load emoji glyph for unicode >= 0x10000
+ * @return Number of extra unicode entries consumed (for multi-codepoint emoji), 0 if no emoji
+ */
+static uint32_t load_emoji(mem_char_t *chr, gui_text_t *text,
+                           uint32_t *unicode_buf, uint32_t uni_i, uint32_t unicode_len)
+{
+    if (text->emoji_path == NULL)
+    {
+        return 0;
+    }
+    char file_path[100];
+    memset(file_path, 0, 100);
+    snprintf(file_path, sizeof(file_path), "%s", text->emoji_path);
+    uint32_t multi_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
+                                                               unicode_len - uni_i, file_path);
+    if (multi_len == 0)
+    {
+        gui_log("No valid emoji\n");
+        return 0;
+    }
+    chr->dot_addr = (void *)gui_vfs_get_file_address(file_path);
+    if (chr->dot_addr != NULL)
+    {
+        chr->char_w = text->font_height;
+        chr->char_h = text->font_height;
+    }
+    else
+    {
+        chr->char_w = 0;
+        chr->char_h = 0;
+    }
+    return multi_len;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
@@ -307,34 +494,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                 }
                 else if (chr[chr_i].unicode >= 0x10000)
                 {
-                    if (text->emoji_path)
-                    {
-                        char file_path[100];
-                        memset(file_path, 0, 100);
-                        snprintf(file_path, sizeof(file_path), "%s", text->emoji_path);
-                        uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
-                                                                                           unicode_len - uni_i, file_path);
-                        // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
-                        if (multi_unicode_len != 0)
-                        {
-                            chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
-                            if (chr[chr_i].dot_addr != NULL)
-                            {
-                                chr[chr_i].char_w = text->font_height;
-                                chr[chr_i].char_h = text->font_height;
-                            }
-                            else
-                            {
-                                chr[chr_i].char_w = 0;
-                                chr[chr_i].char_h = 0;
-                            }
-                            uni_i += multi_unicode_len - 1;
-                        }
-                        else
-                        {
-                            gui_log("No valid emoji\n");
-                        }
-                    }
+                    uint32_t multi_len = load_emoji(&chr[chr_i], text, unicode_buf, uni_i, unicode_len);
+                    if (multi_len) { uni_i += multi_len - 1; }
                 }
                 else
                 {
@@ -351,56 +512,15 @@ void gui_font_get_dot_info(gui_text_t *text)
                         line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
                         chr[chr_i].w = line_byte * 8 / render_mode;
                     }
-                    else if (text->font_mode == FONT_SRC_FTL)
+                    else if (text->font_mode == FONT_SRC_FTL ||
+                             text->font_mode == FONT_SRC_FILESYS)
                     {
-                        chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
-                        uint8_t header[4];
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 4, header, 4);
-
-                        chr[chr_i].char_y = header[0];
-                        chr[chr_i].char_w = header[2];
-                        chr[chr_i].char_h = header[3];
-
-                        chr[chr_i].char_h = chr[chr_i].char_h - chr[chr_i].char_y;
-                        line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
-                        chr[chr_i].w = line_byte * 8 / render_mode;
-
-                        uint32_t dot_size = line_byte * chr[chr_i].char_h;
-                        uint8_t *dot_buf = gui_malloc(dot_size);
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
-
-                        chr[chr_i].dot_addr = dot_buf;
-                    }
-                    else if (text->font_mode == FONT_SRC_FILESYS)
-                    {
-                        /* For crop mode, offset points directly to char data in file */
-                        uint32_t file_offset = offset;
-                        uint8_t header[4];
-                        int ret = font_fs_read(node, file_offset, header, 4);
-                        if (ret < 0)
+                        if (load_dot_crop(&chr[chr_i], text->path, node,
+                                          text->font_mode, offset,
+                                          render_mode, &line_byte) < 0)
                         {
                             continue;
                         }
-
-                        chr[chr_i].char_y = header[0];
-                        chr[chr_i].char_w = header[2];
-                        chr[chr_i].char_h = header[3] - chr[chr_i].char_y;
-                        line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
-                        chr[chr_i].w = line_byte * 8 / render_mode;
-
-                        uint32_t dot_size = line_byte * chr[chr_i].char_h;
-                        uint8_t *dot_buf = gui_malloc(dot_size);
-                        if (dot_buf == NULL)
-                        {
-                            continue;
-                        }
-                        ret = font_fs_read(node, file_offset + 4, dot_buf, dot_size);
-                        if (ret < 0)
-                        {
-                            gui_free(dot_buf);
-                            continue;
-                        }
-                        chr[chr_i].dot_addr = dot_buf;
                     }
                 }
                 all_char_w += chr[chr_i].char_w;
@@ -429,33 +549,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else if (chr[chr_i].unicode >= 0x10000)
                     {
-                        if (text->emoji_path)
-                        {
-                            char file_path[100];
-                            memset(file_path, 0, 100);
-                            snprintf(file_path, sizeof(file_path), "%s", text->emoji_path);
-                            uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
-                                                                                               unicode_len - uni_i, file_path);
-                            if (multi_unicode_len != 0)
-                            {
-                                chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
-                                if (chr[chr_i].dot_addr != NULL)
-                                {
-                                    chr[chr_i].char_w = text->font_height;
-                                    chr[chr_i].char_h = text->font_height;
-                                }
-                                else
-                                {
-                                    chr[chr_i].char_w = 0;
-                                    chr[chr_i].char_h = 0;
-                                }
-                                uni_i += multi_unicode_len - 1;
-                            }
-                            else
-                            {
-                                gui_log("No valid emoji\n");
-                            }
-                        }
+                        uint32_t multi_len = load_emoji(&chr[chr_i], text, unicode_buf, uni_i, unicode_len);
+                        if (multi_len) { uni_i += multi_len - 1; }
                     }
                     else
                     {
@@ -471,53 +566,15 @@ void gui_font_get_dot_info(gui_text_t *text)
                             line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
                             chr[chr_i].w = line_byte * 8 / render_mode;
                         }
-                        else if (text->font_mode == FONT_SRC_FTL)
+                        else if (text->font_mode == FONT_SRC_FTL ||
+                                 text->font_mode == FONT_SRC_FILESYS)
                         {
-                            chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
-                            uint8_t header[4];
-                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 4, header, 4);
-
-                            chr[chr_i].char_y = header[0];
-                            chr[chr_i].char_w = header[2];
-                            chr[chr_i].char_h = header[3] - chr[chr_i].char_y;
-                            line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
-                            chr[chr_i].w = line_byte * 8 / render_mode;
-
-                            uint32_t dot_size = line_byte * chr[chr_i].char_h;
-                            uint8_t *dot_buf = gui_malloc(dot_size);
-                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
-
-                            chr[chr_i].dot_addr = dot_buf;
-                        }
-                        else if (text->font_mode == FONT_SRC_FILESYS)
-                        {
-                            uint32_t file_offset = offset;
-                            uint8_t header[4];
-                            int ret = font_fs_read(node, file_offset, header, 4);
-                            if (ret < 0)
+                            if (load_dot_crop(&chr[chr_i], text->path, node,
+                                              text->font_mode, offset,
+                                              render_mode, &line_byte) < 0)
                             {
                                 continue;
                             }
-
-                            chr[chr_i].char_y = header[0];
-                            chr[chr_i].char_w = header[2];
-                            chr[chr_i].char_h = header[3] - chr[chr_i].char_y;
-                            line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
-                            chr[chr_i].w = line_byte * 8 / render_mode;
-
-                            uint32_t dot_size = line_byte * chr[chr_i].char_h;
-                            uint8_t *dot_buf = gui_malloc(dot_size);
-                            if (dot_buf == NULL)
-                            {
-                                continue;
-                            }
-                            ret = font_fs_read(node, file_offset + 4, dot_buf, dot_size);
-                            if (ret < 0)
-                            {
-                                gui_free(dot_buf);
-                                continue;
-                            }
-                            chr[chr_i].dot_addr = dot_buf;
                         }
                     }
                     all_char_w += chr[chr_i].char_w;
@@ -560,34 +617,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                 }
                 else if (chr[chr_i].unicode >= 0x10000)
                 {
-                    if (text->emoji_path)
-                    {
-                        char file_path[100];
-                        memset(file_path, 0, 100);
-                        memcpy(file_path, text->emoji_path, strlen((const char *)text->emoji_path));
-                        uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
-                                                                                           unicode_len - uni_i, file_path);
-                        // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
-                        if (multi_unicode_len != 0)
-                        {
-                            chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
-                            if (chr[chr_i].dot_addr != NULL)
-                            {
-                                chr[chr_i].char_w = text->font_height;
-                                chr[chr_i].char_h = text->font_height;
-                            }
-                            else
-                            {
-                                chr[chr_i].char_w = 0;
-                                chr[chr_i].char_h = 0;
-                            }
-                            uni_i += multi_unicode_len - 1;
-                        }
-                        else
-                        {
-                            gui_log("No valid emoji\n");
-                        }
-                    }
+                    uint32_t multi_len = load_emoji(&chr[chr_i], text, unicode_buf, uni_i, unicode_len);
+                    if (multi_len) { uni_i += multi_len - 1; }
                 }
                 else
                 {
@@ -599,42 +630,16 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
                         chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
                     }
-                    else if (text->font_mode == FONT_SRC_FTL)
+                    else if (text->font_mode == FONT_SRC_FTL ||
+                             text->font_mode == FONT_SRC_FILESYS)
                     {
-                        chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
-                        uint8_t header[2];
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
-                        chr[chr_i].char_w = (int16_t)header[0];
-                        chr[chr_i].char_h = (int16_t)header[1];
                         uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
-                        uint8_t *dot_buf = gui_malloc(dot_size);
-                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
-                        chr[chr_i].dot_addr = dot_buf;
-                    }
-                    else if (text->font_mode == FONT_SRC_FILESYS)
-                    {
-                        uint32_t file_offset = (uint32_t)offset * font_area + dot_offset;
-                        uint8_t header[2];
-                        int ret = font_fs_read(node, file_offset + 2, header, 2);
-                        if (ret < 0)
+                        uint32_t data_offset = (uint32_t)offset * font_area + dot_offset;
+                        if (load_dot_nocrop(&chr[chr_i], text->path, node,
+                                            text->font_mode, data_offset, dot_size) < 0)
                         {
                             continue;
                         }
-                        chr[chr_i].char_w = (int16_t)header[0];
-                        chr[chr_i].char_h = (int16_t)header[1];
-                        uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
-                        uint8_t *dot_buf = gui_malloc(dot_size);
-                        if (dot_buf == NULL)
-                        {
-                            continue;
-                        }
-                        ret = font_fs_read(node, file_offset + 4, dot_buf, dot_size);
-                        if (ret < 0)
-                        {
-                            gui_free(dot_buf);
-                            continue;
-                        }
-                        chr[chr_i].dot_addr = dot_buf;
                     }
                 }
                 all_char_w += chr[chr_i].char_w;
@@ -665,34 +670,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else if (chr[chr_i].unicode >= 0x10000)
                     {
-                        if (text->emoji_path)
-                        {
-                            char file_path[100];
-                            memset(file_path, 0, 100);
-                            memcpy(file_path, text->emoji_path, strlen((const char *)text->emoji_path));
-                            uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
-                                                                                               unicode_len - uni_i, file_path);
-                            // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
-                            if (multi_unicode_len != 0)
-                            {
-                                chr[chr_i].dot_addr = (void *)gui_vfs_get_file_address(file_path);
-                                if (chr[chr_i].dot_addr != NULL)
-                                {
-                                    chr[chr_i].char_w = text->font_height;
-                                    chr[chr_i].char_h = text->font_height;
-                                }
-                                else
-                                {
-                                    chr[chr_i].char_w = 0;
-                                    chr[chr_i].char_h = 0;
-                                }
-                                uni_i += multi_unicode_len - 1;
-                            }
-                            else
-                            {
-                                gui_log("No valid emoji\n");
-                            }
-                        }
+                        uint32_t multi_len = load_emoji(&chr[chr_i], text, unicode_buf, uni_i, unicode_len);
+                        if (multi_len) { uni_i += multi_len - 1; }
                     }
                     else
                     {
@@ -708,29 +687,16 @@ void gui_font_get_dot_info(gui_text_t *text)
                             chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
                             chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
                         }
-                        else if (text->font_mode == FONT_SRC_FTL)
+                        else if (text->font_mode == FONT_SRC_FTL ||
+                                 text->font_mode == FONT_SRC_FILESYS)
                         {
-                            chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
-                            uint8_t header[2];
-                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, header, 2);
-                            chr[chr_i].char_w = (int16_t)header[0];
-                            chr[chr_i].char_h = (int16_t)header[1];
                             uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
-                            uint8_t *dot_buf = gui_malloc(dot_size);
-                            gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, dot_size);
-                            chr[chr_i].dot_addr = dot_buf;
-                        }
-                        else if (text->font_mode == FONT_SRC_FILESYS)
-                        {
-                            uint32_t file_offset = (uint32_t)index * font_area + dot_offset;
-                            uint8_t header[2];
-                            font_fs_read(node, file_offset + 2, header, 2);
-                            chr[chr_i].char_w = (int16_t)header[0];
-                            chr[chr_i].char_h = (int16_t)header[1];
-                            uint32_t dot_size = aliened_font_size * text->font_height / 8 * render_mode;
-                            uint8_t *dot_buf = gui_malloc(dot_size);
-                            font_fs_read(node, file_offset + 4, dot_buf, dot_size);
-                            chr[chr_i].dot_addr = dot_buf;
+                            uint32_t data_offset = (uint32_t)index * font_area + dot_offset;
+                            if (load_dot_nocrop(&chr[chr_i], text->path, node,
+                                                text->font_mode, data_offset, dot_size) < 0)
+                            {
+                                continue;
+                            }
                         }
                     }
                     all_char_w += chr[chr_i].char_w;
@@ -1217,7 +1183,10 @@ void gui_font_mem_unload(gui_text_t *text)
             mem_char_t *chr = text->data;
             for (int i = 0; i < text->font_len; i++)
             {
-                gui_free(chr[i].dot_addr);
+                if (chr[i].dot_addr && !font_glyph_cache_contains(chr[i].dot_addr))
+                {
+                    gui_free(chr[i].dot_addr);
+                }
             }
         }
         for (int i = 0; i < text->font_len; i++)
@@ -1243,7 +1212,10 @@ void gui_font_mem_destroy(gui_text_t *text)
             mem_char_t *chr = text->data;
             for (int i = 0; i < text->font_len; i++)
             {
-                gui_free(chr[i].dot_addr);
+                if (chr[i].dot_addr && !font_glyph_cache_contains(chr[i].dot_addr))
+                {
+                    gui_free(chr[i].dot_addr);
+                }
             }
         }
         gui_free(text->data);
@@ -1370,6 +1342,14 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
             rtk_draw_unicode(chr + i, outcolor, render_mode, rect, font->crop);
         }
     }
+
+#if 0 /* Enable to print glyph cache stats per draw call */
+    {
+        uint32_t hit, miss, used, total;
+        font_glyph_cache_stats(&hit, &miss, &used, &total);
+        gui_log("glyph cache: hit=%u miss=%u used=%u/%u\n", hit, miss, used, total);
+    }
+#endif
 }
 
 uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
