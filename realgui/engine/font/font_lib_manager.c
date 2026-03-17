@@ -83,6 +83,7 @@ FONT_LIB_NODE *gui_font_lib_register(uint8_t *font_file,
     node->cached_data = cached_data;
     node->cached_size = cached_size;
     node->ref_count = 1;
+    node->fs_fd = NULL;
 
     /* Insert at head */
     node->next = font_lib_head;
@@ -133,6 +134,9 @@ static void font_lib_node_remove(FONT_LIB_NODE *target)
             prev->next = target->next;
         }
     }
+
+    /* Close cached file handle if open */
+    gui_font_lib_fs_close(target);
 
     /* Free cached data (not for MEM mode) */
     if (target->cached_data != NULL && target->src_mode != FONT_SRC_MEMADDR)
@@ -192,6 +196,7 @@ void gui_font_lib_clear_all(void)
         {
             gui_free(node->cached_data);
         }
+        gui_font_lib_fs_close(node);
         gui_free(node);
 
         node = next;
@@ -200,6 +205,35 @@ void gui_font_lib_clear_all(void)
     font_lib_head = NULL;
     font_lib_count = 0;
     // gui_log("font_lib: cleared all fonts\n");
+}
+
+/*============================================================================*
+ *                      File Handle Cache (FILESYS mode)
+ *============================================================================*/
+
+int gui_font_lib_fs_open(FONT_LIB_NODE *node)
+{
+    if (node == NULL || node->font_file == NULL)
+    {
+        return -1;
+    }
+    if (node->fs_fd != NULL)
+    {
+        /* Already open */
+        return 0;
+    }
+    node->fs_fd = gui_vfs_open((const char *)node->font_file, GUI_VFS_READ);
+    return (node->fs_fd != NULL) ? 0 : -1;
+}
+
+void gui_font_lib_fs_close(FONT_LIB_NODE *node)
+{
+    if (node == NULL || node->fs_fd == NULL)
+    {
+        return;
+    }
+    gui_vfs_close(node->fs_fd);
+    node->fs_fd = NULL;
 }
 
 /*============================================================================*

@@ -143,20 +143,29 @@ static int font_fs_read(FONT_LIB_NODE *node, uint32_t offset, uint8_t *buf, uint
         return -1;
     }
 
-    gui_vfs_file_t *file = gui_vfs_open((const char *)node->font_file, GUI_VFS_READ);
+    gui_vfs_file_t *file = node->fs_fd;
+    bool temp_open = false;
+
     if (file == NULL)
     {
-        return -1;
+        /* Fallback: open temporarily if no cached handle */
+        file = gui_vfs_open((const char *)node->font_file, GUI_VFS_READ);
+        if (file == NULL)
+        {
+            return -1;
+        }
+        temp_open = true;
     }
 
     if (gui_vfs_seek(file, offset, GUI_VFS_SEEK_SET) < 0)
     {
-        gui_vfs_close(file);
+        if (temp_open) { gui_vfs_close(file); }
         return -1;
     }
 
     int read_size = gui_vfs_read(file, buf, size);
-    gui_vfs_close(file);
+
+    if (temp_open) { gui_vfs_close(file); }
 
     return read_size;
 }
@@ -215,6 +224,8 @@ void gui_font_get_dot_info(gui_text_t *text)
         }
         table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = font->head_length + font->index_area_size;
+        /* Cache file handle for batch reads */
+        gui_font_lib_fs_open(node);
     }
     else
     {
@@ -737,6 +748,11 @@ void gui_font_get_dot_info(gui_text_t *text)
     text->font_len = chr_i;
     text->active_font_len = chr_i;
     text->char_width_sum += text->extra_letter_spacing * (text->font_len - 1);
+    /* Close cached file handle after batch reads */
+    if (node != NULL && text->font_mode == FONT_SRC_FILESYS)
+    {
+        gui_font_lib_fs_close(node);
+    }
     gui_free(unicode_buf);
 }
 

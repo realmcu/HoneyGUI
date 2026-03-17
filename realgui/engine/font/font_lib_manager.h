@@ -13,6 +13,7 @@ extern "C" {
 
 #include "guidef.h"
 #include "gui_api.h"
+#include "gui_vfs.h"
 #include "font_types.h"
 
 /*============================================================================*
@@ -31,8 +32,26 @@ typedef struct FONT_LIB_NODE
     uint8_t *cached_data;           /**< Cached header + index data */
     uint32_t cached_size;           /**< Size of cached data */
     uint32_t ref_count;             /**< Reference count for memory management */
+    gui_vfs_file_t *fs_fd;          /**< Cached file handle for FILESYS mode */
     struct FONT_LIB_NODE *next;     /**< Next node in linked list */
 } FONT_LIB_NODE;
+
+/**
+ * @brief Open and cache the font file handle for FILESYS mode
+ * Call before batch character reads to avoid repeated open/close.
+ *
+ * @param node Font node (must be FONT_SRC_FILESYS)
+ * @return 0 on success, -1 on failure
+ */
+int gui_font_lib_fs_open(FONT_LIB_NODE *node);
+
+/**
+ * @brief Close the cached font file handle
+ * Call after batch character reads are done.
+ *
+ * @param node Font node
+ */
+void gui_font_lib_fs_close(FONT_LIB_NODE *node);
 
 /*============================================================================*
  *                         Functions
