@@ -467,7 +467,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
 
     if ((text->duration_time_ms == 0 ||
          text->cur_time_ms < (text->init_time_ms + text->duration_time_ms)) &&
-        gui_scroll_text_rect_hit(&draw_rect, &dc->section))
+        gui_text_scope_rect_hit(&draw_rect, &dc->section))
     {
         gui_scroll_text_font_draw(&text->base, &draw_rect);
     }

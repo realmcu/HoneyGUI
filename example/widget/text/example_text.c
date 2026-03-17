@@ -80,6 +80,7 @@ void text_widget_example(void)
  * | 9 | text_font_source_mode_test()     | 3x4 grid: source(MEMADDR/FTL/FILESYS) x type(BMP/IMG/MAT/TTF)            |
  * |10 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
  * |11 | text_measure_test()              | Layout measure: BMP/TTF, single-line/multi-line metrics                  |
+ * |12 | text_clip_test()                 | Partial text display using win clip (top/bottom/right/center)            |
  *
  * @return 0 on success
  */
@@ -98,6 +99,7 @@ static int app_init(void)
     // text_font_source_mode_test();    /* [9] Font source modes       */
     // text_wordwrap_test();            /* [10] Word-wrap & break test */
     // text_measure_test();             /* [11] Layout measure test    */
+    // text_clip_test();                /* [12] Text clip/partial show */
 
     return 0;
 }

@@ -340,6 +340,35 @@ static void gui_text_prepare(gui_obj_t *obj)
     }
 }
 
+static void gui_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
+{
+    text->scope = 0;
+    gui_obj_t *o = (gui_obj_t *)text;
+    gui_win_t *win_scope = NULL;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+        if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+        {
+            text->scope = 1;
+            win_scope = (void *)o;
+            break;
+        }
+    }
+    if (text->scope && win_scope != NULL)
+    {
+        int scopex = win_scope->base.matrix->m[0][2];
+        int scopey = win_scope->base.matrix->m[1][2];
+        int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
+        int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
+
+        rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
+        rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
+        rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
+        rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+    }
+}
+
 static void gui_text_draw(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
@@ -364,7 +393,23 @@ static void gui_text_draw(gui_obj_t *obj)
     {
         gui_text_font_load(text, &draw_rect);
     }
+    draw_rect.xboundleft = draw_rect.x1;
+    draw_rect.xboundright = draw_rect.x2;
+    draw_rect.yboundtop = draw_rect.y1;
+    draw_rect.yboundbottom = draw_rect.y2;
+
     gui_text_resize_rect(text, &draw_rect);
+    gui_text_read_scope(text, &draw_rect);
+    if (text->scope_self)
+    {
+        int16_t ox = text->scope_absolute ? 0 : text->offset_x;
+        int16_t oy = text->scope_absolute ? 0 : text->offset_y;
+        draw_rect.xboundleft = _UI_MAX(ox + text->scope_rect.x1, draw_rect.xboundleft);
+        draw_rect.xboundright = _UI_MIN(ox + text->scope_rect.x2, draw_rect.xboundright);
+        draw_rect.yboundtop = _UI_MAX(oy + text->scope_rect.y1, draw_rect.yboundtop);
+        draw_rect.yboundbottom = _UI_MIN(oy + text->scope_rect.y2, draw_rect.yboundbottom);
+        text->scope = 1;
+    }
     if (text->font_type == GUI_FONT_SRC_TTF)
     {
         gui_font_ttf_adapt_rect(text, &draw_rect);
@@ -373,7 +418,9 @@ static void gui_text_draw(gui_obj_t *obj)
     {
         gui_font_ttf_adapt_rect(text, &draw_rect);
     }
-    if (gui_text_rect_hit(&draw_rect, &dc->section))
+    if (text->scope ?
+        gui_text_scope_rect_hit(&draw_rect, &dc->section) :
+        gui_text_rect_hit(&draw_rect, &dc->section))
     {
         gui_text_font_draw(text, &draw_rect);
     }
@@ -707,6 +754,27 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->hebrew = false;
     gui_text_multilanguage_check(this);
 }
+
+void gui_text_set_scope(gui_text_t *this, int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    this->scope_self = true;
+    this->scope_absolute = false;
+    this->scope_rect.x1 = x;
+    this->scope_rect.y1 = y;
+    this->scope_rect.x2 = x + w - 1;
+    this->scope_rect.y2 = y + h - 1;
+}
+
+void gui_text_set_scope_absolute(gui_text_t *this, int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    this->scope_self = true;
+    this->scope_absolute = true;
+    this->scope_rect.x1 = x;
+    this->scope_rect.y1 = y;
+    this->scope_rect.x2 = x + w - 1;
+    this->scope_rect.y2 = y + h - 1;
+}
+
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
 {

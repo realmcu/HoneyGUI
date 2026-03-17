@@ -95,6 +95,7 @@ typedef struct gui_text
     int16_t offset_x;
     int16_t offset_y;
     uint16_t font_height;
+    gui_rect_t scope_rect;  /**< self scope clip area (relative to text) */
 
     TEXT_MODE mode;
     TEXT_CHARSET charset;
@@ -113,6 +114,8 @@ typedef struct gui_text
     bool ispasswd         : 1;
     bool wordwrap         : 1;
     bool scope            : 1;
+    bool scope_self       : 1;  /**< scope set by gui_text_set_scope */
+    bool scope_absolute   : 1;  /**< 0=relative to text, 1=absolute screen coords */
     bool arabic           : 1;
     bool thai             : 1;
     bool hebrew           : 1;
@@ -374,6 +377,32 @@ gui_text_t *gui_text_create(void       *parent,
  */
 void gui_text_layout_measure(gui_text_t *this_widget);
 
+/**
+ * @brief Set a clip scope on the text widget (relative to text position).
+ *
+ * Only the portion of text inside the scope rectangle will be drawn.
+ * Coordinates are relative to the text widget's own top-left corner.
+ *
+ * @param this_widget Text widget pointer.
+ * @param x X offset of the visible area relative to text.
+ * @param y Y offset of the visible area relative to text.
+ * @param w Width of the visible area.
+ * @param h Height of the visible area.
+ */
+void gui_text_set_scope(gui_text_t *this_widget, int16_t x, int16_t y, int16_t w, int16_t h);
+
+/**
+ * @brief Set an absolute clip scope on the text widget (screen coordinates).
+ *
+ * @param this_widget Text widget pointer.
+ * @param x X coordinate on screen.
+ * @param y Y coordinate on screen.
+ * @param w Width of the visible area.
+ * @param h Height of the visible area.
+ */
+void gui_text_set_scope_absolute(gui_text_t *this_widget, int16_t x, int16_t y, int16_t w,
+                                 int16_t h);
+
 gui_inline bool gui_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
 {
     if (a->x2 < b->x1) { return false; }
@@ -382,7 +411,7 @@ gui_inline bool gui_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
     if (b->y2 < a->y1) { return false; }
     return true;
 }
-gui_inline bool gui_scroll_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
+gui_inline bool gui_text_scope_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
 {
     if (a->xboundright < b->x1) { return false; }
     if (b->x2 < a->xboundleft) { return false; }

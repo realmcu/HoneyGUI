@@ -83,6 +83,7 @@ void text_font_scroll_loop_test(void);
 void text_font_source_mode_test(void);
 void text_wordwrap_test(void);
 void text_measure_test(void);
+void text_clip_test(void);
 
 #ifdef __cplusplus
 }
