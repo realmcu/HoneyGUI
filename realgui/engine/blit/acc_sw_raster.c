@@ -99,6 +99,47 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
             *source_blue = pixel_mix->color.argb_channel.b;
             break;
         }
+    case A4:
+        {
+            /* 4 bpp, little-endian: low nibble first (pixel 0 = bit[3:0], pixel 1 = bit[7:4]) */
+            uint8_t *byte_ptr = (uint8_t *)(uintptr_t)image_base + (image_off >> 1);
+            uint8_t alpha_4bit = (image_off & 1) ? ((*byte_ptr >> 4) & 0x0F) : (*byte_ptr & 0x0F);
+            color_argb8888_t *pixel_mix = (color_argb8888_t *)&color_mix;
+            uint32_t alpha = (alpha_4bit * 17) * pixel_mix->color.argb_channel.a / 255;
+            *source_alpha = alpha;
+            *source_red = pixel_mix->color.argb_channel.r;
+            *source_green = pixel_mix->color.argb_channel.g;
+            *source_blue = pixel_mix->color.argb_channel.b;
+            break;
+        }
+    case A2:
+        {
+            /* 2 bpp, little-endian: pixel 0 = bit[1:0], pixel 1 = bit[3:2], ... */
+            uint8_t *byte_ptr = (uint8_t *)(uintptr_t)image_base + (image_off >> 2);
+            int shift = (image_off & 3) * 2;
+            uint8_t alpha_2bit = (*byte_ptr >> shift) & 0x03;
+            color_argb8888_t *pixel_mix = (color_argb8888_t *)&color_mix;
+            uint32_t alpha = (alpha_2bit * 85) * pixel_mix->color.argb_channel.a / 255;
+            *source_alpha = alpha;
+            *source_red = pixel_mix->color.argb_channel.r;
+            *source_green = pixel_mix->color.argb_channel.g;
+            *source_blue = pixel_mix->color.argb_channel.b;
+            break;
+        }
+    case A1:
+        {
+            /* 1 bpp, little-endian: pixel 0 = bit0, pixel 1 = bit1, ... */
+            uint8_t *byte_ptr = (uint8_t *)(uintptr_t)image_base + (image_off >> 3);
+            int shift = image_off & 7;
+            uint8_t alpha_1bit = (*byte_ptr >> shift) & 0x01;
+            color_argb8888_t *pixel_mix = (color_argb8888_t *)&color_mix;
+            uint32_t alpha = alpha_1bit * pixel_mix->color.argb_channel.a;
+            *source_alpha = alpha;
+            *source_red = pixel_mix->color.argb_channel.r;
+            *source_green = pixel_mix->color.argb_channel.g;
+            *source_blue = pixel_mix->color.argb_channel.b;
+            break;
+        }
     case I8:
         {
             uint8_t *pixel = (uint8_t *)(uintptr_t)image_base + image_off;
