@@ -465,6 +465,17 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
 
     gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
 
+    if (text->base.scope_self)
+    {
+        int16_t ox = text->base.scope_absolute ? 0 : text->base.offset_x;
+        int16_t oy = text->base.scope_absolute ? 0 : text->base.offset_y;
+        draw_rect.xboundleft = _UI_MAX(ox + text->base.scope_rect.x1, draw_rect.xboundleft);
+        draw_rect.xboundright = _UI_MIN(ox + text->base.scope_rect.x2, draw_rect.xboundright);
+        draw_rect.yboundtop = _UI_MAX(oy + text->base.scope_rect.y1, draw_rect.yboundtop);
+        draw_rect.yboundbottom = _UI_MIN(oy + text->base.scope_rect.y2, draw_rect.yboundbottom);
+        text->base.scope = 1;
+    }
+
     if ((text->duration_time_ms == 0 ||
          text->cur_time_ms < (text->init_time_ms + text->duration_time_ms)) &&
         gui_text_scope_rect_hit(&draw_rect, &dc->section))
