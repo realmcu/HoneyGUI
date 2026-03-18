@@ -102,17 +102,9 @@ static void gui_arc_prepare(gui_arc_t *this)
     {
         obj->matrix = gui_malloc(sizeof(gui_matrix_t));
         GUI_ASSERT(obj->matrix != NULL);
+        // Reset matrix to identity before applying transformations
+        matrix_identity(obj->matrix);
     }
-
-    // Reset matrix to identity before applying transformations
-    matrix_identity(obj->matrix);
-
-    // Get absolute position of widget
-    int abs_x, abs_y;
-    gui_obj_absolute_xy(obj, &abs_x, &abs_y);
-
-    // Translate to absolute position first
-    matrix_translate(abs_x, abs_y, obj->matrix);
 
     // Apply transformations (like gui_img_prepare does)
     float center_x = obj->w / 2.0f;

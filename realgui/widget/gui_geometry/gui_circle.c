@@ -1044,8 +1044,21 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
 void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_color_t color)
 {
     GUI_ASSERT(circle != NULL);
-    circle->x = x;
-    circle->y = y;
+
+    // Calculate new widget bounding box
+    int new_base_x = x - radius;
+    int new_base_y = y - radius;
+    int new_size = radius * 2;
+
+    // Update widget position and size
+    circle->base.x = new_base_x;
+    circle->base.y = new_base_y;
+    circle->base.w = new_size;
+    circle->base.h = new_size;
+
+    // Circle center is always at the center of the bounding box
+    circle->x = radius;
+    circle->y = radius;
     circle->radius = radius;
     circle->color = color;
     circle->opacity_value = color.color.rgba.a;
@@ -1054,10 +1067,20 @@ void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_co
 void gui_circle_set_position(gui_circle_t *circle, int x, int y)
 {
     GUI_ASSERT(circle != NULL);
-    if (circle->x != x || circle->y != y)
+
+    // Calculate new widget bounding box position
+    int new_base_x = x - circle->radius;
+    int new_base_y = y - circle->radius;
+
+    // Update widget position if changed
+    if (circle->base.x != new_base_x || circle->base.y != new_base_y)
     {
-        circle->x = x;
-        circle->y = y;
+        circle->base.x = new_base_x;
+        circle->base.y = new_base_y;
+
+        // Circle center is always at the center of the bounding box
+        circle->x = circle->radius;
+        circle->y = circle->radius;
     }
 }
 
