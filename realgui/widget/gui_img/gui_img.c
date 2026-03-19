@@ -603,17 +603,39 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
 
     if (storage_type == IMG_SRC_FILESYS)
     {
-        _this->src_data = gui_strdup((const char *)file_pointer);
-        GUI_ASSERT(_this->src_data != NULL);
-        _this->free_on_destroy = true;  /* We own the strdup'd memory */
+        const void *data = gui_vfs_get_file_address((const char *)file_pointer);
+        if (!data)
+        {
+            /* Fallback: read file into memory */
+            gui_vfs_file_t *f = gui_vfs_open((const char *)file_pointer, GUI_VFS_READ);
+            GUI_ASSERT(f != NULL);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+            int size = gui_vfs_tell(f);
+            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+            data = gui_malloc(size);
+            GUI_ASSERT(data != NULL);
+            gui_vfs_read(f, (void *)data, size);
+            gui_vfs_close(f);
+
+            _this->free_on_destroy = true;  /* Allocated memory, must free */
+        }
+        else
+        {
+            _this->free_on_destroy = false;  /* XIP memory, don't free */
+        }
+
+        _this->storage_type = IMG_SRC_MEMADDR;  /* XIP is also direct memory access */
+
+
+        _this->src_data = (void *)data;
     }
     else
     {
         _this->src_data = (void *)file_pointer;
         _this->free_on_destroy = false;  /* External pointer */
+        _this->storage_type = storage_type;
     }
 
-    _this->storage_type = storage_type;
 }
 
 const uint8_t *gui_img_get_image_data(gui_img_t  *_this)
