@@ -24,6 +24,7 @@ void sdl_panel_set_control_panel(int x, int y, int w, int h);
  * @param on_release Callback function called when button is released (can be NULL)
  */
 void sdl_panel_add_button(int x, int y, int w, int h, int radius,
+                          const char *icon_path,
                           void (*on_press)(void), void (*on_release)(void));
 void sdl_panel_draw(SDL_Surface *surface);
 bool sdl_panel_check_click(int x, int y, bool is_down);

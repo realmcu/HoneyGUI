@@ -162,15 +162,19 @@ void gui_port_dc_init(void)
     int slot_w = panel_w / 4;  // Each button gets 1/4 of panel width
 
     sdl_panel_add_button(slot_w * 0 + (slot_w - btn_size) / 2, btn_y, btn_size, btn_size, -1,
+                         "win32_sim/port/realgui_port/home.bmp",
                          on_home_press, on_home_release);
 
     sdl_panel_add_button(slot_w * 1 + (slot_w - btn_size) / 2, btn_y, btn_size, btn_size, -1,
+                         "win32_sim/port/realgui_port/back.bmp",
                          on_back_press, on_back_release);
 
     sdl_panel_add_button(slot_w * 2 + (slot_w - btn_size) / 2, btn_y, btn_size, btn_size, -1,
+                         "win32_sim/port/realgui_port/menu.bmp",
                          on_menu_press, on_menu_release);
 
     sdl_panel_add_button(slot_w * 3 + (slot_w - btn_size) / 2, btn_y, btn_size, btn_size, -1,
+                         "win32_sim/port/realgui_port/power.bmp",
                          on_power_press, on_power_release);
 
     sdl_driver_init(DRV_LCD_WIDTH, DRV_LCD_HEIGHT, DRV_PIXEL_BITS);

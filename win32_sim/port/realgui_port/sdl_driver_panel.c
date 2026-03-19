@@ -20,6 +20,7 @@ typedef struct
     uint32_t color_normal;
     uint32_t color_pressed;
     bool is_pressed;
+    SDL_Surface *icon;
     void (*on_press)(void);
     void (*on_release)(void);
 } PhysicalButton;
@@ -55,6 +56,7 @@ void sdl_panel_set_control_panel(int x, int y, int w, int h)
  * @note For circle buttons, use w=h and radius=-1
  */
 void sdl_panel_add_button(int x, int y, int w, int h, int radius,
+                          const char *icon_path,
                           void (*on_press)(void), void (*on_release)(void))
 {
     if (button_count >= 8) { return; }
@@ -70,6 +72,17 @@ void sdl_panel_add_button(int x, int y, int w, int h, int radius,
     btn->is_pressed = false;
     btn->on_press = on_press;
     btn->on_release = on_release;
+
+    btn->icon = NULL;
+    if (icon_path)
+    {
+        btn->icon = SDL_LoadBMP(icon_path);
+        if (btn->icon)
+        {
+            SDL_SetColorKey(btn->icon, SDL_TRUE,
+                            SDL_MapRGB(btn->icon->format, 0, 0, 0));
+        }
+    }
 }
 
 static void draw_buttons(SDL_Surface *surface)
@@ -129,6 +142,17 @@ static void draw_buttons(SDL_Surface *surface)
                     pixels[y * pitch + x] = color;
                 }
             }
+        }
+
+        if (btn->icon)
+        {
+            int icon_w = btn->icon->w;
+            int icon_h = btn->icon->h;
+            int icon_x = btn->x + (btn->w - icon_w) / 2;
+            int icon_y = btn->y + (btn->h - icon_h) / 2;
+
+            SDL_Rect dst_rect = {icon_x, icon_y, icon_w, icon_h};
+            SDL_BlitSurface(btn->icon, NULL, surface, &dst_rect);
         }
     }
 }
