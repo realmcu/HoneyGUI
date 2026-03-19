@@ -102,7 +102,7 @@ static void gui_view_released_view_timer_cb(void *obj)
         g_NextView = NULL;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         // gui_log("current view name = %s\n", g_CurrentView->base.name);
-
+        gui_fb_change();
         gui_obj_delete_timer(obj);
     }
 }
@@ -118,7 +118,7 @@ static void gui_view_animate_timer_cb(void *obj)
         g_Target = g_Release;
         _this->current_transition_style = SWITCH_INIT_STATE;
         gui_obj_delete_timer(obj);
-
+        gui_fb_change();
         if (g_PreView != g_NextView) {gui_view_not_show(g_PreView);}
         gui_view_not_show(g_CurrentView);
         if (g_CurrentView->descriptor->keep)
@@ -380,13 +380,13 @@ static void gui_view_not_show(gui_view_t *_this)
     if (_this == NULL || (_this == g_NextView && _this == g_PreView && g_SurpressEvent)) { return; }
 
     gui_obj_t *obj = GUI_BASE(_this);
+    gui_obj_hidden(obj, true);
     if (!_this->descriptor->keep)
     {
         gui_obj_tree_free_async(obj);
     }
     else
     {
-        gui_obj_hidden(obj, true);
         gui_log("%s hide\n", obj->name);
     }
 }
