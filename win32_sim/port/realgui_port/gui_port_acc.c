@@ -13,10 +13,13 @@ extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
 extern void sw_arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degree,
                            void *cache_mem);
 extern void sw_arm2d_blur_init(void);
+extern void *gui_acc_decode(void *in);
 static acc_engine_t acc =
 {
     .blit = sw_acc_blit,
     .blur = sw_arm_2d_blur,
+    .idu_load = gui_acc_decode,
+    .idu_free = gui_free,
 };
 
 

@@ -76,7 +76,7 @@ typedef struct
     uint32_t target_stride;         /*!< Data length between 2 contiguous target lines.*/
 } gui_sw_idu_range_t;
 
-void gui_sw_idu_decode(void *in, gui_rect_t *rect, void *out, uint32_t stride);
+bool gui_sw_idu_decode(void *in, gui_rect_t *rect, void *out, uint32_t stride);
 
 // Wrapper functions for acc_engine integration
 void *gui_sw_idu_load(void *input);

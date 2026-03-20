@@ -14,6 +14,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdint.h>
 
 #define CLIP(X)  ((X) < 0) ? 0 : (((X) > 255) ? 255 : (X))
 
@@ -417,8 +418,27 @@ static void decode_FastLZ_line(uint8_t *in, uint8_t *out, uint8_t *limit)
 
 static void decode_FastLZ(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *range)
 {
+    gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
+    uint8_t pixel_size = 0;
+    switch (head->algorithm_type.pixel_bytes)
+    {
+    case 0:
+        pixel_size = 2;
+        break;
+    case 1:
+        pixel_size = 3;
+        break;
+    case 2:
+        pixel_size = 4;
+        break;
+    case 3:
+        pixel_size = 1;
+        break;
+    default:
+        break;
+    }
     uint32_t *addr_set = (uint32_t *)(in + sizeof(gui_sw_idu_head_t));
-    uint32_t width = (range->end_column - range->start_column + 1);
+    uint32_t width = (range->end_column - range->start_column + 1) * pixel_size;
     uint32_t line_addr = addr_set[range->start_line];
     uint32_t next_addr = 0;
     if (range->target_stride == width)
@@ -782,7 +802,74 @@ static void decode_YUV_Sample_Blur_FastLZ(uint8_t *in, uint8_t *out, gui_sw_idu_
 }
 
 
-void gui_sw_idu_decode(void *in, gui_rect_t *rect, void *out, uint32_t stride)
+void *gui_acc_decode(void *in)
+{
+    if (in == NULL)
+    {
+        GUI_ASSERT(in != NULL);
+        return NULL;
+    }
+    uint8_t pixel_size = 0;
+    const gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)in;
+    uint32_t clut_num = 0;
+    uint32_t clut_offset = 0;
+    switch (head->type)
+    {
+    case RGB565:
+        pixel_size = 2;
+        break;
+    case RGB888:
+        pixel_size = 3;
+        break;
+    case ARGB8888:
+        pixel_size = 4;
+        break;
+    case ARGB8565:
+        pixel_size = 3;
+        break;
+    case I8:
+        pixel_size = 1;
+        clut_num = *(uint32_t *)((uintptr_t)in + sizeof(gui_rgb_data_head_t)) + 1;
+        clut_offset = clut_num * 4;
+        break;
+    case A8:
+        pixel_size = 1;
+        break;
+    default:
+        return NULL;
+    }
+    const imdc_file_header_t *idu_info = (imdc_file_header_t *)((uintptr_t)in + sizeof(
+                                                                    gui_rgb_data_head_t) + clut_offset);
+    if (idu_info->raw_pic_width == 0 || idu_info->raw_pic_height == 0)
+    {
+        return NULL;
+    }
+    uint8_t *decode_img_data = gui_malloc(sizeof(gui_rgb_data_head_t) + 4 + idu_info->raw_pic_width
+                                          * idu_info->raw_pic_height * pixel_size + clut_offset);
+    gui_rgb_data_head_t *output_header = (gui_rgb_data_head_t *)decode_img_data;
+    memcpy(output_header, head, sizeof(gui_rgb_data_head_t));
+    output_header->compress = 0;
+    output_header->idu = 1;
+    if (clut_num)
+    {
+        memcpy(decode_img_data + sizeof(gui_rgb_data_head_t),
+               (uint8_t *)in + sizeof(gui_rgb_data_head_t), clut_offset);
+    }
+    gui_rect_t decode_rect = {.x1 = 0, .y1 = 0, .x2 = head->w - 1, .y2 = head->h - 1};
+    uint32_t buffer_stride = head->w * pixel_size;
+    if (gui_sw_idu_decode((uint8_t *)idu_info, &decode_rect,  decode_img_data +
+                          sizeof(gui_rgb_data_head_t) + clut_offset, buffer_stride))
+    {
+        return decode_img_data;
+    }
+    else
+    {
+        gui_free(decode_img_data);
+        return NULL;
+    }
+}
+
+bool gui_sw_idu_decode(void *in, gui_rect_t *rect, void *out, uint32_t stride)
 {
     gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
     gui_sw_idu_range_t range = {.start_line = rect->y1, .end_line = rect->y2,
@@ -811,8 +898,9 @@ void gui_sw_idu_decode(void *in, gui_rect_t *rect, void *out, uint32_t stride)
         decode_YUV_Sample_Blur_FastLZ(in, out, &range);
         break;
     default:
-        break;
+        return false;
     }
+    return true;
 }
 
 
