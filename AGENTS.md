@@ -1,69 +1,70 @@
 # HoneyGUI Development Guidelines
 
-## General Rules
+**Generated:** 2026-03-23 | **v2.1.1.0** | **Branch:** master
 
-**IMPORTANT**: 
-- Do NOT create or modify Markdown (.md) documentation files unless explicitly requested by the user.
-- Do NOT create README.md, QUICKSTART.md, or any other documentation files by default.
-- Only add documentation when the user specifically asks for it.
+## Overview
 
-## Git Commit Rules
+Embedded GUI framework for Realtek microcontrollers (RTL8762, RTL8773). C library with PC simulator + embedded ports. Supports C/C++ API and HML/XML low-code development.
 
-### Commit Message Format
+## Structure
 
-#### Title (First Line)
-- **Prefix**: Must start with `GUI:`
-- **Length**: Maximum 48 characters
+    realgui/           # Core GUI engine
+    +-- core/          # Event system, object model (def_*.h)
+    +-- widget/        # 21 widget components (gui_*.c)
+    +-- engine/        # Rendering, fonts, codecs
+    +-- dc/            # Display controller
+    +-- input/         # Touch/keyboard handling
+    +-- 3rd/           # Third-party (Arm2D, box2d, stb, h264bsd)
+    +-- server/        # GUI server components
 
-#### Body (Subsequent Lines)
-- **Line Length**: Maximum 60 characters per line
+    example/          # Demo applications by screen resolution
+    win32_sim/        # Windows PC simulator
+    lib/              # Prebuilt toolchain libraries
+    tool/             # Development tools (image/video converters)
 
-### Gerrit Submission
+## Build
 
-**IMPORTANT**: Only commit and push when explicitly requested.
+    # SCons (primary)
+    cd win32_sim && scons
 
-```bash
-git push origin HEAD:refs/for/master
-```
+    # CMake (alternative)
+    cd win32_sim && mkdir build && cmake -G "MinGW Makefiles" .. && mingw32-make
 
-## Coding Standards
+    # Configure app
+    cd win32_sim && menuconfig ../Kconfig.gui
 
-### Logging
-- Use `gui_log()` instead of `printf()`
-- Include: `#include "gui_api_os.h"`
+## Key Conventions
 
-### File System Access
-- Use VFS API instead of system calls
-- Include: `#include "gui_vfs.h"`
-- VFS functions:
-  - `gui_vfs_opendir()` - Open directory
-  - `gui_vfs_readdir()` - Read directory entry
-  - `gui_vfs_closedir()` - Close directory
-  - `gui_vfs_stat()` - Get file info
-  - `gui_vfs_open()` - Open file
-  - `gui_vfs_read()` - Read file
-  - `gui_vfs_close()` - Close file
+- **Logging**: gui_log() not printf() - include gui_api_os.h
+- **File I/O**: VFS API - include gui_vfs.h
+- **Shell commands**: realgui/3rd/letter_shell/ with SHELL_EXPORT_CMD()
+- **Platform macros**: #if defined(_WIN32) || defined(__linux__)
+- **Widget prefix**: gui_ for implementations, gui_ headers
+- **Event types**: GUI_EVENT_* in realgui/core/def_event.h
+- **HML tags**: hg_ prefix (e.g., <hg_view>, <hg_button>)
 
-### Shell Commands
-- Location: `realgui/3rd/letter_shell/`
-- Export macro: `SHELL_EXPORT_CMD()`
-- Format:
-```c
-SHELL_EXPORT_CMD(
-    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN),
-    command_name, function_name, description);
-```
+## Git
 
-## Platform Support
+- **Commit prefix**: GUI: (max 48 chars title, 60 chars body)
+- **Gerrit push**: git push origin HEAD:refs/for/master
 
-### Conditional Compilation
-```c
-#if defined(_WIN32) || defined(__linux__)
-// Platform-specific code
-#endif
-```
+## Anti-Patterns (DO NOT)
 
-### Linker Scripts
-- Windows: `win32_sim/honeygui_mingw.ld`
-- Linux: `win32_sim/honeygui_linux.lds`
-- Section names: Use without dot prefix (e.g., `shellCommand` not `.shellCommand`)
+- Define __ARM_2D_CFG_FORCED_FIXED_POINT_TRANSFORM__ in arm_2d_features.h:158
+- Use virtual screen flag in arm_2d_types.h:636
+- Free cached geometry buffers in gui_circle.c:923, gui_rect.c:1047
+- Edit auto-generated files (cconfig.h, scons-tool/*.py)
+- Use stb_truetype on untrusted font files (no security guarantee)
+
+## Testing
+
+    cd example/test && python run_all_tests.py    # All tests
+    python test_widgets.py                          # Widget demos
+    python test_gui_lib_build.py                    # Cross-compile tests
+
+## Platform Ports
+
+- win32_sim/: MinGW-w64, SDL2, Windows
+- keil_sim/ac5/ac6/: Keil ARM MDK
+- zephyr/: Zephyr RTOS integration
+- lib/: Prebuilt for gcc, armcc, armclang, arm-none-eabi-gcc
