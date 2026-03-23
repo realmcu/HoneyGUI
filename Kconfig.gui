@@ -179,6 +179,12 @@ config REALTEK_BUILD_PARTICLE_DEMO
       RTK GUI Particle System Demo - includes firework, trail, touch,
       snow and bubble effects examples
 
+config REALTEK_BUILD_MAP_NAVIGATION
+    bool "Map Navigation Demo"
+    help
+      Offline map navigation system with GPS integration,
+      A* pathfinding, and TRVG vector graphics rendering
+
 endchoice
 
 menu "HoneyGUI Feature Configuration"

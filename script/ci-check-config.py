@@ -45,7 +45,8 @@ ci_check_config = {
         r"realgui/engine/draw/draw_font.c",
         r"doxygen_graphviz/readme.md",
         r"tool/",
-        r"example/application/FHY_320_200",
+        r"example/map",
+        r"todo/",
     ],
     "ignore_cpp_astyle_check":[
         r"lib/RTE/",

@@ -1,0 +1,10 @@
+import os
+from building import *
+
+cwd = GetCurrentDir()
+inc = [cwd]
+src = Glob('*.c')
+
+objs = DefineGroup('map-state', src, depend=[''], CPPPATH=inc)
+
+Return('objs')

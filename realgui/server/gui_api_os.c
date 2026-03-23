@@ -373,7 +373,22 @@ void gui_lower_free(void *rmem)
     tlsf_free(lower_tlsf, rmem);
 }
 
-
+void *gui_lower_calloc(size_t num, size_t size)
+{
+    void *ptr = NULL;
+    size_t total_size = num * size;
+    GUI_ASSERT(lower_tlsf != NULL);
+    ptr = tlsf_malloc(lower_tlsf, total_size);
+    if (ptr == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
+    if (ptr != NULL)
+    {
+        memset(ptr, 0, total_size);
+    }
+    return ptr;
+}
 
 void gui_lower_mem_debug(void)
 {

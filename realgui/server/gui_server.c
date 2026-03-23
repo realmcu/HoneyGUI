@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <stdbool.h>
 #include "guidef.h"
 #include "draw_img.h"
 #include "gui_fb.h"
@@ -28,6 +29,12 @@ extern void gui_components_init(void);
 static void (*gui_task_ext_execution_hook)(void) = NULL;
 
 /**
+ * @brief Multiple server hooks management
+ */
+#define GUI_MAX_SERVER_HOOKS 16
+static void (*gui_server_hooks[GUI_MAX_SERVER_HOOKS])(void) = {0};
+
+/**
  * @brief Sets the external execution hook for the GUI task.
  *
  * @param hook Function pointer to the external execution hook.
@@ -35,6 +42,58 @@ static void (*gui_task_ext_execution_hook)(void) = NULL;
 void gui_task_ext_execution_sethook(void (*hook)(void))
 {
     gui_task_ext_execution_hook = hook;
+}
+
+bool gui_register_server_hook(void (*hook)(void))
+{
+    if (!hook)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < GUI_MAX_SERVER_HOOKS; i++)
+    {
+        if (gui_server_hooks[i] == hook)
+        {
+            return true;
+        }
+    }
+
+    for (int i = 0; i < GUI_MAX_SERVER_HOOKS; i++)
+    {
+        if (gui_server_hooks[i] == NULL)
+        {
+            gui_server_hooks[i] = hook;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void gui_unregister_server_hook(void (*hook)(void))
+{
+    if (!hook)
+    {
+        return;
+    }
+
+    for (int i = 0; i < GUI_MAX_SERVER_HOOKS; i++)
+    {
+        if (gui_server_hooks[i] == hook)
+        {
+            gui_server_hooks[i] = NULL;
+            return;
+        }
+    }
+}
+
+void gui_clear_all_server_hooks(void)
+{
+    for (int i = 0; i < GUI_MAX_SERVER_HOOKS; i++)
+    {
+        gui_server_hooks[i] = NULL;
+    }
 }
 
 /**
@@ -57,6 +116,15 @@ static void gui_server_entry(void *parameter)
         if (gui_task_ext_execution_hook != NULL)
         {
             gui_task_ext_execution_hook();
+        }
+
+        /* execute all registered server hooks */
+        for (int i = 0; i < GUI_MAX_SERVER_HOOKS; i++)
+        {
+            if (gui_server_hooks[i] != NULL)
+            {
+                gui_server_hooks[i]();
+            }
         }
 
         touch_info_t *tp = tp_algo_process(touchpad_get_data());

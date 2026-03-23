@@ -26,6 +26,9 @@ bool gui_server_dlps_check(void);
 
 void gui_server_exec_cb(gui_msg_cb cb);
 void gui_task_ext_execution_sethook(void (*hook)(void));
+bool gui_register_server_hook(void (*hook)(void));
+void gui_unregister_server_hook(void (*hook)(void));
+void gui_clear_all_server_hooks(void);
 
 #ifdef __cplusplus
 }

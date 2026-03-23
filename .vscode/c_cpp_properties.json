@@ -97,7 +97,16 @@
                 "${workspaceFolder}/realgui/3rd/tjpgd",
                 "/usr/include/SDL2",
                 "${workspaceFolder}/example/application/watch_turnkey_410_502",
-                "${workspaceFolder}/example/application/screen_800_480"
+                "${workspaceFolder}/example/application/screen_800_480",
+                "${workspaceFolder}/example/map",
+                "${workspaceFolder}/example/map/core",
+                "${workspaceFolder}/example/map/platform",
+                "${workspaceFolder}/example/map/platform/impls",
+                "${workspaceFolder}/example/map/platform/impls/honeygui",
+                "${workspaceFolder}/example/map/platform/impls/posix",
+                "${workspaceFolder}/example/map/render",
+                "${workspaceFolder}/example/map/graphics",
+                "${workspaceFolder}/example/map/graphics/trvg"
             ],
             "defines": [
                 "_DEBUG",
