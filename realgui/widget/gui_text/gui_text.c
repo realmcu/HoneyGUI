@@ -319,12 +319,6 @@ static void gui_text_prepare(gui_obj_t *obj)
     this->offset_x = point.x;
     this->offset_y = point.y;
 
-    if (this->mode == LEFT ||
-        this->mode == CENTER ||
-        this->mode == RIGHT)
-    {
-        this->base.h = this->font_height;
-    }
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
@@ -392,6 +386,10 @@ static void gui_text_draw(gui_obj_t *obj)
     if (dc->section_count == 0)
     {
         gui_text_font_load(text, &draw_rect);
+        /* Font load may expand obj dimensions (V2 auto line-height).
+         * Refresh draw_rect to reflect the updated size. */
+        draw_rect.x2 = draw_rect.x1 + obj->w - 1;
+        draw_rect.y2 = draw_rect.y1 + obj->h - 1;
     }
     draw_rect.xboundleft = draw_rect.x1;
     draw_rect.xboundright = draw_rect.x2;
@@ -619,6 +617,11 @@ void gui_text_extra_letter_spacing_set(gui_text_t *this, int8_t extra_letter_spa
 void gui_text_extra_line_spacing_set(gui_text_t *this, int8_t extra_line_spacing)
 {
     this->extra_line_spacing = extra_line_spacing;
+}
+
+void gui_text_set_line_height(gui_text_t *this, int16_t line_height)
+{
+    this->line_height = line_height;
 }
 
 void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)

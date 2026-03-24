@@ -105,6 +105,7 @@ typedef struct gui_text
     uint8_t checksum;
     int8_t extra_letter_spacing;
     int8_t extra_line_spacing;
+    int16_t line_height;            /**< explicit line height (0 = use default) */
     uint8_t bold_weight;
 
     bool layout_refresh   : 1;
@@ -231,6 +232,14 @@ void gui_text_extra_letter_spacing_set(gui_text_t *this_widget, int8_t extra_let
  * @param extra_line_spacing Extra line spacing.
  */
 void gui_text_extra_line_spacing_set(gui_text_t *this_widget, int8_t extra_line_spacing);
+
+/**
+ * @brief Set explicit line height for multi-line layout (Figma "Line height" property).
+ *
+ * @param this_widget Text box widget pointer.
+ * @param line_height Line height in pixels. 0 = use default calculated line height.
+ */
+void gui_text_set_line_height(gui_text_t *this_widget, int16_t line_height);
 
 /**
  * @brief Enable/disable matrix-based image rendering for text.

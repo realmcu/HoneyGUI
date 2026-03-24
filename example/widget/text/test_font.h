@@ -65,6 +65,7 @@ extern void *fontnotokr;
 extern void *fontnotothai;
 extern void *fontnotohebrew;
 extern void *fontharmonysc;
+extern void *fontnotov2;
 /*============================================================================*
  *                           Functions
  *============================================================================*/
@@ -84,6 +85,7 @@ void text_font_source_mode_test(void);
 void text_wordwrap_test(void);
 void text_measure_test(void);
 void text_clip_test(void);
+void text_noto_v2_rendering_test(void);
 
 #ifdef __cplusplus
 }
