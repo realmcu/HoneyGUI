@@ -1944,7 +1944,7 @@ bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
     }
 
     /* V1 header - no typography extension */
-    if (header->version[0] < 2)
+    if (header->version[0] < 3)
     {
         return false;
     }
