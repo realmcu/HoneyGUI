@@ -44,7 +44,7 @@ static void draw_circle_cb(NVGcontext *vg)
 static int app_init(void)
 {
     init_colors();
-    uint32_t *img_data_array[ICON_NUM] = {0};
+    void *img_data_array[ICON_NUM] = {0};
     for (int i = 0; i < ICON_NUM; i++)
     {
         int image_h = ICON_SIZE;

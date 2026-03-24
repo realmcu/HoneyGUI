@@ -71,7 +71,7 @@ struct gui_menu_cellular_gesture_parameter
  */
 gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
                                               int       icon_size,
-                                              uint32_t *icon_array[],
+                                              void     *icon_array[],
                                               int       array_size,
                                               IMG_SOURCE_MODE_TYPE src_mode);
 

@@ -752,7 +752,7 @@ static void app_menu_design(gui_view_t *view)
     }
     else
     {
-        uint32_t *cellilar_img_data_array[] =
+        void *cellilar_img_data_array[] =
         {
             UI_CLOCK_HEARTRATE_ICON_BIN,
             UI_CLOCK_FRUIT_NINJA_ICON_BIN,
