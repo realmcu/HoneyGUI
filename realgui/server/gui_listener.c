@@ -73,7 +73,10 @@ void gui_msg_unsubscribe(gui_obj_t *obj, const char *topic)
                 *pp = cur->next;
                 gui_free(cur);
             }
-            pp = &cur->next;
+            else
+            {
+                pp = &cur->next;
+            }
         }
         obj->has_subscribe = false;
     }
