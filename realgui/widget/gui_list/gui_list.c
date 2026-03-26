@@ -31,7 +31,6 @@ static bool g_Limit = false;
 static int16_t g_Bar_Width = 0;
 static int16_t g_Bar_Height = 0;
 static gui_color_t g_Bar_Color = {0};
-static int8_t g_move_indicator = 0;
 
 /*============================================================================*
  *                           Private Functions
@@ -191,30 +190,28 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
 
             int16_t remainder = _this->offset % grid_size;
             if (remainder == 0) { return; }
-
             int16_t distance;
             int16_t half_grid = grid_size / 2;
             int16_t abs_remainder = abs(remainder);
-            if (abs_remainder > half_grid)
+            if (_this->loop)
             {
-                if (!_this->loop && _this->offset <= temp - _this->total_length)
-                {
-                    distance = -remainder;
-                }
-                else
-                {
-                    distance = g_move_indicator * (grid_size - abs_remainder);
-                }
+                distance = (abs_remainder > half_grid) ? ((remainder > 0 ? 1 : -1) * (grid_size - abs_remainder)) :
+                           -remainder;
             }
             else
             {
-                distance = -remainder;
+                if (_this->last_created_note_index == _this->note_num - 1 &&
+                    _this->offset == hard_offset_min) {return;} // show last note
+                distance = ((abs_remainder > half_grid) ? (abs_remainder - grid_size) :
+                            abs_remainder); // only consider offset < 0
             }
+
             float e_factor = 0.2f;
             int delta = (int16_t)(distance * e_factor); //exponential decay
             if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
             _this->offset += delta;
         }
+        _this->hold = _this->offset;
     }
     else
     {
@@ -233,8 +230,9 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
                 _this->speed = 0;
             }
         }
+        _this->hold = _this->offset;
     }
-    _this->hold = _this->offset;
+
 }
 
 // Free notes that are out of the list
@@ -917,7 +915,6 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
     case HORIZONTAL:
         {
             gui_list_update_speed(_this, tp->deltaX);
-            g_move_indicator = tp->deltaX > 0 ? 1 : -1;
 
             _this->offset = _this->hold + tp->deltaX;
             offset_min = obj->w - _this->total_length - _this->out_scope;
@@ -937,7 +934,6 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
     case VERTICAL:
         {
             gui_list_update_speed(_this, tp->deltaY);
-            g_move_indicator = tp->deltaY > 0 ? 1 : -1;
 
             _this->offset = _this->hold + tp->deltaY;
             offset_min = obj->h - _this->total_length - _this->out_scope;
@@ -1210,6 +1206,12 @@ void gui_list_set_note_num(gui_list_t *list, uint16_t num)
     if (list->bar)
     {
         list->need_update_bar = true;
+    }
+
+    gui_obj_t *obj = GET_BASE(list);
+    if (obj->child_list.next != &obj->child_list)
+    {
+        gui_obj_child_free(obj);
     }
 }
 
