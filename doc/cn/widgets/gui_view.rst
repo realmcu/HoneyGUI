@@ -23,7 +23,7 @@
 -----
 注册视图控件描述子
 ~~~~~~~~~~~~~~~~~~
-使用 :cpp:any:`gui_view_descriptor_register` 函数传入视图控件描述子地址将其注册在描述子列表中供其它视图控件读取使用，作为创建视图控件的参数，其中 ``gui_view_descriptor`` 结构体定义如下：
+使用 :cpp:any:`gui_view_descriptor_register` 函数传入视图控件描述子地址将其注册在描述子列表中供其他视图控件读取使用，作为创建视图控件的参数，其中 ``gui_view_descriptor`` 结构体定义如下：
 
 .. literalinclude:: ../../../realgui/widget/gui_view/gui_view.h
    :language: c
