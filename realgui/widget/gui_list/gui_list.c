@@ -142,10 +142,32 @@ static void gui_list_update_bar(gui_obj_t *obj)
     gui_img_translate(_this->bar, t_x, t_y);
 }
 
+static void gui_list_wrap_loop_offset(gui_list_t *_this);
+
 // Add inertia effect while tp released
 static void gui_list_inertia_motion(gui_obj_t *obj)
 {
     gui_list_t *_this = (gui_list_t *)obj;
+
+    /* Programmatic scroll-to animation: exponential ease toward target */
+    if (_this->scroll_to_active)
+    {
+        int distance = _this->scroll_target - _this->offset;
+        if (distance == 0)
+        {
+            _this->scroll_to_active = false;
+            gui_list_wrap_loop_offset(_this);
+        }
+        else
+        {
+            int delta = (int)(distance * 0.2f);
+            if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
+            _this->offset += delta;
+            _this->hold = _this->offset;
+            gui_fb_change();
+        }
+        return;
+    }
 
     g_Limit = false;
     int temp = _this->dir == HORIZONTAL ? obj->w : obj->h;
@@ -233,6 +255,41 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
         _this->hold = _this->offset;
     }
 
+}
+
+// Wrap loop offset to prevent drift from accumulated programmatic scrolls.
+// Same logic as released_cb's loop handling.
+static void gui_list_wrap_loop_offset(gui_list_t *_this)
+{
+    if (!_this->loop || _this->note_num == 0) { return; }
+
+    int ring = _this->note_num * (_this->note_length + _this->space);
+    if (ring == 0) { return; }
+    if (abs(_this->offset) < ring) { return; }
+
+    _this->offset %= ring;
+    _this->hold = _this->offset;
+    _this->max_created_note_index %= _this->note_num;
+    _this->last_created_note_index %= _this->note_num;
+
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &(_this->base.child_list))
+    {
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        gui_list_note_t *note = (gui_list_note_t *)o;
+        uint16_t index = note->index;
+        index %= _this->note_num;
+        note->index = index;
+        if (_this->dir == HORIZONTAL)
+        {
+            note->start_x = index * (_this->note_length + _this->space);
+        }
+        else
+        {
+            note->start_y = index * (_this->note_length + _this->space);
+        }
+    }
 }
 
 // Free notes that are out of the list
@@ -898,6 +955,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)object;
     gui_list_t *_this = (gui_list_t *)object;
+    _this->scroll_to_active = false;
     g_Limit = false;
 
     int offset_min = 0;
@@ -1322,4 +1380,151 @@ void gui_list_keep_note_alive(gui_list_t *list, bool enable)
         return;
     }
     list->keep_note_alive = enable;
+}
+
+/**
+ * @brief Calculate the target offset for a given note index, considering style and boundaries.
+ * @return The scroll distance to reach the target, or 0 if already at target.
+ */
+static int gui_list_calc_scroll_distance(gui_list_t *list, uint16_t note_index)
+{
+    int16_t grid_size = list->note_length + list->space;
+    if (grid_size == 0) { return 0; }
+
+    int16_t view_size = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
+
+    /* Calculate target offset to bring the note into view */
+    int target_offset = -(note_index * grid_size);
+
+    if (list->style == LIST_ZOOM_CYLINDER)
+    {
+        int16_t center_padding = (view_size - list->note_length) / 2;
+        target_offset = center_padding - (note_index * grid_size);
+    }
+    else if (list->style == LIST_CARD)
+    {
+        target_offset = view_size - list->note_length - (note_index * grid_size);
+    }
+
+    if (list->loop)
+    {
+        /* Loop mode: pick the shortest path around the ring.
+         * Ring circumference = note_num * grid_size (includes consistent spacing
+         * between all adjacent notes, including the last-to-first gap).
+         * This differs from total_length which omits the trailing space. */
+        int ring = list->note_num * grid_size;
+        int direct = target_offset - list->offset;
+        int alt = (direct > 0) ? (direct - ring) : (direct + ring);
+        return (abs(alt) < abs(direct)) ? alt : direct;
+    }
+    else
+    {
+        /* Non-loop: clamp target to valid scroll boundaries */
+        int hard_min, hard_max;
+        if (list->style == LIST_ZOOM_CYLINDER)
+        {
+            int16_t center_padding = (view_size - list->note_length) / 2;
+            hard_max = center_padding;
+            hard_min = center_padding - (list->total_length - list->note_length);
+        }
+        else if (list->style == LIST_CARD)
+        {
+            hard_min = view_size - list->total_length - list->card_stack_location;
+            hard_max = view_size - list->note_length;
+        }
+        else
+        {
+            hard_min = view_size - list->total_length;
+            hard_max = 0;
+        }
+        if (target_offset > hard_max) { target_offset = hard_max; }
+        if (target_offset < hard_min) { target_offset = hard_min; }
+        return target_offset - list->offset;
+    }
+}
+
+void gui_list_scroll_to_note(gui_list_t *list, uint16_t note_index)
+{
+    if (note_index >= list->note_num) { return; }
+
+    /* Normalize loop offset before distance calculation to prevent drift */
+    gui_list_wrap_loop_offset(list);
+
+    int distance = gui_list_calc_scroll_distance(list, note_index);
+    if (distance == 0) { return; }
+
+    /* Timer approach: animate directly toward exact target offset.*/
+    /* No inertia or auto_align needed: exponential ease in inertia_motion*/
+    /* drives offset to scroll_target pixel-perfectly. */
+    list->scroll_target = list->offset + distance;
+    list->scroll_to_active = true;
+    list->inertia = false;
+    list->speed = 0;
+    gui_fb_change();
+}
+
+void gui_list_jump_to_note(gui_list_t *list, uint16_t note_index)
+{
+    if (note_index >= list->note_num) { return; }
+
+    /* Normalize loop offset before calculation to prevent drift */
+    gui_list_wrap_loop_offset(list);
+
+    int distance = gui_list_calc_scroll_distance(list, note_index);
+    if (distance == 0) { return; }
+
+    /* Set offset directly: no animation */
+    list->offset += distance;
+    list->hold = list->offset;
+    list->scroll_to_active = false;
+    list->inertia = false;
+    list->speed = 0;
+
+    /* Normalize loop offset after jump (also updates hold) */
+    gui_list_wrap_loop_offset(list);
+
+    gui_fb_change();
+}
+
+uint16_t gui_list_get_current_note(gui_list_t *list)
+{
+    int16_t grid_size = list->note_length + list->space;
+    if (grid_size == 0) { return 0; }
+
+    int16_t view_size = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
+
+    /* Reverse the target_offset formula: offset = style_base - index * grid_size
+     * => index = (style_base - offset) / grid_size */
+    int style_base = 0;
+    if (list->style == LIST_ZOOM_CYLINDER)
+    {
+        style_base = (view_size - list->note_length) / 2;
+    }
+    else if (list->style == LIST_CARD)
+    {
+        style_base = view_size - list->note_length;
+    }
+
+    /* Round to nearest note index using floor division.
+     * C integer division truncates toward zero; we need floor for correct
+     * rounding when offset is positive (negative raw_pos). */
+    int shifted = style_base - list->offset + grid_size / 2;
+    int index = shifted / grid_size;
+    if (shifted < 0 && (shifted % grid_size) != 0)
+    {
+        index--;
+    }
+
+    if (list->loop)
+    {
+        index = index % list->note_num;
+        if (index < 0) { index += list->note_num; }
+    }
+    else
+    {
+        if (index < 0) { index = 0; }
+        if (index >= list->note_num) { index = list->note_num - 1; }
+    }
+
+    return (uint16_t)index;
 }

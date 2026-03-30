@@ -61,6 +61,7 @@ typedef struct gui_list
     uint32_t space           : 8;
     uint32_t area_display    : 1; // 0:disable area display, 1:enable area display.
     uint32_t keep_note_alive  : 1;
+    uint32_t scroll_to_active : 1; // Programmatic scroll-to animation active.
 
     uint16_t circle_radius;    // Circle radius. Only support CIRCLE style.
 
@@ -71,6 +72,7 @@ typedef struct gui_list
 
     int offset;                  // offset = hold + tp_delta, when sliding.
     int hold;
+    int scroll_target;           // Target offset for programmatic scroll-to animation.
     int total_length;
     int16_t out_scope;           // Out scope of list. Don't support CARD style.
     int16_t card_stack_location; // The distance from stack location to the screen bottom. Only support CARD style.
@@ -241,6 +243,34 @@ void gui_list_enable_area_display(gui_list_t *list, bool enable);
  * @param enable True: enable keep note alive, false: disable keep note alive. Default is false.
  */
 void gui_list_keep_note_alive(gui_list_t *list, bool enable);
+
+/**
+ * @brief Scroll to a specific note with smooth animation.
+ *        Uses exponential ease to smoothly animate the list offset
+ *        until the target note is in view position. For loop mode,
+ *        automatically picks the shortest path around the ring.
+ * @param list Pointer to the list widget.
+ * @param note_index Index of the target note (0-based, must be < note_num).
+ */
+void gui_list_scroll_to_note(gui_list_t *list, uint16_t note_index);
+
+/**
+ * @brief Jump to a specific note instantly without animation.
+ *        Sets the list offset directly so the target note is in view position.
+ *        For loop mode, picks the shortest path and wraps offset if needed.
+ * @param list Pointer to the list widget.
+ * @param note_index Index of the target note (0-based, must be < note_num).
+ */
+void gui_list_jump_to_note(gui_list_t *list, uint16_t note_index);
+
+/**
+ * @brief Get the index of the note currently in view position.
+ *        Returns the note index closest to the primary display position
+ *        (top for Default, center for ZOOM_CYLINDER, bottom for CARD).
+ * @param list Pointer to the list widget.
+ * @return Current note index (0 to note_num-1).
+ */
+uint16_t gui_list_get_current_note(gui_list_t *list);
 
 #ifdef __cplusplus
 }
