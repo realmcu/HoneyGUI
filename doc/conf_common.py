@@ -139,15 +139,16 @@ html_show_sphinx = False
 html_static_path = ['_static']
 html_js_files = [
     'js/auth.js',
-    'js/purify.min.js',
-    'js/marked.min.js',
+    # 'js/purify.min.js',
+    # 'js/marked.min.js',
     'js/typed.umd.js',
     'js/custom.js',
     'js/versions.js',
     'js/imgmodal.js',
     'js/aisummary.js',
-    'js/chatwidget.js',
-    'js/hljs.min.js',
+    # 'js/chatwidget.js',
+    # 'js/hljs.min.js',
+    'js/real-kapa.js',
 ]
 
 html_css_files = [
