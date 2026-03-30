@@ -813,6 +813,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
 
     // Calculate checksum only for key properties (exclude pointers)
     uint8_t new_checksum = 0;
