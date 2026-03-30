@@ -13,8 +13,6 @@
 #include "gui_obj.h"
 #include "tp_algo.h"
 #include "gui_view.h"
-#include "kb_algo.h"
-#include "gui_img.h"
 #include "gui_view_transition.h"
 #include "gui_post_process.h"
 

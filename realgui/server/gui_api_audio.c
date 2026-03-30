@@ -21,7 +21,6 @@
 
 #include "guidef.h"
 #include "gui_api_audio.h"
-#include "gui_api_os.h"
 
 /*============================================================================*
  *                            Macros

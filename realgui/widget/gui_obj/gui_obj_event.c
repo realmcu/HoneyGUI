@@ -13,7 +13,6 @@
 #include "gui_obj_event.h"
 #include "gui_api.h"
 #include "tp_algo.h"
-#include "kb_algo.h"
 
 /*============================================================================*
  *                           Types

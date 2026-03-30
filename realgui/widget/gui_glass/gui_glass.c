@@ -507,6 +507,14 @@ static void gui_glass_draw(draw_img_t *image, struct gui_dispdev *dc)
     {
         return;
     }
+
+    // Validate image data to prevent tainted scalar issues
+    if (image->data == NULL || image->img_w <= 0 || image->img_h <= 0)
+    {
+        return;
+    }
+
+
     if (dc->bit_depth == 32)
     {
         gui_put_glass_on_bg(image, dc);

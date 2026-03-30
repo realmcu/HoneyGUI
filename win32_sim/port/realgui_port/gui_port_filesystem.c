@@ -18,7 +18,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 #ifndef O_BINARY
 #define O_BINARY 0

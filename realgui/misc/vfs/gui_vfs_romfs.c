@@ -154,12 +154,30 @@ static int romfs_vfs_stat(const char *path, gui_vfs_stat_t *stat, void *user_dat
 {
     (void)user_data;
 
-    intptr_t fd = hg_open(path[0] == '/' ? path : path, 0);
-    if (fd == -1) { return -1; }
+    /* Add leading slash if missing */
+    char *full_path = NULL;
+    if (path[0] != '/')
+    {
+        full_path = (char *)gui_malloc(strlen(path) + 2);
+        if (!full_path) { return -1; }
+        full_path[0] = '/';
+        strcpy(full_path + 1, path);
+        path = full_path;
+    }
+
+    intptr_t fd = hg_open(path, 0);
+
+    if (fd == -1)
+    {
+        if (full_path) { gui_free(full_path); }
+        return -1;
+    }
 
     struct hg_stat hg_st;
     int ret = hg_fstat(fd, &hg_st);
     hg_close(fd);
+
+    if (full_path) { gui_free(full_path); }
 
     if (ret == 0)
     {

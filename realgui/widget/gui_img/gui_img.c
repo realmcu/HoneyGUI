@@ -354,6 +354,12 @@ static void gui_img_ctor(gui_img_t            *_this,
             GUI_ASSERT(f != NULL);
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
             int size = gui_vfs_tell(f);
+
+            if (size <= 0)
+            {
+                gui_vfs_close(f);
+                return;
+            }
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
             data = gui_malloc(size);
             GUI_ASSERT(data != NULL);
@@ -611,6 +617,12 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
             GUI_ASSERT(f != NULL);
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
             int size = gui_vfs_tell(f);
+
+            if (size <= 0)
+            {
+                gui_vfs_close(f);
+                return;
+            }
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
             data = gui_malloc(size);
             GUI_ASSERT(data != NULL);

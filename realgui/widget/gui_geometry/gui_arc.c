@@ -14,7 +14,6 @@
 #include "gui_fb.h"
 #include "draw_img.h"
 #include "acc_api.h"
-#include "tp_algo.h"
 #include "lite_geometry.h"
 #include "gui_arc.h"
 

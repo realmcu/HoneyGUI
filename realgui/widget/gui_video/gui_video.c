@@ -11,7 +11,6 @@
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "gui_video.h"
-#include "acc_api.h"
 #include <math.h>
 // #include "gui_h264bsd.h"
 #include "gui_vfs.h"
@@ -223,7 +222,7 @@ static uint8_t **mjpeg2jpeg_slicer(uint8_t *mjpeg, uint32_t *slice_cnt)
             array[*slice_cnt - 1] = pstrt;
             array[*slice_cnt] = pend;
             scan_state = 0;
-            gui_log("jpg: %d 0x%x\n", *slice_cnt - 1, array[*slice_cnt - 1]);
+            gui_log("jpg: %d %p\n", *slice_cnt - 1, (void *)array[*slice_cnt - 1]);
         }
         else if ((scan_state == 0) && (pend + 8 < pdata)) // aligned to 8
         {
@@ -853,7 +852,7 @@ static int video_src_init_avi(gui_video_t  *this)
     if (this->storage_type == IMG_SRC_FILESYS)
     {
         gui_obj_t *obj = (gui_obj_t *)this;
-        uint32_t file_size = 0;
+        int file_size = 0;
 
         const char *fn = this->data;
         gui_vfs_file_t *fp;
@@ -865,6 +864,10 @@ static int video_src_init_avi(gui_video_t  *this)
         }
         if (file_size <= 0)
         {
+            if (fp > 0)
+            {
+                gui_vfs_close(fp);
+            }
             return -1;
         }
 
@@ -1031,8 +1034,14 @@ static int video_src_init_avi(gui_video_t  *this)
 
 
         /* Find movi list */
-        uint32_t pos = gui_vfs_seek(fp, hdrl_data_beacon, GUI_VFS_SEEK_SET);
-        pos = gui_vfs_seek(fp, hdrl_size, GUI_VFS_SEEK_CUR);
+        gui_vfs_seek(fp, hdrl_data_beacon, GUI_VFS_SEEK_SET);
+        int pos = gui_vfs_seek(fp, hdrl_size, GUI_VFS_SEEK_CUR);
+        if (pos < 0)
+        {
+            gui_log("seek error");
+            gui_vfs_close(fp);
+            return -1;
+        }
         while (pos < file_size)
         {
             uint32_t size = 0;
@@ -1040,24 +1049,36 @@ static int video_src_init_avi(gui_video_t  *this)
             gui_vfs_read(fp, &size, 4);
             if (memcmp(sigver, "JUNK", 4) == 0)
             {
-                pos = gui_vfs_seek(fp, size, GUI_VFS_SEEK_CUR);
+                gui_vfs_seek(fp, size, GUI_VFS_SEEK_CUR);
             }
             else if (memcmp(sigver, "LIST", 4) == 0)
             {
                 gui_vfs_read(fp, list_type, 4);
                 if (memcmp(list_type, "movi", 4) != 0)
                 {
-                    pos = gui_vfs_seek(fp, size - 4, GUI_VFS_SEEK_CUR);
+                    gui_vfs_seek(fp, size - 4, GUI_VFS_SEEK_CUR);
                 }
                 else
                 {
                     pos = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_CUR);
+                    if (pos < 0)
+                    {
+                        gui_log("seek error");
+                        gui_vfs_close(fp);
+                        return -1;
+                    }
                     movi_size = size;
                     movi_data_beacon = pos - 4;
                     break;
                 }
             }
             pos = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_CUR);
+            if (pos < 0)
+            {
+                gui_log("seek error");
+                gui_vfs_close(fp);
+                return -1;
+            }
         }
         if (pos >= file_size)
         {
@@ -1643,7 +1664,7 @@ static int video_src_init_h264(gui_video_t  *this)
         gui_vfs_file_t *fp;
 
         fp = gui_vfs_open(fn, GUI_VFS_READ);
-        if (fp <= 0)
+        if (fp == NULL)
         {
             return -1;
         }

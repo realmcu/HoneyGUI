@@ -12,10 +12,8 @@
 #include <string.h>
 #include "unistd.h"
 #include "tp_algo.h"
-#include "kb_algo.h"
 #include "sdl_driver.h"
 #include "sdl_driver_panel.h"
-#include "gui_api.h"
 
 static uint32_t simulator_width = 480;
 static uint32_t simulator_height = 480;

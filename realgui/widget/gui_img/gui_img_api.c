@@ -10,8 +10,6 @@
 #include <string.h>
 #include "gui_img.h"
 #include "gui_obj.h"
-#include "acc_api.h"
-#include "tp_algo.h"
 #include "gui_fb.h"
 
 static void gui_img_rect_copy(uint8_t       *target,

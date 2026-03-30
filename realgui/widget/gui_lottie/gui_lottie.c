@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include "gui_lottie.h"
 #include "gui_obj.h"
-#include "gui_fb.h"
 #include "gui_vfs.h"
 
 /* Simple JSON value extraction helpers */

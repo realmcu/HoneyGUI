@@ -109,10 +109,6 @@ static struct romfs_dirent *romfs_lookup(struct romfs_dirent *root_dirent, const
                         while (*subpath_end == '/')
                         {
                             subpath_end ++;
-                            if (!subpath_end)
-                            {
-                                break;
-                            }
                         }
                         subpath = subpath_end;
                         while ((*subpath_end != '/') && *subpath_end)
@@ -120,12 +116,8 @@ static struct romfs_dirent *romfs_lookup(struct romfs_dirent *root_dirent, const
                             subpath_end ++;
                         }
                     }
-                    char sp = 0;
-                    if (subpath != NULL)
-                    {
-                        sp = *subpath;
-                    }
-                    if (!(sp))
+
+                    if (!(*subpath))
                     {
                         *size = dirent_size;
                         return &dirent[index];

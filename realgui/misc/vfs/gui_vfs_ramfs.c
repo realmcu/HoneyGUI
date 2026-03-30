@@ -10,7 +10,6 @@
  */
 
 #include "gui_vfs.h"
-#include "gui_vfs_ramfs.h"
 #include "gui_api_os.h"
 #include <string.h>
 #include <stdlib.h>

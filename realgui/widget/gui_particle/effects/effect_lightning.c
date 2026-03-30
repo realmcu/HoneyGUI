@@ -247,10 +247,6 @@ static void generate_lightning_strike(float start_x, float start_y,
     s_bolt_count++;
 
     int segments = LIGHTNING_SEGMENTS - depth * 2;
-    if (segments < 4)
-    {
-        segments = 4;
-    }
 
     float jitter = LIGHTNING_JITTER * (1.0f - depth * 0.2f);
     generate_bolt_path(start_x, start_y, end_x, end_y, bolt, segments, jitter);

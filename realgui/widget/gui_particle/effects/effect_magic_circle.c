@@ -27,6 +27,13 @@ static gui_particle_widget_t *s_mc_widget = NULL;
 static float s_center_x = 0.0f;
 static float s_center_y = 0.0f;
 
+static uint32_t circle_rand(void)
+{
+    static uint32_t seed = 98765;
+    seed = seed * 1103515245 + 12345;
+    return (seed >> 16) & 0x7FFF;
+}
+
 static void mc_particle_init(particle_t *p, void *user_data)
 {
     GUI_UNUSED(user_data);
@@ -35,28 +42,28 @@ static void mc_particle_init(particle_t *p, void *user_data)
         return;
     }
 
-    int zone = rand() % 100;
-    float angle = (float)(rand() % 3600) / 3600.0f * 2.0f * M_PI_F;
+    int zone = circle_rand() % 100;
+    float angle = (float)(circle_rand() % 3600) / 3600.0f * 2.0f * M_PI_F;
 
     if (zone < 70)
     {
-        float r = CIRCLE_RADIUS + ((float)(rand() % 40) - 20.0f);
+        float r = CIRCLE_RADIUS + ((float)(circle_rand() % 40) - 20.0f);
         p->x = s_center_x + cosf(angle) * r;
         p->y = s_center_y + sinf(angle) * r;
     }
     else
     {
-        float r = (float)(rand() % (int)INNER_RADIUS);
+        float r = (float)(circle_rand() % (int)INNER_RADIUS);
         p->x = s_center_x + cosf(angle) * r;
         p->y = s_center_y + sinf(angle) * r;
     }
 
-    float spread = ((float)(rand() % 100) / 100.0f - 0.5f) * 30.0f;
-    float up_speed = 20.0f + (float)(rand() % 40);
+    float spread = ((float)(circle_rand() % 100) / 100.0f - 0.5f) * 30.0f;
+    float up_speed = 20.0f + (float)(circle_rand() % 40);
     p->vx = spread;
     p->vy = -up_speed;
 
-    uint8_t palette_idx = rand() % 4;
+    uint8_t palette_idx = circle_rand() % 4;
     switch (palette_idx)
     {
     case 0:
@@ -73,7 +80,7 @@ static void mc_particle_init(particle_t *p, void *user_data)
         break;
     }
 
-    p->scale = 0.5f + (float)(rand() % 100) / 100.0f * 1.0f;
+    p->scale = 0.5f + (float)(circle_rand() % 100) / 100.0f * 1.0f;
 }
 
 static void mc_particle_update(particle_t *p, void *user_data)
@@ -86,7 +93,7 @@ static void mc_particle_update(particle_t *p, void *user_data)
 
     p->vy *= 0.995f;
 
-    p->vx += ((float)(rand() % 100) / 100.0f - 0.5f) * 2.0f;
+    p->vx += ((float)(circle_rand() % 100) / 100.0f - 0.5f) * 2.0f;
     p->vx *= 0.98f;
 
     float life_ratio = (float)p->life / (float)p->max_life;

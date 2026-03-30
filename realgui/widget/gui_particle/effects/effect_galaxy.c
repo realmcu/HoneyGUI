@@ -39,6 +39,13 @@ static float s_galaxy_outer_r = 0.0f;
 static float s_galaxy_inner_r = 0.0f;
 static float s_galaxy_core_r = 0.0f;
 
+static uint32_t galaxy_rand(void)
+{
+    static uint32_t seed = 98765;
+    seed = seed * 1103515245 + 12345;
+    return (seed >> 16) & 0x7FFF;
+}
+
 /**
  * @brief Custom particle init - place on spiral arms
  */
@@ -50,16 +57,16 @@ static void galaxy_particle_init(particle_t *p, void *user_data)
         return;
     }
 
-    int arm = rand() % GALAXY_NUM_ARMS;
+    int arm = galaxy_rand() % GALAXY_NUM_ARMS;
     float arm_angle = (float)arm * 2.0f * M_PI_F / GALAXY_NUM_ARMS;
 
-    float dist = s_galaxy_inner_r + (float)(rand() % 100) / 100.0f *
+    float dist = s_galaxy_inner_r + (float)(galaxy_rand() % 100) / 100.0f *
                  (s_galaxy_outer_r - s_galaxy_inner_r);
 
     float spiral_angle = arm_angle + s_galaxy_rotation +
                          logf(dist / s_galaxy_core_r) * 0.8f;
 
-    float spread = ((float)(rand() % 100) / 100.0f - 0.5f) * 0.3f;
+    float spread = ((float)(galaxy_rand() % 100) / 100.0f - 0.5f) * 0.3f;
     p->x = s_galaxy_center_x + cosf(spiral_angle + spread) * dist;
     p->y = s_galaxy_center_y + sinf(spiral_angle + spread) * dist;
 

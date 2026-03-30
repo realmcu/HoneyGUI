@@ -7,7 +7,6 @@
 #include "draw_img.h"
 #include <string.h>
 #include <math.h>
-#include "acc_api.h"
 #include "acc_sw_jpeg.h"
 #include "gui_vfs.h"
 
@@ -225,6 +224,13 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode, const char
             GUI_ASSERT(f != NULL);
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
             int size = gui_vfs_tell(f);
+
+            if (size <= 0)
+            {
+                gui_vfs_close(f);
+                return;
+            }
+
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
             data = gui_malloc(size);
             GUI_ASSERT(data != NULL);

@@ -6,7 +6,6 @@
 
 #include <string.h>
 #include "font_lib_manager.h"
-#include "gui_components_init.h"
 #include "default_font.h"
 
 /*============================================================================*

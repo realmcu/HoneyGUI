@@ -10,7 +10,6 @@
 #include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_sw_rle.h"
 
 static void rle_filter_rgb565_draw(imdc_file_t *file, uint32_t line,  uint16_t *buf, int32_t img_x,
                                    int32_t remain_len)

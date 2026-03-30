@@ -7,7 +7,6 @@
 #include <string.h>
 #include "gui_svg.h"
 #include "gui_obj.h"
-#include "gui_fb.h"
 #include "gui_vfs.h"
 
 #define NANOSVG_IMPLEMENTATION

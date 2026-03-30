@@ -337,6 +337,13 @@ static void gui_gif_ctor(gui_gif_t            *_this,
             GUI_ASSERT(f != NULL);
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
             int size = gui_vfs_tell(f);
+
+            if (size <= 0)
+            {
+                gui_vfs_close(f);
+                return;
+            }
+
             gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
             data = gui_malloc(size);
             GUI_ASSERT(data != NULL);

@@ -12,7 +12,6 @@
 #include "guidef.h"
 #include "gui_fb.h"
 #include "acc_api.h"
-#include "tp_algo.h"
 #include "gui_rect.h"
 #include "lite_geometry.h"
 

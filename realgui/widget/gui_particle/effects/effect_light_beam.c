@@ -343,8 +343,8 @@ static void init_beam(beam_state_t *b, uint32_t core, uint32_t mid, uint32_t tai
 gui_particle_widget_t *effect_light_beam_create(gui_obj_t *parent, const char *name,
                                                 int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    float cx = (float)(w / 2);
-    float cy = (float)(h / 2);
+    float cx = (float)(w / 2.0f);
+    float cy = (float)(h / 2.0f);
 
     /* Red laser */
     init_beam(&s_beams[0],

@@ -8,11 +8,7 @@
 #include "gui_api.h"
 #include "gui_port.h"
 #include <SDL.h>
-#include <pthread.h>
-#include "unistd.h"
-#include "tp_algo.h"
 #include "kb_algo.h"
-#include "gui_message.h"
 
 
 gui_touch_port_data_t tp_port_data = {0};

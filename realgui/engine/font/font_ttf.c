@@ -1162,6 +1162,16 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 index_table_ptr = (uint8_t *)text->path + ttfbin->head_length;
             }
 
+            // Validate index_table_ptr before use to prevent null dereference
+            if (index_table_ptr == NULL)
+            {
+                if (fs_index_table != NULL)
+                {
+                    gui_free(fs_index_table);
+                }
+                continue;
+            }
+
             uint32_t ttfoffset = getGlyphOffset(unicode_buf[uni_i], ttfbin,
                                                 index_table_ptr,
                                                 text->font_mode == FONT_SRC_FILESYS ? FONT_SRC_MEMADDR : text->font_mode,

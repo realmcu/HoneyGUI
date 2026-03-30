@@ -10,18 +10,16 @@
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "gui_obj_focus.h"
-#include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "gui_server.h"
 #include "gui_components_init.h"
 #include "../../assets/tiger_blue_compressed.txt"
 #include "../../assets/tiger_blue.txt"
-#include "jpeg.txt"
-#include "green.txt"
-#include "nanovg_generate_pixel.txt"
-#include "test_png.txt"
-#include "clock3_Vector.txt"
+// #include "jpeg.txt"
+// #include "green.txt"
+// #include "nanovg_generate_pixel.txt"
+// #include "test_png.txt"
+// #include "clock3_Vector.txt"
 
 
 /* gui image widget example start*/
@@ -68,7 +66,6 @@ void test_timer_cb(void *param)
     gui_log("timer cb test!\n");
 }
 
-#include "gifdec.h"
 static int app_init(void)
 {
 

@@ -8915,7 +8915,10 @@ STBIDEF int gui_stbi_info_from_file(FILE *f, int *x, int *y, int *comp)
     {
         stbi__start_file(&s, f);
         r = stbi__info_main(&s, x, y, comp);
-        fseek(f, pos, SEEK_SET);
+        if (fseek(f, pos, SEEK_SET) != 0)
+        {
+            return -1;
+        }
     }
     return r;
 }
@@ -8939,7 +8942,10 @@ STBIDEF int gui_stbi_is_16_bit_from_file(FILE *f)
     {
         stbi__start_file(&s, f);
         r = stbi__is_16_main(&s);
-        fseek(f, pos, SEEK_SET);
+        if (fseek(f, pos, SEEK_SET) != 0)
+        {
+            return -1;
+        }
     }
     return r;
 }

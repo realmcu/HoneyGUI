@@ -15,7 +15,6 @@
 #include "wheel_algo.h"
 #include <string.h>
 #include "gui_win.h"
-#include "gui_components_init.h"
 #include "gui_version.h"
 #include "gui_server.h"
 
