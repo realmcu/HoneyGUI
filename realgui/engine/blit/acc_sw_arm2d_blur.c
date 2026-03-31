@@ -6,6 +6,7 @@
 
 #include "guidef.h"
 #include "gui_api.h"
+#include "gui_api_dc.h"
 #include "gui_post_process.h"
 #include "gui_matrix.h"
 
@@ -62,6 +63,14 @@ typedef struct arm2d_color_cccn888_t
 } arm2d_color_cccn888_t;
 
 typedef arm2d_color_cccn888_t arm2d_color_rgb565_t;
+
+/* 32-bit ARGB8888 IIR blur accumulator */
+typedef struct arm2d_color_argb8888_acc_t
+{
+    uint16_t hwB;
+    uint16_t hwG;
+    uint16_t hwR;
+} arm2d_color_argb8888_acc_t;
 
 void *arm2d_local_allocate_scratch_memory(uint32_t wSize,
                                           uint_fast8_t nAlign)
@@ -350,6 +359,126 @@ void arm2d_local_rgb565_filter_iir_blur(
     }
 }
 
+static void arm2d_local_argb8888_filter_iir_blur(
+    uint32_t *__restrict pwTarget,
+    int16_t iTargetStride,
+    arm2d_local_region_t *__restrict ptValidRegionOnVirtualScreen,
+    arm2d_local_region_t *ptTargetRegionOnVirtualScreen,
+    uint8_t chBlurDegree,
+    arm2d_local_filter_iir_blur_descriptor_t *ptThis)
+{
+    arm2d_local_scratch_mem_t *ptScratchMemory = &ptThis->tScratchMemory;
+
+    int_fast16_t iWidth  = ptValidRegionOnVirtualScreen->tSize.iWidth;
+    int_fast16_t iHeight = ptValidRegionOnVirtualScreen->tSize.iHeight;
+
+    int16_t iY, iX;
+    uint16_t hwRatio = 256 - chBlurDegree;
+    arm2d_color_argb8888_acc_t tAcc;
+    arm2d_color_argb8888_acc_t *ptStatusH = NULL;
+    arm2d_color_argb8888_acc_t *ptStatusV = NULL;
+
+    if (NULL != (void *)(ptScratchMemory->pBuffer))
+    {
+        ptStatusH = (arm2d_color_argb8888_acc_t *)ptScratchMemory->pBuffer;
+        ptStatusV = ptStatusH + ptTargetRegionOnVirtualScreen->tSize.iWidth;
+    }
+
+    arm2d_local_location_t tOffset =
+    {
+        .iX = ptValidRegionOnVirtualScreen->tLocation.iX - ptTargetRegionOnVirtualScreen->tLocation.iX,
+        .iY = ptValidRegionOnVirtualScreen->tLocation.iY - ptTargetRegionOnVirtualScreen->tLocation.iY,
+    };
+
+    /* Forward horizontal pass */
+    if (ptThis->dir.bForwardHorizontal)
+    {
+        uint32_t *pwPixel = pwTarget;
+
+        if (NULL != ptStatusV)
+        {
+            ptStatusV += tOffset.iY;
+        }
+
+        for (iY = 0; iY < iHeight; iY++)
+        {
+            if (NULL != ptStatusV && tOffset.iX > 0)
+            {
+                tAcc = *ptStatusV;
+            }
+            else
+            {
+                uint8_t *p = (uint8_t *)pwPixel;
+                tAcc.hwB = p[0];
+                tAcc.hwG = p[1];
+                tAcc.hwR = p[2];
+            }
+
+            uint32_t *pwTargetPixel = pwPixel;
+
+            for (iX = 0; iX < iWidth; iX++)
+            {
+                uint8_t *p = (uint8_t *)pwTargetPixel;
+                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;  p[0] = (uint8_t)tAcc.hwB;
+                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;  p[1] = (uint8_t)tAcc.hwG;
+                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;  p[2] = (uint8_t)tAcc.hwR;
+                pwTargetPixel++;
+            }
+
+            if (NULL != ptStatusV)
+            {
+                *ptStatusV++ = tAcc;
+            }
+
+            pwPixel += iTargetStride;
+        }
+    }
+
+    /* Forward vertical pass */
+    if (ptThis->dir.bForwardVertical)
+    {
+        uint32_t *pwPixel = pwTarget;
+
+        if (NULL != ptStatusH)
+        {
+            ptStatusH += tOffset.iX;
+        }
+
+        for (iX = 0; iX < iWidth; iX++)
+        {
+            if (NULL != ptStatusH && tOffset.iY > 0)
+            {
+                tAcc = *ptStatusH;
+            }
+            else
+            {
+                uint8_t *p = (uint8_t *)pwPixel;
+                tAcc.hwB = p[0];
+                tAcc.hwG = p[1];
+                tAcc.hwR = p[2];
+            }
+
+            uint32_t *pwTargetPixel = pwPixel;
+
+            for (iY = 0; iY < iHeight; iY++)
+            {
+                uint8_t *p = (uint8_t *)pwTargetPixel;
+                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;  p[0] = (uint8_t)tAcc.hwB;
+                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;  p[1] = (uint8_t)tAcc.hwG;
+                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;  p[2] = (uint8_t)tAcc.hwR;
+                pwTargetPixel += iTargetStride;
+            }
+
+            pwPixel++;
+
+            if (NULL != ptStatusH)
+            {
+                *ptStatusH++ = tAcc;
+            }
+        }
+    }
+}
+
 void sw_arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degree, void *cache_mem)
 {
     gui_rect_t blur_rect = {0};
@@ -362,8 +491,10 @@ void sw_arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degre
     {
         return;
     }
-    uint16_t *buffer = (uint16_t *)(dc->frame_buf + \
-                                    ((blur_rect.y1 - dc->section.y1) * dc->fb_width + blur_rect.x1) * dc->bit_depth / 8);
+
+    uint8_t *buffer = dc->frame_buf +
+                      ((blur_rect.y1 - dc->section.y1) * dc->fb_width + blur_rect.x1) * dc->bit_depth / 8;
+
     arm2d_local_region_t valid, target;
     valid.tLocation.iX = blur_rect.x1;
     valid.tLocation.iY = blur_rect.y1;
@@ -373,20 +504,31 @@ void sw_arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degre
     target.tLocation.iY = target_rect.y1;
     target.tSize.iWidth = target_rect.x2 - target_rect.x1 + 1;
     target.tSize.iHeight = target_rect.y2 - target_rect.y1 + 1;
+
     arm2d_local_scratch_mem_t local_scratch_mem = {0};
     arm2d_local_scratch_mem_t *mem_for_blur = (arm2d_local_scratch_mem_t *)cache_mem;
     if (cache_mem == NULL)
     {
         mem_for_blur = &local_scratch_mem;
     }
+
     arm2d_local_filter_iir_blur_descriptor_t dsc = {0};
     dsc.tScratchMemory = *mem_for_blur;
     dsc.dir.bForwardHorizontal = 1;
     dsc.dir.bForwardVertical = 1;
     dsc.dir.bReverseHorizontal = 0;
     dsc.dir.bReverseVertical = 0;
-    arm2d_local_rgb565_filter_iir_blur((uint16_t *)buffer, dc->fb_width, &valid, &target, blur_degree,
-                                       &dsc);
+
+    if (dc->bit_depth == 32)
+    {
+        arm2d_local_argb8888_filter_iir_blur((uint32_t *)buffer, dc->fb_width, &valid, &target,
+                                             blur_degree, &dsc);
+    }
+    else
+    {
+        arm2d_local_rgb565_filter_iir_blur((uint16_t *)buffer, dc->fb_width, &valid, &target,
+                                           blur_degree, &dsc);
+    }
 }
 
 void sw_arm_2d_create(gui_rect_t *rect, void **mem)
@@ -399,11 +541,16 @@ void sw_arm_2d_create(gui_rect_t *rect, void **mem)
     uint16_t h = rect->y2 - rect->y1 + 1;
     arm2d_local_scratch_mem_t *scratch_mem = gui_malloc(sizeof(arm2d_local_scratch_mem_t));
 
-    if (NULL ==  arm2d_local_scratch_memory_new(
+    struct gui_dispdev *dc = gui_get_dc();
+    uint16_t item_size = (dc->bit_depth == 32) ?
+                         sizeof(arm2d_color_argb8888_acc_t) :
+                         sizeof(arm2d_color_rgb565_t);
+
+    if (NULL == arm2d_local_scratch_memory_new(
             scratch_mem,
-            sizeof(arm2d_color_rgb565_t),
+            item_size,
             (w + h),
-            __alignof__(arm2d_color_rgb565_t)))
+            __alignof__(uint32_t)))
     {
         memset(scratch_mem, 0, sizeof(arm2d_local_scratch_mem_t));
     }
