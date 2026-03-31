@@ -961,7 +961,7 @@ uint32_t process_thai_char_struct(mem_char_t *chr, uint32_t unicode_len,
     else
     {
         *mark_array_out = NULL;
-        mark_count_out = 0;
+        *mark_count_out = 0;
         gui_free(processed_chr);
         return base_count;
     }
@@ -1030,7 +1030,7 @@ uint32_t post_process_thai_char_struct(mem_char_t *chr, uint32_t base_count, uin
         memcpy(&original_chr[original_idx++], &base_chr[base_count + i], sizeof(mem_char_t));
         if (marks[i].base_index <= active_base)
         {
-            active_len = active_base + i;
+            active_len = active_base + i + 1;
         }
     }
     int32_t tail_count = base_count + mark_count - original_idx;
