@@ -320,6 +320,13 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     draw_rect.yboundtop = draw_rect.y1;
     draw_rect.yboundbottom = draw_rect.y2;
 
+    /* When content changes, reload glyph info (updates char_width_sum)
+     * before computing scroll/fallback offsets below. */
+    if (dc->section_count == 0 && text->base.content_refresh)
+    {
+        gui_scroll_text_font_load(&text->base, &draw_rect);
+    }
+
     if (text->base.mode == SCROLL_X || text->base.mode == SCROLL_X_MID)
     {
         offset = text->base.char_width_sum;

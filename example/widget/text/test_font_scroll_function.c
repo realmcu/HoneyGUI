@@ -36,6 +36,12 @@ gui_scroll_text_t *test_left;
 gui_scroll_text_t *test_center;
 gui_scroll_text_t *test_right;
 
+static bool toggle_state[3] = {false, false, false}; // false = short text, true = long text
+static char *long_text =
+    // "Everyone";
+    "Everyone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom. ";
+static char *short_text_static = "Short";
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -50,6 +56,9 @@ static void stop_cb(void *obj, gui_event_t *e)
     gui_scroll_text_stop(scroll_y);
     gui_scroll_text_stop(scroll_x_reverse);
     gui_scroll_text_stop(scroll_y_reverse);
+    gui_scroll_text_stop(test_left);
+    gui_scroll_text_stop(test_center);
+    gui_scroll_text_stop(test_right);
     gui_log("stop_cb\n");
 }
 
@@ -63,6 +72,9 @@ static void reset_cb(void *obj, gui_event_t *e)
     gui_scroll_text_reset(scroll_y);
     gui_scroll_text_reset(scroll_x_reverse);
     gui_scroll_text_reset(scroll_y_reverse);
+    gui_scroll_text_reset(test_left);
+    gui_scroll_text_reset(test_center);
+    gui_scroll_text_reset(test_right);
     gui_log("reset_cb\n");
 }
 
@@ -76,6 +88,9 @@ static void pause_cb(void *obj, gui_event_t *e)
     gui_scroll_text_pause(scroll_y);
     gui_scroll_text_pause(scroll_x_reverse);
     gui_scroll_text_pause(scroll_y_reverse);
+    gui_scroll_text_pause(test_left);
+    gui_scroll_text_pause(test_center);
+    gui_scroll_text_pause(test_right);
     gui_log("pause_cb\n");
 }
 
@@ -89,7 +104,38 @@ static void resume_cb(void *obj, gui_event_t *e)
     gui_scroll_text_resume(scroll_y);
     gui_scroll_text_resume(scroll_x_reverse);
     gui_scroll_text_resume(scroll_y_reverse);
+    gui_scroll_text_resume(test_left);
+    gui_scroll_text_resume(test_center);
+    gui_scroll_text_resume(test_right);
     gui_log("resume_cb\n");
+}
+
+static void toggle_text_cb(void *obj, gui_event_t *e)
+{
+    GUI_UNUSED(e);
+    gui_scroll_text_t *scroll = (gui_scroll_text_t *)obj;
+    int idx = -1;
+
+    if (scroll == test_left)        { idx = 0; }
+    else if (scroll == test_center) { idx = 1; }
+    else if (scroll == test_right)  { idx = 2; }
+    else { return; }
+
+    toggle_state[idx] = !toggle_state[idx];
+
+    if (toggle_state[idx])
+    {
+        gui_scroll_text_content_set(scroll, long_text, strlen(long_text));
+        gui_scroll_text_scroll_set(scroll, SCROLL_X, 0, 0, 10000, 0);
+        gui_log("toggle_text_cb: idx=%d -> long text (scrolling)\n", idx);
+    }
+    else
+    {
+        gui_scroll_text_content_set(scroll, short_text_static, strlen(short_text_static));
+        gui_scroll_text_scroll_set(scroll, SCROLL_X, 0, 0, 10000, 0);
+        gui_log("toggle_text_cb: idx=%d -> short text (fallback align)\n", idx);
+    }
+    gui_scroll_text_reset(scroll);
 }
 
 /*============================================================================*
@@ -133,6 +179,7 @@ void text_font_scroll_function_test(void)
     gui_scroll_text_scroll_set(test_left, SCROLL_X, 0, 0, 10000, 0);
     gui_scroll_text_type_set(test_left, font32b2, FONT_SRC_MEMADDR);
     gui_scroll_text_non_scroll_align_set(test_left, LEFT);
+    gui_obj_add_event_cb(test_left, (gui_event_cb_t)toggle_text_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     test_center = gui_scroll_text_create(gui_obj_get_root(), "test_center", 200, 262, 200, 32);
     gui_scroll_text_set(test_center, short_text, GUI_FONT_SRC_BMP, APP_COLOR_CYAN, strlen(short_text),
@@ -140,6 +187,7 @@ void text_font_scroll_function_test(void)
     gui_scroll_text_scroll_set(test_center, SCROLL_X, 0, 0, 10000, 0);
     gui_scroll_text_type_set(test_center, font32b2, FONT_SRC_MEMADDR);
     gui_scroll_text_non_scroll_align_set(test_center, CENTER);
+    gui_obj_add_event_cb(test_center, (gui_event_cb_t)toggle_text_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     test_right = gui_scroll_text_create(gui_obj_get_root(), "test_right", 200, 294, 200, 32);
     gui_scroll_text_set(test_right, short_text, GUI_FONT_SRC_BMP, APP_COLOR_TOMATO, strlen(short_text),
@@ -147,6 +195,7 @@ void text_font_scroll_function_test(void)
     gui_scroll_text_scroll_set(test_right, SCROLL_X, 0, 0, 10000, 0);
     gui_scroll_text_type_set(test_right, font32b2, FONT_SRC_MEMADDR);
     gui_scroll_text_non_scroll_align_set(test_right, RIGHT);
+    gui_obj_add_event_cb(test_right, (gui_event_cb_t)toggle_text_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
 
 
