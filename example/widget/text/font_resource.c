@@ -20,6 +20,8 @@
  *                            Macros
  *============================================================================*/
 #define FONT_MEM_POOL_SIZE (1024 * 1024 * 100)
+#define FONT_DIR           "./example/assets/font/"
+#define FONT_PATH(name)    FONT_DIR name
 
 /*============================================================================*
  *                            Variables
@@ -42,8 +44,16 @@ void *fontnotojp;
 void *fontnotokr;
 void *fontnotothai;
 void *fontnotohebrew;
+
+void *fontnotovec;
+void *fontnotoscvec;
+void *fontnotojpvec;
+void *fontnotokrvec;
+
 void *fontharmonysc;
+
 void *fontnotov2;
+
 
 /*============================================================================*
  *                           Private Functions
@@ -114,29 +124,33 @@ void font_file_init(void)
 {
     s_font_mem_offset = 0;
 
-    font32b1 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits1_font.bin", NULL);
-    font32b2 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits2_font.bin", NULL);
-    font32b4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_font.bin", NULL);
-    font32b8 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits8_font.bin", NULL);
-    font32vb4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_vfont.bin", NULL);
+#define LOAD_FONT(file) load_file_to_memory(FONT_PATH(file), NULL)
 
-    font32b4index1 = load_file_to_memory("./example/assets/font/NotoSans_Regular_size32_bits4_font.bin",
-                                         NULL);
-    font32vb4index1 =
-        load_file_to_memory("./example/assets/font/NotoSans_Regular_size32_bits4_vfont.bin", NULL);
+    font32b1       = LOAD_FONT("HarmonyOS_size32_bits1_font.bin");
+    font32b2       = LOAD_FONT("HarmonyOS_size32_bits2_font.bin");
+    font32b4       = LOAD_FONT("HarmonyOS_size32_bits4_font.bin");
+    font32b8       = LOAD_FONT("HarmonyOS_size32_bits8_font.bin");
+    font32vb4      = LOAD_FONT("HarmonyOS_size32_bits4_vfont.bin");
 
-    fontnoto = load_file_to_memory("./example/assets/font/NotoSans_size32_bits2_font.bin", NULL);
-    fontnotoarabic = load_file_to_memory("./example/assets/font/NotoSansArabic_size32_bits2_font.bin",
-                                         NULL);
-    fontnotojp = load_file_to_memory("./example/assets/font/NotoSansJP_size32_bits2_font.bin", NULL);
-    fontnotokr = load_file_to_memory("./example/assets/font/NotoSansKR_size32_bits2_font.bin", NULL);
-    fontnotothai = load_file_to_memory("./example/assets/font/NotoSansThai_size32_bits2_font.bin",
-                                       NULL);
-    fontnotohebrew = load_file_to_memory("./example/assets/font/NotoSansHebrew_size32_bits2_font.bin",
-                                         NULL);
-    fontharmonysc = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits2_font.bin", NULL);
-    fontnotov2 = load_file_to_memory("./example/assets/font/NotoSans_Regular_size32_bits4_v3_font.bin",
-                                     NULL);
+    font32b4index1  = LOAD_FONT("NotoSans_Regular_size32_bits4_font.bin");
+    font32vb4index1 = LOAD_FONT("NotoSans_Regular_size32_bits4_vfont.bin");
+
+    fontnoto       = LOAD_FONT("NotoSans_Regular_size32_bits4_bitmap.bin");
+    fontnotoarabic = LOAD_FONT("NotoSansArabic_size32_bits2_font.bin");
+    fontnotojp     = LOAD_FONT("NotoSansJP_regular_size32_bits2_bitmap.bin");
+    fontnotokr     = LOAD_FONT("NotoSansKR_regular_size32_bits2_bitmap.bin");
+    fontnotothai   = LOAD_FONT("NotoSansThai_size32_bits2_font.bin");
+    fontnotohebrew = LOAD_FONT("NotoSansHebrew_size32_bits2_font.bin");
+
+    fontnotovec    = LOAD_FONT("NotoSans_Regular_vector.bin");
+    fontnotoscvec  = LOAD_FONT("NotoSansSC_Regular_vector.bin");
+    fontnotojpvec  = LOAD_FONT("NotoSansJP_Regular_vector.bin");
+    fontnotokrvec  = LOAD_FONT("NotoSansKR_Regular_vector.bin");
+
+    fontharmonysc  = LOAD_FONT("HarmonyOS_size32_bits2_font.bin");
+    fontnotov2     = LOAD_FONT("NotoSans_Regular_size32_bits4_v3_font.bin");
+
+#undef LOAD_FONT
 
     gui_font_mem_init(font32b2);
 }

@@ -91,7 +91,7 @@ void text_font_source_mode_test(void)
         gui_text_t *t2 = gui_text_create(root, "bmp_ftl", start_x + col_width, y, 0, 0);
         gui_text_set(t2, (void *)TEST_TEXT, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(TEST_TEXT), FONT_SIZE);
-        gui_text_type_set(t2, font32b8, FONT_SRC_FTL);
+        gui_text_type_set(t2, font32b4, FONT_SRC_FTL);
         create_label(root, "BMP+FTL", start_x + col_width, y + FONT_SIZE + LABEL_OFFSET_Y);
 
         /* FILESYS */
@@ -120,7 +120,7 @@ void text_font_source_mode_test(void)
         gui_text_t *t2 = gui_text_create(root, "img_ftl", start_x + col_width, y, 0, 0);
         gui_text_set(t2, (void *)TEST_TEXT, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(TEST_TEXT), FONT_SIZE);
-        gui_text_type_set(t2, font32b8, FONT_SRC_FTL);
+        gui_text_type_set(t2, font32b4, FONT_SRC_FTL);
         gui_text_convert_to_img(t2, RGB565);
         create_label(root, "IMG+FTL", start_x + col_width, y + FONT_SIZE + LABEL_OFFSET_Y);
 
@@ -150,7 +150,7 @@ void text_font_source_mode_test(void)
         gui_text_t *t2 = gui_text_create(root, "mat_ftl", start_x + col_width, y, 0, 0);
         gui_text_set(t2, (void *)TEST_TEXT, GUI_FONT_SRC_MAT, APP_COLOR_WHITE,
                      strlen(TEST_TEXT), FONT_SIZE);
-        gui_text_type_set(t2, font32b8, FONT_SRC_FTL);
+        gui_text_type_set(t2, font32b4, FONT_SRC_FTL);
         create_label(root, "MAT+FTL", start_x + col_width, y + FONT_SIZE + LABEL_OFFSET_Y);
 
         /* FILESYS */
@@ -178,7 +178,7 @@ void text_font_source_mode_test(void)
         gui_text_t *t2 = gui_text_create(root, "ttf_ftl", start_x + col_width, y, 0, 0);
         gui_text_set(t2, (void *)TEST_TEXT, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(TEST_TEXT), FONT_SIZE);
-        gui_text_type_set(t2, font32vb4, FONT_SRC_FTL);
+        gui_text_type_set(t2, font32vb4index1, FONT_SRC_FTL);
         create_label(root, "TTF+FTL", start_x + col_width, y + FONT_SIZE + LABEL_OFFSET_Y);
 
         /* FILESYS */

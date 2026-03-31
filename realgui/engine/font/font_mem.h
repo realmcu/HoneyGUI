@@ -240,6 +240,22 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect);
  */
 void gui_font_get_dot_info(gui_text_t *text);
 
+/**
+ * @brief Search for a glyph in all registered BMP fonts (fallback).
+ * Iterates font_lib nodes with matching font_size, ordered by priority,
+ * skipping the primary font. Only searches BMP type fonts.
+ *
+ * @param unicode Unicode code point to search.
+ * @param font_size Font size to match.
+ * @param skip_file Primary font file to skip (already searched).
+ * @param out_chr Output character info (populated on success).
+ * @param out_line_byte Output line byte width.
+ * @return 0 on success, -1 if not found in any fallback BMP font.
+ */
+int gui_font_bmp_fallback_search(uint32_t unicode, uint8_t font_size,
+                                 uint8_t *skip_file, mem_char_t *out_chr,
+                                 int32_t *out_line_byte);
+
 #ifdef __cplusplus
 }
 #endif

@@ -173,6 +173,23 @@ void gui_font_ttf_unload(gui_text_t *text);
  */
 void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect);
 
+/**
+ * @brief Search for a glyph in all registered TTF fonts (fallback).
+ * Iterates font_lib TTF nodes ordered by priority, skipping the primary font.
+ * TTF fonts are scalable so font_size matching is not required.
+ * Only populates char_w/char_h/dot_addr for MEMADDR mode.
+ *
+ * @param unicode Unicode code point to search.
+ * @param font_height Desired font height in pixels (for scale calculation).
+ * @param bold_weight Bold weight for advance calculation.
+ * @param skip_file Primary font file to skip (already searched).
+ * @param out_chr Output character info (populated on success).
+ * @return 0 on success, -1 if not found in any fallback TTF font.
+ */
+int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
+                                 uint8_t bold_weight, uint8_t *skip_file,
+                                 mem_char_t *out_chr);
+
 #ifdef __cplusplus
 }
 #endif

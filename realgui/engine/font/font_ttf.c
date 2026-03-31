@@ -957,6 +957,262 @@ static uint8_t *get_cached_ttf_index_table(uint8_t *font_file)
     return NULL;
 }
 
+/**
+ * @brief Search for a glyph in all registered TTF fonts (fallback).
+ *
+ * Iterates font_lib TTF nodes ordered by priority, skipping the primary font.
+ * TTF fonts are scalable so font_size matching is not required.
+ * Supports MEMADDR, FTL, and FILESYS modes.
+ */
+int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
+                                 uint8_t bold_weight, uint8_t *skip_file,
+                                 mem_char_t *out_chr)
+{
+    uint16_t min_prio = 0;
+    while (min_prio <= 0xFF)
+    {
+        /* Find next candidate with lowest priority >= min_prio */
+        FONT_LIB_NODE *best = NULL;
+        uint8_t best_prio = 0xFF;
+        FONT_LIB_NODE *node = gui_font_lib_get_head();
+        while (node != NULL)
+        {
+            if (node->font_type == GUI_FONT_SRC_TTF &&
+                node->font_file != skip_file &&
+                node->priority >= min_prio &&
+                (best == NULL || node->priority < best_prio))
+            {
+                best = node;
+                best_prio = node->priority;
+            }
+            node = node->next;
+        }
+
+        if (best == NULL)
+        {
+            break;
+        }
+
+        /* Get TTF header */
+        GUI_FONT_HEAD_TTF *ttfbin = get_cached_ttf_header(best->font_file);
+        bool need_free = false;
+
+        if (ttfbin == NULL)
+        {
+            if (best->src_mode == FONT_SRC_MEMADDR)
+            {
+                ttfbin = (GUI_FONT_HEAD_TTF *)best->font_file;
+            }
+            else if (best->src_mode == FONT_SRC_FTL)
+            {
+                ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+                if (ttfbin == NULL) { min_prio = best_prio + 1; continue; }
+                gui_ftl_read((uintptr_t)best->font_file, (uint8_t *)ttfbin, sizeof(GUI_FONT_HEAD_TTF));
+                need_free = true;
+            }
+            else if (best->src_mode == FONT_SRC_FILESYS)
+            {
+                gui_vfs_file_t *file = gui_vfs_open((const char *)best->font_file, GUI_VFS_READ);
+                if (file == NULL) { min_prio = best_prio + 1; continue; }
+                ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+                if (ttfbin == NULL) { gui_vfs_close(file); min_prio = best_prio + 1; continue; }
+                gui_vfs_read(file, ttfbin, sizeof(GUI_FONT_HEAD_TTF));
+                gui_vfs_close(file);
+                need_free = true;
+            }
+        }
+
+        if (ttfbin == NULL || ttfbin->file_type != FONT_FILE_TTF_FLAG)
+        {
+            if (need_free && ttfbin) { gui_free(ttfbin); }
+            min_prio = (best_prio < 0xFF) ? best_prio + 1 : 0xFF + 1;
+            continue;
+        }
+
+        /* Get index table */
+        uint8_t *index_table_ptr = get_cached_ttf_index_table(best->font_file);
+        uint8_t *alloc_index = NULL;
+
+        if (index_table_ptr == NULL)
+        {
+            if (best->src_mode == FONT_SRC_MEMADDR)
+            {
+                index_table_ptr = best->font_file + ttfbin->head_length;
+            }
+            else if (best->src_mode == FONT_SRC_FTL && ttfbin->index_area_size > 0)
+            {
+                alloc_index = gui_malloc(ttfbin->index_area_size);
+                if (alloc_index)
+                {
+                    gui_ftl_read((uintptr_t)best->font_file + ttfbin->head_length,
+                                 alloc_index, ttfbin->index_area_size);
+                    index_table_ptr = alloc_index;
+                }
+            }
+            else if (best->src_mode == FONT_SRC_FILESYS && ttfbin->index_area_size > 0)
+            {
+                alloc_index = gui_malloc(ttfbin->index_area_size);
+                if (alloc_index)
+                {
+                    gui_vfs_file_t *file = gui_vfs_open((const char *)best->font_file, GUI_VFS_READ);
+                    if (file)
+                    {
+                        gui_vfs_seek(file, ttfbin->head_length, GUI_VFS_SEEK_SET);
+                        gui_vfs_read(file, alloc_index, ttfbin->index_area_size);
+                        gui_vfs_close(file);
+                        index_table_ptr = alloc_index;
+                    }
+                    else
+                    {
+                        gui_free(alloc_index);
+                        alloc_index = NULL;
+                    }
+                }
+            }
+        }
+
+        /* Search for the glyph */
+        uint32_t ttfoffset = getGlyphOffset(unicode, ttfbin, index_table_ptr,
+                                            (best->src_mode == FONT_SRC_FILESYS) ?
+                                            FONT_SRC_MEMADDR : best->src_mode,
+                                            index_table_ptr);
+
+        if (ttfoffset != 0)
+        {
+            float scale = (float)font_height / (ttfbin->ascent - ttfbin->descent);
+
+            if (best->src_mode == FONT_SRC_MEMADDR)
+            {
+                FontGlyphData *glyphData = (FontGlyphData *)(best->font_file + ttfoffset);
+                out_chr->unicode = unicode;
+                out_chr->h = font_height;
+                out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+                out_chr->char_h = font_height;
+                out_chr->dot_addr = best->font_file + ttfoffset;
+
+                if (alloc_index) { gui_free(alloc_index); }
+                if (need_free) { gui_free(ttfbin); }
+                // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d)\n",
+                //         unicode, skip_file, best->font_file, best->priority);
+                return 0;
+            }
+            else if (best->src_mode == FONT_SRC_FTL)
+            {
+                uint8_t *font_ptr = best->font_file + ttfoffset;
+                FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                if (glyphData)
+                {
+                    gui_ftl_read((uintptr_t)font_ptr, (uint8_t *)glyphData, sizeof(FontGlyphData));
+                    int line_count = 0;
+                    uint8_t winding_length = glyphData->winding_count;
+                    uint8_t *winding_lengths = gui_malloc(winding_length);
+                    if (winding_lengths)
+                    {
+                        gui_ftl_read((uintptr_t)(font_ptr + offsetof(FontGlyphData, winding_lengths)),
+                                     winding_lengths, winding_length);
+                        for (int i = 0; i < glyphData->winding_count; i++)
+                        {
+                            line_count += winding_lengths[i];
+                        }
+                        uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length +
+                                                       line_count * sizeof(FontWindings));
+                        if (dot_addr)
+                        {
+                            memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
+                            memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths),
+                                   winding_lengths, winding_length);
+                            gui_ftl_read((uintptr_t)font_ptr + offsetof(FontGlyphData, winding_lengths) +
+                                         winding_length,
+                                         dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                                         line_count * sizeof(FontWindings));
+
+                            out_chr->unicode = unicode;
+                            out_chr->h = font_height;
+                            out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+                            out_chr->char_h = font_height;
+                            out_chr->dot_addr = dot_addr;
+
+                            gui_free(winding_lengths);
+                            gui_free(glyphData);
+                            if (alloc_index) { gui_free(alloc_index); }
+                            if (need_free) { gui_free(ttfbin); }
+                            // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d)\n",
+                            //         unicode, skip_file, best->font_file, best->priority);
+                            return 0;
+                        }
+                        gui_free(winding_lengths);
+                    }
+                    gui_free(glyphData);
+                }
+            }
+            else if (best->src_mode == FONT_SRC_FILESYS)
+            {
+                gui_vfs_file_t *file = gui_vfs_open((const char *)best->font_file, GUI_VFS_READ);
+                if (file)
+                {
+                    FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                    if (glyphData)
+                    {
+                        gui_vfs_seek(file, ttfoffset, GUI_VFS_SEEK_SET);
+                        gui_vfs_read(file, glyphData, sizeof(FontGlyphData));
+                        int line_count = 0;
+                        uint8_t winding_length = glyphData->winding_count;
+                        uint8_t *winding_lengths = gui_malloc(winding_length);
+                        if (winding_lengths)
+                        {
+                            gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths),
+                                         GUI_VFS_SEEK_SET);
+                            gui_vfs_read(file, winding_lengths, winding_length);
+                            for (int i = 0; i < glyphData->winding_count; i++)
+                            {
+                                line_count += winding_lengths[i];
+                            }
+                            uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length +
+                                                           line_count * sizeof(FontWindings));
+                            if (dot_addr)
+                            {
+                                memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
+                                memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths),
+                                       winding_lengths, winding_length);
+                                gui_vfs_seek(file,
+                                             ttfoffset + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                                             GUI_VFS_SEEK_SET);
+                                gui_vfs_read(file,
+                                             dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                                             line_count * sizeof(FontWindings));
+
+                                out_chr->unicode = unicode;
+                                out_chr->h = font_height;
+                                out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+                                out_chr->char_h = font_height;
+                                out_chr->dot_addr = dot_addr;
+
+                                gui_free(winding_lengths);
+                                gui_free(glyphData);
+                                gui_vfs_close(file);
+                                if (alloc_index) { gui_free(alloc_index); }
+                                if (need_free) { gui_free(ttfbin); }
+                                // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d)\n",
+                                //         unicode, skip_file, best->font_file, best->priority);
+                                return 0;
+                            }
+                            gui_free(winding_lengths);
+                        }
+                        gui_free(glyphData);
+                    }
+                    gui_vfs_close(file);
+                }
+            }
+        }
+
+        if (alloc_index) { gui_free(alloc_index); }
+        if (need_free) { gui_free(ttfbin); }
+        min_prio = (best_prio < 0xFF) ? best_prio + 1 : 0xFF + 1;
+    }
+
+    return -1;
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -1184,94 +1440,107 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
             if (ttfoffset == 0)
             {
-                continue;
-            }
-
-            uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
-
-            if (text->font_mode == FONT_SRC_MEMADDR)
-            {
-                FontGlyphData *glyphData = (FontGlyphData *)font_ptr;
-
-                chr[chr_i].unicode = unicode_buf[uni_i];
-                chr[chr_i].h = text->font_height;
-                chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
-                chr[chr_i].char_h = text->font_height;
-                chr[chr_i].dot_addr = font_ptr;
-            }
-            else if (text->font_mode == FONT_SRC_FTL)
-            {
-                FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
-                gui_ftl_read((uintptr_t)font_ptr, (uint8_t *)glyphData, sizeof(FontGlyphData));
-
-                int line_count = 0;
-                uint8_t winding_length = glyphData->winding_count;
-                uint8_t *winding_lengths = gui_malloc(winding_length);
-                gui_ftl_read((uintptr_t)(uint8_t *)(font_ptr + offsetof(FontGlyphData, winding_lengths)),
-                             winding_lengths, winding_length);
-                for (int i = 0; i < glyphData->winding_count; i++)
+                /* Fallback: try other TTF fonts */
+                if (gui_font_ttf_fallback_search(unicode_buf[uni_i], text->font_height,
+                                                 text->bold_weight, (uint8_t *)text->path,
+                                                 &chr[chr_i]) == 0)
                 {
-                    line_count += winding_lengths[i];
+                    /* Found in TTF fallback */
                 }
-
-                uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
-                                                   FontWindings));
-                memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
-                memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
-                gui_ftl_read((uintptr_t)font_ptr + offsetof(FontGlyphData, winding_lengths) + winding_length,
-                             dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
-                             line_count * sizeof(FontWindings));
-
-
-                chr[chr_i].unicode = unicode_buf[uni_i];
-                chr[chr_i].h = text->font_height;
-                chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
-                chr[chr_i].char_h = text->font_height;
-                chr[chr_i].dot_addr = dot_addr;
-
-                gui_free(glyphData);
-                gui_free(winding_lengths);
-            }
-            else if (text->font_mode == FONT_SRC_FILESYS)
-            {
-                gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
-                if (file == NULL)
+                else
                 {
                     continue;
                 }
-                FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
-                gui_vfs_seek(file, ttfoffset, GUI_VFS_SEEK_SET);
-                gui_vfs_read(file, glyphData, sizeof(FontGlyphData));
-
-                int line_count = 0;
-                uint8_t winding_length = glyphData->winding_count;
-                uint8_t *winding_lengths = gui_malloc(winding_length);
-                gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths), GUI_VFS_SEEK_SET);
-                gui_vfs_read(file, winding_lengths, winding_length);
-                for (int i = 0; i < glyphData->winding_count; i++)
-                {
-                    line_count += winding_lengths[i];
-                }
-
-                uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
-                                                   FontWindings));
-                memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
-                memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
-                gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths) + winding_length,
-                             GUI_VFS_SEEK_SET);
-                gui_vfs_read(file, dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
-                             line_count * sizeof(FontWindings));
-                gui_vfs_close(file);
-
-                chr[chr_i].unicode = unicode_buf[uni_i];
-                chr[chr_i].h = text->font_height;
-                chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
-                chr[chr_i].char_h = text->font_height;
-                chr[chr_i].dot_addr = dot_addr;
-
-                gui_free(glyphData);
-                gui_free(winding_lengths);
             }
+            else
+            {
+
+                uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
+
+                if (text->font_mode == FONT_SRC_MEMADDR)
+                {
+                    FontGlyphData *glyphData = (FontGlyphData *)font_ptr;
+
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].h = text->font_height;
+                    chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+                    chr[chr_i].char_h = text->font_height;
+                    chr[chr_i].dot_addr = font_ptr;
+                }
+                else if (text->font_mode == FONT_SRC_FTL)
+                {
+                    FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                    gui_ftl_read((uintptr_t)font_ptr, (uint8_t *)glyphData, sizeof(FontGlyphData));
+
+                    int line_count = 0;
+                    uint8_t winding_length = glyphData->winding_count;
+                    uint8_t *winding_lengths = gui_malloc(winding_length);
+                    gui_ftl_read((uintptr_t)(uint8_t *)(font_ptr + offsetof(FontGlyphData, winding_lengths)),
+                                 winding_lengths, winding_length);
+                    for (int i = 0; i < glyphData->winding_count; i++)
+                    {
+                        line_count += winding_lengths[i];
+                    }
+
+                    uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
+                                                       FontWindings));
+                    memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
+                    memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
+                    gui_ftl_read((uintptr_t)font_ptr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                                 dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                                 line_count * sizeof(FontWindings));
+
+
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].h = text->font_height;
+                    chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+                    chr[chr_i].char_h = text->font_height;
+                    chr[chr_i].dot_addr = dot_addr;
+
+                    gui_free(glyphData);
+                    gui_free(winding_lengths);
+                }
+                else if (text->font_mode == FONT_SRC_FILESYS)
+                {
+                    gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+                    if (file == NULL)
+                    {
+                        continue;
+                    }
+                    FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                    gui_vfs_seek(file, ttfoffset, GUI_VFS_SEEK_SET);
+                    gui_vfs_read(file, glyphData, sizeof(FontGlyphData));
+
+                    int line_count = 0;
+                    uint8_t winding_length = glyphData->winding_count;
+                    uint8_t *winding_lengths = gui_malloc(winding_length);
+                    gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths), GUI_VFS_SEEK_SET);
+                    gui_vfs_read(file, winding_lengths, winding_length);
+                    for (int i = 0; i < glyphData->winding_count; i++)
+                    {
+                        line_count += winding_lengths[i];
+                    }
+
+                    uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
+                                                       FontWindings));
+                    memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
+                    memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
+                    gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                                 GUI_VFS_SEEK_SET);
+                    gui_vfs_read(file, dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                                 line_count * sizeof(FontWindings));
+                    gui_vfs_close(file);
+
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].h = text->font_height;
+                    chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+                    chr[chr_i].char_h = text->font_height;
+                    chr[chr_i].dot_addr = dot_addr;
+
+                    gui_free(glyphData);
+                    gui_free(winding_lengths);
+                }
+            } /* end else (ttfoffset != 0) */
         }
 
         all_char_w += chr[chr_i].char_w;

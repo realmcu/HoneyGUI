@@ -82,6 +82,7 @@ FONT_LIB_NODE *gui_font_lib_register(uint8_t *font_file,
     node->cached_data = cached_data;
     node->cached_size = cached_size;
     node->ref_count = 1;
+    node->priority = 0xFF;  /* default: lowest priority */
     node->fs_fd = NULL;
 
     /* Insert at head */
@@ -182,6 +183,15 @@ uint32_t gui_font_lib_get_count(void)
 FONT_LIB_NODE *gui_font_lib_get_head(void)
 {
     return font_lib_head;
+}
+
+void gui_font_set_priority(uint8_t *font_file, uint8_t priority)
+{
+    FONT_LIB_NODE *node = gui_font_lib_find(font_file);
+    if (node != NULL)
+    {
+        node->priority = priority;
+    }
 }
 
 void gui_font_lib_clear_all(void)

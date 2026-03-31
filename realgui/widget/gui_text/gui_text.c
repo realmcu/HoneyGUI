@@ -686,7 +686,19 @@ void gui_text_font_mode_set(gui_text_t *this, FONT_SRC_MODE font_mode)
 
 void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_mode)
 {
-    if (font_mode == FONT_SRC_FTL)
+    if (font_mode == FONT_SRC_MEMADDR)
+    {
+        uint8_t flag = *((uint8_t *)font_source + 1);
+        if (flag == FONT_FILE_BMP_FLAG)
+        {
+            gui_font_mem_init_mem(font_source);
+        }
+        else if (flag == FONT_FILE_TTF_FLAG)
+        {
+            gui_font_ttf_init_mem(font_source);
+        }
+    }
+    else if (font_mode == FONT_SRC_FTL)
     {
         uint8_t flag = 0;
         gui_ftl_read((uintptr_t)(uint8_t *)font_source + 1, &flag, sizeof(uint8_t));

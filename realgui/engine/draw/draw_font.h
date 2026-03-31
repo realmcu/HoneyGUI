@@ -49,6 +49,7 @@ typedef struct
     uint8_t char_y;
     uint8_t char_w;
     uint8_t char_h;
+    uint8_t render_mode;        /**< bits-per-pixel (1/2/4/8), from source font (fills padding) */
     uint8_t *dot_addr;
     uint8_t *buf;
     void *emoji_img;

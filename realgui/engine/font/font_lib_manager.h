@@ -32,6 +32,7 @@ typedef struct FONT_LIB_NODE
     uint8_t *cached_data;           /**< Cached header + index data */
     uint32_t cached_size;           /**< Size of cached data */
     uint32_t ref_count;             /**< Reference count for memory management */
+    uint8_t priority;               /**< Fallback priority (0 = highest, 0xFF = lowest) */
     gui_vfs_file_t *fs_fd;          /**< Cached file handle for FILESYS mode */
     struct FONT_LIB_NODE *next;     /**< Next node in linked list */
 } FONT_LIB_NODE;
@@ -128,6 +129,15 @@ uint32_t gui_font_lib_get_count(void);
  * @return Head pointer of the linked list
  */
 FONT_LIB_NODE *gui_font_lib_get_head(void);
+
+/**
+ * @brief Set fallback priority for a font node
+ * Lower value = higher priority. Default is 0xFF (lowest).
+ *
+ * @param font_file Font file path or memory address
+ * @param priority Priority value (0 = highest, 0xFF = lowest)
+ */
+void gui_font_set_priority(uint8_t *font_file, uint8_t priority);
 
 /**
  * @brief Clear all fonts from the library

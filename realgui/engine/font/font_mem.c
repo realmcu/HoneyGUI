@@ -465,6 +465,205 @@ static uint32_t load_emoji(mem_char_t *chr, gui_text_t *text,
     return multi_len;
 }
 
+/**
+ * @brief Try to load a single glyph from a specific BMP font.
+ *
+ * Handles all combinations of crop/non-crop, address/offset index,
+ * V1/V2 headers, and MEMADDR/FTL/FILESYS source modes.
+ *
+ * @param font_file  Font file address or path
+ * @param node       Font library node (NULL for MEMADDR)
+ * @param src_mode   Font source mode
+ * @param unicode    Unicode code point to look up
+ * @param font_size  Font size in pixels
+ * @param out_chr    Output character info (populated on success)
+ * @param out_line_byte Output line byte width (for crop fonts)
+ * @return 0 if glyph found, -1 if not found
+ */
+static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
+                                FONT_SRC_MODE src_mode, uint32_t unicode,
+                                uint8_t font_size, mem_char_t *out_chr,
+                                int32_t *out_line_byte)
+{
+    GUI_FONT_HEAD_BMP *font;
+    if (src_mode == FONT_SRC_MEMADDR)
+    {
+        font = (GUI_FONT_HEAD_BMP *)font_file;
+    }
+    else if (node != NULL && node->cached_data != NULL)
+    {
+        font = (GUI_FONT_HEAD_BMP *)node->cached_data;
+    }
+    else
+    {
+        return -1;
+    }
+    if (font == NULL || font->file_type != FONT_FILE_BMP_FLAG)
+    {
+        return -1;
+    }
+
+    uint8_t render_mode = font->render_mode ? font->render_mode : 1;
+    uintptr_t table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
+
+    if (font->crop)
+    {
+        uint32_t offset;
+        if (font->index_method == 0)
+        {
+            uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + unicode * 4);
+            offset = *offset_addr;
+        }
+        else
+        {
+            offset = font_index_bsearch_crop_offset(table_offset, font->index_area_size, unicode);
+        }
+        if (offset == 0xFFFFFFFF)
+        {
+            return -1;
+        }
+
+        if (src_mode == FONT_SRC_MEMADDR)
+        {
+            gui_font_typo_context_t ctx = gui_font_bmp_get_typo_context(font, font_size);
+            if (ctx.is_v2)
+            {
+                GUI_BMP_GLYPH_HEAD_V2 *gh = (GUI_BMP_GLYPH_HEAD_V2 *)(font_file + offset);
+                out_chr->bearing_x = gh->bearing_x;
+                out_chr->bearing_y = gh->bearing_y;
+                out_chr->char_w    = gh->width;
+                out_chr->char_h    = gh->height;
+                out_chr->advance   = gh->advance;
+                *out_line_byte = (out_chr->char_w * render_mode + 8 - 1) / 8;
+                out_chr->w = *out_line_byte * 8 / render_mode;
+                out_chr->dot_addr = font_file + offset + sizeof(GUI_BMP_GLYPH_HEAD_V2);
+            }
+            else
+            {
+                out_chr->dot_addr = font_file + offset + 4;
+                out_chr->char_w = (uint8_t)(*(out_chr->dot_addr - 2));
+                out_chr->char_y = (uint8_t)(*(out_chr->dot_addr - 4));
+                out_chr->char_h = (uint8_t)(*(out_chr->dot_addr - 1)) - out_chr->char_y;
+                *out_line_byte = (out_chr->char_w * render_mode + 8 - 1) / 8;
+                out_chr->w = *out_line_byte * 8 / render_mode;
+            }
+        }
+        else
+        {
+            gui_font_typo_context_t ctx = gui_font_bmp_get_typo_context(font, font_size);
+            if (src_mode == FONT_SRC_FILESYS) { gui_font_lib_fs_open(node); }
+            int rc;
+            if (ctx.is_v2)
+            {
+                rc = gui_font_bmp_load_glyph(out_chr, font_file, node,
+                                             src_mode, offset, render_mode, out_line_byte);
+            }
+            else
+            {
+                rc = load_dot_crop(out_chr, font_file, node,
+                                   src_mode, offset, render_mode, out_line_byte);
+            }
+            if (src_mode == FONT_SRC_FILESYS) { gui_font_lib_fs_close(node); }
+            if (rc < 0) { return -1; }
+        }
+    }
+    else
+    {
+        /* Non-crop */
+        uint8_t aliened = font_size;
+        if (font_size % 8 != 0) { aliened = 8 - font_size % 8 + font_size; }
+        uint32_t font_area = aliened * font_size / 8 * render_mode + 4;
+        uintptr_t dot_offset_base = table_offset + font->index_area_size;
+
+        int32_t index;
+        if (font->index_method == 0)
+        {
+            if (unicode > 0xFFFF) { return -1; }
+            uint16_t idx = *(uint16_t *)(uintptr_t)(unicode * 2 + table_offset);
+            if (idx == 0xFFFF) { return -1; }
+            index = (int32_t)idx;
+        }
+        else
+        {
+            index = font_index_bsearch_bmp(table_offset, font->index_area_size, unicode);
+            if (index < 0) { return -1; }
+        }
+
+        if (src_mode == FONT_SRC_MEMADDR)
+        {
+            out_chr->dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset_base + 4);
+            out_chr->char_w = (int16_t)(*(out_chr->dot_addr - 2));
+            out_chr->char_h = (int16_t)(*(out_chr->dot_addr - 1));
+            out_chr->w = aliened;
+            out_chr->h = font_size;
+        }
+        else
+        {
+            uint32_t dot_size = aliened * font_size / 8 * render_mode;
+            uint32_t data_offset = (uint32_t)index * font_area + dot_offset_base;
+            if (src_mode == FONT_SRC_FILESYS) { gui_font_lib_fs_open(node); }
+            int rc = load_dot_nocrop(out_chr, font_file, node, src_mode, data_offset, dot_size);
+            if (src_mode == FONT_SRC_FILESYS) { gui_font_lib_fs_close(node); }
+            if (rc < 0) { return -1; }
+        }
+    }
+
+    out_chr->render_mode = render_mode;
+    return 0;
+}
+
+/**
+ * @brief Search for a glyph in all registered BMP fonts (fallback).
+ *
+ * Iterates font_lib nodes with matching font_size, ordered by priority,
+ * skipping the primary font.
+ */
+int gui_font_bmp_fallback_search(uint32_t unicode, uint8_t font_size,
+                                 uint8_t *skip_file, mem_char_t *out_chr,
+                                 int32_t *out_line_byte)
+{
+    FONT_LIB_NODE *best = NULL;
+    uint8_t best_prio = 0xFF;
+    uint16_t min_prio = 0;
+
+    while (min_prio <= 0xFF)
+    {
+        best = NULL;
+        best_prio = 0xFF;
+        FONT_LIB_NODE *node = gui_font_lib_get_head();
+        while (node != NULL)
+        {
+            if (node->font_type == GUI_FONT_SRC_BMP &&
+                node->font_size == font_size &&
+                node->font_file != skip_file &&
+                node->priority >= min_prio &&
+                (best == NULL || node->priority < best_prio))
+            {
+                best = node;
+                best_prio = node->priority;
+            }
+            node = node->next;
+        }
+
+        if (best == NULL)
+        {
+            break;
+        }
+
+        if (font_bmp_lookup_char(best->font_file, best, best->src_mode,
+                                 unicode, font_size, out_chr, out_line_byte) == 0)
+        {
+            // gui_log("[BMP fallback] U+%04X: primary=%p -> fallback=%p (prio=%d)\n",
+            //         unicode, skip_file, best->font_file, best->priority);
+            return 0;
+        }
+
+        min_prio = (best_prio < 0xFF) ? best_prio + 1 : 0xFF + 1;
+    }
+
+    return -1;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
@@ -502,6 +701,10 @@ void gui_font_get_dot_info(gui_text_t *text)
             return;
         }
         font = (GUI_FONT_HEAD_BMP *)node->cached_data;
+        if (font == NULL)
+        {
+            return;
+        }
         table_offset = (uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
     }
@@ -566,6 +769,10 @@ void gui_font_get_dot_info(gui_text_t *text)
     if (chr)
     {
         memset(chr, 0, sizeof(mem_char_t) * unicode_len);
+        for (uint16_t k = 0; k < unicode_len; k++)
+        {
+            chr[k].render_mode = render_mode;
+        }
     }
     text->data = chr;
     text->content_refresh = false;
@@ -635,8 +842,20 @@ void gui_font_get_dot_info(gui_text_t *text)
                     uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + chr[chr_i].unicode *
                                                          index_unit_length);
                     offset = *offset_addr;
-                    if (offset == 0xFFFFFFFF) { continue; }
-                    if (text->font_mode == FONT_SRC_MEMADDR)
+                    if (offset == 0xFFFFFFFF)
+                    {
+                        /* Fallback: try other BMP fonts with same size */
+                        if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
+                                                         (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
+                        {
+                            /* Found in BMP fallback */
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    else if (text->font_mode == FONT_SRC_MEMADDR)
                     {
                         if (typo_ctx.is_v2)
                         {
@@ -718,8 +937,19 @@ void gui_font_get_dot_info(gui_text_t *text)
                     {
                         // Binary search for unicode in offset+crop index table
                         offset = font_index_bsearch_crop_offset(table_offset, index_area_size, chr[chr_i].unicode);
-                        if (offset == 0xFFFFFFFF) { continue; }
-                        if (text->font_mode == FONT_SRC_MEMADDR)
+                        if (offset == 0xFFFFFFFF)
+                        {
+                            if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
+                                                             (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
+                            {
+                                /* Found in BMP fallback */
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                        else if (text->font_mode == FONT_SRC_MEMADDR)
                         {
                             if (typo_ctx.is_v2)
                             {
@@ -814,8 +1044,19 @@ void gui_font_get_dot_info(gui_text_t *text)
                 else
                 {
                     offset = *(uint16_t *)(uintptr_t)(chr[chr_i].unicode * 2 + table_offset);
-                    if (offset == 0xFFFF) { continue; }
-                    if (text->font_mode == FONT_SRC_MEMADDR)
+                    if (offset == 0xFFFF)
+                    {
+                        if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
+                                                         (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
+                        {
+                            /* Found in BMP fallback */
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    else if (text->font_mode == FONT_SRC_MEMADDR)
                     {
                         /* @deprecated V1 nocrop: 2-byte header */
                         chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
@@ -870,10 +1111,18 @@ void gui_font_get_dot_info(gui_text_t *text)
                         int32_t index = font_index_bsearch_bmp(table_offset, index_area_size, chr[chr_i].unicode);
                         if (index < 0)
                         {
-                            gui_log("Character %x not found in BMP-BIN file \n", chr[chr_i].unicode);
-                            continue;
+                            if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
+                                                             (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
+                            {
+                                /* Found in BMP fallback - skip primary font loading */
+                            }
+                            else
+                            {
+                                gui_log("Character %x not found in BMP-BIN file \n", chr[chr_i].unicode);
+                                continue;
+                            }
                         }
-                        if (text->font_mode == FONT_SRC_MEMADDR)
+                        else if (text->font_mode == FONT_SRC_MEMADDR)
                         {
                             /* @deprecated V1 nocrop: 2-byte header */
                             chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
@@ -1741,7 +1990,8 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         else
         {
-            rtk_draw_unicode(chr + i, outcolor, render_mode, rect, font->crop);
+            uint8_t chr_render_mode = chr[i].render_mode ? chr[i].render_mode : render_mode;
+            rtk_draw_unicode(chr + i, outcolor, chr_render_mode, rect, font->crop);
         }
     }
 
