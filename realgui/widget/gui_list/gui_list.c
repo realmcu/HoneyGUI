@@ -31,6 +31,8 @@ static bool g_Limit = false;
 static int16_t g_Bar_Width = 0;
 static int16_t g_Bar_Height = 0;
 static gui_color_t g_Bar_Color = {0};
+static int8_t g_offset_increase = 0;
+static bool quick_slide = false;
 
 /*============================================================================*
  *                           Private Functions
@@ -63,7 +65,6 @@ static void gui_list_update_speed(gui_list_t *_this, int16_t tp_delta)
     _this->record[record_num] = tp_delta;
     _this->speed = _this->record[record_num] - _this->record[0];
     int max_speed = GUI_MAX_SPEED;
-    int min_speed = GUI_MIN_SPEED;
 
     if (_this->speed > max_speed)
     {
@@ -72,15 +73,6 @@ static void gui_list_update_speed(gui_list_t *_this, int16_t tp_delta)
     else if (_this->speed < -max_speed)
     {
         _this->speed = -max_speed;
-    }
-
-    if ((_this->speed > 0) && (_this->speed < min_speed))
-    {
-        _this->speed = min_speed;
-    }
-    else if ((_this->speed < 0) && (_this->speed > -min_speed))
-    {
-        _this->speed = -min_speed;
     }
 }
 
@@ -130,7 +122,7 @@ static void gui_list_update_bar(gui_obj_t *obj)
     if (_this->dir == HORIZONTAL && total_length > w)
     {
         float range = (float)(w - g_Bar_Width);
-        t_x = offset * range / (total_length - w);
+        t_x = -offset * range / (total_length - w);
         t_x = (t_x > range) ? range : t_x;
     }
     else if (_this->dir == VERTICAL && total_length > h)
@@ -215,17 +207,30 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
             int16_t distance;
             int16_t half_grid = grid_size / 2;
             int16_t abs_remainder = abs(remainder);
-            if (_this->loop)
+            if (!_this->loop && _this->offset == hard_offset_min)
             {
-                distance = (abs_remainder > half_grid) ? ((remainder > 0 ? 1 : -1) * (grid_size - abs_remainder)) :
-                           -remainder;
+                return;
             }
             else
             {
-                if (_this->last_created_note_index == _this->note_num - 1 &&
-                    _this->offset == hard_offset_min) {return;} // show last note
-                distance = ((abs_remainder > half_grid) ? (abs_remainder - grid_size) :
-                            abs_remainder); // only consider offset < 0
+                if (quick_slide)
+                {
+                    distance = g_offset_increase * ((abs_remainder > half_grid) ? (grid_size - abs_remainder) :
+                                                    abs_remainder);
+                }
+                else
+                {
+                    if (abs_remainder > grid_size / 2)
+                    {
+
+                        distance = g_offset_increase * ((abs_remainder > half_grid) ? (grid_size - abs_remainder) :
+                                                        abs_remainder);
+                    }
+                    else
+                    {
+                        distance = -remainder;
+                    }
+                }
             }
 
             float e_factor = 0.2f;
@@ -973,7 +978,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
     case HORIZONTAL:
         {
             gui_list_update_speed(_this, tp->deltaX);
-
+            g_offset_increase = tp->deltaX > 0 ? 1 : -1;
             _this->offset = _this->hold + tp->deltaX;
             offset_min = obj->w - _this->total_length - _this->out_scope;
             offset_max = _this->out_scope;
@@ -992,7 +997,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
     case VERTICAL:
         {
             gui_list_update_speed(_this, tp->deltaY);
-
+            g_offset_increase = tp->deltaY > 0 ? 1 : -1;
             _this->offset = _this->hold + tp->deltaY;
             offset_min = obj->h - _this->total_length - _this->out_scope;
             offset_max = _this->out_scope;
@@ -1062,6 +1067,14 @@ static void gui_list_released_cb(void *obj, gui_event_t *e)
         }
     }
     _this->hold = _this->offset;
+    if (abs(_this->speed) >= GUI_MIN_SPEED)
+    {
+        quick_slide = true;
+    }
+    else
+    {
+        quick_slide = false;
+    }
 
     memset(_this->record, 0, sizeof(_this->record));
 }
