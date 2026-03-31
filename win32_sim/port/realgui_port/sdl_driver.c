@@ -163,6 +163,11 @@ void *sdl_driver_thread(void *arg)
                                                    simulator_pixel_bits == 16 ? SDL_PIXELFORMAT_RGB565 :
                                                    SDL_PIXELFORMAT_INDEX8);
 
+    if (simulator_pixel_bits == 32)
+    {
+        SDL_SetSurfaceBlendMode(customSurface, SDL_BLENDMODE_NONE);
+    }
+
     if (screen_corner_radius != 0)
     {
         create_screen_mask(simulator_width, simulator_height, screen_corner_radius);
