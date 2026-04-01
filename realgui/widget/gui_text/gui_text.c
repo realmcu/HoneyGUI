@@ -287,7 +287,6 @@ static void gui_text_input_prepare(gui_obj_t *obj)
 static void gui_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
-    // touch_info_t *tp = tp_get_info();
     gui_point3f_t point = {0, 0, 1};
     uint8_t last;
 
@@ -296,21 +295,7 @@ static void gui_text_prepare(gui_obj_t *obj)
         return;
     }
 
-#if 0 // font mat scale min scale function
-    if (this->base.matrix->m[0][0] < this->min_scale)
-    {
-        this->base.matrix->m[0][0] = this->min_scale;
-        this->scale_img->base.matrix->m[0][0] = this->min_scale;
-    }
-    if (this->base.matrix->m[1][1] < this->min_scale)
-    {
-        this->base.matrix->m[1][1] = this->min_scale;
-        this->scale_img->base.matrix->m[1][1] = this->min_scale;
-    }
-    // gui_log("text scale x %f, y %f ; img scale x %f, y %f",
-    //         this->base.matrix->m[0][0],this->base.matrix->m[1][1],
-    //         this->scale_img->base.matrix->m[0][0],this->scale_img->base.matrix->m[1][1]);
-#endif
+    /* --- Lightweight section: always runs (even when hidden) --- */
     if (this->matrix)
     {
         matrix_multiply(obj->matrix, this->matrix);
@@ -323,7 +308,6 @@ static void gui_text_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
 
-
     last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
@@ -331,6 +315,22 @@ static void gui_text_prepare(gui_obj_t *obj)
     if (last != this->checksum || this->content_refresh)
     {
         gui_fb_change();
+    }
+
+    /* --- Heavy section: skip when hidden to avoid wasted work --- */
+    if (obj->not_show)
+    {
+        return;
+    }
+
+    if (this->len > 0)
+    {
+        gui_text_rect_t rect;
+        rect.x1 = this->offset_x;
+        rect.y1 = this->offset_y;
+        rect.x2 = rect.x1 + obj->w - 1;
+        rect.y2 = rect.y1 + obj->h - 1;
+        gui_text_font_load(this, &rect);
     }
 }
 
@@ -369,7 +369,7 @@ static void gui_text_draw(gui_obj_t *obj)
     struct gui_dispdev *dc;
     gui_text_rect_t draw_rect = {0};
 
-    if (text->len == 0)
+    if (text->len == 0 || text->data == NULL)
     {
         text->content_refresh = false;
         text->layout_refresh = false;
@@ -382,21 +382,19 @@ static void gui_text_draw(gui_obj_t *obj)
     draw_rect.x2 = draw_rect.x1 + obj->w - 1;
     draw_rect.y2 = draw_rect.y1 + obj->h - 1;
 
-
-    if (dc->section_count == 0)
-    {
-        gui_text_font_load(text, &draw_rect);
-        /* Font load may expand obj dimensions (V2 auto line-height).
-         * Refresh draw_rect to reflect the updated size. */
-        draw_rect.x2 = draw_rect.x1 + obj->w - 1;
-        draw_rect.y2 = draw_rect.y1 + obj->h - 1;
-    }
     draw_rect.xboundleft = draw_rect.x1;
     draw_rect.xboundright = draw_rect.x2;
     draw_rect.yboundtop = draw_rect.y1;
     draw_rect.yboundbottom = draw_rect.y2;
 
     gui_text_resize_rect(text, &draw_rect);
+
+    if (text->font_type == GUI_FONT_SRC_TTF ||
+        (text->font_type == GUI_FONT_SRC_MAT && text->use_img_blit))
+    {
+        gui_font_ttf_adapt_rect(text, &draw_rect);
+    }
+
     gui_text_read_scope(text, &draw_rect);
     if (text->scope_self)
     {
@@ -408,29 +406,18 @@ static void gui_text_draw(gui_obj_t *obj)
         draw_rect.yboundbottom = _UI_MIN(oy + text->scope_rect.y2, draw_rect.yboundbottom);
         text->scope = 1;
     }
-    if (text->font_type == GUI_FONT_SRC_TTF)
-    {
-        gui_font_ttf_adapt_rect(text, &draw_rect);
-    }
-    if (text->font_type == GUI_FONT_SRC_MAT && text->use_img_blit)
-    {
-        gui_font_ttf_adapt_rect(text, &draw_rect);
-    }
     if (text->scope ?
         gui_text_scope_rect_hit(&draw_rect, &dc->section) :
         gui_text_rect_hit(&draw_rect, &dc->section))
     {
         gui_text_font_draw(text, &draw_rect);
     }
-    if (dc->section_count == dc->section_total - 1)
-    {
-        gui_text_font_unload(text);
-    }
 }
 
 static void gui_text_end(gui_obj_t *obj)
 {
-    (void)obj;
+    gui_text_t *text = (gui_text_t *)obj;
+    gui_text_font_unload(text);
 }
 
 static void gui_text_destroy(gui_obj_t *obj)

@@ -1574,6 +1574,11 @@ void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect)
     rect->y1 = my1;
     rect->x2 = mx2;
     rect->y2 = my2;
+
+    rect->xboundleft = mx1;
+    rect->xboundright = mx2;
+    rect->yboundtop = my1;
+    rect->yboundbottom = my2;
 }
 
 void gui_font_ttf_load(gui_text_t *text, gui_text_rect_t *rect)

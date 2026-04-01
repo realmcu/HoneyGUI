@@ -29,15 +29,18 @@ extern "C" {
 typedef struct gui_scroll_text
 {
     gui_text_t base;
-    uint32_t start_value;
-    uint32_t end_value;
-    uint32_t cnt_value;
     uint32_t init_time_ms;
     uint32_t cur_time_ms;
     uint32_t duration_time_ms;
-    uint32_t interval_time_ms;
-    uint32_t loop_gap;
-    uint32_t scroll_pause_ms;
+    gui_text_rect_t draw_rect;
+    uint16_t start_value;
+    uint16_t end_value;
+    uint16_t cnt_value;
+    uint16_t loop_gap;
+    uint16_t interval_time_ms;
+    uint16_t scroll_pause_ms;
+    int16_t loop_shift_x;
+    int16_t loop_shift_y;
     TEXT_MODE fallback_mode;
     bool scrolling;
     bool loop;
@@ -98,9 +101,9 @@ gui_scroll_text_t *gui_scroll_text_create(void       *parent,
  */
 void gui_scroll_text_scroll_set(gui_scroll_text_t *_this,
                                 TEXT_MODE          mode,
-                                uint32_t           start_value,
-                                uint32_t           end_value,
-                                uint32_t           interval_time_ms,
+                                uint16_t           start_value,
+                                uint16_t           end_value,
+                                uint16_t           interval_time_ms,
                                 uint32_t           duration_time_ms);
 
 /**
@@ -207,7 +210,7 @@ void gui_scroll_text_non_scroll_align_set(gui_scroll_text_t *_this, TEXT_MODE mo
  * @param enable true to enable loop scrolling, false to disable
  * @param gap_pixel pixel gap between the end and the repeated start of the text
  */
-void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint32_t gap_pixel);
+void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint16_t gap_pixel);
 
 /**
  * @brief Set pause time between scroll cycles
@@ -217,7 +220,7 @@ void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint32_t ga
  * @param _this the scroll text widget pointer
  * @param pause_ms pause duration in milliseconds, 0 means no pause
  */
-void gui_scroll_text_scroll_pause_set(gui_scroll_text_t *_this, uint32_t pause_ms);
+void gui_scroll_text_scroll_pause_set(gui_scroll_text_t *_this, uint16_t pause_ms);
 
 #ifdef __cplusplus
 }
