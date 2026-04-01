@@ -648,6 +648,12 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
         _this->storage_type = storage_type;
     }
 
+    /* Sync draw_img->data if already allocated (e.g. timer callback between prepare and draw) */
+    if (_this->draw_img != NULL)
+    {
+        gui_img_refresh_draw_data(_this);
+    }
+
 }
 
 const uint8_t *gui_img_get_image_data(gui_img_t  *_this)
