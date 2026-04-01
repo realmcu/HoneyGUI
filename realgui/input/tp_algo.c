@@ -205,8 +205,8 @@ static bool tp_judge_quick_x_left_slide(struct gui_touch_port_data *raw_data)
         {
             if (tp.deltaX < 0)
             {
-                tp.type = TOUCH_LEFT_SLIDE;
-                TP_LOG("type = TOUCH_LEFT_SLIDE, %d \n", __LINE__);
+                tp.type = TOUCH_LEFT_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_LEFT_SLIDE_QUICK, %d \n", __LINE__);
                 return true;
             }
         }
@@ -223,8 +223,8 @@ static bool tp_judge_quick_x_right_slide(struct gui_touch_port_data *raw_data)
         {
             if (tp.deltaX > 0)
             {
-                tp.type = TOUCH_RIGHT_SLIDE;
-                TP_LOG("type = TOUCH_RIGHT_SLIDE, %d \n", __LINE__);
+                tp.type = TOUCH_RIGHT_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_RIGHT_SLIDE_QUICK, %d \n", __LINE__);
                 return true;
             }
         }
@@ -241,8 +241,8 @@ static bool tp_judge_quick_y_down_slide(struct gui_touch_port_data *raw_data)
         {
             if (tp.deltaY > 0)
             {
-                tp.type = TOUCH_DOWN_SLIDE;
-                TP_LOG("type = TOUCH_DOWN_SLIDE\n");
+                tp.type = TOUCH_DOWN_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_DOWN_SLIDE_QUICK, %d \n", __LINE__);
                 return true;
             }
         }
@@ -259,8 +259,8 @@ static bool tp_judge_quick_y_up_slide(struct gui_touch_port_data *raw_data)
         {
             if (tp.deltaY < 0)
             {
-                tp.type = TOUCH_UP_SLIDE;
-                TP_LOG("type = TOUCH_UP_SLIDE\n");
+                tp.type = TOUCH_UP_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_UP_SLIDE_QUICK, %d \n", __LINE__);
                 return true;
             }
         }

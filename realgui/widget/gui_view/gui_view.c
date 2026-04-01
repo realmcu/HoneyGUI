@@ -164,8 +164,9 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
     g_SurpressTP = true;
     g_SurpressEvent = true;
 
-    if (tp->type == TOUCH_LEFT_SLIDE)
+    switch (tp->type)
     {
+    case TOUCH_LEFT_SLIDE:
         g_Target = -o->w;
         if (g_Release <= -o->w / 2)
         {
@@ -175,9 +176,8 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
         {
             g_Target = 0;
         }
-    }
-    else if (tp->type == TOUCH_RIGHT_SLIDE)
-    {
+        break;
+    case TOUCH_RIGHT_SLIDE:
         if (g_Release >= o->w / 2)
         {
             g_Target = o->w;
@@ -186,9 +186,8 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
         {
             g_Target = 0;
         }
-    }
-    else if (tp->type == TOUCH_UP_SLIDE)
-    {
+        break;
+    case TOUCH_UP_SLIDE:
         if (g_Release <= -o->h / 2)
         {
             g_Target = -o->h;
@@ -197,9 +196,8 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
         {
             g_Target = 0;
         }
-    }
-    else if (tp->type == TOUCH_DOWN_SLIDE)
-    {
+        break;
+    case TOUCH_DOWN_SLIDE:
         if (g_Release >= o->h / 2)
         {
             g_Target = o->h;
@@ -208,20 +206,27 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
         {
             g_Target = 0;
         }
-    }
-    else if (tp->type == TOUCH_ORIGIN_FROM_X)
-    {
+        break;
+    case TOUCH_LEFT_SLIDE_QUICK:
+        g_Target = -o->w;
+        break;
+    case TOUCH_RIGHT_SLIDE_QUICK:
+        g_Target = o->w;
+        break;
+    case TOUCH_UP_SLIDE_QUICK:
+        g_Target = -o->h;
+        break;
+    case TOUCH_DOWN_SLIDE_QUICK:
+        g_Target = o->h;
+        break;
+
+    default:
         g_Target = 0;
+        break;
     }
-    else if (tp->type == TOUCH_ORIGIN_FROM_Y)
-    {
-        g_Target = 0;
-    }
-    else
-    {
-        // GUI_ASSERT(0);
-        g_Target = 0;
-    }
+    gui_obj_hidden(GUI_BASE(g_NextView), false);
+
+    // gui_log("g_Target = %d\n", g_Target);
     g_Offset = 0;
 }
 
@@ -460,6 +465,11 @@ static void gui_view_prepare(gui_obj_t *obj)
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP, "touch");
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN, "touch");
         g_SwitchDone = false;
+
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_UP_SLIDE_QUICK, "touch");
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
     }
 
     if (!g_SurpressTP && _this == g_CurrentView)
@@ -812,7 +822,7 @@ void gui_view_switch_direct(gui_view_t *_this, const char *target_view_name,
         return;
     }
 
-    if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor) { return; }
+    if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor || g_NextView) { return; }
     gui_view_switch_on_event(_this, target_view_name, switch_out_style, switch_in_style,
                              GUI_EVENT_INVALID);
 }

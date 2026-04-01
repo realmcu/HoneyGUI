@@ -36,6 +36,8 @@ typedef struct
 
 #define MAX_EVENT_CNT   10
 
+#define SLIDE_REGION_THRESHOLD 30
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -162,14 +164,12 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_code_t event, const void *in
         {
             gui_obj_store_event(obj, event, indev_name);
         }
-        // GUI_ASSERT(NULL != NULL);
         break;
     case GUI_EVENT_TOUCH_TRIPLE_CLICKED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_TRIPLE))
         {
             gui_obj_store_event(obj, event, indev_name);
         }
-        // GUI_ASSERT(NULL != NULL);
         break;
     case GUI_EVENT_TOUCH_PRESSED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->pressed == true))
@@ -227,6 +227,32 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_code_t event, const void *in
         break;
     case GUI_EVENT_TOUCH_SCROLL_VERTICAL:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_HOLD_Y))
+        {
+            gui_obj_store_event(obj, event, indev_name);
+        }
+        break;
+    case GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK:
+        if ((tp->type == TOUCH_LEFT_SLIDE_QUICK) &&
+            (gui_get_screen_width() - tp->x <= SLIDE_REGION_THRESHOLD))
+        {
+            gui_obj_store_event(obj, event, indev_name);
+        }
+        break;
+    case GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK:
+        if ((tp->type == TOUCH_RIGHT_SLIDE_QUICK) && (tp->x <= SLIDE_REGION_THRESHOLD))
+        {
+            gui_obj_store_event(obj, event, indev_name);
+        }
+        break;
+    case GUI_EVENT_TOUCH_UP_SLIDE_QUICK:
+        if ((tp->type == TOUCH_UP_SLIDE_QUICK) &&
+            (gui_get_screen_height() - tp->y <= SLIDE_REGION_THRESHOLD))
+        {
+            gui_obj_store_event(obj, event, indev_name);
+        }
+        break;
+    case GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK:
+        if ((tp->type == TOUCH_DOWN_SLIDE_QUICK) && (tp->y <= SLIDE_REGION_THRESHOLD))
         {
             gui_obj_store_event(obj, event, indev_name);
         }

@@ -83,6 +83,15 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
  */
 void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
                                 struct gui_menu_cellular_gesture_parameter *para_array, int array_length);
+
+/**
+ * @brief Config offset.
+ * @param menu_cellular Menu_cellular pointer.
+ * @param offset_x X-axis offset.
+ * @param offset_y Y-axis offset.
+ */
+void gui_menu_cellular_offset(gui_menu_cellular_t *menu_cellular, int offset_x, int offset_y);
+
 #ifdef __cplusplus
 }
 #endif

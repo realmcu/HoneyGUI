@@ -329,7 +329,7 @@ static void note_released_cb(void *widget)
 
 static void create_inform_note(gui_obj_t *obj, void *param)
 {
-    gui_log("create_inform_note\n");
+    // gui_log("create_inform_note\n");
     uint16_t index = ((gui_list_note_t *)obj)->index;
     information_t *inform = ((information_t **)param)[index];
     const char *informer = inform->informer;
@@ -407,12 +407,13 @@ static void list_timer_cb(void *param)
 {
     (void)param;
 
-
+    static uint8_t local_infor_num = 0;
     gui_view_t *next_view = gui_view_get_next();
     if (!note_dur_animation && !clear_flag &&
-        (next_view == current_view || next_view == NULL))
+        (next_view == current_view || next_view == NULL) && local_infor_num != infor_num)
     {
         gui_list_set_note_num(list, infor_num);
+        local_infor_num = infor_num;
     }
 
     if (current_view != gui_view_get_current())
@@ -518,8 +519,10 @@ static void top_view_design(gui_view_t *view)
     list = gui_list_create(view, "list", 0, NOTE_START, 0, 0, NOTE_HEIGHT,
                            NOTE_INTERVAL, VERTICAL, create_inform_note, infor_rec, true);
     gui_list_set_style(list, LIST_CLASSIC);
+    gui_list_set_note_num(list, infor_num);
     gui_list_set_bar_color(list, APP_COLOR_GRAY);
     gui_list_set_out_scope(list, 50);
+    gui_list_set_inertia(list, false);
     gui_obj_create_timer(GUI_BASE(list), 20, true, list_timer_cb);
 }
 
