@@ -8,6 +8,7 @@
 #include "guidef.h"
 #include "gui_matrix.h"
 #include "gui_fb.h"
+#include "gui_dirty_region.h"
 #include "gui_obj.h"
 #include "gui_post_process.h"
 
@@ -43,6 +44,17 @@ static void obj_reset_active(gui_obj_t *obj)
         obj->active = false;
         obj_reset_active(obj);
     }
+}
+
+static bool rect_intersection(const gui_rect_t *a, const gui_rect_t *b, gui_rect_t *result)
+{
+    result->x1 = _UI_MAX(a->x1, b->x1);
+    result->y1 = _UI_MAX(a->y1, b->y1);
+    result->x2 = _UI_MIN(a->x2, b->x2);
+    result->y2 = _UI_MIN(a->y2, b->y2);
+
+    // Check if intersection is valid
+    return (result->x1 <= result->x2) && (result->y1 <= result->y2);
 }
 
 static bool obj_is_active(gui_obj_t *obj)
@@ -250,6 +262,7 @@ static void obj_draw_end(gui_obj_t *obj)
 static void gui_pfb_draw(gui_obj_t *root)
 {
     gui_dispdev_t *dc = gui_get_dc();
+    gui_dirty_region_manager_t *mgr = gui_dirty_region_get_manager();
     uint32_t scan_line_time_us = dc->driver_ic_scan_line_time_us;
     uint32_t write_line_time_us = dc->host_write_line_time_us;
     uint32_t line_section_cnt = 0; // means section line count for tear effect issue
@@ -264,6 +277,45 @@ static void gui_pfb_draw(gui_obj_t *root)
 
     for (uint32_t i = 0; i < dc->section_total; i++)
     {
+        // Calculate current section rectangle
+        gui_rect_t section_rect;
+        if (dc->pfb_type == PFB_Y_DIRECTION)
+        {
+            section_rect.x1 = 0;
+            section_rect.y1 = i * dc->fb_height;
+            line_section_cnt = dc->fb_height;
+        }
+        else
+        {
+            section_rect.x1 = i * dc->fb_width;
+            section_rect.y1 = 0;
+            line_section_cnt = dc->fb_width;
+        }
+        section_rect.x2 = _UI_MIN(section_rect.x1 + dc->fb_width - 1, dc->screen_width - 1);
+        section_rect.y2 = _UI_MIN(section_rect.y1 + dc->fb_height - 1, dc->screen_height - 1);
+
+        // Calculate intersections between section and dirty regions
+        gui_rect_t intersections[GUI_MAX_DIRTY_REGIONS];
+        uint16_t intersection_count = 0;
+
+        if (!mgr->full_refresh && mgr->count > 0)
+        {
+            for (uint16_t j = 0; j < mgr->count; j++)
+            {
+                gui_rect_t intersection;
+                if (rect_intersection(&section_rect, &mgr->regions[j], &intersection))
+                {
+                    intersections[intersection_count++] = intersection;
+                }
+            }
+
+            if (intersection_count == 0)
+            {
+                continue;  // No intersection, skip this section
+            }
+        }
+
+        // Has intersection or needs full refresh, prepare rendering
         if (i % 2 == 0)
         {
             dc->frame_buf = dc->disp_buf_1;
@@ -273,26 +325,29 @@ static void gui_pfb_draw(gui_obj_t *root)
             dc->frame_buf = dc->disp_buf_2;
         }
 
-        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
-
         dc->section_count = i;
 
-        if (dc->pfb_type == PFB_Y_DIRECTION)
+        if (mgr->full_refresh || mgr->count == 0)
         {
-            dc->section.x1 = 0;
-            dc->section.y1 = dc->section_count * dc->fb_height;
-            line_section_cnt = dc->fb_height;
+            // Full screen mode, render entire section
+            // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
+            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+            dc->section = section_rect;
+            obj_draw_scan(root);
         }
         else
         {
-            dc->section.x1 = dc->section_count * dc->fb_width;
-            dc->section.y1 = 0;
-            line_section_cnt = dc->fb_width;
+            // Dirty region mode, render each intersection
+            // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
+            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+
+            for (uint16_t k = 0; k < intersection_count; k++)
+            {
+                dc->section = intersections[k];
+                obj_draw_scan(root);
+            }
         }
 
-        dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
-        dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
-        obj_draw_scan(root);
         post_process_handle();
 
         if (dc->get_lcd_us != NULL) //add by wanghao, code for tear effect
@@ -323,6 +378,9 @@ static void gui_pfb_draw(gui_obj_t *root)
     }
 
     gui_flash_boost_disable();
+
+    // Clear dirty regions at frame end
+    gui_dirty_region_clear();
 }
 
 static void gui_fb_draw(gui_obj_t *root)
@@ -346,15 +404,38 @@ static void gui_fb_draw(gui_obj_t *root)
     }
     else if (dc->type == DC_SINGLE)
     {
-        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
-        dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
-        obj_draw_scan(root);
+        gui_dirty_region_manager_t *mgr = gui_dirty_region_get_manager();
+
+        if (mgr->full_refresh || mgr->count == 0)
+        {
+            // Full screen refresh (fallback mode or no dirty regions)
+            // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
+            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+            dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
+            obj_draw_scan(root);
+        }
+        else
+        {
+            // Dirty region optimized rendering
+            // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
+            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+
+            for (uint16_t i = 0; i < mgr->count; i++)
+            {
+                dc->section = mgr->regions[i];
+                obj_draw_scan(root);
+            }
+        }
+
         post_process_handle();
         if (dc->lcd_draw_sync != NULL)
         {
             dc->lcd_draw_sync();
         }
         dc->lcd_update(dc);
+
+        // Clear dirty regions at frame end
+        gui_dirty_region_clear();
     }
     else if (dc->type == DC_DOUBLE)
     {

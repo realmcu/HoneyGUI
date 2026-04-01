@@ -24,8 +24,12 @@ extern "C" {
 typedef enum t_gui_dc_type
 {
     DC_RAMLESS,
+    DC_PFB,
+    DC_PARTIAL_FB,
     DC_SINGLE,
+    DC_SINGLE_FB,
     DC_DOUBLE,
+    DC_DOUBLE_FB,
 } T_GUI_DC_TYPE;
 
 typedef enum t_gui_pfb_type
