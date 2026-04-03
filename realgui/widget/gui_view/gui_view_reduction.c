@@ -46,30 +46,35 @@ void gui_view_reduction(gui_view_t *_this, int16_t release)
     float s;
 
     int16_t offset_x = 0, offset_y = 0;
-    if (_this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_REDUCTION)
+    switch (_this->current_transition_style)
     {
+    case SWITCH_IN_FROM_LEFT_USE_REDUCTION:
         offset_x = release - w;
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_REDUCTION)
-    {
-        offset_x = release + w;
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_USE_REDUCTION)
-    {
+        break;
+    case SWITCH_IN_FROM_RIGHT_USE_REDUCTION:
+        offset_x = -release + w;
+        break;
+    case SWITCH_IN_FROM_TOP_USE_REDUCTION:
         offset_y = release - h;
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_REDUCTION)
-    {
-        offset_y = release + h;
-    }
-    else if (_this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_REDUCTION ||
-             _this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_REDUCTION)
-    {
+        break;
+    case SWITCH_IN_FROM_BOTTOM_USE_REDUCTION:
+        offset_y = -release + h;
+        break;
+    case SWITCH_OUT_TO_LEFT_USE_REDUCTION:
+        offset_x = -release;
+        break;
+    case SWITCH_OUT_TO_RIGHT_USE_REDUCTION:
         offset_x = release;
-    }
-    else
-    {
+        break;
+    case SWITCH_OUT_TO_TOP_USE_REDUCTION:
+        offset_y = -release;
+        break;
+    case SWITCH_OUT_TO_BOTTOM_USE_REDUCTION:
         offset_y = release;
+        break;
+
+    default:
+        break;
     }
 
     int sx = abs(offset_x);

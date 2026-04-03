@@ -26,64 +26,37 @@ void gui_view_translation(gui_view_t *_this, int16_t release)
     int16_t w = obj->w;
     int16_t h = obj->h;
 
-    int16_t offset_x, offset_y;
-    if (_this->current_event_code == GUI_EVENT_TOUCH_MOVE_LEFT ||
-        _this->current_event_code == GUI_EVENT_TOUCH_MOVE_RIGHT)
+    switch (_this->current_transition_style)
     {
-        offset_x = release;
-        offset_y = release * (h / w);
-    }
-    else
-    {
-        offset_x = release * (w / h);
-        offset_y = release;
+    case SWITCH_OUT_TO_RIGHT_USE_TRANSLATION:
+        matrix_translate(release, 0, obj->matrix);
+        break;
+    case SWITCH_OUT_TO_LEFT_USE_TRANSLATION:
+        matrix_translate(-release, 0, obj->matrix);
+        break;
+    case SWITCH_IN_FROM_LEFT_USE_TRANSLATION:
+        matrix_translate(release - w, 0, obj->matrix);
+        break;
+    case SWITCH_IN_FROM_RIGHT_USE_TRANSLATION:
+        matrix_translate(-release + w, 0, obj->matrix);
+        break;
+    case SWITCH_OUT_TO_TOP_USE_TRANSLATION:
+        matrix_translate(0, -release, obj->matrix);
+        break;
+    case SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION:
+        matrix_translate(0, release, obj->matrix);
+        break;
+    case SWITCH_IN_FROM_TOP_USE_TRANSLATION:
+        matrix_translate(0, release - h, obj->matrix);
+        break;
+    case SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION:
+        matrix_translate(0, -release + h, obj->matrix);
+        break;
+
+    default:
+        break;
     }
 
-    if (_this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_TRANSLATION)
-    {
-        matrix_translate(offset_x, 0, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_TRANSLATION)
-    {
-        matrix_translate(offset_x, 0, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_TRANSLATION)
-    {
-        matrix_translate(abs(offset_x) - w, 0, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_TRANSLATION)
-    {
-        matrix_translate(-abs(offset_x) + w, 0, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_OUT_TO_TOP_USE_TRANSLATION)
-    {
-        matrix_translate(0, offset_y, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION)
-    {
-        matrix_translate(0, offset_y, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_USE_TRANSLATION)
-    {
-        matrix_translate(0, abs(release) - h, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION)
-    {
-        matrix_translate(0, -abs(release) + h, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_RIGHT_USE_TRANSLATION)
-    {
-        matrix_translate(-abs(offset_x) + w, abs(offset_y) - h, obj->matrix);
-    }
-    else if (_this->current_transition_style == SWITCH_IN_CENTER_ZOOM_FADE)
-    {
-        float scale = (float)abs(offset_x) / w;
-        obj->opacity_value = (uint32_t)(UINT8_MAX * scale);
-
-        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-        matrix_scale(scale, scale, obj->matrix);
-        matrix_translate(obj->w / -2, obj->h / -2, obj->matrix);
-    }
 }
 
 

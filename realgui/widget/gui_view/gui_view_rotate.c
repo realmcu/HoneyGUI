@@ -62,31 +62,37 @@ void gui_view_rotate(gui_view_t *_this, int16_t release)
     gui_vertex_t rv0, rv1, rv2, rv3;
 
     int16_t offset_x = 0, offset_y = 0;
-    if (_this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_ROTATE)
+    switch (_this->current_transition_style)
     {
+    case SWITCH_IN_FROM_LEFT_USE_ROTATE:
         offset_x = release - w;
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_ROTATE)
-    {
-        offset_x = release + w;
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_USE_ROTATE)
-    {
+        break;
+    case SWITCH_IN_FROM_RIGHT_USE_ROTATE:
+        offset_x = -release + w;
+        break;
+    case SWITCH_IN_FROM_TOP_USE_ROTATE:
         offset_y = release - h;
-    }
-    else if (_this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_ROTATE)
-    {
-        offset_y = release + h;
-    }
-    else if (_this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_ROTATE ||
-             _this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_ROTATE)
-    {
+        break;
+    case SWITCH_IN_FROM_BOTTOM_USE_ROTATE:
+        offset_y = -release + h;
+        break;
+    case SWITCH_OUT_TO_LEFT_USE_ROTATE:
+        offset_x = -release;
+        break;
+    case SWITCH_OUT_TO_RIGHT_USE_ROTATE:
         offset_x = release;
-    }
-    else
-    {
+        break;
+    case SWITCH_OUT_TO_TOP_USE_ROTATE:
+        offset_y = -release;
+        break;
+    case SWITCH_OUT_TO_BOTTOM_USE_ROTATE:
         offset_y = release;
+        break;
+
+    default:
+        break;
     }
+
     rotate_degree_x = 90.f * offset_y / (_this->base.h / 2.f);
     rotate_degree_y = 90.f * offset_x / (_this->base.w / 2.f);
     matrix_compute_rotate(-rotate_degree_x, rotate_degree_y, 0, &rotate_3D);

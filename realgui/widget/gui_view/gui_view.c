@@ -75,6 +75,7 @@ static void gui_view_released_view_timer_cb(void *obj)
             if (g_CurrentView->descriptor->keep)
             {
                 g_PreView = g_CurrentView;
+                g_PreView->current_transition_style = SWITCH_INIT_STATE;
                 if (g_NextView->opacity != UINT8_MAX) //decrease time of processing PreView
                 {
                     gui_obj_hidden(&g_PreView->base, false);
@@ -99,7 +100,7 @@ static void gui_view_released_view_timer_cb(void *obj)
         g_Target = g_Release;
         g_NextView = NULL;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
-        // gui_log("current view name = %s\n", g_CurrentView->base.name);
+        gui_log("current view name = %s\n", g_CurrentView->base.name);
         gui_fb_change();
         gui_obj_delete_timer(obj);
     }
@@ -110,7 +111,7 @@ static void gui_view_animate_timer_cb(void *obj)
     gui_view_t *_this = (gui_view_t *)obj;
 
     g_Release += _this->animate_step;
-    if (g_Release >= g_Target)
+    if (abs(g_Release) >= abs(g_Target))
     {
         g_Release = 0;
         g_Target = g_Release;
@@ -157,9 +158,6 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
     gui_view_t *_this = (gui_view_t *)obj;
     gui_obj_t *o = (gui_obj_t *)_this;
     // gui_log("name = %s, detalX = %d, detalY = %d\n", o->name, tp->deltaX, tp->deltaY);
-
-    gui_obj_create_timer(o, 10, true, gui_view_released_view_timer_cb);
-    gui_obj_start_timer(o);
 
     g_SurpressTP = true;
     g_SurpressEvent = true;
@@ -228,6 +226,12 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
 
     // gui_log("g_Target = %d\n", g_Target);
     g_Offset = 0;
+
+    if (g_Release != 0)
+    {
+        gui_obj_create_timer(o, 10, true, gui_view_released_view_timer_cb);
+        gui_obj_start_timer(o);
+    }
 }
 
 static void gui_view_pressing_cb(void *obj, gui_event_t *e)
@@ -346,6 +350,25 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
     g_TriggerMove = true;
     g_OffsetNeedUpdate = false;
     g_Offset = 0;
+
+    switch (e->code)
+    {
+    case GUI_EVENT_TOUCH_MOVE_LEFT:
+        g_Target = -obj->w;
+        break;
+    case GUI_EVENT_TOUCH_MOVE_RIGHT:
+        g_Target = obj->w;
+        break;
+    case GUI_EVENT_TOUCH_MOVE_UP:
+        g_Target = -obj->h;
+        break;
+    case GUI_EVENT_TOUCH_MOVE_DOWN:
+        g_Target = obj->h;
+        break;
+
+    default:
+        break;
+    }
     // gui_log("gui_view_on_event_trigger_move_cb next view name = %s\n", g_NextView->base.name);
 }
 
@@ -370,7 +393,16 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
     g_SurpressEvent = true;
     g_SurpressTP = true;
 
-    if (e->code == GUI_EVENT_INVALID)
+    // if (g_CurrentView->current_event_code < SWITCH_OUT_NONE_ANIMATION &&
+    //     g_CurrentView->current_event_code % 2 == 0)
+    // {
+    //     g_CurrentView->animate_step = -g_CurrentView->animate_step;
+    //     g_Release = -g_Release;
+    //     g_Target = -g_Target;
+    // }
+
+    if (e->code == GUI_EVENT_INVALID &&
+        g_NextView->current_transition_style >= SWITCH_OUT_NONE_ANIMATION)
     {
         g_NextView->base.x = gui_get_screen_width();
     }
@@ -483,7 +515,7 @@ static void gui_view_prepare(gui_obj_t *obj)
     if (_this->current_transition_style == SWITCH_INIT_STATE) {}
     else if (_this->current_transition_style < SWITCH_OUT_NONE_ANIMATION)
     {
-        gui_view_transition(_this, g_Release);
+        gui_view_transition(_this, abs(g_Release));
     }
     else if (_this->current_transition_style >= SWITCH_OUT_NONE_ANIMATION)
     {

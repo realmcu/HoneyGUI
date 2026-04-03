@@ -41,8 +41,6 @@ typedef enum
     SWITCH_IN_FROM_RIGHT_USE_TRANSLATION, ///< Switch in from right with transition effect.
     SWITCH_IN_FROM_TOP_USE_TRANSLATION, ///< Switch in from top with transition effect.
     SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION, ///< Switch in from bottom with transition effect.
-    SWITCH_IN_FROM_TOP_RIGHT_USE_TRANSLATION,
-    SWITCH_IN_CENTER_ZOOM_FADE,
 
     SWITCH_IN_FROM_LEFT_USE_CUBE = 0x0200, ///< Switch in from left with cube effect.
     SWITCH_IN_FROM_RIGHT_USE_CUBE, ///< Switch in from right with cube effect.

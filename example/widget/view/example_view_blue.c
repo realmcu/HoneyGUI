@@ -58,7 +58,7 @@ static void switch_in_cb(gui_view_t *view)
 
     gui_view_switch_on_event(view, "yellow_view",
                              SWITCH_OUT_TO_TOP_USE_TRANSLATION,
-                             SWITCH_IN_CENTER_ZOOM_FADE,
+                             SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_view_switch_on_event(view, "lime_view", SWITCH_OUT_STILL_USE_BLUR,
