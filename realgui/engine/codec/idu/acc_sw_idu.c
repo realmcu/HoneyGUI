@@ -867,6 +867,9 @@ void *gui_acc_decode(void *in)
         clut_offset = clut_num * 4;
         break;
     case A8:
+    case A4:
+    case A2:
+    case A1:
         pixel_size = 1;
         break;
     default:
@@ -889,8 +892,8 @@ void *gui_acc_decode(void *in)
         memcpy(decode_img_data + sizeof(gui_rgb_data_head_t),
                (uint8_t *)in + sizeof(gui_rgb_data_head_t), clut_offset);
     }
-    gui_rect_t decode_rect = {.x1 = 0, .y1 = 0, .x2 = head->w - 1, .y2 = head->h - 1};
-    uint32_t buffer_stride = head->w * pixel_size;
+    gui_rect_t decode_rect = {.x1 = 0, .y1 = 0, .x2 = idu_info->raw_pic_width - 1, .y2 = idu_info->raw_pic_height - 1};
+    uint32_t buffer_stride = idu_info->raw_pic_width * pixel_size;
     if (gui_sw_idu_decode((uint8_t *)idu_info, &decode_rect,  decode_img_data +
                           sizeof(gui_rgb_data_head_t) + clut_offset, buffer_stride))
     {
