@@ -245,7 +245,24 @@ static void decode_RLE_1stage(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *ran
 {
     gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
     uint32_t *addr_set = (uint32_t *)(in + sizeof(gui_sw_idu_head_t));
-    uint8_t pixel_size = (head->algorithm_type.pixel_bytes + 2);
+    uint8_t pixel_size = 0;
+    switch (head->algorithm_type.pixel_bytes)
+    {
+    case 0:
+        pixel_size = 2;
+        break;
+    case 1:
+        pixel_size = 3;
+        break;
+    case 2:
+        pixel_size = 4;
+        break;
+    case 3:
+        pixel_size = 1;
+        break;
+    default:
+        break;
+    }
     uint32_t width = (range->end_column - range->start_column + 1) * pixel_size;
     uint32_t line_addr = addr_set[range->start_line];
     uint32_t next_addr = 0;
@@ -321,7 +338,24 @@ static void decode_RLE_2stage_line(uint8_t *in, uint8_t *out, uint8_t *limit, ui
 static void decode_RLE_2stage(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *range)
 {
     gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
-    uint8_t pixel_size = (head->algorithm_type.pixel_bytes + 2);
+    uint8_t pixel_size = 0;
+    switch (head->algorithm_type.pixel_bytes)
+    {
+    case 0:
+        pixel_size = 2;
+        break;
+    case 1:
+        pixel_size = 3;
+        break;
+    case 2:
+        pixel_size = 4;
+        break;
+    case 3:
+        pixel_size = 1;
+        break;
+    default:
+        break;
+    }
     uint32_t *addr_set = (uint32_t *)(in + sizeof(gui_sw_idu_head_t));
     uint32_t width = (range->end_column - range->start_column + 1) * pixel_size;
     uint32_t line_addr = addr_set[range->start_line];
