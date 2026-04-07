@@ -59,6 +59,7 @@ typedef struct draw_circle
 typedef struct acc_engine
 {
     void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
+    void (*fb_clear)(uint8_t *addr, gui_color_t color, uint32_t len);
     //todo
     void (*draw_circle)(draw_circle_t *circle, gui_dispdev_t *dc, gui_rect_t *rect);
     void (*blur)(gui_dispdev_t *dc, gui_rect_t *rect, uint8_t blur_degree, void *cache_mem);
