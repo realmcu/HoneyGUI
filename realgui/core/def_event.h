@@ -65,8 +65,7 @@ typedef enum
     GUI_EVENT_KB_SHORT_PRESSED          = 0x0200,
     GUI_EVENT_KB_LONG_PRESSED,
 
-    GUI_EVENT_VIEW_SWITCH_DIRECT
-    /** wheel device events*/
+    GUI_EVENT_VIEW_SWITCH_DIRECT,
 
 } gui_event_code_t;
 

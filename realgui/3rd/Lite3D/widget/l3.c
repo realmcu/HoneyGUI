@@ -22,11 +22,14 @@
  *                           Public Functions
  *============================================================================*/
 
-// Function to return a detailed version string
+/**
+ * @brief Return a detailed version string
+ * @return Version information string
+ */
 char *l3_version(void)
 {
-    // Static string to hold the version details
-    // Use snprintf for safe string formatting (change buffer size if needed)
+    /* Static string to hold the version details.
+     * Use snprintf for safe string formatting (change buffer size if needed). */
     static char version_info[256];
     snprintf(version_info, sizeof(version_info),
              "Version: %s\nBranch: %s\nCommit: %s\nBuild Date: %s\nRepository Status: %s",

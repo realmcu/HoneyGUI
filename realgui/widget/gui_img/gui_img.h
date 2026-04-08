@@ -48,8 +48,8 @@ typedef struct gui_img
     void *src_data;                    /* Image source pointer (type determined by storage_type). */
 
 
-    uint32_t fg_color_set;  //A8 image set color
-    uint32_t bg_color_fix;  //bg color fix for A8 image
+    uint32_t fg_color_set;  /* A8 image set color */
+    uint32_t bg_color_fix;  /* bg color fix for A8 image */
 
     uint32_t opacity_value    : 8;        /* Opacity value (0-255). */
     uint32_t blend_mode       : 5;        /* Blend mode. */
@@ -104,6 +104,11 @@ uint16_t gui_img_get_height(gui_img_t *_this);
  */
 void gui_img_refresh_size(gui_img_t *_this);
 
+/**
+ * @brief Refresh the image draw data.
+ *
+ * @param _this Image widget pointer.
+ */
 void gui_img_refresh_draw_data(gui_img_t  *_this);
 /**
  * @brief Set the image's blend mode.

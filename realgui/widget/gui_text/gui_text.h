@@ -189,7 +189,7 @@ void gui_text_set(gui_text_t    *this_widget,
  * @brief Set text mode of this_widget text widget.
  * @note If text line count was more than one, it will display on the left even if it was set left or right.
  * @param this_widget Text widget pointer.
- * @param mode There are three modes: LEFT, CENTER, and RIGHT.
+ * @param mode Text layout mode (e.g., LEFT, CENTER, RIGHT, MULTI_LEFT, SCROLL_X, VERTICAL_LEFT_TOP, RTL_RIGHT, etc.).
  */
 void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
 

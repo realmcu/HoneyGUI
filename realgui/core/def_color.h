@@ -36,19 +36,19 @@ extern "C" {
   */
 
 /**
- * @brief Combines R, G, B, and A components into a 32-bit color value in ABGR8888 format.
+ * @brief Combines R, G, B, and A components into a 32-bit color value in ARGB8888 format.
  *
  * The resulting integer has the following byte layout:
  * - Bits 31-24: Alpha (A)
- * - Bits 23-16: Blue (B)
+ * - Bits 23-16: Red (R)
  * - Bits 15-8:  Green (G)
- * - Bits 7-0:   Red (R)
+ * - Bits 7-0:   Blue (B)
  *
+ * @param a Alpha component (0-255).
  * @param r Red component (0-255).
  * @param g Green component (0-255).
  * @param b Blue component (0-255).
- * @param a Alpha component (0-255).
- * @return A 32-bit unsigned integer representing the color in ABGR8888 format (e.g., 0xAABBGGRR).
+ * @return A 32-bit unsigned integer representing the color in ARGB8888 format (e.g., 0xAARRGGBB).
  */
 #define GUI_COLOR_ARGB8888(a, r, g, b) \
     ( ((uint32_t)(a) << 24) | \
