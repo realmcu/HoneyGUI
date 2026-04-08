@@ -21,6 +21,8 @@ extern "C" {
 #include "guidef.h"
 #include "gui_api.h"
 #include "gui_obj.h"
+#include "gui_dirty_region.h"
+#include "gui_dirty_border.h"
 
 
 /*============================================================================*

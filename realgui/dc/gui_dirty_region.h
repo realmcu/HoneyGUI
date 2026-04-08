@@ -41,6 +41,23 @@ typedef struct
  *============================================================================*/
 
 /**
+ * @brief Enable or disable dirty region optimization
+ *
+ * When disabled, forces full screen refresh every frame.
+ * When enabled, only dirty regions are re-rendered.
+ *
+ * @param enable true to enable dirty region optimization, false to force full refresh
+ */
+void gui_dirty_region_enable(bool enable);
+
+/**
+ * @brief Check if dirty region optimization is enabled
+ *
+ * @return true if enabled, false if disabled (full refresh mode)
+ */
+bool gui_dirty_region_is_enabled(void);
+
+/**
  * @brief Mark a rectangular area as dirty (needs redraw)
  *
  * @param rect Rectangle area to redraw (in screen coordinates)

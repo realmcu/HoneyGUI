@@ -13,98 +13,85 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "gui_components_init.h"
-#include "../../assets/tiger_blue_compressed.txt"
 #include "../../assets/tiger_blue.txt"
-// #include "jpeg.txt"
-// #include "green.txt"
-// #include "nanovg_generate_pixel.txt"
-// #include "test_png.txt"
-// #include "clock3_Vector.txt"
+
 
 
 /* gui image widget example start*/
-void test_event_cb(void *obj, gui_event_t *e)
+void img_kb_cb(void *obj, gui_event_t *e)
 {
     gui_obj_t *this = (gui_obj_t *)obj;
     const char *dev_name = e->indev_name ? (const char *)e->indev_name : "unknown";
     gui_log("Event test obj name = %s, e = 0x%x, indev = %s !\n", this->name, e->code, dev_name);
 }
 
-void test_event_0_cb(void *obj, gui_event_t *e)
+void img_tp_clicked_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     gui_log("Single clicked!\n");
 }
 
-void test_event_1_cb(void *obj, gui_event_t *e)
+void img_tp_double_clicked_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     gui_log("Double clicked!\n");
 }
 
-void test_event_2_cb(void *obj, gui_event_t *e)
+void img_tp_triple_clicked_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     gui_log("Triple clicked!\n");
 }
 
-void test_event_3_cb(void *obj, gui_event_t *e)
+void img_tp_long_pressed_cb(void *obj, gui_event_t *e)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     gui_log("Touch long!\n");
 }
 
-void test_timer_cb(void *param)
+void img_timer_cb(void *param)
 {
-    (void)param;
+    static float angle = 0;
+    gui_img_t *img = (gui_img_t *)param;
 
+    gui_img_rotation(img, angle++);
 
-    gui_log("timer cb test!\n");
+    gui_log("Handler[img] timer cb!\n");
 }
+
 
 static int app_init(void)
 {
-
     void *addr = (void *)_actiger_blue;
-    // void *addr = (void *)_acgreen;
+    gui_dispdev_t *dc = gui_get_dc();
 
-    // gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", _achour, 0, 0, 0, 0);
+    gui_dirty_border_enable(true);
+
     // gui_img_t *img = gui_img_create_from_fs(gui_obj_get_root(),  "img_1_test", "/pc/example/application/screen_410_502/root_image/root/UI/cellular_menu_card.bin", 0, 0, 0, 0);
-    gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
+    gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_test", addr, 0, 0, 0, 0);
 
-
-
-    gui_img_a8_recolor(img, GUI_COLOR_ARGB8888(255, 0, 0, 0));
-
-    gui_img_a8_fix_bg(img, GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01));
-
-    gui_img_a8_mix_alpha(img, 128);
-
-    gui_img_set_mode(img, IMG_2D_SW_FIX_A8_BGFG);
-
-    // gui_img_set_focus(img, 50, 50);
-
+    gui_img_set_focus(img, gui_img_get_width(img) / 2, gui_img_get_height(img) / 2);
     gui_img_rotation(img, 0.0f);
-    // gui_img_scale(img, 0.5f, 0.5f);
+    gui_img_translate(img, dc->screen_width / 2, dc->screen_height / 2);
 
-    // gui_img_translate(img, 50, 50);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)img_tp_clicked_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)img_tp_double_clicked_cb, GUI_EVENT_TOUCH_DOUBLE_CLICKED,
+                         NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)img_tp_triple_clicked_cb, GUI_EVENT_TOUCH_TRIPLE_CLICKED,
+                         NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)img_tp_long_pressed_cb, GUI_EVENT_TOUCH_LONG, NULL);
 
-    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_0_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_1_cb, GUI_EVENT_TOUCH_DOUBLE_CLICKED, NULL);
-    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_2_cb, GUI_EVENT_TOUCH_TRIPLE_CLICKED, NULL);
-    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_3_cb, GUI_EVENT_TOUCH_LONG, NULL);
-
-    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
-
+    gui_obj_add_event_cb(img, (gui_event_cb_t)img_kb_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
     gui_obj_focus_set(img);
 
 
-    // gui_obj_create_timer(&(img->base), 1000, true, test_timer_cb);
-    // gui_obj_start_timer(&(img->base));
+    gui_obj_create_timer(&(img->base), 100, true, img_timer_cb);
+    gui_obj_start_timer(&(img->base));
+
 
     return 0;
 }

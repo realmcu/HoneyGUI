@@ -8,7 +8,6 @@
 #include "guidef.h"
 #include "gui_matrix.h"
 #include "gui_fb.h"
-#include "gui_dirty_region.h"
 #include "gui_obj.h"
 #include "gui_post_process.h"
 
@@ -259,116 +258,212 @@ static void obj_draw_end(gui_obj_t *obj)
     }
 }
 
+/**
+ * @brief Calculate the section rectangle for a given section index.
+ *
+ * PFB (Partial Frame Buffer) divides the screen into horizontal or vertical
+ * strips called "sections". Each section is rendered independently.
+ * For Y-direction: sections are horizontal strips (full width, fb_height tall).
+ * For X-direction: sections are vertical strips (fb_width wide, full height).
+ */
+static gui_rect_t calc_section_rect(gui_dispdev_t *dc, uint32_t section_idx)
+{
+    gui_rect_t rect;
+    if (dc->pfb_type == PFB_Y_DIRECTION)
+    {
+        rect.x1 = 0;
+        rect.y1 = section_idx * dc->fb_height;
+    }
+    else
+    {
+        rect.x1 = section_idx * dc->fb_width;
+        rect.y1 = 0;
+    }
+    rect.x2 = _UI_MIN(rect.x1 + dc->fb_width - 1, dc->screen_width - 1);
+    rect.y2 = _UI_MIN(rect.y1 + dc->fb_height - 1, dc->screen_height - 1);
+    return rect;
+}
+
+/**
+ * @brief Find intersections between a section and all dirty regions.
+ *
+ * Tests each dirty region (including cleanup rects) against the section.
+ * Returns the intersecting sub-rectangles. Sections with no intersections
+ * can be skipped entirely (no rendering needed).
+ *
+ * @param section   Current section rectangle
+ * @param mgr       Dirty region manager (includes real + cleanup regions)
+ * @param out       Output array for intersection results
+ * @param max_count Maximum intersections to store
+ * @return Number of intersections found
+ */
+static uint16_t find_dirty_intersections(const gui_rect_t *section,
+                                         const gui_dirty_region_manager_t *mgr,
+                                         gui_rect_t *out, uint16_t max_count)
+{
+    uint16_t count = 0;
+    for (uint16_t j = 0; j < mgr->count && count < max_count; j++)
+    {
+        gui_rect_t intersection;
+        if (rect_intersection(section, &mgr->regions[j], &intersection))
+        {
+            out[count++] = intersection;
+        }
+    }
+    return count;
+}
+
+/**
+ * @brief Merge multiple intersection rects into a single bounding box.
+ *
+ * When a section intersects with multiple dirty regions (including cleanup
+ * rects from the previous frame), we cannot render them separately because
+ * each obj_draw_scan() call writes to fb[0] using dc->section width as stride.
+ * Multiple calls with different strides would overwrite each other, leaving
+ * only the last result. Merging into one bounding box ensures a single
+ * obj_draw_scan() call with consistent stride.
+ *
+ * Example:
+ *   intersections[0] = [50, 100, 150, 119]   (dirty region A)
+ *   intersections[1] = [300, 100, 400, 119]   (cleanup rect)
+ *   result bbox      = [50, 100, 400, 119]    (single render area)
+ */
+static gui_rect_t merge_to_bbox(const gui_rect_t *rects, uint16_t count)
+{
+    gui_rect_t bbox = rects[0];
+    for (uint16_t k = 1; k < count; k++)
+    {
+        bbox.x1 = _UI_MIN(bbox.x1, rects[k].x1);
+        bbox.y1 = _UI_MIN(bbox.y1, rects[k].y1);
+        bbox.x2 = _UI_MAX(bbox.x2, rects[k].x2);
+        bbox.y2 = _UI_MAX(bbox.y2, rects[k].y2);
+    }
+    return bbox;
+}
+
+/**
+ * @brief Draw debug borders for dirty regions in the current section.
+ *
+ * Only draws borders for real dirty regions (not cleanup rects).
+ * In full_refresh mode, draws a screen-sized border.
+ * Controlled by gui_dirty_border_enable() API.
+ */
+static void draw_section_borders(gui_dispdev_t *dc, gui_dirty_region_manager_t *mgr,
+                                 uint16_t real_dirty_count)
+{
+    if (!gui_dirty_border_is_enabled())
+    {
+        return;
+    }
+
+    if (mgr->full_refresh || mgr->count == 0)
+    {
+        gui_rect_t screen_rect = {0, 0, dc->screen_width - 1, dc->screen_height - 1};
+        draw_dirty_border(dc, &screen_rect);
+    }
+    else
+    {
+        for (uint16_t j = 0; j < real_dirty_count; j++)
+        {
+            draw_dirty_border(dc, &mgr->regions[j]);
+        }
+    }
+}
+
+/**
+ * @brief Wait for LCD scan line to avoid tear effect.
+ *
+ * Compares the LCD's current scan position with the host's write position.
+ * If the host is about to overtake the scan line (which causes visible
+ * tearing), busy-waits until safe to proceed.
+ */
+static void tear_effect_wait(gui_dispdev_t *dc, uint32_t time_base,
+                             uint32_t section_idx, uint32_t line_section_cnt)
+{
+    if (dc->get_lcd_us == NULL)
+    {
+        return;
+    }
+
+    uint32_t scan_line_time_us = dc->driver_ic_scan_line_time_us;
+    uint32_t write_line_time_us = dc->host_write_line_time_us;
+
+    uint32_t scanned_line_cnt = (dc->get_lcd_us() - time_base) / scan_line_time_us;
+    uint32_t writed_line_cnt = section_idx * line_section_cnt;
+
+    uint32_t scanned_line_cnt_next = (dc->get_lcd_us() + write_line_time_us * line_section_cnt -
+                                      time_base) / scan_line_time_us;
+    uint32_t writed_line_cnt_next = (section_idx + 1) * line_section_cnt;
+
+    while ((writed_line_cnt > scanned_line_cnt) && (writed_line_cnt_next > scanned_line_cnt_next))
+    {
+        scanned_line_cnt = (dc->get_lcd_us() - time_base) / scan_line_time_us;
+        scanned_line_cnt_next = (dc->get_lcd_us() + write_line_time_us * line_section_cnt -
+                                 time_base) / scan_line_time_us;
+    }
+}
+
 static void gui_pfb_draw(gui_obj_t *root)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_dirty_region_manager_t *mgr = gui_dirty_region_get_manager();
-    uint32_t scan_line_time_us = dc->driver_ic_scan_line_time_us;
-    uint32_t write_line_time_us = dc->host_write_line_time_us;
-    uint32_t line_section_cnt = 0; // means section line count for tear effect issue
 
     gui_flash_boost();
-    uint32_t time_base = 0;
 
-    if (dc->get_lcd_us != NULL) //add by wanghao, code for tear effect
+    uint32_t time_base = 0;
+    if (dc->get_lcd_us != NULL)
     {
         time_base = dc->get_lcd_us();
     }
 
+    /* Prepare dirty border cleanup: inject previous frame's border edges
+     * as cleanup regions, return count of real (current frame) dirty regions */
+    uint16_t real_dirty_count = dirty_border_prepare(mgr);
+
     for (uint32_t i = 0; i < dc->section_total; i++)
     {
-        // Calculate current section rectangle
-        gui_rect_t section_rect;
-        if (dc->pfb_type == PFB_Y_DIRECTION)
-        {
-            section_rect.x1 = 0;
-            section_rect.y1 = i * dc->fb_height;
-            line_section_cnt = dc->fb_height;
-        }
-        else
-        {
-            section_rect.x1 = i * dc->fb_width;
-            section_rect.y1 = 0;
-            line_section_cnt = dc->fb_width;
-        }
-        section_rect.x2 = _UI_MIN(section_rect.x1 + dc->fb_width - 1, dc->screen_width - 1);
-        section_rect.y2 = _UI_MIN(section_rect.y1 + dc->fb_height - 1, dc->screen_height - 1);
+        /* --- 1. Calculate section bounds --- */
+        gui_rect_t section_rect = calc_section_rect(dc, i);
+        uint32_t line_section_cnt = (dc->pfb_type == PFB_Y_DIRECTION)
+                                    ? dc->fb_height : dc->fb_width;
 
-        // Calculate intersections between section and dirty regions
+        /* --- 2. Dirty region intersection check --- */
         gui_rect_t intersections[GUI_MAX_DIRTY_REGIONS];
         uint16_t intersection_count = 0;
 
         if (!mgr->full_refresh && mgr->count > 0)
         {
-            for (uint16_t j = 0; j < mgr->count; j++)
-            {
-                gui_rect_t intersection;
-                if (rect_intersection(&section_rect, &mgr->regions[j], &intersection))
-                {
-                    intersections[intersection_count++] = intersection;
-                }
-            }
-
+            intersection_count = find_dirty_intersections(&section_rect, mgr,
+                                                          intersections, GUI_MAX_DIRTY_REGIONS);
             if (intersection_count == 0)
             {
-                continue;  // No intersection, skip this section
+                continue;
             }
         }
 
-        // Has intersection or needs full refresh, prepare rendering
-        if (i % 2 == 0)
-        {
-            dc->frame_buf = dc->disp_buf_1;
-        }
-        else
-        {
-            dc->frame_buf = dc->disp_buf_2;
-        }
-
+        /* --- 3. Select framebuffer (double buffering) --- */
+        dc->frame_buf = (i % 2 == 0) ? dc->disp_buf_1 : dc->disp_buf_2;
         dc->section_count = i;
+
+        /* --- 4. Clear framebuffer and render --- */
+        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
 
         if (mgr->full_refresh || mgr->count == 0)
         {
-            // Full screen mode, render entire section
-            // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
-            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
             dc->section = section_rect;
-            obj_draw_scan(root);
         }
         else
         {
-            // Dirty region mode, render each intersection
-            // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
-            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
-
-            for (uint16_t k = 0; k < intersection_count; k++)
-            {
-                dc->section = intersections[k];
-                obj_draw_scan(root);
-            }
+            dc->section = merge_to_bbox(intersections, intersection_count);
         }
+        obj_draw_scan(root);
 
+        /* --- 5. Post-processing and debug borders --- */
         post_process_handle();
+        draw_section_borders(dc, mgr, real_dirty_count);
 
-        if (dc->get_lcd_us != NULL) //add by wanghao, code for tear effect
-        {
-
-            uint32_t scanned_line_cnt = (dc->get_lcd_us() - time_base) / scan_line_time_us;
-            uint32_t writed_line_cnt = i * line_section_cnt;
-
-            uint32_t scanned_line_cnt_next = (dc->get_lcd_us() + write_line_time_us * line_section_cnt -
-                                              time_base) / scan_line_time_us;
-            uint32_t writed_line_cnt_next = (i + 1) * line_section_cnt;;
-
-            //gui_log("scanned_line_cnt = %d, writed_line_cnt = %d", scanned_line_cnt, writed_line_cnt);
-
-            while ((writed_line_cnt > scanned_line_cnt) && (writed_line_cnt_next > scanned_line_cnt_next))
-            {
-                scanned_line_cnt = (dc->get_lcd_us() - time_base) / scan_line_time_us;
-                scanned_line_cnt_next = (dc->get_lcd_us() + write_line_time_us * line_section_cnt - time_base) /
-                                        scan_line_time_us;
-            }
-        }
+        /* --- 6. Tear effect sync and LCD update --- */
+        tear_effect_wait(dc, time_base, i, line_section_cnt);
 
         if (dc->lcd_draw_sync != NULL)
         {
@@ -378,8 +473,6 @@ static void gui_pfb_draw(gui_obj_t *root)
     }
 
     gui_flash_boost_disable();
-
-    // Clear dirty regions at frame end
     gui_dirty_region_clear();
 }
 
@@ -428,6 +521,23 @@ static void gui_fb_draw(gui_obj_t *root)
         }
 
         post_process_handle();
+
+        if (gui_dirty_border_is_enabled())
+        {
+            if (mgr->full_refresh || mgr->count == 0)
+            {
+                gui_rect_t full_screen = {0, 0, dc->fb_width - 1, dc->fb_height - 1};
+                draw_dirty_border(dc, &full_screen);
+            }
+            else
+            {
+                for (uint16_t i = 0; i < mgr->count; i++)
+                {
+                    draw_dirty_border(dc, &mgr->regions[i]);
+                }
+            }
+        }
+
         if (dc->lcd_draw_sync != NULL)
         {
             dc->lcd_draw_sync();

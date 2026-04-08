@@ -21,6 +21,9 @@ static gui_dirty_region_manager_t g_dirty_mgr =
     .full_refresh = false,
 };
 
+/** Dirty region optimization enable flag */
+static bool s_dirty_region_enabled = true;
+
 /*============================================================================*
  *                         Private Functions
  *============================================================================*/
@@ -79,10 +82,34 @@ static bool clip_rect_to_screen(gui_rect_t *rect, int16_t screen_width, int16_t 
  *                         Public Functions
  *============================================================================*/
 
+void gui_dirty_region_enable(bool enable)
+{
+    s_dirty_region_enabled = enable;
+    if (!enable)
+    {
+        /* When disabling, clear all dirty regions and force full refresh */
+        g_dirty_mgr.count = 0;
+        g_dirty_mgr.full_refresh = true;
+    }
+}
+
+bool gui_dirty_region_is_enabled(void)
+{
+    return s_dirty_region_enabled;
+}
+
 void gui_dirty_set_region(gui_rect_t *rect)
 {
     if (rect == NULL)
     {
+        return;
+    }
+
+    /* When dirty region optimization is disabled, force full refresh */
+    if (!s_dirty_region_enabled)
+    {
+        g_dirty_mgr.full_refresh = true;
+        gui_fb_change();
         return;
     }
 
