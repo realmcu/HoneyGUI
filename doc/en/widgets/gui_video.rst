@@ -31,10 +31,12 @@ The Video widget supports the MJPEG, AVI, and H264 formats. The characteristics 
 
 
 1. Video File Resource Size 
-The file size of a video resource is influenced by multiple factors, including duration, frame rate, resolution, scene complexity, and the presence of audio. Higher scene complexity—characterized by high-frequency content with significant changes or detailed textures—typically results in larger exported file sizes.
-During video conversion, appropriate quality parameters can be configured to balance the trade-off between storage space and image quality. Exported AVI files can be previewed using standard media players on PC platforms.
+
+The file size of a video resource is influenced by multiple factors, including duration, frame rate, resolution, scene complexity, and the presence of audio. Higher scene complexity-characterized by high-frequency content with significant changes or detailed textures-typically results in larger exported file sizes.
+During video conversion, appropriate quality parameters can be configured to balance the trade-off between storage space and image quality. Exported AVI files can be previewed using standard media players on :term:`PC` platforms.
 
 2. Video Resource Conversion 
+
 Use the conversion tool to generate video formats compatible with HoneyGUI:
 
   a. The tool supports importing common video formats as well as image sequences.
@@ -47,25 +49,25 @@ Access Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~
 The Video widget supports various resource access methods:
 
-- **Direct Mapping**: Reads directly from memory addresses (e.g., RAM/PSRAM, NOR Flash XIP).
+- **Direct Mapping**: Reads directly from memory addresses (e.g., :term:`RAM`/:term:`PSRAM`, NOR Flash XIP).
 - **File System**: Reads via file system interfaces (e.g., LittleFS).
 - **Buffered Access**: Reads from storage addresses via a buffer (e.g., NAND Flash).
 
-When creating a Video widget, the appropriate creation API must be selected based on the specific resource access method.
+When creating a Video widget, the appropriate creation :term:`API` must be selected based on the specific resource access method.
 
 .. table:: Video Creation API
-   :widths: 18 145
+   :widths: 26 40
    :align: center
 
-   +------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-   |  Type            |  Creation API                                                                                                                                |
-   +==================+==============================================================================================================================================+
-   |  Direct Mapping  |  :cpp:any:`gui_video_t *gui_video_create_from_mem(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h);`  |
-   +------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-   |  File System     |  :cpp:any:`gui_video_t *gui_video_create_from_fs(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h);`   |
-   +------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-   |  Buffered Access |  :cpp:any:`gui_video_t *gui_video_create_from_ftl(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h);`  |
-   +------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
+   +--------------------------+----------------------------------------+
+   |         Type             |  Creation API                          |
+   +==========================+========================================+
+   |      Direct Mapping      |  :cpp:any:`gui_video_create_from_mem`  |
+   +--------------------------+----------------------------------------+
+   |      File System         |  :cpp:any:`gui_video_create_from_fs`   |
+   +--------------------------+----------------------------------------+
+   |      Buffered Access     |  :cpp:any:`gui_video_create_from_ftl`  |
+   +--------------------------+----------------------------------------+
 
 
 
@@ -83,7 +85,7 @@ Repeat Playback
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Use the function :cpp:any:`gui_video_set_repeat_count` to set the number of times the video repeats. For example, setting the repeat count to 1 results in the video playing twice (initial play + 1 repeat).
 
-Set the count to :cpp:any:`GUI_VIDEO_REPEAT_INFINITE` or a negative value to enable infinite looping.
+Set the count to :c:macro:`GUI_VIDEO_REPEAT_INFINITE` or a negative value to enable infinite looping.
 
 
 Frame Rate Settings
@@ -107,7 +109,7 @@ UI Transformations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Scaling
 ^^^^^^^^^^^^^^
-Use the function :cpp:any:gui_video_set_scale to set the scaling parameters for the video display, allowing adjustment of the video aspect ratio.
+Use the function :cpp:any:`gui_video_set_scale` to set the scaling parameters for the video display, allowing adjustment of the video aspect ratio.
 
 
 
