@@ -848,7 +848,8 @@ static void gui_rect_prepare(gui_obj_t *obj)
     // FORCE single buffer for gradient or alpha for consistency
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
                               (this->base.w * this->base.h <= 10000) ||
-                              (this->use_gradient && this->gradient != NULL);
+                              (this->use_gradient && this->gradient != NULL) ||
+                              has_transform;
 
     if (this->radius == 0 && !this->use_gradient)
     {
@@ -859,6 +860,14 @@ static void gui_rect_prepare(gui_obj_t *obj)
     }
     else if (need_single_buffer)
     {
+        // Free split-rendering buffers in case we switched from split to single-buffer path.
+        // matrix_changed uses rect_1 == NULL to detect single-buffer mode, so these must be NULL.
+        free_draw_img(&this->rect_1);
+        free_draw_img(&this->rect_2);
+        free_draw_img(&this->circle_00);
+        free_draw_img(&this->circle_01);
+        free_draw_img(&this->circle_10);
+        free_draw_img(&this->circle_11);
         if (need_regenerate || this->rect_0 == NULL)
         {
             this->rect_0 = create_rounded_rect_buffer(this, obj, &this->rect_0);
