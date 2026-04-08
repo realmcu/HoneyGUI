@@ -176,16 +176,6 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
         hard_offset_min = soft_offset_min;
         hard_offset_max = soft_offset_max;
     }
-    else if (_this->style == LIST_ZOOM_CYLINDER)
-    {
-        int16_t center_padding = (temp - _this->note_length) / 2;
-
-        hard_offset_max = center_padding;
-        soft_offset_max = center_padding + _this->out_scope;
-
-        hard_offset_min = center_padding - (_this->total_length - _this->note_length);
-        soft_offset_min = hard_offset_min - _this->out_scope;
-    }
     if (!_this->inertia || _this->speed == 0)
     {
         if (!_this->loop && (_this->offset > hard_offset_max || _this->offset < hard_offset_min))
@@ -458,18 +448,21 @@ static void gui_list_prepare(gui_obj_t *obj)
         g_Limit = false;
     }
 
-    if (!g_Limit && (gui_view_t *)(obj->parent) != gui_view_get_next())
+    if (_this->enable_scroll)
     {
-        if (_this->dir == HORIZONTAL)
+        if (!g_Limit && (gui_view_t *)(obj->parent) != gui_view_get_next())
         {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
+            if (_this->dir == HORIZONTAL)
+            {
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
+            }
+            else
+            {
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, "touch");
+            }
         }
-        else
-        {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, "touch");
-        }
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     }
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
 
     if (_this->bar)
     {
@@ -620,23 +613,6 @@ static void gui_list_note_circle(gui_obj_t *obj)
 }
 
 static void gui_list_note_zoom(gui_obj_t *obj)
-{
-    gui_list_t *list = (gui_list_t *)obj->parent;
-    float scale_range = 0.5f;
-    int32_t scope = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
-
-    int32_t diff = (list->dir == HORIZONTAL)
-                   ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
-                   : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
-    diff = abs(diff);
-    if (diff > scope / 2) { diff = scope / 2;}
-    float scale = 1.0f - scale_range * diff / (scope / 2.0f);
-
-    matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-    matrix_scale(scale, scale, obj->matrix);
-    matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
-}
-static void gui_list_note_zoom_cylinder(gui_obj_t *obj)
 {
     gui_list_t *list = (gui_list_t *)obj->parent;
 
@@ -881,9 +857,6 @@ static void gui_list_note_transform(gui_obj_t *obj)
     case LIST_ZOOM:
         gui_list_note_zoom(obj);
         break;
-    case LIST_ZOOM_CYLINDER:
-        gui_list_note_zoom_cylinder(obj);
-        break;
     case LIST_CARD:
         gui_list_note_card(obj);
         break;
@@ -969,7 +942,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
     int temp_view_size = (_this->dir == HORIZONTAL) ? obj->w : obj->h;
     int16_t center_padding = 0;
 
-    if (_this->style == LIST_ZOOM_CYLINDER)
+    if (_this->style == LIST_ZOOM)
     {
         center_padding = (temp_view_size - _this->note_length) / 2;
     }
@@ -987,7 +960,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
                 offset_max = obj->w - _this->note_length;
                 offset_min -= _this->card_stack_location;
             }
-            else if (_this->style == LIST_ZOOM_CYLINDER)
+            else if (_this->style == LIST_ZOOM)
             {
                 offset_max = center_padding + _this->out_scope;
                 offset_min = center_padding - (_this->total_length - _this->note_length) - _this->out_scope;
@@ -1006,7 +979,7 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
                 offset_max = obj->h - _this->note_length;
                 offset_min -= _this->card_stack_location;
             }
-            else if (_this->style == LIST_ZOOM_CYLINDER)
+            else if (_this->style == LIST_ZOOM)
             {
                 offset_max = center_padding + _this->out_scope;
                 offset_min = center_padding - (_this->total_length - _this->note_length) - _this->out_scope;
@@ -1216,6 +1189,7 @@ gui_list_t *gui_list_create(void       *parent,
     _this->note_design = note_design;
     _this->design_param = design_param;
     _this->inertia = true;
+    _this->enable_scroll = true;
     if (dir == HORIZONTAL)
     {
         _this->total_length = w;
@@ -1321,7 +1295,7 @@ void gui_list_set_offset(gui_list_t *list, int16_t offset)
         offset_max = temp - list->note_length;
         offset_min -= list->card_stack_location;
     }
-    else if (list->style == LIST_ZOOM_CYLINDER)
+    else if (list->style == LIST_ZOOM)
     {
         int16_t center_padding = (temp - list->note_length) / 2;
         offset_max = center_padding + list->out_scope;
@@ -1409,7 +1383,7 @@ static int gui_list_calc_scroll_distance(gui_list_t *list, uint16_t note_index)
     /* Calculate target offset to bring the note into view */
     int target_offset = -(note_index * grid_size);
 
-    if (list->style == LIST_ZOOM_CYLINDER)
+    if (list->style == LIST_ZOOM)
     {
         int16_t center_padding = (view_size - list->note_length) / 2;
         target_offset = center_padding - (note_index * grid_size);
@@ -1434,7 +1408,7 @@ static int gui_list_calc_scroll_distance(gui_list_t *list, uint16_t note_index)
     {
         /* Non-loop: clamp target to valid scroll boundaries */
         int hard_min, hard_max;
-        if (list->style == LIST_ZOOM_CYLINDER)
+        if (list->style == LIST_ZOOM)
         {
             int16_t center_padding = (view_size - list->note_length) / 2;
             hard_max = center_padding;
@@ -1509,7 +1483,7 @@ uint16_t gui_list_get_current_note(gui_list_t *list)
     /* Reverse the target_offset formula: offset = style_base - index * grid_size
      * => index = (style_base - offset) / grid_size */
     int style_base = 0;
-    if (list->style == LIST_ZOOM_CYLINDER)
+    if (list->style == LIST_ZOOM)
     {
         style_base = (view_size - list->note_length) / 2;
     }
@@ -1540,4 +1514,9 @@ uint16_t gui_list_get_current_note(gui_list_t *list)
     }
 
     return (uint16_t)index;
+}
+
+void gui_list_enable_scroll(gui_list_t *list, bool enable)
+{
+    list->enable_scroll = enable;
 }

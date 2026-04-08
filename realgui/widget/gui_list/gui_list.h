@@ -36,7 +36,6 @@ typedef enum
     LIST_FAN,              ///< Rotate like fan.
     LIST_HELIX,            ///< Rotate like helix.
     LIST_CURL,             ///< Rotate curly.
-    LIST_ZOOM_CYLINDER,    ///< Zoom center list with cylinder style.
 } LIST_STYLE;
 
 /* LIST_STYLE enum end*/
@@ -62,6 +61,7 @@ typedef struct gui_list
     uint32_t area_display    : 1; // 0:disable area display, 1:enable area display.
     uint32_t keep_note_alive  : 1;
     uint32_t scroll_to_active : 1; // Programmatic scroll-to animation active.
+    uint32_t enable_scroll    : 1; // Whether to enable scroll, default is true.
 
     uint16_t circle_radius;    // Circle radius. Only support CIRCLE style.
 
@@ -271,6 +271,13 @@ void gui_list_jump_to_note(gui_list_t *list, uint16_t note_index);
  * @return Current note index (0 to note_num-1).
  */
 uint16_t gui_list_get_current_note(gui_list_t *list);
+
+/**
+ * @brief Enable scroll of list.
+ * @param list Pointer to the list widget.
+ * @param enable True: enable scroll, false: disable scroll. Default is true.
+ */
+void gui_list_enable_scroll(gui_list_t *list, bool enable);
 
 #ifdef __cplusplus
 }

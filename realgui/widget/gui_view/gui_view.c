@@ -165,7 +165,6 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
     switch (tp->type)
     {
     case TOUCH_LEFT_SLIDE:
-        g_Target = -o->w;
         if (g_Release <= -o->w / 2)
         {
             g_Target = -o->w;
