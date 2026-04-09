@@ -100,7 +100,7 @@ static void gui_view_released_view_timer_cb(void *obj)
         g_Target = g_Release;
         g_NextView = NULL;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
-        gui_log("current view name = %s\n", g_CurrentView->base.name);
+        // gui_log("current view name = %s\n", g_CurrentView->base.name);
         gui_fb_change();
         gui_obj_delete_timer(obj);
     }
@@ -230,6 +230,10 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
     {
         gui_obj_create_timer(o, 10, true, gui_view_released_view_timer_cb);
         gui_obj_start_timer(o);
+    }
+    else
+    {
+        gui_view_released_view_timer_cb(obj);
     }
 }
 
