@@ -1,12 +1,12 @@
 Embedded Deployment
 ===================
 
-This document describes deployment solutions for HoneyGUI Design projects to embedded platforms, including three different deployment methods and their applicable scenarios.
+This document describes deployment solutions for HoneyGUI Visual Designer projects to embedded platforms, including three different deployment methods and their applicable scenarios.
 
 Overview
 --------
 
-HoneyGUI Design supports multiple deployment methods, allowing selection of the most appropriate solution based on project requirements:
+HoneyGUI Visual Designer supports multiple deployment methods, allowing selection of the most appropriate solution based on project requirements:
 
 .. list-table::
    :header-rows: 1
@@ -52,7 +52,7 @@ Export Products
    │   └── main_ui.c           # UI implementation
    ├── callbacks/
    │   ├── main_callbacks.h    # Callback declarations
-   │   └── main_callbacks.c    # Callback implementation (protected)
+   │   └── main_callbacks.c    # Callback implementation (protected regions)
    └── assets/
        └── *.bin               # Binary resources
 
@@ -81,7 +81,7 @@ Generated Code Example
 Advantages
 ~~~~~~~~~~
 
-* Minimal ROM/RAM usage
+* Minimal ROM / :term:`RAM` usage
 * Fastest execution speed
 * Easy debugging (can step through)
 * Flexible event handling (pure C code)
@@ -89,7 +89,7 @@ Advantages
 Disadvantages
 ~~~~~~~~~~~~~
 
-* UI changes require firmware recompilation
+* :term:`UI` changes require firmware recompilation
 * Cannot OTA update UI
 
 Use Cases
@@ -104,7 +104,7 @@ Deployment Steps
 
 1. **Generate Code**:
 
-   Click "Generate Code" button in VSCode to generate C code files.
+   Click :guilabel:`Generate Code` button in VSCode to generate C code files.
 
 2. **Integrate into Firmware Project**:
 
@@ -520,7 +520,7 @@ Development Recommendations
 Development Phase
 ~~~~~~~~~~~~~~~~~
 
-* Use **Solution 1 (C Code)** for rapid iteration on PC simulator
+* Use **Solution 1 (C Code)** for rapid iteration on :term:`PC` simulator
 * Use VSCode plugin build and simulation features
 * Leverage protected regions to preserve custom logic
 

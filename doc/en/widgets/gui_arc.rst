@@ -130,7 +130,7 @@ The Arc Group widget is designed for batch rendering multiple static arcs in a s
 
 **Performance Benefits**
 
-- **Reduced Transfer Overhead**: Combines multiple arcs into one buffer, reducing DMA/GPU transfer calls
+- **Reduced Transfer Overhead**: Combines multiple arcs into one buffer, reducing :term:`DMA` / :term:`GPU` transfer calls
 - **Optimized for Static Content**: Ideal for background arcs that don't change frequently
 - **Memory Efficient**: Shares a single buffer for multiple arcs
 
@@ -155,7 +155,7 @@ The arc widget is useful in scenarios such as:
 - **Progress Indicators**: Displaying loading progress, battery levels, etc.
 - **Dashboard Gauges**: Constructing speedometers, thermometers, etc.
 - **Data Visualization**: Showing proportional data, statistical charts
-- **UI Decoration**: As decorative elements in the interface
+- **User Interface Decoration**: As decorative elements in the interface
 - **State Indicators**: Representing system statuses, connection statuses, etc.
 - **Transform Animations**: Leverage rotation, scale, and translation for complex arc animation effects
 

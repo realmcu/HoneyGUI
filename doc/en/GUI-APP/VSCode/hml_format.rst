@@ -21,23 +21,21 @@ The basic structure of an HML file is as follows:
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8"?>
-   <hone:HoneyGUI xmlns:hone="http://www.honeygui.com">
-       <HoneyGUI version="1.0">
+   <hml>
+       <meta>
+           <project name="MyApp" resolution="480X272" />
+       </meta>
+       <view>
            <!-- Interface component definitions -->
-       </HoneyGUI>
-   </hone:HoneyGUI>
-
-Namespace
-~~~~~~~~~
-
-* **xmlns:hone**: HoneyGUI namespace declaration
-* **version**: HML format version number
+       </view>
+   </hml>
 
 Root Elements
 ~~~~~~~~~~~~~
 
-* **hone:HoneyGUI**: Document root element
-* **HoneyGUI**: Actual content container
+* **hml**: Document root element
+* **meta**: Metadata containing project name, resolution and other configuration
+* **view**: Interface content container holding all component definitions
 
 Component Definition
 --------------------
@@ -75,8 +73,8 @@ Position and Size Attributes
 
 * **x**: Horizontal position (pixels)
 * **y**: Vertical position (pixels)
-* **w**: Width (pixels)
-* **h**: Height (pixels)
+* **width**: Width (pixels)
+* **height**: Height (pixels)
 
 .. note::
    Position is relative to the upper left corner of the parent component.
@@ -94,9 +92,14 @@ View container for organizing layout:
 
 .. code-block:: xml
 
-   <hg_view id="main_view" x="0" y="0" w="480" h="272">
+   <hg_view id="main_view" x="0" y="0" width="480" height="272" entry="true">
        <!-- Child components -->
    </hg_view>
+
+Attributes:
+
+* ``entry``: Whether this is the entry view (at least one per project)
+* ``backgroundColor``: Background color (for designer display only)
 
 hg_window
 """""""""
@@ -105,9 +108,49 @@ Window container supporting multi-window management:
 
 .. code-block:: xml
 
-   <hg_window id="popup" x="100" y="100" w="280" h="160">
+   <hg_window id="popup" x="100" y="100" width="280" height="160">
        <!-- Window content -->
    </hg_window>
+
+hg_canvas
+"""""""""
+
+Custom drawing canvas:
+
+.. code-block:: xml
+
+   <hg_canvas
+       id="drawing"
+       x="0" y="0" width="480" height="272"/>
+
+hg_list
+"""""""
+
+List container:
+
+.. code-block:: xml
+
+   <hg_list
+       id="menu"
+       x="0" y="50" width="480" height="200"
+       itemWidth="480" itemHeight="50"
+       direction="VERTICAL"
+       noteNum="5"
+       inertia="true"
+       loop="false"/>
+
+hg_menu_cellular
+""""""""""""""""
+
+Cellular menu container:
+
+.. code-block:: xml
+
+   <hg_menu_cellular
+       id="main_menu"
+       x="0" y="0" width="480" height="502"
+       iconFolder="assets/feature"
+       iconSize="64"/>
 
 Basic Widgets
 ~~~~~~~~~~~~~
@@ -121,13 +164,11 @@ Button component:
 
    <hg_button
        id="submit_btn"
-       x="10" y="10" w="100" h="40"
+       x="10" y="10" width="100" height="40"
        text="Submit"
-       fontSize="16"
-       textColor="#FFFFFF"
-       backgroundColor="#007AFF"
-       normalImage="assets/button_normal.bin"
-       pressedImage="assets/button_pressed.bin"/>
+       color="#FFFFFF"
+       imageOn="assets/button_on.png"
+       imageOff="assets/button_off.png"/>
 
 hg_label
 """"""""
@@ -138,12 +179,13 @@ Text label:
 
    <hg_label
        id="title"
-       x="0" y="0" w="480" h="50"
+       x="0" y="0" width="480" height="50"
        text="Welcome to HoneyGUI"
        fontSize="24"
-       fontColor="#333333"
-       fontFamily="assets/font.bin"
-       textAlign="center"/>
+       color="#333333"
+       fontFile="assets/font/Inter24pt-Medium.ttf"
+       hAlign="CENTER"
+       vAlign="MID"/>
 
 hg_image
 """"""""
@@ -154,24 +196,8 @@ Image display:
 
    <hg_image
        id="logo"
-       x="50" y="50" w="100" h="100"
-       src="assets/logo.bin"
-       mode="fit"
-       rotation="0"/>
-
-hg_switch
-"""""""""
-
-Toggle switch:
-
-.. code-block:: xml
-
-   <hg_switch
-       id="wifi_switch"
-       x="300" y="20" w="60" h="30"
-       checked="true"
-       onColor="#34C759"
-       offColor="#8E8E93"/>
+       x="50" y="50" width="100" height="100"
+       src="assets/logo.png"/>
 
 Input Widgets
 ~~~~~~~~~~~~~
@@ -185,95 +211,13 @@ Text input field:
 
    <hg_input
        id="username"
-       x="20" y="100" w="200" h="40"
-       placeholder="Enter username"
-       maxLength="20"
-       fontSize="14"/>
+       x="20" y="100" width="200" height="40"
+       placeholder="Enter username"/>
 
-hg_checkbox
-"""""""""""
+hg_checkbox and hg_radio
+""""""""""""""""""""""""
 
-Checkbox:
-
-.. code-block:: xml
-
-   <hg_checkbox
-       id="agree"
-       x="20" y="150" w="24" h="24"
-       checked="false"
-       label="I agree to the terms"/>
-
-hg_radio
-""""""""
-
-Radio button:
-
-.. code-block:: xml
-
-   <hg_radio
-       id="option1"
-       x="20" y="180" w="24" h="24"
-       groupName="options"
-       checked="true"
-       label="Option 1"/>
-
-Advanced Widgets
-~~~~~~~~~~~~~~~~
-
-hg_progressbar
-""""""""""""""
-
-Progress bar:
-
-.. code-block:: xml
-
-   <hg_progressbar
-       id="loading"
-       x="50" y="200" w="380" h="10"
-       min="0" max="100" value="75"
-       color="#007AFF"
-       backgroundColor="#E5E5EA"/>
-
-hg_slider
-"""""""""
-
-Slider:
-
-.. code-block:: xml
-
-   <hg_slider
-       id="volume"
-       x="50" y="220" w="380" h="30"
-       min="0" max="100" value="50"
-       thumbColor="#007AFF"
-       trackColor="#E5E5EA"/>
-
-hg_canvas
-"""""""""
-
-Custom drawing canvas:
-
-.. code-block:: xml
-
-   <hg_canvas
-       id="drawing"
-       x="0" y="0" w="480" h="272"
-       backgroundColor="#FFFFFF"/>
-
-hg_list
-"""""""
-
-List container:
-
-.. code-block:: xml
-
-   <hg_list
-       id="menu"
-       x="0" y="50" w="480" h="200"
-       itemHeight="50"
-       scrollable="true">
-       <!-- List items -->
-   </hg_list>
+Checkbox and radio button are not yet implemented in the SDK (TODO) and are not currently supported.
 
 Multimedia Components
 ~~~~~~~~~~~~~~~~~~~~~
@@ -287,10 +231,22 @@ Video player:
 
    <hg_video
        id="player"
-       x="0" y="0" w="480" h="272"
+       x="0" y="0" width="480" height="272"
        src="assets/video.mp4"
        autoplay="false"
        loop="false"/>
+
+hg_gif
+""""""
+
+GIF animation:
+
+.. code-block:: xml
+
+   <hg_gif
+       id="anim"
+       x="50" y="50" width="150" height="150"
+       src="assets/anim.gif"/>
 
 hg_3d
 """""
@@ -301,9 +257,8 @@ hg_3d
 
    <hg_3d
        id="model"
-       x="50" y="50" w="380" h="380"
-       modelSrc="assets/model.bin"
-       rotationX="0" rotationY="0" rotationZ="0"/>
+       x="50" y="50" width="380" height="380"
+       modelPath="assets/models/cube.bin"/>
 
 Event Configuration
 -------------------
@@ -315,10 +270,12 @@ Basic Syntax
 
 .. code-block:: xml
 
-   <hg_button id="btn1" x="10" y="10" w="100" h="40" text="Next">
+   <hg_button id="btn1" x="10" y="10" width="100" height="40" text="Next">
        <events>
            <event type="onClick">
-               <action type="switchView" target="page2" animation="slideLeft"/>
+               <action type="switchView" target="page2"
+                       switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
+                       switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION"/>
            </event>
        </events>
    </hg_button>
@@ -327,11 +284,11 @@ Event Types
 ~~~~~~~~~~~
 
 * **onClick**: Click event
-* **onLongPress**: Long press event (default 1000ms)
-* **onSwipe**: Swipe event (up, down, left, right)
-* **onChange**: Value change event (for input fields, sliders, etc.)
-* **onFocus**: Gain focus
-* **onBlur**: Lose focus
+* **onLongPress**: Long press event
+* **onTouchDown**: Touch down event
+* **onTouchUp**: Touch up event
+* **onSwipeLeft / onSwipeRight / onSwipeUp / onSwipeDown**: Swipe events (container components)
+* **onMessage**: Message listener event
 
 Action Types
 ~~~~~~~~~~~~
@@ -343,16 +300,15 @@ Switch to another view:
 
 .. code-block:: xml
 
-   <action type="switchView" target="main_menu" animation="fade"/>
+   <action type="switchView" target="main_menu"
+           switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
+           switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION"/>
 
-Animation options:
+switchOutStyle / switchInStyle options:
 
-* ``fade``: Fade in/out
-* ``slideLeft``: Slide from right to left
-* ``slideRight``: Slide from left to right
-* ``slideUp``: Slide from bottom to top
-* ``slideDown``: Slide from top to bottom
-* ``none``: No animation
+* Translation: ``SWITCH_OUT_TO_LEFT/RIGHT/TOP/BOTTOM_USE_TRANSLATION``
+* Cube: ``SWITCH_OUT_TO_LEFT/RIGHT/TOP/BOTTOM_USE_CUBE``
+* Others: ``SWITCH_OUT_NONE_ANIMATION``, ``SWITCH_OUT_ANIMATION_FADE``
 
 sendMessage
 """""""""""
@@ -370,7 +326,7 @@ Call user-defined C function:
 
 .. code-block:: xml
 
-   <action type="callFunction" function="on_button_click"/>
+   <action type="callFunction" functionName="on_button_click"/>
 
 .. note::
    Users need to implement this function in the generated callback file.
@@ -385,10 +341,10 @@ A component can respond to multiple events:
    <hg_button id="btn1" x="10" y="10" w="100" h="40" text="Action">
        <events>
            <event type="onClick">
-               <action type="callFunction" function="handle_click"/>
+               <action type="callFunction" functionName="handle_click"/>
            </event>
            <event type="onLongPress">
-               <action type="callFunction" function="handle_long_press"/>
+               <action type="callFunction" functionName="handle_long_press"/>
            </event>
        </events>
    </hg_button>
@@ -402,65 +358,58 @@ Simple Login Interface
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8"?>
-   <hone:HoneyGUI xmlns:hone="http://www.honeygui.com">
-       <HoneyGUI version="1.0">
-           <hg_view id="login_view" x="0" y="0" w="480" h="272">
+   <hml>
+       <meta>
+           <project name="LoginApp" resolution="480X272" />
+       </meta>
+       <view>
+           <hg_view id="login_view" x="0" y="0" width="480" height="272" entry="true">
                <!-- Title -->
                <hg_label
                    id="title"
-                   x="0" y="20" w="480" h="40"
+                   x="0" y="20" width="480" height="40"
                    text="User Login"
                    fontSize="24"
-                   fontColor="#333333"
-                   textAlign="center"/>
+                   color="#333333"
+                   hAlign="CENTER"
+                   vAlign="MID"/>
 
                <!-- Username input -->
                <hg_label
                    id="username_label"
-                   x="40" y="80" w="100" h="30"
+                   x="40" y="80" width="100" height="30"
                    text="Username:"
                    fontSize="16"/>
                <hg_input
                    id="username_input"
-                   x="150" y="80" w="280" h="40"
-                   placeholder="Enter username"
-                   maxLength="20"/>
+                   x="150" y="80" width="280" height="40"
+                   placeholder="Enter username"/>
 
                <!-- Password input -->
                <hg_label
                    id="password_label"
-                   x="40" y="130" w="100" h="30"
+                   x="40" y="130" width="100" height="30"
                    text="Password:"
                    fontSize="16"/>
                <hg_input
                    id="password_input"
-                   x="150" y="130" w="280" h="40"
-                   placeholder="Enter password"
-                   type="password"
-                   maxLength="20"/>
-
-               <!-- Remember password -->
-               <hg_checkbox
-                   id="remember"
-                   x="150" y="180" w="24" h="24"
-                   label="Remember me"/>
+                   x="150" y="130" width="280" height="40"
+                   placeholder="Enter password"/>
 
                <!-- Login button -->
                <hg_button
                    id="login_btn"
-                   x="150" y="220" w="180" h="40"
-                   text="Login"
-                   backgroundColor="#007AFF"
-                   textColor="#FFFFFF">
+                   x="150" y="220" width="180" height="40"
+                   text="Login">
                    <events>
                        <event type="onClick">
-                           <action type="callFunction" function="handle_login"/>
+                           <action type="callFunction" functionName="handle_login"/>
                        </event>
                    </events>
                </hg_button>
            </hg_view>
-       </HoneyGUI>
-   </hone:HoneyGUI>
+       </view>
+   </hml>
 
 Multi-View Navigation
 ~~~~~~~~~~~~~~~~~~~~~
@@ -468,40 +417,48 @@ Multi-View Navigation
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8"?>
-   <hone:HoneyGUI xmlns:hone="http://www.honeygui.com">
-       <HoneyGUI version="1.0">
-           <hg_view id="home_view" x="0" y="0" w="480" h="272">
+   <hml>
+       <meta>
+           <project name="NavApp" resolution="480X272" />
+       </meta>
+       <view>
+           <hg_view id="home_view" x="0" y="0" width="480" height="272" entry="true">
                <hg_label
                    id="home_title"
-                   x="0" y="20" w="480" h="40"
+                   x="0" y="20" width="480" height="40"
                    text="Home Page"
                    fontSize="24"
-                   textAlign="center"/>
+                   hAlign="CENTER"
+                   vAlign="MID"/>
 
                <hg_button
                    id="to_settings"
-                   x="190" y="100" w="100" h="40"
+                   x="190" y="100" width="100" height="40"
                    text="Settings">
                    <events>
                        <event type="onClick">
-                           <action type="switchView" target="settings_view" animation="slideLeft"/>
+                           <action type="switchView" target="settings_view"
+                                   switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
+                                   switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION"/>
                        </event>
                    </events>
                </hg_button>
 
                <hg_button
                    id="to_about"
-                   x="190" y="160" w="100" h="40"
+                   x="190" y="160" width="100" height="40"
                    text="About">
                    <events>
                        <event type="onClick">
-                           <action type="switchView" target="about_view" animation="fade"/>
+                           <action type="switchView" target="about_view"
+                                   switchOutStyle="SWITCH_OUT_ANIMATION_FADE"
+                                   switchInStyle="SWITCH_IN_ANIMATION_FADE"/>
                        </event>
                    </events>
                </hg_button>
            </hg_view>
-       </HoneyGUI>
-   </hone:HoneyGUI>
+       </view>
+   </hml>
 
 Manual HML Editing
 ------------------
@@ -509,7 +466,7 @@ Manual HML Editing
 Although the visual designer is recommended, you can also directly edit HML files:
 
 1. Right-click on an ``.hml`` file in VSCode
-2. Select **Open With Text Editor**
+2. Select :guilabel:`Open With Text Editor`
 3. Directly modify the XML content
 4. After saving, you can reopen it with the designer to see the effect
 
@@ -535,7 +492,7 @@ Naming Conventions
 ~~~~~~~~~~~~~~~~~~
 
 * Use lowercase letters and underscores: ``main_view``, ``login_button``
-* Avoid starting with numbers: Use ``view_1`` instead of ``view1``
+* Avoid starting with numbers: Use ``view_1`` instead of ``1view``
 * Use meaningful names: ``submit_btn`` rather than ``btn1``
 
 Structural Organization

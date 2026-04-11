@@ -13,7 +13,7 @@ The designer uses a classic four-area layout:
 
 .. figure:: resource/design-ui.png
    :align: center
-   :width: 800px
+   :width: 900px
 
    Designer Interface Layout
 
@@ -81,6 +81,9 @@ Container Components
 
 * **hg_view**: View container for organizing interface layout
 * **hg_window**: Window container with multi-window management support
+* **hg_canvas**: Custom drawing canvas
+* **hg_list**: List container with scrolling support
+* **hg_menu_cellular**: Cellular menu container
 
 Basic Controls
 """"""""""""""
@@ -88,28 +91,31 @@ Basic Controls
 * **hg_button**: Button with text and icon support
 * **hg_label**: Text label with multi-line text support
 * **hg_image**: Image display supporting multiple formats
-* **hg_switch**: Switch button with on/off states
 
 Input Controls
 """"""""""""""
 
 * **hg_input**: Text input box
-* **hg_checkbox**: Checkbox
-* **hg_radio**: Radio button
+* **hg_checkbox**: Checkbox (TODO)
+* **hg_radio**: Radio button (TODO)
 
-Advanced Controls
-"""""""""""""""""
+Graphic Controls
+""""""""""""""""
 
-* **hg_progressbar**: Progress bar
-* **hg_slider**: Slider
-* **hg_canvas**: Custom drawing canvas
-* **hg_list**: List container with scrolling support
+* **hg_arc**: Arc shape
+* **hg_circle**: Circle shape
+* **hg_rect**: Rectangle shape
+* **hg_svg**: SVG graphics
+* **hg_glass**: Glass effect
+* **hg_particle**: Particle effect
 
 Multimedia Components
 """""""""""""""""""""
 
 * **hg_video**: Video player
+* **hg_gif**: GIF animation
 * **hg_3d**: 3D model display
+* **hg_lottie**: Lottie animation
 
 Using Components
 ~~~~~~~~~~~~~~~~
@@ -273,37 +279,35 @@ hg_button
 """""""""
 
 * ``text``: Button text
-* ``fontSize``: Font size
-* ``textColor``: Text color
-* ``backgroundColor``: Background color
-* ``normalImage``: Normal state image
-* ``pressedImage``: Pressed state image
+* ``color``: Text color
+* ``toggleMode``: Whether it is a toggle button
+* ``imageOn``: Image path for on state
+* ``imageOff``: Image path for off state
 
 hg_label
 """"""""
 
 * ``text``: Text content (multi-line supported)
 * ``fontSize``: Font size
-* ``fontColor``: Font color
-* ``fontFamily``: Font file path
-* ``textAlign``: Alignment (left, center, right)
-* ``lineHeight``: Line height
+* ``color``: Font color
+* ``fontFile``: Font file path
+* ``hAlign``: Horizontal alignment (LEFT, CENTER, RIGHT)
+* ``vAlign``: Vertical alignment (TOP, MID)
+* ``letterSpacing``: Letter spacing
+* ``lineSpacing``: Line spacing
+* ``wordWrap``: Whether to auto wrap
 
 hg_image
 """"""""
 
 * ``src``: Image file path
-* ``mode``: Display mode (fill, fit, stretch)
-* ``rotation``: Rotation angle
 
-hg_progressbar
-""""""""""""""
+hg_arc / hg_circle / hg_rect
+"""""""""""""""""""""""""""""
 
-* ``min``: Minimum value
-* ``max``: Maximum value
-* ``value``: Current value
-* ``color``: Progress bar color
-* ``backgroundColor``: Background color
+* ``color`` / ``fillColor``: Color
+* ``opacity``: Opacity (0-255)
+* ``useGradient``: Whether to enable gradient
 
 Event Properties
 ~~~~~~~~~~~~~~~~

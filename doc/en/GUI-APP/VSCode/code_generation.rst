@@ -1,19 +1,19 @@
 Code Generation
 ===============
 
-This document describes the code generation functionality of HoneyGUI Design, including architecture design, usage methods, and implementation details.
+This document describes the code generation functionality of HoneyGUI Visual Designer, including architecture design, usage methods, and implementation details.
 
 Overview
 --------
 
-Generate C code that calls HoneyGUI APIs from the HML designer, enabling conversion from visual design to embedded GUI code.
+Generate C code that calls HoneyGUI :term:`API` from the HML designer, enabling conversion from visual design to embedded :term:`GUI` code.
 
 Code Generation Flow
 --------------------
 
 .. code-block:: text
 
-   HML Files → Parser → Component Tree → C Code Generator → HoneyGUI API Call Code
+   HML Files -> Parser -> Component Tree -> C Code Generator -> HoneyGUI API Call Code
 
 Architecture Design
 -------------------
@@ -50,14 +50,14 @@ Naming Rules
 ~~~~~~~~~~~~
 
 * Use HML file name as the base name for generated files
-* Example: ``main.hml`` → ``main.h``, ``main.c``, ``main_callbacks.h``, ``main_callbacks.c``
+* Example: ``main.hml`` -> ``main.h``, ``main.c``, ``main_callbacks.h``, ``main_callbacks.c``
 
 Directory Mapping
 ~~~~~~~~~~~~~~~~~
 
-* HML files in ``ui/xxx/`` directory → C code generated to corresponding subdirectories in ``src/`` directory
+* HML files in ``ui/xxx/`` directory -> C code generated to corresponding subdirectories in ``src/`` directory
 * Each HML file generates to an independent subdirectory
-* Example: ``ui/main/main.hml`` → ``src/ui/main_ui.c``, ``src/callbacks/main_callbacks.c``, ``src/user/main_user.c``
+* Example: ``ui/main/main.hml`` -> ``src/ui/main_ui.c``, ``src/callbacks/main_callbacks.c``, ``src/user/main_user.c``
 * Automatically create subdirectories if they don't exist
 
 Generated File Structure
@@ -97,7 +97,7 @@ Generate Code
 ~~~~~~~~~~~~~
 
 1. Open any HML file in the designer
-2. Click the "Generate Code" button in the toolbar
+2. Click the :gui_label:`Generate Code` button in the toolbar
 3. Automatically scan all HML files in the project and generate code
 4. Display generation progress and results
 
@@ -109,8 +109,8 @@ Generate Code
 
 **Shortcuts**:
 
-* Command Palette: ``Ctrl+Shift+P`` → ``HoneyGUI: Generate Code``
-* Toolbar Button: Click "Generate Code"
+* Command Palette: ``Ctrl+Shift+P`` -> ``HoneyGUI: Generate Code``
+* Toolbar Button: Click :gui_label:`Generate Code`
 
 Code Protected Regions
 -----------------------
@@ -120,9 +120,9 @@ Protected Region Syntax
 
 .. code-block:: c
 
-   // HONEYGUI PROTECTED START [unique_id]
+   /* @protected start unique_id */
    // Code here will be preserved during regeneration
-   // HONEYGUI PROTECTED END [unique_id]
+   /* @protected end unique_id */
 
 Examples
 ~~~~~~~~
@@ -131,23 +131,19 @@ Examples
 
 .. code-block:: c
 
-   // HONEYGUI PROTECTED START [on_start_click]
-   void on_start_click(gui_obj_t *obj) {
-       // TODO: Implement event handling logic
-   }
-   // HONEYGUI PROTECTED END [on_start_click]
+   /* @protected start custom_functions */
+   // Custom functions
+   /* @protected end custom_functions */
 
 **After User Modification**:
 
 .. code-block:: c
 
-   // HONEYGUI PROTECTED START [on_start_click]
-   void on_start_click(gui_obj_t *obj) {
+   /* @protected start custom_functions */
+   void on_start_click(void *obj, gui_event_t *e) {
        printf("Starting application...\n");
-       init_app_state();
-       load_user_settings();
    }
-   // HONEYGUI PROTECTED END [on_start_click]
+   /* @protected end custom_functions */
 
 **After Regeneration**: Code inside protected regions is preserved, other code is updated.
 
@@ -212,11 +208,16 @@ Callback Files (_callbacks.h / _callbacks.c)
    // main_callbacks.c
    #include "main_callbacks.h"
 
-   /* @protected start on_start_click */
-   void on_start_click(gui_obj_t *obj) {
-       // User implementation logic
+   void on_btn1_click(void *obj, gui_event_t *e)
+   {
+       GUI_UNUSED(obj);
+       GUI_UNUSED(e);
+       // TODO: Implement event handling logic
    }
-   /* @protected end on_start_click */
+
+   /* @protected start custom_functions */
+   // Custom functions
+   /* @protected end custom_functions */
 
 Important Notes
 ---------------

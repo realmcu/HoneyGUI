@@ -1,7 +1,7 @@
 Resource Management
 ===================
 
-HoneyGUI Design provides built-in resource conversion tools for converting images, 3D models, and other resources into binary formats supported by HoneyGUI. These tools are implemented in pure JavaScript/TypeScript, eliminating the need to install Python.
+HoneyGUI Visual Designer provides built-in resource conversion tools for converting images, 3D models, and other resources into binary formats supported by HoneyGUI. These tools are implemented in pure JavaScript/TypeScript, eliminating the need to install Python. For detailed usage, see :ref:`VSCode Plugin Resource Conversion`.
 
 Overview
 --------
@@ -70,26 +70,22 @@ Feature Comparison
      - ✅
      - ✅
      - Complete
-   * - MTL Material
+   * - GLTF Parsing
      - ✅
      - ✅
      - Complete
    * - RLE Compression
      - ✅
-     - ⏳
-     - Planned
+     - ✅
+     - Complete
    * - FastLZ Compression
      - ✅
-     - ⏳
-     - Planned
+     - ✅
+     - Complete
    * - YUV Compression
      - ✅
      - ⏳
-     - Planned
-   * - GLTF Parsing
-     - ✅
-     - ⏳
-     - Planned
+     - In Progress
 
 Tool Directory Structure
 ------------------------
@@ -98,20 +94,29 @@ Tool Directory Structure
 
    tools/
    ├── image-converter/       # Image conversion module
-   │   ├── types.ts          # Format definitions
-   │   ├── headers.ts        # Binary headers
+   │   ├── compress/          # Compression algorithms
+   │   │   ├── base.ts        # Compression base class
+   │   │   ├── fastlz.ts      # FastLZ compression
+   │   │   ├── rle.ts         # RLE compression
+   │   │   ├── yuv.ts         # YUV sampling compression
+   │   │   └── index.ts       # Exports
+   │   ├── types.ts           # Format definitions
+   │   ├── headers.ts         # Binary headers
    │   ├── pixel-converter.ts # Pixel conversion
-   │   └── converter.ts      # Main converter
+   │   └── converter.ts       # Main converter
    ├── model-converter/       # 3D model conversion module
-   │   ├── types.ts          # Model types
-   │   ├── obj-parser.ts     # OBJ parser
-   │   └── obj-converter.ts  # OBJ converter
-   ├── tests/                 # Test cases
+   │   ├── types.ts           # Model types
+   │   ├── obj-parser.ts      # OBJ parser
+   │   ├── obj-converter.ts   # OBJ converter
+   │   ├── gltf-parser.ts     # GLTF parser
+   │   └── gltf-converter.ts  # GLTF converter
+   ├── font-converter/        # Font conversion module
+   ├── image-to-jpeg-converter/ # JPEG conversion module
+   ├── glass-generator/       # Glass effect generator
+   ├── video-converter-ts/    # Video conversion module
    ├── examples/              # Usage examples
-   ├── README.md             # Project documentation
-   ├── QUICKSTART.md         # Quick start guide
-   ├── INTEGRATION.md        # Integration guide
-   └── COMPLETION_REPORT.md  # Completion report
+   ├── tests/                 # Test cases
+   └── index.ts               # Unified exports
 
 Image Resource Management
 -------------------------
@@ -121,7 +126,7 @@ Supported Image Formats
 
 **Input Formats**:
 
-* PNG (Recommended)
+* :term:`PNG` (recommended)
 * JPEG/JPG
 
 **Output Formats**:
@@ -153,7 +158,7 @@ Using in plugin:
 
    // Convert image
    await imageConverter.convert(
-       'assets/icon.png',      // Input file
+       'assets/icon.png',       // Input file
        'build/assets/icon.bin', // Output file
        'auto'                   // Auto format selection
    );
@@ -162,7 +167,7 @@ Using in plugin:
    await imageConverter.convert(
        'assets/logo.png',
        'build/assets/logo.bin',
-       'ARGB8888'              // Use 32-bit format
+       'ARGB8888'               // Use 32-bit format
    );
 
 Pixel Format Selection Guide
@@ -192,7 +197,7 @@ Pixel Format Selection Guide
      - Monochrome icons, masks
 
 .. tip::
-   Use ``'auto'`` mode to let the converter automatically select the optimal format:
+   Use ``auto`` mode to let the converter automatically select the optimal format:
 
    * Has alpha channel → ARGB8888
    * No alpha channel → RGB565
@@ -208,9 +213,6 @@ Supported Model Formats
 * OBJ (Wavefront Object) - ✅ Implemented
 * MTL (Material Template Library) - ✅ Implemented
 
-**Planned Support**:
-
-* GLTF/GLB - ⏳ In development
 
 OBJ Model Conversion
 ~~~~~~~~~~~~~~~~~~~~
@@ -254,7 +256,7 @@ Font Formats
 HoneyGUI supports the following font formats:
 
 * TTF (TrueType Font)
-* BIN (Pre-converted binary font)
+* BIN (pre-converted binary font)
 
 Font Conversion
 ~~~~~~~~~~~~~~~
@@ -355,7 +357,7 @@ Resource Optimization
 
    * Use appropriate resolution (avoid oversized images)
    * Choose correct pixel format
-   * Consider using compression (coming soon)
+   * Consider using compression
 
 2. **Model Optimization**:
 
@@ -429,4 +431,3 @@ Next Steps
 * Learn :doc:`code_generation` to understand how to use resources in code
 * See :doc:`build_simulation` to understand the complete build process
 * Refer to :doc:`deployment` for resource deployment on embedded devices
-* Read HoneyGUI SDK tool documentation for more resource format details

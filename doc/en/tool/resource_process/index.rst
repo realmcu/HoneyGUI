@@ -18,12 +18,12 @@ An integrated solution built into the HoneyGUI Visual Designer plugin:
 Exe programs that need to be downloaded and run separately:
 
 - **Features**: Resource conversion only
-- **Characteristics**: GUI interface, batch conversion
+- **Characteristics**: :term:`GUI` interface, batch conversion
 - **Output**: Resource bin files
 - **Use Cases**: Standalone use or batch conversion
 - **Note**: After conversion, packing tool is required for packaging
 
-**Packing Tool**
+**Pack Tool**
 
 Packing script depends on Python environment:
 
@@ -40,6 +40,6 @@ Packing script depends on Python environment:
     :maxdepth: 2
 
     VSCode Plugin Resource Conversion Tool <resource_converter>
-    Image Conversion Tool <image>
-    Font Conversion Tool <font>
-    Packing Tool <packing>
+    Image Convert Tool <image>
+    Font Convert Tool <font>
+    Pack Tool <packing>

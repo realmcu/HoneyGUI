@@ -74,7 +74,7 @@ typedef struct gui_scroll_text
  * @param parent The father widget which the scroll text nested in.
  * @param name The widget's name.
  * @param x The X-axis coordinate of the text box.
- * @param x The Y-axis coordinate of the text box.
+ * @param y The Y-axis coordinate of the text box.
  * @param w The width of the text box.
  * @param h The height of the text box.
  * @return Return the widget object pointer: gui_scroll_text_t*

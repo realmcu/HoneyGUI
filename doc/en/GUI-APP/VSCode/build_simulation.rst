@@ -1,12 +1,12 @@
 Build and Simulation
 ====================
 
-This document describes how to build and run HoneyGUI Design projects, including development environment setup, build process, and simulation testing.
+This document describes how to build and run HoneyGUI Visual Designer projects, including development environment setup, build process, and simulation testing.
 
 Overview
 --------
 
-HoneyGUI Design supports PC simulation, allowing rapid GUI application development and testing without embedded hardware. Projects use the SCons build system and support Windows, Linux, and WSL environments.
+HoneyGUI Visual Designer supports simulation on :term:`PC`, allowing rapid :term:`GUI` application development and testing without embedded hardware. Projects use the SCons build system and support Windows, Linux, and WSL environments.
 
 Development Environment Requirements
 -------------------------------------
@@ -41,7 +41,7 @@ Required software:
 * **VSCode**: Code editor
 
   * Download: https://code.visualstudio.com/
-  * Install HoneyGUI Design plugin
+  * Install HoneyGUI Visual Designer plugin
 
 Optional software:
 
@@ -94,7 +94,7 @@ Ensure MinGW-w64 ``bin`` directory is in PATH:
 Project Structure
 -----------------
 
-Standard HoneyGUI Design project structure:
+Standard HoneyGUI Visual Designer project structure:
 
 .. code-block:: text
 
@@ -147,12 +147,12 @@ Build Process
 Build Using VSCode Plugin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. **Open Project**: Open HoneyGUI Design project folder in VSCode
+1. **Open Project**: Open HoneyGUI Visual Designer project folder in VSCode
 
 2. **Generate Code**:
 
-   * Click "Generate Code" button in toolbar
-   * Or use command palette: ``Ctrl+Shift+P`` → ``HoneyGUI: Generate Code``
+   * Click the :gui_label:`Generate Code` button in toolbar
+   * Or use command palette: ``Ctrl+Shift+P`` -> ``HoneyGUI: Generate Code``
 
 3. **Configure Application**:
 
@@ -404,7 +404,7 @@ Solutions:
 
 Solutions:
 
-* Confirm resource files have been converted to .bin format
+* Confirm resource files have been converted to ``.bin`` format
 * Check file path is correct
 * Rebuild project
 

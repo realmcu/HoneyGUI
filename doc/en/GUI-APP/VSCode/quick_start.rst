@@ -1,7 +1,7 @@
 Quick Start
 ===========
 
-This chapter introduces how to install the HoneyGUI Visual Designer plugin and create your first GUI application.
+This chapter introduces how to install the HoneyGUI Visual Designer plugin and create your first :term:`GUI` application.
 
 Installation Requirements
 --------------------------
@@ -32,16 +32,16 @@ Method 1: Install from VSCode Marketplace
 
 1. Open VSCode
 2. Click the Extensions icon in the activity bar (or press ``Ctrl+Shift+X``)
-3. Type **"HoneyGUI Visual Designer"** in the search box
-4. Click the **Install** button
+3. Type ``HoneyGUI Visual Designer`` in the search box
+4. Click the :guilabel:`Install` button
 
 Method 2: Install from VSIX File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Download the plugin's ``.vsix`` file
 2. In VSCode, open the Extensions panel
-3. Click the **...** menu in the top right corner
-4. Select **Install from VSIX...**
+3. Click the :guilabel:`...` menu in the top right corner
+4. Select :guilabel:`Install from VSIX...`
 5. Choose the downloaded VSIX file
 
 Environment Check
@@ -49,7 +49,7 @@ Environment Check
 
 After installation, the plugin will automatically check the development environment:
 
-1. Open VSCode Command Palette (``Ctrl+Shift+P``)
+1. Open VSCode Command Palette (or press ``Ctrl+Shift+P``)
 2. Type and execute ``HoneyGUI: Check Environment``
 3. View the terminal output to confirm all dependencies are installed
 
@@ -63,7 +63,7 @@ Using Project Templates
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Click the HoneyGUI icon in the VSCode activity bar
-2. Click the **New Project** button in the sidebar
+2. Click the :guilabel:`New Project` button in the sidebar
 3. Select a project template:
 
    * **Blank Project**: Design interface from scratch
@@ -76,7 +76,7 @@ Using Project Templates
 
 .. figure:: resource/create-project.png
    :align: center
-   :width: 600px
+   :width: 900px
 
    Create New Project
 
@@ -89,7 +89,7 @@ The created project contains the following structure:
 
    my-project/
    ├── project.json          # Project configuration file
-   ├── views/                # HML interface files directory
+   ├── ui/                   # HML interface files directory
    │   └── main.hml          # Main interface
    ├── src/                  # Generated C code
    │   ├── ui/               # UI structure code (auto-generated)
@@ -112,7 +112,7 @@ Opening the Designer
 
 .. figure:: resource/design-ui.png
    :align: center
-   :width: 800px
+   :width: 900px
 
    Visual Designer Interface
 
@@ -156,13 +156,13 @@ Automatic Code Generation
 
 After completing the design, the plugin will automatically generate C code:
 
-1. Click the **Generate Code** button in the toolbar, or use the command palette:
+1. Click the :guilabel:`Generate Code` button in the toolbar, or use the command palette:
 
    .. code-block:: text
 
       Ctrl+Shift+P → HoneyGUI: Generate Code
 
-2. The plugin will scan all HML files in the ``views/`` directory
+2. The plugin will scan all HML files in the ``ui/`` directory
 3. Automatically generate the following files:
 
    * ``src/ui/*.c`` - UI structure code (regenerated each time)
@@ -172,16 +172,16 @@ After completing the design, the plugin will automatically generate C code:
 Code Protection Zones
 ~~~~~~~~~~~~~~~~~~~~~
 
-Generated code contains protection zone markers where users can add custom logic:
+Generated callback code contains protection zone markers where users can add custom logic:
 
 .. code-block:: c
 
-   // @protected start
+   /* @protected start custom_functions */
    // Add your code here
-   void on_button_click(void *obj, gui_event_t *event) {
+   void on_button_click(void *obj, gui_event_t *e) {
        printf("Button clicked!\n");
    }
-   // @protected end
+   /* @protected end custom_functions */
 
 .. warning::
    Code outside protection zones will be overwritten during regeneration. Always write custom code inside protection zones.
@@ -192,7 +192,7 @@ Build and Simulation
 Building the Project
 ~~~~~~~~~~~~~~~~~~~~
 
-1. Click the **▶ Build and Simulate** button in the toolbar
+1. Click the :guilabel:`Simulate` button in the toolbar
 2. Or use the command palette: ``HoneyGUI: Build and Simulate``
 3. The plugin will automatically:
 
@@ -202,7 +202,7 @@ Building the Project
 
 .. figure:: resource/compile.png
    :align: center
-   :width: 600px
+   :width: 900px
 
    Build and Simulation
 
@@ -228,7 +228,7 @@ Common Issues
 
 1. Check if SDL2 library is installed
 2. On Linux: ``sudo apt-get install libsdl2-dev``
-3. On Windows: Ensure MinGW includes SDL2
+3. On Windows: Ensure MinGW includes SDL2 library
 
 Next Steps
 ----------

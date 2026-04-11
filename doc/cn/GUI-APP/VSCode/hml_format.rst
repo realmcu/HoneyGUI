@@ -11,7 +11,7 @@ HML 文件是可视化设计器的底层存储格式，具有以下特点：
 * **人类可读**：基于 XML 格式，便于阅读和编辑
 * **版本控制友好**：纯文本格式，适合 Git 等版本控制工具
 * **完整描述**：包含组件结构、属性、事件等所有信息
-* **平台无关**：可以转换为不同目标平台的代码（C、Python 等）
+* **平台无关**：可以转换为不同目标平台的代码 (C、Python 等)
 
 基本结构
 ---------
@@ -21,23 +21,21 @@ HML 文件的基本结构如下：
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8"?>
-   <hone:HoneyGUI xmlns:hone="http://www.honeygui.com">
-       <HoneyGUI version="1.0">
+   <hml>
+       <meta>
+           <project name="MyApp" resolution="480X272" />
+       </meta>
+       <view>
            <!-- 界面组件定义 -->
-       </HoneyGUI>
-   </hone:HoneyGUI>
-
-命名空间
-~~~~~~~~
-
-* **xmlns:hone**：HoneyGUI 命名空间声明
-* **version**：HML 格式版本号
+       </view>
+   </hml>
 
 根元素
 ~~~~~~
 
-* **hone:HoneyGUI**：文档根元素
-* **HoneyGUI**：实际内容容器
+* **hml**：文档根元素
+* **meta**：元数据，包含项目名称、分辨率等配置
+* **view**：界面内容容器，包含所有组件定义
 
 组件定义
 ---------
@@ -75,8 +73,8 @@ HML 文件的基本结构如下：
 
 * **x**：水平位置（像素）
 * **y**：垂直位置（像素）
-* **w**：宽度（像素）
-* **h**：高度（像素）
+* **width**：宽度（像素）
+* **height**：高度（像素）
 
 .. note::
    位置是相对于父组件的左上角。
@@ -94,9 +92,14 @@ hg_view
 
 .. code-block:: xml
 
-   <hg_view id="main_view" x="0" y="0" w="480" h="272">
+   <hg_view id="main_view" x="0" y="0" width="480" height="272" entry="true">
        <!-- 子组件 -->
    </hg_view>
+
+属性：
+
+* ``entry``：是否为入口视图（每个项目至少一个）
+* ``backgroundColor``：背景色（仅设计器显示用）
 
 hg_window
 """""""""
@@ -105,9 +108,49 @@ hg_window
 
 .. code-block:: xml
 
-   <hg_window id="popup" x="100" y="100" w="280" h="160">
+   <hg_window id="popup" x="100" y="100" width="280" height="160">
        <!-- 窗口内容 -->
    </hg_window>
+
+hg_canvas
+"""""""""
+
+自定义绘图画布：
+
+.. code-block:: xml
+
+   <hg_canvas
+       id="drawing"
+       x="0" y="0" width="480" height="272"/>
+
+hg_list
+"""""""
+
+列表容器：
+
+.. code-block:: xml
+
+   <hg_list
+       id="menu"
+       x="0" y="50" width="480" height="200"
+       itemWidth="480" itemHeight="50"
+       direction="VERTICAL"
+       noteNum="5"
+       inertia="true"
+       loop="false"/>
+
+hg_menu_cellular
+""""""""""""""""
+
+蜂窝菜单容器：
+
+.. code-block:: xml
+
+   <hg_menu_cellular
+       id="main_menu"
+       x="0" y="0" width="480" height="502"
+       iconFolder="assets/feature"
+       iconSize="64"/>
 
 基础控件
 ~~~~~~~~
@@ -121,13 +164,11 @@ hg_button
 
    <hg_button
        id="submit_btn"
-       x="10" y="10" w="100" h="40"
+       x="10" y="10" width="100" height="40"
        text="Submit"
-       fontSize="16"
-       textColor="#FFFFFF"
-       backgroundColor="#007AFF"
-       normalImage="assets/button_normal.bin"
-       pressedImage="assets/button_pressed.bin"/>
+       color="#FFFFFF"
+       imageOn="assets/button_on.png"
+       imageOff="assets/button_off.png"/>
 
 hg_label
 """"""""
@@ -138,12 +179,13 @@ hg_label
 
    <hg_label
        id="title"
-       x="0" y="0" w="480" h="50"
+       x="0" y="0" width="480" height="50"
        text="Welcome to HoneyGUI"
        fontSize="24"
-       fontColor="#333333"
-       fontFamily="assets/font.bin"
-       textAlign="center"/>
+       color="#333333"
+       fontFile="assets/font/Inter24pt-Medium.ttf"
+       hAlign="CENTER"
+       vAlign="MID"/>
 
 hg_image
 """"""""
@@ -154,24 +196,8 @@ hg_image
 
    <hg_image
        id="logo"
-       x="50" y="50" w="100" h="100"
-       src="assets/logo.bin"
-       mode="fit"
-       rotation="0"/>
-
-hg_switch
-"""""""""
-
-开关按钮：
-
-.. code-block:: xml
-
-   <hg_switch
-       id="wifi_switch"
-       x="300" y="20" w="60" h="30"
-       checked="true"
-       onColor="#34C759"
-       offColor="#8E8E93"/>
+       x="50" y="50" width="100" height="100"
+       src="assets/logo.png"/>
 
 输入控件
 ~~~~~~~~
@@ -185,95 +211,13 @@ hg_input
 
    <hg_input
        id="username"
-       x="20" y="100" w="200" h="40"
-       placeholder="Enter username"
-       maxLength="20"
-       fontSize="14"/>
+       x="20" y="100" width="200" height="40"
+       placeholder="Enter username"/>
 
-hg_checkbox
-"""""""""""
+hg_checkbox 和 hg_radio
+""""""""""""""""""""""""
 
-复选框：
-
-.. code-block:: xml
-
-   <hg_checkbox
-       id="agree"
-       x="20" y="150" w="24" h="24"
-       checked="false"
-       label="I agree to the terms"/>
-
-hg_radio
-""""""""
-
-单选按钮：
-
-.. code-block:: xml
-
-   <hg_radio
-       id="option1"
-       x="20" y="180" w="24" h="24"
-       groupName="options"
-       checked="true"
-       label="Option 1"/>
-
-高级控件
-~~~~~~~~
-
-hg_progressbar
-""""""""""""""
-
-进度条：
-
-.. code-block:: xml
-
-   <hg_progressbar
-       id="loading"
-       x="50" y="200" w="380" h="10"
-       min="0" max="100" value="75"
-       color="#007AFF"
-       backgroundColor="#E5E5EA"/>
-
-hg_slider
-"""""""""
-
-滑动条：
-
-.. code-block:: xml
-
-   <hg_slider
-       id="volume"
-       x="50" y="220" w="380" h="30"
-       min="0" max="100" value="50"
-       thumbColor="#007AFF"
-       trackColor="#E5E5EA"/>
-
-hg_canvas
-"""""""""
-
-自定义绘图画布：
-
-.. code-block:: xml
-
-   <hg_canvas
-       id="drawing"
-       x="0" y="0" w="480" h="272"
-       backgroundColor="#FFFFFF"/>
-
-hg_list
-"""""""
-
-列表容器：
-
-.. code-block:: xml
-
-   <hg_list
-       id="menu"
-       x="0" y="50" w="480" h="200"
-       itemHeight="50"
-       scrollable="true">
-       <!-- 列表项 -->
-   </hg_list>
+复选框和单选按钮目前在 SDK 中尚未实现 (TODO)，暂不支持使用。
 
 多媒体组件
 ~~~~~~~~~~
@@ -287,10 +231,22 @@ hg_video
 
    <hg_video
        id="player"
-       x="0" y="0" w="480" h="272"
+       x="0" y="0" width="480" height="272"
        src="assets/video.mp4"
        autoplay="false"
        loop="false"/>
+
+hg_gif
+""""""
+
+GIF 动画：
+
+.. code-block:: xml
+
+   <hg_gif
+       id="anim"
+       x="50" y="50" width="150" height="150"
+       src="assets/anim.gif"/>
 
 hg_3d
 """""
@@ -301,9 +257,8 @@ hg_3d
 
    <hg_3d
        id="model"
-       x="50" y="50" w="380" h="380"
-       modelSrc="assets/model.bin"
-       rotationX="0" rotationY="0" rotationZ="0"/>
+       x="50" y="50" width="380" height="380"
+       modelPath="assets/models/cube.bin"/>
 
 事件配置
 ---------
@@ -315,10 +270,12 @@ hg_3d
 
 .. code-block:: xml
 
-   <hg_button id="btn1" x="10" y="10" w="100" h="40" text="Next">
+   <hg_button id="btn1" x="10" y="10" width="100" height="40" text="Next">
        <events>
            <event type="onClick">
-               <action type="switchView" target="page2" animation="slideLeft"/>
+               <action type="switchView" target="page2"
+                       switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
+                       switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION"/>
            </event>
        </events>
    </hg_button>
@@ -327,11 +284,11 @@ hg_3d
 ~~~~~~~~
 
 * **onClick**：点击事件
-* **onLongPress**：长按事件（默认 1000ms）
-* **onSwipe**：滑动事件（up、down、left、right）
-* **onChange**：值改变事件（用于输入框、滑动条等）
-* **onFocus**：获得焦点
-* **onBlur**：失去焦点
+* **onLongPress**：长按事件
+* **onTouchDown**：按下事件
+* **onTouchUp**：抬起事件
+* **onSwipeLeft / onSwipeRight / onSwipeUp / onSwipeDown**：滑动事件（容器组件）
+* **onMessage**：消息监听事件
 
 动作类型
 ~~~~~~~~
@@ -343,16 +300,15 @@ switchView
 
 .. code-block:: xml
 
-   <action type="switchView" target="main_menu" animation="fade"/>
+   <action type="switchView" target="main_menu"
+           switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
+           switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION"/>
 
-动画选项：
+switchOutStyle / switchInStyle 选项：
 
-* ``fade``：淡入淡出
-* ``slideLeft``：从右向左滑动
-* ``slideRight``：从左向右滑动
-* ``slideUp``：从下向上滑动
-* ``slideDown``：从上向下滑动
-* ``none``：无动画
+* 平移： ``SWITCH_OUT_TO_LEFT/RIGHT/TOP/BOTTOM_USE_TRANSLATION``
+* 立方体： ``SWITCH_OUT_TO_LEFT/RIGHT/TOP/BOTTOM_USE_CUBE``
+* 其他： ``SWITCH_OUT_NONE_ANIMATION``、 ``SWITCH_OUT_ANIMATION_FADE``
 
 sendMessage
 """""""""""
@@ -370,7 +326,7 @@ callFunction
 
 .. code-block:: xml
 
-   <action type="callFunction" function="on_button_click"/>
+   <action type="callFunction" functionName="on_button_click"/>
 
 .. note::
    用户需要在生成的回调文件中实现此函数。
@@ -402,65 +358,58 @@ callFunction
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8"?>
-   <hone:HoneyGUI xmlns:hone="http://www.honeygui.com">
-       <HoneyGUI version="1.0">
-           <hg_view id="login_view" x="0" y="0" w="480" h="272">
+   <hml>
+       <meta>
+           <project name="LoginApp" resolution="480X272" />
+       </meta>
+       <view>
+           <hg_view id="login_view" x="0" y="0" width="480" height="272" entry="true">
                <!-- 标题 -->
                <hg_label
                    id="title"
-                   x="0" y="20" w="480" h="40"
+                   x="0" y="20" width="480" height="40"
                    text="User Login"
                    fontSize="24"
-                   fontColor="#333333"
-                   textAlign="center"/>
+                   color="#333333"
+                   hAlign="CENTER"
+                   vAlign="MID"/>
 
                <!-- 用户名输入 -->
                <hg_label
                    id="username_label"
-                   x="40" y="80" w="100" h="30"
+                   x="40" y="80" width="100" height="30"
                    text="Username:"
                    fontSize="16"/>
                <hg_input
                    id="username_input"
-                   x="150" y="80" w="280" h="40"
-                   placeholder="Enter username"
-                   maxLength="20"/>
+                   x="150" y="80" width="280" height="40"
+                   placeholder="Enter username"/>
 
                <!-- 密码输入 -->
                <hg_label
                    id="password_label"
-                   x="40" y="130" w="100" h="30"
+                   x="40" y="130" width="100" height="30"
                    text="Password:"
                    fontSize="16"/>
                <hg_input
                    id="password_input"
-                   x="150" y="130" w="280" h="40"
-                   placeholder="Enter password"
-                   type="password"
-                   maxLength="20"/>
-
-               <!-- 记住密码 -->
-               <hg_checkbox
-                   id="remember"
-                   x="150" y="180" w="24" h="24"
-                   label="Remember me"/>
+                   x="150" y="130" width="280" height="40"
+                   placeholder="Enter password"/>
 
                <!-- 登录按钮 -->
                <hg_button
                    id="login_btn"
-                   x="150" y="220" w="180" h="40"
-                   text="Login"
-                   backgroundColor="#007AFF"
-                   textColor="#FFFFFF">
+                   x="150" y="220" width="180" height="40"
+                   text="Login">
                    <events>
                        <event type="onClick">
-                           <action type="callFunction" function="handle_login"/>
+                           <action type="callFunction" functionName="handle_login"/>
                        </event>
                    </events>
                </hg_button>
            </hg_view>
-       </HoneyGUI>
-   </hone:HoneyGUI>
+       </view>
+   </hml>
 
 多视图导航
 ~~~~~~~~~~
@@ -468,40 +417,48 @@ callFunction
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8"?>
-   <hone:HoneyGUI xmlns:hone="http://www.honeygui.com">
-       <HoneyGUI version="1.0">
-           <hg_view id="home_view" x="0" y="0" w="480" h="272">
+   <hml>
+       <meta>
+           <project name="NavApp" resolution="480X272" />
+       </meta>
+       <view>
+           <hg_view id="home_view" x="0" y="0" width="480" height="272" entry="true">
                <hg_label
                    id="home_title"
-                   x="0" y="20" w="480" h="40"
+                   x="0" y="20" width="480" height="40"
                    text="Home Page"
                    fontSize="24"
-                   textAlign="center"/>
+                   hAlign="CENTER"
+                   vAlign="MID"/>
 
                <hg_button
                    id="to_settings"
-                   x="190" y="100" w="100" h="40"
+                   x="190" y="100" width="100" height="40"
                    text="Settings">
                    <events>
                        <event type="onClick">
-                           <action type="switchView" target="settings_view" animation="slideLeft"/>
+                           <action type="switchView" target="settings_view"
+                                   switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
+                                   switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION"/>
                        </event>
                    </events>
                </hg_button>
 
                <hg_button
                    id="to_about"
-                   x="190" y="160" w="100" h="40"
+                   x="190" y="160" width="100" height="40"
                    text="About">
                    <events>
                        <event type="onClick">
-                           <action type="switchView" target="about_view" animation="fade"/>
+                           <action type="switchView" target="about_view"
+                                   switchOutStyle="SWITCH_OUT_ANIMATION_FADE"
+                                   switchInStyle="SWITCH_IN_ANIMATION_FADE"/>
                        </event>
                    </events>
                </hg_button>
            </hg_view>
-       </HoneyGUI>
-   </hone:HoneyGUI>
+       </view>
+   </hml>
 
 手动编辑 HML
 --------------
@@ -509,7 +466,7 @@ callFunction
 虽然推荐使用可视化设计器，但您也可以直接编辑 HML 文件：
 
 1. 在 VSCode 中右键点击 ``.hml`` 文件
-2. 选择 **用文本编辑器打开**
+2. 选择 :guilabel:`用文本编辑器打开`
 3. 直接修改 XML 内容
 4. 保存后，可以重新用设计器打开查看效果
 
@@ -534,9 +491,9 @@ callFunction
 命名规范
 ~~~~~~~~
 
-* 使用小写字母和下划线：``main_view``, ``login_button``
-* 避免使用数字开头：``view1`` 改为 ``view_1``
-* 使用有意义的名称：``submit_btn`` 而不是 ``btn1``
+* 使用小写字母和下划线： ``main_view``, ``login_button``
+* 避免使用数字开头： ``1view`` 改为 ``view_1``
+* 使用有意义的名称： ``submit_btn`` 而不是 ``btn1``
 
 组织结构
 ~~~~~~~~

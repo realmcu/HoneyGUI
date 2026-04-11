@@ -18,7 +18,7 @@ Tool Overview
 
 The resource conversion tools in HoneyGUI Visual Designer plugin support the following resource types:
 
-- **Image Conversion**: PNG, JPEG, BMP, GIF → bin files
+- **Image Conversion**: :term:`PNG`, JPEG, BMP, GIF → bin files
 - **3D Model Conversion**: OBJ, GLTF → descriptor bin files
 - **Video Conversion**: MP4, AVI, MOV, etc. → MJPEG/AVI/H264 formats
 - **Font Conversion**: TTF, OTF → bitmap or vector font bin files
@@ -76,7 +76,7 @@ In the resource conversion tool panel:
 2. **Select Resource**: Click on a resource file in the left list.
 3. **Right Properties Panel**: Configure conversion parameters for that resource.
 
-   - Images: Format (RGB565, ARGB8888, etc.), compression method (RLE, FastLZ, YUV)
+   - Images: Format (RGB565, ARGB8888, etc.), compression method (:term:`RLE`, FastLZ, YUV)
    - Fonts: Font size, render mode (1/2/4/8 bpp), character set, output format
    - Videos: Output format (MJPEG, AVI, H264), frame rate, quality, crop/scale
    - 3D Models: Format automatically recognized, no additional configuration needed
@@ -369,7 +369,7 @@ Font file size is affected by character set, font size, bit depth, and other fac
 Glass Effect Conversion
 ------------------------
 
-Glass effect is a visual effect that blurs the background, commonly used to achieve frosted glass, matte glass, and other UI effects.
+Glass effect is a visual effect that blurs the background, commonly used to achieve frosted glass, matte glass, and other :term:`UI` effects.
 
 Supported Formats
 ^^^^^^^^^^^^^^^^^

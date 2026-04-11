@@ -337,10 +337,10 @@ To run this example, enable the Kconfig option via ``menuconfig`` and save to ``
    <br>
 
 
-.. _3D App List:
+.. _3D Application List:
 
-3D App List
-~~~~~~~~~~~~
+3D Application List
+~~~~~~~~~~~~~~~~~~~~~
 
 This interface consists of 6 3D application icons. By calling the function ``l3_set_face_image(l3_model_base_t *_this, uint8_t face_index, void *image_addr)``, you can replace the texture map of a specified face of the 3D model.
 
@@ -381,7 +381,7 @@ FPS Benchmark
 The table below shows the frame rate performance of various examples on different chip platforms. The compilation environment uses ``ARMCLANG V6.22`` with the ``-O2 LTO`` compilation option.
 
 .. csv-table:: FPS Benchmark Results
-   :header: Chip Model,CPU Frequency,Resolution,:ref:`3D Butterfly`,:ref:`3D Face`,:ref:`3D Dog`,:ref:`3D App List`,:ref:`3D Robot`
+   :header: Chip Model,CPU Frequency,Resolution,:ref:`3D Butterfly`,:ref:`3D Face`,:ref:`3D Dog`,:ref:`3D Application List`,:ref:`3D Robot`
    :align: center
    :name: FPS Benchmark Results
 

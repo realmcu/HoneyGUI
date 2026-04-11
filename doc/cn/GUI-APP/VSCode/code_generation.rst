@@ -1,12 +1,12 @@
 代码生成
 ========
 
-本文档描述 HoneyGUI Design 的代码生成功能,包括架构设计、使用方法和实现细节。
+本文档描述 HoneyGUI Visual Designer 的代码生成功能，包括架构设计、使用方法和实现细节。
 
 概述
 ----
 
-从 HML 设计器生成调用 HoneyGUI API 的 C 代码,实现可视化设计到嵌入式 GUI 代码的转换。
+从 HML 设计器生成调用 HoneyGUI :term:`API` 的 C 代码，实现可视化设计到嵌入式 :term:`GUI` 代码的转换。
 
 代码生成流程
 ------------
@@ -23,23 +23,23 @@
 
 .. code-block:: text
 
-   CodeGenerator (服务层)
+   CodeGenerator（服务层）
      ├─ 扫描项目中的所有 HML 文件
      ├─ 生成项目入口文件 (EntryFileGenerator)
      ├─ 生成构建脚本 (SConscriptGenerator)
      └─ 为每个 HML 生成代码 (HoneyGuiCCodeGenerator)
 
-   EntryFileGenerator (独立工具)
+   EntryFileGenerator（独立工具）
      └─ 生成 {ProjectName}Entry.c
 
-   SConscriptGenerator (独立工具)
+   SConscriptGenerator（独立工具）
      └─ 生成 src/SConscript
 
-   HoneyGuiCCodeGenerator (核心生成器)
+   HoneyGuiCCodeGenerator（核心生成器）
      ├─ 生成 {hmlFileName}_ui.h
      ├─ 生成 {hmlFileName}_ui.c
      ├─ 生成 {hmlFileName}_callbacks.h
-     ├─ 生成 {hmlFileName}_callbacks.c (含保护区)
+     ├─ 生成 {hmlFileName}_callbacks.c（含保护区）
      ├─ 生成 {hmlFileName}_user.h
      └─ 生成 {hmlFileName}_user.c
 
@@ -50,14 +50,14 @@
 ~~~~~~~~
 
 * 使用 HML 文件名作为生成文件的基础名称
-* 例如: ``main.hml`` → ``main.h``, ``main.c``, ``main_callbacks.h``, ``main_callbacks.c``
+* 例如： ``main.hml`` → ``main.h``, ``main.c``, ``main_callbacks.h``, ``main_callbacks.c``
 
 目录映射
 ~~~~~~~~
 
 * HML 文件在 ``ui/xxx/`` 目录 → C 代码生成到 ``src/`` 目录的对应子目录
 * 每个 HML 文件生成到独立的子目录
-* 例如: ``ui/main/main.hml`` → ``src/ui/main_ui.c``, ``src/callbacks/main_callbacks.c``, ``src/user/main_user.c``
+* 例如： ``ui/main/main.hml`` → ``src/ui/main_ui.c``, ``src/callbacks/main_callbacks.c``, ``src/user/main_user.c``
 * 自动创建不存在的子目录
 
 生成文件结构
@@ -74,17 +74,17 @@
    └── src/
        ├── {ProjectName}Entry.c    # 项目入口文件
        ├── SConscript              # 构建脚本
-       ├── ui/                     # UI代码(每次覆盖)
+       ├── ui/                     # UI代码（每次覆盖）
        │   ├── main_ui.h
        │   ├── main_ui.c
        │   ├── settings_ui.h
        │   └── settings_ui.c
-       ├── callbacks/              # 回调代码(保护区)
+       ├── callbacks/              # 回调代码（保护区）
        │   ├── main_callbacks.h
        │   ├── main_callbacks.c
        │   ├── settings_callbacks.h
        │   └── settings_callbacks.c
-       └── user/                   # 用户代码(只生成一次)
+       └── user/                   # 用户代码（只生成一次）
            ├── main_user.h
            ├── main_user.c
            ├── settings_user.h
@@ -97,7 +97,7 @@
 ~~~~~~~~
 
 1. 在设计器中打开任意 HML 文件
-2. 点击工具栏的"生成代码"按钮
+2. 点击工具栏的 :gui_label:`生成代码`
 3. 自动扫描项目中所有 HML 文件并生成代码
 4. 显示生成进度和结果
 
@@ -109,8 +109,8 @@
 
 **快捷方式**:
 
-* 命令面板: ``Ctrl+Shift+P`` → ``HoneyGUI: Generate Code``
-* 工具栏按钮: 点击"生成代码"
+* 命令面板： ``Ctrl+Shift+P`` → ``HoneyGUI: Generate Code``
+* 工具栏按钮：点击 :gui_label:`生成代码`
 
 代码保护区
 ----------
@@ -120,9 +120,9 @@
 
 .. code-block:: c
 
-   // HONEYGUI PROTECTED START [unique_id]
+   /* @protected start unique_id */
    // 这里的代码在重新生成时会被保留
-   // HONEYGUI PROTECTED END [unique_id]
+   /* @protected end unique_id */
 
 示例
 ~~~~
@@ -131,25 +131,21 @@
 
 .. code-block:: c
 
-   // HONEYGUI PROTECTED START [on_start_click]
-   void on_start_click(gui_obj_t *obj) {
-       // TODO: 实现事件处理逻辑
-   }
-   // HONEYGUI PROTECTED END [on_start_click]
+   /* @protected start custom_functions */
+   // Custom functions
+   /* @protected end custom_functions */
 
 **用户修改后**:
 
 .. code-block:: c
 
-   // HONEYGUI PROTECTED START [on_start_click]
-   void on_start_click(gui_obj_t *obj) {
+   /* @protected start custom_functions */
+   void on_start_click(void *obj, gui_event_t *e) {
        printf("Starting application...\n");
-       init_app_state();
-       load_user_settings();
    }
-   // HONEYGUI PROTECTED END [on_start_click]
+   /* @protected end custom_functions */
 
-**重新生成后**: 保护区内的代码被保留,其他代码更新。
+**重新生成后**: 保护区内的代码被保留，其他代码更新。
 
 生成的代码结构
 --------------
@@ -212,11 +208,16 @@
    // main_callbacks.c
    #include "main_callbacks.h"
 
-   /* @protected start on_start_click */
-   void on_start_click(gui_obj_t *obj) {
-       // 用户实现逻辑
+   void on_btn1_click(void *obj, gui_event_t *e)
+   {
+       GUI_UNUSED(obj);
+       GUI_UNUSED(e);
+       // TODO: Implement event handling logic
    }
-   /* @protected end on_start_click */
+
+   /* @protected start custom_functions */
+   // Custom functions
+   /* @protected end custom_functions */
 
 注意事项
 --------
@@ -224,18 +225,18 @@
 1. **目录结构**: HML 文件必须在 ``ui/`` 目录下的子目录中
 2. **文件命名**: HML 文件名应使用有效的 C 标识符
 3. **保护区**: 不要手动修改保护区标记
-4. **重新生成**: 修改 HML 后重新生成,用户代码会被保留
-5. **多文件**: 每个 HML 独立生成,互不影响
+4. **重新生成**: 修改 HML 后重新生成，用户代码会被保留
+5. **多文件**: 每个 HML 独立生成，互不影响
 
 视图切换实现
 ------------
 
-对于 ``hg_view`` 组件的视图切换 (switchView),代码生成器不再生成独立的回调函数,而是利用 HoneyGUI SDK 的 ``GUI_VIEW_INSTANCE`` 宏和 ``gui_view_switch_on_event`` 函数在 ``switch_in`` 回调中直接注册。这大大简化了代码结构,并减少了不必要的保护区。
+对于 ``hg_view`` 组件的视图切换 (switchView)，代码生成器不再生成独立的回调函数，而是利用 HoneyGUI SDK 的 ``GUI_VIEW_INSTANCE`` 宏和 ``gui_view_switch_on_event`` 函数在 ``switch_in`` 回调中直接注册。这大大简化了代码结构，并减少了不必要的保护区。
 
 示例
 ~~~~
 
-HML 文件中配置的视图切换事件:
+HML 文件中配置的视图切换事件：
 
 .. code-block:: xml
 
@@ -249,7 +250,7 @@ HML 文件中配置的视图切换事件:
        </events>
    </hg_view>
 
-生成的 C 代码:
+生成的 C 代码：
 
 .. code-block:: c
 
@@ -269,7 +270,7 @@ HML 文件中配置的视图切换事件:
 构建生成的代码
 --------------
 
-生成代码后,可以使用 SCons 构建系统编译项目:
+生成代码后，可以使用 SCons 构建系统编译项目：
 
 .. code-block:: bash
 

@@ -117,7 +117,7 @@ Rounded Rectangle widgets are applicable in scenarios such as:
 - **Modern Buttons**: Create interactive buttons with rounded corner effects
 - **Card Layouts**: Implement card-style UI design elements
 - **Dialogs and Panels**: Render rounded corner dialogs and information panels
-- **Icon Backgrounds**: Serve as background for app icons or functional icons
+- **Icon Backgrounds**: Serve as background for application icons or functional icons
 - **Progress Bar Containers**: Create rounded containers for progress bars
 - **List Items**: Implement rounded list items or menu items
 - **Animated Elements**: Support animation effects with dynamic position changes

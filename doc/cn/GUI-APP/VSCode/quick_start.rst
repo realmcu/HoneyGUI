@@ -1,7 +1,7 @@
 快速开始
 ========
 
-本章节介绍如何安装 HoneyGUI Visual Designer 插件并创建第一个 GUI 应用程序。
+本章节介绍如何安装 HoneyGUI Visual Designer 插件并创建第一个 :term:`GUI` 应用程序。
 
 安装要求
 ---------
@@ -11,18 +11,18 @@
 
 * **VSCode**：版本 1.60.0 或更高
 * **Python**：3.9.7 或更高版本
-* **SCons**：4.4.0 (通过 ``pip install scons==4.4.0`` 安装)
+* **SCons**：4.4.0 （通过 ``pip install scons==4.4.0`` 安装）
 * **kconfiglib**：通过 ``pip install kconfiglib`` 安装
 
 **Windows 平台**：
 
-* MinGW-w64 (推荐 8.1.0 版本)，安装路径 ``C:\mingw64``
-* CMake 3.31.2+ (可选，用于 CMake 构建方式)
+* MinGW-w64 （推荐 8.1.0 版本），安装路径 ``C:\mingw64``
+* CMake 3.31.2+ （可选，用于 CMake 构建方式）
 
 **Linux/WSL 平台**：
 
 * GCC 工具链
-* SDL2 开发库：``sudo apt-get install libsdl2-dev``
+* SDL2 开发库： ``sudo apt-get install libsdl2-dev``
 
 安装插件
 ---------
@@ -32,16 +32,16 @@
 
 1. 打开 VSCode
 2. 点击左侧活动栏的扩展图标（或按 ``Ctrl+Shift+X``）
-3. 在搜索框中输入 **"HoneyGUI Visual Designer"**
-4. 点击 **安装** 按钮
+3. 在搜索框中输入 ``HoneyGUI Visual Designer``
+4. 点击 :guilabel:`安装` 按钮
 
 方法二：从 VSIX 文件安装
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. 下载插件的 ``.vsix`` 文件
 2. 在 VSCode 中，打开扩展面板
-3. 点击右上角的 **...** 菜单
-4. 选择 **从 VSIX 安装...**
+3. 点击右上角的 :guilabel:`...` 菜单
+4. 选择 :guilabel:`从 VSIX 安装...`
 5. 选择下载的 VSIX 文件
 
 环境检查
@@ -49,7 +49,7 @@
 
 安装完成后，插件会自动检查开发环境：
 
-1. 打开 VSCode 命令面板（``Ctrl+Shift+P``）
+1. 打开 VSCode 命令面板（或按 ``Ctrl+Shift+P``）
 2. 输入并执行 ``HoneyGUI: Check Environment``
 3. 查看终端输出，确认所有依赖项已安装
 
@@ -63,12 +63,12 @@
 ~~~~~~~~~~~~
 
 1. 点击 VSCode 左侧活动栏的 HoneyGUI 图标
-2. 在侧边栏中点击 **新建项目** 按钮
+2. 在侧边栏中点击 :guilabel:`新建项目` 按钮
 3. 选择项目模板：
 
    * **空白项目**：从零开始设计界面
-   * **Watch 项目**：智能手表界面模板（410x502）
-   * **Dashboard 项目**：仪表盘界面模板（800x480）
+   * **Watch 项目**：智能手表界面模板 (410x502)
+   * **Dashboard 项目**：仪表盘界面模板 (800x480)
 
 4. 输入项目名称
 5. 选择项目保存位置
@@ -76,7 +76,7 @@
 
 .. figure:: resource/create-project.png
    :align: center
-   :width: 600px
+   :width: 900px
 
    创建新项目
 
@@ -89,7 +89,7 @@
 
    my-project/
    ├── project.json          # 项目配置文件
-   ├── views/                # HML 界面文件目录
+   ├── ui/                   # HML 界面文件目录
    │   └── main.hml          # 主界面
    ├── src/                  # 生成的 C 代码
    │   ├── ui/               # UI 结构代码（自动生成）
@@ -112,7 +112,7 @@
 
 .. figure:: resource/design-ui.png
    :align: center
-   :width: 800px
+   :width: 900px
 
    可视化设计器界面
 
@@ -145,8 +145,8 @@
 * **移动组件**：拖动选中的组件
 * **调整尺寸**：拖动组件边缘的控制点
 * **删除组件**：选中后按 ``Delete`` 键
-* **复制粘贴**：``Ctrl+C`` / ``Ctrl+V``
-* **撤销重做**：``Ctrl+Z`` / ``Ctrl+Y``
+* **复制粘贴**： ``Ctrl+C`` / ``Ctrl+V``
+* **撤销重做**： ``Ctrl+Z`` / ``Ctrl+Y``
 
 生成代码
 ---------
@@ -156,13 +156,13 @@
 
 设计完成后，插件会自动生成 C 代码：
 
-1. 点击工具栏的 **生成代码** 按钮，或使用命令面板：
+1. 点击工具栏的 :guilabel:`生成代码` 按钮，或使用命令面板：
 
    .. code-block:: text
 
       Ctrl+Shift+P → HoneyGUI: Generate Code
 
-2. 插件会扫描 ``views/`` 目录下的所有 HML 文件
+2. 插件会扫描 ``ui/`` 目录下的所有 HML 文件
 3. 自动生成以下文件：
 
    * ``src/ui/*.c`` - UI 结构代码（每次重新生成）
@@ -172,16 +172,16 @@
 代码保护区
 ~~~~~~~~~~
 
-生成的代码包含保护区标记，用户可以在保护区内添加自定义逻辑：
+生成的回调代码包含保护区标记，用户可以在保护区内添加自定义逻辑：
 
 .. code-block:: c
 
-   // @protected start
+   /* @protected start custom_functions */
    // 在这里添加您的代码
-   void on_button_click(void *obj, gui_event_t *event) {
+   void on_button_click(void *obj, gui_event_t *e) {
        printf("Button clicked!\n");
    }
-   // @protected end
+   /* @protected end custom_functions */
 
 .. warning::
    保护区外的代码会在重新生成时被覆盖，请务必将自定义代码写在保护区内。
@@ -192,8 +192,8 @@
 编译项目
 ~~~~~~~~
 
-1. 点击工具栏的 **▶ 编译仿真** 按钮
-2. 或使用命令面板：``HoneyGUI: Build and Simulate``
+1. 点击工具栏的 :guilabel:`仿真` 按钮
+2. 或使用命令面板： ``HoneyGUI: Build and Simulate``
 3. 插件会自动执行：
 
    * 转换资源文件（图片、字体等）
@@ -202,7 +202,7 @@
 
 .. figure:: resource/compile.png
    :align: center
-   :width: 600px
+   :width: 900px
 
    编译仿真
 
@@ -227,8 +227,8 @@
 **仿真器无法启动**：
 
 1. 检查 SDL2 库是否已安装
-2. 在 Linux 上：``sudo apt-get install libsdl2-dev``
-3. 在 Windows 上：确认 MinGW 包含 SDL2
+2. 在 Linux 上： ``sudo apt-get install libsdl2-dev``
+3. 在 Windows 上：确认 MinGW 包含 SDL2 库
 
 下一步
 -------

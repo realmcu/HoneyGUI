@@ -1,12 +1,12 @@
 资源管理
 ========
 
-HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型等资源转换为 HoneyGUI 支持的二进制格式。这些工具采用纯 JavaScript/TypeScript 实现,无需安装 Python 环境。
+HoneyGUI Visual Designer 提供了内置的资源转换工具，用于将图片、3D 模型等资源转换为 HoneyGUI 支持的二进制格式。这些工具采用纯 JavaScript/TypeScript 实现，无需安装 Python 环境。关于该工具的详细使用方法，请参见 :ref:`VSCode插件资源转换`。
 
 概述
 ----
 
-``tools/`` 目录包含了纯 JavaScript/TypeScript 实现的 HoneyGUI 转换工具,用于替代 SDK 中的 Python 工具。
+``tools/`` 目录包含了纯 JavaScript/TypeScript 实现的 HoneyGUI 转换工具，用于替代 SDK 中的 Python 工具。
 
 为什么需要 JS 版本?
 -------------------
@@ -22,10 +22,10 @@ HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型
 解决方案
 ~~~~~~~~
 
-* ✅ 纯 JS/TS 实现,无需 Python
-* ✅ 插件自包含,开箱即用
+* ✅ 纯 JS/TS 实现，无需 Python
+* ✅ 插件自包含，开箱即用
 * ✅ 性能提升 25-40%
-* ✅ 统一技术栈,易于维护
+* ✅ 统一技术栈，易于维护
 
 功能对比
 --------
@@ -70,26 +70,23 @@ HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型
      - ✅
      - ✅
      - 完成
-   * - MTL 材质
+   * - GLTF 解析
      - ✅
      - ✅
      - 完成
    * - RLE 压缩
      - ✅
-     - ⏳
-     - 计划中
+     - ✅
+     - 完成
    * - FastLZ 压缩
      - ✅
-     - ⏳
-     - 计划中
+     - ✅
+     - 完成
    * - YUV 压缩
      - ✅
      - ⏳
      - 计划中
-   * - GLTF 解析
-     - ✅
-     - ⏳
-     - 计划中
+
 
 工具目录结构
 ------------
@@ -98,20 +95,29 @@ HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型
 
    tools/
    ├── image-converter/       # 图像转换模块
-   │   ├── types.ts          # 格式定义
-   │   ├── headers.ts        # 二进制头部
+   │   ├── compress/          # 压缩算法
+   │   │   ├── base.ts        # 压缩基类
+   │   │   ├── fastlz.ts      # FastLZ 压缩
+   │   │   ├── rle.ts         # RLE 压缩
+   │   │   ├── yuv.ts         # YUV 采样压缩
+   │   │   └── index.ts       # 导出
+   │   ├── types.ts           # 格式定义
+   │   ├── headers.ts         # 二进制头部
    │   ├── pixel-converter.ts # 像素转换
-   │   └── converter.ts      # 主转换器
+   │   └── converter.ts       # 主转换器
    ├── model-converter/       # 3D 模型转换模块
-   │   ├── types.ts          # 模型类型
-   │   ├── obj-parser.ts     # OBJ 解析器
-   │   └── obj-converter.ts  # OBJ 转换器
-   ├── tests/                 # 测试用例
+   │   ├── types.ts           # 模型类型
+   │   ├── obj-parser.ts      # OBJ 解析器
+   │   ├── obj-converter.ts   # OBJ 转换器
+   │   ├── gltf-parser.ts     # GLTF 解析器
+   │   └── gltf-converter.ts  # GLTF 转换器
+   ├── font-converter/        # 字体转换模块
+   ├── image-to-jpeg-converter/ # JPEG 转换模块
+   ├── glass-generator/       # Glass 效果生成
+   ├── video-converter-ts/    # 视频转换模块
    ├── examples/              # 使用示例
-   ├── README.md             # 项目说明
-   ├── QUICKSTART.md         # 快速开始
-   ├── INTEGRATION.md        # 集成指南
-   └── COMPLETION_REPORT.md  # 完成报告
+   ├── tests/                 # 测试用例
+   └── index.ts               # 统一导出
 
 图像资源管理
 ------------
@@ -121,14 +127,14 @@ HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型
 
 **输入格式**:
 
-* PNG (推荐)
+* :term:`PNG` （推荐）
 * JPEG/JPG
 
 **输出格式**:
 
-* RGB565 - 16 位颜色,无透明度
-* RGB888 - 24 位真彩色,无透明度
-* ARGB8888 - 32 位真彩色,完整透明度
+* RGB565 - 16 位颜色，无透明度
+* RGB888 - 24 位真彩色，无透明度
+* ARGB8888 - 32 位真彩色，完整透明度
 * ARGB8565 - 24 位混合格式 (RGB565 + 8 位 Alpha)
 * A8 - 8 位灰度/透明度
 
@@ -137,12 +143,12 @@ HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型
 
 1. 将图片文件 (PNG/JPEG) 放入 ``assets/images/`` 目录
 2. 构建项目时自动转换为 ``.bin`` 格式
-3. 在 HML 中引用: ``src="assets/images/logo.bin"``
+3. 在 HML 中引用： ``src="assets/images/logo.bin"``
 
 手动转换图像
 ~~~~~~~~~~~~
 
-在插件中使用:
+在插件中使用：
 
 .. code-block:: typescript
 
@@ -176,23 +182,23 @@ HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型
      - 文件大小
      - 适用场景
    * - RGB565
-     - 最小 (2 字节/像素)
+     - 最小（2 字节/像素）
      - 不需要透明度的图标、背景
    * - RGB888
-     - 中等 (3 字节/像素)
-     - 高质量图片,无透明需求
+     - 中等（3 字节/像素）
+     - 高质量图片，无透明需求
    * - ARGB8888
-     - 最大 (4 字节/像素)
+     - 最大（4 字节/像素）
      - 需要透明度的图标、UI 元素
    * - ARGB8565
-     - 中等 (3 字节/像素)
+     - 中等（3 字节/像素）
      - 平衡透明度和文件大小
    * - A8
-     - 最小 (1 字节/像素)
+     - 最小（1 字节/像素）
      - 单色图标、遮罩
 
 .. tip::
-   使用 ``'auto'`` 模式让转换器根据图像特性自动选择最优格式:
+   使用 ``auto`` 模式让转换器根据图像特性自动选择最优格式：
 
    * 有透明通道 → ARGB8888
    * 无透明通道 → RGB565
@@ -206,16 +212,12 @@ HoneyGUI Design 提供了内置的资源转换工具,用于将图片、3D 模型
 **当前支持**:
 
 * OBJ (Wavefront Object) - ✅ 已实现
-* MTL (Material Template Library) - ✅ 已实现
-
-**计划支持**:
-
-* GLTF/GLB - ⏳ 开发中
+* GLTF (GL Transmission Format) - ✅ 已实现
 
 OBJ 模型转换
 ~~~~~~~~~~~~
 
-OBJ 转换流程:
+OBJ 转换流程：
 
 1. 将 ``.obj`` 和 ``.mtl`` 文件放入 ``assets/models/`` 目录
 2. 构建时自动转换为 HoneyGUI 二进制格式
@@ -240,10 +242,10 @@ OBJ 转换流程:
 模型优化建议
 ~~~~~~~~~~~~
 
-* **顶点数量**: 控制在 10000 以内 (嵌入式设备限制)
-* **面片数量**: 尽量使用三角面,避免复杂多边形
-* **材质**: 使用简单材质,避免复杂着色器
-* **纹理**: 压缩纹理图片,使用适当的分辨率
+* **顶点数量**: 控制在 10000 以内 （嵌入式设备限制）
+* **面片数量**: 尽量使用三角面，避免复杂多边形
+* **材质**: 使用简单材质，避免复杂着色器
+* **纹理**: 压缩纹理图片，使用适当的分辨率
 
 字体资源管理
 ------------
@@ -251,15 +253,15 @@ OBJ 转换流程:
 字体格式
 ~~~~~~~~
 
-HoneyGUI 支持以下字体格式:
+HoneyGUI 支持以下字体格式：
 
 * TTF (TrueType Font)
-* BIN (预转换的二进制字体)
+* BIN （预转换的二进制字体）
 
 字体转换
 ~~~~~~~~
 
-使用 HoneyGUI SDK 的字体工具转换:
+使用 HoneyGUI SDK 的字体工具转换：
 
 .. code-block:: bash
 
@@ -270,7 +272,7 @@ HoneyGUI 支持以下字体格式:
 .. note::
    字体转换目前仍使用 SDK 提供的 Python 工具。VSCode 插件会在未来版本中集成 JS 版本的字体转换器。
 
-在 HML 中使用字体:
+在 HML 中使用字体：
 
 .. code-block:: xml
 
@@ -285,18 +287,18 @@ HoneyGUI 支持以下字体格式:
 ROM 文件系统
 ~~~~~~~~~~~~
 
-HoneyGUI 使用 ROM 文件系统管理资源:
+HoneyGUI 使用 ROM 文件系统管理资源：
 
 1. 所有资源放在 ``assets/`` 目录
 2. 构建时使用 ``mkromfs`` 工具打包
 3. 生成 ``root.bin`` 文件包含所有资源
 4. 嵌入式设备从 Flash 加载
 
-打包流程:
+打包流程：
 
 .. code-block:: bash
 
-   # 自动打包 (在构建过程中)
+   # 自动打包 （在构建过程中）
    cd win32_sim
    scons
 
@@ -307,7 +309,7 @@ HoneyGUI 使用 ROM 文件系统管理资源:
 资源路径规范
 ~~~~~~~~~~~~
 
-在 HML 中引用资源时使用相对路径:
+在 HML 中引用资源时使用相对路径：
 
 .. code-block:: xml
 
@@ -322,7 +324,7 @@ HoneyGUI 使用 ROM 文件系统管理资源:
 性能数据
 --------
 
-JS/TS 工具 vs Python 工具性能对比:
+JS/TS 工具 vs Python 工具性能对比：
 
 .. list-table::
    :header-rows: 1
@@ -336,7 +338,7 @@ JS/TS 工具 vs Python 工具性能对比:
      - 50ms
      - 30ms
      - 40%
-   * - OBJ 解析 (1000 顶点)
+   * - OBJ 解析（1000 顶点）
      - 80ms
      - 60ms
      - 25%
@@ -353,13 +355,13 @@ JS/TS 工具 vs Python 工具性能对比:
 
 1. **图像优化**:
 
-   * 使用合适的分辨率 (避免过大的图片)
+   * 使用合适的分辨率（避免过大的图片）
    * 选择正确的像素格式
-   * 考虑使用压缩 (即将支持)
+   * 考虑使用压缩
 
 2. **模型优化**:
 
-   * 简化几何体 (减少顶点和面片)
+   * 简化几何体（减少顶点和面片）
    * 使用低分辨率纹理
    * 移除不必要的细节
 
@@ -374,8 +376,8 @@ JS/TS 工具 vs Python 工具性能对比:
 
 * **目录组织**: 按类型分类资源 (images/, models/, fonts/)
 * **命名规范**: 使用清晰的文件名 (logo.png, button_bg.png)
-* **版本控制**: 将源文件 (PNG, OBJ) 加入 Git,生成的 .bin 文件加入 .gitignore
-* **资源清单**: 维护资源列表文档,记录用途和格式
+* **版本控制**: 将源文件 (PNG, OBJ) 加入 Git，生成的 .bin 文件加入 .gitignore
+* **资源清单**: 维护资源列表文档，记录用途和格式
 
 故障排查
 --------
@@ -389,10 +391,10 @@ JS/TS 工具 vs Python 工具性能对比:
 
    Error: Failed to convert image
 
-解决方案:
+解决方案：
 
 * 检查图像文件是否损坏
-* 确认文件格式 (仅支持 PNG/JPEG)
+* 确认文件格式（仅支持 PNG/JPEG）
 * 检查文件权限
 
 **问题 2: 模型加载失败**
@@ -401,7 +403,7 @@ JS/TS 工具 vs Python 工具性能对比:
 
    Error: Failed to parse OBJ file
 
-解决方案:
+解决方案：
 
 * 检查 OBJ 文件语法
 * 确认 MTL 文件路径正确
@@ -409,7 +411,7 @@ JS/TS 工具 vs Python 工具性能对比:
 
 **问题 3: 字体显示异常**
 
-解决方案:
+解决方案：
 
 * 确认字体文件格式正确
 * 检查字体文件路径
@@ -429,4 +431,3 @@ JS/TS 工具 vs Python 工具性能对比:
 * 学习 :doc:`code_generation` 了解如何在代码中使用资源
 * 查看 :doc:`build_simulation` 了解完整的构建流程
 * 参考 :doc:`deployment` 了解资源在嵌入式设备上的部署
-* 阅读 HoneyGUI SDK 工具文档了解更多资源格式细节

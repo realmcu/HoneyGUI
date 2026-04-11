@@ -1,7 +1,7 @@
 Event System
 ============
 
-The HoneyGUI Design event system adopts the **Event-Action** pattern, allowing users to configure event responses for components in the designer without writing code to implement common interaction logic.
+The HoneyGUI Visual Designer event system adopts the **Event-Action** pattern, allowing users to configure event responses for components in the designer without writing code to implement common interaction logic.
 
 Core Concepts
 -------------
@@ -27,16 +27,16 @@ UI Design Changes
 Unified Property Panel Tabs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The original "View Switch" functionality has been unified into the Event-Action system:
+The original view switch functionality has been unified into the Event-Action system:
 
 .. code-block:: text
 
-   ┌─────────────────────────────────────┐
-   │ [Properties] [Events]               │  ← Used uniformly by all components
-   ├─────────────────────────────────────┤
+   +-------------------------------------+
+   | [Properties] [Events]               |  <- Used uniformly by all components
+   +-------------------------------------+
 
 * **Properties**: Basic component attributes (position, size, style, etc.)
-* **Events**: Event-Action configuration (includes original "View Switch" functionality)
+* **Events**: Event-Action configuration (includes original view switch functionality)
 
 Event Types
 -----------
@@ -163,7 +163,7 @@ Component Supported Events
      - onClick, onLongPress, onTouchDown, onTouchUp, onMessage
    * - hg_image
      - onClick, onLongPress, onTouchDown, onTouchUp, onMessage
-   * - hg_text
+   * - hg_label
      - onClick, onLongPress, onMessage
    * - hg_switch
      - onClick, onCheckedChange, onMessage
@@ -281,7 +281,7 @@ Event Configuration in HML
      </events>
    </hg_button>
 
-**View Swipe Switch (Original view_switch functionality)**:
+**View Swipe Switch (original view_switch functionality)**:
 
 .. code-block:: xml
 
@@ -412,7 +412,7 @@ Practical Examples
 Example 1: Button Click to Jump
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Scenario**: Click "Next" button to jump to page 2
+**Scenario**: Click :gui_label:`Next` button to jump to page 2
 
 **HML Configuration**:
 
@@ -490,13 +490,13 @@ Example 3: Message Communication
 
 .. code-block:: xml
 
-   <hg_text id="data_label" x="10" y="60" w="200" h="30" text="Data">
+   <hg_label id="data_label" x="10" y="60" w="200" h="30" text="Data">
      <events>
        <event type="onMessage" message="refresh_data">
-         <action type="callFunction" function="on_refresh_data" />
+         <action type="callFunction" functionName="on_refresh_data" />
        </event>
      </events>
-   </hg_text>
+   </hg_label>
 
 Example 4: Custom Function Call
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -510,7 +510,7 @@ Example 4: Custom Function Call
    <hg_button id="save_btn" x="10" y="10" w="100" h="40" text="Save">
      <events>
        <event type="onClick">
-         <action type="callFunction" function="save_settings" />
+         <action type="callFunction" functionName="save_settings" />
        </event>
      </events>
    </hg_button>

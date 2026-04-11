@@ -1,13 +1,13 @@
 Using VSCode Plugin to Develop Applications
 ============================================
 
-HoneyGUI Visual Designer is a powerful VSCode extension that provides a visual design environment, code generation, and real-time simulation tools for embedded GUI application development.
+HoneyGUI Visual Designer is a powerful VSCode extension that provides a visual design environment, code generation, and real-time simulation tools for embedded :term:`GUI` application development.
 
 Key Features
 -------------
 
 * **Fully Offline Development**: No network dependency, all features run locally
-* **Visual Design**: Drag-and-drop design interface with WYSIWYG experience
+* **Visual Design**: Drag and drop design interface, what you see is what you get
 * **HML File Format**: XML-based interface description language, version control friendly
 * **Code Protection Mechanism**: User code is never overwritten, supports multiple redesigns
 * **One-Stop Workflow**: Integrated design, coding, compilation, and simulation workflow
