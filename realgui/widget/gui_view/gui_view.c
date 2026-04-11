@@ -226,14 +226,14 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
     // gui_log("g_Target = %d\n", g_Target);
     g_Offset = 0;
 
-    if (g_Release != 0)
+    if (g_Release == 0 && g_Target == 0)
     {
-        gui_obj_create_timer(o, 10, true, gui_view_released_view_timer_cb);
-        gui_obj_start_timer(o);
+        gui_view_released_view_timer_cb(obj);
     }
     else
     {
-        gui_view_released_view_timer_cb(obj);
+        gui_obj_create_timer(o, 10, true, gui_view_released_view_timer_cb);
+        gui_obj_start_timer(o);
     }
 }
 
@@ -857,7 +857,10 @@ void gui_view_switch_direct(gui_view_t *_this, const char *target_view_name,
         return;
     }
 
-    if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor || g_NextView) { return; }
+    if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor)
+    {
+        return;
+    }
     gui_view_switch_on_event(_this, target_view_name, switch_out_style, switch_in_style,
                              GUI_EVENT_INVALID);
 }
