@@ -40,7 +40,7 @@ Configurations
 Usage Steps
 ------------
 
-Step 1:  Declare the APP ui design function
+Step 1:  Declare Ui Design Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: C
@@ -56,7 +56,7 @@ Step 1:  Declare the APP ui design function
       app_fruit_ninja::fruit_ninja_design(obj);
    }
 
-Step 2:  Call function
+Step 2:  Call Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: c
 

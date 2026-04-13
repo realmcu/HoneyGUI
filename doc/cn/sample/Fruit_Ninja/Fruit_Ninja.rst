@@ -41,7 +41,7 @@
 调用步骤
 ---------
 
-步骤 1:  Declare the APP ui design function
+步骤 1:  Declare Ui Design Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c
@@ -58,7 +58,7 @@
       app_fruit_ninja::fruit_ninja_design(obj);
    }
 
-步骤 2:  Call function
+步骤 2:  Call Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c
