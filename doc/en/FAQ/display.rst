@@ -7,7 +7,7 @@ Display
 Font
 ----------
 
-Why is the font anti-aliasing effect poor or white font edges have abnormal colors?
+Why Is the Font Anti-Aliasing Effect Poor or White Font Edges Have Abnormal Colors?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When using font libraries with more than 2 bits, if the font anti-aliasing effect is poor and the font edges have abnormal colors or the font color display is abnormal, it may be due to endianness issues in the font rendering data.
@@ -17,7 +17,7 @@ Please verify by displaying RGB single-channel color fonts. For example, set the
 Image
 ----------
 
-Why do black stripes appear after image rotation?
+Why Do Black Stripes Appear After Image Rotation?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Black stripes may appear after image rotation because the pixel positions change during rotation, and pixels at the rotated positions are not filled, resulting in black stripes.
@@ -29,35 +29,35 @@ If the problem persists, please contact the technical support team for assistanc
 Screen Rotation
 -----------
 
-Does HoneyGUI support screen rotation?
+Does HoneyGUI Support Screen Rotation?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 HoneyGUI supports screen rotation functionality.
 
-Screen rotation refers to rotating the screen by 90, 180, or 270 degrees, typically used to solve the problem of UI design resolution not matching the display screen dimensions.
+Screen rotation refers to rotating the screen by 90, 180, or 270 degrees, typically used to solve the problem of :term:`UI` design resolution not matching the display screen dimensions.
 
 For example, the UI design uses 480x800 resolution, but the display screen is 800x480 resolution. In this case, screen rotation is needed to match pixel dimensions.
 
 HoneyGUI does not support real-time rotation within the UI, such as the portrait lock feature on phones or screen flipping when watching videos.
 
-How is screen rotation implemented?
+How Is Screen Rotation Implemented?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The current screen rotation functionality is a post-rendering process. After rendering, the generated image buffer is rotated. Its rendering process is completely consistent with normal mode.
 
-What impact does screen rotation have on rendering frame rate?
+What Impact Does Screen Rotation Have on Rendering Frame Rate?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Screen rotation will slightly reduce the frame rate.
 
-How to enable screen rotation?
+How to Enable Screen Rotation?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Since there are many implementation methods for screen rotation, and the most efficient rotation implementation may differ across platforms and applications, the SDK may not include screen rotation functionality implementation.
 
 Users can refer to the technical documentation to make corresponding code modifications, or contact the technical team for assistance.
 
-What rotation methods are available for screen rotation?
+What Rotation Methods Are Available for Screen Rotation?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The essence of screen rotation is to adjust horizontally arranged pixel data to vertically arranged pixel data. Depending on hardware configuration, there are multiple implementation methods available.
@@ -150,13 +150,13 @@ Key Concepts
 - **SRC (Source Buffer)**: Storage location of pixel data before rotation
 - **DST (Destination Buffer)**: Storage location of pixel data after rotation
 - **High-speed Area**: SRAM or storage medium with speed close to SRAM
-- **Low-speed Area**: PSRAM or other storage medium significantly slower than SRAM
+- **Low-speed Area**: :term:`PSRAM` or other storage medium significantly slower than SRAM
 - **Any Range**: Solutions can be applied to full-frame or block-based, code logic is the same, only processing range differs
 
 Typical Application Cases
 """"""""""""""""""""""""""
 
-**Case 1: GPU + Block-based Rendering + Full-frame Display**
+**Case 1: :term:`GPU` + Block-based Rendering + Full-frame Display**
 
 Hardware Configuration:
 
@@ -168,7 +168,7 @@ Hardware Configuration:
 
 Recommended Solution: Solution 2 (GPU Cached Rotation), compare with Solution 1
 
-Reason: Block area is high-speed, GPU rotates and saves to another high-speed block cache first, then DMA copies to low-speed full-frame area in parallel. Although DMA parallel copy occupies the bus and affects other low-speed area access, it is usually better than direct writing to low-speed area. It is recommended to compare the performance of Solution 1 (GPU direct rotation to low-speed area) and Solution 2 on the actual platform.
+Reason: Block area is high-speed, GPU rotates and saves to another high-speed block cache first, then :term:`DMA` copies to low-speed full-frame area in parallel. Although DMA parallel copy occupies the bus and affects other low-speed area access, it is usually better than direct writing to low-speed area. It is recommended to compare the performance of Solution 1 (GPU direct rotation to low-speed area) and Solution 2 on the actual platform.
 
 **Case 2: GPU + Block-based Rendering + Block Display**
 

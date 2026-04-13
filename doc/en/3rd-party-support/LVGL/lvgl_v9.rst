@@ -1015,7 +1015,7 @@ EEZ Studio
 
 GUI Guider
 ~~~~~~~~~~~~~~~~~
-.. <!-- - GUI Guider: `NXP GUI Guider <https://www.nxp.com/design/design-center/software/development-software/gui-guider:GUI-GUIDER>`_ -->
+.. GUI Guider link is broken, temporarily removed: NXP GUI Guider (gui-guider)
 
 Forum
 -----------------------------
