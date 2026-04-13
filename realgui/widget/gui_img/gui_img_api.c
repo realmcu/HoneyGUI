@@ -94,7 +94,9 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
     (void)matrix;
     gui_dispdev_t *dc = gui_get_dc();
     gui_dispdev_t *dc_bak = gui_malloc(sizeof(gui_dispdev_t));
+    GUI_ASSERT(dc_bak != NULL);
     gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
+    GUI_ASSERT(matrix_bak != NULL);
     memcpy(dc_bak, dc, sizeof(gui_dispdev_t));
     memcpy(matrix_bak, obj->matrix, sizeof(gui_matrix_t));
     matrix_scale(1.0f, 1.0f, obj->matrix);

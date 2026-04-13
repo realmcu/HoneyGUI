@@ -131,6 +131,7 @@ static void decode_RLE_16bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
     {
         gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * 2);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * 2;
         uint32_t line_length = width * 2;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
@@ -164,6 +165,7 @@ static void decode_RLE_24bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
     {
         gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * 3);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * 3;
         uint32_t line_length = width * 3;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
@@ -197,6 +199,7 @@ static void decode_RLE_32bit(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *rang
     {
         gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * 4);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * 4;
         uint32_t line_length = width * 4;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
@@ -282,6 +285,7 @@ static void decode_RLE_1stage(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *ran
     {
         gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * pixel_size);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * pixel_size;
         uint32_t line_length = width;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
@@ -377,6 +381,7 @@ static void decode_RLE_2stage(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *ran
     {
         gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * pixel_size);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * pixel_size;
         uint32_t line_length = width;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
@@ -490,6 +495,7 @@ static void decode_FastLZ(uint8_t *in, uint8_t *out, gui_sw_idu_range_t *range)
         gui_sw_idu_head_t *head = (gui_sw_idu_head_t *)in;
         uint8_t pixel_size = (head->algorithm_type.pixel_bytes + 2);
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * pixel_size);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * pixel_size;
         uint32_t line_length = width * pixel_size;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
@@ -668,6 +674,7 @@ static void decode_YUV_Sample_Blur(uint8_t *in, uint8_t *out, gui_sw_idu_range_t
     uint32_t line_addr = addr_set[range->start_line];
     uint32_t next_addr = 0;
     uint8_t *YUVbuf = (uint8_t *)gui_malloc(head->raw_pic_width * 3);
+    GUI_ASSERT(YUVbuf != NULL);
     uint8_t blur_bit = 0;
     if (head->algorithm_type.feature_2 == GUI_SW_IDU_YUV_BLUR_1BIT)
     {
@@ -706,6 +713,7 @@ static void decode_YUV_Sample_Blur(uint8_t *in, uint8_t *out, gui_sw_idu_range_t
     else
     {
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * 3);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * 3;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
@@ -753,6 +761,7 @@ static void decode_YUV_Sample_Blur_FastLZ(uint8_t *in, uint8_t *out, gui_sw_idu_
     uint32_t line_addr = addr_set[range->start_line];
     uint32_t next_addr = 0;
     uint8_t *YUVbuf = (uint8_t *)gui_malloc(head->raw_pic_width * 3);
+    GUI_ASSERT(YUVbuf != NULL);
     uint8_t blur_bit = 0;
     uint32_t yuv_blur_compressed_line_length = compress_line_length;
     if (head->algorithm_type.feature_2 == GUI_SW_IDU_YUV_BLUR_1BIT)
@@ -780,6 +789,7 @@ static void decode_YUV_Sample_Blur_FastLZ(uint8_t *in, uint8_t *out, gui_sw_idu_
         yuv_blur_compressed_line_length = compress_line_length / 2 + compress_line_length % 2;
     }
     uint8_t *fastLZ_decoded_data = (uint8_t *)gui_malloc(yuv_blur_compressed_line_length);
+    GUI_ASSERT(fastLZ_decoded_data != NULL);
     if (range->target_stride == width)
     {
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
@@ -807,6 +817,7 @@ static void decode_YUV_Sample_Blur_FastLZ(uint8_t *in, uint8_t *out, gui_sw_idu_
     else
     {
         uint8_t *line_buffer = (uint8_t *)gui_malloc(head->raw_pic_width * 3);
+        GUI_ASSERT(line_buffer != NULL);
         uint32_t line_offset = range->start_column * 3;
         for (uint32_t line = range->start_line; line <= range->end_line; line++)
         {
@@ -883,6 +894,7 @@ void *gui_acc_decode(void *in)
     }
     uint8_t *decode_img_data = gui_malloc(sizeof(gui_rgb_data_head_t) + 4 + idu_info->raw_pic_width
                                           * idu_info->raw_pic_height * pixel_size + clut_offset);
+    GUI_ASSERT(decode_img_data != NULL);
     gui_rgb_data_head_t *output_header = (gui_rgb_data_head_t *)decode_img_data;
     memcpy(output_header, head, sizeof(gui_rgb_data_head_t));
     output_header->compress = 0;

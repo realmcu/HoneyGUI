@@ -931,6 +931,7 @@ uint32_t process_thai_char_struct(mem_char_t *chr, uint32_t unicode_len,
     uint32_t above_count_for_curr_base = 0;
 
     mem_char_t *processed_chr = gui_malloc(sizeof(mem_char_t) * unicode_len);
+    GUI_ASSERT(processed_chr != NULL);
     memset(processed_chr, 0, sizeof(mem_char_t) * unicode_len);
 
     for (uint32_t i = 0; i < unicode_len; ++i)
@@ -956,6 +957,7 @@ uint32_t process_thai_char_struct(mem_char_t *chr, uint32_t unicode_len,
     if (mark_count > 0)
     {
         marks = (THAI_MARK_INFO *)gui_malloc(sizeof(THAI_MARK_INFO) * mark_count);
+        GUI_ASSERT(marks != NULL);
         memset(marks, 0, sizeof(THAI_MARK_INFO) * mark_count);
     }
     else
@@ -1017,6 +1019,7 @@ uint32_t post_process_thai_char_struct(mem_char_t *chr, uint32_t base_count, uin
     update_thai_char_position(base_chr, mark_chr, mark_count, marks);
 
     mem_char_t *original_chr = gui_malloc(sizeof(mem_char_t) * (base_count + mark_count));
+    GUI_ASSERT(original_chr != NULL);
     // memset(original_chr, 0, sizeof(mem_char_t) * (base_count + mark_count));
 
     uint32_t active_len = 0;

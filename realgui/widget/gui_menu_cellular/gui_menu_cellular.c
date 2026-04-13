@@ -212,6 +212,7 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
 {
 
     gui_menu_cellular_t *this = gui_malloc(sizeof(gui_menu_cellular_t));
+    GUI_ASSERT(this != NULL);
     gui_dispdev_t *dc = gui_get_dc();
     memset(this, 0, sizeof(gui_menu_cellular_t));
 

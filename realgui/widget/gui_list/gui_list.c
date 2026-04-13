@@ -1080,6 +1080,7 @@ static void gui_list_create_bar(gui_list_t *_this,
     int pixel_bytes = 4;
     size_t buffer_size = bar_h * bar_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
     _this->bar_data = gui_malloc(buffer_size);
+    GUI_ASSERT(_this->bar_data != NULL);
     memset(_this->bar_data, 0, buffer_size);
     _this->bar = gui_img_create_from_mem(_this->base.parent, "list_bar", _this->bar_data, bar_x, bar_y,
                                          bar_w, bar_h);
@@ -1096,6 +1097,7 @@ static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
     // gui_log("add note %d\n", index);
 
     gui_list_note_t *_this = gui_malloc(sizeof(gui_list_note_t));
+    GUI_ASSERT(_this != NULL);
     memset(_this, 0, sizeof(gui_list_note_t));
 
     bool add_at_head = 0;
@@ -1170,6 +1172,7 @@ gui_list_t *gui_list_create(void       *parent,
                             bool        create_bar)
 {
     gui_list_t *_this = gui_malloc(sizeof(gui_list_t));
+    GUI_ASSERT(_this != NULL);
     memset(_this, 0, sizeof(gui_list_t));
     if (w == 0)
     {

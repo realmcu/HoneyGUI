@@ -124,6 +124,7 @@ static void gui_gif_prepare(gui_obj_t *obj)
     }
 
     _this->draw_img = gui_malloc(sizeof(draw_img_t));
+    GUI_ASSERT(_this->draw_img != NULL);
     memset(_this->draw_img, 0x00, sizeof(draw_img_t));
 
     _this->draw_img->data = _this->src_data;

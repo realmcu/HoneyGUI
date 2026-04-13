@@ -222,11 +222,13 @@ gui_svg_t *gui_svg_create_from_mem(void       *parent,
                                    int16_t     y)
 {
     gui_svg_t *_this = gui_malloc(sizeof(gui_svg_t));
+    GUI_ASSERT(_this != NULL);
     memset(_this, 0, sizeof(gui_svg_t));
 
     gui_svg_ctor(_this, parent, name, x, y, 0, 0);
 
     char *svg_copy = gui_malloc(size + 1);
+    GUI_ASSERT(svg_copy != NULL);
     memcpy(svg_copy, addr, size);
     svg_copy[size] = '\0';
 
@@ -257,6 +259,7 @@ gui_svg_t *gui_svg_create_from_file(void       *parent,
                                     int16_t     y)
 {
     gui_svg_t *_this = gui_malloc(sizeof(gui_svg_t));
+    GUI_ASSERT(_this != NULL);
     memset(_this, 0, sizeof(gui_svg_t));
 
     gui_svg_ctor(_this, parent, name, x, y, 0, 0);

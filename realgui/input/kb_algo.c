@@ -87,7 +87,6 @@ gui_indev_kb_t *gui_kb_create(char *name, bool *state, uint32_t *timestamp_ms_pr
                               uint32_t *timestamp_ms_release)
 {
     gui_indev_kb_t *kb = gui_malloc(sizeof(gui_indev_kb_t));
-    GUI_ASSERT(kb != NULL);
     if (kb == NULL) { return NULL; }
     gui_obj_t *this = (gui_obj_t *)kb;
     memset(kb, 0x00, sizeof(gui_indev_kb_t));

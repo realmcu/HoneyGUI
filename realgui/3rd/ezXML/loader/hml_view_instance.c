@@ -213,7 +213,9 @@ static void hml_scan_node_for_views(ezxml_t node, int *count, char *xml_content,
                 }
 
                 gui_view_descriptor_t *desc = gui_malloc(sizeof(gui_view_descriptor_t));
+                GUI_ASSERT(desc != NULL);
                 gui_view_t **pView = gui_malloc(sizeof(gui_view_t *));
+                GUI_ASSERT(pView != NULL);
 
                 if (desc && pView && hml_view_instance_count < HML_MAX_VIEWS)
                 {

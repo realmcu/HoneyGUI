@@ -93,7 +93,7 @@ static void *ramfs_vfs_open(const char *path, gui_vfs_mode_t mode, void *user_da
 
     ramfs_file_handle_t *handle = (ramfs_file_handle_t *)gui_malloc(sizeof(
                                                                         ramfs_file_handle_t));
-    if (!handle) { return NULL; }
+    GUI_ASSERT(handle != NULL);
 
     handle->entry = entry;
     handle->position = (mode & GUI_VFS_APPEND) ? entry->size : 0;

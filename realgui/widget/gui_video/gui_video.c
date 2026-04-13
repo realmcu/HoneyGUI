@@ -207,6 +207,7 @@ static uint8_t **mjpeg2jpeg_slicer(uint8_t *mjpeg, uint32_t *slice_cnt)
             {
                 // gui_log("%s %d\n", __FUNCTION__, __LINE__);
                 array = (uint8_t **)gui_malloc(2 * sizeof(uint8_t *));
+                GUI_ASSERT(array != NULL);
             }
             else
             {
@@ -691,16 +692,14 @@ static void gui_video_draw(gui_obj_t *obj)
                 gui_h264bsd_rewind(this->decoder);
             }
 
-            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + header->w * header->h * 2);
-
-            if (!this->frame_buff_raw)
-            {
-                gui_log("gui_video_draw malloc h264 fb error! \n");
-            }
+            uint32_t frame_size = (uint32_t)header->w * (uint32_t)header->h * 2;
+            GUI_ASSERT(header->w == 0 || frame_size / header->w / 2 == (uint32_t)header->h);
+            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + frame_size);
+            GUI_ASSERT(this->frame_buff_raw != NULL);
             this->frame_buff = this->frame_buff_raw;
             // gui_log("dec frame %d\n", this->frame_cur);
             int ret = gui_h264bsd_get_frame(this->decoder, this->frame_buff + sizeof(gui_rgb_data_head_t),
-                                            header->w * header->h * 2);
+                                            frame_size);
             if (ret)
             {
                 gui_log("h264 dec ret: %d\n", ret);
@@ -727,16 +726,14 @@ static void gui_video_draw(gui_obj_t *obj)
                 gui_h264bsd_rewind(this->decoder);
             }
 
-            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + header->w * header->h * 2);
-
-            if (!this->frame_buff_raw)
-            {
-                gui_log("gui_video_draw malloc h264 fb error! \n");
-            }
+            uint32_t frame_size = (uint32_t)header->w * (uint32_t)header->h * 2;
+            GUI_ASSERT(header->w == 0 || frame_size / header->w / 2 == (uint32_t)header->h);
+            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + frame_size);
+            GUI_ASSERT(this->frame_buff_raw != NULL);
             this->frame_buff = this->frame_buff_raw;
             // gui_log("dec frame %d\n", this->frame_cur);
             int ret = gui_h264bsd_get_frame(this->decoder, this->frame_buff + sizeof(gui_rgb_data_head_t),
-                                            header->w * header->h * 2);
+                                            frame_size);
             if (ret)
             {
                 gui_log("h264 dec ret: %d\n", ret);
@@ -765,16 +762,14 @@ static void gui_video_draw(gui_obj_t *obj)
                 gui_h264bsd_rewind(this->decoder);
             }
 
-            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + header->w * header->h * 2);
-
-            if (!this->frame_buff_raw)
-            {
-                gui_log("gui_video_draw malloc h264 fb error! \n");
-            }
+            uint32_t frame_size = (uint32_t)header->w * (uint32_t)header->h * 2;
+            GUI_ASSERT(header->w == 0 || frame_size / header->w / 2 == (uint32_t)header->h);
+            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + frame_size);
+            GUI_ASSERT(this->frame_buff_raw != NULL);
             this->frame_buff = this->frame_buff_raw;
             // gui_log("dec frame %d\n", this->frame_cur);
             int ret = gui_h264bsd_get_frame(this->decoder, this->frame_buff + sizeof(gui_rgb_data_head_t),
-                                            header->w * header->h * 2);
+                                            frame_size);
             if (ret)
             {
                 gui_log("h264 dec ret: %d\n", ret);
@@ -1107,6 +1102,7 @@ static int video_src_init_avi(gui_video_t  *this)
         /*  slicing  */
         uint32_t chunk_num = idx1_size / sizeof(IndexItem_t);
         this->array = (uint8_t **)gui_malloc(chunk_num * sizeof(AviMoviChunk_t));
+        GUI_ASSERT(this->array != NULL);
         this->chunk_num = chunk_num;
 
         uint32_t frame_cnt = 0;
@@ -1378,6 +1374,7 @@ static int video_src_init_avi(gui_video_t  *this)
         /*  slicing  */
         uint32_t chunk_num = idx1_size / sizeof(IndexItem_t);
         this->array = (uint8_t **)gui_malloc(chunk_num * sizeof(AviMoviChunk_t));
+        GUI_ASSERT(this->array != NULL);
         this->chunk_num = chunk_num;
 
         uint32_t frame_cnt = 0;
@@ -1621,6 +1618,7 @@ static int video_src_init_avi(gui_video_t  *this)
         /*  slicing  */
         uint32_t chunk_num = idx1_size / sizeof(IndexItem_t);
         this->array = (uint8_t **)gui_malloc(chunk_num * sizeof(AviMoviChunk_t));
+        GUI_ASSERT(this->array != NULL);
         this->chunk_num = chunk_num;
 
         uint32_t frame_cnt = 0;
@@ -1804,12 +1802,14 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     {
                         gui_log("%s %d\n", __FUNCTION__, __LINE__);
                         array = (uint32_t *)gui_malloc(2 * sizeof(uint32_t));
+                        GUI_ASSERT(array != NULL);
                     }
                     else
                     {
                         uint32_t *temp = NULL;
                         // gui_log("%s %d cnt %d array 0x%x\n", __FUNCTION__, __LINE__, slice_cnt, array);
                         temp = (uint32_t *)gui_malloc((slice_cnt + 1) * sizeof(uint32_t));
+                        GUI_ASSERT(temp != NULL);
                         memcpy(temp, array, slice_cnt  * sizeof(uint32_t));
                         gui_free(array);
                         array = temp;
@@ -1919,12 +1919,14 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     {
                         gui_log("%s %d\n", __FUNCTION__, __LINE__);
                         array = (uint32_t *)gui_malloc(2 * sizeof(uint32_t));
+                        GUI_ASSERT(array != NULL);
                     }
                     else
                     {
                         uint32_t *temp = NULL;
                         // gui_log("%s %d cnt %d array 0x%x\n", __FUNCTION__, __LINE__, slice_cnt, array);
                         temp = (uint32_t *)gui_malloc((slice_cnt + 1) * sizeof(uint32_t));
+                        GUI_ASSERT(temp != NULL);
                         memcpy(temp, array, slice_cnt  * sizeof(uint32_t));
                         gui_free(array);
                         array = temp;
@@ -2423,7 +2425,6 @@ gui_video_t *gui_video_create_from_ftl(void           *parent,
     }
 
     gui_video_t *img = gui_malloc(sizeof(gui_video_t));
-    GUI_ASSERT(img != NULL);
     if (img == NULL)
     {
         return NULL;
@@ -2455,7 +2456,6 @@ gui_video_t *gui_video_create_from_fs(void           *parent,
     }
 
     gui_video_t *img = gui_malloc(sizeof(gui_video_t));
-    GUI_ASSERT(img != NULL);
     if (img == NULL)
     {
         return NULL;
@@ -2487,7 +2487,6 @@ gui_video_t *gui_video_create_from_mem(void           *parent,
     }
 
     gui_video_t *img = gui_malloc(sizeof(gui_video_t));
-    GUI_ASSERT(img != NULL);
     if (img == NULL)
     {
         return NULL;

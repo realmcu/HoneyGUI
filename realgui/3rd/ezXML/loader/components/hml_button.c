@@ -89,6 +89,7 @@ gui_obj_t *hml_create_button(gui_obj_t *parent, ezxml_t node)
 
     // Allocate and store state
     hml_button_state_t *state = (hml_button_state_t *)gui_malloc(sizeof(hml_button_state_t));
+    GUI_ASSERT(state != NULL);
     state->img_on = img_on;
     state->img_off = img_off;
     state->current_state = is_on;

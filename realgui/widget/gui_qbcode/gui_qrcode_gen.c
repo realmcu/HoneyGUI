@@ -1853,6 +1853,7 @@ uint8_t *gui_qrcode_gen_get_data(unsigned char *data, uint16_t data_length, uint
 {
     T_QRCODEGEN_ECC err_cor_lvl = QRCODEGEN_ECC_HIGH;  // Error correction level
     uint8_t *temp_buffer = gui_malloc(QRCODEGEN_BUFFER_LEN_MAX);
+    GUI_ASSERT(temp_buffer != NULL);
     bool gen_qbcode_ret;
 
     app_qrcode.gen_version_min = QRCODEGEN_VERSION_MIN;

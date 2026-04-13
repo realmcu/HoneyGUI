@@ -54,6 +54,7 @@
 #include <ctype.h>
 #include "guidef.h"
 #include "gui_vfs.h"
+#include "gui_api.h"
 
 extern void *gui_malloc(size_t n);
 extern void *gui_realloc(void *ptr_old, size_t n);

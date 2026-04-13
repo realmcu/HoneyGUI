@@ -94,6 +94,7 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
 
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
+    GUI_ASSERT(img != NULL);
     memset(img, 0x00, sizeof(draw_img_t));
 
     bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f);
@@ -114,6 +115,7 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
     {
         img->blend_mode = IMG_RECT;
         gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
+        GUI_ASSERT(rect_data != NULL);
         set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
         img->data = rect_data;
     }

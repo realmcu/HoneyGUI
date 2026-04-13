@@ -588,6 +588,7 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
 
         uint32_t size = text->font_height * text->font_height * buffer_bytes;
         uint8_t *img_buf = gui_malloc(size + sizeof(gui_rgb_data_head_t));
+        GUI_ASSERT(img_buf != NULL);
         memset(img_buf, 0x00, size + sizeof(gui_rgb_data_head_t));
         uint8_t *font_buf = img_buf + sizeof(gui_rgb_data_head_t);
 
@@ -624,6 +625,7 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
             if (chr[i].buf == NULL)
             {
                 gui_matrix_t *font_matrix = gui_malloc(sizeof(gui_matrix_t) * 2);
+                GUI_ASSERT(font_matrix != NULL);
 
                 memcpy(&draw_img.matrix, text->base.matrix, sizeof(gui_matrix_t));
                 matrix_translate(draw_img.img_target_x - text->offset_x, draw_img.img_target_y - text->offset_y,

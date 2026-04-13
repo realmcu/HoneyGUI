@@ -86,6 +86,7 @@ void *lx_platform_calloc(size_t num, size_t size)
     if (num != 0 && size != 0)
     {
         ptr = gui_malloc(size * num);
+        GUI_ASSERT(ptr != NULL);
     }
 
     if (ptr != NULL)

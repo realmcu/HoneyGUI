@@ -540,6 +540,7 @@ void sw_arm_2d_create(gui_rect_t *rect, void **mem)
     uint16_t w = rect->x2 - rect->x1 + 1;
     uint16_t h = rect->y2 - rect->y1 + 1;
     arm2d_local_scratch_mem_t *scratch_mem = gui_malloc(sizeof(arm2d_local_scratch_mem_t));
+    GUI_ASSERT(scratch_mem != NULL);
 
     struct gui_dispdev *dc = gui_get_dc();
     uint16_t item_size = (dc->bit_depth == 32) ?

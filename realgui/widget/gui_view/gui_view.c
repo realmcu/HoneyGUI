@@ -692,6 +692,7 @@ gui_view_t *gui_view_create(void       *parent,
         return _this;
     }
     gui_view_t *_this = gui_malloc(sizeof(gui_view_t));
+    GUI_ASSERT(_this != NULL);
     // gui_dispdev_t *dc = gui_get_dc();
     memset(_this, 0, sizeof(gui_view_t));
     _this->descriptor = descriptor;
@@ -805,6 +806,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
     }
 
     on_event = gui_malloc(sizeof(gui_view_on_event_t));
+    GUI_ASSERT(on_event != NULL);
     on_event->descriptor = descriptor;
     on_event->switch_out_style = switch_out_style;
     on_event->switch_in_style = switch_in_style;

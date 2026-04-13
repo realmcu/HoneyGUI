@@ -1344,6 +1344,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 
             int32_t line_count = rect_h / line_height + 1;
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
+            GUI_ASSERT(line_buf != NULL);
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
 
             if (typo_ctx.is_v2)
@@ -1687,6 +1688,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 
             int32_t line_count = rect_w / line_height + 1;
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
+            GUI_ASSERT(line_buf != NULL);
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
 
             for (uint16_t i = 0; i < font_len; i++)
@@ -1750,6 +1752,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 
             int32_t line_count = rect_w / line_height + 1;
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
+            GUI_ASSERT(line_buf != NULL);
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
 
             for (uint16_t i = 0; i < font_len; i++)
@@ -2020,6 +2023,7 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
     }
 
     uint8_t *data = gui_malloc(sizeof(GUI_FONT_HEAD_BMP));
+    GUI_ASSERT(data != NULL);
     gui_ftl_read((uintptr_t)font_bin_addr, data, sizeof(GUI_FONT_HEAD_BMP));
 
     GUI_FONT_HEAD_BMP *font = (GUI_FONT_HEAD_BMP *)data;

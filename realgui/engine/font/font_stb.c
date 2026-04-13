@@ -613,6 +613,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     if (text->data == NULL)
     {
         FONT_STB_SCREEN *stb_screen = gui_malloc(sizeof(FONT_STB_SCREEN));
+        GUI_ASSERT(stb_screen != NULL);
         bool flag = creat_stb_screen(text, rect, stb_screen);
         text->data = stb_screen;
         if (flag == false)

@@ -69,10 +69,12 @@ static void prepare(gui_obj_t *obj)
         if (blur_param == NULL)
         {
             blur_param = gui_malloc(sizeof(post_process_event));
+            GUI_ASSERT(blur_param != NULL);
             this->blur_param = blur_param;
             memset(blur_param, 0, sizeof(post_process_event));
             post_process_event *event = (post_process_event *)blur_param;
             event->param = gui_malloc(sizeof(post_process_blur_param));
+            GUI_ASSERT(event->param != NULL);
             memset(event->param, 0, sizeof(post_process_blur_param));
             post_process_blur_param *param = (post_process_blur_param *)event->param;
             param->area = new_rect;
@@ -242,6 +244,7 @@ gui_win_t *gui_win_create(void       *parent,
                           int16_t     h)
 {
     gui_win_t *this = gui_malloc(sizeof(gui_win_t));
+    GUI_ASSERT(this != NULL);
 
     memset(this, 0, sizeof(gui_win_t));
     gui_win_ctor(this, parent, name, x, y, w, h);

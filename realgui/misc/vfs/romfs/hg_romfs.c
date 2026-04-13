@@ -466,7 +466,8 @@ static int dfs_romfs_getdents(struct romfs_fd *file, struct hg_dirent *dirp, uin
 
         d->d_namlen = strlen(name);
         d->d_reclen = (uint16_t)sizeof(struct hg_dirent);
-        strncpy(d->d_name, name, strlen(name) + 1);
+        strncpy(d->d_name, name, sizeof(d->d_name) - 1);
+        d->d_name[sizeof(d->d_name) - 1] = '\0';
 
         /* move to next position */
         ++ file->pos;

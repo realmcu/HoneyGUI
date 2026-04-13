@@ -165,6 +165,7 @@ void gui_obj_ctor(gui_obj_t  *_this,
     _this->h = h;
     _this->opacity_value = UINT8_MAX;
     _this->matrix = gui_malloc(sizeof(struct gui_matrix));
+    GUI_ASSERT(_this->matrix != NULL);
 
     matrix_identity(_this->matrix);
     _this->magic = GUI_MAGIC_NUMBER;
@@ -178,6 +179,7 @@ gui_obj_t *gui_obj_create(void       *parent,
                           int16_t     h)
 {
     gui_obj_t *this = gui_malloc(sizeof(gui_obj_t));
+    GUI_ASSERT(this != NULL);
     memset(this, 0, sizeof(gui_obj_t));
     gui_obj_ctor(this, parent, name, x, y, w, h);
 
@@ -272,6 +274,11 @@ void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect)
     uint32_t j = 0;
     for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
     {
+        if (i >= MAX_OBJ_LIST)
+        {
+            GUI_ASSERT(NULL != NULL);
+            break;
+        }
         obj_list[i++] = o;
     }
 

@@ -739,6 +739,7 @@ void gui_text_set_matrix(gui_text_t *this, gui_matrix_t *matrix)
     if (this->matrix == NULL)
     {
         this->matrix = gui_malloc(sizeof(struct gui_matrix));
+        GUI_ASSERT(this->matrix != NULL);
     }
     memcpy(this->matrix, matrix, sizeof(gui_matrix_t));
 }

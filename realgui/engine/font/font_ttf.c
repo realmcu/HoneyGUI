@@ -1236,6 +1236,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
         else if (text->font_mode == FONT_SRC_FTL)
         {
             ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+            GUI_ASSERT(ttfbin != NULL);
             gui_ftl_read((uintptr_t)text->path, (uint8_t *)ttfbin, sizeof(GUI_FONT_HEAD_TTF));
             need_free_ttfbin = true;
         }
@@ -1248,6 +1249,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 return;
             }
             ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+            GUI_ASSERT(ttfbin != NULL);
             gui_vfs_read(file, ttfbin, sizeof(GUI_FONT_HEAD_TTF));
             gui_vfs_close(file);
             need_free_ttfbin = true;
@@ -1470,11 +1472,13 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 else if (text->font_mode == FONT_SRC_FTL)
                 {
                     FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                    GUI_ASSERT(glyphData != NULL);
                     gui_ftl_read((uintptr_t)font_ptr, (uint8_t *)glyphData, sizeof(FontGlyphData));
 
                     int line_count = 0;
                     uint8_t winding_length = glyphData->winding_count;
                     uint8_t *winding_lengths = gui_malloc(winding_length);
+                    GUI_ASSERT(winding_lengths != NULL);
                     gui_ftl_read((uintptr_t)(uint8_t *)(font_ptr + offsetof(FontGlyphData, winding_lengths)),
                                  winding_lengths, winding_length);
                     for (int i = 0; i < glyphData->winding_count; i++)
@@ -1484,6 +1488,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
                     uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
                                                        FontWindings));
+                    GUI_ASSERT(dot_addr != NULL);
                     memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
                     memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
                     gui_ftl_read((uintptr_t)font_ptr + offsetof(FontGlyphData, winding_lengths) + winding_length,
@@ -1508,12 +1513,14 @@ void gui_font_get_ttf_info(gui_text_t *text)
                         continue;
                     }
                     FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                    GUI_ASSERT(glyphData != NULL);
                     gui_vfs_seek(file, ttfoffset, GUI_VFS_SEEK_SET);
                     gui_vfs_read(file, glyphData, sizeof(FontGlyphData));
 
                     int line_count = 0;
                     uint8_t winding_length = glyphData->winding_count;
                     uint8_t *winding_lengths = gui_malloc(winding_length);
+                    GUI_ASSERT(winding_lengths != NULL);
                     gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths), GUI_VFS_SEEK_SET);
                     gui_vfs_read(file, winding_lengths, winding_length);
                     for (int i = 0; i < glyphData->winding_count; i++)
@@ -1523,6 +1530,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
                     uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
                                                        FontWindings));
+                    GUI_ASSERT(dot_addr != NULL);
                     memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
                     memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
                     gui_vfs_seek(file, ttfoffset + offsetof(FontGlyphData, winding_lengths) + winding_length,
@@ -1652,6 +1660,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         else if (text->font_mode == FONT_SRC_FTL)
         {
             ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+            GUI_ASSERT(ttfbin != NULL);
             gui_ftl_read((uintptr_t)text->path, (uint8_t *)ttfbin, sizeof(GUI_FONT_HEAD_TTF));
             need_free_ttfbin = true;
         }
@@ -1663,6 +1672,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 return;
             }
             ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+            GUI_ASSERT(ttfbin != NULL);
             gui_vfs_read(file, ttfbin, sizeof(GUI_FONT_HEAD_TTF));
             gui_vfs_close(file);
             need_free_ttfbin = true;
@@ -1803,6 +1813,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         GUI_ASSERT(line_count != 0);
         ttf_point *windingsf = gui_malloc(line_count * sizeof(ttf_point));
+        GUI_ASSERT(windingsf != NULL);
 
         /* Calculate extra space needed for bold effect */
         uint8_t bold_weight = text->bold_weight;
@@ -1855,7 +1866,9 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 #if defined FONT_TTF_USE_MVE && 0
                 /* MVE version: scalar load/store overhead cancels MVE benefit, not effective */
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                GUI_ASSERT(windingsfm != NULL);
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                GUI_ASSERT(windingsd != NULL);
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
                 for (int i = 0; i < line_count; i++)
                 {
@@ -1880,7 +1893,9 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 #else
 #if FIX_AUTO_VECTORIZE
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                GUI_ASSERT(windingsfm != NULL);
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                GUI_ASSERT(windingsd != NULL);
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
                 for (int i = 0; i < line_count; i++)
                 {
@@ -1905,6 +1920,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 gui_free(windingsd);
 #else
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                GUI_ASSERT(windingsfm != NULL);
                 for (int i = 0; i < line_count; i++)
                 {
                     windingsf[i].x = windings[i].x;
@@ -1970,7 +1986,9 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 //MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.
                 /*todo by luke*/
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                GUI_ASSERT(windingsfm != NULL);
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                GUI_ASSERT(windingsd != NULL);
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
                 for (int i = 0; i < line_count; i++)
                 {
@@ -1991,7 +2009,9 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 #else
 #if FIX_AUTO_VECTORIZE
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                GUI_ASSERT(windingsfm != NULL);
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                GUI_ASSERT(windingsd != NULL);
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
                 for (int i = 0; i < line_count; i++)
                 {
@@ -2011,6 +2031,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 gui_free(windingsd);
 #else
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                GUI_ASSERT(windingsfm != NULL);
                 for (int i = 0; i < line_count; i++)
                 {
                     windingsf[i].x = windings[i].x * render_scale;
@@ -2064,6 +2085,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 /* MVE version: memcpy overhead cancels MVE benefit, not effective */
                 {
                     FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                    GUI_ASSERT(windingsd != NULL);
                     memcpy(windingsd, windings, line_count * sizeof(FontWindings));
 
                     const float offset_x = -glyphData->x0 * render_scale + bold_extra;
@@ -2089,6 +2111,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 #else
 #if FIX_AUTO_VECTORIZE
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                GUI_ASSERT(windingsd != NULL);
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
                 for (int i = 0; i < line_count; i++)
                 {
@@ -2111,6 +2134,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
 
         LINE_T *line_list = gui_malloc(line_count * sizeof(LINE_T));
+        GUI_ASSERT(line_list != NULL);
 
         int lint_count_actual = 0;
         int winding_offset = 0;
@@ -2136,10 +2160,12 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
         uint32_t render_size = render_w * render_h / 8;
         uint32_t *img = gui_malloc(render_size);
+        GUI_ASSERT(img != NULL);
         memset(img, 0, render_size);
 
         uint32_t out_size = out_w * out_h;
         uint8_t *img_out = gui_malloc(out_size);
+        GUI_ASSERT(img_out != NULL);
 
         for (int i = 0; i < lint_count_actual; i++)
         {

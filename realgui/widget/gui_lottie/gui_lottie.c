@@ -277,11 +277,13 @@ gui_lottie_t *gui_lottie_create_from_mem(void       *parent,
                                          int16_t     h)
 {
     gui_lottie_t *_this = gui_malloc(sizeof(gui_lottie_t));
+    GUI_ASSERT(_this != NULL);
     memset(_this, 0, sizeof(gui_lottie_t));
 
     gui_lottie_ctor(_this, parent, name, x, y, w, h);
 
     _this->lottie_data = gui_malloc(size + 1);
+    GUI_ASSERT(_this->lottie_data != NULL);
     memcpy(_this->lottie_data, addr, size);
     ((char *)_this->lottie_data)[size] = '\0';
 
@@ -308,6 +310,7 @@ gui_lottie_t *gui_lottie_create_from_file(void       *parent,
                                           int16_t     h)
 {
     gui_lottie_t *_this = gui_malloc(sizeof(gui_lottie_t));
+    GUI_ASSERT(_this != NULL);
     memset(_this, 0, sizeof(gui_lottie_t));
 
     gui_lottie_ctor(_this, parent, name, x, y, w, h);
@@ -320,6 +323,7 @@ gui_lottie_t *gui_lottie_create_from_file(void       *parent,
         gui_vfs_stat_t st;
         gui_vfs_stat(filename, &st);
         _this->lottie_data = gui_malloc(st.size + 1);
+        GUI_ASSERT(_this->lottie_data != NULL);
         memcpy(_this->lottie_data, addr, st.size);
         ((char *)_this->lottie_data)[st.size] = '\0';
     }
@@ -335,6 +339,7 @@ gui_lottie_t *gui_lottie_create_from_file(void       *parent,
             if (fsize > 0)
             {
                 _this->lottie_data = gui_malloc(fsize + 1);
+                GUI_ASSERT(_this->lottie_data != NULL);
                 gui_vfs_read(f, _this->lottie_data, fsize);
                 ((char *)_this->lottie_data)[fsize] = '\0';
             }

@@ -26,10 +26,12 @@ void post_process_add(post_process_event *event)
     if (process_list == NULL)
     {
         process_list = (T_PROCESS_ITEM *)gui_malloc(sizeof(T_PROCESS_ITEM));
+        GUI_ASSERT(process_list != NULL);
         list_tail = process_list;
         new_list = true;
     }
     post_process_event *new_event = (post_process_event *)gui_malloc(sizeof(post_process_event));
+    GUI_ASSERT(new_event != NULL);
     memcpy(new_event, event, sizeof(post_process_event));
 
     if (new_list)
@@ -40,6 +42,7 @@ void post_process_add(post_process_event *event)
     else
     {
         T_PROCESS_ITEM *new_item = (T_PROCESS_ITEM *)gui_malloc(sizeof(T_PROCESS_ITEM));
+        GUI_ASSERT(new_item != NULL);
         list_tail->next = new_item;
         new_item->event = new_event;
         new_item->next = NULL;
