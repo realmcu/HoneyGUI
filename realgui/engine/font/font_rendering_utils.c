@@ -1152,7 +1152,8 @@ static void font_render_8bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
                 if (alpha)
                 {
                     uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
-                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back, alpha);
+                    writebuf[write_off + j - font->target_rect.x1] =
+                        fontBlendARGB(font->color, color_back, alpha, font->blend_mode);
                 }
             }
         }
@@ -1170,7 +1171,8 @@ static void font_render_8bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
                 {
                     alpha = _UI_UDIV255(font_alpha * alpha);
                     uint32_t color_back = writebuf[write_off + j - font->target_rect.x1];
-                    writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGBA(font->color, color_back, alpha);
+                    writebuf[write_off + j - font->target_rect.x1] =
+                        fontBlendARGB(font->color, color_back, alpha, font->blend_mode);
                 }
             }
         }
@@ -1294,8 +1296,15 @@ static void font_render_8bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
      * MVE      - ~156% faster (1.56x speedup) expected
      */
 #if FONT_RENDERING_MVE
-    font_render_8bpp_to_ARGB8888_mve(font, glyph);
-#elif FONT_RENDERING_STABLE
+    if (font->blend_mode == IMG_SRC_OVER_MODE)
+    {
+        font_render_8bpp_to_ARGB8888_mve(font, glyph);
+    }
+    else
+    {
+        font_render_8bpp_to_ARGB8888_stable(font, glyph);
+    }
+#else
     font_render_8bpp_to_ARGB8888_stable(font, glyph);
 #endif
 }

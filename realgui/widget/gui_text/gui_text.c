@@ -778,6 +778,11 @@ void gui_text_set_scope_absolute(gui_text_t *this, int16_t x, int16_t y, int16_t
     this->scope_rect.y2 = y + h - 1;
 }
 
+void gui_text_set_font_blend_mode(gui_text_t *this, BLEND_MODE_TYPE blend_mode)
+{
+    this->font_blend_mode = blend_mode;
+}
+
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
 {
@@ -877,6 +882,7 @@ gui_text_t *gui_text_create(void       *parent,
     memset(text, 0, sizeof(gui_text_t));
 
     gui_text_ctor(text, parent, name, x, y, w, h);
+    text->font_blend_mode = IMG_SRC_OVER_MODE;
     gui_list_init(&(GET_BASE(text)->child_list));
     if ((GET_BASE(text)->parent) != NULL)
     {

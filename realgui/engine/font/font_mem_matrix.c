@@ -305,8 +305,6 @@ static void rtk_draw_unicode_matrix(mem_char_t *chr, gui_color_t color, uint8_t 
         {
             uint32_t *writebuf = (uint32_t *)dc->frame_buf;
             uint32_t color_back;
-            gui_log("font scale %f , x %d %d , y %d %d \n", (double)scale, x_start, x_end, y_start, y_end);
-            gui_log(" \n");
             for (int32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;

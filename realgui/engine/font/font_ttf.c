@@ -399,6 +399,7 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
         .target_buf = dc->frame_buf,
         .target_buf_stride = dc->fb_width * (dc->bit_depth >> 3),
         .color = outcolor,
+        .blend_mode = text->font_blend_mode,
         .target_rect = {
             .x1 = dc->section.x1,
             .y1 = dc->section.y1,

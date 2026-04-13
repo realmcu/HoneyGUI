@@ -101,6 +101,7 @@ typedef struct gui_text
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
     FONT_SRC_MODE font_mode;
+    BLEND_MODE_TYPE font_blend_mode;    /**< blend mode for font rendering */
     uint8_t emoji_size;
     uint8_t checksum;
     int8_t extra_letter_spacing;
@@ -411,6 +412,14 @@ void gui_text_set_scope(gui_text_t *this_widget, int16_t x, int16_t y, int16_t w
  */
 void gui_text_set_scope_absolute(gui_text_t *this_widget, int16_t x, int16_t y, int16_t w,
                                  int16_t h);
+
+/**
+ * @brief Set font blend mode for text rendering.
+ *
+ * @param this_widget Text widget pointer.
+ * @param blend_mode Blend mode (e.g., IMG_PLUS_DARKER for darken blend).
+ */
+void gui_text_set_font_blend_mode(gui_text_t *this_widget, BLEND_MODE_TYPE blend_mode);
 
 gui_inline bool gui_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
 {

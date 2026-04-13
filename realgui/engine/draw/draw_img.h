@@ -86,6 +86,7 @@ typedef enum
     IMG_2D_SW_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
     IMG_2D_SW_FIX_A8_FG, //fixed fg
     IMG_2D_SW_FIX_A8_BGFG, //fixed fg and bg
+    IMG_PLUS_DARKER, //darken blend: min(blended, background)
 } BLEND_MODE_TYPE;
 /* BLEND_MODE_TYPE structure end*/
 

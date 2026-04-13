@@ -38,7 +38,7 @@ typedef struct draw_font
     GUI_FormatType target_format;
 
     // gui_matrix_t transform;
-    // BLEND_MODE_TYPE blend_mode;
+    BLEND_MODE_TYPE blend_mode;
 } draw_font_t;
 
 typedef struct font_glyph
@@ -91,6 +91,41 @@ gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
     // result &= 0b00000111111000001111100000011111; // mask out fractional parts
     result &= 0x7e0f81f;
     return (uint16_t)((result >> 16) | result); // contract result
+}
+
+gui_inline uint32_t fontBlendARGB(gui_color_t fg, uint32_t bg, uint8_t alpha,
+                                  BLEND_MODE_TYPE blend_mode)
+{
+    uint8_t inv = 255 - alpha;
+    uint8_t dr = (bg >> 16) & 0xff;
+    uint8_t dg = (bg >> 8)  & 0xff;
+    uint8_t db = bg & 0xff;
+    uint8_t or_, og, ob;
+
+    switch (blend_mode)
+    {
+    case IMG_PLUS_DARKER:
+        {
+            // Figma Plus Darker: result = max(0, D + (S - 255) * alpha / 255)
+            int pr = (int)dr - (int)_UI_UDIV255((255 - fg.color.rgba.r) * alpha);
+            int pg = (int)dg - (int)_UI_UDIV255((255 - fg.color.rgba.g) * alpha);
+            int pb = (int)db - (int)_UI_UDIV255((255 - fg.color.rgba.b) * alpha);
+            or_ = (uint8_t)(pr > 0 ? pr : 0);
+            og  = (uint8_t)(pg > 0 ? pg : 0);
+            ob  = (uint8_t)(pb > 0 ? pb : 0);
+            break;
+        }
+    default:
+        {
+            // Standard SRC_OVER: S * Sa + D * (1 - Sa)
+            or_ = (uint8_t)_UI_UDIV255(fg.color.rgba.r * alpha + dr * inv);
+            og  = (uint8_t)_UI_UDIV255(fg.color.rgba.g * alpha + dg * inv);
+            ob  = (uint8_t)_UI_UDIV255(fg.color.rgba.b * alpha + db * inv);
+            break;
+        }
+    }
+
+    return 0xff000000 | ((uint32_t)or_ << 16) | ((uint32_t)og << 8) | ob;
 }
 
 gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)

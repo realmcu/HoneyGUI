@@ -1879,9 +1879,8 @@ void gui_font_mem_destroy(gui_text_t *text)
 }
 
 static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t render_mode,
-                             gui_text_rect_t *rect, bool crop)
+                             gui_text_rect_t *rect, BLEND_MODE_TYPE blend_mode)
 {
-    (void)crop;
     if (chr->dot_addr == NULL) { return; }
     gui_dispdev_t *dc = gui_get_dc();
 
@@ -1904,6 +1903,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t render_
     {
         .color = color,
         .render_mode = render_mode,
+        .blend_mode = blend_mode,
         .target_buf = dc->frame_buf,
         .target_buf_stride = dc->fb_width * dc->bit_depth / 8,
         .clip_rect = {
@@ -1994,7 +1994,8 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
         else
         {
             uint8_t chr_render_mode = chr[i].render_mode ? chr[i].render_mode : render_mode;
-            rtk_draw_unicode(chr + i, outcolor, chr_render_mode, rect, font->crop);
+            rtk_draw_unicode(chr + i, outcolor, chr_render_mode, rect,
+                             text->font_blend_mode);
         }
     }
 
