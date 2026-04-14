@@ -511,6 +511,11 @@ static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
         uint32_t offset;
         if (font->index_method == 0)
         {
+            /* Direct offset mode - bounds check against index table size */
+            if (unicode >= font->index_area_size / sizeof(uint32_t))
+            {
+                return -1;
+            }
             uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + unicode * 4);
             offset = *offset_addr;
         }
@@ -578,7 +583,11 @@ static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
         int32_t index;
         if (font->index_method == 0)
         {
-            if (unicode > 0xFFFF) { return -1; }
+            /* Direct offset mode - bounds check against index table size */
+            if (unicode >= font->index_area_size / sizeof(uint16_t))
+            {
+                return -1;
+            }
             uint16_t idx = *(uint16_t *)(uintptr_t)(unicode * 2 + table_offset);
             if (idx == 0xFFFF) { return -1; }
             index = (int32_t)idx;

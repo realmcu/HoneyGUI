@@ -509,7 +509,12 @@ static uint32_t getGlyphOffset(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint
 {
     if (ttfbin->index_method == 0)
     {
-        /* Direct offset calculation mode */
+        /* Direct offset mode - bounds check against index table size */
+        if (unicode >= ttfbin->index_area_size / sizeof(uint32_t))
+        {
+            return 0;
+        }
+
         if (font_mode == FONT_SRC_MEMADDR)
         {
             uint32_t glyphOffset = *((uint32_t *)table_ptr + unicode);
