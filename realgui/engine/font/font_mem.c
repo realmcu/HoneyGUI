@@ -1370,8 +1370,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                             chr[i].char_w = rect->x2 + 1 - chr[i].x;
                             continue;
                         }
-                        if (wordwrap && i != font_len - 1 &&
-                            last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
+                        if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
                         {
                             i = last_space_index + 1;
                         }
@@ -1428,8 +1427,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                             chr[i].char_w = rect->x2 + 1 - chr[i].x;
                             continue;
                         }
-                        if (wordwrap && i != font_len - 1 &&
-                            last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
+                        if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
                         {
                             i = last_space_index + 1;
                         }
@@ -1575,8 +1573,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                             chr[i].char_w = rect->x2 + 1 - chr[i].x;
                             continue;
                         }
-                        if (wordwrap && i != font_len - 1 &&
-                            last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
+                        if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
                         {
                             i = last_space_index + 1;
                         }
@@ -1627,8 +1624,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                             chr[i].char_w = rect->x2 + 1 - chr[i].x;
                             continue;
                         }
-                        if (wordwrap && i != font_len - 1 &&
-                            last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
+                        if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
                         {
                             i = last_space_index + 1;
                         }
