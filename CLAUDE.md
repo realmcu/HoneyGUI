@@ -254,6 +254,98 @@ HoneyGUI supports three development approaches:
    - Works with RVisualDesigner for low-code workflow
    - Suitable for rapid prototyping and small applications
 
+## Git Commit Guidelines
+
+HoneyGUI uses a structured commit message format. All commits must follow the template in `.git-commit-template`.
+
+### Commit Message Format
+
+```
+<MODULE>: <short description (max 72 chars)>
+
+
+[JIRA] <JIRA-ID or NA>
+
+[JIRA TYPE] Bug-Native-Minor | Bug-Native-Critical | Bug-Introduced-Minor | Bug-Introduced-Critical | Feature-*
+
+[Introduced by] <Change-ID or NA>
+
+[Issue description]
+<Describe the issue>
+
+[Issue reproduction]
+<Steps to reproduce>
+
+[Cause]
+<Root cause analysis>
+
+[Solution]
+<Description of fix>
+
+[Validation] <Validation method or NA>
+<Test results>
+
+[Need Cherry Pick to] default | branch-name | NA
+```
+
+### Guidelines
+
+- **Module prefix**: Use `GUI:` prefix for all commits (per AGENTS.md)
+  - Use `GUI-BypassTest:` when explicitly requested to skip CI/CD testing
+  - Bypass testing only for: config changes, doc updates, non-functional changes
+  - Example: `GUI-BypassTest: update VSCode debug configuration`
+- **Subject line**: Max 72 characters, capitalize first letter, no period at end
+- **Language**: Commit messages must be in English only - no Chinese characters allowed
+- **JIRA**: Include JIRA ticket ID or `NA` if not applicable
+- **All sections required**: Issue description, reproduction, cause, solution, validation
+- **Validation**: Always include test results or validation method
+- **Cherry pick**: Default is `default` for main branch integration
+
+### Common Commit Types
+
+- `GUI: fix <issue>` - Bug fixes
+- `GUI: add <feature>` - New features
+- `GUI: update <component>` - Enhancements
+- `GUI: refactor <module>` - Code refactoring
+
+### Example
+
+```
+GUI: fix memory leak in gui_text widget
+
+[JIRA] GUI-1234
+[JIRA TYPE] Bug-Native-Minor
+[Introduced by] NA
+
+[Issue description]
+Text widget leaks memory when rendering long strings repeatedly.
+
+[Issue reproduction]
+1. Create gui_text widget
+2. Update text content 1000+ times
+3. Observe memory usage increasing
+
+[Cause]
+Font glyph cache not freed when text content changes.
+
+[Solution]
+Add cache cleanup in gui_text_set() before allocating new cache.
+
+[Validation] Verified on RTL8762D
+- Memory usage stable after 10000 text updates
+- No performance regression
+
+[Need Cherry Pick to] default
+```
+
+### Pushing Commits
+
+This project uses Gerrit for code review:
+
+```bash
+git push origin HEAD:refs/for/master
+```
+
 ## Important Conventions
 
 - Event types recently renamed from `gui_event_t` to `gui_event_code_t` (event struct still named `gui_event_t`)
