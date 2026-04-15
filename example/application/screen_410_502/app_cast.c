@@ -39,7 +39,7 @@ static void create_cast(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
@@ -60,18 +60,18 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 
 static void create_cast(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
     gui_obj_hidden(&(gui_view_get_current()->base), true);
     gui_video_t *video = gui_video_create_from_mem(view, 0, (void *)CAST_DEMO_400_496_HEADER_H264, 5, 3,
                                                    400,
@@ -81,7 +81,4 @@ static void create_cast(gui_view_t *view)
 
 
     gui_view_set_animate_step(view, 1000);
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_NONE_ANIMATION,
-                             SWITCH_IN_NONE_ANIMATION,
-                             GUI_EVENT_KB_SHORT_PRESSED);
 }

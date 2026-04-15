@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 #include "gui_view.h"
+#include "gui_obj_focus.h"
 #include "gui_components_init.h"
 
 /*============================================================================*
@@ -69,6 +70,10 @@ typedef struct information
 
 // Generate a pseudo-random number
 uint16_t xorshift16(void);
+
+void click_button_back_2_watchface_or_menu(void *obj, gui_event_t *e);
+void slide_back_2_menu(void *obj, gui_event_t *e);
+
 
 #ifdef __cplusplus
 }

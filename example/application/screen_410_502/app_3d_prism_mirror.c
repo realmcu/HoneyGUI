@@ -57,8 +57,7 @@ static void prism_view_switch_to_other_view(void);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-const static gui_view_descriptor_t *image_view = NULL;
+
 static void app_ui_prism_mirror_design(gui_view_t *view);
 static const gui_view_descriptor_t descriptor =
 {
@@ -91,16 +90,6 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    image_view = gui_view_descriptor_get("image_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
 static void prism_mirror3d_update_angle_cb(void *param)
@@ -287,9 +276,9 @@ static void gui_prism_mirror3d_enter_animate(gui_lite3d_t *lite3d_prism_mirror)
 
 static void prism_view_switch_to_other_view()
 {
-    if (image_view && face_flags_rotation >= 0 && face_flags_rotation < face_nums)
+    if (face_flags_rotation >= 0 && face_flags_rotation < face_nums)
     {
-        gui_view_switch_direct(current_view, image_view->name, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(current_view, "image_view", SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }
@@ -307,12 +296,18 @@ static void prism_position_init(void)
 
 static void app_ui_prism_mirror_design(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && (view_c->descriptor == gui_view_descriptor_get("menu_view") ||
+                   view_c->descriptor == gui_view_descriptor_get("image_view")))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
 
     gui_obj_t *obj = GUI_BASE(view);
     // gui_obj_create_timer(obj, 10, true, return_timer_cb);
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
 
     l3_model_base_t *prism_3d = l3_create_model(DESC_PRISM_BIN, L3_DRAW_FRONT_AND_BACK, 0, 0, 410, 502);
 

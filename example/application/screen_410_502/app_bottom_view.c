@@ -38,11 +38,6 @@ static void clear_bottom_view(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
-const static gui_view_descriptor_t *fruit_ninja_view = NULL;
-const static gui_view_descriptor_t *heartrate_view = NULL;
-const static gui_view_descriptor_t *box2d_ring_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -105,18 +100,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    fruit_ninja_view = gui_view_descriptor_get("fruit_ninja_view");
-    heartrate_view = gui_view_descriptor_get("heartrate_view");
-    box2d_ring_view = gui_view_descriptor_get("box2d_ring_view");
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_bottom_view(gui_view_t *view)
 {
@@ -242,22 +225,22 @@ static void switch_app_cb(void *obj)
     const char *obj_name = ((gui_obj_t *)obj)->name;
     if (strcmp(obj_name, "RING") == 0)
     {
-        gui_view_switch_direct(current_view, box2d_ring_view->name, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, "box2d_ring_view", SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "FJ") == 0)
     {
-        gui_view_switch_direct(current_view, fruit_ninja_view->name, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, "fruit_ninja_view", SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "HR") == 0)
     {
-        gui_view_switch_direct(current_view, heartrate_view->name, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, "heartrate_view", SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "app_menu") == 0)
     {
-        gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_direct(current_view, "menu_view", SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
 }
@@ -480,7 +463,7 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void bottom_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, "watchface_view", SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 

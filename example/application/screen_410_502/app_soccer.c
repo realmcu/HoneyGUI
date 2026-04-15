@@ -35,7 +35,7 @@ static void soccer_app(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -80,18 +80,39 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
+void click_button_back_2_watchface_or_menu(void *obj, gui_event_t *e)
 {
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
+    GUI_UNUSED(e);
+    if (strcmp(e->indev_name, "Menu") == 0 || strcmp(e->indev_name, "Back") == 0)
+    {
+        gui_view_switch_direct(obj, "menu_view", SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
+    else if (strcmp(e->indev_name, "Home") == 0)
+    {
+        gui_view_switch_direct(obj, "watchface_view", SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
 }
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
+void slide_back_2_menu(void *obj, gui_event_t *e)
+{
+    GUI_UNUSED(e);
+    gui_view_switch_direct(obj, "menu_view", SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
 
 static void soccer_app(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
     if (gui_soccer_array[0] == NULL)
     {
         uint32_t *soccer_array[20] =
@@ -126,8 +147,5 @@ static void soccer_app(gui_view_t *view)
     gui_soccer_t *soccer = gui_soccer_create(obj, "soccer", gui_soccer_array, 0, 0);
     gui_soccer_set_center(soccer, dc->screen_width / 2, dc->screen_height / 2);
 
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
 
 }

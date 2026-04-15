@@ -35,9 +35,6 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-const static gui_view_descriptor_t *heartrate_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-
 static gui_win_t *win_watch = NULL;
 static char date_text_content[10] = {0};
 extern struct tm *timeinfo;
@@ -83,15 +80,6 @@ extern char *day[];
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    heartrate_view = gui_view_descriptor_get("heartrate_view");
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void time_update_cb(void *param)
 {
@@ -620,7 +608,7 @@ static void switch_heartrate(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(gui_view_get_current(), heartrate_view->name, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "heartrate_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -637,7 +625,7 @@ static void switch_menu(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(gui_view_get_current(), menu_view->name, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "menu_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 

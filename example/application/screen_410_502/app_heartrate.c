@@ -39,11 +39,6 @@ static void clear_heartrate_cache(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *call_dial_view = NULL;
-const static gui_view_descriptor_t *qrcode_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
-const static gui_view_descriptor_t *pre_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -72,17 +67,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    call_dial_view = gui_view_descriptor_get("call_dial_view");
-    qrcode_view = gui_view_descriptor_get("qrcode_view");
-    menu_view = gui_view_descriptor_get("menu_view");
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void draw_line_chart(NVGcontext *vg, float *samples)
 {
@@ -285,6 +269,25 @@ static void clear_heartrate_cache(gui_view_t *view)
 
 static void heartrate_design(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && (view_c->descriptor == gui_view_descriptor_get("recorder_view") ||
+                   view_c->descriptor == gui_view_descriptor_get("qrcode_view")))
+    {
+        gui_view_switch_on_event(view, "recorder_view", SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+                                 SWITCH_IN_FROM_LEFT_USE_ROTATE,
+                                 GUI_EVENT_TOUCH_MOVE_RIGHT);
+        gui_view_switch_on_event(view, "qrcode_view", SWITCH_OUT_TO_LEFT_USE_ROTATE,
+                                 SWITCH_IN_FROM_RIGHT_USE_ROTATE,
+                                 GUI_EVENT_TOUCH_MOVE_LEFT);
+    }
+    else
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
     gui_obj_t *obj = GUI_BASE(view);
 
     win_hb = gui_win_create(obj, "hb_win", 0, 0, SCREEN_WIDTH,
@@ -415,29 +418,4 @@ static void heartrate_design(gui_view_t *view)
         gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
-
-    // view layout
-    const char *name = GUI_BASE(gui_view_get_current())->name;
-    if (strcmp(name, "call_dial_view") == 0 || strcmp(name, "qrcode_view") == 0)
-    {
-        gui_view_switch_on_event(view, call_dial_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
-                                 SWITCH_IN_FROM_LEFT_USE_ROTATE,
-                                 GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_view_switch_on_event(view, qrcode_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
-                                 SWITCH_IN_FROM_RIGHT_USE_ROTATE,
-                                 GUI_EVENT_TOUCH_MOVE_LEFT);
-        return;
-    }
-    else if (strcmp(name, "menu_view") == 0)
-    {
-        pre_view = menu_view;
-    }
-    else
-    {
-        pre_view = watchface_view;
-    }
-    gui_view_switch_on_event(view, pre_view->name, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
-
 }

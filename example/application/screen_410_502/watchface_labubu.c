@@ -33,8 +33,6 @@ static void create_watchface_labubu(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
@@ -61,27 +59,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-// static void return_to_menu()
-// {
-//     gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-//                            SWITCH_IN_ANIMATION_FADE);
-// }
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
 
 static void time_update_cb(void *p)
 {
@@ -115,6 +92,15 @@ static void time_update_cb(void *p)
 
 static void create_watchface_labubu(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
     if (text_num_black_array[0] == NULL)
     {
         void *text_num_black[11] =
@@ -165,17 +151,12 @@ static void create_watchface_labubu(gui_view_t *view)
     {
         gui_obj_hidden(&(gui_view_get_current()->base), true);
         // gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
-        gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                                 SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_PRESSED);
     }
     else
     {
-        gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_switch_on_event(view, "watchface_view", SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_TOUCH_CLICKED);
-        gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_ANIMATION_FADE,
-                                 SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_PRESSED);
+
     }
 }

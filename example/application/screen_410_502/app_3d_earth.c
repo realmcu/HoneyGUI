@@ -33,7 +33,7 @@ static void earth_app(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -57,14 +57,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
 static void update_earth_animation(void *param)
@@ -93,10 +85,16 @@ static void earth_global_cb(l3_model_base_t *this)
 
 static void earth_app(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
     gui_obj_t *obj = GUI_BASE(view);
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
 
     l3_model_base_t *earth_3d = l3_create_model(DESC_EARTH_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
     l3_set_global_transform(earth_3d, (l3_global_transform_cb)earth_global_cb);

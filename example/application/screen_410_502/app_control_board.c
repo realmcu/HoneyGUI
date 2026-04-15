@@ -43,7 +43,6 @@ static void control_board_design(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -69,15 +68,6 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 /* update switch display state */
 void switch_bt(bool state)
@@ -232,7 +222,7 @@ static void switch_cb(void *obj, gui_event_t *e)
 
 static void control_board_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, "watchface_view", SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
     // draw background

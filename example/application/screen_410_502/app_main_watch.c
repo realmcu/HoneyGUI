@@ -46,13 +46,6 @@ extern void clear_watchface_classic(gui_view_t *view);
  *============================================================================*/
 /* VIEW */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-const static gui_view_descriptor_t *app_control_view = NULL;
-const static gui_view_descriptor_t *app_bottom_view = NULL;
-const static gui_view_descriptor_t *app_top_view = NULL;
-const static gui_view_descriptor_t *activity_view = NULL;
-const static gui_view_descriptor_t *labubu_digital_view = NULL;
-const static gui_view_descriptor_t *call_incoming_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -96,20 +89,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    app_control_view = gui_view_descriptor_get("app_control_view");
-    app_bottom_view = gui_view_descriptor_get("app_bottom_view");
-    app_top_view = gui_view_descriptor_get("app_top_view");
-    activity_view = gui_view_descriptor_get("activity_view");
-    call_incoming_view  = gui_view_descriptor_get("call_incoming_view");
-    labubu_digital_view  = gui_view_descriptor_get("labubu_digital_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void gui_fps_cb(void *p)
 {
@@ -158,50 +137,6 @@ static void fps_create(void *parent)
                                           font_size);
     gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_text_type_set(low_mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-}
-
-// Enter menu and change menu style by button
-static void kb_button_cb(void *param)
-{
-    (void)param;
-    // extern gui_kb_port_data_t *kb_get_data(void);
-    // gui_kb_port_data_t *kb = kb_get_data();
-    // static uint32_t time_press = 0;
-    // static bool hold = 0;
-    // static bool press_his = 0;
-    // static uint32_t release_his = 0;
-    // if (hold)
-    // {
-    //     if (kb->event == GUI_KB_EVENT_UP)
-    //     {
-    //         hold = 0;
-    //         uint32_t time = kb->timestamp_ms_release - time_press;
-    //         if (time <= 150)
-    //         {
-    //             // Press twice quickly to change menu style
-    //             if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
-    //             {
-    //                 gui_log("change menu style\n");
-    //                 menu_style = !menu_style;
-    //             }
-    //             press_his = !press_his;
-    //             release_his = kb->timestamp_ms_release;
-    //             return;
-    //         }
-    //         else
-    //         {
-    //             // Press once to enter menu
-    //             press_his = 0;
-    //             gui_view_switch_direct(gui_view_get_current(), menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-    //                                    SWITCH_IN_ANIMATION_FADE);
-    //         }
-    //     }
-    // }
-    // else if (kb->event == GUI_KB_EVENT_DOWN)
-    // {
-    //     time_press = kb->timestamp_ms_press;
-    //     hold = 1;
-    // }
 }
 
 /* Generate a pseudo-random number */
@@ -336,32 +271,41 @@ static void win_cb(void *param)
         *call_incoming_flag = false;
         gui_view_t *current_view = gui_view_get_current();
         gui_view_set_animate_step(current_view, 1000);
-        gui_view_switch_direct(current_view, call_incoming_view->name, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(current_view, "call_incoming_view", SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
+    }
+}
+
+static void click_button(void *obj, gui_event_t *e)
+{
+    if (strcmp(e->indev_name, "Menu") == 0)
+    {
+        gui_view_switch_direct(obj, "menu_view", SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_ANIMATION_FADE);
     }
 }
 
 static void watchface_design(gui_view_t *view)
 {
     /* view layout */
-    gui_view_switch_on_event(view, app_bottom_view->name, SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, "app_bottom_view", SWITCH_INIT_STATE,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, app_top_view->name, SWITCH_OUT_STILL_USE_BLUR,
+    gui_view_switch_on_event(view, "app_top_view", SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
-    gui_view_switch_on_event(view, activity_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, "activity_view", SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_view_switch_on_event(view, app_control_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+    gui_view_switch_on_event(view, "app_control_view", SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
     extern void create_watchface_classic(gui_view_t *view);
     create_watchface_classic(view);
 
-    gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
-    gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
+    gui_obj_add_event_cb(view, click_button, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+    gui_obj_focus_set(view);
 }
 
 // Send information to the top view
@@ -420,7 +364,7 @@ static void app_main_watch_ui_design(void)
     json_refreash();
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_main_watch_win", 0, 0, 0, 0);
-    gui_view_create(win, labubu_digital_view->name, 0, 0, 0, 0); // watch turn on animation
+    gui_view_create(win, "labubu_digital_view", 0, 0, 0, 0); // watch turn on animation
     fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     gui_obj_start_timer(GUI_BASE(win));

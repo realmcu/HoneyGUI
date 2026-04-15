@@ -51,7 +51,7 @@ static void flower_app(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -86,14 +86,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
 static void update_branch_rotation(void)
@@ -262,11 +254,17 @@ static void single_petal_init(Petal *single_petal, gui_obj_t *obj, gui_dispdev_t
 
 static void flower_app(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
     gui_obj_t *obj = GUI_BASE(view);
     gui_dispdev_t *dc = gui_get_dc();
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
 
     // gui_img_t *background = gui_img_create_from_mem(obj, "flower_background", BACKGROUND_BIN, 0, 0, 0,
     //                                                 0);

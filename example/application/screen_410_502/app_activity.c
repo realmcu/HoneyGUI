@@ -45,9 +45,6 @@ static void clear_activity(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
-const static gui_view_descriptor_t *recorder_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -77,17 +74,6 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    recorder_view = gui_view_descriptor_get("recorder_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_activity(gui_view_t *view)
 {
@@ -263,6 +249,8 @@ static void enter_timer_cb(void *obj)
 
 static void activity_design(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+
     gui_obj_t *obj = GUI_BASE(view);
     has_draw_bg = false;
 
@@ -303,17 +291,17 @@ static void activity_design(gui_view_t *view)
     draw_flag = 0;
 
     // view layout
-    const char *name = GUI_BASE(gui_view_get_current())->name;
-    if (strcmp(name, "watchface_view") == 0 || strcmp(name, "recorder_view") == 0)
+    if (view_c && (view_c->descriptor == gui_view_descriptor_get("watchface_view") ||
+                   view_c->descriptor == gui_view_descriptor_get("recorder_view")))
     {
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, arc_activity_cb,
                                           img_data);
         gui_img_refresh_size(img);
         gui_obj_create_timer(obj, 10, true, enter_timer_cb);
-        gui_view_switch_on_event(view, watchface_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+        gui_view_switch_on_event(view, "watchface_view", SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                                  SWITCH_IN_FROM_LEFT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_view_switch_on_event(view, recorder_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+        gui_view_switch_on_event(view, "recorder_view", SWITCH_OUT_TO_LEFT_USE_ROTATE,
                                  SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_LEFT);
     }
@@ -322,8 +310,9 @@ static void activity_design(gui_view_t *view)
         count = 0;
         gui_obj_create_timer(GUI_BASE(img), 10, true, activity_timer_cb);
 
-        gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                                 SWITCH_IN_ANIMATION_FADE,
-                                 GUI_EVENT_KB_SHORT_PRESSED);
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
     }
 }

@@ -53,7 +53,7 @@ static void firework_sim_cb(NVGcontext *vg);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
@@ -87,26 +87,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-// static void return_to_menu()
-// {
-//     gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-//                            SWITCH_IN_ANIMATION_FADE);
-// }
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
 
 static void draw_hexagon(NVGcontext *vg, float centerX, float centerY, float radius,
                          float rotationAngle, NVGcolor color)
@@ -323,12 +303,18 @@ static void firework_sim_cb(NVGcontext *vg)
 
 static void app_ui_fireworks_design(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
     srand((uint32_t)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
     // gui_obj_create_timer(obj, 10, true, return_timer_cb);
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
 
     gui_dispdev_t *dc = gui_get_dc();
     screen_w = gui_get_screen_width();

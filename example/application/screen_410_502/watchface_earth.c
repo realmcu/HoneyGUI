@@ -39,7 +39,7 @@ static void create_watchface_earth(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
@@ -65,26 +65,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-// static void return_to_menu()
-// {
-//     gui_view_switch_direct(current_view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-//                            SWITCH_IN_ANIMATION_FADE);
-// }
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
 
 static void time_update_cb(void *p)
 {
@@ -141,6 +121,15 @@ static void enter_cb(void *p)
 
 static void create_watchface_earth(gui_view_t *view)
 {
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
+    {
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
+    }
+
 #ifdef EARTH_420_336_416_MJPG
     gui_obj_hidden(&(gui_view_get_current()->base), true);
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
@@ -177,8 +166,6 @@ static void create_watchface_earth(gui_view_t *view)
     }
     time_update_cb(NULL);
 #endif
-    gui_view_switch_on_event(view, menu_view->name, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
+
     // gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
 }

@@ -45,8 +45,6 @@ static void create_recorder(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *activity_view = NULL;
-const static gui_view_descriptor_t *call_dial_view = NULL;
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
@@ -91,15 +89,6 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    call_dial_view = gui_view_descriptor_get("call_dial_view");
-    activity_view = gui_view_descriptor_get("activity_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void format_time(uint32_t seconds, char *str)
 {
@@ -408,10 +397,10 @@ static void record_time_update(void *p)
 static void create_recorder(gui_view_t *view)
 {
     // view layout
-    gui_view_switch_on_event(view, activity_view->name, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+    gui_view_switch_on_event(view, "activity_view", SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, call_dial_view->name, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, "heartrate_view", SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
