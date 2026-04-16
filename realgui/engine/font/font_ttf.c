@@ -1817,7 +1817,10 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         {
             line_count += winding_lengths[i];
         }
-        GUI_ASSERT(line_count != 0);
+        if (line_count == 0)
+        {
+            continue;  /* glyph has advance but no outline (e.g. non-breaking space) */
+        }
         ttf_point *windingsf = gui_malloc(line_count * sizeof(ttf_point));
         GUI_ASSERT(windingsf != NULL);
 
