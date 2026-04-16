@@ -317,15 +317,30 @@ def extract_gltf_desc(gltf_filename: str, bin_filename: str, txt_filename: str):
             accessor = gltf.accessors[accessor_idx]
             bufferView = gltf.bufferViews[accessor.bufferView]
             buffer = gltf.buffers[bufferView.buffer]
-            
+
             # Get buffer data
             data = gltf.get_data_from_buffer_uri(buffer.uri)
-            
-            # Extract the relevant portion
-            start = bufferView.byteOffset + accessor.byteOffset
-            end = start + accessor.count * get_component_size(accessor.componentType) * get_type_size(accessor.type)
-            
-            return data[start:end]
+
+            bv_offset = bufferView.byteOffset or 0
+            acc_offset = accessor.byteOffset or 0
+            component_size = get_component_size(accessor.componentType)
+            type_size = get_type_size(accessor.type)
+            element_size = component_size * type_size
+            byte_stride = bufferView.byteStride or element_size
+
+            # Handle interleaved (byteStride != element_size) and packed buffers
+            if byte_stride == element_size:
+                start = bv_offset + acc_offset
+                end = start + accessor.count * element_size
+                return data[start:end]
+            else:
+                # Interleaved: pick out each element individually
+                result = bytearray()
+                base = bv_offset + acc_offset
+                for i in range(accessor.count):
+                    elem_start = base + i * byte_stride
+                    result.extend(data[elem_start:elem_start + element_size])
+                return bytes(result)
         
         def get_component_size(component_type):
             sizes = {5120: 1, 5121: 1, 5122: 2, 5123: 2, 5125: 4, 5126: 4}
@@ -434,37 +449,41 @@ def extract_gltf_desc(gltf_filename: str, bin_filename: str, txt_filename: str):
                 joints_data = None
                 weights_data = None
                 
-                if 'POSITION' in prim.attributes.__dict__:
-                    pos_accessor_idx = prim.attributes.POSITION
+                pos_accessor_idx = getattr(prim.attributes, 'POSITION', None)
+                if pos_accessor_idx is not None:
                     pos_raw = get_accessor_data(pos_accessor_idx)
                     pos_data = parse_accessor_data(pos_raw, gltf.accessors[pos_accessor_idx])
-                
-                if 'NORMAL' in prim.attributes.__dict__:
-                    norm_accessor_idx = prim.attributes.NORMAL
+
+                norm_accessor_idx = getattr(prim.attributes, 'NORMAL', None)
+                if norm_accessor_idx is not None:
                     norm_raw = get_accessor_data(norm_accessor_idx)
                     norm_data = parse_accessor_data(norm_raw, gltf.accessors[norm_accessor_idx])
-                
-                if 'TEXCOORD_0' in prim.attributes.__dict__:
-                    uv_accessor_idx = prim.attributes.TEXCOORD_0
+
+                uv_accessor_idx = getattr(prim.attributes, 'TEXCOORD_0', None)
+                if uv_accessor_idx is not None:
                     uv_raw = get_accessor_data(uv_accessor_idx)
                     uv_data = parse_accessor_data(uv_raw, gltf.accessors[uv_accessor_idx])
-                
-                if 'JOINTS_0' in prim.attributes.__dict__:
-                    joints_accessor_idx = prim.attributes.JOINTS_0
+
+                joints_accessor_idx = getattr(prim.attributes, 'JOINTS_0', None)
+                if joints_accessor_idx is not None:
                     joints_raw = get_accessor_data(joints_accessor_idx)
                     joints_data = parse_accessor_data(joints_raw, gltf.accessors[joints_accessor_idx])
-                
-                if 'WEIGHTS_0' in prim.attributes.__dict__:
-                    weights_accessor_idx = prim.attributes.WEIGHTS_0
+
+                weights_accessor_idx = getattr(prim.attributes, 'WEIGHTS_0', None)
+                if weights_accessor_idx is not None:
                     weights_raw = get_accessor_data(weights_accessor_idx)
                     weights_data = parse_accessor_data(weights_raw, gltf.accessors[weights_accessor_idx])
-                
-                # Get indices
+
+                # Build index list: indexed or non-indexed
                 if prim.indices is not None:
                     indices_raw = get_accessor_data(prim.indices)
                     indices = parse_accessor_data(indices_raw, gltf.accessors[prim.indices])
-                    
-                    # Build triangles
+                elif pos_data is not None:
+                    indices = np.arange(len(pos_data), dtype=np.uint32)
+                else:
+                    indices = None
+
+                if indices is not None:
                     triangle_count = len(indices) // 3
                     total_triangle_count += triangle_count
                     

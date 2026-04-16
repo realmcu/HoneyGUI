@@ -23,6 +23,8 @@ static int find_node_index(cgltf_node *target_node, cgltf_node *all_nodes, int n
 
 void create_gltf_description(cgltf_data *data, l3_gltf_model_description_t *gltf_desc)
 {
+    total_triangle_count = 0;
+
     gltf_desc->node_count = data->nodes_count;
     gltf_desc->mesh_count = data->meshes_count;
     gltf_desc->material_count = data->materials_count;
@@ -197,6 +199,7 @@ void create_gltf_description(cgltf_data *data, l3_gltf_model_description_t *gltf
                 printf("Warning: Primitive %zu of mesh %zu is not of type TRIANGLES. Skipping.\n", j, i);
                 dst_prim->triangle_count = 0;
                 dst_prim->triangles = NULL;
+                dst_mesh->primitive_count--;
                 continue;
             }
 
@@ -231,14 +234,19 @@ void create_gltf_description(cgltf_data *data, l3_gltf_model_description_t *gltf
                 }
             }
 
-            if (!pos_accessor || !src_prim->indices)
+
+            if (!pos_accessor)
             {
-                printf("Warning: Primitive %zu of mesh %zu is missing positions or indices. Skipping.\n", j, i);
+                printf("Warning: Primitive %zu of mesh %zu is missing positions. Skipping.\n", j, i);
+                dst_prim->triangle_count = 0;
+                dst_prim->triangles = NULL;
+                dst_mesh->primitive_count--;
                 continue;
             }
 
             // Count triangles
-            dst_prim->triangle_count = src_prim->indices->count / 3;
+            size_t vertex_count = src_prim->indices ? src_prim->indices->count : pos_accessor->count;
+            dst_prim->triangle_count = vertex_count / 3;
             if (dst_prim->triangle_count == 0)
             {
                 dst_prim->triangles = NULL;
@@ -253,9 +261,15 @@ void create_gltf_description(cgltf_data *data, l3_gltf_model_description_t *gltf
                 for (int vert_of_tri = 0; vert_of_tri < 3; ++vert_of_tri)
                 {
                     unsigned int original_vertex_index;
-                    // Calculate the position in the indices buffer
                     size_t index_buffer_pos = tri_idx * 3 + vert_of_tri;
-                    cgltf_accessor_read_uint(src_prim->indices, index_buffer_pos, &original_vertex_index, 1);
+                    if (src_prim->indices)
+                    {
+                        cgltf_accessor_read_uint(src_prim->indices, index_buffer_pos, &original_vertex_index, 1);
+                    }
+                    else
+                    {
+                        original_vertex_index = (unsigned int)index_buffer_pos;
+                    }
 
                     // Get the vertex data
                     l3_gltf_complete_vertex_t *vert_to_fill = &current_triangle->vertices[vert_of_tri];
