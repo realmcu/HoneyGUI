@@ -140,7 +140,7 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
     *input_img = img;
 }
 
-/** Prepare arc image data for a specific corner (Legacy/Fallback) */
+/** Prepare arc image data for a specific corner with supersampling AA */
 static void prepare_arc_img(gui_rounded_rect_t *this, uint8_t *circle_data, int corner_type)
 {
     if (this->radius == 0) { return; }
@@ -148,90 +148,58 @@ static void prepare_arc_img(gui_rounded_rect_t *this, uint8_t *circle_data, int 
     uint16_t img_size = this->radius + 1;
     memset(data, 0, img_size * img_size * 4);
 
-    // Calculate boundary points for anti-aliasing (including row 0)
-    float boundary[img_size];
-    memset(boundary, 0, sizeof(boundary));
+    float center = (float)this->radius;
+    float radius_sq = this->radius * this->radius;
+    float inner_sq = (this->radius - 0.5f) * (this->radius - 0.5f);
+    float outer_sq = (this->radius + 0.5f) * (this->radius + 0.5f);
+    uint32_t color_full = this->color.color.argb_full;
+
+    int is_right = (corner_type == 1 || corner_type == 2);
+    int is_bottom = (corner_type == 2 || corner_type == 3);
+
     for (int i = 0; i < img_size; i++)
     {
-        float y = i + 0.5 - this->radius;
-        float x_boundary = this->radius - sqrtf(this->radius * this->radius - y * y);
-        boundary[i] = (x_boundary < 0) ? 0 : x_boundary;
-    }
+        float py = is_bottom ? (img_size - 1 - i) : i;
+        py += 0.5f;
+        float dy = py - center;
+        float dy_sq = dy * dy;
+        float wy0 = dy - 0.5f;
 
-    // Fill the corner based on corner type
-    for (int i = 0; i < img_size; i++)
-    {
-        uint16_t right = (int)boundary[i];
-
-        // Fill solid pixels
-        if (right < img_size)
+        for (int j = 0; j < img_size; j++)
         {
-            for (int j = right + 2; j < img_size; j++)
+            float px = is_right ? (img_size - 1 - j) : j;
+            px += 0.5f;
+            float dx = px - center;
+            float dist_sq = dx * dx + dy_sq;
+
+            if (dist_sq <= inner_sq)
             {
-                int fill_i, fill_j;
-                switch (corner_type)
+                data[i * img_size + j] = color_full;
+            }
+            else if (dist_sq < outer_sq)
+            {
+                int count = 0;
+                float step = 0.25f;
+                for (int sx = 0; sx < 4; sx++)
                 {
-                case 0: // Top-left
-                    fill_i = i;
-                    fill_j = j;
-                    break;
-                case 1: // Top-right
-                    fill_i = i;
-                    fill_j = img_size - 1 - j;
-                    break;
-                case 2: // Bottom-right
-                    fill_i = img_size - 1 - i;
-                    fill_j = img_size - 1 - j;
-                    break;
-                case 3: // Bottom-left
-                    fill_i = img_size - 1 - i;
-                    fill_j = j;
-                    break;
-                default:
-                    fill_i = i;
-                    fill_j = j;
-                    break;
+                    float wx = dx - 0.5f + (sx + 0.5f) * step;
+                    float wx_sq = wx * wx;
+                    for (int sy = 0; sy < 4; sy++)
+                    {
+                        float wy = wy0 + (sy + 0.5f) * step;
+                        if (wx_sq + wy * wy <= radius_sq)
+                        {
+                            count++;
+                        }
+                    }
                 }
-                if (fill_i >= 0 && fill_i < img_size && fill_j >= 0 && fill_j < img_size)
+
+                uint8_t alpha = (count * 255) >> 4;
+                if (alpha > 0)
                 {
-                    data[fill_i * img_size + fill_j] = this->color.color.argb_full;
+                    data[i * img_size + j] = (color_full & 0x00FFFFFF) | ((uint32_t)alpha << 24);
                 }
             }
-        }
-
-        // Anti-aliasing edge pixel
-        float portion = ceilf(boundary[i]) - boundary[i];
-        gui_color_t color = this->color;
-        color.color.rgba.a = (uint8_t)(portion * color.color.rgba.a);
-
-        int edge_i, edge_j;
-        switch (corner_type)
-        {
-        case 0: // Top-left
-            edge_i = i;
-            edge_j = right + 1;
-            break;
-        case 1: // Top-right
-            edge_i = i;
-            edge_j = img_size - 1 - (right + 1);
-            break;
-        case 2: // Bottom-right
-            edge_i = img_size - 1 - i;
-            edge_j = img_size - 1 - (right + 1);
-            break;
-        case 3: // Bottom-left
-            edge_i = img_size - 1 - i;
-            edge_j = right + 1;
-            break;
-        default:
-            edge_i = i;
-            edge_j = right + 1;
-            break;
-        }
-
-        if (edge_i >= 0 && edge_i < img_size && edge_j >= 0 && edge_j < img_size)
-        {
-            data[edge_i * img_size + edge_j] = color.color.argb_full;
         }
     }
 }
