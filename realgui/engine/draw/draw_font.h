@@ -19,6 +19,10 @@ extern "C" {
 #include "guidef.h"
 #include "gui_api.h"
 
+#ifndef ENABLE_FONT_V3_TYPO
+#define ENABLE_FONT_V3_TYPO  0
+#endif
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
@@ -54,10 +58,12 @@ typedef struct
     uint8_t *buf;
     void *emoji_img;
 
-    /* V2 bearing-based fields (zero-initialized for V1 glyphs) */
-    int8_t bearing_x;           /**< V2: horizontal bearing (pixels) */
-    int8_t bearing_y;           /**< V2: vertical bearing from baseline to glyph top (pixels) */
-    uint8_t advance;            /**< V2: horizontal advance width (pixels) */
+#if ENABLE_FONT_V3_TYPO
+    /* V3 bearing-based fields (zero-initialized for V1 glyphs) */
+    int8_t bearing_x;           /**< V3: horizontal bearing (pixels) */
+    int8_t bearing_y;           /**< V3: vertical bearing from baseline to glyph top (pixels) */
+    uint8_t advance;            /**< V3: horizontal advance width (pixels) */
+#endif
 } mem_char_t;
 /* Memory char struct end */
 

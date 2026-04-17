@@ -89,22 +89,18 @@ static const uint8_t lookup_table_4b[16] =
  *                            Variables
  *============================================================================*/
 
-/**
- * One-shot flag to avoid repeated deprecation log output for legacy vector fonts.
- * Set to true after the first gui_log() deprecation notice is emitted.
- */
-static bool s_legacy_ttf_deprecation_logged = false;
-
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
 
 /* Forward declaration - used by gui_font_ttf_fallback_search before definition */
+#if ENABLE_FONT_V3_TYPO
 static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *glyphData,
                                        uint32_t unicode, uint16_t font_height,
                                        float scale, uint8_t bold_weight,
                                        const gui_font_typo_context_t *typo_ctx,
                                        uint8_t *dot_addr);
+#endif
 
 static TransformCase determineTransformCase(float a, float b)
 {
@@ -1097,9 +1093,10 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
 
         if (ttfoffset != 0)
         {
+#if ENABLE_FONT_V3_TYPO
             gui_font_typo_context_t fb_typo_ctx = gui_font_ttf_get_typo_context(ttfbin, font_height);
             float scale;
-            if (fb_typo_ctx.is_v2)
+            if (fb_typo_ctx.is_v3)
             {
                 scale = (float)font_height / fb_typo_ctx.metrics.units_per_em;
             }
@@ -1107,13 +1104,24 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
             {
                 scale = (float)font_height / (ttfbin->ascent - ttfbin->descent);
             }
+#else
+            float scale = (float)font_height / (ttfbin->ascent - ttfbin->descent);
+#endif /* ENABLE_FONT_V3_TYPO */
 
             if (best->src_mode == FONT_SRC_MEMADDR)
             {
                 FontGlyphData *glyphData = (FontGlyphData *)(best->font_file + ttfoffset);
+#if ENABLE_FONT_V3_TYPO
                 ttf_populate_glyph_metrics(out_chr, glyphData, unicode, font_height,
                                            scale, bold_weight, &fb_typo_ctx,
                                            best->font_file + ttfoffset);
+#else
+                out_chr->unicode = unicode;
+                out_chr->h = font_height;
+                out_chr->char_h = font_height;
+                out_chr->dot_addr = best->font_file + ttfoffset;
+                out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+#endif
 
                 if (alloc_index) { gui_free(alloc_index); }
                 if (need_free) { gui_free(ttfbin); }
@@ -1151,8 +1159,16 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                                          dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
                                          line_count * sizeof(FontWindings));
 
+#if ENABLE_FONT_V3_TYPO
                             ttf_populate_glyph_metrics(out_chr, glyphData, unicode, font_height,
                                                        scale, bold_weight, &fb_typo_ctx, dot_addr);
+#else
+                            out_chr->unicode = unicode;
+                            out_chr->h = font_height;
+                            out_chr->char_h = font_height;
+                            out_chr->dot_addr = dot_addr;
+                            out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+#endif
 
                             gui_free(winding_lengths);
                             gui_free(glyphData);
@@ -1203,8 +1219,16 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                                              dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
                                              line_count * sizeof(FontWindings));
 
+#if ENABLE_FONT_V3_TYPO
                                 ttf_populate_glyph_metrics(out_chr, glyphData, unicode, font_height,
                                                            scale, bold_weight, &fb_typo_ctx, dot_addr);
+#else
+                                out_chr->unicode = unicode;
+                                out_chr->h = font_height;
+                                out_chr->char_h = font_height;
+                                out_chr->dot_addr = dot_addr;
+                                out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+#endif
 
                                 gui_free(winding_lengths);
                                 gui_free(glyphData);
@@ -1232,6 +1256,7 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
     return -1;
 }
 
+#if ENABLE_FONT_V3_TYPO
 gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *header,
                                                       uint16_t font_height)
 {
@@ -1260,14 +1285,14 @@ gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *h
         {
             gui_font_typo_layout_t layout = gui_font_typo_calc_layout(&ctx.metrics,
                                                                       (uint8_t)font_height);
-            ctx.is_v2 = true;
+            ctx.is_v3 = true;
             ctx.baseline_px = layout.baseline;
             ctx.default_line_height = layout.line_height;
         }
         else
         {
             /* Inline calculation for large font sizes (font_height > 255) */
-            ctx.is_v2 = true;
+            ctx.is_v3 = true;
             ctx.baseline_px = (int16_t)((int32_t)header->ascent * font_height / units_per_em);
             ctx.default_line_height = (int16_t)((int32_t)(header->ascent - header->descent +
                                                           header->lineGap) * font_height / units_per_em);
@@ -1280,18 +1305,9 @@ gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *h
          * Scheduled for removal ~6-12 months after standard typography release.
          * Regenerate font files with Font_Tool v3+ to use the standard typography model.
          */
-        ctx.is_v2 = false;
+        ctx.is_v3 = false;
         ctx.baseline_px = 0;
         ctx.default_line_height = (int16_t)font_height;
-
-        /* One-shot deprecation notice for legacy vector font files */
-        if (!s_legacy_ttf_deprecation_logged)
-        {
-            s_legacy_ttf_deprecation_logged = true;
-            gui_log("[DEPRECATED] Legacy vector font detected (version < 3). "
-                    "Please regenerate with Font_Tool v3+ for standard typography support. "
-                    "Legacy rendering will be removed in a future release.\n");
-        }
     }
 
     return ctx;
@@ -1300,7 +1316,7 @@ gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *h
 /**
  * @brief Populate V3 standard bearing/advance fields in mem_char_t from glyph data.
  *
- * For V3 standard mode (typo_ctx.is_v2 = true), computes bearing_x, bearing_y,
+ * For V3 standard mode (typo_ctx.is_v3 = true), computes bearing_x, bearing_y,
  * advance from font units using the standard scale. Clamps bearing values to
  * int8_t range with gui_log() warning on overflow.
  *
@@ -1326,7 +1342,7 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
     chr->char_h = font_height;
     chr->dot_addr = dot_addr;
 
-    if (typo_ctx->is_v2)
+    if (typo_ctx->is_v3)
     {
         /* V3 standard: compute bearing/advance from font units */
 
@@ -1344,7 +1360,7 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
         /* bearing_y = round(-sy0 * scale), clamp to int8_t */
         /* sy0 is negative for glyphs above baseline (Y-flipped coordinate),
          * so -sy0 gives the distance from baseline to glyph top in font units.
-         * This matches bitmap V2 bearingY = round(bbox.y2 * scale). */
+         * This matches bitmap V3 bearingY = round(bbox.y2 * scale). */
         float raw_by = -glyphData->y0 * scale;
         int16_t by = (int16_t)roundf(raw_by);
         if (by < -128 || by > 127)
@@ -1370,6 +1386,7 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
         chr->char_w = glyphData->advance * scale + bold_weight * 2;
     }
 }
+#endif /* ENABLE_FONT_V3_TYPO */
 
 /*============================================================================*
  *                           Public Functions
@@ -1467,10 +1484,11 @@ void gui_font_get_ttf_info(gui_text_t *text)
     uint32_t chr_i = 0;
 
     /* Build typography context once per text widget (not per-glyph) */
+#if ENABLE_FONT_V3_TYPO
     gui_font_typo_context_t typo_ctx = gui_font_ttf_get_typo_context(ttfbin, text->font_height);
 
     float scale;
-    if (typo_ctx.is_v2)
+    if (typo_ctx.is_v3)
     {
         /* V3 standard: scale = font_height / units_per_em */
         scale = (float)text->font_height / typo_ctx.metrics.units_per_em;
@@ -1483,6 +1501,9 @@ void gui_font_get_ttf_info(gui_text_t *text)
          */
         scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
     }
+#else
+    float scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
+#endif /* ENABLE_FONT_V3_TYPO */
 
     uint8_t *preloaded_index_table = NULL;
     bool need_free_index_table = false;
@@ -1551,7 +1572,8 @@ void gui_font_get_ttf_info(gui_text_t *text)
             chr[chr_i].h = text->font_height;
             // chr[chr_i].char_y = 0;
 
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
                 /* V3 standard: look up space glyph advance from font data */
                 uint8_t *space_index_table_ptr = NULL;
@@ -1644,6 +1666,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 }
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 /**
                  * @deprecated Legacy space width approximation (version[0] < 3).
@@ -1737,9 +1760,17 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 {
                     FontGlyphData *glyphData = (FontGlyphData *)font_ptr;
 
+#if ENABLE_FONT_V3_TYPO
                     ttf_populate_glyph_metrics(&chr[chr_i], glyphData, unicode_buf[uni_i],
                                                text->font_height, scale, text->bold_weight,
                                                &typo_ctx, font_ptr);
+#else
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].h = text->font_height;
+                    chr[chr_i].char_h = text->font_height;
+                    chr[chr_i].dot_addr = font_ptr;
+                    chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+#endif
                 }
                 else if (text->font_mode == FONT_SRC_FTL)
                 {
@@ -1768,9 +1799,17 @@ void gui_font_get_ttf_info(gui_text_t *text)
                                  line_count * sizeof(FontWindings));
 
 
+#if ENABLE_FONT_V3_TYPO
                     ttf_populate_glyph_metrics(&chr[chr_i], glyphData, unicode_buf[uni_i],
                                                text->font_height, scale, text->bold_weight,
                                                &typo_ctx, dot_addr);
+#else
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].h = text->font_height;
+                    chr[chr_i].char_h = text->font_height;
+                    chr[chr_i].dot_addr = dot_addr;
+                    chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+#endif
 
                     gui_free(glyphData);
                     gui_free(winding_lengths);
@@ -1809,9 +1848,17 @@ void gui_font_get_ttf_info(gui_text_t *text)
                                  line_count * sizeof(FontWindings));
                     gui_vfs_close(file);
 
+#if ENABLE_FONT_V3_TYPO
                     ttf_populate_glyph_metrics(&chr[chr_i], glyphData, unicode_buf[uni_i],
                                                text->font_height, scale, text->bold_weight,
                                                &typo_ctx, dot_addr);
+#else
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].h = text->font_height;
+                    chr[chr_i].char_h = text->font_height;
+                    chr[chr_i].dot_addr = dot_addr;
+                    chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+#endif
 
                     gui_free(glyphData);
                     gui_free(winding_lengths);
@@ -1964,12 +2011,13 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
     mem_char_t *chr = text->data;
 
     /* Build typography context to detect V3 vs legacy */
+#if ENABLE_FONT_V3_TYPO
     gui_font_typo_context_t typo_ctx = gui_font_ttf_get_typo_context(ttfbin, text->font_height);
 
     short ascent = 0;
     float scale = 0;
 
-    if (typo_ctx.is_v2)
+    if (typo_ctx.is_v3)
     {
         /* V3 standard: scale = font_height / units_per_em */
         /* ascent = 0 because bearing-based layout already handles baseline positioning */
@@ -1985,6 +2033,10 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         ascent = ttfbin->ascent;
         scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
     }
+#else
+    short ascent = ttfbin->ascent;
+    float scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
+#endif /* ENABLE_FONT_V3_TYPO */
 
     if (scale <= 0)
     {
@@ -2360,7 +2412,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 out_h = render_h / raster_prec;
 
                 out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET - bold_weight;
-                if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+                if (typo_ctx.is_v3)
                 {
                     /* V3: bearing-based layout already positions chr.x/y correctly.
                      * out_x0/y0 should not include glyph_x0/y0 (the bearing offsets)
@@ -2369,6 +2422,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                     out_y0 = ROUNDING_OFFSET - bold_weight;
                 }
                 else
+#endif /* ENABLE_FONT_V3_TYPO */
                 {
                     out_y0 = glyph_y0 / raster_prec + ascent * scale + ROUNDING_OFFSET - bold_weight;
                 }

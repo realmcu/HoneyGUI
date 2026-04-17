@@ -174,12 +174,13 @@ void gui_font_ttf_unload(gui_text_t *text);
  */
 void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect);
 
+#if ENABLE_FONT_V3_TYPO
 /**
  * @brief Build typography context from TTF font header.
  *
  * For V3 headers (version[0] >= 3), populates all fields from header metrics.
  * Reads units_per_em from the header extension (last 2 bytes of header).
- * For legacy headers (version[0] < 3), returns is_v2=false with baseline_px=0.
+ * For legacy headers (version[0] < 3), returns is_v3=false with baseline_px=0.
  *
  * @param header   Pointer to TTF font header.
  * @param font_height Font height in pixels (em-size for V3, canvas size for legacy).
@@ -187,6 +188,7 @@ void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect);
  */
 gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *header,
                                                       uint16_t font_height);
+#endif /* ENABLE_FONT_V3_TYPO */
 
 /**
  * @brief Search for a glyph in all registered TTF fonts (fallback).

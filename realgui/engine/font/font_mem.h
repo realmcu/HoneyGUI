@@ -31,10 +31,11 @@ typedef struct
 } GUI_CHAR_HEAD;
 
 /*============================================================================*
- *                V2 Typography Types (Standard Typography Model)
+ *                V3 Typography Types (Standard Typography Model)
  *============================================================================*/
+#if ENABLE_FONT_V3_TYPO
 
-/** @brief Typography metrics from V2 header extension fields (font units) */
+/** @brief Typography metrics from V3 header extension fields (font units) */
 typedef struct
 {
     int16_t ascender;        /**< font ascender (positive, font units) */
@@ -43,7 +44,7 @@ typedef struct
     uint16_t units_per_em;   /**< font design units per em */
 } gui_font_typo_metrics_t;
 
-/** @brief V2 per-glyph header (bearing-based, 6 bytes packed) */
+/** @brief V3 per-glyph header (bearing-based, 6 bytes packed) */
 #pragma pack(push, 1)
 typedef struct
 {
@@ -68,11 +69,13 @@ typedef struct
 /** @brief Typography context, computed once per text widget */
 typedef struct
 {
-    bool is_v2;                          /**< true if V2 font detected */
+    bool is_v3;                          /**< true if V3 font detected */
     int16_t baseline_px;                 /**< baseline Y offset (pixels), 0 for V1 */
     int16_t default_line_height;         /**< default line height (pixels) */
-    gui_font_typo_metrics_t metrics;     /**< raw metrics (valid only when is_v2=true) */
+    gui_font_typo_metrics_t metrics;     /**< raw metrics (valid only when is_v3=true) */
 } gui_font_typo_context_t;
+
+#endif /* ENABLE_FONT_V3_TYPO */
 
 typedef struct
 {
@@ -102,12 +105,13 @@ typedef struct
 } GUI_FONT_HEAD_BMP;
 #pragma pack()
 
+#if ENABLE_FONT_V3_TYPO
 /**
- * @brief Parse typography metrics from a V2 binary font header.
+ * @brief Parse typography metrics from a V3 binary font header.
  *
  * @param header Pointer to the font header.
  * @param out_metrics Output typography metrics (populated on success).
- * @return true if V2 metrics were successfully parsed, false for V1 or invalid data.
+ * @return true if V3 metrics were successfully parsed, false for V1 or invalid data.
  */
 bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
                                      gui_font_typo_metrics_t *out_metrics);
@@ -115,7 +119,7 @@ bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
 /**
  * @brief Calculate pixel-level typography layout from font metrics.
  *
- * @param metrics Typography metrics (from V2 header).
+ * @param metrics Typography metrics (from V3 header).
  * @param font_size Font size in pixels (em-size).
  * @return Computed layout parameters.
  */
@@ -125,8 +129,8 @@ gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *
 /**
  * @brief Build typography context from font header.
  *
- * For V2 headers, populates all fields from extension data.
- * For V1 headers, returns is_v2=false with baseline_px=0 and default_line_height=font_size.
+ * For V3 headers, populates all fields from extension data.
+ * For V1 headers, returns is_v3=false with baseline_px=0 and default_line_height=font_size.
  *
  * @param header Pointer to the font header.
  * @param font_size Font size in pixels.
@@ -134,6 +138,7 @@ gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *
  */
 gui_font_typo_context_t gui_font_bmp_get_typo_context(const GUI_FONT_HEAD_BMP *header,
                                                       uint8_t font_size);
+#endif /* ENABLE_FONT_V3_TYPO */
 
 /**
  * @brief Initialize the character binary file and store the font and

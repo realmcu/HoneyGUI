@@ -13,9 +13,6 @@
 #include "gui_vfs.h"
 #include "font_glyph_cache.h"
 
-/** @brief One-shot flag: V1 deprecation notice already printed */
-static bool s_v1_deprecation_warned = true;
-
 /*============================================================================*
  *                      Font Library Access Functions
  *============================================================================*/
@@ -176,8 +173,8 @@ static int font_fs_read(FONT_LIB_NODE *node, uint32_t offset, uint8_t *buf, uint
 }
 
 /**
- * @deprecated V1 crop glyph loading - scheduled for removal after V2 release.
- *             Use gui_font_bmp_load_glyph() (V2 bearing-based) for new fonts.
+ * @deprecated V1 crop glyph loading - scheduled for removal after V3 release.
+ *             Use gui_font_bmp_load_glyph() (V3 bearing-based) for new fonts.
  *
  * @brief Load crop-mode glyph (4-byte header) from FTL or FS with cache
  *
@@ -259,8 +256,8 @@ static int load_dot_crop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *nod
 }
 
 /**
- * @deprecated V1 non-crop glyph loading - scheduled for removal after V2 release.
- *             Use gui_font_bmp_load_glyph() (V2 bearing-based) for new fonts.
+ * @deprecated V1 non-crop glyph loading - scheduled for removal after V3 release.
+ *             Use gui_font_bmp_load_glyph() (V3 bearing-based) for new fonts.
  *
  * @brief Load non-crop glyph (2-byte header) from FTL or FS with cache
  *
@@ -333,7 +330,7 @@ static int load_dot_nocrop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *n
 }
 
 /**
- * @brief Load V2 bearing-based glyph (6-byte header + tight bitmap).
+ * @brief Load V3 bearing-based glyph (6-byte header + tight bitmap).
  *
  * Header format: [bearingX(1), bearingY(1), width(1), height(1), advance(1), reserved(1)]
  * Bitmap: width x height pixels, packed by render_mode.
@@ -347,6 +344,7 @@ static int load_dot_nocrop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *n
  * @param line_byte    Output: aligned line byte width for rendering.
  * @return 0 on success, -1 on failure.
  */
+#if ENABLE_FONT_V3_TYPO
 static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *node,
                                    FONT_SRC_MODE font_mode, uint32_t offset,
                                    uint8_t render_mode, int32_t *line_byte)
@@ -371,7 +369,7 @@ static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB
         return 0;
     }
 
-    /* Read 6-byte V2 glyph header */
+    /* Read 6-byte V3 glyph header */
     uint8_t header[6];
     if (font_mode == FONT_SRC_FTL)
     {
@@ -430,6 +428,7 @@ static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB
     }
     return 0;
 }
+#endif /* ENABLE_FONT_V3_TYPO */
 
 /**
  * @brief Load emoji glyph for unicode >= 0x10000
@@ -470,7 +469,7 @@ static uint32_t load_emoji(mem_char_t *chr, gui_text_t *text,
  * @brief Try to load a single glyph from a specific BMP font.
  *
  * Handles all combinations of crop/non-crop, address/offset index,
- * V1/V2 headers, and MEMADDR/FTL/FILESYS source modes.
+ * V1/V3 headers, and MEMADDR/FTL/FILESYS source modes.
  *
  * @param font_file  Font file address or path
  * @param node       Font library node (NULL for MEMADDR)
@@ -531,8 +530,9 @@ static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
 
         if (src_mode == FONT_SRC_MEMADDR)
         {
+#if ENABLE_FONT_V3_TYPO
             gui_font_typo_context_t ctx = gui_font_bmp_get_typo_context(font, font_size);
-            if (ctx.is_v2)
+            if (ctx.is_v3)
             {
                 GUI_BMP_GLYPH_HEAD_V2 *gh = (GUI_BMP_GLYPH_HEAD_V2 *)(font_file + offset);
                 out_chr->bearing_x = gh->bearing_x;
@@ -545,6 +545,7 @@ static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
                 out_chr->dot_addr = font_file + offset + sizeof(GUI_BMP_GLYPH_HEAD_V2);
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 out_chr->dot_addr = font_file + offset + 4;
                 out_chr->char_w = (uint8_t)(*(out_chr->dot_addr - 2));
@@ -556,15 +557,19 @@ static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
         }
         else
         {
+#if ENABLE_FONT_V3_TYPO
             gui_font_typo_context_t ctx = gui_font_bmp_get_typo_context(font, font_size);
+#endif
             if (src_mode == FONT_SRC_FILESYS) { gui_font_lib_fs_open(node); }
             int rc;
-            if (ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (ctx.is_v3)
             {
                 rc = gui_font_bmp_load_glyph(out_chr, font_file, node,
                                              src_mode, offset, render_mode, out_line_byte);
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 rc = load_dot_crop(out_chr, font_file, node,
                                    src_mode, offset, render_mode, out_line_byte);
@@ -795,31 +800,26 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint32_t uni_i = 0;
     uint32_t chr_i = 0;
 
-    /* Build typography context once per text widget (V2 vs V1 detection) */
+    /* Build typography context once per text widget (V3 vs V1 detection) */
+#if ENABLE_FONT_V3_TYPO
     gui_font_typo_context_t typo_ctx = gui_font_bmp_get_typo_context(font, text->font_height);
+    int16_t chr_h;
 
-    /* V2: auto-expand widget height to fit at least one line.
-     * In V2, font_size (em-size) < default_line_height, so the prepare-stage
-     * "h = font_height" is too small.  Expand here where header is already parsed. */
-    if (typo_ctx.is_v2 && text->base.h < typo_ctx.default_line_height)
+    if (typo_ctx.is_v3)
     {
-        text->base.h = typo_ctx.default_line_height;
+        chr_h = typo_ctx.default_line_height;
+        if (text->base.h < chr_h)
+        {
+            text->base.h = chr_h;
+        }
     }
-
-    /* V2: chr->h represents line height (used for layout clipping & line spacing).
-     * V1: chr->h = font_height (= backSize = canvas height). */
-    int16_t chr_h = typo_ctx.is_v2 ? typo_ctx.default_line_height : text->font_height;
-
-    /* One-time V1 deprecation notice */
-    if (!typo_ctx.is_v2 && !s_v1_deprecation_warned)
+    else
     {
-        s_v1_deprecation_warned = true;
-        gui_log("[font_mem] Warning: V1 font format detected (font_size=%d). "
-                "V1 support is deprecated and will be removed in a future release. "
-                "Please regenerate your font files with the V2 Font Tool.\n",
-                font->font_size);
+        chr_h = text->font_height;
     }
-
+#else
+    int16_t chr_h = text->font_height;
+#endif /* ENABLE_FONT_V3_TYPO */
     if (crop)
     {
         switch (index_method)
@@ -867,9 +867,10 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else if (text->font_mode == FONT_SRC_MEMADDR)
                     {
-                        if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+                        if (typo_ctx.is_v3)
                         {
-                            /* V2: read 6-byte bearing-based header directly from memory */
+                            /* V3: read 6-byte bearing-based header directly from memory */
                             GUI_BMP_GLYPH_HEAD_V2 *gh = (GUI_BMP_GLYPH_HEAD_V2 *)((uint8_t *)text->path + offset);
                             chr[chr_i].bearing_x = gh->bearing_x;
                             chr[chr_i].bearing_y = gh->bearing_y;
@@ -881,6 +882,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                             chr[chr_i].dot_addr = (uint8_t *)text->path + offset + sizeof(GUI_BMP_GLYPH_HEAD_V2);
                         }
                         else
+#endif /* ENABLE_FONT_V3_TYPO */
                         {
                             /* @deprecated V1 crop: 4-byte header */
                             chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
@@ -894,7 +896,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                     else if (text->font_mode == FONT_SRC_FTL ||
                              text->font_mode == FONT_SRC_FILESYS)
                     {
-                        if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+                        if (typo_ctx.is_v3)
                         {
                             if (gui_font_bmp_load_glyph(&chr[chr_i], text->path, node,
                                                         text->font_mode, offset,
@@ -904,6 +907,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                             }
                         }
                         else
+#endif /* ENABLE_FONT_V3_TYPO */
                         {
                             if (load_dot_crop(&chr[chr_i], text->path, node,
                                               text->font_mode, offset,
@@ -961,9 +965,10 @@ void gui_font_get_dot_info(gui_text_t *text)
                         }
                         else if (text->font_mode == FONT_SRC_MEMADDR)
                         {
-                            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+                            if (typo_ctx.is_v3)
                             {
-                                /* V2: read 6-byte bearing-based header directly from memory */
+                                /* V3: read 6-byte bearing-based header directly from memory */
                                 GUI_BMP_GLYPH_HEAD_V2 *gh = (GUI_BMP_GLYPH_HEAD_V2 *)((uint8_t *)text->path + offset);
                                 chr[chr_i].bearing_x = gh->bearing_x;
                                 chr[chr_i].bearing_y = gh->bearing_y;
@@ -975,6 +980,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                                 chr[chr_i].dot_addr = (uint8_t *)text->path + offset + sizeof(GUI_BMP_GLYPH_HEAD_V2);
                             }
                             else
+#endif /* ENABLE_FONT_V3_TYPO */
                             {
                                 /* @deprecated V1 crop: 4-byte header */
                                 chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
@@ -988,7 +994,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                         else if (text->font_mode == FONT_SRC_FTL ||
                                  text->font_mode == FONT_SRC_FILESYS)
                         {
-                            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+                            if (typo_ctx.is_v3)
                             {
                                 if (gui_font_bmp_load_glyph(&chr[chr_i], text->path, node,
                                                             text->font_mode, offset,
@@ -998,6 +1005,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                                 }
                             }
                             else
+#endif /* ENABLE_FONT_V3_TYPO */
                             {
                                 if (load_dot_crop(&chr[chr_i], text->path, node,
                                                   text->font_mode, offset,
@@ -1202,7 +1210,7 @@ void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
 }
 
 /**
- * @brief Position a single glyph using V2 bearing-based layout.
+ * @brief Position a single glyph using V3 bearing-based layout.
  *
  * @param chr           Glyph to position (bearing_x/y, advance must be filled)
  * @param cursor_x      Current horizontal cursor (updated on return)
@@ -1210,6 +1218,7 @@ void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
  * @param baseline_px   Baseline offset from line top (pixels)
  * @param letter_spacing Extra letter spacing
  */
+#if ENABLE_FONT_V3_TYPO
 static void layout_position_bearing(mem_char_t *chr, int16_t *cursor_x, int16_t line_y,
                                     int16_t baseline_px, int8_t letter_spacing)
 {
@@ -1217,6 +1226,7 @@ static void layout_position_bearing(mem_char_t *chr, int16_t *cursor_x, int16_t 
     chr->y = line_y + baseline_px - chr->bearing_y;
     *cursor_x += chr->advance + letter_spacing;
 }
+#endif /* ENABLE_FONT_V3_TYPO */
 
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
@@ -1239,6 +1249,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     bool need_rtl = false;
 
     /* Build typo context: dispatch by file_type (BMP vs TTF) */
+#if ENABLE_FONT_V3_TYPO
     gui_font_typo_context_t typo_ctx = {0};
     uint8_t font_file_type = 0;
     {
@@ -1271,6 +1282,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             }
         }
     }
+#endif /* ENABLE_FONT_V3_TYPO */
 
     if (text_mode >= RTL_RIGHT && text_mode <= RTL_MULTI_LEFT)
     {
@@ -1303,9 +1315,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                                 (rect_h - text->font_height) / 2 : 0;
             int offset = _UI_MAX((int32_t)((rect_w - char_width_sum) / 2), 0);
 
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
-                /* V2: bearing-based single-line positioning */
+                /* V3: bearing-based single-line positioning */
                 int16_t cursor_x = rect->x1 + offset * align_factor;
                 int16_t line_y = rect->y1 + offset_y;
                 for (uint16_t i = 0; i < font_len; i++)
@@ -1320,6 +1333,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 /* V1: char_w stepping */
                 for (uint16_t i = 0; i < font_len; i++)
@@ -1354,12 +1368,13 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             int32_t line = 0;
             int32_t last_space_index = 0;
             int32_t line_start_index = 0;
-            /* V2 line_height: text->line_height (explicit) > typo_ctx.default_line_height
+            /* V3 line_height: text->line_height (explicit) > typo_ctx.default_line_height
                V1 line_height: chr[0].h + extra_line_spacing (unchanged)
                TTF V3 + explicit line_height > 0: use text->line_height (ignore extra_line_spacing)
                TTF V3 + line_height == 0: typo_ctx.default_line_height + extra_line_spacing */
             int32_t line_height;
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
                 if (text->line_height > 0)
                 {
@@ -1371,7 +1386,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     }
                     else
                     {
-                        /* BMP V2: preserve existing behavior (add line_spacing) */
+                        /* BMP V3: preserve existing behavior (add line_spacing) */
                         line_height = text->line_height + line_spacing;
                     }
                 }
@@ -1382,6 +1397,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 /* Legacy: chr[0].h + extra_line_spacing */
                 line_height = chr[0].h + line_spacing;
@@ -1395,9 +1411,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             GUI_ASSERT(line_buf != NULL);
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
 
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
-                /* V2: bearing-based multi-line layout, wrap by advance */
+                /* V3: bearing-based multi-line layout, wrap by advance */
                 int16_t cursor_x = rect->x1;
                 for (uint16_t i = 0; i < font_len; i++)
                 {
@@ -1449,6 +1466,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 /* V1: char_w stepping */
                 for (uint16_t i = 0; i < font_len; i++)
@@ -1511,13 +1529,15 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 return;
             }
             line_buf[line].index = active_font_len - 1;
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
-                /* V2: last line align offset based on last glyph x + char_w */
+                /* V3: last line align offset based on last glyph x + char_w */
                 line_buf[line].offset = (rect_w - (chr[active_font_len - 1].x - rect->x1) -
                                          chr[active_font_len - 1].char_w) / 2 * align_factor;
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 line_buf[line].offset = (rect_w - chr[active_font_len - 1].x + rect->x1 -
                                          chr[active_font_len - 1].char_w) / 2 * align_factor;
@@ -1547,9 +1567,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             active_font_len = font_len;
             uint32_t offset_y = (text_mode >= SCROLL_X_MID) ?
                                 (rect_h - text->font_height) / 2 : 0;
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
-                /* V2: bearing-based horizontal scroll positioning */
+                /* V3: bearing-based horizontal scroll positioning */
                 int16_t cursor_x = rect->x1;
                 int16_t line_y = rect->y1 + offset_y;
                 for (uint16_t i = 0; i < font_len; i++)
@@ -1564,6 +1585,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 /* V1: char_w stepping */
                 for (uint16_t i = 0; i < font_len; i++)
@@ -1592,9 +1614,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             uint32_t line = 0;
             int32_t last_space_index = 0;
             int32_t line_start_index = 0;
-            /* V2/V1 line height (TTF V3: explicit line_height ignores extra_line_spacing) */
+            /* V3/V1 line height (TTF V3: explicit line_height ignores extra_line_spacing) */
             int32_t line_height;
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
                 if (text->line_height > 0)
                 {
@@ -1613,14 +1636,16 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 line_height = chr[0].h + line_spacing;
             }
             active_font_len = font_len;
 
-            if (typo_ctx.is_v2)
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
             {
-                /* V2: bearing-based vertical scroll layout */
+                /* V3: bearing-based vertical scroll layout */
                 int16_t cursor_x = rect->x1;
                 for (uint16_t i = 0; i < font_len; i++)
                 {
@@ -1667,6 +1692,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             else
+#endif /* ENABLE_FONT_V3_TYPO */
             {
                 /* V1: char_w stepping */
                 for (uint16_t i = 0; i < font_len; i++)
@@ -2250,8 +2276,9 @@ uint8_t gui_font_mem_delete(uint8_t *font_bin_addr)
 }
 
 /*============================================================================*
- *                V2 Typography Functions (Standard Typography Model)
+ *                V3 Typography Functions (Standard Typography Model)
  *============================================================================*/
+#if ENABLE_FONT_V3_TYPO
 
 bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
                                      gui_font_typo_metrics_t *out_metrics)
@@ -2268,7 +2295,7 @@ bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
     }
 
     /*
-     * V2 extension fields are appended after font_name.
+     * V3 extension fields are appended after font_name.
      * Calculate the byte offset where extension starts:
      *   head_length(1) + file_type(1) + version(4) + font_size(1) +
      *   render_mode(1) + bitfield(1) + index_area_size(4) +
@@ -2292,7 +2319,7 @@ bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
 
     if (out_metrics->units_per_em == 0)
     {
-        gui_log("Warning: V2 font header has units_per_em == 0\n");
+        gui_log("Warning: V3 font header has units_per_em == 0\n");
         return false;
     }
 
@@ -2331,18 +2358,20 @@ gui_font_typo_context_t gui_font_bmp_get_typo_context(const GUI_FONT_HEAD_BMP *h
 
     if (gui_font_bmp_parse_typo_metrics(header, &ctx.metrics))
     {
-        ctx.is_v2 = true;
+        ctx.is_v3 = true;
         gui_font_typo_layout_t layout = gui_font_typo_calc_layout(&ctx.metrics, font_size);
         ctx.baseline_px = layout.baseline;
         ctx.default_line_height = layout.line_height;
     }
     else
     {
-        ctx.is_v2 = false;
+        ctx.is_v3 = false;
         ctx.baseline_px = 0;
         ctx.default_line_height = (int16_t)font_size;
     }
 
     return ctx;
 }
+
+#endif /* ENABLE_FONT_V3_TYPO */
 
