@@ -73,6 +73,7 @@ extern void *fontnotokrvec;
 extern void *fontharmonysc;
 
 extern void *fontnotov2;
+extern void *fontnotov2vec;
 /*============================================================================*
  *                           Functions
  *============================================================================*/

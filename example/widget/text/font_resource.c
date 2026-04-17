@@ -53,6 +53,7 @@ void *fontnotokrvec;
 void *fontharmonysc;
 
 void *fontnotov2;
+void *fontnotov2vec;
 
 
 /*============================================================================*
@@ -149,6 +150,7 @@ void font_file_init(void)
 
     fontharmonysc  = LOAD_FONT("HarmonyOS_size32_bits2_font.bin");
     fontnotov2     = LOAD_FONT("NotoSans_Regular_size32_bits4_v3_font.bin");
+    fontnotov2vec  = LOAD_FONT("NotoSans_Regular_vectorv3.bin");
 
 #undef LOAD_FONT
 

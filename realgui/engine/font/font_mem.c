@@ -7,6 +7,7 @@
 #include <string.h>
 #include "draw_font.h"
 #include "font_mem.h"
+#include "font_ttf.h"
 #include "font_lib_manager.h"
 #include "font_rendering_utils.h"
 #include "gui_vfs.h"
@@ -1237,25 +1238,37 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     bool wordwrap = text->wordwrap || text->arabic || text->hebrew;
     bool need_rtl = false;
 
-    /* Build V2 typo context (V1: is_v2=false, baseline_px=0) */
+    /* Build typo context: dispatch by file_type (BMP vs TTF) */
     gui_font_typo_context_t typo_ctx = {0};
+    uint8_t font_file_type = 0;
     {
-        GUI_FONT_HEAD_BMP *font_header = NULL;
+        uint8_t *header_ptr = NULL;
         if (text->font_mode == FONT_SRC_MEMADDR)
         {
-            font_header = (GUI_FONT_HEAD_BMP *)text->path;
+            header_ptr = (uint8_t *)text->path;
         }
         else
         {
             FONT_LIB_NODE *node = get_fontlib_by_name(text->path);
             if (node != NULL)
             {
-                font_header = (GUI_FONT_HEAD_BMP *)node->cached_data;
+                header_ptr = (uint8_t *)node->cached_data;
             }
         }
-        if (font_header != NULL)
+
+        if (header_ptr != NULL)
         {
-            typo_ctx = gui_font_bmp_get_typo_context(font_header, text->font_height);
+            font_file_type = *(header_ptr + 1);  /* offset 1 = file_type */
+            if (font_file_type == FONT_FILE_BMP_FLAG)
+            {
+                typo_ctx = gui_font_bmp_get_typo_context(
+                               (GUI_FONT_HEAD_BMP *)header_ptr, text->font_height);
+            }
+            else if (font_file_type == FONT_FILE_TTF_FLAG)
+            {
+                typo_ctx = gui_font_ttf_get_typo_context(
+                               (GUI_FONT_HEAD_TTF *)header_ptr, text->font_height);
+            }
         }
     }
 
@@ -1342,11 +1355,37 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             int32_t last_space_index = 0;
             int32_t line_start_index = 0;
             /* V2 line_height: text->line_height (explicit) > typo_ctx.default_line_height
-               V1 line_height: chr[0].h + extra_line_spacing (unchanged) */
-            int32_t line_height = typo_ctx.is_v2 ?
-                                  ((text->line_height > 0 ? text->line_height
-                                    : typo_ctx.default_line_height) + line_spacing) :
-                                  (chr[0].h + line_spacing);
+               V1 line_height: chr[0].h + extra_line_spacing (unchanged)
+               TTF V3 + explicit line_height > 0: use text->line_height (ignore extra_line_spacing)
+               TTF V3 + line_height == 0: typo_ctx.default_line_height + extra_line_spacing */
+            int32_t line_height;
+            if (typo_ctx.is_v2)
+            {
+                if (text->line_height > 0)
+                {
+                    /* Explicit line_height set by user */
+                    if (font_file_type == FONT_FILE_TTF_FLAG)
+                    {
+                        /* TTF V3: explicit line_height ignores extra_line_spacing */
+                        line_height = text->line_height;
+                    }
+                    else
+                    {
+                        /* BMP V2: preserve existing behavior (add line_spacing) */
+                        line_height = text->line_height + line_spacing;
+                    }
+                }
+                else
+                {
+                    /* No explicit line_height: use default + extra_line_spacing */
+                    line_height = typo_ctx.default_line_height + line_spacing;
+                }
+            }
+            else
+            {
+                /* Legacy: chr[0].h + extra_line_spacing */
+                line_height = chr[0].h + line_spacing;
+            }
             int32_t align_factor = (text_mode <= MULTI_RIGHT) ?
                                    (text_mode - MULTI_LEFT) : (text_mode - MULTI_MID_LEFT);
             bool vertical_center = (text_mode >= MULTI_MID_LEFT);
@@ -1553,11 +1592,30 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             uint32_t line = 0;
             int32_t last_space_index = 0;
             int32_t line_start_index = 0;
-            /* V2/V1 line height */
-            int32_t line_height = typo_ctx.is_v2 ?
-                                  ((text->line_height > 0 ? text->line_height
-                                    : typo_ctx.default_line_height) + line_spacing) :
-                                  (chr[0].h + line_spacing);
+            /* V2/V1 line height (TTF V3: explicit line_height ignores extra_line_spacing) */
+            int32_t line_height;
+            if (typo_ctx.is_v2)
+            {
+                if (text->line_height > 0)
+                {
+                    if (font_file_type == FONT_FILE_TTF_FLAG)
+                    {
+                        line_height = text->line_height;
+                    }
+                    else
+                    {
+                        line_height = text->line_height + line_spacing;
+                    }
+                }
+                else
+                {
+                    line_height = typo_ctx.default_line_height + line_spacing;
+                }
+            }
+            else
+            {
+                line_height = chr[0].h + line_spacing;
+            }
             active_font_len = font_len;
 
             if (typo_ctx.is_v2)
