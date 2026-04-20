@@ -55,9 +55,6 @@ extern void *font32b4;
 extern void *font32b8;
 extern void *font32vb4;
 
-extern void *font32b4index1;
-extern void *font32vb4index1;
-
 extern void *fontnoto;
 extern void *fontnotoarabic;
 extern void *fontnotojp;
@@ -71,9 +68,6 @@ extern void *fontnotojpvec;
 extern void *fontnotokrvec;
 
 extern void *fontharmonysc;
-
-extern void *fontnotov2;
-extern void *fontnotov2vec;
 /*============================================================================*
  *                           Functions
  *============================================================================*/
@@ -93,7 +87,7 @@ void text_font_source_mode_test(void);
 void text_wordwrap_test(void);
 void text_measure_test(void);
 void text_clip_test(void);
-void text_noto_v2_rendering_test(void);
+void text_font_typo_rendering_test(void);
 void text_font_fallback_test(void);
 
 #ifdef __cplusplus

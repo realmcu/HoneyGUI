@@ -20,7 +20,12 @@
  *                            Macros
  *============================================================================*/
 #define FONT_MEM_POOL_SIZE (1024 * 1024 * 100)
+
+#if ENABLE_FONT_V3_TYPO
+#define FONT_DIR           "./example/assets/font/v3/"
+#else
 #define FONT_DIR           "./example/assets/font/"
+#endif
 #define FONT_PATH(name)    FONT_DIR name
 
 /*============================================================================*
@@ -35,9 +40,6 @@ void *font32b4;
 void *font32b8;
 void *font32vb4;
 
-void *font32b4index1;
-void *font32vb4index1;
-
 void *fontnoto;
 void *fontnotoarabic;
 void *fontnotojp;
@@ -51,9 +53,6 @@ void *fontnotojpvec;
 void *fontnotokrvec;
 
 void *fontharmonysc;
-
-void *fontnotov2;
-void *fontnotov2vec;
 
 
 /*============================================================================*
@@ -127,30 +126,29 @@ void font_file_init(void)
 
 #define LOAD_FONT(file) load_file_to_memory(FONT_PATH(file), NULL)
 
-    font32b1       = LOAD_FONT("HarmonyOS_size32_bits1_font.bin");
-    font32b2       = LOAD_FONT("HarmonyOS_size32_bits2_font.bin");
-    font32b4       = LOAD_FONT("HarmonyOS_size32_bits4_font.bin");
-    font32b8       = LOAD_FONT("HarmonyOS_size32_bits8_font.bin");
-    font32vb4      = LOAD_FONT("HarmonyOS_size32_bits4_vfont.bin");
+    /* HarmonyOS Sans SC - bitmap (1/2/4/8-bit) + vector */
+    font32b1       = LOAD_FONT("HarmonyOS_Sans_SC_Regular_size32_bits1_bitmap.bin");
+    font32b2       = LOAD_FONT("HarmonyOS_Sans_SC_Regular_size32_bits2_bitmap.bin");
+    font32b4       = LOAD_FONT("HarmonyOS_Sans_SC_Regular_size32_bits4_bitmap.bin");
+    font32b8       = LOAD_FONT("HarmonyOS_Sans_SC_Regular_size32_bits8_bitmap.bin");
+    font32vb4      = LOAD_FONT("HarmonyOS_Sans_SC_Regular_vector.bin");
+    fontharmonysc  = font32b2;
 
-    font32b4index1  = LOAD_FONT("NotoSans_Regular_size32_bits4_font.bin");
-    font32vb4index1 = LOAD_FONT("NotoSans_Regular_size32_bits4_vfont.bin");
-
+    /* NotoSans - bitmap + vector (Latin/basic) */
     fontnoto       = LOAD_FONT("NotoSans_Regular_size32_bits4_bitmap.bin");
-    fontnotoarabic = LOAD_FONT("NotoSansArabic_size32_bits2_font.bin");
-    fontnotojp     = LOAD_FONT("NotoSansJP_regular_size32_bits2_bitmap.bin");
-    fontnotokr     = LOAD_FONT("NotoSansKR_regular_size32_bits2_bitmap.bin");
-    fontnotothai   = LOAD_FONT("NotoSansThai_size32_bits2_font.bin");
-    fontnotohebrew = LOAD_FONT("NotoSansHebrew_size32_bits2_font.bin");
-
     fontnotovec    = LOAD_FONT("NotoSans_Regular_vector.bin");
+
+    /* NotoSans - multi-language bitmap */
+    fontnotoarabic = LOAD_FONT("NotoSansArabic_Regular_size32_bits2_bitmap.bin");
+    fontnotojp     = LOAD_FONT("NotoSansJP_Regular_size32_bits2_bitmap.bin");
+    fontnotokr     = LOAD_FONT("NotoSansKR_Regular_size32_bits2_bitmap.bin");
+    fontnotothai   = LOAD_FONT("NotoSansThai_Regular_size32_bits2_bitmap.bin");
+    fontnotohebrew = LOAD_FONT("NotoSansHebrew_Regular_size32_bits2_bitmap.bin");
+
+    /* NotoSans - multi-language vector */
     fontnotoscvec  = LOAD_FONT("NotoSansSC_Regular_vector.bin");
     fontnotojpvec  = LOAD_FONT("NotoSansJP_Regular_vector.bin");
     fontnotokrvec  = LOAD_FONT("NotoSansKR_Regular_vector.bin");
-
-    fontharmonysc  = LOAD_FONT("HarmonyOS_size32_bits2_font.bin");
-    fontnotov2     = LOAD_FONT("NotoSans_Regular_size32_bits4_v3_font.bin");
-    fontnotov2vec  = LOAD_FONT("NotoSans_Regular_vectorv3.bin");
 
 #undef LOAD_FONT
 

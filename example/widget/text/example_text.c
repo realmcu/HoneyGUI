@@ -49,7 +49,7 @@ void text_widget_example(void)
     char *text_string = "HoneyGUI";
     gui_text_t *text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
     gui_text_set(text, text_string, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(text_string), 32);
-    gui_text_type_set(text, font32b1, FONT_SRC_MEMADDR);
+    gui_text_type_set(text, font32b2, FONT_SRC_MEMADDR);
 
     gui_obj_add_event_cb(text, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
@@ -81,7 +81,7 @@ void text_widget_example(void)
  * |10 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
  * |11 | text_measure_test()              | Layout measure: BMP/TTF, single-line/multi-line metrics                  |
  * |12 | text_clip_test()                 | Partial text display using win clip (top/bottom/right/center)            |
- * |13 | text_noto_v2_rendering_test()    | NotoSans V2 bitmap + vector views (swipeable)                            |
+ * |13 | text_font_typo_rendering_test()  | Typography rendering: bitmap + vector baseline/line-height (swipeable)   |
  * |14 | text_font_fallback_test()        | Mixed-language fallback: CJK+EN in one string with priority chain        |
  *
  * @return 0 on success
@@ -102,7 +102,7 @@ static int app_init(void)
     // text_wordwrap_test();            /* [10] Word-wrap & break test */
     // text_measure_test();             /* [11] Layout measure test    */
     // text_clip_test();                /* [12] Text clip/partial show */
-    // text_noto_v2_rendering_test();   /* [13] NotoSans V2 bitmap+vec */
+    // text_font_typo_rendering_test(); /* [13] Typography bitmap+vec  */
     // text_font_fallback_test();       /* [14] Mixed-lang fallback    */
 
     return 0;

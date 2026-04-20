@@ -71,7 +71,7 @@ void custom_font_rendering_demo(void)
 
     gui_text_t *text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
     gui_text_set(text, "HoneyGUI", GUI_FONT_SRC_CUS, APP_COLOR_WHITE, 8, 32);
-    gui_text_type_set(text, font32b1, FONT_SRC_MEMADDR);
+    gui_text_type_set(text, font32b2, FONT_SRC_MEMADDR);
 
     gui_text_t *free_text = gui_text_create(gui_obj_get_root(), "free_text", 0, 430, 0, 48);
     gui_text_set(free_text, "DESTROY", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 7, 48);

@@ -23,8 +23,17 @@ static const char *TEST_TEXT = "HoneyGUI";
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static uint8_t *fs_font_path = (uint8_t *)"/pc/example/assets/font/HarmonyOS_size32_bits8_font.bin";
-static uint8_t *fs_ttf_path = (uint8_t *)"/pc/example/assets/font/HarmonyOS_size32_bits4_vfont.bin";
+#if ENABLE_FONT_V3_TYPO
+static uint8_t *fs_font_path =
+    (uint8_t *)"/pc/example/assets/font/v3/HarmonyOS_Sans_SC_Regular_size32_bits8_bitmap.bin";
+static uint8_t *fs_ttf_path =
+    (uint8_t *)"/pc/example/assets/font/v3/HarmonyOS_Sans_SC_Regular_vector.bin";
+#else
+static uint8_t *fs_font_path =
+    (uint8_t *)"/pc/example/assets/font/HarmonyOS_Sans_SC_Regular_size32_bits8_bitmap.bin";
+static uint8_t *fs_ttf_path =
+    (uint8_t *)"/pc/example/assets/font/HarmonyOS_Sans_SC_Regular_vector.bin";
+#endif
 
 /*============================================================================*
  *                           Private Functions
@@ -178,7 +187,7 @@ void text_font_source_mode_test(void)
         gui_text_t *t2 = gui_text_create(root, "ttf_ftl", start_x + col_width, y, 0, 0);
         gui_text_set(t2, (void *)TEST_TEXT, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(TEST_TEXT), FONT_SIZE);
-        gui_text_type_set(t2, font32vb4index1, FONT_SRC_FTL);
+        gui_text_type_set(t2, fontnotovec, FONT_SRC_FTL);
         create_label(root, "TTF+FTL", start_x + col_width, y + FONT_SIZE + LABEL_OFFSET_Y);
 
         /* FILESYS */

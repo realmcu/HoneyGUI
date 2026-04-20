@@ -96,43 +96,50 @@ void text_clip_test(void)
     uint8_t sc_opa = 80;
 
     /* Case 1: Full text, no clipping */
-    draw_indicator(gui_obj_get_root(), "bg1", 0, y, sw, th, APP_COLOR_CYAN, bg_opa);
     gui_text_t *t1 = gui_text_create(gui_obj_get_root(), "clip_full", 0, y, sw, 0);
     gui_text_set(t1, str, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, len, fh);
     gui_text_type_set(t1, font32b4, FONT_SRC_MEMADDR);
     gui_text_mode_set(t1, MULTI_LEFT);
+    gui_text_wordwrap_set(t1, true);
+    gui_text_layout_measure(t1);
+    th = t1->char_height_sum > 0 ? t1->char_height_sum : fh * 2;
+    int16_t half_th = th / 2 + 1;
+    draw_indicator(gui_obj_get_root(), "bg1", 0, y, sw, th, APP_COLOR_CYAN, bg_opa);
     y += th + gap;
 
     /* Case 2: Bottom half only */
     draw_indicator(gui_obj_get_root(), "bg2", 0, y, sw, th, APP_COLOR_GREEN, bg_opa);
-    draw_indicator(gui_obj_get_root(), "sc2", 0, y + fh, sw, fh, APP_COLOR_GREEN, sc_opa);
+    draw_indicator(gui_obj_get_root(), "sc2", 0, y + half_th, sw, half_th, APP_COLOR_GREEN, sc_opa);
     gui_text_t *t2 = gui_text_create(gui_obj_get_root(), "clip_bot", 0, y, sw, th);
     gui_text_set(t2, str, GUI_FONT_SRC_BMP, APP_COLOR_GREEN, len, fh);
     gui_text_type_set(t2, font32b4, FONT_SRC_MEMADDR);
     gui_text_mode_set(t2, MULTI_LEFT);
-    gui_text_set_scope(t2, 0, fh, sw, fh);
+    gui_text_wordwrap_set(t2, true);
+    gui_text_set_scope(t2, 0, half_th, sw, half_th);
     y += th + gap;
 
     /* Case 3: Top half only */
     draw_indicator(gui_obj_get_root(), "bg3", 0, y, sw, th, APP_COLOR_RED, bg_opa);
-    draw_indicator(gui_obj_get_root(), "sc3", 0, y, sw, fh, APP_COLOR_RED, sc_opa);
+    draw_indicator(gui_obj_get_root(), "sc3", 0, y, sw, half_th, APP_COLOR_RED, sc_opa);
     gui_text_t *t3 = gui_text_create(gui_obj_get_root(), "clip_top", 0, y, sw, th);
     gui_text_set(t3, str, GUI_FONT_SRC_BMP, APP_COLOR_RED, len, fh);
     gui_text_type_set(t3, font32b4, FONT_SRC_MEMADDR);
     gui_text_mode_set(t3, MULTI_LEFT);
-    gui_text_set_scope(t3, 0, 0, sw, fh);
+    gui_text_wordwrap_set(t3, true);
+    gui_text_set_scope(t3, 0, 0, sw, half_th);
     y += th + gap;
 
     /* Case 4: Center region, TTF */
     int16_t crop = 40;
     draw_indicator(gui_obj_get_root(), "bg4", 0, y, sw, th, APP_COLOR_YELLOW, bg_opa);
-    draw_indicator(gui_obj_get_root(), "sc4", crop, y + fh / 2, sw - crop * 2, fh, APP_COLOR_YELLOW,
-                   sc_opa);
+    draw_indicator(gui_obj_get_root(), "sc4", crop, y + th / 4, sw - crop * 2, half_th,
+                   APP_COLOR_YELLOW, sc_opa);
     gui_text_t *t4 = gui_text_create(gui_obj_get_root(), "clip_ctr", 0, y, sw, th);
     gui_text_set(t4, str, GUI_FONT_SRC_TTF, APP_COLOR_YELLOW, len, fh);
     gui_text_type_set(t4, font32vb4, FONT_SRC_MEMADDR);
     gui_text_mode_set(t4, MULTI_LEFT);
-    gui_text_set_scope(t4, crop, fh / 2, sw - crop * 2, fh);
+    gui_text_wordwrap_set(t4, true);
+    gui_text_set_scope(t4, crop, th / 4, sw - crop * 2, half_th);
     y += th + gap;
 
     /* Case 5: Moving text, absolute scope fixed in center */

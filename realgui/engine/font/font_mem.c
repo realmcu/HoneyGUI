@@ -831,11 +831,21 @@ void gui_font_get_dot_info(gui_text_t *text)
                 chr[chr_i].w = 0;
                 chr[chr_i].h = chr_h;
                 uint32_t offset = 0;
-                if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
+                if (chr[chr_i].unicode == 0x0D)
+                {
+                    chr[chr_i].char_w = text->font_height / 4;
+                    chr[chr_i].char_h = text->font_height / 4;
+#if ENABLE_FONT_V3_TYPO
+                    chr[chr_i].advance = text->font_height / 4;
+#endif
+                }
+#if !ENABLE_FONT_V3_TYPO
+                else if (chr[chr_i].unicode == 0x20)
                 {
                     chr[chr_i].char_w = text->font_height / 4;
                     chr[chr_i].char_h = text->font_height / 4;
                 }
+#endif
                 else if (chr[chr_i].unicode == 0x0A)
                 {
                     line_flag ++;
@@ -918,7 +928,11 @@ void gui_font_get_dot_info(gui_text_t *text)
                         }
                     }
                 }
+#if ENABLE_FONT_V3_TYPO
+                all_char_w += chr[chr_i].advance;
+#else
                 all_char_w += chr[chr_i].char_w;
+#endif
                 chr_i ++;
             }
             break;
@@ -931,11 +945,21 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].w = 0;
                     chr[chr_i].h = chr_h;
                     uint32_t offset = 0;
-                    if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
+                    if (chr[chr_i].unicode == 0x0D)
+                    {
+                        chr[chr_i].char_w = text->font_height / 4;
+                        chr[chr_i].char_h = text->font_height / 4;
+#if ENABLE_FONT_V3_TYPO
+                        chr[chr_i].advance = text->font_height / 4;
+#endif
+                    }
+#if !ENABLE_FONT_V3_TYPO
+                    else if (chr[chr_i].unicode == 0x20)
                     {
                         chr[chr_i].char_w = text->font_height / 4;
                         chr[chr_i].char_h = text->font_height / 4;
                     }
+#endif
                     else if (chr[chr_i].unicode == 0x0A)
                     {
                         line_flag ++;
@@ -1016,7 +1040,11 @@ void gui_font_get_dot_info(gui_text_t *text)
                             }
                         }
                     }
+#if ENABLE_FONT_V3_TYPO
+                    all_char_w += chr[chr_i].advance;
+#else
                     all_char_w += chr[chr_i].char_w;
+#endif
                     chr_i ++;
                 }
             }
@@ -1043,11 +1071,21 @@ void gui_font_get_dot_info(gui_text_t *text)
                 chr[chr_i].w = aliened_font_size;
                 chr[chr_i].h = text->font_height;
                 uint16_t offset = 0;
-                if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
+                if (chr[chr_i].unicode == 0x0D)
+                {
+                    chr[chr_i].char_w = text->font_height / 4;
+                    chr[chr_i].char_h = text->font_height / 4;
+#if ENABLE_FONT_V3_TYPO
+                    chr[chr_i].advance = text->font_height / 4;
+#endif
+                }
+#if !ENABLE_FONT_V3_TYPO
+                else if (chr[chr_i].unicode == 0x20)
                 {
                     chr[chr_i].char_w = text->font_height / 4;
                     chr[chr_i].char_h = text->font_height / 4;
                 }
+#endif
                 else if (chr[chr_i].unicode == 0x0A)
                 {
                     line_flag ++;
@@ -1114,11 +1152,13 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_w = 0;
                         chr[chr_i].char_h = 0;
                     }
+#if !ENABLE_FONT_V3_TYPO
                     else if (chr[chr_i].unicode == 0x20)
                     {
                         chr[chr_i].char_w = text->font_height / 4;
                         chr[chr_i].char_h = text->font_height / 4;
                     }
+#endif
                     else if (chr[chr_i].unicode >= 0x10000)
                     {
                         uint32_t multi_len = load_emoji(&chr[chr_i], text, unicode_buf, uni_i, unicode_len);
@@ -1325,7 +1365,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 {
                     layout_position_bearing(&chr[i], &cursor_x, line_y,
                                             typo_ctx.baseline_px, letter_spacing);
-                    if ((chr[i].x + chr[i].char_w - 1) > rect->x2)
+                    if ((cursor_x - 1) > rect->x2)
                     {
                         active_font_len = i;
                         break;
@@ -1416,11 +1456,13 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             {
                 /* V3: bearing-based multi-line layout, wrap by advance */
                 int16_t cursor_x = rect->x1;
+                int16_t last_space_cursor_x = rect->x1;
                 for (uint16_t i = 0; i < font_len; i++)
                 {
                     if (chr[i].unicode == 0x20)
                     {
                         last_space_index = i;
+                        last_space_cursor_x = cursor_x;
                     }
 
                     /* Check if advance exceeds right boundary */
@@ -1437,11 +1479,19 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         }
                         if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
                         {
+                            /* Line width up to the space (not including post-space chars) */
+                            int16_t line_used = last_space_cursor_x + chr[last_space_index].advance
+                                                + letter_spacing - rect->x1;
+                            line_buf[line].index = last_space_index;
+                            line_buf[line].offset = (rect_w - line_used) / 2 * align_factor;
                             i = last_space_index + 1;
                         }
-                        line_buf[line].index = i - 1;
-                        line_buf[line].offset = (rect_w - (cursor_x - rect->x1) + letter_spacing) / 2 *
-                                                align_factor;
+                        else
+                        {
+                            line_buf[line].index = i - 1;
+                            line_buf[line].offset = (rect_w - (cursor_x - rect->x1)) / 2 *
+                                                    align_factor;
+                        }
                         line++;
                         line_start_index = i;
                         cursor_x = rect->x1;
@@ -1449,7 +1499,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     else if (i > 0 && chr[i - 1].unicode == 0x0A)
                     {
                         line_buf[line].index = i - 1;
-                        line_buf[line].offset = (rect_w - (cursor_x - rect->x1) + letter_spacing * 2) / 2 *
+                        line_buf[line].offset = (rect_w - (cursor_x - rect->x1)) / 2 *
                                                 align_factor;
                         line++;
                         line_start_index = i;
@@ -1458,7 +1508,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 
                     layout_position_bearing(&chr[i], &cursor_x, rect->y1 + line * line_height,
                                             typo_ctx.baseline_px, letter_spacing);
-                    if (chr[i].y + chr[i].h - 1 > rect->y2)
+                    if ((rect->y1 + (line + 1) * line_height - 1) > rect->y2)
                     {
                         active_font_len = i;
                         break;
@@ -1532,9 +1582,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 #if ENABLE_FONT_V3_TYPO
             if (typo_ctx.is_v3)
             {
-                /* V3: last line align offset based on last glyph x + char_w */
-                line_buf[line].offset = (rect_w - (chr[active_font_len - 1].x - rect->x1) -
-                                         chr[active_font_len - 1].char_w) / 2 * align_factor;
+                /* V3: last line offset based on cursor position (advance-based) */
+                int16_t last_cursor = chr[active_font_len - 1].x - chr[active_font_len - 1].bearing_x
+                                      + chr[active_font_len - 1].advance;
+                line_buf[line].offset = (rect_w - (last_cursor - rect->x1)) / 2 * align_factor;
             }
             else
 #endif /* ENABLE_FONT_V3_TYPO */
@@ -1902,7 +1953,19 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     {
         for (uint32_t i = 0; i < active_font_len; i++)
         {
-            chr[i].x = rect->x1 + rect_w - (chr[i].x - rect->x1) - chr[i].char_w;
+#if ENABLE_FONT_V3_TYPO
+            if (typo_ctx.is_v3)
+            {
+                /* Recover cursor origin, mirror it, then re-apply bearing_x */
+                int16_t cursor_x = chr[i].x - chr[i].bearing_x;
+                int16_t mirrored_cursor = rect->x1 + rect_w - (cursor_x - rect->x1) - chr[i].advance;
+                chr[i].x = mirrored_cursor + chr[i].bearing_x;
+            }
+            else
+#endif
+            {
+                chr[i].x = rect->x1 + rect_w - (chr[i].x - rect->x1) - chr[i].char_w;
+            }
         }
     }
     if (text->thai && mark_array_out)
