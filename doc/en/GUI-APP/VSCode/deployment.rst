@@ -453,28 +453,19 @@ Bind Data on Embedded Side
 Solution Selection Guide
 -------------------------
 
-.. code-block:: text
+.. mermaid::
 
-                  ┌─────────────────┐
-                  │ Need OTA UI     │
-                  │ updates?        │
-                  └────────┬────────┘
-                           │
-            ┌──────────────┴──────────────┐
-            │ No                          │ Yes
-            ▼                             ▼
-    ┌───────────────┐           ┌─────────────────┐
-    │ Solution 1:   │           │ Flash sufficient?│
-    │ C Code        │           └────────┬────────┘
-    └───────────────┘                    │
-                          ┌──────────────┴──────────────┐
-                          │ Yes                         │ No
-                          ▼                             ▼
-                  ┌───────────────┐           ┌───────────────┐
-                  │ Solution 2:   │           │ Solution 3:   │
-                  │ HML (XML)     │           │ HML (BIN)     │
-                  │ (Easy debug)  │           │ (Small size)  │
-                  └───────────────┘           └───────────────┘
+   graph TD
+       Q1{Need OTA UI updates?}
+       Q2{Flash sufficient?}
+       A1[Solution 1: C Code]
+       A2[Solution 2: HML<br/>Easy debug]
+       A3[Solution 3: BIN<br/>Small size]
+
+       Q1 -->|No| A1
+       Q1 -->|Yes| Q2
+       Q2 -->|Yes| A2
+       Q2 -->|No| A3
 
 Performance and Resource Comparison
 ------------------------------------
@@ -567,4 +558,3 @@ Next Steps
 * See :doc:`code_generation` for code generation details
 * Learn :doc:`build_simulation` to test on PC
 * Refer to :doc:`resource_management` to optimize resource usage
-* Read HoneyGUI SDK porting documentation for platform adaptation

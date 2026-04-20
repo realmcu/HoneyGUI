@@ -19,7 +19,7 @@ Windows
 * **MinGW-w64**: C/C++ 编译器
 
   * 推荐版本： 8.1.0 或更高
-  * 安装路径： ``C:\mingw64``（默认）
+  * 安装路径： ``C:\mingw64`` （默认）
   * 下载： https://sourceforge.net/projects/mingw-w64/
 
 * **Python**: 3.9.7 或更高版本
@@ -151,7 +151,7 @@ HoneyGUI Visual Designer 项目的标准结构：
 
 2. **生成代码**:
 
-   * 点击工具栏的 :gui_label:`生成代码` 按钮
+   * 点击工具栏的 :guilabel:`生成代码` 按钮
    * 或使用命令面板： ``Ctrl+Shift+P`` → ``HoneyGUI: Generate Code``
 
 3. **配置应用**:

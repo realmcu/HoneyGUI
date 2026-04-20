@@ -97,7 +97,7 @@ Generate Code
 ~~~~~~~~~~~~~
 
 1. Open any HML file in the designer
-2. Click the :gui_label:`Generate Code` button in the toolbar
+2. Click the :guilabel:`Generate Code` button in the toolbar
 3. Automatically scan all HML files in the project and generate code
 4. Display generation progress and results
 
@@ -110,7 +110,7 @@ Generate Code
 **Shortcuts**:
 
 * Command Palette: ``Ctrl+Shift+P`` -> ``HoneyGUI: Generate Code``
-* Toolbar Button: Click :gui_label:`Generate Code`
+* Toolbar Button: Click :guilabel:`Generate Code`
 
 Code Protected Regions
 -----------------------

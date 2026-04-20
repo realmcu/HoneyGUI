@@ -29,11 +29,11 @@ Unified Property Panel Tabs
 
 The original view switch functionality has been unified into the Event-Action system:
 
-.. code-block:: text
+.. figure:: resource/property.png
+   :align: center
+   :width: 300px
 
-   +-------------------------------------+
-   | [Properties] [Events]               |  <- Used uniformly by all components
-   +-------------------------------------+
+   Properties Panel
 
 * **Properties**: Basic component attributes (position, size, style, etc.)
 * **Events**: Event-Action configuration (includes original view switch functionality)
@@ -386,25 +386,11 @@ UI Design
 Property Panel - Events Tab
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: text
+.. figure:: resource/event.png
+   :align: center
+   :width: 300px
 
-   ┌─────────────────────────────────────┐
-   │ [Properties] [Events]               │
-   ├─────────────────────────────────────┤
-   │                                     │
-   │ ▼ onSwipeLeft               [Delete]│
-   │ ┌─────────────────────────────────┐ │
-   │ │ 1. switchView                   │ │
-   │ │    Target View: [screen2    ▼]  │ │
-   │ │    Exit Anim:   [Slide Left ▼]  │ │
-   │ │    Enter Anim:  [From Right ▼]  │ │
-   │ │                         [×]     │ │
-   │ └─────────────────────────────────┘ │
-   │ [+ Add Action]                      │
-   │                                     │
-   │ [+ Add Event]                       │
-   │                                     │
-   └─────────────────────────────────────┘
+   Events Panel
 
 Practical Examples
 ------------------
@@ -412,7 +398,7 @@ Practical Examples
 Example 1: Button Click to Jump
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Scenario**: Click :gui_label:`Next` button to jump to page 2
+**Scenario**: Click :guilabel:`Next` button to jump to page 2
 
 **HML Configuration**:
 

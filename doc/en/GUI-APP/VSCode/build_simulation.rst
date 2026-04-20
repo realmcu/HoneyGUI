@@ -151,7 +151,7 @@ Build Using VSCode Plugin
 
 2. **Generate Code**:
 
-   * Click the :gui_label:`Generate Code` button in toolbar
+   * Click the :guilabel:`Generate Code` button in toolbar
    * Or use command palette: ``Ctrl+Shift+P`` -> ``HoneyGUI: Generate Code``
 
 3. **Configure Application**:
