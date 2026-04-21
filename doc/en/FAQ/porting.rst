@@ -15,7 +15,7 @@ data header size.
 JS Malloc Heap
 --------------
 
-JS (javascript) is included in :term:`GUI` module, the heap space JS used may fail to malloc due to resource
+JS (javascript) is included in :term:`GUI` module, the heap space JS used may fail to ``malloc`` due to resource
 limitation, so this heap space could relocate on :term:`PSRAM` if SoC supports PSRAM feature. The specific
 information can be found in the :term:`API` ``void *context_alloc(size_t size, void *cb_data_p)``.
 

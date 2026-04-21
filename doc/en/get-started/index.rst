@@ -46,6 +46,8 @@ Installation For Windows
 -------------------------
 
 
+.. _Install_compiler_en:
+
 Install Compiler
 ^^^^^^^^^^^^^^^^
 

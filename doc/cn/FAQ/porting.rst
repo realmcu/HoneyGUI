@@ -7,12 +7,12 @@
 用户数据
 --------
 
-生成用户数据 bin 镜像时，需要考虑 ``flash_map.h`` 中的用户数据地址。通常，生成脚本中的地址与 ``flash_map.h`` 中的用户数据地址一致。如果由于 mppgtool 要求，用户数据 bin 需要添加图像数据头，则生成脚本中的地址必须增加图像数据头大小。
+生成用户数据 bin 镜像时，需要考虑 ``flash_map.h`` 中的用户数据地址。通常，生成脚本中的地址与 ``flash_map.h`` 中的用户数据地址一致。如果由于 ``mppgtool`` 要求，用户数据 bin 需要添加图像数据头，则生成脚本中的地址必须增加图像数据头大小。
 
 JS 分配堆内存
 --------------
 
-JS ( JavaScript ) 包含在 :term:`GUI` 模块中， JS 使用的堆空间可能会受到资源限制，导致 ``malloc`` 失败。如果 SoC 支持 :term:`PSRAM` 特性，可以将此堆空间重定位到 PSRAM 。具体信息请参考 API ``void *context_alloc(size_t size, void *cb_data_p)``。
+JS ( JavaScript ) 包含在 :term:`GUI` 模块中， JS 使用的堆空间可能会受到资源限制，导致 ``malloc`` 失败。如果 SoC 支持 :term:`PSRAM` 特性，可以将此堆空间重定位到 PSRAM 。具体信息请参考 :term:`API` ``void *context_alloc(size_t size, void *cb_data_p)``。
 
 喂狗
 ----

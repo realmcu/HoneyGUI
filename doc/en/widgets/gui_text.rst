@@ -107,13 +107,20 @@ Font Render Mode
 ^^^^^^^^^^^^^^^^^
 For vector fonts, developers can use the function :cpp:any:`gui_text_rendermode_set` to set the rasterization render mode (1/2/4/8).
 
+Font Source Mode
+^^^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_font_mode_set` to set the font source mode, such as loading fonts from memory address, FTL, or file system.
+
+Bold Setting
+^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_bold_set` to set the bold weight and bold mode for text. Bold weight ranges from 0 (normal) to 8 (boldest), and bold mode supports horizontal bold (fast) and omnidirectional bold.
+
+.. note::
+    Bold functionality is only effective for TTF vector fonts; bitmap fonts do not support this setting.
+
 Emoji Support
 ^^^^^^^^^^^^^^
 Developers can use the function :cpp:any:`gui_text_emoji_set` to set the path and size of emoji image files. Requires use with a file system.
-
-Text Input
-^^^^^^^^^^^
-Text widget supports the input setting. You can use this function to set input :cpp:any:`gui_text_input_set`.
 
 Text Modes
 ^^^^^^^^^^^
@@ -225,6 +232,12 @@ This function supports all font types (BMP/TTF/STB/MAT) and all layout modes, co
 .. note::
     Must be called after setting text content and font attributes (e.g., ``gui_text_set``, ``gui_text_mode_set``, etc.).
 
+Scope Clipping
+^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_set_scope` to set a clip scope on the text widget. Only the portion of text inside the scope rectangle will be drawn. The coordinates are relative to the text widget's own top-left corner.
+
+Additionally, :cpp:any:`gui_text_set_scope_absolute` can be used to set the clip scope using absolute screen coordinates.
+
 Example
 --------
 
@@ -249,25 +262,37 @@ The text widget provides multiple examples and test cases located in ``example/w
      - Custom font engine with user-defined load/draw/unload/destroy
    * - 4
      - ``text_font_rendering_test()``
-     - Swipeable views: bitmap (1/2/4/8-bit), vector, bold, matrix
+     - Swipeable views: bitmap (1/2/4/8-bit), vector, bold, matrix, img, bench
    * - 5
      - ``text_font_layout_test()``
-     - Swipeable views: single-line, multi-line, scroll, vertical
+     - Swipeable views: single-line, multi-line, scroll, vertical, RTL
    * - 6
      - ``text_multi_language_test()``
-     - Multi-language rendering (Arabic, English, Chinese, Thai, HE)
+     - Language list with per-language rendering (AR, EN, ZH, TH, HE)
    * - 7
      - ``text_font_scroll_function_test()``
-     - Scroll control: stop/reset/pause/resume and alignment modes
+     - Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes
    * - 8
-     - ``text_font_source_mode_test()``
-     - Font source modes: MEMADDR/FTL/FILESYS × BMP/IMG/MAT/TTF
+     - ``text_font_scroll_loop_test()``
+     - Scroll loop (marquee) for X/Y forward and reverse directions
    * - 9
+     - ``text_font_source_mode_test()``
+     - 3x4 grid: source (MEMADDR/FTL/FILESYS) x type (BMP/IMG/MAT/TTF)
+   * - 10
      - ``text_wordwrap_test()``
      - Word wrap with oversized word break protection
-   * - 10
+   * - 11
      - ``text_measure_test()``
      - Layout measure: BMP/TTF single-line and multi-line metrics
+   * - 12
+     - ``text_clip_test()``
+     - Partial text display using win clip (top/bottom/right/center)
+   * - 13
+     - ``text_font_typo_rendering_test()``
+     - Typography rendering: bitmap + vector baseline/line-height (swipeable)
+   * - 14
+     - ``text_font_fallback_test()``
+     - Mixed-language fallback: CJK+EN in one string with priority chain
 
 Simple Text Widget (Example 1: text_widget_example)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -12,7 +12,7 @@
 安装适当版本的工具链
 ^^^^^^^^^^^^^^^^^^^^^
 
-在 VSCode 中使用 MinGW 工具链进行模拟器开发，推荐使用 MinGW 版本 8.1.0，您可以从 `MinGW v8.1.0 Download <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z>`_ 下载获取。不能保证所有更新版本的 MinGW 能够正常工作。
+在 VSCode 中使用 MinGW 工具链进行模拟器开发（参考快速入门中的 :ref:`Install_compiler_cn`），推荐使用 MinGW 版本 8.1.0，您可以从 `MinGW v8.1.0 Download <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z>`_ 下载获取。不能保证所有更新版本的 MinGW 能够正常工作。
 
 .. warning::
 

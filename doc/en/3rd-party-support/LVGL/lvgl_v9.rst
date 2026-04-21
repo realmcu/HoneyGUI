@@ -173,14 +173,14 @@ Based on actual development needs, different memory resources, and rendering mod
   - Uses partial rendering scheme
   - Configures two RAM area caches
   - Suitable for MCUs without :term:`PSRAM`
-  - This scheme only supports display ICs with RAM
+  - This scheme only supports display :term:`IC` with RAM
 
 - ``SCHEME_RAM_PSRAM_PARTIAL`` Region Drawing Scheme with Full Screen Cache
 
   - Uses partial rendering scheme
   - Configures two RAM area caches and one PSRAM full screen cache
   - This scheme only supports MCUs with PSRAM
-  - No special requirements for display :term:`IC`
+  - No special requirements for display IC
 
 - ``SCHEME_PSRAM_DIRECT`` Full Screen Direct Write Scheme
 
@@ -376,7 +376,7 @@ LVGL offers a wealth of demos and examples to help developers become familiar wi
 
 - The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos, with their source code stored in the directory :file:`your lvgl dir\\lvgl\\src\\demo`. Developers can directly call the corresponding ``lv_demo_xxx()`` functions to familiarize themselves.
 
-- The online documentation `LVGL Example <<https://docs.lvgl.io/9.4/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir\\example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
+- The online documentation `LVGL Example <https://docs.lvgl.io/9.4/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir\\example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
 
 RTK Extension Demo
 -------------------
