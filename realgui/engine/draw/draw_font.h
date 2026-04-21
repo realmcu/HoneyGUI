@@ -20,7 +20,7 @@ extern "C" {
 #include "gui_api.h"
 
 #ifndef ENABLE_FONT_V3_TYPO
-#define ENABLE_FONT_V3_TYPO  0
+#define ENABLE_FONT_V3_TYPO  1
 #endif
 
 /*============================================================================*
