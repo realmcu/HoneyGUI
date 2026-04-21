@@ -32,9 +32,9 @@ GUI Server Task
 
 GUI server is the running function of GUI task, and its specific running process is divided into six parts:
 
-1. GUI :term:`APP` exist: First, the currently running GUI APP needs to be obtained. When the GUI detects that there is a running GUI APP, it will proceed to the next step;
+1. GUI application exist: First, the currently running GUI APP needs to be obtained. When the GUI detects that there is a running GUI APP, it will proceed to the next step;
 2. Get :term:`LCD` data: Get real-time information about the screen;
-3. Get :term:`TP` data: Get real-time information about the touchpad and run the touch algorithm;
+3. Get touchpad data: Get real-time information about the touchpad and run the touch algorithm;
 4. Get keyboard data: Get real-time information about the keyboard and run the keyboard algorithm;
 5. Obj draw: Drawing widgets in the APP, including functional operations and image processing.
 6. Update :term:`FB`: Delivers the drawn results to the screen.
