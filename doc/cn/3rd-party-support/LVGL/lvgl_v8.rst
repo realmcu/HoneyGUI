@@ -199,7 +199,7 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 ``void lv_port_disp_init(void)`` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``。
 
-文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 ``DISPLAY_FLUSH_TYPE`` 以切换模式，其中 ``RAMLESS_XXX`` 适用于不带有 RAM 的 display :term:`IC` ， ``RAM_XXX`` 适用于带有 RAM 的 display IC ， ``XXX_FULL_SCREEN_XXX`` 表示为每次整屏推出， ``XXX_TWO_SEC`` 表示为只绘制变化的显示内容，单位为两个 buffer 大小， buffer 的像素高度由 ``SECTION_HEIGHT`` 定义。
+文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 ``DISPLAY_FLUSH_TYPE`` 以切换模式，其中 ``RAMLESS_XXX`` 适用于不带有  :term:`RAM` 的 display :term:`IC` ， ``RAM_XXX`` 适用于带有 RAM 的 display IC ， ``XXX_FULL_SCREEN_XXX`` 表示为每次整屏推出， ``XXX_TWO_SEC`` 表示为只绘制变化的显示内容，单位为两个 buffer 大小， buffer 的像素高度由 ``SECTION_HEIGHT`` 定义。
 
 
 详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 :term:`RAM` 的 display IC：
