@@ -81,7 +81,7 @@ Container Components
 
 * **hg_view**: View container for organizing interface layout
 * **hg_window**: Window container with multi-window management support
-* **hg_canvas**: Custom drawing canvas
+* **hg_canvas**: Custom drawing canvas (TODO)
 * **hg_list**: List container with scrolling support
 * **hg_menu_cellular**: Cellular menu container
 

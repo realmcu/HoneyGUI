@@ -72,14 +72,14 @@ Image Operations
 Usage Instructions
 ^^^^^^^^^^^^^^^^^^
 
-Basic Operations
-****************
-
 .. figure:: https://foruda.gitee.com/images/1764729198150245214/585f6f68_8391010.png
    :width: 400px
    :align: center
    
    Tool Window 
+
+Basic Graphics
+****************
 
 1. Select the desired shape type
 2. Adjust the corresponding parameter sliders

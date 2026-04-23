@@ -115,13 +115,7 @@ Window container supporting multi-window management:
 hg_canvas
 """""""""
 
-Custom drawing canvas:
-
-.. code-block:: xml
-
-   <hg_canvas
-       id="drawing"
-       x="0" y="0" width="480" height="272"/>
+Custom drawing canvas (TODO): not yet supported in the visual designer.
 
 hg_list
 """""""

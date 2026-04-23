@@ -115,13 +115,7 @@ hg_window
 hg_canvas
 """""""""
 
-自定义绘图画布：
-
-.. code-block:: xml
-
-   <hg_canvas
-       id="drawing"
-       x="0" y="0" width="480" height="272"/>
+自定义绘图画布 (TODO)：可视化设计器暂不支持。
 
 hg_list
 """""""

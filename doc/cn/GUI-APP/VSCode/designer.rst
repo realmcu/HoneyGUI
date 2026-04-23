@@ -81,7 +81,7 @@ HoneyGUI 提供丰富的组件，分为以下几类：
 
 * **hg_view**：视图容器，用于组织界面布局
 * **hg_window**：窗口容器，支持多窗口管理
-* **hg_canvas**：自定义绘图画布
+* **hg_canvas**：自定义绘图画布 (TODO)
 * **hg_list**：列表容器，支持滚动
 * **hg_menu_cellular**：蜂窝菜单容器
 
