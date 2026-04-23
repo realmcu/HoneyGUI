@@ -41,6 +41,15 @@ static inline int get_pixel_size(PixelFormat format)
 
 // ==================== Pixel drawing function ====================
 
+// Forward declarations for static helper functions
+static void add_pixel_with_coverage(DrawContext *ctx, int x, int y, PixelColor color,
+                                    float coverage);
+static inline void write_pixel_at_offset(DrawContext *ctx, int byte_offset, PixelColor color);
+static inline void write_pixel_rgb565(DrawContext *ctx, int byte_offset, PixelColor color);
+static inline void write_pixel_argb8888(DrawContext *ctx, int byte_offset, PixelColor color);
+static inline PixelColor get_pixel_color_rgb565(DrawContext *ctx, int byte_offset);
+static inline PixelColor get_pixel_color_argb8888(DrawContext *ctx, int byte_offset);
+
 void add_pixel_to_context(DrawContext *ctx, int x, int y, PixelColor color)
 {
     add_pixel_with_coverage(ctx, x, y, color, 1.0f);

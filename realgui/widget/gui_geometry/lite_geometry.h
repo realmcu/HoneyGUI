@@ -137,13 +137,6 @@ void add_pixel_with_coverage_rgb565(DrawContext *ctx, int x, int y, PixelColor c
                                     float coverage);
 void add_pixel_with_coverage_argb8888(DrawContext *ctx, int x, int y, PixelColor color,
                                       float coverage);
-
-static void add_pixel_with_coverage(DrawContext *ctx, int x, int y, PixelColor color,
-                                    float coverage);
-static inline void write_pixel_at_offset(DrawContext *ctx, int byte_offset, PixelColor color);
-static inline void write_pixel_rgb565(DrawContext *ctx, int byte_offset, PixelColor color);
-static inline void write_pixel_argb8888(DrawContext *ctx, int byte_offset, PixelColor color);
-// static inline PixelColor get_pixel_color(DrawContext *ctx, int x, int y);
 PixelColor blend_colors_argb8888(PixelColor bg_color, PixelColor fg_color,
                                  uint8_t alpha);
 PixelColor blend_colors_rgb565(PixelColor bg_color, PixelColor fg_color,

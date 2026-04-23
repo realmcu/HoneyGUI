@@ -853,13 +853,13 @@ static int video_src_init_avi(gui_video_t  *this)
         gui_vfs_file_t *fp;
 
         fp = gui_vfs_open(fn, GUI_VFS_READ);
-        if (fp > 0)
+        if (fp != NULL)
         {
             file_size = gui_vfs_seek(fp, 0, GUI_VFS_SEEK_END); // end
         }
         if (file_size <= 0)
         {
-            if (fp > 0)
+            if (fp != NULL)
             {
                 gui_vfs_close(fp);
             }
