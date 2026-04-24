@@ -222,6 +222,11 @@ static int load_dot_crop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *nod
     chr->w = *line_byte * 8 / render_mode;
 
     uint32_t dot_size = *line_byte * chr->char_h;
+    if (dot_size == 0)
+    {
+        chr->dot_addr = NULL;
+        return 0;
+    }
     uint8_t *dot_buf = gui_malloc(dot_size);
     if (dot_buf == NULL) { return -1; }
 
@@ -297,6 +302,11 @@ static int load_dot_nocrop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *n
     chr->char_h = (int16_t)header[1];
 
     /* Read dot data (at data_offset + 4) */
+    if (dot_size == 0)
+    {
+        chr->dot_addr = NULL;
+        return 0;
+    }
     uint8_t *dot_buf = gui_malloc(dot_size);
     if (dot_buf == NULL) { return -1; }
 

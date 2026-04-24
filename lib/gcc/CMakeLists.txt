@@ -24,6 +24,12 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/install" CACHE PATH "Installation Directory" FORCE)
 
 execute_process( 
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/../../tool/git_generate_version.py 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../realgui/
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+execute_process( 
     COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/../../tool/convert_dot_config_to.py 
     ${CMAKE_CURRENT_SOURCE_DIR}/.config 
     ${CMAKE_CURRENT_SOURCE_DIR}/config.cmake

@@ -41,7 +41,12 @@ def get_git_status():
         return "unknown"
 
 def create_version_header(output_path, tag, branch, commit_hash, repo_status):
-    header_content = f"""
+    header_content = f"""/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef GUI_VERSION_H
 #define GUI_VERSION_H
 

@@ -28,5 +28,10 @@ if __name__ == "__main__":
     config_options = parse_config(config_file)
     
     with open(output_file, 'w') as file:
+        file.write("#\n")
+        file.write("# Copyright (c) 2026, Realtek Semiconductor Corporation\n")
+        file.write("#\n")
+        file.write("# SPDX-License-Identifier: MIT\n")
+        file.write("#\n\n")
         for key, value in config_options.items():
             file.write(f"set({key} {value})\n")
