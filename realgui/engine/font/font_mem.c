@@ -1285,8 +1285,8 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         return;
     }
     mem_char_t *chr = text->data;
-    int rect_w = rect->x2 - rect->x1 + 1;
-    int rect_h = rect->y2 - rect->y1 + 1;
+    int32_t rect_w = rect->x2 - rect->x1 + 1;
+    int32_t rect_h = rect->y2 - rect->y1 + 1;
     uint32_t char_width_sum = text->char_width_sum;
     uint32_t char_height_sum = text->char_height_sum;
     uint32_t char_line_sum = text->char_line_sum;
@@ -1332,6 +1332,20 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             }
         }
     }
+
+    /* Resolve line height once for all multi-line/vertical layout modes */
+    int32_t line_height;
+    if (typo_ctx.is_v3)
+    {
+        line_height = (text->line_height > 0) ? text->line_height
+                      : typo_ctx.default_line_height + line_spacing;
+    }
+    else
+    {
+        line_height = chr[0].h + line_spacing;
+    }
+#else
+    int32_t line_height = chr[0].h + line_spacing;
 #endif /* ENABLE_FONT_V3_TYPO */
 
     if (text_mode >= RTL_RIGHT && text_mode <= RTL_MULTI_LEFT)
@@ -1361,15 +1375,15 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         {
             char_line_sum = 1;
             int32_t align_factor = (text_mode <= RIGHT) ? (text_mode - LEFT) : (text_mode - MID_LEFT);
-            uint32_t offset_y = (text_mode >= MID_LEFT && text_mode <= MID_RIGHT) ?
-                                (rect_h - text->font_height) / 2 : 0;
-            int offset = _UI_MAX((int32_t)((rect_w - char_width_sum) / 2), 0);
+            int16_t offset_y = (text_mode >= MID_LEFT && text_mode <= MID_RIGHT) ?
+                               (rect_h - text->font_height) / 2 : 0;
+            int16_t offset_x = _UI_MAX((int32_t)((rect_w - char_width_sum) / 2), 0) * align_factor;
 
 #if ENABLE_FONT_V3_TYPO
             if (typo_ctx.is_v3)
             {
                 /* V3: bearing-based single-line positioning */
-                int16_t cursor_x = rect->x1 + offset * align_factor;
+                int16_t cursor_x = rect->x1 + offset_x;
                 int16_t line_y = rect->y1 + offset_y;
                 for (uint16_t i = 0; i < font_len; i++)
                 {
@@ -1391,7 +1405,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     chr[i].y = rect->y1 + offset_y;
                     if (i == 0)
                     {
-                        chr[i].x = rect->x1 + offset * align_factor;
+                        chr[i].x = rect->x1 + offset_x;
                     }
                     else
                     {
@@ -1418,40 +1432,6 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             int32_t line = 0;
             int32_t last_space_index = 0;
             int32_t line_start_index = 0;
-            /* V3 line_height: text->line_height (explicit) > typo_ctx.default_line_height
-               V1 line_height: chr[0].h + extra_line_spacing (unchanged)
-               TTF V3 + explicit line_height > 0: use text->line_height (ignore extra_line_spacing)
-               TTF V3 + line_height == 0: typo_ctx.default_line_height + extra_line_spacing */
-            int32_t line_height;
-#if ENABLE_FONT_V3_TYPO
-            if (typo_ctx.is_v3)
-            {
-                if (text->line_height > 0)
-                {
-                    /* Explicit line_height set by user */
-                    if (font_file_type == FONT_FILE_TTF_FLAG)
-                    {
-                        /* TTF V3: explicit line_height ignores extra_line_spacing */
-                        line_height = text->line_height;
-                    }
-                    else
-                    {
-                        /* BMP V3: preserve existing behavior (add line_spacing) */
-                        line_height = text->line_height + line_spacing;
-                    }
-                }
-                else
-                {
-                    /* No explicit line_height: use default + extra_line_spacing */
-                    line_height = typo_ctx.default_line_height + line_spacing;
-                }
-            }
-            else
-#endif /* ENABLE_FONT_V3_TYPO */
-            {
-                /* Legacy: chr[0].h + extra_line_spacing */
-                line_height = chr[0].h + line_spacing;
-            }
             int32_t align_factor = (text_mode <= MULTI_RIGHT) ?
                                    (text_mode - MULTI_LEFT) : (text_mode - MULTI_MID_LEFT);
             bool vertical_center = (text_mode >= MULTI_MID_LEFT);
@@ -1626,8 +1606,8 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         {
             char_line_sum = 1;
             active_font_len = font_len;
-            uint32_t offset_y = (text_mode >= SCROLL_X_MID) ?
-                                (rect_h - text->font_height) / 2 : 0;
+            int16_t offset_y = (text_mode >= SCROLL_X_MID) ?
+                               (rect_h - text->font_height) / 2 : 0;
 #if ENABLE_FONT_V3_TYPO
             if (typo_ctx.is_v3)
             {
@@ -1675,32 +1655,6 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             uint32_t line = 0;
             int32_t last_space_index = 0;
             int32_t line_start_index = 0;
-            /* V3/V1 line height (TTF V3: explicit line_height ignores extra_line_spacing) */
-            int32_t line_height;
-#if ENABLE_FONT_V3_TYPO
-            if (typo_ctx.is_v3)
-            {
-                if (text->line_height > 0)
-                {
-                    if (font_file_type == FONT_FILE_TTF_FLAG)
-                    {
-                        line_height = text->line_height;
-                    }
-                    else
-                    {
-                        line_height = text->line_height + line_spacing;
-                    }
-                }
-                else
-                {
-                    line_height = typo_ctx.default_line_height + line_spacing;
-                }
-            }
-            else
-#endif /* ENABLE_FONT_V3_TYPO */
-            {
-                line_height = chr[0].h + line_spacing;
-            }
             active_font_len = font_len;
 
 #if ENABLE_FONT_V3_TYPO
@@ -1833,7 +1787,6 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         {
             gui_text_line_t *line_buf;
             uint32_t line = 0;
-            int32_t line_height = chr[0].h + line_spacing;
             int32_t align_factor = text_mode - VERTICAL_LEFT_TOP;
 
             int32_t line_count = rect_w / line_height + 1;
@@ -1897,7 +1850,6 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         {
             gui_text_line_t *line_buf;
             uint32_t line = 0;
-            int32_t line_height = chr[0].h + line_spacing;
             int32_t align_factor = VERTICAL_RIGHT_BOT - text_mode;
 
             int32_t line_count = rect_w / line_height + 1;
