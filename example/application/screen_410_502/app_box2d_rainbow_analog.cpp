@@ -46,6 +46,7 @@ extern "C" {
         .on_switch_in = app_rainbow_analog_ui_design,
         .on_switch_out = app_close,
         .keep = 0,
+        .use_snap_shot = 0
     };
 
     static int gui_view_descriptor_register_init(void)

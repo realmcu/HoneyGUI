@@ -21,7 +21,7 @@
 
 static void app_ui_view_yellow_design(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL, true);
 
 static void app_ui_view_yellow_design(gui_view_t *view)
 {

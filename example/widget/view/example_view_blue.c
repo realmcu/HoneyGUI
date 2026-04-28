@@ -24,7 +24,7 @@
 static void switch_in_cb(gui_view_t *view);
 static void switch_out_cb(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, true, switch_in_cb, switch_out_cb);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, switch_in_cb, switch_out_cb, true);
 
 static void img_cb(void *obj, gui_event_t *e)
 {

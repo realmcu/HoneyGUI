@@ -115,6 +115,10 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
         {
             tp_do_reset();
         }
+        tp.left_moved = false;
+        tp.right_moved = false;
+        tp.up_moved = false;
+        tp.down_moved = false;
         return tp_local_event;
     }
 

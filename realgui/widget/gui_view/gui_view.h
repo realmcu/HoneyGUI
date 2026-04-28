@@ -19,6 +19,7 @@ extern "C" {
 #include "guidef.h"
 #include "gui_fb.h"
 #include "gui_obj.h"
+#include "gui_img.h"
 #include "gui_matrix.h"
 
 /*============================================================================*
@@ -42,7 +43,16 @@ typedef enum
     SWITCH_IN_FROM_TOP_USE_TRANSLATION, ///< Switch in from top with transition effect.
     SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION, ///< Switch in from bottom with transition effect.
 
-    SWITCH_IN_FROM_LEFT_USE_CUBE = 0x0200, ///< Switch in from left with cube effect.
+    SWITCH_IN_FROM_LEFT_USE_REDUCTION = 0x0200, ///< Switch in from left with reduction effect.
+    SWITCH_IN_FROM_RIGHT_USE_REDUCTION, ///< Switch in from right with reduction effect.
+    SWITCH_IN_FROM_TOP_USE_REDUCTION, ///< Switch in from top with reduction effect.
+    SWITCH_IN_FROM_BOTTOM_USE_REDUCTION, ///< Switch in from bottom with reduction effect.
+    SWITCH_OUT_TO_LEFT_USE_REDUCTION, ///< Switch out to left with reduction effect.
+    SWITCH_OUT_TO_RIGHT_USE_REDUCTION, ///< Switch out to right with reduction effect.
+    SWITCH_OUT_TO_TOP_USE_REDUCTION, ///< Switch out to top with reduction effect.
+    SWITCH_OUT_TO_BOTTOM_USE_REDUCTION, ///< Switch out to bottom with reduction effect.
+
+    SWITCH_IN_FROM_LEFT_USE_CUBE = 0x0300, ///< Switch in from left with cube effect.
     SWITCH_IN_FROM_RIGHT_USE_CUBE, ///< Switch in from right with cube effect.
     SWITCH_IN_FROM_TOP_USE_CUBE, ///< Switch in from top with cube effect.
     SWITCH_IN_FROM_BOTTOM_USE_CUBE, ///< Switch in from bottom with cube effect.
@@ -52,7 +62,7 @@ typedef enum
     SWITCH_OUT_TO_TOP_USE_CUBE, ///< Switch out to top with cube effect.
     SWITCH_OUT_TO_BOTTOM_USE_CUBE, ///< Switch out to bottom with cube effect.
 
-    SWITCH_IN_FROM_LEFT_USE_ROTATE = 0x0300, ///< Switch in from left with rotate effect.
+    SWITCH_IN_FROM_LEFT_USE_ROTATE = 0x0400, ///< Switch in from left with rotate effect.
     SWITCH_IN_FROM_RIGHT_USE_ROTATE, ///< Switch in from right with rotate effect.
     SWITCH_IN_FROM_TOP_USE_ROTATE, ///< Switch in from top with rotate effect.
     SWITCH_IN_FROM_BOTTOM_USE_ROTATE, ///< Switch in from bottom with rotate effect.
@@ -61,16 +71,6 @@ typedef enum
     SWITCH_OUT_TO_RIGHT_USE_ROTATE, ///< Switch out to right with rotate effect.
     SWITCH_OUT_TO_TOP_USE_ROTATE, ///< Switch out to top with rotate effect.
     SWITCH_OUT_TO_BOTTOM_USE_ROTATE, ///< Switch out to bottom with rotate effect.
-
-    SWITCH_IN_FROM_LEFT_USE_REDUCTION = 0x0400, ///< Switch in from left with reduction effect.
-    SWITCH_IN_FROM_RIGHT_USE_REDUCTION, ///< Switch in from right with reduction effect.
-    SWITCH_IN_FROM_TOP_USE_REDUCTION, ///< Switch in from top with reduction effect.
-    SWITCH_IN_FROM_BOTTOM_USE_REDUCTION, ///< Switch in from bottom with reduction effect.
-
-    SWITCH_OUT_TO_LEFT_USE_REDUCTION, ///< Switch out to left with reduction effect.
-    SWITCH_OUT_TO_RIGHT_USE_REDUCTION, ///< Switch out to right with reduction effect.
-    SWITCH_OUT_TO_TOP_USE_REDUCTION, ///< Switch out to top with reduction effect.
-    SWITCH_OUT_TO_BOTTOM_USE_REDUCTION, ///< Switch out to bottom with reduction effect.
 
     SWITCH_OUT_NONE_ANIMATION = 0x0500, ///< No animation.
     SWITCH_OUT_ANIMATION_ZOOM,
@@ -102,18 +102,19 @@ struct gui_view_on_event;
 typedef struct gui_view
 {
     gui_obj_t base;
-    uint16_t animate_step;
-    uint8_t opacity;
+    uint32_t animate_step       : 16;
+    uint32_t opacity            : 8;
+    uint32_t on_event_num       : 8;
 
     VIEW_SWITCH_STYLE current_transition_style;
     gui_event_code_t current_event_code;
     const struct gui_view_descriptor *descriptor;
     void *blur_param;
-
     struct gui_view_on_event **on_event;
-    uint8_t on_event_num;
 
-    uint8_t checksum;
+    void *snap_shot_data;
+    gui_img_t *snap_shot;
+    gui_obj_t *obj_temp;
 } gui_view_t;
 
 /* gui_view_descriptor start*/
@@ -126,8 +127,10 @@ typedef struct gui_view_descriptor
     void (* on_switch_out)(gui_view_t
                            *view); // Callback function when view is switched out and destroyed.
 
-uint8_t keep       :
+uint8_t keep            :
     1; // If keep is true, the view will not be destroyed when switch to other view and will be created when register view
+uint8_t use_snap_shot   :
+    1; // If use_snap_shot is true, the view will use snap shot to switch in and out. Need large memory.
 } gui_view_descriptor_t;
 /* gui_view_descriptor end*/
 
@@ -259,6 +262,12 @@ gui_view_t *gui_view_get_current(void);
  * @return Next view pointer.
  */
 gui_view_t *gui_view_get_next(void);
+
+/**
+ * @brief Update snap shot.
+ * @param _this Pointer to view.
+ */
+void gui_view_update_snap_shot_async(gui_view_t *_this);
 
 #ifdef __cplusplus
 }

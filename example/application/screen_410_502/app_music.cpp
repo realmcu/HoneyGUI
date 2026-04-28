@@ -56,6 +56,7 @@ extern "C" {
         .on_switch_in = app_music_ui_design,
         .on_switch_out = clear_music,
         .keep = 0,
+        .use_snap_shot = 0
     };
 
     static int gui_view_descriptor_register_init(void)

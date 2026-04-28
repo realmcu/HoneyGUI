@@ -14,6 +14,7 @@
 #include "gui_components_init.h"
 #include "gui_rect.h"
 #include "gui_list.h"
+#include "gui_obj_focus.h"
 
 /* Use the following macro to checkout the different style lists */
 #define RUN_VERTICAL_CIRCLE_STYLE
@@ -25,7 +26,7 @@
 // #define RUN_VERTICAL_CLASSIC_STYLE
 // #define RUN_VERTICAL_FADE_STYLE
 
-#define NOTE_NUM 20
+#define NOTE_NUM 8
 
 int length = 100;
 
@@ -93,6 +94,26 @@ static void note_design(gui_obj_t *obj, void *p)
     GUI_UNUSED(canvas);
 }
 
+static void list_event_cb(void *obj, gui_event_t *e)
+{
+    GUI_UNUSED(e);
+    GUI_UNUSED(obj);
+    gui_list_t *list = (gui_list_t *)obj;
+    static int8_t index = 0;
+    if (strcmp(e->indev_name, "Home") == 0)
+    {
+        index += 2;
+        index %= NOTE_NUM;
+        gui_list_scroll_to_note(list, index);
+    }
+    else if (strcmp(e->indev_name, "Back") == 0)
+    {
+        index -= 2;
+        index %= NOTE_NUM;
+        gui_list_jump_to_note(list, index);
+    }
+}
+
 static int app_init(void)
 {
     uint16_t space = 10;
@@ -110,6 +131,9 @@ static int app_init(void)
     gui_list_set_auto_align(list, true);
     // gui_list_keep_note_alive(list, true);
     gui_list_enable_loop(list, true);
+    gui_list_enable_scroll(list, false);
+    gui_obj_add_event_cb(list, (gui_event_cb_t)list_event_cb, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+    gui_obj_focus_set(list);
     return 0;
 #endif
 
