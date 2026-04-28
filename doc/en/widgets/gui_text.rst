@@ -118,8 +118,8 @@ Developers can use the function :cpp:any:`gui_text_bold_set` to set the bold wei
 .. note::
     Bold functionality is only effective for TTF vector fonts; bitmap fonts do not support this setting.
 
-Emoji Support
-^^^^^^^^^^^^^^
+Emoji
+^^^^^
 Developers can use the function :cpp:any:`gui_text_emoji_set` to set the path and size of emoji image files. Requires use with a file system.
 
 Text Modes

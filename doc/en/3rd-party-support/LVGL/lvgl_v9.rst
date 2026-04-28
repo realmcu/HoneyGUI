@@ -7,9 +7,9 @@ Introduction to LVGL
 - `LVGL Official Website <https://lvgl.io/>`_
 - `LVGL Online Documentation <https://docs.lvgl.io/9.4/index.html>`_
 
-LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library in C language, providing all the necessary tools to create embedded GUIs with easy-to-use graphical elements, attractive visual effects, and low memory usage.
+LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library in C language, providing all the necessary tools to create embedded :term:`GUI`\ s with easy-to-use graphical elements, attractive visual effects, and low memory usage.
 
-LVGL offers a :term:`GUI` engine that handles all interactions between the application and the end user. This includes not only drawing display content and accepting user input to convert it into events that the application can capture, but also providing over 30 built-in widgets, more than 100 style properties, scrolling, animations, advanced software rendering, and built-in :term:`GPU` support ranging from MCU to OpenGL, among other features. This combination of features allows you to efficiently develop user interfaces without reinventing the wheel.
+LVGL offers a GUI engine that handles all interactions between the application and the end user. This includes not only drawing display content and accepting user input to convert it into events that the application can capture, but also providing over 30 built-in widgets, more than 100 style properties, scrolling, animations, advanced software rendering, and built-in :term:`GPU` support ranging from MCU to OpenGL, among other features. This combination of features allows you to efficiently develop user interfaces without reinventing the wheel.
 
 LVGL showcases demo effects on its official website to demonstrate LVGL's :term:`UI` building capabilities. The online documentation serves as the primary development resource for LVGL, detailing the design and operational logic of LVGL, usage methods for various controls, a wealth of example programs, and porting methods. Whether you are a beginner or an experienced developer, you can quickly get started and gain an in-depth understanding of LVGL's functions and features based on the online documentation.
 
