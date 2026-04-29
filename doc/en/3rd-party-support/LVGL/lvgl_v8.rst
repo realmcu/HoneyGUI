@@ -173,7 +173,7 @@ Porting
 ==========================
 - Documentation: `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_
 
-LVGL provides extensive porting support, allowing developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touchscreens, input devices, and custom :term:`GPU`s. Developers can configure the porting according to the requirements of their projects, such as adjusting the display parameters when changing display devices, or adapting the input interface when replacing input devices. This article focuses on the porting process and methods for display devices, input devices, and file systems. For more details, please refer to `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_.
+LVGL provides extensive porting support, allowing developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touchscreens, input devices, and custom :term:`GPU` . Developers can configure the porting according to the requirements of their projects, such as adjusting the display parameters when changing display devices, or adapting the input interface when replacing input devices. This article focuses on the porting process and methods for display devices, input devices, and file systems. For more details, please refer to `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_.
 
 .. note::
     The following examples do not include the specific implementation of hardware device drivers. They only illustrate how to integrate drivers with the LVGL interface. When implementing hardware device drivers, developers can complete the driver functionality under a consistent :term:`API` framework with the example driver, in order to interface with the HoneyGUI driver layer. The porting interfaces of the example projects can be reused in higher layers.
@@ -186,9 +186,9 @@ Once the developers have completed the debugging of the display device driver, a
 
 The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function ``void lv_port_disp_init(void)``, such as screen size and frame buffer configuration. The display refresh function is defined as ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``.
 
-The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure ``DISPLAY_FLUSH_TYPE`` to switch modes, where ``RAMLESS_XXX`` is suitable for display  :term:`IC`s without :term:`RAM` , ``RAM_XXX`` is suitable for display ICs with RAM, ``XXX_FULL_SCREEN_XXX`` indicates pushing the entire screen each time, and ``XXX_TWO_SEC`` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by ``SECTION_HEIGHT``.
+The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure ``DISPLAY_FLUSH_TYPE`` to switch modes, where ``RAMLESS_XXX`` is suitable for display  :term:`IC` without :term:`RAM` , ``RAM_XXX`` is suitable for display ICs with RAM, ``XXX_FULL_SCREEN_XXX`` indicates pushing the entire screen each time, and ``XXX_TWO_SEC`` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by ``SECTION_HEIGHT``.
 
-For detailed display device porting methods and considerations, please refer to the documentation `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_. The following code snippet demonstrates porting a display :term:`IC` without :term:`RAM`:
+For detailed display device porting methods and considerations, please refer to the documentation `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_. The following code snippet demonstrates porting a display IC without :term:`RAM`:
 
 - When using a display IC without RAM, a frame buffer that covers the entire screen size needs to be allocated. Therefore, two frame buffers with a size equal to the screen size are allocated on the :term:`PSRAM` for display. The macro definitions for display parameters are defined in the file :file:`lv_conf.h`.
 - If the display IC used has RAM, the size of the frame buffer does not need to be the same as the screen size. Due to different screen update methods, the ``LVGL_USE_EDPI`` in :file:`lv_port_disp.c` needs to be configured as not enabled (0) to switch the ``disp_flush`` function for screen update adaptation.
@@ -698,12 +698,17 @@ In the C array format, the resources will be included in the compilation process
 
 In the bin binary file format, the resources are not included in the compilation. They are stored separately and require a file system or other means to access them. An example :file:`lvgl_example_assets.c` is provided in the path :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets` to demonstrate how to configure resources of different formats for the widgets.
 
+
+
+
+
 Image Converter
 -----------------------------
 
+.. _LVGL Image Converter1:
 
-LVGL Image Converter
-~~~~~~~~~~~~~~~~~~~~~~~
+LVGL Image Online Converter 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Online conversion tool: `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
 - Documentation: `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_
@@ -748,14 +753,13 @@ It's worth mentioning that when using the bin file as an image resource, the dat
 
 HoneyGUI Image Convert Tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- Download link for the conversion tool: `HoneyGUI Image Convert Tool <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/index.html>`_
-- Documentation: `HoneyGUI Image Convert Tool - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_
+- Documentation: :ref:`Image Convert Tool`
 
 When further compression of image resource space is needed, the HoneyGUI Image Convert Tool supports compressing and converting images. The IC supports both software and hardware decoding. The HoneyGUI Image Convert Tool uses RLE (Run-length Encoding) compression, a simple lossless algorithm that reduces storage space by encoding consecutive repeated pixel values and the number of repetitions. It has low computational complexity and high compression rates, making it ideal for compressing GUI resources.
 
 Compressing Images
 ^^^^^^^^^^^^^^^^^^^^^^
-Users can utilize the HoneyGUI Image Convert Tool to convert image resources into RLE-compressed binary file format. For detailed usage steps, please refer to  `HoneyGUI Image Converter - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_:
+Users can utilize the HoneyGUI Image Convert Tool to convert image resources into RLE-compressed binary file format. For detailed usage steps, please refer to  :ref:`Image Convert Tool`:
 
 1. Select the image file to be compressed (supports :term:`PNG`, JPEG, etc.)
 2. Configure the image conversion parameters: enable :guilabel:`Compress`, choose :guilabel:`Compress Mode` as :guilabel:`RLE`, enable :guilabel:`Color Head`, and select :guilabel:`Color Space` as needed
@@ -785,7 +789,7 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
 
 2. If imported as a C array format
 
- a. Open the LVGL image conversion tool and upload the compressed file to be converted, please refer to :ref:`LVGL Image Converter`.
+ a. Open the LVGL image conversion tool and upload the compressed file to be converted, please refer to :ref:`LVGL Image Converter1`.
 
  b. In the :guilabel:`Color format` option, be sure to select **CF_RAW**
 

@@ -775,15 +775,14 @@ LVGL 在线转换工具
 
 HoneyGUI 图像转换工具
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- 转换工具下载链接： `HoneyGUI Image Convert Tool <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/index.html>`_
-- 文档说明：`HoneyGUI Image Convert Tool - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_
+- 文档说明：:ref:`图像转换工具`
 
 当需要进一步压缩图片资源占用空间时，HoneyGUI 图像转换工具支持对图片进行压缩转换，IC 支持软硬件解码。HoneyGUI 图像转换工具采用 RLE(Run-length Encoding) 压缩，该压缩算法是一种简单的无损算法，通过编码连续重复的像素值和重复次数来减少存储空间，计算复杂度低且压缩率较高，非常适合用于压缩 GUI 资源。
 
 压缩图片
 ^^^^^^^^^
 
-用户可利用 HoneyGUI 图像转换工具将图片资源转换为 RLE 压缩的二进制文件格式，具体使用步骤请参考 `HoneyGUI Image Converter - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_：
+用户可利用 HoneyGUI 图像转换工具将图片资源转换为 RLE 压缩的二进制文件格式，具体使用步骤请参考 :ref:`图像转换工具`：
 
 1. 选择需要压缩的图片文件（支持 :term:`PNG` 、JPEG 等格式）
 2. 配置图片的转换参数：启用 :guilabel:`Compress`，:guilabel:`Compress Mode` 选择 :guilabel:`RLE`， 启用 :guilabel:`Color Head`，:guilabel:`Color Space` 按需选择
