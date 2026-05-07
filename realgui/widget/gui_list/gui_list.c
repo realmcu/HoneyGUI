@@ -1476,7 +1476,7 @@ void gui_list_jump_to_note(gui_list_t *list, uint16_t note_index)
     gui_fb_change();
 }
 
-uint16_t gui_list_get_current_note(gui_list_t *list)
+uint16_t gui_list_get_current_note_index(gui_list_t *list)
 {
     int16_t grid_size = list->note_length + list->space;
     if (grid_size == 0) { return 0; }

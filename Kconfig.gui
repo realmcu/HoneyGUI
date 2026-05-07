@@ -80,6 +80,12 @@ config REALTEK_BUILD_EXAMPLE_LIST_WIDGET
     help
       RTK GUI List Demo
 
+config REALTEK_BUILD_EXAMPLE_CARD_LIST_WIDGET
+    bool "Card List Widget Demo"
+    help
+      RTK GUI Card List Demo: 3-D perspective carousel with inertia scrolling,
+      auto-snap, loop mode, and horizontal/vertical orientations.
+
 config REALTEK_BUILD_EXAMPLE_MENU_CELLULAR_WIDGET
     bool "Menu Cellular Widget Demo"
     help

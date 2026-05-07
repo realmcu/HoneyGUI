@@ -270,7 +270,7 @@ void gui_list_jump_to_note(gui_list_t *list, uint16_t note_index);
  * @param list Pointer to the list widget.
  * @return Current note index (0 to note_num-1).
  */
-uint16_t gui_list_get_current_note(gui_list_t *list);
+uint16_t gui_list_get_current_note_index(gui_list_t *list);
 
 /**
  * @brief Enable scroll of list.

@@ -101,6 +101,8 @@ typedef enum t_obj_type
     LIST,
     LIST_NOTE,
     MENU_CELLULAR,
+    CARD_LIST,
+    CARD_LIST_SLOT,
 } T_OBJ_TYPE;
 typedef enum
 {
