@@ -782,13 +782,14 @@ private:
         std::istringstream timeStream(timePart);
         timeStream >> minutes >> dummy >> seconds;
         int rst = 0;
-        if (minutes * 60 + seconds > INT_MAX)
+        long long total = (long long)minutes * 60 + seconds;
+        if (total > INT_MAX)
         {
             rst = INT_MAX;
         }
         else
         {
-            rst = minutes * 60 + seconds;
+            rst = (int)total;
         }
         return rst;
     }

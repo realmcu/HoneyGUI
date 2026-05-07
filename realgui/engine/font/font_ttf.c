@@ -1085,6 +1085,7 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
             }
         }
 
+        GUI_ASSERT(index_table_ptr != NULL);
         /* Search for the glyph */
         uint32_t ttfoffset = getGlyphOffset(unicode, ttfbin, index_table_ptr,
                                             (best->src_mode == FONT_SRC_FILESYS) ?

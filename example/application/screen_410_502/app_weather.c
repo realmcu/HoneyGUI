@@ -12,9 +12,7 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "time.h"
-#include "tp_algo.h"
 #include <math.h>
-#include "cJSON.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_list.h"
@@ -88,7 +86,6 @@ static void update_panel_animation(void *param)
 {
     (void)param;
 
-    // touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
     gui_list_note_t *note = (gui_list_note_t *)param;
 
@@ -230,8 +227,6 @@ static void update_leaf_animation(void *param)
 
 static void update_weather_animation(void *param)
 {
-    // touch_info_t *tp = tp_get_info();
-    // gui_dispdev_t *dc = gui_get_dc();
     gui_win_t *win = (gui_win_t *)param;
 
 

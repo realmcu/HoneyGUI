@@ -187,6 +187,9 @@ void handle_image_blend_mode(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *r
 }
 void blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
+    if (image == NULL || image->data == NULL || dc == NULL) { return; }
+    if (image->img_w <= 0 || image->img_h <= 0) { return; }
+
     if (!is_identity_matrix(&image->matrix))
     {
         do_raster(image, dc, rect);

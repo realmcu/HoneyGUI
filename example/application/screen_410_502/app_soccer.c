@@ -12,9 +12,7 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "time.h"
-#include "tp_algo.h"
 #include <math.h>
-#include "cJSON.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_soccer.h"

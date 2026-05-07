@@ -45,6 +45,9 @@
 
 void blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
+    if (image == NULL || image->data == NULL || dc == NULL) { return; }
+    if (image->img_w <= 0 || image->img_h <= 0) { return; }
+
     gui_rgb_data_head_t *head = image->data;
 
     if ((dc->bit_depth == 16) && (rect == NULL))
@@ -111,7 +114,7 @@ void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     gui_rgb_data_head_t *header = (gui_rgb_data_head_t *)image->data;
 
-    if (header == NULL || image->img_w <= 0 || image->img_h <= 0 || header->type > 0x3b)
+    if (header == NULL)
     {
         return;
     }

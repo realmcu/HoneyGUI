@@ -16,7 +16,6 @@
 #include "app_main_watch.h"
 #include "gui_components_init.h"
 #include "gui_view.h"
-#include "tp_algo.h"
 #include "root_image/ui_resource.h"
 
 /*============================================================================*

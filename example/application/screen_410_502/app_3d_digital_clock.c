@@ -12,7 +12,6 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "time.h"
-#include "tp_algo.h"
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
@@ -75,9 +74,6 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static void update_digital_clock_animation(void *param)
 {
-    (void)param;
-
-    // touch_info_t *tp = tp_get_info();
     gui_lite3d_t *this = (gui_lite3d_t *)param;
 
     angle += 0.1f;

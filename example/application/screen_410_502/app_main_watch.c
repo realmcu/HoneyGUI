@@ -430,6 +430,12 @@ char *read_file(const char *file_path)
     }
     fseek(file, 0, SEEK_END);
     long length = ftell(file);
+    if (length < 0)
+    {
+        perror("ftell");
+        fclose(file);
+        return NULL;
+    }
     fseek(file, 0, SEEK_SET);
     char *content = (char *)gui_malloc(length + 1);
     if (content)

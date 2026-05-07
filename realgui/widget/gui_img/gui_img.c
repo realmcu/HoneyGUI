@@ -136,6 +136,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
     draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
 
+    GUI_ASSERT(_this->draw_img->data != NULL);
     if (_this->need_clip)
     {
         gui_rect_t rect = {0};

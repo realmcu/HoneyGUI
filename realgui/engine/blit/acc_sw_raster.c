@@ -473,6 +473,7 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 
 void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
+    GUI_ASSERT(image->data != NULL);
     int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;
     if (!draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end)) { return; }
 

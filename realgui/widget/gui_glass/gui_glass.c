@@ -543,6 +543,7 @@ static void gui_glass_draw_cb(gui_obj_t *obj)
     gui_glass_t *_this = (gui_glass_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
     draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->data);
+    GUI_ASSERT(_this->draw_img->data != NULL);
     gui_glass_draw(_this->draw_img, dc);
     draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->data);
 }

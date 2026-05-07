@@ -174,6 +174,7 @@ static void gui_gif_draw_cb(gui_obj_t *obj)
     gui_palette_file_t palette = {0};
     change_gif_to_palette(_this, &palette);
 
+    GUI_ASSERT(_this->draw_img->data != NULL);
     if (_this->need_clip)
     {
         gui_rect_t rect = {0};
