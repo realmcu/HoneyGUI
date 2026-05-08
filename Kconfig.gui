@@ -12,8 +12,10 @@ choice
     prompt "Select HoneyGUI Demo"
     default REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
     optional
+    depends on !REALTEK_BUILD_HONEYGUI_APP
     help
-      Select one demo to build (mutually exclusive, or select none)
+      Select one demo to build (mutually exclusive, or select none).
+      Cannot be selected when Build HoneyGUI APP is enabled.
 
 config REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
     bool "Image Widget Demo"
