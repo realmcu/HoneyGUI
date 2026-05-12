@@ -31,6 +31,13 @@ static void free_draw_img(draw_img_t **img)
 {
     if (img == NULL || *img == NULL) { return; }
 
+    /* Free HW-acceleration user data (e.g. boundary-line cache from hw_acc_prepare_cb). */
+    if ((*img)->acc_user != NULL)
+    {
+        gui_free((*img)->acc_user);
+        (*img)->acc_user = NULL;
+    }
+
     if ((*img)->data != NULL)
     {
         gui_free((void *)(*img)->data);
@@ -1023,9 +1030,22 @@ static void gui_rect_draw(gui_obj_t *obj)
 }
 static void gui_rect_end(gui_obj_t *obj)
 {
-    // DO NOT free buffers here - they are cached for reuse
-    // Buffers will be freed in gui_rect_destory() when widget is destroyed
-    (void)obj; // Suppress unused parameter warning
+    /* Pixel buffers are cached across frames and must NOT be freed here.
+     * However HW-acceleration user data (acc_user, e.g. the boundary-line
+     * cache allocated by hw_acc_prepare_cb) is allocated every frame inside
+     * draw_img_new_area -> draw_img_acc_prepare_cb.  We must release it now
+     * so the next frame's prepare call does not orphan the old pointer. */
+    if (draw_img_acc_end_cb != NULL)
+    {
+        gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
+        if (this->rect_0   != NULL) { draw_img_acc_end_cb(this->rect_0);   }
+        if (this->rect_1   != NULL) { draw_img_acc_end_cb(this->rect_1);   }
+        if (this->rect_2   != NULL) { draw_img_acc_end_cb(this->rect_2);   }
+        if (this->circle_00 != NULL) { draw_img_acc_end_cb(this->circle_00); }
+        if (this->circle_01 != NULL) { draw_img_acc_end_cb(this->circle_01); }
+        if (this->circle_10 != NULL) { draw_img_acc_end_cb(this->circle_10); }
+        if (this->circle_11 != NULL) { draw_img_acc_end_cb(this->circle_11); }
+    }
 }
 
 static void gui_rect_destroy(gui_obj_t *obj)
