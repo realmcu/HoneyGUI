@@ -197,28 +197,37 @@ static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
 {
     text->scope = 0;
     gui_obj_t *o = (gui_obj_t *)text;
-    gui_win_t *win_scope = NULL;
+
     while (o->parent != NULL)
     {
         o = o->parent;
         if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
         {
-            text->scope = 1;
-            win_scope = (void *)o;
-            break;
-        }
-    }
-    if (text->scope && win_scope != NULL)
-    {
-        int scopex = win_scope->base.matrix->m[0][2];
-        int scopey = win_scope->base.matrix->m[1][2];
-        int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
-        int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
+            gui_win_t *win_scope = (void *)o;
+            int scopex = win_scope->base.matrix->m[0][2];
+            int scopey = win_scope->base.matrix->m[1][2];
+            int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
+            int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
 
-        rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
-        rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
-        rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
-        rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+            text->scope = 1;
+            rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
+            rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
+            rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
+            rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+        }
+        else if (o->type == LIST || o->type == LIST_NOTE)
+        {
+            int scopex = o->matrix->m[0][2];
+            int scopey = o->matrix->m[1][2];
+            int scopew = o->matrix->m[0][0] * o->w;
+            int scopeh = o->matrix->m[1][1] * o->h;
+
+            text->scope = 1;
+            rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
+            rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
+            rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
+            rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+        }
     }
 }
 
