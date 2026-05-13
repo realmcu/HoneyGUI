@@ -108,6 +108,8 @@ static void gui_server_entry(void *parameter)
     GUI_UNUSED(parameter);
     gui_server_msg_init();
     gui_components_init();
+    gui_msg_t msg = {.event = GUI_EVENT_RESET_ACTIVE_TIME};
+    gui_send_msg_to_server(&msg);
     while (1)
     {
 
