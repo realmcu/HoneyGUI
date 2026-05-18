@@ -39,7 +39,7 @@ void gui_msg_subscribe(gui_obj_t *obj, const char *topic, gui_listener_cb_t call
 void gui_msg_unsubscribe(gui_obj_t *obj, const char *topic);
 
 /**
- * @brief Publish a message to all subscribers
+ * @brief Publish a message to all subscribers, data deep copied inside
  * @param topic Message topic string
  * @param data Message data pointer
  * @param len Data length

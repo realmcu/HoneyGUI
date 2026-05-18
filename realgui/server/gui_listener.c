@@ -98,6 +98,10 @@ static void msg_task_exec(void *p)
     {
         task->callback(task->obj, task->topic, task->data, task->len);
     }
+    if (task->data && task->len)
+    {
+        gui_free(task->data);
+    }
     gui_free(task);
 }
 
@@ -116,9 +120,17 @@ void gui_msg_publish(const char *topic, void *data, uint16_t len)
             msg_task_t *task = gui_malloc(sizeof(msg_task_t) + topic_len);
             if (task)
             {
+                memset(task, 0, sizeof(msg_task_t) + topic_len);
                 task->callback = sub->callback;
                 task->obj = sub->obj;
-                task->data = data;
+                if (data && len)
+                {
+                    task->data = gui_malloc(len);
+                }
+                if (task->data)
+                {
+                    memcpy(task->data, data, len);
+                }
                 task->len = len;
                 memcpy(task->topic, topic, topic_len);
 
