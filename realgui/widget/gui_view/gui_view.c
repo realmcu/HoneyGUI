@@ -501,6 +501,12 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
     //     g_Target = -g_Target;
     // }
 
+    if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR ||
+        on_event->switch_in_style == SWITCH_IN_NONE_ANIMATION) // cover CurrentView
+    {
+        gui_view_adjust_list(GUI_BASE(g_NextView), obj);
+    }
+
     if (e->code == GUI_EVENT_INVALID &&
         g_NextView->current_transition_style >= SWITCH_OUT_NONE_ANIMATION)
     {
