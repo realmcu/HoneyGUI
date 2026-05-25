@@ -96,6 +96,7 @@ typedef enum
 
 #define EVENT_NUM_MAX 15
 
+
 /** @brief View structure. */
 struct gui_view_descriptor;
 struct gui_view_on_event;
@@ -112,8 +113,7 @@ typedef struct gui_view
     void *blur_param;
     struct gui_view_on_event **on_event;
 
-    void *snap_shot_data;
-    gui_img_t *snap_shot;
+    gui_img_t *snapshot;
     gui_obj_t *obj_temp;
 } gui_view_t;
 
@@ -129,8 +129,9 @@ typedef struct gui_view_descriptor
 
 uint8_t keep            :
     1; // If keep is true, the view will not be destroyed when switch to other view and will be created when register view
-uint8_t use_snap_shot   :
-    1; // If use_snap_shot is true, the view will use snap shot to switch in and out. Need large memory.
+uint8_t use_snapshot   :
+    1; // If use_snapshot is true, the view will use snap shot to switch in and out. Need large memory.
+    void **snapshot_data; // Double pointer to snapshot_data in RAM (like pView pattern)
 } gui_view_descriptor_t;
 /* gui_view_descriptor end*/
 
@@ -197,6 +198,11 @@ const gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
  * @return Pointer to the view.
  */
 gui_view_t *gui_view_get(const char *name);
+
+/**
+ * @brief Clear all view's snap shot data.
+ */
+void gui_view_clear_all_snapshot_data(void);
 
 /**
  * @brief Switches the current GUI view to a new view based on the specified event.
@@ -267,7 +273,13 @@ gui_view_t *gui_view_get_next(void);
  * @brief Update snap shot.
  * @param _this Pointer to view.
  */
-void gui_view_update_snap_shot_async(gui_view_t *_this);
+void gui_view_update_snapshot_async(gui_view_t *_this);
+
+/**
+ * @brief Enable pre-cache snap shot. Need to be called before gui_view_create.
+ * @param enable True to enable pre-cache, False to disable. Default is true.
+ */
+void gui_view_enable_precache_snapshot(bool enable);
 
 #ifdef __cplusplus
 }

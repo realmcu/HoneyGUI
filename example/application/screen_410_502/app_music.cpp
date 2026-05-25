@@ -44,6 +44,7 @@
  *============================================================================*/
 extern "C" {
     static gui_view_t *current_view = NULL;
+    static void *current_snapshot_data = NULL;
 
     static void app_music_ui_design(gui_view_t *view);
     static void clear_music(gui_view_t *view);
@@ -56,7 +57,8 @@ extern "C" {
         .on_switch_in = app_music_ui_design,
         .on_switch_out = clear_music,
         .keep = 0,
-        .use_snap_shot = 0
+        .use_snapshot = 0,
+        .snapshot_data = &current_snapshot_data,
     };
 
     static int gui_view_descriptor_register_init(void)

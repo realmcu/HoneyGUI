@@ -63,6 +63,18 @@ gui_view_t *gui_view_get(const char *name)
     return *(descriptor->pView);
 }
 
+void gui_view_clear_all_snapshot_data(void)
+{
+    for (uint32_t i = 0; i < descriptor_count; i++)
+    {
+        if (descriptor_list[i]->use_snapshot == true && *(descriptor_list[i]->snapshot_data) != NULL)
+        {
+            gui_free(*(descriptor_list[i]->snapshot_data));
+            *(descriptor_list[i]->snapshot_data) = NULL;
+        }
+    }
+}
+
 const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
 {
     for (uint32_t i = 0; i < descriptor_count; i++)

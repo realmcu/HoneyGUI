@@ -20,7 +20,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define SNAP_SHOT_CACHE_INTERVAL 4000 //ms
+#define SNAPSHOT_CACHE_INTERVAL 4000 //ms
 
 /*============================================================================*
  *                            Variables
@@ -40,6 +40,8 @@ static bool g_OffsetNeedUpdate = false;
 
 static bool g_SwitchDone = false;
 
+static bool g_SnapShotCacheNeedUpdate = true;
+static bool g_SnapShotPreCache = true; // whether cache all layout views or not
 static uint32_t g_SnapShotCacheTime = 0;
 
 /*============================================================================*
@@ -48,9 +50,10 @@ static uint32_t g_SnapShotCacheTime = 0;
 static void gui_view_not_show(gui_view_t *_this);
 static void gui_view_adjust_list(gui_obj_t *old, gui_obj_t *new);
 static void gui_view_move_childlist(gui_obj_t *src, gui_obj_t *tar);
-static void gui_view_show_snap_shot(gui_view_t *_this, bool show);
-static void gui_view_create_snap_shot(gui_view_t *_this);
-static void gui_view_cache_snap_shot_data(gui_view_t *_this);
+static void gui_view_show_snapshot(gui_view_t *_this, bool show);
+static void gui_view_create_snapshot(gui_view_t *_this);
+static void gui_view_cache_snapshot_data(gui_view_t *_this);
+static void gui_view_save_common_data(gui_view_t *old_view, gui_view_t *new_view);
 
 
 /*============================================================================*
@@ -72,13 +75,6 @@ static void gui_view_released_view_timer_cb(void *obj)
             delta = (distance > 0) ? 1 : -1;
         }
         g_Release += delta;
-
-        if (g_Release != 0 && g_Release == g_Target &&
-            g_NextView->current_transition_style <= SWITCH_IN_STILL_USE_BLUR &&
-            g_NextView->descriptor->use_snap_shot == true)
-        {
-            gui_view_adjust_list(obj, GUI_BASE(g_NextView));
-        }
     }
     else
     {
@@ -86,12 +82,13 @@ static void gui_view_released_view_timer_cb(void *obj)
         {
             // gui_log("obj name = %s, g_Release = %d!\n", ((gui_obj_t *)obj)->name, g_Release);
 
-            if (g_PreView != g_NextView) {gui_view_not_show(g_PreView);}
-            gui_view_not_show(g_CurrentView);
-            if (g_CurrentView->descriptor->keep)
+            gui_view_t *old_view = g_CurrentView;
+            g_CurrentView = g_NextView;
+            gui_view_show_snapshot(g_CurrentView, false);
+            gui_view_not_show(old_view);
+            if (old_view->descriptor->keep)
             {
-                g_PreView = g_CurrentView;
-                g_PreView->current_transition_style = SWITCH_INIT_STATE;
+                g_PreView = old_view;
                 if (g_NextView->opacity != UINT8_MAX) //decrease time of processing PreView
                 {
                     gui_obj_hidden(&g_PreView->base, false);
@@ -105,12 +102,14 @@ static void gui_view_released_view_timer_cb(void *obj)
             {
                 g_PreView = NULL;
             }
-            g_CurrentView = g_NextView;
             g_SnapShotCacheTime = gui_ms_get();
+            gui_view_update_snapshot_async(g_CurrentView);
+            g_SnapShotCacheNeedUpdate = false;
         }
         else
         {
             gui_view_not_show(g_NextView);
+            gui_view_show_snapshot(g_CurrentView, false);
         }
         g_SwitchDone = true;
         g_Release = 0;
@@ -119,7 +118,6 @@ static void gui_view_released_view_timer_cb(void *obj)
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         // gui_log("current view name = %s\n", g_CurrentView->base.name);
         gui_fb_change();
-        gui_view_show_snap_shot(g_CurrentView, false);
         gui_obj_delete_timer(obj);
     }
 }
@@ -136,11 +134,13 @@ static void gui_view_animate_timer_cb(void *obj)
         _this->current_transition_style = SWITCH_INIT_STATE;
         gui_obj_delete_timer(obj);
         gui_fb_change();
-        if (g_PreView != g_NextView) {gui_view_not_show(g_PreView);}
-        gui_view_not_show(g_CurrentView);
-        if (g_CurrentView->descriptor->keep)
+        gui_view_t *old_view = g_CurrentView;
+        g_CurrentView = g_NextView;
+        gui_view_show_snapshot(g_CurrentView, false);
+        gui_view_not_show(old_view);
+        if (old_view->descriptor->keep)
         {
-            g_PreView = g_CurrentView;
+            g_PreView = old_view;
             if (g_NextView->opacity != UINT8_MAX) //decrease time of processing PreView
             {
                 gui_obj_hidden(&g_PreView->base, false);
@@ -154,14 +154,15 @@ static void gui_view_animate_timer_cb(void *obj)
         {
             g_PreView = NULL;
         }
+
         g_SwitchDone = true;
-        g_CurrentView = g_NextView;
         g_SnapShotCacheTime = gui_ms_get();
+        gui_view_update_snapshot_async(g_CurrentView);
+        g_SnapShotCacheNeedUpdate = false;
         g_CurrentView->base.x = 0;
         g_CurrentView->base.y = 0;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         g_NextView = NULL;
-        gui_view_show_snap_shot(g_CurrentView, false);
     }
 }
 
@@ -343,77 +344,202 @@ static void gui_view_transition(gui_view_t *_this, int16_t release)
         gui_view_blur(_this, release);
     }
 }
-static void gui_view_show_snap_shot(gui_view_t *_this, bool show)
+
+static void gui_view_free_snapshot_obj_async(void *msg)
+{
+    gui_view_t *_this = ((gui_msg_t *)msg)->payload;
+    if (_this->descriptor->use_snapshot)
+    {
+        if (_this->snapshot)
+        {
+            // gui_log("%s free snapshot\n", _this->descriptor->name);
+            gui_obj_tree_free(_this->snapshot);
+            _this->snapshot = NULL;
+        }
+        if (_this->obj_temp)
+        {
+            // gui_log("%s free obj_temp\n", _this->descriptor->name);
+            gui_view_move_childlist(_this->obj_temp, GUI_BASE(_this));
+            gui_obj_tree_free(_this->obj_temp);
+            _this->obj_temp = NULL;
+        }
+        else if (_this == g_CurrentView)
+        {
+            g_CurrentView->descriptor->on_switch_in(g_CurrentView); // After-create widget tree
+            gui_log("%s after-create\n", g_CurrentView->base.name);
+        }
+    }
+    gui_fb_change();
+    gui_view_save_common_data(_this, g_CurrentView);
+}
+
+static void gui_view_show_snapshot(gui_view_t *_this, bool show)
 {
     gui_obj_t *obj = GUI_BASE(_this);
     if (show)
     {
-        _this->obj_temp = gui_obj_create(gui_obj_get_fake_root(), 0, 0, 0, 0, 0);
-        gui_view_move_childlist(obj, _this->obj_temp);
+        if (obj->child_list.next != &obj->child_list)
+        {
+            _this->obj_temp = gui_obj_create(gui_obj_get_fake_root(), "obj_temp", 0, 0, 0, 0);
+            gui_view_move_childlist(obj, _this->obj_temp);
+        }
     }
-    else if (_this->obj_temp)
+    else
     {
-        gui_log("%s free snap_shot obj\n", _this->descriptor->name);
-        gui_view_move_childlist(_this->obj_temp, obj);
-        gui_obj_tree_free(_this->obj_temp);
-        _this->obj_temp = NULL;
+        gui_msg_t msg =
+        {
+            .event = GUI_EVENT_USER_DEFINE,
+            .cb = gui_view_free_snapshot_obj_async,
+            .payload = (void *)_this,
+        };
+        gui_send_msg_to_server(&msg);
     }
 }
 
-static void gui_view_cache_snap_shot_data(gui_view_t *_this)
+static void gui_view_cache_snapshot_data(gui_view_t *_this)
 {
-    if (_this != NULL && _this->descriptor->use_snap_shot == true)
+    if (_this != NULL && _this->descriptor->use_snapshot == true)
     {
-        if (_this->snap_shot_data == NULL)
+        if (!g_SnapShotCacheNeedUpdate)
         {
-            uint16_t w = (uint16_t)_this->base.w;
-            uint16_t h = (uint16_t)_this->base.h;
-            uint16_t bit_depth = 16;
-            uint32_t size = (uint32_t) w * h * bit_depth / 8;
-            _this->snap_shot_data = gui_malloc(sizeof(gui_rgb_data_head_t) + size);
-            memset(_this->snap_shot_data, 0, sizeof(gui_rgb_data_head_t));
+            g_SnapShotCacheNeedUpdate = true;
         }
+        else
+        {
+            void **cache = _this->descriptor->snapshot_data;
+            if (*cache == NULL)
+            {
+                uint16_t w = (uint16_t)_this->base.w;
+                uint16_t h = (uint16_t)_this->base.h;
+                uint16_t bit_depth = 16;
+                uint32_t size = (uint32_t) w * h * bit_depth / 8;
+                *cache = gui_malloc(sizeof(gui_rgb_data_head_t) + size);
+                memset(*cache, 0, sizeof(gui_rgb_data_head_t));
+            }
+            else if (_this != g_CurrentView)
+            {
+                return;
+            }
 
-        uint8_t opacity_rec = _this->opacity;
-        _this->opacity = UINT8_MAX;
-        bool hidden_rec = _this->base.not_show;
-        _this->base.not_show = false;
-        gui_img_tree_convert_to_img((gui_obj_t *)_this, NULL, _this->snap_shot_data);
-        _this->opacity = opacity_rec;
-        _this->base.not_show = hidden_rec;
-        gui_log("%s cache snapshot\n", _this->descriptor->name);
+            uint8_t opacity_rec = _this->opacity;
+            _this->opacity = UINT8_MAX;
+            bool hidden_rec = _this->base.not_show;
+            _this->base.not_show = false;
+            gui_img_tree_convert_to_img((gui_obj_t *)_this, NULL, *cache);
+            _this->opacity = opacity_rec;
+            _this->base.not_show = hidden_rec;
+            gui_log("%s cache snapshot\n", _this->descriptor->name);
+        }
+    }
+
+    if (g_SnapShotPreCache == true && _this == g_CurrentView)
+    {
+        for (uint32_t i = 0; i < _this->on_event_num; i++)
+        {
+            const gui_view_descriptor_t *nd = _this->on_event[i]->descriptor;
+            if (!nd->use_snapshot || nd->snapshot_data == NULL) { continue; }
+
+            gui_view_t *neighbor = *nd->pView;
+            if (neighbor == g_CurrentView || *nd->snapshot_data != NULL) { continue; }
+
+            bool temp_created = false;
+            if (neighbor == NULL)
+            {
+                neighbor = gui_view_create(gui_obj_get_fake_root(), nd->name, 0, 0, 0, 0);
+                temp_created = true;
+            }
+
+            g_SnapShotCacheNeedUpdate = true;
+            gui_view_cache_snapshot_data(neighbor);
+
+            if (temp_created)
+            {
+                // Preserve cache buffer before destroying temporary view
+                void *saved_cache = *nd->snapshot_data;
+                *nd->snapshot_data = NULL;
+                gui_obj_tree_free(GUI_BASE(neighbor));
+                *nd->pView = NULL;
+
+                // Restore cache buffer
+                *nd->snapshot_data = saved_cache;
+            }
+        }
     }
 }
 
-static void gui_view_create_snap_shot(gui_view_t *_this)
+static void gui_view_create_snapshot(gui_view_t *_this)
 {
-    if (_this != NULL && _this->descriptor->use_snap_shot == true)
+    if (_this != NULL && _this->descriptor->use_snapshot == true)
     {
-        if (_this->snap_shot_data == NULL)
+        if (*_this->descriptor->snapshot_data == NULL)
         {
-            gui_view_cache_snap_shot_data(_this);
+            gui_view_cache_snapshot_data(_this);
         }
 
-        if (_this->snap_shot == NULL)
+        if (_this->snapshot == NULL)
         {
-            gui_view_show_snap_shot(_this, true);
-            _this->snap_shot = gui_img_create_from_mem(_this, "view_snapshot", (void *)_this->snap_shot_data, 0,
-                                                       0, 0, 0);
-            gui_img_set_quality(_this->snap_shot, true);
+            gui_view_show_snapshot(_this, true);
+            _this->snapshot = gui_img_create_from_mem(_this, "view_snapshot",
+                                                      (void *)*_this->descriptor->snapshot_data, 0,
+                                                      0, 0, 0);
+            gui_img_set_quality(_this->snapshot, true);
         }
         BLEND_MODE_TYPE blend_mode = IMG_BYPASS_MODE;
         if (_this->opacity != UINT8_MAX || _this->current_transition_style >= SWITCH_IN_FROM_LEFT_USE_CUBE)
         {
             blend_mode = IMG_FILTER_BLACK;
         }
-        gui_img_set_mode(_this->snap_shot, blend_mode);
+        gui_img_set_mode(_this->snapshot, blend_mode);
     }
 }
 
-static void gui_view_update_snap_shot(void *msg)
+static void gui_view_save_common_data(gui_view_t *old_view, gui_view_t *new_view)
+{
+    GUI_UNUSED(old_view);
+    GUI_UNUSED(new_view);
+
+    if (old_view == NULL || new_view == NULL || old_view == new_view) { return; }
+    if (g_SnapShotPreCache == true)
+    {
+        for (uint32_t i = 0; i < old_view->on_event_num; i++)
+        {
+            const gui_view_descriptor_t *nd = old_view->on_event[i]->descriptor;
+            if (!nd->use_snapshot || nd->snapshot_data == NULL) { continue; }
+            if (*nd->snapshot_data == NULL || nd == new_view->descriptor) { continue; }
+
+            // Check if new_view also has this neighbor
+            bool shared = false;
+            for (uint32_t j = 0; j < new_view->on_event_num; j++)
+            {
+                if (new_view->on_event[j]->descriptor == nd)
+                {
+                    shared = true;
+                    break;
+                }
+            }
+
+            if (!shared)
+            {
+                gui_free(*nd->snapshot_data);
+                *nd->snapshot_data = NULL;
+                // gui_log("%s free snapshot data\n", nd->name);
+            }
+        }
+    }
+    else
+    {
+        if (old_view->descriptor->use_snapshot && *old_view->descriptor->snapshot_data != NULL)
+        {
+            gui_free(*old_view->descriptor->snapshot_data);
+            *old_view->descriptor->snapshot_data = NULL;
+        }
+    }
+}
+
+static void gui_view_update_snapshot(void *msg)
 {
     gui_view_t *_this = (gui_view_t *)(((gui_msg_t *)msg)->payload);
-    gui_view_cache_snap_shot_data(_this);
+    gui_view_cache_snapshot_data(_this);
 }
 
 static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
@@ -429,6 +555,11 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
     gui_view_on_event_t *on_event = e->user_data;
     g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
     if (g_NextView != next_view_rec) {gui_view_not_show(next_view_rec);}
+    if (g_PreView && g_NextView != g_PreView)
+    {
+        gui_view_not_show(g_PreView);
+        g_PreView = NULL;
+    }
 
     g_NextView->current_transition_style = on_event->switch_in_style;
     g_CurrentView->current_transition_style = on_event->switch_out_style;
@@ -436,8 +567,10 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
     }
-
-    gui_obj_hidden(GUI_BASE(g_NextView), true);
+    else
+    {
+        gui_obj_hidden(GUI_BASE(g_NextView), true);
+    }
 
     g_NextView->current_event_code = e->code;
     g_CurrentView->current_event_code = e->code;
@@ -466,8 +599,9 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
         break;
     }
 
-    gui_view_create_snap_shot(g_CurrentView);
-    gui_view_create_snap_shot(g_NextView);
+    g_SnapShotCacheNeedUpdate = true;
+    gui_view_create_snapshot(g_CurrentView);
+    gui_view_create_snapshot(g_NextView);
     // gui_log("gui_view_on_event_trigger_move_cb next view name = %s\n", g_NextView->base.name);
 }
 
@@ -483,6 +617,12 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
     g_NextView->current_event_code = e->code;
     g_CurrentView->current_event_code = e->code;
 
+    if (g_PreView && g_NextView != g_PreView)
+    {
+        gui_view_not_show(g_PreView);
+        g_PreView = NULL;
+    }
+
     gui_obj_create_timer(obj, 10, true, gui_view_animate_timer_cb);
     gui_obj_start_timer(obj);
 
@@ -492,14 +632,6 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
     g_SurpressEvent = true;
     g_SurpressTP = true;
     g_SnapShotCacheTime = gui_ms_get();
-
-    // if (g_CurrentView->current_event_code < SWITCH_OUT_NONE_ANIMATION &&
-    //     g_CurrentView->current_event_code % 2 == 0)
-    // {
-    //     g_CurrentView->animate_step = -g_CurrentView->animate_step;
-    //     g_Release = -g_Release;
-    //     g_Target = -g_Target;
-    // }
 
     if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR ||
         on_event->switch_in_style == SWITCH_IN_NONE_ANIMATION) // cover CurrentView
@@ -513,16 +645,19 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
         g_NextView->base.x = gui_get_screen_width();
     }
 
-    gui_view_create_snap_shot(g_CurrentView);
-    gui_view_create_snap_shot(g_NextView);
+    g_SnapShotCacheNeedUpdate = true;
+    gui_view_create_snapshot(g_CurrentView);
+    gui_view_create_snapshot(g_NextView);
 
     // gui_log("gui_view_on_event_cb\n");
 }
 
 static void gui_view_not_show(gui_view_t *_this)
 {
-    if (_this == NULL || (_this == g_NextView && _this == g_PreView && g_SurpressEvent)) { return; }
+    if (_this == NULL) { return; }
+    gui_view_show_snapshot(_this, false);
 
+    if (_this == g_NextView && _this == g_PreView && g_SurpressEvent) { return; }
     gui_obj_t *obj = GUI_BASE(_this);
     gui_obj_hidden(obj, true);
     if (!_this->descriptor->keep)
@@ -531,12 +666,6 @@ static void gui_view_not_show(gui_view_t *_this)
     }
     else
     {
-        if (_this->descriptor->use_snap_shot == true && _this->snap_shot != NULL)
-        {
-            gui_obj_tree_free(_this->snap_shot);
-            _this->snap_shot = NULL;
-            gui_view_show_snap_shot(_this, false);
-        }
         gui_log("%s hide\n", obj->name);
     }
 }
@@ -617,12 +746,13 @@ static void gui_view_prepare(gui_obj_t *obj)
 
     if (_this == g_CurrentView)
     {
-        if (_this->descriptor->use_snap_shot == true && g_NextView == NULL)
+        if (_this->descriptor->use_snapshot == true && g_NextView == NULL)
         {
-            if (gui_ms_get() - g_SnapShotCacheTime >= SNAP_SHOT_CACHE_INTERVAL)
+            if (gui_ms_get() - g_SnapShotCacheTime >= SNAPSHOT_CACHE_INTERVAL)
             {
                 g_SnapShotCacheTime = gui_ms_get();
-                gui_view_update_snap_shot_async(_this);
+                gui_view_update_snapshot_async(_this);
+                g_SnapShotCacheNeedUpdate = true;
             }
         }
 
@@ -689,6 +819,17 @@ static void gui_view_destroy(gui_obj_t *obj)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
+    if (_this->descriptor->use_snapshot == true)
+    {
+        if (_this->obj_temp != NULL)
+        {
+            gui_obj_tree_free(_this->obj_temp);
+            _this->obj_temp = NULL;
+            // gui_log("destroy %s free obj_temp\n", _this->descriptor->name);
+            gui_view_save_common_data(_this, g_CurrentView);
+        }
+    }
+
     for (uint32_t i = 0; i < _this->on_event_num; i++)
     {
         gui_free(_this->on_event[i]);
@@ -700,20 +841,6 @@ static void gui_view_destroy(gui_obj_t *obj)
         gui_free(_this->on_event);
     }
 
-    if (_this->descriptor->use_snap_shot == true)
-    {
-        if (_this->snap_shot_data != NULL)
-        {
-            gui_free(_this->snap_shot_data);
-            _this->snap_shot_data = NULL;
-        }
-        if (_this->obj_temp != NULL)
-        {
-            gui_obj_tree_free(_this->obj_temp);
-            _this->obj_temp = NULL;
-        }
-    }
-
     if (_this->descriptor->on_switch_out != NULL)
     {
         _this->descriptor->on_switch_out(_this);
@@ -723,6 +850,7 @@ static void gui_view_destroy(gui_obj_t *obj)
     if (_this == g_CurrentView)
     {
         g_CurrentView = NULL;
+        gui_view_clear_all_snapshot_data();
     }
     else if (_this == g_NextView)
     {
@@ -834,14 +962,14 @@ gui_view_t *gui_view_create(void       *parent,
         {
             gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list), &(GET_BASE(_this)->brother_list));
             g_CurrentView = _this;
-            gui_view_cache_snap_shot_data(_this);
+            gui_view_cache_snapshot_data(_this);
             g_SnapShotCacheTime = gui_ms_get();
         }
         else
         {
             gui_view_adjust_list(GET_BASE(g_CurrentView), obj);
         }
-        gui_log("%s show\n", obj->name);
+        gui_log("show %s\n", obj->name);
 
         return _this;
     }
@@ -879,10 +1007,12 @@ gui_view_t *gui_view_create(void       *parent,
     }
 
     *descriptor->pView = _this;
-    descriptor->on_switch_in(_this);
+    if (*descriptor->snapshot_data == NULL)
+    {
+        descriptor->on_switch_in(_this);
+        gui_log("create %s\n", GET_BASE(_this)->name);
+    }
 
-
-    gui_log("create %s\n", GET_BASE(_this)->name);
     if (g_CurrentView == NULL && parent != gui_obj_get_fake_root())
     {
         g_CurrentView = _this;
@@ -890,7 +1020,7 @@ gui_view_t *gui_view_create(void       *parent,
         g_SurpressEvent = false;
         g_SurpressTP = true;
         g_SwitchDone = false;
-        gui_view_cache_snap_shot_data(_this);
+        gui_view_cache_snapshot_data(_this);
     }
     return _this;
 }
@@ -1047,16 +1177,21 @@ void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity)
     _this->opacity = opacity;
 }
 
-void gui_view_update_snap_shot_async(gui_view_t *_this)
+void gui_view_update_snapshot_async(gui_view_t *_this)
 {
-    if (_this && _this->descriptor->use_snap_shot == true)
+    // if (_this && _this->descriptor->use_snapshot == true)
     {
         gui_msg_t msg =
         {
             .event = GUI_EVENT_USER_DEFINE,
-            .cb = gui_view_update_snap_shot,
+            .cb = gui_view_update_snapshot,
             .payload = _this,
         };
         gui_send_msg_to_server(&msg);
     }
+}
+
+void gui_view_enable_precache_snapshot(bool enable)
+{
+    g_SnapShotPreCache = enable;
 }

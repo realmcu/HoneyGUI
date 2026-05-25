@@ -29,6 +29,7 @@
  *============================================================================*/
 extern "C" {
     static gui_view_t *current_view = NULL;
+    static void *current_snapshot_data = NULL;
 
     void app_box2d_time_ui_design(gui_view_t *view);
     static void clear_mem(gui_view_t *view);
@@ -41,7 +42,8 @@ extern "C" {
         .on_switch_in = app_box2d_time_ui_design,
         .on_switch_out = clear_mem,
         .keep = 0,
-        .use_snap_shot = 0
+        .use_snapshot = 0,
+        .snapshot_data = &current_snapshot_data
     };
 
     static int gui_view_descriptor_register_init(void)

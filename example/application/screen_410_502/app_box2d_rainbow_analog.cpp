@@ -34,6 +34,7 @@
  *============================================================================*/
 extern "C" {
     static gui_view_t *current_view = NULL;
+    static void *current_snapshot_data = NULL;
 
     static void app_rainbow_analog_ui_design(gui_view_t *view);
     static void app_close(gui_view_t *view);
@@ -46,7 +47,8 @@ extern "C" {
         .on_switch_in = app_rainbow_analog_ui_design,
         .on_switch_out = app_close,
         .keep = 0,
-        .use_snap_shot = 0
+        .use_snapshot = 0,
+        .snapshot_data = &current_snapshot_data,
     };
 
     static int gui_view_descriptor_register_init(void)

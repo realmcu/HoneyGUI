@@ -22,7 +22,7 @@
 
 static void app_ui_view_lime_design(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_lime_design, NULL, true);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_lime_design, NULL, false);
 
 static void img_cb(void *obj, gui_event_t *e)
 {

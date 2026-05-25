@@ -24,7 +24,7 @@
 static void switch_in_cb(gui_view_t *view);
 static void switch_out_cb(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, switch_in_cb, switch_out_cb, true);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, true, switch_in_cb, switch_out_cb, true);
 
 static void img_cb(void *obj, gui_event_t *e)
 {
@@ -39,7 +39,7 @@ static void img_cb(void *obj, gui_event_t *e)
 static void switch_out_cb(gui_view_t *view)
 {
     GUI_UNUSED(view);
-    gui_log("blue view clean\n");
+    // gui_log("blue view clean\n");
 }
 
 static void switch_in_cb(gui_view_t *view)
@@ -75,6 +75,7 @@ static void switch_in_cb(gui_view_t *view)
 
 static int app_init(void)
 {
+    gui_view_enable_precache_snapshot(false);
     gui_view_create(gui_obj_get_root(), CURRENT_VIEW_NAME, 0, 0, 0, 0);
     return 0;
 }
