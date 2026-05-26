@@ -383,6 +383,22 @@ static void gui_img_ctor(gui_img_t            *_this,
 
     }
 
+    /* Auto-detect if clipping is needed */
+    {
+        gui_obj_t *o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            if (o->type == WINDOW || o->type == LIST_NOTE)
+            {
+                if (x < 0 || y < 0 || (x + obj->w) > o->w || (y + obj->h) > o->h)
+                {
+                    _this->need_clip = true;
+                }
+                break;
+            }
+        }
+    }
 }
 
 
