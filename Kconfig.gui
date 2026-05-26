@@ -128,6 +128,13 @@ config REALTEK_BUILD_EXAMPLE_VIDEO_WIDGET
     help
       RTK GUI Video Widget Demo
 
+config REALTEK_BUILD_EXAMPLE_MSV1_WIDGET
+    bool "MSV1 Video Widget Demo"
+    help
+      RTK GUI MSV1 (Microsoft Video 1 / CRAM) Widget Demo.
+      Plays output_msv1_360.avi at 360x360 resolution, 25 FPS.
+      Tap to toggle play/pause.
+
 config REALTEK_BUILD_REAL_PAINTENGINE
     bool "Paint Engine Demo"
     help
