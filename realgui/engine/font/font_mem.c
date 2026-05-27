@@ -1250,6 +1250,9 @@ void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
             gui_font_get_dot_info(text);
         }
     }
+#if ENABLE_FONT_V3_TYPO
+    rect->y2 = _UI_MAX(rect->y2, rect->y1 + (int16_t)text->base.h - 1);
+#endif
     // if (text->layout_refresh)
     {
         if (text != NULL)
