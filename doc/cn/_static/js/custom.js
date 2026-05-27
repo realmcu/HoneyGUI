@@ -200,8 +200,8 @@ function highlightAPI() {
 /* ============= Toggle Languages ============= */
 function toggleLanguage() {
     let currentUrl = window.location.href;
-    let newEnUrl = currentUrl.replace(/(\/|_)cn\//gi, '$1en/');
-    let newCnUrl = currentUrl.replace(/(\/|_)en\//gi, '$1cn/');
+    let newEnUrl = currentUrl.replace(/(\/|_)cn(\/|\.html)/gi, '$1en$2');
+    let newCnUrl = currentUrl.replace(/(\/|_)en(\/|\.html)/gi, '$1cn$2');
 
     document.getElementById('toEN').href = newEnUrl;
     document.getElementById('toCN').href = newCnUrl;
