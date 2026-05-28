@@ -27,14 +27,21 @@ if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_MSV1_WIDGET'):
 
         print("Target arch is win32, attempting to add prebuilt binary object...")
         BIN_SUBDIR = os.path.join(cwd, 'root_image')
-        # BIN_FILE = os.path.join(BIN_SUBDIR, 'output_msv1_360.avi')
-        # OBJ_FILE = os.path.join(BIN_SUBDIR, 'output_msv1_360_avi.o')
-        BIN_FILE = os.path.join(BIN_SUBDIR, 'output.avi')
-        OBJ_FILE = os.path.join(BIN_SUBDIR, 'output_avi.o')
+        additional_objs = []
+
+        BIN_FILE = os.path.join(BIN_SUBDIR, 'cat_00.avi')
+        OBJ_FILE = os.path.join(BIN_SUBDIR, 'cat_00_avi.o')
         result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
         if result_node:
-            additional_objs = []
             additional_objs.append(result_node)
+
+        BIN_FILE = os.path.join(BIN_SUBDIR, 'cat_03.avi')
+        OBJ_FILE = os.path.join(BIN_SUBDIR, 'cat_03_avi.o')
+        result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
+        if result_node:
+            additional_objs.append(result_node)
+
+        if additional_objs:
             print(additional_objs)
             src = Flatten(src + additional_objs)
 

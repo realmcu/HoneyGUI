@@ -408,6 +408,21 @@ void msv1_decoder_destroy(msv1_decoder_t *ctx)
     }
 }
 
+int msv1_decoder_reset(msv1_decoder_t *ctx,
+                       uint16_t width, uint16_t height,
+                       uint8_t bits_per_pixel, uint8_t *pixel_buf)
+{
+    if (!ctx || !pixel_buf)                                           { return -1; }
+    if (bits_per_pixel != 8 && bits_per_pixel != 16)                  { return -1; }
+    if (!width || !height || (width % 4) != 0 || (height % 4) != 0)  { return -1; }
+
+    ctx->width          = width;
+    ctx->height         = height;
+    ctx->bits_per_pixel = bits_per_pixel;
+    ctx->pixels         = pixel_buf;
+    return 0;
+}
+
 int msv1_decode_frame_rgb565(msv1_decoder_t *ctx,
                              const uint8_t  *src,
                              size_t          src_size,

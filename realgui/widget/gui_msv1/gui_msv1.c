@@ -800,6 +800,10 @@ static void gui_msv1_prepare(gui_obj_t *obj)
 {
     gui_msv1_t *this = (gui_msv1_t *)obj;
     gui_img_set_src(this->img, (const uint8_t *) & (this->header), IMG_SRC_MEMADDR);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
 }
 
 static void gui_msv1_draw(gui_obj_t *obj)
@@ -1002,11 +1006,8 @@ gui_msv1_t *gui_msv1_create_from_mem(void *parent, const char *name, void *addr,
 
     if (name == NULL)
     {
-        name = "DEFAULT_LIVE_IMAGE";
+        name = "DEFAULT_MSV1_IMAGE";
     }
-
-
-
     gui_msv1_t *img = gui_msv1_ctor((gui_obj_t *)parent, name, addr,
                                     x, y, w, h, IMG_SRC_MEMADDR);
     GET_BASE(img)->create_done = true;
@@ -1017,15 +1018,33 @@ gui_msv1_t *gui_msv1_create_from_mem(void *parent, const char *name, void *addr,
 gui_msv1_t *gui_msv1_create_from_fs(void *parent, const char *name, void *path,
                                     int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    return gui_msv1_ctor((gui_obj_t *)parent, name, path,
-                         x, y, w, h, IMG_SRC_FILESYS);
+    GUI_ASSERT(parent != NULL);
+
+    if (name == NULL)
+    {
+        name = "DEFAULT_MSV1_IMAGE";
+    }
+    gui_msv1_t *img = gui_msv1_ctor((gui_obj_t *)parent, name, path,
+                                    x, y, w, h, IMG_SRC_FILESYS);
+    GET_BASE(img)->create_done = true;
+
+    return img;
 }
 
 gui_msv1_t *gui_msv1_create_from_ftl(void *parent, const char *name, void *addr,
                                      int16_t x, int16_t y, int16_t w, int16_t h)
 {
-    return gui_msv1_ctor((gui_obj_t *)parent, name, addr,
-                         x, y, w, h, IMG_SRC_FTL);
+    GUI_ASSERT(parent != NULL);
+
+    if (name == NULL)
+    {
+        name = "DEFAULT_MSV1_IMAGE";
+    }
+    gui_msv1_t *img = gui_msv1_ctor((gui_obj_t *)parent, name, addr,
+                                    x, y, w, h, IMG_SRC_FTL);
+    GET_BASE(img)->create_done = true;
+
+    return img;
 }
 
 void gui_msv1_set_state(gui_msv1_t *this, GUI_VIDEO_STATE state)
@@ -1071,4 +1090,168 @@ void gui_msv1_set_scale(gui_msv1_t *this, float scale_x, float scale_y)
 {
     if (!this) { return; }
     gui_img_scale(this->img, scale_x, scale_y);
+}
+
+void gui_msv1_set_src(gui_msv1_t *this, void *src, uint8_t storage_type)
+{
+    /* Declare all locals at the top for Keil AC5 (C89) compatibility. */
+    gui_obj_t  *obj;
+    void       *old_data;
+    uint8_t     old_storage_type;
+    void       *old_chunks;
+    uint32_t    old_chunk_num;
+    uint32_t    old_num_frame;
+    int16_t     old_w;
+    int16_t     old_h;
+    uint8_t     old_bpp;
+    uint32_t    old_frame_time;
+    uint16_t    old_palette[256];
+    int         parse_ret;
+    int16_t     new_w;
+    int16_t     new_h;
+    int         size_changed;
+    uint8_t    *new_render_buf;
+    size_t      new_total;
+    uint8_t    *pixel_buf;
+
+    if (!this || !src) { return; }
+    if (storage_type != IMG_SRC_MEMADDR &&
+        storage_type != IMG_SRC_FILESYS &&
+        storage_type != IMG_SRC_FTL) { return; }
+
+    obj = (gui_obj_t *)this;
+
+    /* ------------------------------------------------------------------ *
+     * Save every field that the parse helpers may mutate so we can roll
+     * back to the old source on any failure.
+     * ------------------------------------------------------------------ */
+    old_data         = this->data;
+    old_storage_type = this->storage_type;
+    old_chunks       = this->chunks;
+    old_chunk_num    = this->chunk_num;
+    old_num_frame    = this->num_frame;
+    old_w            = this->header.w;
+    old_h            = this->header.h;
+    old_bpp          = this->bits_per_pixel;
+    old_frame_time   = this->frame_time;
+    memcpy(old_palette, this->palette565, sizeof(this->palette565));
+
+    /* Null out chunks so the parse helper always builds a fresh array. */
+    this->chunks    = NULL;
+    this->chunk_num = 0;
+
+    /* ------------------------------------------------------------------ *
+     * Install new source and parse the AVI container.
+     * On success this updates: header.w/h, obj.w/h, bits_per_pixel,
+     * frame_time, palette565[], num_frame, chunks, chunk_num.
+     * ------------------------------------------------------------------ */
+    this->data         = src;
+    this->storage_type = storage_type;
+
+    parse_ret = -1;
+    if (storage_type == IMG_SRC_MEMADDR)      { parse_ret = msv1_src_init_mem(this); }
+    else if (storage_type == IMG_SRC_FILESYS) { parse_ret = msv1_src_init_fs(this);  }
+    else if (storage_type == IMG_SRC_FTL)     { parse_ret = msv1_src_init_ftl(this); }
+
+    if (parse_ret != 0)
+    {
+        gui_log("msv1 set_src: AVI parse failed -- keeping old source\n");
+        goto rollback;
+    }
+
+    new_w        = this->header.w;
+    new_h        = this->header.h;
+    size_changed = (new_w != old_w || new_h != old_h);
+    new_total    = sizeof(gui_rgb_data_head_t) + (size_t)new_w * (size_t)new_h * 2u;
+
+    /* ------------------------------------------------------------------ *
+     * Allocate a new pixel buffer when the frame size has changed.
+     * Never use realloc; always free + malloc.
+     * ------------------------------------------------------------------ */
+    if (size_changed)
+    {
+        new_render_buf = (uint8_t *)gui_malloc(new_total);
+        if (!new_render_buf)
+        {
+            gui_log("msv1 set_src: render buf alloc failed -- keeping old source\n");
+            gui_free(this->chunks);
+            goto rollback;
+        }
+    }
+    else
+    {
+        new_render_buf = this->render_buf;  /* reuse; zero-filled below */
+    }
+
+    /* Zero-fill gives the decoder a clean slate for the first frame. */
+    memset(new_render_buf, 0, new_total);
+
+    /* Write the updated image header into the buffer prefix. */
+    this->header.type = RGB565;
+    this->header.w    = new_w;
+    this->header.h    = new_h;
+    memcpy(new_render_buf, &this->header, sizeof(gui_rgb_data_head_t));
+
+    /* ------------------------------------------------------------------ *
+     * Reset the decoder in-place (reuse the existing struct allocation).
+     * Points the decoder at the pixel area of the new render_buf.
+     * ------------------------------------------------------------------ */
+    pixel_buf = new_render_buf + sizeof(gui_rgb_data_head_t);
+    if (msv1_decoder_reset(this->decoder,
+                           (uint16_t)new_w, (uint16_t)new_h,
+                           this->bits_per_pixel, pixel_buf) != 0)
+    {
+        gui_log("msv1 set_src: decoder reset failed -- keeping old source\n");
+        if (size_changed) { gui_free(new_render_buf); }
+        gui_free(this->chunks);
+        goto rollback;
+    }
+
+    /* ================================================================== *
+     * COMMIT POINT -- all resources are ready; no more failure paths.
+     * ================================================================== */
+
+    /* Swap render_buf when size changed; free the old one. */
+    if (size_changed)
+    {
+        gui_free(this->render_buf);
+        this->render_buf = new_render_buf;
+    }
+
+    /* Release old chunk index (new one already committed in this->chunks). */
+    gui_free(old_chunks);
+
+    /* Update the base object and the child image widget. */
+    obj->w = new_w;
+    obj->h = new_h;
+    if (this->img)
+    {
+        ((gui_obj_t *)this->img)->w = new_w;
+        ((gui_obj_t *)this->img)->h = new_h;
+        gui_img_set_src(this->img, this->render_buf, IMG_SRC_MEMADDR);
+        gui_img_refresh_size(this->img);
+    }
+
+    /* Restart the playback timer at the new video's native frame rate. */
+    gui_obj_create_timer(obj, this->frame_time, true, gui_msv1_play_cb);
+
+    /* Reset frame counters and restart from frame 0. */
+    gui_msv1_reset(this);
+    this->repeat_cnt = -1;  /* reset to infinite; caller may reconfigure */
+    this->state      = GUI_VIDEO_STATE_PLAYING;
+    return;
+
+rollback:
+    this->data           = old_data;
+    this->storage_type   = old_storage_type;
+    this->chunks         = old_chunks;
+    this->chunk_num      = old_chunk_num;
+    this->num_frame      = old_num_frame;
+    this->header.w       = old_w;
+    this->header.h       = old_h;
+    this->bits_per_pixel = old_bpp;
+    this->frame_time     = old_frame_time;
+    memcpy(this->palette565, old_palette, sizeof(this->palette565));
+    obj->w = old_w;
+    obj->h = old_h;
 }

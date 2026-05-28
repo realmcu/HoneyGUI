@@ -69,6 +69,31 @@ const void *msv1_decode_frame(msv1_decoder_t *ctx,
 void msv1_decoder_destroy(msv1_decoder_t *ctx);
 
 /**
+ * Reset an existing decoder context to a new frame geometry and pixel buffer.
+ *
+ * The caller is responsible for allocating (and later freeing) the new
+ * pixel_buf.  The old pixel buffer is NOT touched by this function.
+ * All four fields (width, height, bits_per_pixel, pixels) are updated
+ * atomically: the function either succeeds and updates all fields, or
+ * returns -1 without modifying the context.
+ *
+ * Use this to reuse the decoder allocation when switching video sources,
+ * as required by gui_msv1_set_src.
+ *
+ * @param ctx            Existing decoder context (must not be NULL).
+ * @param width          New frame width in pixels (multiple of 4, > 0).
+ * @param height         New frame height in pixels (multiple of 4, > 0).
+ * @param bits_per_pixel New colour depth: 8 or 16.
+ * @param pixel_buf      New pixel buffer; must hold at least
+ *                       (width * height * bytes_per_pixel) bytes.
+ *
+ * @return 0 on success, -1 on invalid arguments (context unchanged).
+ */
+int msv1_decoder_reset(msv1_decoder_t *ctx,
+                       uint16_t width, uint16_t height,
+                       uint8_t bits_per_pixel, uint8_t *pixel_buf);
+
+/**
  * Decode one frame and write the result as packed RGB565 into dst.
  *
  *  - 16-bpp source: each RGB555 pixel is widened to RGB565 (G LSB padded to 0).

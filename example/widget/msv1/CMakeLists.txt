@@ -22,8 +22,10 @@ if(CONFIG_REALTEK_BUILD_EXAMPLE_MSV1_WIDGET)
 
     # Binary resource embedding for CMake builds (host/simulator only)
     if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        set(BIN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/root_image/output_msv1_360.avi")
-        set(OBJ_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/root_image/output_msv1_360_avi.o")
+        # set(BIN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/root_image/output_msv1_360.avi")
+        # set(OBJ_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/root_image/output_msv1_360_avi.o")
+        set(BIN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/root_image/cat_00.avi")
+        set(OBJ_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/root_image/cat_00_avi.o")
         if(EXISTS ${BIN_FILE})
             add_custom_command(
                 OUTPUT  ${OBJ_FILE}

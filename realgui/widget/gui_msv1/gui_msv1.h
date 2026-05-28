@@ -167,6 +167,30 @@ void gui_msv1_set_frame_step(gui_msv1_t *this, uint32_t step);
  */
 void gui_msv1_set_scale(gui_msv1_t *this, float scale_x, float scale_y);
 
+/**
+ * @brief Switch the video source at runtime.
+ *
+ * Handles all combinations of storage-type transitions
+ * (MEMADDR <-> FTL <-> FILESYS).  The AVI container is re-parsed from
+ * the new source, all widget state is updated, and playback restarts from
+ * the first frame.
+ *
+ * Buffer management:
+ *  - The render pixel buffer is freed and reallocated only when the new
+ *    video's frame dimensions differ from the current ones.  When the
+ *    dimensions are identical the existing buffer is reused (zero-filled).
+ *    realloc is never used.
+ *  - The existing msv1_decoder_t struct is reused (not destroyed / recreated).
+ *
+ * On failure the widget's current source and state are left unchanged.
+ *
+ * @param this         Widget pointer (must not be NULL).
+ * @param src          New source: RAM/Flash pointer, FTL base address, or
+ *                     NUL-terminated VFS path string.
+ * @param storage_type IMG_SRC_MEMADDR, IMG_SRC_FTL, or IMG_SRC_FILESYS.
+ */
+void gui_msv1_set_src(gui_msv1_t *this, void *src, uint8_t storage_type);
+
 #ifdef __cplusplus
 }
 #endif
