@@ -560,7 +560,8 @@ static void gui_card_slot_prepare(gui_obj_t *obj)
     float opacity_f = fmaxf(cl->min_opacity, 1.0f - abs_pos * cl->opacity_step);
 
     /* Smoothly fade buffer slots out as they leave the visible zone. */
-    float vis_edge = (float)(cl->display_count / 2);
+    uint8_t vis_edge_int = cl->display_count / 2;
+    float vis_edge = (float)vis_edge_int;
     if (abs_pos > vis_edge)
     {
         float t = clamp_f(abs_pos - vis_edge, 0.0f, 1.0f);

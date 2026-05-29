@@ -94,7 +94,12 @@ typedef struct
 static void msg_task_exec(void *p)
 {
     msg_task_t *task = (msg_task_t *)p;
-    if (task && task->callback)
+
+    if (task == NULL)
+    {
+        return;
+    }
+    if (task->callback)
     {
         task->callback(task->obj, task->topic, task->data, task->len);
     }

@@ -832,7 +832,7 @@ static void gui_msv1_draw(gui_obj_t *obj)
         return;
     }
 
-    if (this->frame_cur < 2)
+    if (this->frame_cur < 2 && this->render_buf)
     {
         uint16_t *px = (uint16_t *)(this->render_buf + sizeof(gui_rgb_data_head_t));
         gui_log("msv1_draw: frame%d px[0]=0x%04x px[1]=0x%04x\n",
