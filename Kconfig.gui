@@ -128,12 +128,13 @@ config REALTEK_BUILD_EXAMPLE_VIDEO_WIDGET
     help
       RTK GUI Video Widget Demo
 
-config REALTEK_BUILD_EXAMPLE_MSV1_WIDGET
-    bool "MSV1 Video Widget Demo"
+config REALTEK_BUILD_EXAMPLE_LITE_VIDEO_WIDGET
+    bool "Lite Video Unified Widget Demo (MSV1 + Cinepak)"
     help
-      RTK GUI MSV1 (Microsoft Video 1 / CRAM) Widget Demo.
-      Plays output_msv1_360.avi at 360x360 resolution, 25 FPS.
-      Tap to toggle play/pause.
+      RTK GUI Lite Video unified widget demo.
+      Auto-detects and plays both Microsoft Video 1 (MSV1) and Cinepak AVI files
+      through the same gui_lite_video API. Tap to toggle play/pause;
+      double-click to switch between video sources (cross-codec switching supported).
 
 config REALTEK_BUILD_REAL_PAINTENGINE
     bool "Paint Engine Demo"

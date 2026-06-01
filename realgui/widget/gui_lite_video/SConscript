@@ -7,9 +7,7 @@ from building import *
 cwd = GetCurrentDir()
 inc = [cwd]
 
-# Explicitly list only the C port sources.
-# msvideo1.cpp is a ScummVM reference and must NOT be compiled.
-src = ['msv1_decoder.c', 'gui_msv1.c']
+src = Glob('*.c') + Glob('*.cpp')
 
 if GetDepend(['']):
     objs = DefineGroup('widget', src, depend = [''], CPPPATH = inc)
