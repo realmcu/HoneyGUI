@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-if(1)
+if(CONFIG_REALTEK_BUILD_EXAMPLE_LITE_VIDEO_WIDGET)
 
     file(GLOB SOURCES "*.c")
     if(SOURCES)
