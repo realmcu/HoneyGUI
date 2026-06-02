@@ -770,6 +770,9 @@ static void gui_rect_prepare(gui_obj_t *obj)
     // obj->matrix is already initialized by gui_obj_ctor
     // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
 
+    // Detect non-translate parent transform (rotation/scale/skew)
+    bool parent_has_non_translate = !matrix_only_translate(obj->matrix);
+
     // Apply transformations if needed
     bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f ||
                           this->offset_x != 0.0f || this->offset_y != 0.0f);
@@ -826,7 +829,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
                               (this->base.w * this->base.h <= 10000) ||
                               (this->use_gradient && this->gradient != NULL) ||
-                              has_transform;
+                              has_transform || parent_has_non_translate;
 
     if (this->radius == 0 && !this->use_gradient)
     {
