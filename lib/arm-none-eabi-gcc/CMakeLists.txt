@@ -9,10 +9,19 @@ cmake_policy(SET CMP0123 NEW)
 
 set(CMAKE_SYSTEM_NAME Generic)
 
-set(ARMCLANG_PATH "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/bin")
-
-set(CMAKE_C_COMPILER "${ARMCLANG_PATH}/arm-none-eabi-gcc.exe")
-set(CMAKE_CXX_COMPILER "${ARMCLANG_PATH}/arm-none-eabi-g++.exe")
+# Try to find arm-none-eabi-gcc in PATH first (Linux CI)
+find_program(ARM_NONE_EABI_GCC arm-none-eabi-gcc)
+if(ARM_NONE_EABI_GCC)
+    set(CMAKE_C_COMPILER arm-none-eabi-gcc)
+    set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
+    message(STATUS "Using arm-none-eabi-gcc from PATH: ${ARM_NONE_EABI_GCC}")
+else()
+    # Fallback to Windows path for local development
+    set(ARMCLANG_PATH "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/bin")
+    set(CMAKE_C_COMPILER "${ARMCLANG_PATH}/arm-none-eabi-gcc.exe")
+    set(CMAKE_CXX_COMPILER "${ARMCLANG_PATH}/arm-none-eabi-g++.exe")
+    message(STATUS "Using arm-none-eabi-gcc from Windows path: ${ARMCLANG_PATH}")
+endif()
 
 
 set(CMAKE_CXX_STANDARD 11)

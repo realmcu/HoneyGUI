@@ -1,0 +1,99 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-scons:
+    name: SCons Build (Linux Sim)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev python3-pip python-is-python3
+          pip install scons kconfiglib
+
+      - name: Build with SCons
+        run: cd win32_sim && scons -j$(nproc)
+
+      - name: Verify binary
+        run: ls -lh win32_sim/gui
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-binary
+          path: win32_sim/gui
+          retention-days: 30
+
+  # CMake build is Windows/MinGW-only (links mingw32, gdi32, etc.)
+  # Skipped on Linux CI - use SCons build instead
+
+  lint:
+    name: Static Analysis (cppcheck)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install cppcheck
+        run: sudo apt-get install -y cppcheck
+
+      - name: Run cppcheck on realgui/
+        run: |
+          cppcheck --enable=warning,performance,portability \
+                   --suppress=missingIncludeSystem \
+                   --error-exitcode=1 \
+                   -I realgui/engine \
+                   -I realgui/widget \
+                   -I realgui/core \
+                   -I realgui/server \
+                   realgui/ 2>&1 | head -200
+
+  test:
+    name: Widget Tests
+    runs-on: ubuntu-22.04
+    needs: [build-scons]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev python3-pip xvfb python-is-python3
+          pip install scons kconfiglib
+
+      - name: Build
+        run: cd win32_sim && scons -j$(nproc)
+
+      - name: Run widget tests
+        run: |
+          cd example/test
+          xvfb-run -a python test_widgets.py 2>&1
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: example/test/test_report.txt
+          retention-days: 30

@@ -1,0 +1,131 @@
+name: Build Libraries
+
+on:
+  push:
+    branches: [master]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-gcc-lib:
+    name: libgui.a (host GCC)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip cmake gcc g++ python-is-python3
+          pip install kconfiglib
+
+      - name: Build static library
+        run: |
+          cd lib/gcc
+          mkdir -p build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          make -j$(nproc) install
+
+      - name: Pack library and headers
+        run: |
+          mkdir -p /tmp/hgui-libs/gcc
+          cp -r lib/gcc/install/lib /tmp/hgui-libs/gcc/
+          cp -r lib/gcc/install/include /tmp/hgui-libs/gcc/
+          cd /tmp && tar czf hgui-libs-gcc.tar.gz hgui-libs/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hgui-libs-gcc
+          path: /tmp/hgui-libs-gcc.tar.gz
+          retention-days: 90
+
+  build-arm-none-eabi:
+    name: libgui.a (arm-none-eabi-gcc)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip cmake gcc-arm-none-eabi python-is-python3
+          pip install kconfiglib
+
+      - name: Diagnostic - locate toolchain
+        run: |
+          echo "=== arm-none-eabi-gcc location ==="
+          which arm-none-eabi-gcc || echo "NOT IN PATH"
+          echo "=== Installed packages ==="
+          dpkg -l 2>/dev/null | grep -i arm-none-eabi || echo "No arm-none-eabi package found"
+          echo "=== Search apt for arm-none-eabi ==="
+          apt-cache search arm-none-eabi 2>/dev/null || echo "No apt results"
+          echo "=== Compiler test ==="
+          arm-none-eabi-gcc --version 2>&1 || echo "COMPILER NOT AVAILABLE"
+
+      - name: Patch CMakeLists.txt for Linux CI (hardcoded Windows paths)
+        run: |
+          cd lib/arm-none-eabi-gcc
+          sed -i 's|arm-none-eabi-gcc.exe|arm-none-eabi-gcc|g' CMakeLists.txt
+          sed -i 's|arm-none-eabi-g++.exe|arm-none-eabi-g++|g' CMakeLists.txt
+          sed -i 's|C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/bin|/usr/bin|' CMakeLists.txt
+          echo "Patched:"
+          grep -n "COMPILER\|CLANG_PATH" CMakeLists.txt | head -5
+
+      - name: Build for all SOC targets
+        run: |
+          TARGET_DIR=/tmp/hgui-libs-arm-none-eabi
+          mkdir -p $TARGET_DIR
+          for soc in RTL8762G RTL8763D RTL8763E RTL8773E; do
+            echo "=== Building for $soc ==="
+            cd lib/arm-none-eabi-gcc
+            rm -rf build && mkdir -p build && cd build
+            cmake .. -DSOC=$soc -DCMAKE_BUILD_TYPE=Release
+            make -j$(nproc) install
+            mkdir -p $TARGET_DIR/$soc
+            cp -r ../install/* $TARGET_DIR/$soc/
+            cd ../../..
+          done
+          echo "=== All SOC builds complete ==="
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hgui-libs-arm-none-eabi-gcc
+          path: /tmp/hgui-libs-arm-none-eabi/
+          retention-days: 90
+
+  trigger-design-ci:
+    name: Trigger honeygui-design CI
+    needs: [build-gcc-lib]
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Repository Dispatch to honeygui-design
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          curl -s -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            https://api.github.com/repos/realmcu/honeygui-design/dispatches \
+            -d '{
+              "event_type": "hgui-libs-updated",
+              "client_payload": {
+                "sha": "${{ github.sha }}",
+                "run_id": "${{ github.run_id }}",
+                "ref": "master"
+              }
+            }'
+          echo "Successfully triggered honeygui-design CI with event: hgui-libs-updated"
