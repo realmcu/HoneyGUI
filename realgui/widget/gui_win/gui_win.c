@@ -57,7 +57,12 @@ static void prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_UP_SLIDE_QUICK, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
     matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);
+
     if (obj->need_preprocess && blur_prepare != NULL)
     {
         int16_t x1 = (int16_t)obj->matrix->m[0][2];
