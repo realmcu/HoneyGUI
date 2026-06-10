@@ -44,15 +44,8 @@ static void clear_activity(gui_view_t *view);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = activity_design,
-    .on_switch_out = clear_activity,
-};
+
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, activity_design, clear_activity);
 
 extern char *cjson_content;
 static uint8_t *img_data = NULL;
@@ -67,13 +60,6 @@ static char stand_content[30] = {0};
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static void clear_activity(gui_view_t *view)
 {
@@ -129,17 +115,17 @@ static void arc_activity_cb(NVGcontext *vg)
                 stand_val = stand->valueint;
 
                 {
-                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "move_text", current_view);
+                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "move_text", current_view_line_48);
                     sprintf(move_content, "Move:%d/20000steps", move_val);
                     gui_text_content_set((gui_text_t *)obj, move_content, strlen(move_content));
                 }
                 {
-                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "ex_text", current_view);
+                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "ex_text", current_view_line_48);
                     sprintf(ex_content, "Exercise:%d/60min", ex_val);
                     gui_text_content_set((gui_text_t *)obj, ex_content, strlen(ex_content));
                 }
                 {
-                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "stand_text", current_view);
+                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "stand_text", current_view_line_48);
                     sprintf(stand_content, "Stand:%d/30times", stand_val);
                     gui_text_content_set((gui_text_t *)obj, stand_content, strlen(stand_content));
                 }
@@ -206,7 +192,7 @@ static void arc_activity_cb(NVGcontext *vg)
 static void activity_timer_cb(void *obj)
 {
     (void)obj;
-    if (current_view->current_transition_style < SWITCH_OUT_NONE_ANIMATION &&
+    if (gui_view_get_current()->current_transition_style < SWITCH_OUT_NONE_ANIMATION &&
         gui_view_get_next() != NULL)
     {
         return;

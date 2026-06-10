@@ -31,32 +31,10 @@
  *                                  C Interface
  *============================================================================*/
 extern "C" {
-    static gui_view_t *current_view = NULL;
-    static void *current_snapshot_data = NULL;
-
     static void app_box2d_ring_ui_design(gui_view_t *view);
     static void close_box2d_ring(gui_view_t *view);
 
-    static gui_view_descriptor_t const descriptor =
-    {
-        /* change Here for current view */
-        .name = (const char *)CURRENT_VIEW_NAME,
-        .pView = &current_view,
-        .on_switch_in = app_box2d_ring_ui_design,
-        .on_switch_out = close_box2d_ring,
-        .keep = 0,
-        .use_snapshot = 0,
-        .snapshot_data = &current_snapshot_data,
-    };
-
-    static int gui_view_descriptor_register_init(void)
-    {
-        gui_view_descriptor_register(&descriptor);
-        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-        return 0;
-    }
-    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
+    GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_box2d_ring_ui_design, close_box2d_ring);
 }
 /*============================================================================*
  *                             C++ Namespace
@@ -341,7 +319,7 @@ static void canvas_callback(NVGcontext *vg)
 static void render()
 {
     count = 0;
-    gui_rect_create((gui_obj_t *)current_view, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+    gui_rect_create((gui_obj_t *)gui_view_get_current(), 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
                     gui_rgba(255, 255, 255, 255));
 
     // Draw balls
@@ -358,7 +336,7 @@ static void render()
 
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
                                           BALL_RADIUS * 2, canvas_callback, img_data);
-        gui_img_t *img = gui_img_create_from_mem((gui_obj_t *)current_view, 0, (void *)img_data,
+        gui_img_t *img = gui_img_create_from_mem((gui_obj_t *)gui_view_get_current(), 0, (void *)img_data,
                                                  ballX - BALL_RADIUS,
                                                  ballY - BALL_RADIUS, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);

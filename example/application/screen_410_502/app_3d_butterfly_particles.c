@@ -58,16 +58,7 @@ static void free_particles_resources(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = butterfly_particle_app,
-    .on_switch_out = free_particles_resources,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, butterfly_particle_app, free_particles_resources);
 
 /* Butterfly Design */
 gui_img_t *butterfly_wing1 = NULL;
@@ -109,15 +100,6 @@ static char date_text_content[10];
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static int x_to_screen_w(float butterfly_x)
 {
     float a = 30.0f;   //left fish's max x (most left)
@@ -483,23 +465,23 @@ static void time_update_cb(void *p)
 
     extern struct tm *timeinfo;
 #endif
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "date_text", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "date_text", gui_view_get_current());
     sprintf(date_text_content, "%s %d", day[timeinfo->tm_wday], timeinfo->tm_mday);
     gui_text_content_set((gui_text_t *)text, date_text_content, strlen(date_text_content));
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
                     ((gui_img_t *)img_hour_decimal)->storage_type);
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
                     ((gui_img_t *)img_hour_single)->storage_type);
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_minute_decimal,
                     text_num_array[timeinfo->tm_min / 10], ((gui_img_t *)img_minute_decimal)->storage_type);
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
                     ((gui_img_t *)img_minute_single)->storage_type);
 }

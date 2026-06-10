@@ -53,18 +53,7 @@ static void clear_mem(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_call_dail_design,
-    .on_switch_out = clear_mem,
-
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_call_dail_design, clear_mem);
 
 static gui_win_t *win_call_dail = NULL;
 
@@ -76,15 +65,6 @@ static uint8_t *img_data = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
 static void clear_mem(gui_view_t *view)
 {
     (void)view;
@@ -141,7 +121,7 @@ static void call_wait_cb(void *p)
             gui_update_call_number(dial_number_display);
 
             extern void app_calling_design(gui_obj_t *parent);
-            app_calling_design(GUI_BASE(current_view));
+            app_calling_design(GUI_BASE(gui_view_get_current()));
             gui_obj_tree_free_async(GUI_BASE(img)->parent);
         }
     }
@@ -157,7 +137,7 @@ static void win_scroll_cb(void *obj, gui_event_t *e)
 
 static void app_call_wait_design(void)
 {
-    gui_win_t *win_call_wait = gui_win_create(current_view, "win_call_wait", 0, 0, 0, 0);
+    gui_win_t *win_call_wait = gui_win_create(gui_view_get_current(), "win_call_wait", 0, 0, 0, 0);
     gui_obj_add_event_cb(GUI_BASE(win_call_wait), win_scroll_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL,
                          NULL); // Disable view horizontal scroll
     gui_obj_add_event_cb(GUI_BASE(win_call_wait), win_scroll_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL,
@@ -219,7 +199,7 @@ static void click_number_tab_cb(void *o, gui_event_t *e)
     {
         dial_number_display++;
     }
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "dial_number", current_view)
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "dial_number", gui_view_get_current())
     gui_text_content_set((gui_text_t *)text, dial_number_display, strlen(dial_number_display));
 }
 
@@ -240,7 +220,7 @@ static void click_back_cb(void *o, gui_event_t *e)
     {
         dial_number_display--;
     }
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "dial_number", current_view)
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "dial_number", gui_view_get_current())
     gui_text_content_set((gui_text_t *)text, dial_number_display, strlen(dial_number_display));
 }
 

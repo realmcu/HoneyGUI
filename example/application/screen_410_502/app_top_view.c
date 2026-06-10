@@ -41,15 +41,7 @@ static void top_view_design(gui_view_t *view);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = top_view_design,
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, top_view_design, NULL);
 
 static gui_list_t *list;
 static gui_rounded_rect_t *canvas_clear;
@@ -62,13 +54,6 @@ static uint16_t view_more_cnt = 0; // for view_more animation
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 
 static void cancel_cb(void *p)
@@ -146,7 +131,8 @@ static void create_view_more(void *obj, gui_event_t *e)
     const char *time = inform->time;
     app_name app = inform->app;
 
-    gui_win_t *win = gui_win_create(current_view, "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
+    gui_win_t *win = gui_win_create(gui_view_get_current(), "win_view_more", -SCREEN_WIDTH, 0,
+                                    SCREEN_WIDTH,
                                     SCREEN_HEIGHT);
     gui_obj_create_timer(GUI_BASE(win), 20, true, view_more_cb);
     gui_obj_add_event_cb(GUI_BASE(win), (gui_event_cb_t)view_more_event_cb,
@@ -401,13 +387,13 @@ static void list_timer_cb(void *param)
     static uint8_t local_infor_num = 0;
     gui_view_t *next_view = gui_view_get_next();
     if (!note_dur_animation && !clear_flag &&
-        (next_view == current_view || next_view == NULL) && local_infor_num != infor_num)
+        (next_view == current_view_line_44 || next_view == NULL) && local_infor_num != infor_num)
     {
         gui_list_set_note_num(list, infor_num);
         local_infor_num = infor_num;
     }
 
-    if (current_view != gui_view_get_current())
+    if (current_view_line_44 != gui_view_get_current())
     {
         gui_node_list_t *node = NULL;
         gui_list_for_each(node, &(list->base.child_list))

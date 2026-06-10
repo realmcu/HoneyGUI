@@ -50,33 +50,13 @@ static void cleanup_resources(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_firefly_design,
-    .on_switch_out = cleanup_resources,
-
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_firefly_design, cleanup_resources);
 
 #define MAX_FIREFLY 20
 static Firefly fireflys[MAX_FIREFLY];
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
 static void update_all_fireflys(void *param)
 {
     (void)param;

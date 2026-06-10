@@ -76,15 +76,7 @@ static void switch_app_glass(void *obj, gui_event_t *e);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = app_menu_design,
-    .on_switch_out = clear_menu,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_menu_design, clear_menu);
 
 extern uint8_t menu_style;
 static int16_t list_offset_his = 0;
@@ -138,21 +130,12 @@ static const char *text_array[] =
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void switch_app_box2d_ring(void *obj, gui_event_t *e)
 {
     (void)obj;//not used
     (void)e;
 
-    gui_view_switch_direct(current_view, "box2d_ring_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "box2d_ring_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -161,7 +144,7 @@ static void switch_app_fruit_ninja(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "fruit_ninja_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "fruit_ninja_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -170,7 +153,7 @@ static void switch_app_heart_rate(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "heartrate_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "heartrate_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -179,7 +162,7 @@ static void switch_app_music(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "music_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "music_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -188,7 +171,7 @@ static void switch_app_activity(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "activity_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "activity_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -197,7 +180,7 @@ static void switch_app_soccer(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "soccer_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "soccer_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -206,7 +189,7 @@ static void switch_app_flower(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "flower_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "flower_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -215,7 +198,7 @@ static void switch_app_weather(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "weather_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "weather_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -224,7 +207,7 @@ static void switch_app_butterfly(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "butterfly_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "butterfly_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -233,7 +216,7 @@ static void switch_app_applist(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "applist_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "applist_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -242,7 +225,7 @@ static void switch_app_disc(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "disc_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "disc_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -251,7 +234,7 @@ static void switch_app_glass(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "glass_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "glass_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -261,10 +244,10 @@ static void switch_app_face(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "face_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "face_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
-    gui_obj_hidden(GUI_BASE(current_view), true);
+    gui_obj_hidden(GUI_BASE(gui_view_get_current()), true);
 }
 
 static void switch_app_earth(void *obj, gui_event_t *e)
@@ -272,7 +255,7 @@ static void switch_app_earth(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "earth_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "earth_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -282,7 +265,7 @@ static void switch_app_robot(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "robot_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "robot_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -292,7 +275,7 @@ static void switch_app_flag(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "flag_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "flag_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -302,7 +285,7 @@ static void switch_app_prism_thick(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "prism_thick_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "prism_thick_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -311,7 +294,7 @@ static void switch_app_prism_mirror(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "prism3d_mirror_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "prism3d_mirror_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -321,7 +304,7 @@ static void switch_app_windmill(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "windmill_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "windmill_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -330,7 +313,7 @@ static void switch_app_pandkoi(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "pandkoi_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "pandkoi_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_seawater(void *obj, gui_event_t *e)
@@ -338,7 +321,7 @@ static void switch_app_seawater(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "seawater_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "seawater_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_firefly(void *obj, gui_event_t *e)
@@ -346,7 +329,7 @@ static void switch_app_firefly(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "firefly_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "firefly_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_rainbow_digital(void *obj, gui_event_t *e)
@@ -354,7 +337,7 @@ static void switch_app_rainbow_digital(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "rainbow_digital_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "rainbow_digital_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_koiclock(void *obj, gui_event_t *e)
@@ -362,7 +345,7 @@ static void switch_app_koiclock(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "koiclock_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "koiclock_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_digital_clock(void *obj, gui_event_t *e)
@@ -370,7 +353,7 @@ static void switch_app_digital_clock(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "digital_clock_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "digital_clock_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_countdown(void *obj, gui_event_t *e)
@@ -378,7 +361,7 @@ static void switch_app_countdown(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "box2d_countdown_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "box2d_countdown_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_firework(void *obj, gui_event_t *e)
@@ -386,7 +369,7 @@ static void switch_app_firework(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "fireworks_clock_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "fireworks_clock_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -395,7 +378,7 @@ static void switch_app_heart_particle(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "heart_particle_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "heart_particle_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -404,7 +387,7 @@ static void switch_app_butterfly_particle(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "butterfly_particle_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "butterfly_particle_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 static void switch_app_butterflys(void *obj, gui_event_t *e)
@@ -412,7 +395,7 @@ static void switch_app_butterflys(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "butterflys_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "butterflys_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -421,7 +404,7 @@ static void switch_app_earth_clock(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "earth_clock_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "earth_clock_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -431,7 +414,7 @@ static void switch_app_cast(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "cast_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "cast_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -441,7 +424,7 @@ static void switch_app_labubu_digital(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "labubu_digital_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "labubu_digital_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -450,7 +433,7 @@ static void switch_app_flower_clock(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "flower_clock_view", SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), "flower_clock_view", SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -460,7 +443,7 @@ static void switch_app_rainbow_analog(void *obj, gui_event_t *e)
     (void)obj;
     (void)e;
 
-    gui_view_switch_direct(current_view, "rainbow_analog_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "rainbow_analog_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -472,12 +455,12 @@ static void switch_menu_style_cb(void *obj, gui_event_t *e)
 
     if (gui_view_get_next() != NULL) { return; }
 
-    gui_obj_t *parent = GUI_BASE(current_view)->parent;
-    gui_obj_tree_free(GUI_BASE(current_view));
-    clear_menu(current_view);
+    gui_obj_t *parent = GUI_BASE(gui_view_get_current())->parent;
+    gui_obj_tree_free(GUI_BASE(gui_view_get_current()));
+    clear_menu(gui_view_get_current());
 
     menu_style = (menu_style + 1) % 2;
-    gui_view_create(parent, descriptor.name, 0, 0, 0, 0);
+    gui_view_create(parent, CURRENT_VIEW_NAME, 0, 0, 0, 0);
 }
 
 static void list_timer_cb(void *obj)

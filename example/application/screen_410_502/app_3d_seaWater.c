@@ -58,19 +58,7 @@ static void cleanup_resources(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_wave_nums_design,
-    .on_switch_out = cleanup_resources,
-
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_wave_nums_design, cleanup_resources);
 
 /* Gui Obj */
 static gui_canvas_t *canvas_wave = NULL;
@@ -107,18 +95,9 @@ static uint32_t fish_last_bubble_time[4] = {0};
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void return_to_menu(void)
 {
-    gui_view_switch_direct(current_view, "menu_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "menu_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 

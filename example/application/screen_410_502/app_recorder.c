@@ -44,15 +44,7 @@ static void create_recorder(gui_view_t *view);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = create_recorder,
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_recorder, NULL);
 
 static gui_win_t *win_recorder = NULL;
 static uint32_t record_time = 0;
@@ -81,15 +73,6 @@ static record_infor_t record_infor[RECORD_NUM_MAX] =
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void format_time(uint32_t seconds, char *str)
 {
     uint32_t h = seconds / 3600;
@@ -278,7 +261,7 @@ static void create_recorder_play(void)
         format_time(record_infor[play_index].time, file_time_str);
     }
 
-    win_play = gui_win_create(current_view, "win_play", 0, 0, 0, 0);
+    win_play = gui_win_create(gui_view_get_current(), "win_play", 0, 0, 0, 0);
     gui_obj_add_event_cb(GUI_BASE(win_play), win_scroll_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL,
                          NULL); // Disable view horizontal scroll
     gui_obj_add_event_cb(GUI_BASE(win_play), win_scroll_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL,

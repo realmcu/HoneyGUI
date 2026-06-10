@@ -38,15 +38,7 @@ static void clear_heartrate_cache(gui_view_t *view);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = heartrate_design,
-    .on_switch_out = clear_heartrate_cache,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, heartrate_design, clear_heartrate_cache);
 
 static gui_win_t *win_hb = NULL;
 static uint8_t *img_data = NULL;
@@ -59,15 +51,6 @@ extern uint8_t json_refresh_flag;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void draw_line_chart(NVGcontext *vg, float *samples)
 {
     float x = 36.0f;

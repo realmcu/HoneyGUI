@@ -45,16 +45,7 @@ extern void clear_watchface_classic(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* VIEW */
-static gui_view_t *current_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = watchface_design,
-    .on_switch_out = clear_watchface_classic,
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, watchface_design, clear_watchface_classic);
 
 bool menu_style = 0;
 char *cjson_content = NULL;
@@ -81,14 +72,6 @@ static gui_audio_ctrl_t gui_audio_info = {0};
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
 
 static void gui_fps_cb(void *p)
 {

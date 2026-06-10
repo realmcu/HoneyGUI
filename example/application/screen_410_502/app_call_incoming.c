@@ -45,19 +45,9 @@ void app_calling_design(gui_obj_t *parent);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *last_view = NULL;
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
 
-    .on_switch_in = app_call_incoming_design,
-    .on_switch_out = NULL,
-
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_call_incoming_design, NULL);
 
 static gui_win_t *win_call_in = NULL;
 
@@ -68,14 +58,6 @@ static uint32_t call_time = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static void format_time(uint32_t seconds, char *str)
 {
@@ -139,9 +121,9 @@ static void click_call_end_cb(void *obj, gui_event_t *e)
         call->call_end();
     }
 
-    if (current_view)
+    if (strcmp(gui_view_get_current()->base.name, CURRENT_VIEW_NAME) == 0)
     {
-        gui_view_switch_direct(current_view, last_view->name, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(gui_view_get_current(), last_view->name, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
     else
@@ -161,7 +143,7 @@ static void click_call_incoming_cb(void *obj, gui_event_t *e)
         call->call_start();
     }
 
-    app_calling_design(GUI_BASE(current_view));
+    app_calling_design(GUI_BASE(gui_view_get_current()));
     gui_obj_hidden(GUI_BASE(win_call_in), true);
 }
 

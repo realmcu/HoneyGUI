@@ -51,19 +51,7 @@ static void app_ui_koiclock_design(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 
-static gui_view_t *current_view = NULL;
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_koiclock_design,
-    .on_switch_out = NULL,
-
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_koiclock_design, NULL);
 
 /* Fish Position*/
 static Fish_Pos fish_pos[FISH_COUNT];
@@ -82,15 +70,6 @@ static float wave_opa = 255.0f;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void fish_pos_init(void)
 {
     const float initial_angles[FISH_COUNT] = {0, 45, 240};

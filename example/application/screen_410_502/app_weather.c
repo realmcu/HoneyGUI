@@ -44,15 +44,7 @@ static void weather_app(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = weather_app,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, weather_app, NULL);
 
 /* Weather List Management */
 static gui_list_t *weather_list;
@@ -73,15 +65,6 @@ static float leaf_rot_angle = 0.0f;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void update_panel_animation(void *param)
 {
     (void)param;
@@ -417,6 +400,6 @@ static void weather_app(gui_view_t *view)
     gui_list_set_offset(weather_list, -55);
     gui_list_set_note_num(weather_list, 8);
     gui_list_set_style(weather_list, LIST_ZOOM);
-    gui_win_t *weather_win = gui_win_create(current_view, "weather_win", 0, 0, 0, 0);
+    gui_win_t *weather_win = gui_win_create(gui_view_get_current(), "weather_win", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(weather_win), 10, true, update_weather_animation);
 }

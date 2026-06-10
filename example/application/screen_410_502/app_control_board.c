@@ -41,14 +41,7 @@ static void control_board_design(gui_view_t *view);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = control_board_design,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, control_board_design, NULL);
 
 static switch_state_t sw_state = {0};
 static gui_img_t *img_capsule_phone;
@@ -60,19 +53,11 @@ static gui_img_t *img_capsule_mute;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
 /* update switch display state */
 void switch_bt(bool state)
 {
     sw_state.sw_1 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_bt", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_bt", gui_view_get_current());
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_1)
     {
@@ -87,7 +72,7 @@ void switch_bt(bool state)
 void switch_local_play(bool state)
 {
     sw_state.sw_2 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_local_play", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_local_play", gui_view_get_current());
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_2)
     {
@@ -102,7 +87,7 @@ void switch_local_play(bool state)
 void switch_phone(bool state)
 {
     sw_state.sw_3 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_phone", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_phone", gui_view_get_current());
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_3)
     {
@@ -119,7 +104,7 @@ void switch_phone(bool state)
 void switch_earphone(bool state)
 {
     sw_state.sw_4 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_earphone", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_earphone", gui_view_get_current());
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_4)
     {
@@ -134,7 +119,7 @@ void switch_earphone(bool state)
 void switch_mute(bool state)
 {
     sw_state.sw_5 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_mute", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_mute", gui_view_get_current());
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_5)
     {
@@ -151,7 +136,7 @@ void switch_mute(bool state)
 void switch_nobother(bool state)
 {
     sw_state.sw_6 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_nobother", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_nobother", gui_view_get_current());
     gui_img_t *img = (gui_img_t *)obj;
     if (sw_state.sw_6)
     {

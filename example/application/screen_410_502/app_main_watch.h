@@ -14,6 +14,7 @@ extern "C" {
 #include "gui_view.h"
 #include "gui_obj_focus.h"
 #include "gui_components_init.h"
+#include "gui_view_instance.h"
 
 /*============================================================================*
  *                           Types

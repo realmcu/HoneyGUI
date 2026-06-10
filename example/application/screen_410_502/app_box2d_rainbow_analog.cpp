@@ -33,32 +33,10 @@
  *                                  C Interface
  *============================================================================*/
 extern "C" {
-    static gui_view_t *current_view = NULL;
-    static void *current_snapshot_data = NULL;
-
     static void app_rainbow_analog_ui_design(gui_view_t *view);
     static void app_close(gui_view_t *view);
 
-    static gui_view_descriptor_t const descriptor =
-    {
-        /* change Here for current view */
-        .name = (const char *)CURRENT_VIEW_NAME,
-        .pView = &current_view,
-        .on_switch_in = app_rainbow_analog_ui_design,
-        .on_switch_out = app_close,
-        .keep = 0,
-        .use_snapshot = 0,
-        .snapshot_data = &current_snapshot_data,
-    };
-
-    static int gui_view_descriptor_register_init(void)
-    {
-        gui_view_descriptor_register(&descriptor);
-        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-        return 0;
-    }
-    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
+    GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_rainbow_analog_ui_design, app_close);
 }
 
 /*============================================================================*

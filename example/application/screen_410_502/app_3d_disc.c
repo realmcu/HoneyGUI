@@ -36,16 +36,7 @@ static void disc_app(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = disc_app,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, disc_app, NULL);
 
 /* Animation Variables */
 static float rot_x_angle = 0.0f;
@@ -61,15 +52,6 @@ static bool is_playing = false;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void update_disc_animation(void *param)
 {
     (void)param;

@@ -28,31 +28,10 @@
  *                                  C Interface
  *============================================================================*/
 extern "C" {
-    static gui_view_t *current_view = NULL;
-    static void *current_snapshot_data = NULL;
-
     void app_box2d_time_ui_design(gui_view_t *view);
     static void clear_mem(gui_view_t *view);
 
-    static gui_view_descriptor_t const descriptor =
-    {
-        /* change Here for current view */
-        .name = (const char *)CURRENT_VIEW_NAME,
-        .pView = &current_view,
-        .on_switch_in = app_box2d_time_ui_design,
-        .on_switch_out = clear_mem,
-        .keep = 0,
-        .use_snapshot = 0,
-        .snapshot_data = &current_snapshot_data
-    };
-
-    static int gui_view_descriptor_register_init(void)
-    {
-        gui_view_descriptor_register(&descriptor);
-        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-        return 0;
-    }
-    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+    GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_box2d_time_ui_design, clear_mem);
 }
 
 /*============================================================================*
@@ -274,7 +253,7 @@ static void createNumber(int number)
         fixtureDef.restitution = PARTICLE_RESTITUTION;
         p->body->CreateFixture(&fixtureDef);
 
-        p->img = gui_img_create_from_mem(current_view, 0, p->img_data,
+        p->img = gui_img_create_from_mem(gui_view_get_current(), 0, p->img_data,
                                          (int)(pos.x - PARTICLE_RADIUS),
                                          (int)(pos.y - PARTICLE_RADIUS),
                                          0, 0);
@@ -388,13 +367,14 @@ static void app_box2d_cb(void *obj)
 
 static bool init()
 {
-    GUI_WIDGET_TRY_EXCEPT(current_view)
+    GUI_WIDGET_TRY_EXCEPT(gui_view_get_current())
 
-    gui_win_t *win = gui_win_create(current_view, "Countdown", 0, 0, screen_w, screen_h);
+    gui_win_t *win = gui_win_create(gui_view_get_current(), "Countdown", 0, 0, screen_w, screen_h);
     if (!win) { return false; }
 
     // background
-    gui_rect_create((gui_obj_t *)current_view, 0, 0, 0, screen_w, screen_h, 0, gui_rgb(30, 30, 30));
+    gui_rect_create((gui_obj_t *)gui_view_get_current(), 0, 0, 0, screen_w, screen_h, 0, gui_rgb(30, 30,
+                    30));
 
     gui_obj_create_timer(GUI_BASE(win), 16, true, app_box2d_cb);
     gui_obj_start_timer(GUI_BASE(win));
@@ -467,7 +447,7 @@ static int ui_design(gui_obj_t *obj)
 extern "C" {
     // static void return_cb()
     // {
-    //     gui_view_switch_direct(current_view, "menu_view", SWITCH_OUT_ANIMATION_FADE,
+    //     gui_view_switch_direct(gui_view_get_current(), "menu_view", SWITCH_OUT_ANIMATION_FADE,
     //                            SWITCH_IN_ANIMATION_FADE);
     // }
     // static void return_timer_cb(void *obj)

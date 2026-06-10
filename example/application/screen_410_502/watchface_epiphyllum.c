@@ -34,16 +34,7 @@ static void create_watchface_flower(gui_view_t *view);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = create_watchface_flower,
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_flower, NULL);
 
 #ifdef FLOWER_MJPG
 /* Time & Date */
@@ -59,15 +50,6 @@ static uint8_t flower_index = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void time_update_cb(void *p)
 {
     (void)p;
@@ -80,19 +62,19 @@ static void time_update_cb(void *p)
     extern struct tm *timeinfo;
 #endif
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
                     ((gui_img_t *)img_hour_decimal)->storage_type);
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
                     ((gui_img_t *)img_hour_single)->storage_type);
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
                     ((gui_img_t *)img_minute_decimal)->storage_type);
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", gui_view_get_current());
     gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
                     ((gui_img_t *)img_minute_single)->storage_type);
 }

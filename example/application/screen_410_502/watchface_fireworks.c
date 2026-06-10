@@ -52,19 +52,7 @@ static void firework_sim_cb(NVGcontext *vg);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_fireworks_design,
-    .on_switch_out = cleanup_resources,
-
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_fireworks_design, cleanup_resources);
 
 /* Draw Clock */
 static gui_img_t *current_img = NULL;
@@ -79,15 +67,6 @@ static uint8_t currentColorIndex = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void draw_hexagon(NVGcontext *vg, float centerX, float centerY, float radius,
                          float rotationAngle, NVGcolor color)
 {

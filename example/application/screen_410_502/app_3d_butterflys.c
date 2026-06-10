@@ -60,19 +60,7 @@ static void update_butterfly_wing_bg(gui_lite3d_t *lite3d_butterfly, gui_win_t *
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_butterflys_design,
-    .on_switch_out = free_particles_resources,
-
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_butterflys_design, free_particles_resources);
 
 /* Particle Window */
 static gui_win_t *butterfly_win[BUTTERFLY_COUNT] = {NULL};
@@ -91,18 +79,9 @@ static uint32_t last_particle_spawn = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void return_to_menu(void)
 {
-    gui_view_switch_direct(current_view, "menu_view", SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(gui_view_get_current(), "menu_view", SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 

@@ -31,16 +31,7 @@ static void digital_clock_app(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = digital_clock_app,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, digital_clock_app, NULL);
 
 /* 3D Digital Clock */
 static uint8_t *clock_fig_bin[10] = {0};
@@ -63,15 +54,6 @@ static float last_time = 0.0f;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void update_digital_clock_animation(void *param)
 {
     gui_lite3d_t *this = (gui_lite3d_t *)param;

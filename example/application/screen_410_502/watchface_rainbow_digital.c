@@ -65,15 +65,7 @@ static void rainbow_digital_app(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = rainbow_digital_app,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, rainbow_digital_app, NULL);
 
 /* Digit Layer Offsets */
 static const LayerOffset DEFAULT_LAYER_OFFSETS[5] =
@@ -109,15 +101,6 @@ static int reached_target_count = 0; // Counter for layers reaching the target
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 // Initialize a single digit
 static void init_digit(RainbowDigit *digit, gui_win_t *win, uint8_t *img_bin[5], int x_base,
                        int y_base)

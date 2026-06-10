@@ -56,17 +56,8 @@ static void prism_view_switch_to_other_view(void);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-
 static void app_ui_prism_mirror_design(gui_view_t *view);
-static const gui_view_descriptor_t descriptor =
-{
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = app_ui_prism_mirror_design,
-    .on_switch_out = NULL,
-    .keep = false,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_prism_mirror_design, NULL);
 
 /* Prism Animate */
 static Position_pos_t prism_world_pos_temp = {0.0f, 0.0f, 0.0f};
@@ -83,15 +74,6 @@ static bool enter_prism_view_flag = true;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-
 static void prism_mirror3d_update_angle_cb(void *param)
 {
     (void)param;
@@ -278,7 +260,7 @@ static void prism_view_switch_to_other_view()
 {
     if (face_flags_rotation >= 0 && face_flags_rotation < face_nums)
     {
-        gui_view_switch_direct(current_view, "image_view", SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(gui_view_get_current(), "image_view", SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }
