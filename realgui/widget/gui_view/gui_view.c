@@ -501,6 +501,7 @@ static void gui_view_save_common_data(gui_view_t *old_view, gui_view_t *new_view
     if (old_view == NULL || new_view == NULL || old_view == new_view) { return; }
     if (g_SnapShotPreCache == true)
     {
+        // Process all neighbors of old_view
         for (uint32_t i = 0; i < old_view->on_event_num; i++)
         {
             const gui_view_descriptor_t *nd = old_view->on_event[i]->descriptor;
@@ -523,6 +524,26 @@ static void gui_view_save_common_data(gui_view_t *old_view, gui_view_t *new_view
                 gui_free(*nd->snapshot_data);
                 *nd->snapshot_data = NULL;
                 // gui_log("%s free snapshot data\n", nd->name);
+            }
+        }
+
+        // Process old_view's snapshot data
+        if (old_view->descriptor->use_snapshot && *old_view->descriptor->snapshot_data != NULL)
+        {
+            bool shared = false;
+            for (uint32_t j = 0; j < new_view->on_event_num; j++)
+            {
+                if (new_view->on_event[j]->descriptor == old_view->descriptor)
+                {
+                    shared = true;
+                    break;
+                }
+            }
+            if (!shared)
+            {
+                gui_free(*old_view->descriptor->snapshot_data);
+                *old_view->descriptor->snapshot_data = NULL;
+                // gui_log("%s free snapshot data\n", old_view->descriptor->name);
             }
         }
     }
