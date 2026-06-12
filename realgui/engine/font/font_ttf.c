@@ -2312,6 +2312,14 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
                 out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET - bold_weight;
                 out_y0 = glyph_y0 / raster_prec + ROUNDING_OFFSET - bold_weight;
+#if ENABLE_FONT_V3_TYPO
+                if (typo_ctx.is_v3)
+                {
+                    /* V3: bearing already encoded in chr.x/chr.y, avoid double bearing */
+                    out_x0 = ROUNDING_OFFSET - bold_weight;
+                    out_y0 = ROUNDING_OFFSET - bold_weight;
+                }
+#endif /* ENABLE_FONT_V3_TYPO */
                 out_x1 = out_x0 + out_w - 1;
                 out_y1 = out_y0 + out_h - 1;
 

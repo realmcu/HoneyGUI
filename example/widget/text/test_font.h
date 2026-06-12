@@ -89,6 +89,7 @@ void text_measure_test(void);
 void text_clip_test(void);
 void text_font_typo_rendering_test(void);
 void text_font_fallback_test(void);
+void text_vector_scale_test(void);
 
 #ifdef __cplusplus
 }

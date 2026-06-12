@@ -83,6 +83,7 @@ void text_widget_example(void)
  * |12 | text_clip_test()                 | Partial text display using win clip (top/bottom/right/center)            |
  * |13 | text_font_typo_rendering_test()  | Typography rendering: bitmap + vector baseline/line-height (swipeable)   |
  * |14 | text_font_fallback_test()        | Mixed-language fallback: CJK+EN in one string with priority chain        |
+ * |15 | text_vector_scale_test()         | V3 vector font scaling: win-issued scale + text self-scale (looping)     |
  *
  * @return 0 on success
  */
@@ -104,6 +105,7 @@ static int app_init(void)
     // text_clip_test();                /* [12] Text clip/partial show */
     // text_font_typo_rendering_test(); /* [13] Typography bitmap+vec  */
     // text_font_fallback_test();       /* [14] Mixed-lang fallback    */
+    // text_vector_scale_test();        /* [15] Vector font scaling    */
 
     return 0;
 }
