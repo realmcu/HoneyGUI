@@ -17,17 +17,10 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *left_view = NULL;
 
 static void ui_typo_vector(gui_view_t *view);
-static const gui_view_descriptor_t descriptor =
-{
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = ui_typo_vector,
-    .on_switch_out = NULL,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, ui_typo_vector, NULL);
 
 static char *multiline_text =
     "The quick brown fox\n"
@@ -40,12 +33,6 @@ static char *multiline_text =
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static int gui_view_get_other_view_descriptor_init(void)
 {

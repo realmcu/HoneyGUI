@@ -40,19 +40,11 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *left_view = NULL;
 static const gui_view_descriptor_t *right_view = NULL;
 
 static void ui_text_font(gui_view_t *view);
-static const gui_view_descriptor_t descriptor =
-{
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = ui_text_font,
-    .on_switch_out = NULL,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, ui_text_font, NULL);
 static char *text_string[FONT_NUM] =
 {
     "LEFT",
@@ -77,12 +69,6 @@ static TEXT_MODE text_mode[FONT_NUM] =
  *                           Private Functions
  *============================================================================*/
 
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static int gui_view_get_other_view_descriptor_init(void)
 {
@@ -123,6 +109,6 @@ static void ui_text_font(gui_view_t *view)
  */
 void text_font_layout_test(void)
 {
-    gui_view_create(gui_obj_get_root(), descriptor.name, 0, 0, 0, 0);
+    gui_view_create(gui_obj_get_root(), CURRENT_VIEW_NAME, 0, 0, 0, 0);
 }
 
