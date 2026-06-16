@@ -210,16 +210,23 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
                 }
                 else
                 {
-                    if (abs_remainder > grid_size / 2)
+                    /* Flip threshold = how far the drag must leave the current note */
+                    uint8_t flip_num = 1;
+                    uint8_t flip_den = 2;
+                    int16_t r0 = remainder;
+                    if (r0 < 0) { r0 += grid_size; }
+                    int16_t base = _this->offset - r0;
+                    int16_t target;
+                    if (g_offset_increase > 0)
                     {
-
-                        distance = g_offset_increase * ((abs_remainder > half_grid) ? (grid_size - abs_remainder) :
-                                                        abs_remainder);
+                        target = (r0 * flip_den > grid_size * flip_num) ? (base + grid_size) : base;
                     }
                     else
                     {
-                        distance = -remainder;
+                        target = (r0 * flip_den < grid_size * (flip_den - flip_num)) ? base :
+                                 (base + grid_size);
                     }
+                    distance = target - _this->offset;
                 }
             }
 
