@@ -2171,6 +2171,18 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
                 mx_offset = chr[index].x - text->offset_x;
                 my_offset = chr[index].y - text->offset_y;
+#if ENABLE_FONT_V3_TYPO
+                if (typo_ctx.is_v3)
+                {
+                    /* V3: chr.x/chr.y are the glyph bbox top-left (bearing applied).
+                     * The windings below re-add the glyph's own bearing through
+                     * scale*glyphData->x0/y0, so shift the origin back to the pen
+                     * position / baseline to avoid double-counting bearing.
+                     * (bearing_x = round(x0*scale), bearing_y = round(-y0*scale)) */
+                    mx_offset -= chr[index].bearing_x;
+                    my_offset += chr[index].bearing_y;
+                }
+#endif /* ENABLE_FONT_V3_TYPO */
 
                 computeBoundingBoxFloatV2(mx_offset + glyph_x0, my_offset + glyph_y0,
                                           mx_offset + glyph_x1, my_offset + glyph_y1,
