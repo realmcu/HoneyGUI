@@ -360,7 +360,7 @@ void gui_obj_get_area(gui_obj_t *obj,
     matrix_multiply_point(obj->matrix, p + 2);
     matrix_multiply_point(obj->matrix, p + 3);
 
-    for (uint8_t i = 1; i < 3; i++)
+    for (uint8_t i = 1; i < 4; i++)
     {
         gui_point3f_t *point = p + i;
 
