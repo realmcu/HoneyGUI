@@ -138,7 +138,7 @@ typedef struct _gui_obj_t
     //start of run time
     void (* obj_cb)(struct _gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
     //end of run time
-    T_OBJ_TYPE type;                            //no need this , only use name
+    uint32_t type                       : 8;    // T_OBJ_TYPE; no need this, only use name
     uint32_t active                     : 1;    // this_widget flag means obj location in screen
     uint32_t not_show                   : 1;
 
