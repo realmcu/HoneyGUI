@@ -36,7 +36,7 @@ FONT_LIB_NODE *gui_font_lib_find(uint8_t *font_file)
     return NULL;
 }
 
-FONT_LIB_NODE *gui_font_lib_find_by_size(uint8_t font_size, FONT_SRC_TYPE font_type)
+FONT_LIB_NODE *gui_font_lib_find_by_size(uint16_t font_size, FONT_SRC_TYPE font_type)
 {
     FONT_LIB_NODE *node = font_lib_head;
     while (node != NULL)
@@ -51,7 +51,7 @@ FONT_LIB_NODE *gui_font_lib_find_by_size(uint8_t font_size, FONT_SRC_TYPE font_t
 }
 
 FONT_LIB_NODE *gui_font_lib_register(uint8_t *font_file,
-                                     uint8_t font_size,
+                                     uint16_t font_size,
                                      FONT_SRC_MODE src_mode,
                                      FONT_SRC_TYPE font_type,
                                      uint8_t *cached_data,

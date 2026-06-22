@@ -19,7 +19,7 @@
 
 FONT_LIB_NODE *get_fontlib_by_size(uint16_t font_size)
 {
-    FONT_LIB_NODE *node = gui_font_lib_find_by_size((uint8_t)font_size, GUI_FONT_SRC_BMP);
+    FONT_LIB_NODE *node = gui_font_lib_find_by_size(font_size, GUI_FONT_SRC_BMP);
     if (node != NULL)
     {
         return node;
@@ -492,7 +492,7 @@ static uint32_t load_emoji(mem_char_t *chr, gui_text_t *text,
  */
 static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
                                 FONT_SRC_MODE src_mode, uint32_t unicode,
-                                uint8_t font_size, mem_char_t *out_chr,
+                                uint16_t font_size, mem_char_t *out_chr,
                                 int32_t *out_line_byte)
 {
     GUI_FONT_HEAD_BMP *font;
@@ -591,9 +591,9 @@ static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
     else
     {
         /* Non-crop */
-        uint8_t aliened = font_size;
-        if (font_size % 8 != 0) { aliened = 8 - font_size % 8 + font_size; }
-        uint32_t font_area = aliened * font_size / 8 * render_mode + 4;
+        uint16_t aliened = font_size;
+        if (font_size % 8 != 0) { aliened = (uint16_t)(8 - font_size % 8 + font_size); }
+        uint32_t font_area = (uint32_t)aliened * font_size / 8 * render_mode + 4;
         uintptr_t dot_offset_base = table_offset + font->index_area_size;
 
         int32_t index;
@@ -643,7 +643,7 @@ static int font_bmp_lookup_char(uint8_t *font_file, FONT_LIB_NODE *node,
  * Iterates font_lib nodes with matching font_size, ordered by priority,
  * skipping the primary font.
  */
-int gui_font_bmp_fallback_search(uint32_t unicode, uint8_t font_size,
+int gui_font_bmp_fallback_search(uint32_t unicode, uint16_t font_size,
                                  uint8_t *skip_file, mem_char_t *out_chr,
                                  int32_t *out_line_byte)
 {
@@ -2158,7 +2158,7 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
     gui_ftl_read((uintptr_t)font_bin_addr, data, head_index_len);
 
     /* Register to font_lib_manager */
-    node = gui_font_lib_register(font_bin_addr, font->font_size, FONT_SRC_FTL,
+    node = gui_font_lib_register(font_bin_addr, gui_font_bmp_font_size(font), FONT_SRC_FTL,
                                  GUI_FONT_SRC_BMP, data, head_index_len);
     if (node == NULL)
     {
@@ -2241,7 +2241,7 @@ uint8_t gui_font_mem_init_fs(uint8_t *font_path)
     font = (GUI_FONT_HEAD_BMP *)data;
 
     /* Register to font_lib_manager */
-    node = gui_font_lib_register(font_path, font->font_size, FONT_SRC_FILESYS,
+    node = gui_font_lib_register(font_path, gui_font_bmp_font_size(font), FONT_SRC_FILESYS,
                                  GUI_FONT_SRC_BMP, data, head_index_len);
     if (node == NULL)
     {
@@ -2249,7 +2249,7 @@ uint8_t gui_font_mem_init_fs(uint8_t *font_path)
         return UINT8_MAX;
     }
 
-    gui_log("gui_font_mem_init_fs: loaded %s, size=%d\n", font_path, font->font_size);
+    gui_log("gui_font_mem_init_fs: loaded %s, size=%d\n", font_path, gui_font_bmp_font_size(font));
     return 0;
 }
 
@@ -2281,7 +2281,7 @@ uint8_t gui_font_mem_init(uint8_t *font_bin_addr)
     }
 
     /* Register to font_lib_manager (no cached data for MEM mode) */
-    node = gui_font_lib_register(font_bin_addr, font->font_size, FONT_SRC_MEMADDR,
+    node = gui_font_lib_register(font_bin_addr, gui_font_bmp_font_size(font), FONT_SRC_MEMADDR,
                                  GUI_FONT_SRC_BMP, NULL, 0);
     if (node == NULL)
     {
@@ -2316,16 +2316,17 @@ bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
         return false;
     }
 
-    /* V1 header - no typography extension */
-    if (header->version[0] < 3)
+    /* Typography extension exists only in V3.2+ fonts */
+    if (!gui_font_bmp_is_v32(header))
     {
         return false;
     }
 
     /*
-     * V3 extension fields are appended after font_name.
-     * Calculate the byte offset where extension starts:
-     *   head_length(1) + file_type(1) + version(4) + font_size(1) +
+     * V3.2 extension fields are appended after font_name.
+     * The fixed header is 14 bytes regardless of version, because
+     * version + font_size always spans 5 bytes (offset 2-6):
+     *   head_length(1) + file_type(1) + version(3) + font_size(2) +
      *   render_mode(1) + bitfield(1) + index_area_size(4) +
      *   font_name_length(1) + font_name(N) = 14 + font_name_length
      */
@@ -2355,7 +2356,7 @@ bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
 }
 
 gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *metrics,
-                                                 uint8_t font_size)
+                                                 uint16_t font_size)
 {
     gui_font_typo_layout_t layout = {0};
 
@@ -2379,7 +2380,7 @@ gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *
 }
 
 gui_font_typo_context_t gui_font_bmp_get_typo_context(const GUI_FONT_HEAD_BMP *header,
-                                                      uint8_t font_size)
+                                                      uint16_t font_size)
 {
     gui_font_typo_context_t ctx;
     memset(&ctx, 0, sizeof(ctx));
@@ -2395,7 +2396,7 @@ gui_font_typo_context_t gui_font_bmp_get_typo_context(const GUI_FONT_HEAD_BMP *h
     {
         ctx.is_v3 = false;
         ctx.baseline_px = 0;
-        ctx.default_line_height = (int16_t)font_size;
+        ctx.default_line_height = (int16_t)(font_size > 32767 ? 32767 : font_size);
     }
 
     return ctx;

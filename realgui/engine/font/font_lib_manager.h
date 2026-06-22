@@ -26,7 +26,7 @@ extern "C" {
 typedef struct FONT_LIB_NODE
 {
     uint8_t *font_file;             /**< Font file path or memory address */
-    uint8_t font_size;              /**< Font size in pixels (for BMP) or default size (for TTF) */
+    uint16_t font_size;             /**< Font size in pixels (for BMP) or default size (for TTF) */
     FONT_SRC_MODE src_mode;         /**< Font source: MEM/FTL/FS */
     FONT_SRC_TYPE font_type;        /**< Font type: BMP or TTF */
     uint8_t *cached_data;           /**< Cached header + index data */
@@ -73,7 +73,7 @@ FONT_LIB_NODE *gui_font_lib_find(uint8_t *font_file);
  * @param font_type Font type (BMP or TTF)
  * @return Pointer to font node, or NULL if not found
  */
-FONT_LIB_NODE *gui_font_lib_find_by_size(uint8_t font_size, FONT_SRC_TYPE font_type);
+FONT_LIB_NODE *gui_font_lib_find_by_size(uint16_t font_size, FONT_SRC_TYPE font_type);
 
 /**
  * @brief Register a font to the library (increase ref_count if exists)
@@ -87,7 +87,7 @@ FONT_LIB_NODE *gui_font_lib_find_by_size(uint8_t font_size, FONT_SRC_TYPE font_t
  * @return Pointer to font node, or NULL on failure
  */
 FONT_LIB_NODE *gui_font_lib_register(uint8_t *font_file,
-                                     uint8_t font_size,
+                                     uint16_t font_size,
                                      FONT_SRC_MODE src_mode,
                                      FONT_SRC_TYPE font_type,
                                      uint8_t *cached_data,

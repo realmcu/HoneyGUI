@@ -80,18 +80,28 @@ typedef struct
 typedef struct
 {
     uint8_t *font_file;
-    uint8_t font_size;
+    uint16_t font_size;
     FONT_SRC_MODE type;
     uint8_t *data;
 } MEM_FONT_LIB;
 
 #pragma pack(1)
+/*
+ * On-disk BMP font header. The byte layout is stable across all versions
+ * because "version + font_size" always spans 5 bytes (offset 2..6), so
+ * render_mode and every field after it keep identical offsets:
+ *   - V1/V2/V3.0 : version[4] (offset 2-5) + font_size uint8  (offset 6)
+ *   - V3.2+      : version[3] (offset 2-4) + font_size uint16  (offset 5-6, LE)
+ * The font_size member below is only valid for the legacy 1-byte layout.
+ * ALWAYS read the size via gui_font_bmp_font_size(); never touch the
+ * font_size member directly, since its offset/width depends on the version.
+ */
 typedef struct
 {
     uint8_t head_length;                /*font file head length*/
     uint8_t file_type;                  /*0x1-FONT_FILE_BMP_FLAG is font file*/
-    uint8_t version[4];                 /*version*/
-    uint8_t font_size;                  /*font size*/
+    uint8_t version[4];                 /*version: [0]=major [1]=minor [2]=revision*/
+    uint8_t font_size;                  /*legacy 1-byte size; use gui_font_bmp_font_size()*/
     uint8_t render_mode;                /*support 1/2/4/8*/
     uint8_t bold :          1;          /*bold*/
     uint8_t italic :        1;          /*italic*/
@@ -103,7 +113,38 @@ typedef struct
     uint8_t font_name_length;           /*length of font name*/
     uint8_t *font_name;
 } GUI_FONT_HEAD_BMP;
+
 #pragma pack()
+
+/**
+ * @brief Whether a BMP font header uses the V3.2+ typography layout.
+ *
+ * V3.2 introduced a 3-byte version followed by a uint16 font_size
+ * (offset 5-6) plus per-glyph bearing data. Everything older - including
+ * V1, V2 and the early V3.0 fonts - uses version[4] + uint8 font_size
+ * (offset 6). The discriminator is therefore "version >= 3.2.0".
+ */
+static inline bool gui_font_bmp_is_v32(const GUI_FONT_HEAD_BMP *header)
+{
+    const uint8_t *b = (const uint8_t *)header;
+    return (b[2] > 3) || (b[2] == 3 && b[3] >= 2);
+}
+
+/**
+ * @brief Read the font size from a BMP header, honoring the version layout.
+ *
+ * @param header Pointer to the BMP font header (raw bytes, any version).
+ * @return Font size in pixels (uint16; supports > 255 for V3.2+ fonts).
+ */
+static inline uint16_t gui_font_bmp_font_size(const GUI_FONT_HEAD_BMP *header)
+{
+    const uint8_t *b = (const uint8_t *)header;
+    if (gui_font_bmp_is_v32(header))
+    {
+        return (uint16_t)(b[5] | (b[6] << 8));   /* V3.2+: uint16 LE @ offset 5-6 */
+    }
+    return header->font_size;                     /* V1/V2/V3.0: uint8 @ offset 6 */
+}
 
 #if ENABLE_FONT_V3_TYPO
 /**
@@ -124,7 +165,7 @@ bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
  * @return Computed layout parameters.
  */
 gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *metrics,
-                                                 uint8_t font_size);
+                                                 uint16_t font_size);
 
 /**
  * @brief Build typography context from font header.
@@ -132,12 +173,12 @@ gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *
  * For V3 headers, populates all fields from extension data.
  * For V1 headers, returns is_v3=false with baseline_px=0 and default_line_height=font_size.
  *
- * @param header Pointer to the font header.
- * @param font_size Font size in pixels.
+ * @param header Pointer to the font header (raw bytes, any version).
+ * @param font_size Font size in pixels (uint16, supports > 255).
  * @return Typography context for layout use.
  */
 gui_font_typo_context_t gui_font_bmp_get_typo_context(const GUI_FONT_HEAD_BMP *header,
-                                                      uint8_t font_size);
+                                                      uint16_t font_size);
 #endif /* ENABLE_FONT_V3_TYPO */
 
 /**
@@ -257,7 +298,7 @@ void gui_font_get_dot_info(gui_text_t *text);
  * @param out_line_byte Output line byte width.
  * @return 0 on success, -1 if not found in any fallback BMP font.
  */
-int gui_font_bmp_fallback_search(uint32_t unicode, uint8_t font_size,
+int gui_font_bmp_fallback_search(uint32_t unicode, uint16_t font_size,
                                  uint8_t *skip_file, mem_char_t *out_chr,
                                  int32_t *out_line_byte);
 
