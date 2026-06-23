@@ -51,18 +51,18 @@ typedef struct
     int16_t w;
     int16_t h;
     uint8_t char_y;
-    uint8_t char_w;
-    uint8_t char_h;
-    uint8_t render_mode;        /**< bits-per-pixel (1/2/4/8), from source font (fills padding) */
+    uint8_t render_mode;        /**< bits-per-pixel (1/2/4/8), from source font */
+    uint16_t char_w;            /**< glyph width (pixels); 16-bit to match uint16 font_size */
+    uint16_t char_h;            /**< glyph height (pixels); 16-bit to match uint16 font_size */
     uint8_t *dot_addr;
     uint8_t *buf;
     void *emoji_img;
 
 #if ENABLE_FONT_V3_TYPO
     /* V3 bearing-based fields (zero-initialized for V1 glyphs) */
-    int8_t bearing_x;           /**< V3: horizontal bearing (pixels) */
-    int8_t bearing_y;           /**< V3: vertical bearing from baseline to glyph top (pixels) */
-    uint8_t advance;            /**< V3: horizontal advance width (pixels) */
+    int16_t bearing_x;          /**< V3: horizontal bearing (pixels) */
+    int16_t bearing_y;          /**< V3: vertical bearing from baseline to glyph top (pixels) */
+    uint16_t advance;           /**< V3: horizontal advance width (pixels) */
 #endif
 } mem_char_t;
 /* Memory char struct end */

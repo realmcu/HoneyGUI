@@ -340,9 +340,10 @@ static int load_dot_nocrop(mem_char_t *chr, uint8_t *font_path, FONT_LIB_NODE *n
 }
 
 /**
- * @brief Load V3 bearing-based glyph (6-byte header + tight bitmap).
+ * @brief Load V3 bearing-based glyph (10-byte header + tight bitmap).
  *
- * Header format: [bearingX(1), bearingY(1), width(1), height(1), advance(1), reserved(1)]
+ * Header format (all little-endian):
+ *   [bearingX(int16), bearingY(int16), width(uint16), height(uint16), advance(uint16)]
  * Bitmap: width x height pixels, packed by render_mode.
  *
  * @param chr          Output character struct (bearing_x, bearing_y, advance populated).
@@ -359,7 +360,7 @@ static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB
                                    FONT_SRC_MODE font_mode, uint32_t offset,
                                    uint8_t render_mode, int32_t *line_byte)
 {
-    const uint32_t hdr_size = sizeof(GUI_BMP_GLYPH_HEAD_V2); /* 6 bytes */
+    const uint32_t hdr_size = sizeof(GUI_BMP_GLYPH_HEAD_V2); /* 10 bytes */
 
     /* Try cache first */
     uint32_t cached_size = 0;
@@ -379,8 +380,8 @@ static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB
         return 0;
     }
 
-    /* Read 6-byte V3 glyph header */
-    uint8_t header[6];
+    /* Read V3 glyph header (sizeof keeps this in sync with the struct width) */
+    uint8_t header[sizeof(GUI_BMP_GLYPH_HEAD_V2)];
     if (font_mode == FONT_SRC_FTL)
     {
         gui_ftl_read((uintptr_t)font_path + offset, header, hdr_size);
@@ -409,7 +410,7 @@ static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB
     uint8_t *dot_buf = gui_malloc(dot_size);
     if (dot_buf == NULL) { return -1; }
 
-    /* Read tight bitmap data after 6-byte header */
+    /* Read tight bitmap data after the glyph header */
     if (font_mode == FONT_SRC_FTL)
     {
         gui_ftl_read((uintptr_t)font_path + offset + hdr_size, dot_buf, dot_size);
@@ -890,7 +891,7 @@ void gui_font_get_dot_info(gui_text_t *text)
 #if ENABLE_FONT_V3_TYPO
                         if (typo_ctx.is_v3)
                         {
-                            /* V3: read 6-byte bearing-based header directly from memory */
+                            /* V3: read 10-byte bearing-based header directly from memory */
                             GUI_BMP_GLYPH_HEAD_V2 *gh = (GUI_BMP_GLYPH_HEAD_V2 *)((uint8_t *)text->path + offset);
                             chr[chr_i].bearing_x = gh->bearing_x;
                             chr[chr_i].bearing_y = gh->bearing_y;
@@ -1002,7 +1003,7 @@ void gui_font_get_dot_info(gui_text_t *text)
 #if ENABLE_FONT_V3_TYPO
                             if (typo_ctx.is_v3)
                             {
-                                /* V3: read 6-byte bearing-based header directly from memory */
+                                /* V3: read 10-byte bearing-based header directly from memory */
                                 GUI_BMP_GLYPH_HEAD_V2 *gh = (GUI_BMP_GLYPH_HEAD_V2 *)((uint8_t *)text->path + offset);
                                 chr[chr_i].bearing_x = gh->bearing_x;
                                 chr[chr_i].bearing_y = gh->bearing_y;
@@ -1065,7 +1066,7 @@ void gui_font_get_dot_info(gui_text_t *text)
     }
     else
     {
-        uint8_t aliened_font_size;
+        uint16_t aliened_font_size;
         aliened_font_size = text->font_height;
         if (text->font_height % 8 != 0)
         {

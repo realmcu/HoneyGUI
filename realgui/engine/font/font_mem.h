@@ -44,16 +44,22 @@ typedef struct
     uint16_t units_per_em;   /**< font design units per em */
 } gui_font_typo_metrics_t;
 
-/** @brief V3 per-glyph header (bearing-based, 6 bytes packed) */
+/**
+ * @brief V3.2 per-glyph header (bearing-based, 10 bytes packed).
+ *
+ * All metrics are 16-bit to match the uint16 font_size: an 8-bit layout
+ * overflowed for large fonts (bearing_y past ~110px, width/advance past
+ * 255px), which truncated char_w and skewed the rendered glyph because the
+ * packed bitmap row stride no longer matched the header width.
+ */
 #pragma pack(push, 1)
 typedef struct
 {
-    int8_t bearing_x;        /**< horizontal bearing from origin to glyph left (pixels) */
-    int8_t bearing_y;        /**< vertical bearing from baseline to glyph top (pixels) */
-    uint8_t width;           /**< tight bbox width (pixels) */
-    uint8_t height;          /**< tight bbox height (pixels) */
-    uint8_t advance;         /**< horizontal advance width (pixels) */
-    uint8_t reserved;        /**< reserved, set to 0 */
+    int16_t bearing_x;       /**< horizontal bearing from origin to glyph left (pixels) */
+    int16_t bearing_y;       /**< vertical bearing from baseline to glyph top (pixels) */
+    uint16_t width;          /**< tight bbox width (pixels) */
+    uint16_t height;         /**< tight bbox height (pixels) */
+    uint16_t advance;        /**< horizontal advance width (pixels) */
 } GUI_BMP_GLYPH_HEAD_V2;
 #pragma pack(pop)
 
