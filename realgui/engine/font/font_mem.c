@@ -1379,8 +1379,9 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         {
             char_line_sum = 1;
             int32_t align_factor = (text_mode <= RIGHT) ? (text_mode - LEFT) : (text_mode - MID_LEFT);
+            /* MID centers the line box (line_height), matching MULTI_MID_* and the CSS/Figma model. */
             int16_t offset_y = (text_mode >= MID_LEFT && text_mode <= MID_RIGHT) ?
-                               (rect_h - text->font_height) / 2 : 0;
+                               (rect_h - line_height) / 2 : 0;
             int16_t offset_x = _UI_MAX((int32_t)((rect_w - char_width_sum) / 2), 0) * align_factor;
 
 #if ENABLE_FONT_V3_TYPO
@@ -2374,8 +2375,9 @@ gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *
     /* Integer arithmetic with truncation rounding for deterministic embedded results */
     layout.ascent_px   = (int16_t)((int32_t)asc * font_size / upm);
     layout.descent_px  = (int16_t)((int32_t)(-desc) * font_size / upm);
-    layout.baseline    = layout.ascent_px;
     layout.line_height = (int16_t)((int32_t)(asc - desc + gap) * font_size / upm);
+    /* Baseline includes half-leading (CSS/Figma model); reduces to ascent_px when line_gap == 0. */
+    layout.baseline    = (layout.line_height + layout.ascent_px - layout.descent_px) / 2;
 
     return layout;
 }
