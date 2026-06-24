@@ -1919,7 +1919,7 @@ void gui_font_ttf_load(gui_text_t *text, gui_text_rect_t *rect)
     {
         if (text->content_refresh)
         {
-            gui_font_ttf_unload(text);
+            gui_font_ttf_destroy(text);
             gui_font_get_ttf_info(text);
         }
     }
@@ -1932,7 +1932,7 @@ void gui_font_ttf_load(gui_text_t *text, gui_text_rect_t *rect)
     }
 }
 
-void gui_font_ttf_unload(gui_text_t *text)
+void gui_font_ttf_destroy(gui_text_t *text)
 {
     if (text->data)
     {
@@ -1954,7 +1954,22 @@ void gui_font_ttf_unload(gui_text_t *text)
         gui_free(text->data);
         text->data = NULL;
     }
-    return;
+}
+
+void gui_font_ttf_unload(gui_text_t *text)
+{
+    /* Cross-frame static cache: keep alive until content change or destroy. */
+    if (text->font_cache_static)
+    {
+        return;
+    }
+    /* Non-RAMLESS: object-level chr[] cache persists across frames. */
+    gui_dispdev_t *dc = gui_get_dc();
+    if (dc == NULL || dc->type != DC_RAMLESS)
+    {
+        return;
+    }
+    gui_font_ttf_destroy(text);
 }
 
 void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
@@ -2074,32 +2089,91 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         tm_type = FONT_IDENTITY;
     }
 
+    /* Frame-start snapshot: the put path below flips text->font_cache_static
+     * per glyph, but the hit dispatch must see one consistent value across the
+     * whole pass (esp. RAMLESS, one pass per section) so a transition-frame
+     * glyph[0] cannot misroute glyph[1] into the banding branch. */
+    const bool prev_static = text->font_cache_static;
+
     for (uint16_t index = 0; index < text->active_font_len; index++)
     {
         if (chr[index].buf)
         {
-            font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x, chr[index].y, chr[index].w,
-                                         chr[index].h);
-            if (dc->pfb_type == PFB_Y_DIRECTION)
+            bool now_static = (tm_type == FONT_IDENTITY || tm_type == FONT_TRANSFORM);
+            if (now_static && prev_static)
             {
-                if (dc->section_count * dc->fb_height >= (unsigned long)(chr[index].y + chr[index].h))
+                /* Cross-frame cache hit: recompute geometry from dot_addr (no extra
+                 * fields). chr[].x/y are re-laid out each frame, so translation
+                 * follows for free -- the cached bitmap is position-independent. */
+                FontGlyphData *gd = (FontGlyphData *)chr[index].dot_addr;
+                float rscale = scale * raster_prec;
+                int   bw     = text->bold_weight;
+                int   bex    = bw * raster_prec;
+                float gx0c = rscale * gd->x0;
+                float gy0c = rscale * gd->y0;
+                float gx1c = rscale * gd->x1;
+                float gy1c = rscale * gd->y1;
+                int rw_c = ALIGN_TO((int)(gx1c - gx0c + 1 + bex * 2 + 1), raster_prec);
+                int rh_c = ALIGN_TO((int)(gy1c - gy0c + 1 + bex * 2 + 1), raster_prec);
+                rw_c = ALIGN_TO(rw_c, 32);
+                int ow_c = rw_c / raster_prec;
+                int oh_c = ALIGN_TO((int)(gy1c - gy0c + 1 + bex * 2 + 1), raster_prec) / raster_prec;
+                int ox0_c, oy0_c;
+#if ENABLE_FONT_V3_TYPO
+                if (typo_ctx.is_v3)
                 {
-                    gui_free(chr[index].buf);
-                    chr[index].buf = NULL;
-                    chr[index].char_w = 0;
+                    ox0_c = (int)(ROUNDING_OFFSET) - bw;
+                    oy0_c = (int)(ROUNDING_OFFSET) - bw;
                 }
+                else
+#endif
+                {
+                    ox0_c = (int)(gx0c / raster_prec + ROUNDING_OFFSET) - bw;
+                    oy0_c = (int)(gy0c / raster_prec + ascent * scale + ROUNDING_OFFSET) - bw;
+                }
+                (void)rh_c;
+                font_ttf_draw_bitmap_classic(text, chr[index].buf, rect,
+                                             chr[index].x + ox0_c,
+                                             chr[index].y + oy0_c,
+                                             ow_c, oh_c);
+                continue;
             }
-            else
+            if (dc->type == DC_RAMLESS && !prev_static)
             {
-                if (dc->section_count * dc->fb_width >= (unsigned long)(chr[index].x + chr[index].w))
+                /* RAMLESS section-banding (scale/rotate, or cache disabled):
+                 * chr[].x/y store absolute bitmap position (mx0/my0), chr[].w/h
+                 * store bitmap size; free once the scan band passes the glyph.
+                 * Unchanged from the original per-frame behaviour. */
+                font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x, chr[index].y,
+                                             chr[index].w, chr[index].h);
+                if (dc->pfb_type == PFB_Y_DIRECTION)
                 {
-                    gui_free(chr[index].buf);
-                    chr[index].buf = NULL;
-                    chr[index].char_w = 0;
+                    if (dc->section_count * dc->fb_height >= (unsigned long)(chr[index].y + chr[index].h))
+                    {
+                        gui_free(chr[index].buf);
+                        chr[index].buf = NULL;
+                        chr[index].char_w = 0;
+                    }
                 }
+                else
+                {
+                    if (dc->section_count * dc->fb_width >= (unsigned long)(chr[index].x + chr[index].w))
+                    {
+                        gui_free(chr[index].buf);
+                        chr[index].buf = NULL;
+                        chr[index].char_w = 0;
+                    }
+                }
+                continue;
             }
-            continue;
+            /* Bitmap no longer valid for the current transform: an
+             * identity/translate static cache while tm_type is now scale/rotate,
+             * or a non-RAMLESS scale leftover. Free and re-rasterize. */
+            gui_free(chr[index].buf);
+            chr[index].buf = NULL;
+            goto ttf_rasterize;
         }
+ttf_rasterize:
         if (chr[index].dot_addr == 0 || chr[index].char_w == 0)
         {
             continue;
@@ -2572,8 +2646,22 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         gui_free(line_list);
         gui_free(img);
 
-        if (dc->type == DC_RAMLESS)
+        if ((tm_type == FONT_IDENTITY || tm_type == FONT_TRANSFORM) && text->font_cache_enable)
         {
+            /* Cross-frame cache: keep bitmap until content change / disable / destroy.
+             * Do NOT overwrite chr[].x/y -- hit path needs the layout position. */
+            if (chr[index].buf)
+            {
+                gui_free(chr[index].buf);
+            }
+            chr[index].buf = img_out;
+            text->font_cache_static = 1;
+        }
+        else if (dc->type == DC_RAMLESS)
+        {
+            /* RAMLESS section-banding (scale/rotate, or cache disabled): store the
+             * absolute bitmap position in chr[].x/y for the banding hit path;
+             * freed per frame as the scan band passes the glyph. */
             chr[index].buf = img_out;
             chr[index].x = mx0;
             chr[index].y = my0;
@@ -2581,10 +2669,13 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
             chr[index].h = out_h;
             chr[index].char_w = mx1 - mx0 + 1;
             chr[index].char_h = my1 - my0 + 1;
+            text->font_cache_static = 0;
         }
         else
         {
+            /* Non-RAMLESS scale/rotate (or cache disabled): rasterize every frame. */
             gui_free(img_out);
+            text->font_cache_static = 0;
         }
     }
     if (need_free_ttfbin)

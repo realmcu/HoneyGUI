@@ -123,6 +123,9 @@ typedef struct gui_text
     bool hebrew           : 1;
     uint8_t rendermode    : 2;
     uint8_t bold_mode     : 1;  /**< 0=BOLD_HORIZONTAL (fast), 1=BOLD_FULL */
+bool font_cache_enable :
+    1; /**< user opt-in: cross-frame glyph bitmap cache (identity/translate only) */
+    bool font_cache_static : 1; /**< internal: chr[].buf currently holds a cross-frame static cache */
 } gui_text_t;
 
 /** @brief Text line structure. */
@@ -337,6 +340,21 @@ void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
  * @param matrix Matrix pointer.
  */
 void gui_text_set_matrix(gui_text_t *this_widget, gui_matrix_t *matrix);
+
+/**
+ * @brief Enable cross-frame glyph bitmap cache for TTF text.
+ *
+ * When enabled, rasterized glyph bitmaps are kept alive across frames instead
+ * of being freed each frame, eliminating re-rasterization for static or purely
+ * translating/scrolling text. Only effective for identity / pure-translate
+ * transforms; scale/rotate always re-rasterizes per frame. Trades memory
+ * (resident glyph bitmaps until content change or destroy) for CPU.
+ *
+ * @param this_widget Text widget pointer.
+ * @param enable true to keep glyph bitmaps across frames, false (default) to
+ *               free them each frame.
+ */
+void gui_text_set_cache(gui_text_t *this_widget, bool enable);
 
 /**
  * @brief Set text content.

@@ -165,6 +165,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect);
  * @param text Widget pointer
  */
 void gui_font_ttf_unload(gui_text_t *text);
+void gui_font_ttf_destroy(gui_text_t *text);
 
 /**
  * @brief calculate rect

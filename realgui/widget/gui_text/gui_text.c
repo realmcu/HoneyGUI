@@ -252,7 +252,7 @@ static void gui_text_font_destroy(gui_text_t *text)
 
     case GUI_FONT_SRC_TTF:
         {
-
+            gui_font_ttf_destroy(text);
         }
         break;
 
@@ -751,6 +751,15 @@ void gui_text_set_matrix(gui_text_t *this, gui_matrix_t *matrix)
         GUI_ASSERT(this->matrix != NULL);
     }
     memcpy(this->matrix, matrix, sizeof(gui_matrix_t));
+}
+
+void gui_text_set_cache(gui_text_t *this, bool enable)
+{
+    this->font_cache_enable = enable;
+    /* Force a full rebuild (-> gui_font_ttf_destroy) so the policy applies next
+     * frame; it frees any resident static cache and nulls chr[].buf, so
+     * font_cache_static self-heals (NULL buf short-circuits the hit path). */
+    this->content_refresh = true;
 }
 
 void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)

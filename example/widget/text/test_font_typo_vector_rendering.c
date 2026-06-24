@@ -68,6 +68,7 @@ static void ui_typo_vector(gui_view_t *view)
                  strlen(label_str), font_size);
     gui_text_type_set(label, fontnotovec, FONT_SRC_MEMADDR);
     gui_text_mode_set(label, CENTER);
+    gui_text_set_cache(label, true);
 
     /* swipe right -> bitmap view */
     gui_view_switch_on_event(view, left_view->name, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
