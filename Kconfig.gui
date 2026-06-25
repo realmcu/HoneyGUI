@@ -136,6 +136,14 @@ config REALTEK_BUILD_EXAMPLE_LITE_VIDEO_WIDGET
       through the same gui_lite_video API. Tap to toggle play/pause;
       double-click to switch between video sources (cross-codec switching supported).
 
+config REALTEK_BUILD_EXAMPLE_STREAM_WIDGET
+    bool "Stream Widget Demo (live RAW video stream)"
+    help
+      RTK GUI Stream widget demo.
+      A background producer thread feeds synthetic RGB565 frames through the
+      stream_transport FIFO and the gui_stream widget displays them live.
+      Tap to toggle play/pause.
+
 config REALTEK_BUILD_REAL_PAINTENGINE
     bool "Paint Engine Demo"
     help

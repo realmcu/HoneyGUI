@@ -1,0 +1,22 @@
+# for module compiling
+import os
+import sys
+
+from building import *
+
+cwd = GetCurrentDir()
+inc = [cwd]
+
+src = Glob('*.c') + Glob('*.cpp')
+
+if GetDepend(['']):
+    objs = DefineGroup('widget', src, depend = [''], CPPPATH = inc)
+    # Pick up the porting layer (and any other) source held in subdirectories.
+    for d in os.listdir(cwd):
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
+
+Return('objs')
