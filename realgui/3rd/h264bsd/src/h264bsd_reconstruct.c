@@ -79,6 +79,69 @@ static const u32 lumaFracPos[4][4] =
 /* clipping table, defined in h264bsd_intra_prediction.c */
 extern const u8 h264bsdClip[];
 
+/* MVE (Helium) accelerated interpolation paths. Gated on the actual feature
+ * macro so both armclang and Zephyr-SDK GCC (cortex-m55) build the vector path;
+ * any non-MVE target silently falls back to the scalar code in each function. */
+
+#if defined(__ARM_FEATURE_MVE)
+#include <arm_mve.h>
+
+/* widening byte load -> s16 lanes (zero-extend; pixel 0..255 stays positive) */
+static inline int16x8_t mve_ldb_s16(const u8 *p, mve_pred16_t pg)
+{
+    return vreinterpretq_s16_u16(vldrbq_z_u16((uint8_t *)p, pg));
+}
+
+/* luma 6-tap core (coeffs 1,-5,20,20,-5,1): UNCLIPPED, UNROUNDED signed sum.
+ * s16 range [-2550,10710] fits. */
+static inline int16x8_t mve_sixtap_s16(int16x8_t t0, int16x8_t t1, int16x8_t t2,
+                                       int16x8_t t3, int16x8_t t4, int16x8_t t5)
+{
+    int16x8_t s = vaddq_s16(t0, t5);
+    s = vmlaq_n_s16(s, vaddq_s16(t2, t3), 20);
+    s = vmlaq_n_s16(s, vaddq_s16(t1, t4), (int16_t) - 5);  /* no vmlsq_n in MVE */
+    return s;
+}
+
+/* half-pel finish: clp[(sum + 16) >> 5], i.e. round, arithmetic >>5, clip[0,255] */
+static inline uint16x8_t mve_clip_halfpel(int16x8_t sum)
+{
+    int16x8_t v = vshrq_n_s16(vaddq_n_s16(sum, 16), 5);
+    v = vminq_s16(vmaxq_s16(v, vdupq_n_s16(0)), vdupq_n_s16(255));
+    return vreinterpretq_u16_s16(v);
+}
+
+/* --- s32-widening helpers for the two-pass center positions (j/f/q/i/k) ----
+ * The first 6-tap pass on bytes fits s16 ([-2550,10710]) and is stored to an
+ * int16 scratch; the second 6-tap pass on those intermediates overflows s16
+ * (up to ~42*10710), so it is done 4 lanes wide in s32. Same integer math as
+ * the scalar reference -> bit-exact. */
+
+/* 6-tap core (1,-5,20,20,-5,1) in s32, unrounded/unclipped */
+static inline int32x4_t mve_sixtap_s32(int32x4_t t0, int32x4_t t1, int32x4_t t2,
+                                       int32x4_t t3, int32x4_t t4, int32x4_t t5)
+{
+    int32x4_t s = vaddq_s32(t0, t5);
+    s = vmlaq_n_s32(s, vaddq_s32(t2, t3), 20);
+    s = vmlaq_n_s32(s, vaddq_s32(t1, t4), -5);
+    return s;
+}
+
+/* center finish: clp[(sum + 512) >> 10] */
+static inline int32x4_t mve_clip_mid_s32(int32x4_t sum)
+{
+    int32x4_t v = vshrq_n_s32(vaddq_n_s32(sum, 512), 10);
+    return vminq_s32(vmaxq_s32(v, vdupq_n_s32(0)), vdupq_n_s32(255));
+}
+
+/* half-pel finish on an s16 intermediate widened to s32: clp[(val + 16) >> 5] */
+static inline int32x4_t mve_clip_half_s32(int32x4_t val)
+{
+    int32x4_t v = vshrq_n_s32(vaddq_n_s32(val, 16), 5);
+    return vminq_s32(vmaxq_s32(v, vdupq_n_s32(0)), vdupq_n_s32(255));
+}
+#endif
+
 /*------------------------------------------------------------------------------
     4. Local function prototypes
 ------------------------------------------------------------------------------*/
@@ -154,6 +217,30 @@ void h264bsdInterpolateChromaHor(
 
     val = 8 - xFrac;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* out[r][c] = (val*src[r][c] + xFrac*src[r][c+1] + 4) >> 3
+     * (identity: ((s)<<3 + 32) >> 6 == (s + 4) >> 3). All values <= 255. */
+    {
+        mve_pred16_t pg = vctp16q(chromaPartWidth);
+        for (comp = 0; comp <= 1; comp++)
+        {
+            u8 *src = pRef + (comp * height + (u32)y0) * width + x0;
+            u8 *dst = predPartChroma + comp * 8 * 8;
+            for (y = chromaPartHeight; y; y--)
+            {
+                uint16x8_t a = vldrbq_z_u16(src, pg);
+                uint16x8_t b = vldrbq_z_u16(src + 1, pg);
+                uint16x8_t cc = vmulq_n_u16(a, (uint16_t)val);
+                cc = vmlaq_n_u16(cc, b, (uint16_t)xFrac);
+                cc = vaddq_n_u16(cc, 4);
+                cc = vshrq_n_u16(cc, 3);
+                vstrbq_p_u16(dst, cc, pg);
+                src += width;
+                dst += 8;
+            }
+        }
+    }
+#else
     for (comp = 0; comp <= 1; comp++)
     {
 
@@ -189,6 +276,7 @@ void h264bsdInterpolateChromaHor(
             ptrA += 2 * width - chromaPartWidth;
         }
     }
+#endif
 
 }
 
@@ -250,6 +338,29 @@ void h264bsdInterpolateChromaVer(
 
     val = 8 - yFrac;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* out[r][c] = (val*src[r][c] + yFrac*src[r+1][c] + 4) >> 3 */
+    {
+        mve_pred16_t pg = vctp16q(chromaPartWidth);
+        for (comp = 0; comp <= 1; comp++)
+        {
+            u8 *src = pRef + (comp * height + (u32)y0) * width + x0;
+            u8 *dst = predPartChroma + comp * 8 * 8;
+            for (y = chromaPartHeight; y; y--)
+            {
+                uint16x8_t t = vldrbq_z_u16(src, pg);
+                uint16x8_t b = vldrbq_z_u16(src + width, pg);
+                uint16x8_t cc = vmulq_n_u16(t, (uint16_t)val);
+                cc = vmlaq_n_u16(cc, b, (uint16_t)yFrac);
+                cc = vaddq_n_u16(cc, 4);
+                cc = vshrq_n_u16(cc, 3);
+                vstrbq_p_u16(dst, cc, pg);
+                src += width;
+                dst += 8;
+            }
+        }
+    }
+#else
     for (comp = 0; comp <= 1; comp++)
     {
 
@@ -285,6 +396,7 @@ void h264bsdInterpolateChromaVer(
             ptrA += 2 * width - chromaPartWidth;
         }
     }
+#endif
 
 }
 #endif
@@ -346,6 +458,36 @@ void h264bsdInterpolateChromaHorVer(
     valX = 8 - xFrac;
     valY = 8 - yFrac;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* separable: vBlend[col] = valY*src[r][col] + yFrac*src[r+1][col]  (<=2040)
+     * out[r][c]  = (valX*vBlend[c] + xFrac*vBlend[c+1] + 32) >> 6        (<=255) */
+    {
+        mve_pred16_t pg = vctp16q(chromaPartWidth);
+        for (comp = 0; comp <= 1; comp++)
+        {
+            u8 *src = ref + (comp * height + (u32)y0) * width + x0;
+            u8 *dst = predPartChroma + comp * 8 * 8;
+            for (y = chromaPartHeight; y; y--)
+            {
+                uint16x8_t p0 = vldrbq_z_u16(src, pg);
+                uint16x8_t p1 = vldrbq_z_u16(src + width, pg);
+                uint16x8_t p0r = vldrbq_z_u16(src + 1, pg);
+                uint16x8_t p1r = vldrbq_z_u16(src + 1 + width, pg);
+                uint16x8_t vL = vmulq_n_u16(p0, (uint16_t)valY);
+                vL = vmlaq_n_u16(vL, p1, (uint16_t)yFrac);
+                uint16x8_t vR = vmulq_n_u16(p0r, (uint16_t)valY);
+                vR = vmlaq_n_u16(vR, p1r, (uint16_t)yFrac);
+                uint16x8_t cc = vmulq_n_u16(vL, (uint16_t)valX);
+                cc = vmlaq_n_u16(cc, vR, (uint16_t)xFrac);
+                cc = vaddq_n_u16(cc, 32);
+                cc = vshrq_n_u16(cc, 6);
+                vstrbq_p_u16(dst, cc, pg);
+                src += width;
+                dst += 8;
+            }
+        }
+    }
+#else
     for (comp = 0; comp <= 1; comp++)
     {
 
@@ -401,6 +543,7 @@ void h264bsdInterpolateChromaHorVer(
             ptrA += 2 * width - chromaPartWidth;
         }
     }
+#endif
 
 }
 
@@ -524,6 +667,28 @@ void h264bsdInterpolateVerHalf(
 
     ref += (u32)y0 * width + (u32)x0;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* out[r][c] = clip( (in[r] -5 in[r+1] +20 in[r+2] +20 in[r+3]
+     *                    -5 in[r+4] + in[r+5] + 16) >> 5 ) per column.
+     * Vectorize across columns; one scalar row loop. */
+    for (i = 0; i < partHeight; i++)
+    {
+        const u8 *s = ref + i * width;
+        u8 *d = mb + i * 16;
+        for (j = 0; j < partWidth; j += 8)
+        {
+            mve_pred16_t pg = vctp16q(partWidth - j);
+            int16x8_t v0 = mve_ldb_s16(s + j,             pg);
+            int16x8_t v1 = mve_ldb_s16(s + j +     width, pg);
+            int16x8_t v2 = mve_ldb_s16(s + j + 2 * width, pg);
+            int16x8_t v3 = mve_ldb_s16(s + j + 3 * width, pg);
+            int16x8_t v4 = mve_ldb_s16(s + j + 4 * width, pg);
+            int16x8_t v5 = mve_ldb_s16(s + j + 5 * width, pg);
+            uint16x8_t o = mve_clip_halfpel(mve_sixtap_s16(v0, v1, v2, v3, v4, v5));
+            vstrbq_p_u16(d + j, o, pg);
+        }
+    }
+#else
     ptrC = ref + width;
     ptrV = ptrC + 5 * width;
 
@@ -592,6 +757,7 @@ void h264bsdInterpolateVerHalf(
         ptrV += 4 * width - partWidth;
         mb += 4 * 16 - partWidth;
     }
+#endif
 
 }
 
@@ -643,6 +809,29 @@ void h264bsdInterpolateVerQuarter(
 
     ref += (u32)y0 * width + (u32)x0;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* vertical half-pel per column, then round-average with integer sample
+     * in[r + 2 + verOffset] (M for 'd', N for 'n'). */
+    for (i = 0; i < partHeight; i++)
+    {
+        const u8 *s  = ref + i * width;
+        const u8 *si = ref + (i + 2 + verOffset) * width;
+        u8 *d = mb + i * 16;
+        for (j = 0; j < partWidth; j += 8)
+        {
+            mve_pred16_t pg = vctp16q(partWidth - j);
+            int16x8_t v0 = mve_ldb_s16(s + j,             pg);
+            int16x8_t v1 = mve_ldb_s16(s + j +     width, pg);
+            int16x8_t v2 = mve_ldb_s16(s + j + 2 * width, pg);
+            int16x8_t v3 = mve_ldb_s16(s + j + 3 * width, pg);
+            int16x8_t v4 = mve_ldb_s16(s + j + 4 * width, pg);
+            int16x8_t v5 = mve_ldb_s16(s + j + 5 * width, pg);
+            uint16x8_t half  = mve_clip_halfpel(mve_sixtap_s16(v0, v1, v2, v3, v4, v5));
+            uint16x8_t isamp = vldrbq_z_u16((uint8_t *)(si + j), pg);
+            vstrbq_p_u16(d + j, vrhaddq_u16(half, isamp), pg);
+        }
+    }
+#else
     ptrC = ref + width;
     ptrV = ptrC + 5 * width;
 
@@ -726,6 +915,7 @@ void h264bsdInterpolateVerQuarter(
         ptrInt += 4 * width - partWidth;
         mb += 4 * 16 - partWidth;
     }
+#endif
 
 }
 
@@ -778,6 +968,27 @@ void h264bsdInterpolateHorHalf(
 
     ref += (u32)y0 * width + (u32)x0;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* out[k] = clip( (ref[k] -5 ref[k+1] +20 ref[k+2] +20 ref[k+3]
+     *                 -5 ref[k+4] + ref[k+5] + 16) >> 5 ), vectorized across k. */
+    for (y = partHeight; y; y--)
+    {
+        for (x = 0; x < partWidth; x += 8)
+        {
+            mve_pred16_t pg = vctp16q(partWidth - x);
+            int16x8_t t0 = mve_ldb_s16(ref + x + 0, pg);
+            int16x8_t t1 = mve_ldb_s16(ref + x + 1, pg);
+            int16x8_t t2 = mve_ldb_s16(ref + x + 2, pg);
+            int16x8_t t3 = mve_ldb_s16(ref + x + 3, pg);
+            int16x8_t t4 = mve_ldb_s16(ref + x + 4, pg);
+            int16x8_t t5 = mve_ldb_s16(ref + x + 5, pg);
+            uint16x8_t o = mve_clip_halfpel(mve_sixtap_s16(t0, t1, t2, t3, t4, t5));
+            vstrbq_p_u16(mb + x, o, pg);
+        }
+        ref += width;
+        mb += 16;
+    }
+#else
     ptrJ = ref + 5;
 
     for (y = partHeight; y; y--)
@@ -849,6 +1060,7 @@ void h264bsdInterpolateHorHalf(
         ptrJ += width - partWidth;
         mb += 16 - partWidth;
     }
+#endif
 
 }
 
@@ -900,6 +1112,28 @@ void h264bsdInterpolateHorQuarter(
 
     ref += (u32)y0 * width + (u32)x0;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* horizontal half-pel per column, round-averaged with integer sample
+     * ref[k + 2 + horOffset] (G for 'a', H for 'c'). */
+    for (y = partHeight; y; y--)
+    {
+        for (x = 0; x < partWidth; x += 8)
+        {
+            mve_pred16_t pg = vctp16q(partWidth - x);
+            int16x8_t t0 = mve_ldb_s16(ref + x + 0, pg);
+            int16x8_t t1 = mve_ldb_s16(ref + x + 1, pg);
+            int16x8_t t2 = mve_ldb_s16(ref + x + 2, pg);
+            int16x8_t t3 = mve_ldb_s16(ref + x + 3, pg);
+            int16x8_t t4 = mve_ldb_s16(ref + x + 4, pg);
+            int16x8_t t5 = mve_ldb_s16(ref + x + 5, pg);
+            uint16x8_t half  = mve_clip_halfpel(mve_sixtap_s16(t0, t1, t2, t3, t4, t5));
+            uint16x8_t isamp = vldrbq_z_u16((uint8_t *)(ref + x + 2 + horOffset), pg);
+            vstrbq_p_u16(mb + x, vrhaddq_u16(half, isamp), pg);
+        }
+        ref += width;
+        mb += 16;
+    }
+#else
     ptrJ = ref + 5;
 
     for (y = partHeight; y; y--)
@@ -1003,6 +1237,7 @@ void h264bsdInterpolateHorQuarter(
         ptrJ += width - partWidth;
         mb += 16 - partWidth;
     }
+#endif
 
 }
 
@@ -1056,6 +1291,40 @@ void h264bsdInterpolateHorVerQuarter(
     /* Ref points to G + (-2, -2) */
     ref += (u32)y0 * width + (u32)x0;
 
+#if defined(__ARM_FEATURE_MVE)
+    /* diagonal quarter = round-average of a horizontal half-pel ('b'/'s', taken
+     * on integer row rowH) and a vertical half-pel ('h'/'m', on integer col colV). */
+    {
+        u32 rowH = 2 + ((horVerOffset & 0x2) >> 1);
+        u32 colV = 2 + (horVerOffset & 0x1);
+        u32 yy, xx;
+        for (yy = 0; yy < partHeight; yy++)
+        {
+            const u8 *hrow = ref + (rowH + yy) * width;  /* horizontal half-pel row */
+            const u8 *vrow = ref + yy * width + colV;     /* vertical-window top, col */
+            u8 *d = mb + yy * 16;
+            for (xx = 0; xx < partWidth; xx += 8)
+            {
+                mve_pred16_t pg = vctp16q(partWidth - xx);
+                int16x8_t h0 = mve_ldb_s16(hrow + xx + 0, pg);
+                int16x8_t h1 = mve_ldb_s16(hrow + xx + 1, pg);
+                int16x8_t h2 = mve_ldb_s16(hrow + xx + 2, pg);
+                int16x8_t h3 = mve_ldb_s16(hrow + xx + 3, pg);
+                int16x8_t h4 = mve_ldb_s16(hrow + xx + 4, pg);
+                int16x8_t h5 = mve_ldb_s16(hrow + xx + 5, pg);
+                uint16x8_t hHalf = mve_clip_halfpel(mve_sixtap_s16(h0, h1, h2, h3, h4, h5));
+                int16x8_t v0 = mve_ldb_s16(vrow + xx,             pg);
+                int16x8_t v1 = mve_ldb_s16(vrow + xx +     width, pg);
+                int16x8_t v2 = mve_ldb_s16(vrow + xx + 2 * width, pg);
+                int16x8_t v3 = mve_ldb_s16(vrow + xx + 3 * width, pg);
+                int16x8_t v4 = mve_ldb_s16(vrow + xx + 4 * width, pg);
+                int16x8_t v5 = mve_ldb_s16(vrow + xx + 5 * width, pg);
+                uint16x8_t vHalf = mve_clip_halfpel(mve_sixtap_s16(v0, v1, v2, v3, v4, v5));
+                vstrbq_p_u16(d + xx, vrhaddq_u16(hHalf, vHalf), pg);
+            }
+        }
+    }
+#else
     /* ptrJ points to either J or Q, depending on vertical offset */
     ptrJ = ref + (((horVerOffset & 0x2) >> 1) + 2) * width + 5;
 
@@ -1208,6 +1477,7 @@ void h264bsdInterpolateHorVerQuarter(
         ptrV += 4 * width - partWidth;
         mb += 4 * 16 - partWidth;
     }
+#endif
 
 }
 #endif
@@ -1260,6 +1530,52 @@ void h264bsdInterpolateMidHalf(
     }
 
     ref += (u32)y0 * width + (u32)x0;
+
+#if defined(__ARM_FEATURE_MVE)
+    /* pixel 'j': 6-tap horizontal then 6-tap vertical. Pass 1 (bytes->s16
+     * intermediates) is 8-wide s16; pass 2 (intermediates->clip[(.+512)>>10])
+     * overflows s16 so it is 4-wide s32. Bit-exact vs the scalar reference. */
+    {
+        int16_t hbuf[21 * 16];   /* [partHeight+5][partWidth], raw 6-tap fits s16 */
+        u32 r, c;
+
+        for (r = 0; r < partHeight + 5; r++)
+        {
+            const u8 *s = ref + r * width;
+            int16_t *d = hbuf + r * partWidth;
+            for (c = 0; c < partWidth; c += 8)
+            {
+                mve_pred16_t pg = vctp16q(partWidth - c);
+                int16x8_t t0 = mve_ldb_s16(s + c + 0, pg);
+                int16x8_t t1 = mve_ldb_s16(s + c + 1, pg);
+                int16x8_t t2 = mve_ldb_s16(s + c + 2, pg);
+                int16x8_t t3 = mve_ldb_s16(s + c + 3, pg);
+                int16x8_t t4 = mve_ldb_s16(s + c + 4, pg);
+                int16x8_t t5 = mve_ldb_s16(s + c + 5, pg);
+                vstrhq_p_s16(d + c, mve_sixtap_s16(t0, t1, t2, t3, t4, t5), pg);
+            }
+        }
+
+        for (r = 0; r < partHeight; r++)
+        {
+            u8 *d = mb + r * 16;
+            const int16_t *h0 = hbuf + r * partWidth;
+            for (c = 0; c < partWidth; c += 4)
+            {
+                mve_pred16_t pg = vctp32q(partWidth - c);
+                int32x4_t t0 = vldrhq_z_s32(h0 + c + 0 * (i32)partWidth, pg);
+                int32x4_t t1 = vldrhq_z_s32(h0 + c + 1 * (i32)partWidth, pg);
+                int32x4_t t2 = vldrhq_z_s32(h0 + c + 2 * (i32)partWidth, pg);
+                int32x4_t t3 = vldrhq_z_s32(h0 + c + 3 * (i32)partWidth, pg);
+                int32x4_t t4 = vldrhq_z_s32(h0 + c + 4 * (i32)partWidth, pg);
+                int32x4_t t5 = vldrhq_z_s32(h0 + c + 5 * (i32)partWidth, pg);
+                int32x4_t o = mve_clip_mid_s32(mve_sixtap_s32(t0, t1, t2, t3, t4, t5));
+                vstrbq_p_u32(d + c, vreinterpretq_u32_s32(o), pg);
+            }
+        }
+    }
+    return;
+#endif
 
     b1 = table;
     ptrJ = ref + 5;
@@ -1447,6 +1763,55 @@ void h264bsdInterpolateMidVerQuarter(
     }
 
     ref += (u32)y0 * width + (u32)x0;
+
+#if defined(__ARM_FEATURE_MVE)
+    /* pixel 'f'/'q': mid value 'j' averaged with the horizontal half-pel at the
+     * integer row (2+verOffset) of the 6-tap window: out = (j + b + 1) >> 1.
+     * Pass 1 identical to MidHalf; pass 2 adds the vrhaddq average. Bit-exact. */
+    {
+        int16_t hbuf[21 * 16];
+        u32 r, c;
+
+        for (r = 0; r < partHeight + 5; r++)
+        {
+            const u8 *s = ref + r * width;
+            int16_t *d = hbuf + r * partWidth;
+            for (c = 0; c < partWidth; c += 8)
+            {
+                mve_pred16_t pg = vctp16q(partWidth - c);
+                int16x8_t t0 = mve_ldb_s16(s + c + 0, pg);
+                int16x8_t t1 = mve_ldb_s16(s + c + 1, pg);
+                int16x8_t t2 = mve_ldb_s16(s + c + 2, pg);
+                int16x8_t t3 = mve_ldb_s16(s + c + 3, pg);
+                int16x8_t t4 = mve_ldb_s16(s + c + 4, pg);
+                int16x8_t t5 = mve_ldb_s16(s + c + 5, pg);
+                vstrhq_p_s16(d + c, mve_sixtap_s16(t0, t1, t2, t3, t4, t5), pg);
+            }
+        }
+
+        for (r = 0; r < partHeight; r++)
+        {
+            u8 *d = mb + r * 16;
+            const int16_t *h0 = hbuf + r * partWidth;
+            const int16_t *hb = hbuf + (r + 2 + verOffset) * partWidth;
+            for (c = 0; c < partWidth; c += 4)
+            {
+                mve_pred16_t pg = vctp32q(partWidth - c);
+                int32x4_t t0 = vldrhq_z_s32(h0 + c + 0 * (i32)partWidth, pg);
+                int32x4_t t1 = vldrhq_z_s32(h0 + c + 1 * (i32)partWidth, pg);
+                int32x4_t t2 = vldrhq_z_s32(h0 + c + 2 * (i32)partWidth, pg);
+                int32x4_t t3 = vldrhq_z_s32(h0 + c + 3 * (i32)partWidth, pg);
+                int32x4_t t4 = vldrhq_z_s32(h0 + c + 4 * (i32)partWidth, pg);
+                int32x4_t t5 = vldrhq_z_s32(h0 + c + 5 * (i32)partWidth, pg);
+                int32x4_t mid = mve_clip_mid_s32(mve_sixtap_s32(t0, t1, t2, t3, t4, t5));
+                int32x4_t hv  = mve_clip_half_s32(vldrhq_z_s32(hb + c, pg));
+                int32x4_t o = vrhaddq_s32(mid, hv);
+                vstrbq_p_u32(d + c, vreinterpretq_u32_s32(o), pg);
+            }
+        }
+    }
+    return;
+#endif
 
     b1 = table;
     ptrJ = ref + 5;
@@ -1652,6 +2017,57 @@ void h264bsdInterpolateMidHorQuarter(
     }
 
     ref += (u32)y0 * width + (u32)x0;
+
+#if defined(__ARM_FEATURE_MVE)
+    /* pixel 'i'/'k': 6-tap vertical (pass 1, bytes->s16, width partWidth+5) then
+     * 6-tap horizontal (pass 2, ->clip[(.+512)>>10]) averaged with the vertical
+     * half-pel at integer column (2+horOffset): out = (mid + h + 1) >> 1.
+     * Pass 1 is 8-wide s16; pass 2 overflows s16 so it is 4-wide s32. Bit-exact. */
+    {
+        const i32 vbw = tableWidth;   /* partWidth + 5 */
+        int16_t vbuf[21 * 21];        /* [partHeight][partWidth+5], raw 6-tap fits s16 */
+        u32 r;
+        i32 c;
+
+        for (r = 0; r < partHeight; r++)
+        {
+            const u8 *s = ref + r * width;
+            int16_t *d = vbuf + (i32)r * vbw;
+            for (c = 0; c < vbw; c += 8)
+            {
+                mve_pred16_t pg = vctp16q((u32)(vbw - c));
+                int16x8_t t0 = mve_ldb_s16(s + c + 0 * (i32)width, pg);
+                int16x8_t t1 = mve_ldb_s16(s + c + 1 * (i32)width, pg);
+                int16x8_t t2 = mve_ldb_s16(s + c + 2 * (i32)width, pg);
+                int16x8_t t3 = mve_ldb_s16(s + c + 3 * (i32)width, pg);
+                int16x8_t t4 = mve_ldb_s16(s + c + 4 * (i32)width, pg);
+                int16x8_t t5 = mve_ldb_s16(s + c + 5 * (i32)width, pg);
+                vstrhq_p_s16(d + c, mve_sixtap_s16(t0, t1, t2, t3, t4, t5), pg);
+            }
+        }
+
+        for (r = 0; r < partHeight; r++)
+        {
+            u8 *d = mb + r * 16;
+            const int16_t *vr = vbuf + (i32)r * vbw;
+            for (c = 0; c < (i32)partWidth; c += 4)
+            {
+                mve_pred16_t pg = vctp32q((u32)((i32)partWidth - c));
+                int32x4_t t0 = vldrhq_z_s32(vr + c + 0, pg);
+                int32x4_t t1 = vldrhq_z_s32(vr + c + 1, pg);
+                int32x4_t t2 = vldrhq_z_s32(vr + c + 2, pg);
+                int32x4_t t3 = vldrhq_z_s32(vr + c + 3, pg);
+                int32x4_t t4 = vldrhq_z_s32(vr + c + 4, pg);
+                int32x4_t t5 = vldrhq_z_s32(vr + c + 5, pg);
+                int32x4_t mid = mve_clip_mid_s32(mve_sixtap_s32(t0, t1, t2, t3, t4, t5));
+                int32x4_t hv  = mve_clip_half_s32(vldrhq_z_s32(vr + c + 2 + (i32)horOffset, pg));
+                int32x4_t o = vrhaddq_s32(mid, hv);
+                vstrbq_p_u32(d + c, vreinterpretq_u32_s32(o), pg);
+            }
+        }
+    }
+    return;
+#endif
 
     h1 = table + tableWidth;
     ptrC = ref + width;

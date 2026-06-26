@@ -1,4 +1,8 @@
-#if defined(__ARM_FEATURE_MVE) && defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+/* MVE (Helium) color conversion. Originally gated on __ARMCC_VERSION (armclang),
+ * which excluded the Zephyr SDK GCC build even though GCC fully supports the
+ * arm_mve.h intrinsics for cortex-m55 (__ARM_FEATURE_MVE). Gate on the actual
+ * MVE feature macro so the vectorized path is used under both compilers. */
+#if defined(__ARM_FEATURE_MVE)
 
 #include "arm_mve.h"
 typedef enum
@@ -53,10 +57,23 @@ static void mve_yuv420_to_rgb(const uint8_t *inputy, const uint8_t *inputcb, con
 
                 uint16x8_t resultb = vaddq_u16(rawy, vmulhq_u16(rawcb, n58064));
                 resultb = vqsubq_n_u16(resultb, 226);
-                uint16x8_t rgb565;
-                rgb565 = vsriq_n_u16(vshlq_n_u16(resultb, 8), rgb565, 5);
-                rgb565 = vsriq_n_u16(vshlq_n_u16(resultg, 8), rgb565, 6);
-                rgb565 = vsriq_n_u16(vshlq_n_u16(resultr, 8), rgb565, 5);
+
+                /* CLIP high end to 255 (low end already clamped to 0 by the
+                 * unsigned-saturating vqsub above). The original code skipped
+                 * this, so bright pixels wrapped around to wrong colors. */
+                uint16x8_t n255 = vdupq_n_u16(255);
+                resultr = vminq_u16(resultr, n255);
+                resultg = vminq_u16(resultg, n255);
+                resultb = vminq_u16(resultb, n255);
+
+                /* pack R5G6B5. (Replaces a vsriq_n_u16 chain that GCC rejects
+                 * with "argument must be a constant immediate".) */
+                uint16x8_t r5 = vshrq_n_u16(resultr, 3);
+                uint16x8_t g6 = vshrq_n_u16(resultg, 2);
+                uint16x8_t b5 = vshrq_n_u16(resultb, 3);
+                uint16x8_t rgb565 = vorrq_u16(b5,
+                                              vorrq_u16(vshlq_n_u16(g6, 5),
+                                                        vshlq_n_u16(r5, 11)));
                 vst1q_u16((uint16_t *)&outputrgb[(i * raw_w + j) * 2], rgb565);
             }
         }

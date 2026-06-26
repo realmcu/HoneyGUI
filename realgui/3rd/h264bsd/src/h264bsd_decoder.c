@@ -792,7 +792,10 @@ u32 *h264bsdNextOutputPictureBGR565(storage_t *pStorage, u32 *picId, u32 *isIdrP
     }
 
 
-#if defined(__ARM_FEATURE_MVE) && defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+    /* Use the Helium/MVE YUV420->RGB565 path whenever MVE is available (gate on the
+     * feature macro so it works under GCC too, not only armclang); scalar fallback
+     * otherwise (e.g. PC simulator / non-MVE target). */
+#if defined(__ARM_FEATURE_MVE)
     extern void mve_yuv420_to_rgb565(uint8_t *data, uint8_t *pOutput,
                                      uint32_t width, uint32_t height);
     mve_yuv420_to_rgb565(data, (uint8_t *)pStorage->conversionBuffer, width, height);

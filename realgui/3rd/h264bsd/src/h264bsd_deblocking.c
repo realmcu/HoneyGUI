@@ -60,6 +60,11 @@
 #include "armVC.h"
 #endif /* H264DEC_OMXDL */
 
+#if defined(__ARM_FEATURE_MVE)
+#include <arm_mve.h>
+#endif
+
+
 /*------------------------------------------------------------------------------
     2. External compiler flags
 --------------------------------------------------------------------------------
@@ -702,6 +707,141 @@ void FilterVerLumaEdge(
     ASSERT(bS && bS <= 4);
     ASSERT(thresholds);
 
+#if defined(__ARM_FEATURE_MVE)
+    {
+        uint32x4_t row_off = vdupq_n_u32(0);
+        row_off = vsetq_lane_u32(imageWidth, row_off, 1);
+        row_off = vsetq_lane_u32(2 * imageWidth, row_off, 2);
+        row_off = vsetq_lane_u32(3 * imageWidth, row_off, 3);
+
+        if (bS < 4)
+        {
+            i32 tc_sc = thresholds->tc0[bS - 1];
+            int32x4_t tc_v = vdupq_n_s32(tc_sc);
+
+            int32x4_t p2v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data - 3, row_off));
+            int32x4_t p1v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data - 2, row_off));
+            int32x4_t p0v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data - 1, row_off));
+            int32x4_t q0v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data,     row_off));
+            int32x4_t q1v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data + 1, row_off));
+            int32x4_t q2v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data + 2, row_off));
+
+            mve_pred16_t main_mask =
+                vcmpltq_n_s32(vabdq_s32(p0v, q0v), (int32_t)alpha) &
+                vcmpltq_n_s32(vabdq_s32(p1v, p0v), (int32_t)beta)  &
+                vcmpltq_n_s32(vabdq_s32(q1v, q0v), (int32_t)beta);
+
+            if (main_mask)
+            {
+                mve_pred16_t p2_mask = main_mask &
+                                       vcmpltq_n_s32(vabdq_s32(p2v, p0v), (int32_t)beta);
+                mve_pred16_t q2_mask = main_mask &
+                                       vcmpltq_n_s32(vabdq_s32(q2v, q0v), (int32_t)beta);
+
+                int32x4_t bound = vaddq_s32(tc_v,
+                                            vpselq_s32(vdupq_n_s32(1), vdupq_n_s32(0), p2_mask));
+                bound = vaddq_s32(bound,
+                                  vpselq_s32(vdupq_n_s32(1), vdupq_n_s32(0), q2_mask));
+
+                int32x4_t pq_half = vshrq_n_s32(
+                                        vaddq_n_s32(vaddq_s32(p0v, q0v), 1), 1);
+
+                if (p2_mask)
+                {
+                    int32x4_t v2 = vshrq_n_s32(
+                                       vsubq_s32(vaddq_s32(p2v, pq_half), vshlq_n_s32(p1v, 1)), 1);
+                    int32x4_t p1_new = vaddq_s32(p1v,
+                                                 vminq_s32(vmaxq_s32(v2, vnegq_s32(tc_v)), tc_v));
+                    vstrbq_scatter_offset_p_s32(data - 2, row_off, p1_new, p2_mask);
+                }
+
+                if (q2_mask)
+                {
+                    int32x4_t v3 = vshrq_n_s32(
+                                       vsubq_s32(vaddq_s32(q2v, pq_half), vshlq_n_s32(q1v, 1)), 1);
+                    int32x4_t q1_new = vaddq_s32(q1v,
+                                                 vminq_s32(vmaxq_s32(v3, vnegq_s32(tc_v)), tc_v));
+                    vstrbq_scatter_offset_p_s32(data + 1, row_off, q1_new, q2_mask);
+                }
+
+                int32x4_t mval = vshrq_n_s32(vaddq_n_s32(
+                                                 vaddq_s32(vshlq_n_s32(vsubq_s32(q0v, p0v), 2),
+                                                           vsubq_s32(p1v, q1v)), 4), 3);
+                int32x4_t delta = vminq_s32(vmaxq_s32(mval, vnegq_s32(bound)), bound);
+
+                int32x4_t p0_new = vminq_s32(vmaxq_s32(
+                                                 vaddq_s32(p0v, delta), vdupq_n_s32(0)), vdupq_n_s32(255));
+                int32x4_t q0_new = vminq_s32(vmaxq_s32(
+                                                 vsubq_s32(q0v, delta), vdupq_n_s32(0)), vdupq_n_s32(255));
+                vstrbq_scatter_offset_p_s32(data - 1, row_off, p0_new, main_mask);
+                vstrbq_scatter_offset_p_s32(data,     row_off, q0_new, main_mask);
+            }
+        }
+        else
+        {
+            int32x4_t p3v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data - 4, row_off));
+            int32x4_t p2v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data - 3, row_off));
+            int32x4_t p1v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data - 2, row_off));
+            int32x4_t p0v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data - 1, row_off));
+            int32x4_t q0v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data,     row_off));
+            int32x4_t q1v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data + 1, row_off));
+            int32x4_t q2v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data + 2, row_off));
+            int32x4_t q3v = vreinterpretq_s32_u32(vldrbq_gather_offset_u32(data + 3, row_off));
+
+            int32x4_t abd_pq = vabdq_s32(p0v, q0v);
+            mve_pred16_t main_mask =
+                vcmpltq_n_s32(abd_pq, (int32_t)alpha) &
+                vcmpltq_n_s32(vabdq_s32(p1v, p0v), (int32_t)beta) &
+                vcmpltq_n_s32(vabdq_s32(q1v, q0v), (int32_t)beta);
+
+            if (main_mask)
+            {
+                mve_pred16_t tf_mask = main_mask &
+                                       vcmpltq_n_s32(abd_pq, (int32_t)((alpha >> 2) + 2));
+
+                mve_pred16_t p_strong = tf_mask &
+                                        vcmpltq_n_s32(vabdq_s32(p2v, p0v), (int32_t)beta);
+                mve_pred16_t q_strong = tf_mask &
+                                        vcmpltq_n_s32(vabdq_s32(q2v, q0v), (int32_t)beta);
+
+                int32x4_t tmp_p = vaddq_s32(vaddq_s32(p1v, p0v), q0v);
+                int32x4_t tmp_q = vaddq_s32(vaddq_s32(p0v, q0v), q1v);
+
+                int32x4_t p0_strong = vshrq_n_s32(vaddq_n_s32(
+                                                      vaddq_s32(vaddq_s32(p2v, vshlq_n_s32(tmp_p, 1)), q1v), 4), 3);
+                int32x4_t p0_weak = vshrq_n_s32(vaddq_n_s32(
+                                                    vaddq_s32(vaddq_s32(vshlq_n_s32(p1v, 1), p0v), q1v), 2), 2);
+                int32x4_t p0_new = vpselq_s32(p0_strong, p0_weak, p_strong);
+                vstrbq_scatter_offset_p_s32(data - 1, row_off, p0_new, main_mask);
+
+                int32x4_t p1_new = vshrq_n_s32(
+                                       vaddq_n_s32(vaddq_s32(p2v, tmp_p), 2), 2);
+                vstrbq_scatter_offset_p_s32(data - 2, row_off, p1_new, p_strong);
+
+                int32x4_t p2_new = vshrq_n_s32(vaddq_n_s32(
+                                                   vaddq_s32(vshlq_n_s32(p3v, 1), vmlaq_n_s32(tmp_p, p2v, 3)), 4), 3);
+                vstrbq_scatter_offset_p_s32(data - 3, row_off, p2_new, p_strong);
+
+                int32x4_t q0_strong = vshrq_n_s32(vaddq_n_s32(
+                                                      vaddq_s32(vaddq_s32(p1v, vshlq_n_s32(tmp_q, 1)), q2v), 4), 3);
+                int32x4_t q0_weak = vshrq_n_s32(vaddq_n_s32(
+                                                    vaddq_s32(vaddq_s32(vshlq_n_s32(q1v, 1), q0v), p1v), 2), 2);
+                int32x4_t q0_new = vpselq_s32(q0_strong, q0_weak, q_strong);
+                vstrbq_scatter_offset_p_s32(data, row_off, q0_new, main_mask);
+
+                int32x4_t q1_new = vshrq_n_s32(
+                                       vaddq_n_s32(vaddq_s32(q2v, tmp_q), 2), 2);
+                vstrbq_scatter_offset_p_s32(data + 1, row_off, q1_new, q_strong);
+
+                int32x4_t q2_new = vshrq_n_s32(vaddq_n_s32(
+                                                   vaddq_s32(vshlq_n_s32(q3v, 1), vmlaq_n_s32(tmp_q, q2v, 3)), 4), 3);
+                vstrbq_scatter_offset_p_s32(data + 2, row_off, q2_new, q_strong);
+            }
+        }
+        return;
+    }
+#endif
+
     if (bS < 4)
     {
         tc = thresholds->tc0[bS - 1];
@@ -897,6 +1037,150 @@ void FilterHorLuma(
 //    if (sample ++ % (1024 * 64) == 0) {
 //        printf("Hash A: %d, Hash B: %d\n", hashA, hashB);
 //    }
+
+#if defined(__ARM_FEATURE_MVE)
+    {
+        if (bS < 4)
+        {
+            int16_t tc_s = (int16_t)thresholds->tc0[bS - 1];
+            int16x8_t tc_v = vdupq_n_s16(tc_s);
+
+            for (int mve_h = 0; mve_h < 2; mve_h++)
+            {
+                u8 *src = data + mve_h * 8;
+                int16x8_t p2s = vreinterpretq_s16_u16(vldrbq_u16(src - 3 * imageWidth));
+                int16x8_t p1s = vreinterpretq_s16_u16(vldrbq_u16(src - 2 * imageWidth));
+                int16x8_t p0s = vreinterpretq_s16_u16(vldrbq_u16(src - 1 * imageWidth));
+                int16x8_t q0s = vreinterpretq_s16_u16(vldrbq_u16(src));
+                int16x8_t q1s = vreinterpretq_s16_u16(vldrbq_u16(src + 1 * imageWidth));
+                int16x8_t q2s = vreinterpretq_s16_u16(vldrbq_u16(src + 2 * imageWidth));
+
+                mve_pred16_t main_mask =
+                    vcmpltq_n_s16(vabdq_s16(p0s, q0s), (int16_t)alpha) &
+                    vcmpltq_n_s16(vabdq_s16(p1s, p0s), (int16_t)beta)  &
+                    vcmpltq_n_s16(vabdq_s16(q1s, q0s), (int16_t)beta);
+                if (!main_mask) { continue; }
+
+                mve_pred16_t p2_mask = main_mask &
+                                       vcmpltq_n_s16(vabdq_s16(p2s, p0s), (int16_t)beta);
+                mve_pred16_t q2_mask = main_mask &
+                                       vcmpltq_n_s16(vabdq_s16(q2s, q0s), (int16_t)beta);
+
+                int16x8_t bound = vaddq_s16(tc_v,
+                                            vpselq_s16(vdupq_n_s16(1), vdupq_n_s16(0), p2_mask));
+                bound = vaddq_s16(bound,
+                                  vpselq_s16(vdupq_n_s16(1), vdupq_n_s16(0), q2_mask));
+
+                int16x8_t pq_half = vshrq_n_s16(
+                                        vaddq_n_s16(vaddq_s16(p0s, q0s), 1), 1);
+
+                if (p2_mask)
+                {
+                    int16x8_t v2 = vshrq_n_s16(
+                                       vsubq_s16(vaddq_s16(p2s, pq_half), vshlq_n_s16(p1s, 1)), 1);
+                    int16x8_t p1_new = vaddq_s16(p1s,
+                                                 vminq_s16(vmaxq_s16(v2, vnegq_s16(tc_v)), tc_v));
+                    vstrbq_p_u16(src - 2 * imageWidth,
+                                 vreinterpretq_u16_s16(p1_new), p2_mask);
+                }
+
+                if (q2_mask)
+                {
+                    int16x8_t v3 = vshrq_n_s16(
+                                       vsubq_s16(vaddq_s16(q2s, pq_half), vshlq_n_s16(q1s, 1)), 1);
+                    int16x8_t q1_new = vaddq_s16(q1s,
+                                                 vminq_s16(vmaxq_s16(v3, vnegq_s16(tc_v)), tc_v));
+                    vstrbq_p_u16(src + 1 * imageWidth,
+                                 vreinterpretq_u16_s16(q1_new), q2_mask);
+                }
+
+                int16x8_t mval = vshrq_n_s16(vaddq_n_s16(
+                                                 vaddq_s16(vshlq_n_s16(vsubq_s16(q0s, p0s), 2),
+                                                           vsubq_s16(p1s, q1s)), 4), 3);
+                int16x8_t mdelta = vminq_s16(vmaxq_s16(mval, vnegq_s16(bound)), bound);
+
+                int16x8_t p0_new = vminq_s16(vmaxq_s16(
+                                                 vaddq_s16(p0s, mdelta), vdupq_n_s16(0)), vdupq_n_s16(255));
+                int16x8_t q0_new = vminq_s16(vmaxq_s16(
+                                                 vsubq_s16(q0s, mdelta), vdupq_n_s16(0)), vdupq_n_s16(255));
+                vstrbq_p_u16(src - 1 * imageWidth,
+                             vreinterpretq_u16_s16(p0_new), main_mask);
+                vstrbq_p_u16(src,
+                             vreinterpretq_u16_s16(q0_new), main_mask);
+            }
+        }
+        else
+        {
+            for (int mve_h = 0; mve_h < 2; mve_h++)
+            {
+                u8 *src = data + mve_h * 8;
+                int16x8_t p3s = vreinterpretq_s16_u16(vldrbq_u16(src - 4 * imageWidth));
+                int16x8_t p2s = vreinterpretq_s16_u16(vldrbq_u16(src - 3 * imageWidth));
+                int16x8_t p1s = vreinterpretq_s16_u16(vldrbq_u16(src - 2 * imageWidth));
+                int16x8_t p0s = vreinterpretq_s16_u16(vldrbq_u16(src - 1 * imageWidth));
+                int16x8_t q0s = vreinterpretq_s16_u16(vldrbq_u16(src));
+                int16x8_t q1s = vreinterpretq_s16_u16(vldrbq_u16(src + 1 * imageWidth));
+                int16x8_t q2s = vreinterpretq_s16_u16(vldrbq_u16(src + 2 * imageWidth));
+                int16x8_t q3s = vreinterpretq_s16_u16(vldrbq_u16(src + 3 * imageWidth));
+
+                int16x8_t abd_pq = vabdq_s16(p0s, q0s);
+                mve_pred16_t main_mask =
+                    vcmpltq_n_s16(abd_pq, (int16_t)alpha) &
+                    vcmpltq_n_s16(vabdq_s16(p1s, p0s), (int16_t)beta) &
+                    vcmpltq_n_s16(vabdq_s16(q1s, q0s), (int16_t)beta);
+                if (!main_mask) { continue; }
+
+                mve_pred16_t tf_mask = main_mask &
+                                       vcmpltq_n_s16(abd_pq, (int16_t)((alpha >> 2) + 2));
+
+                mve_pred16_t p_strong = tf_mask &
+                                        vcmpltq_n_s16(vabdq_s16(p2s, p0s), (int16_t)beta);
+                mve_pred16_t q_strong = tf_mask &
+                                        vcmpltq_n_s16(vabdq_s16(q2s, q0s), (int16_t)beta);
+
+                int16x8_t tmp_p = vaddq_s16(vaddq_s16(p1s, p0s), q0s);
+                int16x8_t tmp_q = vaddq_s16(vaddq_s16(p0s, q0s), q1s);
+
+                int16x8_t p0_strong = vshrq_n_s16(vaddq_n_s16(
+                                                      vaddq_s16(vaddq_s16(p2s, vshlq_n_s16(tmp_p, 1)), q1s), 4), 3);
+                int16x8_t p0_weak = vshrq_n_s16(vaddq_n_s16(
+                                                    vaddq_s16(vaddq_s16(vshlq_n_s16(p1s, 1), p0s), q1s), 2), 2);
+                int16x8_t p0_new = vpselq_s16(p0_strong, p0_weak, p_strong);
+                vstrbq_p_u16(src - 1 * imageWidth,
+                             vreinterpretq_u16_s16(p0_new), main_mask);
+
+                int16x8_t p1_new = vshrq_n_s16(
+                                       vaddq_n_s16(vaddq_s16(p2s, tmp_p), 2), 2);
+                vstrbq_p_u16(src - 2 * imageWidth,
+                             vreinterpretq_u16_s16(p1_new), p_strong);
+
+                int16x8_t p2_new = vshrq_n_s16(vaddq_n_s16(
+                                                   vaddq_s16(vshlq_n_s16(p3s, 1), vmlaq_n_s16(tmp_p, p2s, 3)), 4), 3);
+                vstrbq_p_u16(src - 3 * imageWidth,
+                             vreinterpretq_u16_s16(p2_new), p_strong);
+
+                int16x8_t q0_strong = vshrq_n_s16(vaddq_n_s16(
+                                                      vaddq_s16(vaddq_s16(p1s, vshlq_n_s16(tmp_q, 1)), q2s), 4), 3);
+                int16x8_t q0_weak = vshrq_n_s16(vaddq_n_s16(
+                                                    vaddq_s16(vaddq_s16(vshlq_n_s16(q1s, 1), q0s), p1s), 2), 2);
+                int16x8_t q0_new = vpselq_s16(q0_strong, q0_weak, q_strong);
+                vstrbq_p_u16(src,
+                             vreinterpretq_u16_s16(q0_new), main_mask);
+
+                int16x8_t q1_new = vshrq_n_s16(
+                                       vaddq_n_s16(vaddq_s16(q2s, tmp_q), 2), 2);
+                vstrbq_p_u16(src + 1 * imageWidth,
+                             vreinterpretq_u16_s16(q1_new), q_strong);
+
+                int16x8_t q2_new = vshrq_n_s16(vaddq_n_s16(
+                                                   vaddq_s16(vshlq_n_s16(q3s, 1), vmlaq_n_s16(tmp_q, q2s, 3)), 4), 3);
+                vstrbq_p_u16(src + 2 * imageWidth,
+                             vreinterpretq_u16_s16(q2_new), q_strong);
+            }
+        }
+        return;
+    }
+#endif
 
     if (bS < 4)
     {
@@ -1138,6 +1422,56 @@ void FilterHorChroma(
     ASSERT(data);
     ASSERT(bS <= 4);
     ASSERT(thresholds);
+
+#if defined(__ARM_FEATURE_MVE)
+    {
+        int16x8_t p1s = vreinterpretq_s16_u16(vldrbq_u16(data - 2 * width));
+        int16x8_t p0s = vreinterpretq_s16_u16(vldrbq_u16(data - 1 * width));
+        int16x8_t q0s = vreinterpretq_s16_u16(vldrbq_u16(data));
+        int16x8_t q1s = vreinterpretq_s16_u16(vldrbq_u16(data + 1 * width));
+
+        mve_pred16_t main_mask =
+            vcmpltq_n_s16(vabdq_s16(p0s, q0s), (int16_t)thresholds->alpha) &
+            vcmpltq_n_s16(vabdq_s16(p1s, p0s), (int16_t)thresholds->beta)  &
+            vcmpltq_n_s16(vabdq_s16(q1s, q0s), (int16_t)thresholds->beta);
+
+        if (main_mask)
+        {
+
+            if (bS < 4)
+            {
+                int16_t tc_s = (int16_t)(thresholds->tc0[bS - 1] + 1);
+                int16x8_t tc_v = vdupq_n_s16(tc_s);
+
+                int16x8_t mval = vshrq_n_s16(vaddq_n_s16(
+                                                 vaddq_s16(vshlq_n_s16(vsubq_s16(q0s, p0s), 2),
+                                                           vsubq_s16(p1s, q1s)), 4), 3);
+                int16x8_t mdelta = vminq_s16(vmaxq_s16(mval, vnegq_s16(tc_v)), tc_v);
+
+                int16x8_t p0_new = vminq_s16(vmaxq_s16(
+                                                 vaddq_s16(p0s, mdelta), vdupq_n_s16(0)), vdupq_n_s16(255));
+                int16x8_t q0_new = vminq_s16(vmaxq_s16(
+                                                 vsubq_s16(q0s, mdelta), vdupq_n_s16(0)), vdupq_n_s16(255));
+                vstrbq_p_u16(data - 1 * width,
+                             vreinterpretq_u16_s16(p0_new), main_mask);
+                vstrbq_p_u16(data,
+                             vreinterpretq_u16_s16(q0_new), main_mask);
+            }
+            else
+            {
+                int16x8_t p0_new = vshrq_n_s16(vaddq_n_s16(
+                                                   vaddq_s16(vaddq_s16(vshlq_n_s16(p1s, 1), p0s), q1s), 2), 2);
+                int16x8_t q0_new = vshrq_n_s16(vaddq_n_s16(
+                                                   vaddq_s16(vaddq_s16(vshlq_n_s16(q1s, 1), q0s), p1s), 2), 2);
+                vstrbq_p_u16(data - 1 * width,
+                             vreinterpretq_u16_s16(p0_new), main_mask);
+                vstrbq_p_u16(data,
+                             vreinterpretq_u16_s16(q0_new), main_mask);
+            }
+        }
+        return;
+    }
+#endif
 
     if (bS < 4)
     {

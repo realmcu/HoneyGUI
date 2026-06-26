@@ -16,7 +16,19 @@ if(ZEPHYR_BASE)
 	  target_compile_options(${GUI_TARGET_NAME} PRIVATE -Wno-double-promotion)
 	  add_subdirectory(realgui)
 	  add_subdirectory(example)
-	  
+
+	  # Compile the ENTIRE GUI library with -Ofast.
+	  # NOTE: target_compile_options(${GUI_TARGET_NAME} PRIVATE -Ofast) does NOT work
+	  # here -- Zephyr appends its interface-level -Os AFTER per-target options, so
+	  # -Os would win (GCC takes the last -O). Instead we attach -Ofast as a
+	  # source-file COMPILE_OPTIONS to every source of guiLib; CMake emits per-source
+	  # options last on the compile line, so -Ofast overrides the inherited -Os.
+	  # Done here (guiLib's own directory) after all add_subdirectory() calls, so the
+	  # SOURCES list is complete and the property lands in the right directory scope.
+	  get_target_property(_gui_all_srcs ${GUI_TARGET_NAME} SOURCES)
+	  if(_gui_all_srcs)
+	      set_source_files_properties(${_gui_all_srcs} PROPERTIES COMPILE_OPTIONS "-Ofast")
+	  endif()
   endif()
 elseif(CONFIG_AMEBAGREEN2)
   ameba_internal_library(honeygui)
