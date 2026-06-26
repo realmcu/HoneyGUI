@@ -1122,6 +1122,11 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                 out_chr->char_h = font_height;
                 out_chr->dot_addr = best->font_file + ttfoffset;
                 out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+                if (out_chr->char_w == 0 && glyphData->x1 > glyphData->x0)
+                {
+                    int _vis = (int)roundf((glyphData->x1 - glyphData->x0) * scale) + bold_weight * 2;
+                    out_chr->char_w = (uint16_t)(_vis > 0 ? _vis : 1);
+                }
 #endif
 
                 if (alloc_index) { gui_free(alloc_index); }
@@ -1169,6 +1174,11 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                             out_chr->char_h = font_height;
                             out_chr->dot_addr = dot_addr;
                             out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+                            if (out_chr->char_w == 0 && glyphData->x1 > glyphData->x0)
+                            {
+                                int _vis = (int)roundf((glyphData->x1 - glyphData->x0) * scale) + bold_weight * 2;
+                                out_chr->char_w = (uint16_t)(_vis > 0 ? _vis : 1);
+                            }
 #endif
 
                             gui_free(winding_lengths);
@@ -1229,6 +1239,11 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                                 out_chr->char_h = font_height;
                                 out_chr->dot_addr = dot_addr;
                                 out_chr->char_w = glyphData->advance * scale + bold_weight * 2;
+                                if (out_chr->char_w == 0 && glyphData->x1 > glyphData->x0)
+                                {
+                                    int _vis = (int)roundf((glyphData->x1 - glyphData->x0) * scale) + bold_weight * 2;
+                                    out_chr->char_w = (uint16_t)(_vis > 0 ? _vis : 1);
+                                }
 #endif
 
                                 gui_free(winding_lengths);
@@ -1374,9 +1389,16 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
 
         /* advance = round(advance_fu * scale) + bold_weight * 2 */
         int16_t raw_advance = (int16_t)roundf(glyphData->advance * scale);
-        uint8_t final_advance = (uint8_t)(raw_advance + bold_weight * 2);
+        uint16_t final_advance = (uint16_t)(raw_advance + bold_weight * 2);
         chr->advance = final_advance;
         chr->char_w = final_advance;  /* for compatibility with width sum */
+        /* Combining marks (advance=0) have visual extent but zero advance.
+         * Set char_w from bbox so the draw loop does not skip them. */
+        if (final_advance == 0 && glyphData->x1 > glyphData->x0)
+        {
+            int vis_w = (int)roundf((glyphData->x1 - glyphData->x0) * scale) + bold_weight * 2;
+            chr->char_w = (uint16_t)(vis_w > 0 ? vis_w : 1);
+        }
     }
     else
     {
@@ -1385,6 +1407,12 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
          * Scheduled for removal ~6-12 months after standard typography release.
          */
         chr->char_w = glyphData->advance * scale + bold_weight * 2;
+        /* Combining marks (advance=0): set char_w from bbox to avoid draw-loop skip. */
+        if (chr->char_w == 0 && glyphData->x1 > glyphData->x0)
+        {
+            int vis_w = (int)roundf((glyphData->x1 - glyphData->x0) * scale) + bold_weight * 2;
+            chr->char_w = (uint16_t)(vis_w > 0 ? vis_w : 1);
+        }
     }
 }
 #endif /* ENABLE_FONT_V3_TYPO */
@@ -1771,6 +1799,12 @@ void gui_font_get_ttf_info(gui_text_t *text)
                     chr[chr_i].char_h = text->font_height;
                     chr[chr_i].dot_addr = font_ptr;
                     chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+                    if (chr[chr_i].char_w == 0 && glyphData->x1 > glyphData->x0)
+                    {
+                        int _vis = (int)roundf((glyphData->x1 - glyphData->x0) * scale)
+                                   + text->bold_weight * 2;
+                        chr[chr_i].char_w = (uint16_t)(_vis > 0 ? _vis : 1);
+                    }
 #endif
                 }
                 else if (text->font_mode == FONT_SRC_FTL)
@@ -1810,6 +1844,12 @@ void gui_font_get_ttf_info(gui_text_t *text)
                     chr[chr_i].char_h = text->font_height;
                     chr[chr_i].dot_addr = dot_addr;
                     chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+                    if (chr[chr_i].char_w == 0 && glyphData->x1 > glyphData->x0)
+                    {
+                        int _vis = (int)roundf((glyphData->x1 - glyphData->x0) * scale)
+                                   + text->bold_weight * 2;
+                        chr[chr_i].char_w = (uint16_t)(_vis > 0 ? _vis : 1);
+                    }
 #endif
 
                     gui_free(glyphData);
@@ -1859,6 +1899,12 @@ void gui_font_get_ttf_info(gui_text_t *text)
                     chr[chr_i].char_h = text->font_height;
                     chr[chr_i].dot_addr = dot_addr;
                     chr[chr_i].char_w = glyphData->advance * scale + text->bold_weight * 2;
+                    if (chr[chr_i].char_w == 0 && glyphData->x1 > glyphData->x0)
+                    {
+                        int _vis = (int)roundf((glyphData->x1 - glyphData->x0) * scale)
+                                   + text->bold_weight * 2;
+                        chr[chr_i].char_w = (uint16_t)(_vis > 0 ? _vis : 1);
+                    }
 #endif
 
                     gui_free(glyphData);

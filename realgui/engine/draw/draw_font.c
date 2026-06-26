@@ -593,11 +593,48 @@ static void update_thai_char_position(mem_char_t *base_chr, mem_char_t *mark_chr
     for (uint32_t i = 0; i < mark_count; i++)
     {
         uint32_t base_idx = marks[i].base_index - 1;
-        mark_chr[i].x = base_chr[base_idx].x + base_chr[base_idx].char_w - mark_chr[i].char_w;
-        mark_chr[i].y = base_chr[base_idx].y;
-        if (marks[i].mark_pos == THAI_TOPMOST)
+#if ENABLE_FONT_V3_TYPO
+        if (mark_chr[i].bearing_y != 0)
         {
-            mark_chr[i].y -= mark_chr[i].char_h;
+            /* V3: pen lands after base advance; apply mark's own bearing from there. */
+            int16_t pen_x = base_chr[base_idx].x - base_chr[base_idx].bearing_x
+                            + (int16_t)base_chr[base_idx].char_w;
+            int16_t baseline_y = base_chr[base_idx].y + base_chr[base_idx].bearing_y;
+            mark_chr[i].x = pen_x + mark_chr[i].bearing_x;
+            mark_chr[i].y = baseline_y - mark_chr[i].bearing_y;
+            if (marks[i].mark_pos == THAI_TOPMOST && i > 0
+                && marks[i].base_index == marks[i - 1].base_index)
+            {
+                mark_chr[i].y -= (int16_t)(mark_chr[i].h / 8);
+            }
+        }
+        else
+#endif
+        {
+            mark_chr[i].y = base_chr[base_idx].y;
+            if (mark_chr[i].char_h < mark_chr[i].h)
+            {
+                /* Bitmap: char_h is actual image height.
+                 * Right-align mark within base; shift TOPMOST above ABOVE. */
+                mark_chr[i].x = base_chr[base_idx].x + base_chr[base_idx].char_w
+                                - mark_chr[i].char_w;
+                if (marks[i].mark_pos == THAI_TOPMOST)
+                {
+                    mark_chr[i].y -= mark_chr[i].char_h;
+                }
+            }
+            else
+            {
+                /* TTF: char_h == h (font_height); glyph x0 in the render function
+                 * provides the horizontal offset — set mark.x to pen_after_base. */
+                mark_chr[i].x = base_chr[base_idx].x + base_chr[base_idx].char_w;
+                /* TOPMOST: shift up by ~1/6 of font_height to clear the ABOVE mark. */
+                if (marks[i].mark_pos == THAI_TOPMOST && i > 0
+                    && marks[i].base_index == marks[i - 1].base_index)
+                {
+                    mark_chr[i].y -= (int16_t)(mark_chr[i].h / 8);
+                }
+            }
         }
     }
 }
