@@ -87,6 +87,7 @@ typedef enum
     IMG_2D_SW_FIX_A8_FG, //fixed fg
     IMG_2D_SW_FIX_A8_BGFG, //fixed fg and bg
     IMG_PLUS_DARKER, //darken blend: min(blended, background)
+    IMG_A8_BLUR, //A8-shaped blur: blur the framebuffer under the image, masked by the A8 alpha
 } BLEND_MODE_TYPE;
 /* BLEND_MODE_TYPE structure end*/
 

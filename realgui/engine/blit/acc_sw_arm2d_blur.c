@@ -287,9 +287,13 @@ void arm2d_local_rgb565_filter_iir_blur(
 
                 arm2d_local_rgb565_unpack_comp(*phwTargetPixel, &tPixel);
 
-                tAcc.hwB += (tPixel.B - tAcc.hwB) * hwRatio >> 8;  tPixel.B = tAcc.hwB;
-                tAcc.hwG += (tPixel.G - tAcc.hwG) * hwRatio >> 8;  tPixel.G = tAcc.hwG;
-                tAcc.hwR += (tPixel.R - tAcc.hwR) * hwRatio >> 8;  tPixel.R = tAcc.hwR;
+                tAcc.hwB += (tPixel.B - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (tPixel.G - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (tPixel.R - tAcc.hwR) * hwRatio >> 8;
+
+                tPixel.B = tAcc.hwB;
+                tPixel.G = tAcc.hwG;
+                tPixel.R = tAcc.hwR;
 
                 *phwTargetPixel = arm2d_local_rgb565_pack(&tPixel);
 
@@ -339,9 +343,13 @@ void arm2d_local_rgb565_filter_iir_blur(
 
                 arm2d_local_rgb565_unpack_comp(*phwTargetPixel, &tPixel);
 
-                tAcc.hwB += (tPixel.B - tAcc.hwB) * hwRatio >> 8;  tPixel.B = tAcc.hwB;
-                tAcc.hwG += (tPixel.G - tAcc.hwG) * hwRatio >> 8;  tPixel.G = tAcc.hwG;
-                tAcc.hwR += (tPixel.R - tAcc.hwR) * hwRatio >> 8;  tPixel.R = tAcc.hwR;
+                tAcc.hwB += (tPixel.B - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (tPixel.G - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (tPixel.R - tAcc.hwR) * hwRatio >> 8;
+
+                tPixel.B = tAcc.hwB;
+                tPixel.G = tAcc.hwG;
+                tPixel.R = tAcc.hwR;
 
                 *phwTargetPixel = arm2d_local_rgb565_pack(&tPixel);
 
@@ -419,9 +427,13 @@ static void arm2d_local_argb8888_filter_iir_blur(
             for (iX = 0; iX < iWidth; iX++)
             {
                 uint8_t *p = (uint8_t *)pwTargetPixel;
-                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;  p[0] = (uint8_t)tAcc.hwB;
-                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;  p[1] = (uint8_t)tAcc.hwG;
-                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;  p[2] = (uint8_t)tAcc.hwR;
+                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;
+
+                p[0] = (uint8_t)tAcc.hwB;
+                p[1] = (uint8_t)tAcc.hwG;
+                p[2] = (uint8_t)tAcc.hwR;
                 pwTargetPixel++;
             }
 
@@ -463,9 +475,13 @@ static void arm2d_local_argb8888_filter_iir_blur(
             for (iY = 0; iY < iHeight; iY++)
             {
                 uint8_t *p = (uint8_t *)pwTargetPixel;
-                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;  p[0] = (uint8_t)tAcc.hwB;
-                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;  p[1] = (uint8_t)tAcc.hwG;
-                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;  p[2] = (uint8_t)tAcc.hwR;
+                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;
+
+                p[0] = (uint8_t)tAcc.hwB;
+                p[1] = (uint8_t)tAcc.hwG;
+                p[2] = (uint8_t)tAcc.hwR;
                 pwTargetPixel += iTargetStride;
             }
 
