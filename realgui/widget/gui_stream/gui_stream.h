@@ -46,7 +46,7 @@ typedef enum
     GUI_STREAM_CODEC_MSV1,      /**< Microsoft Video 1, 16-bpp (RGB555) only.    */
     GUI_STREAM_CODEC_CINEPAK,   /**< Cinepak (CVID).                             */
     GUI_STREAM_CODEC_RLE,       /**< Reserved -- not implemented yet.            */
-    GUI_STREAM_CODEC_H264,      /**< Placeholder -- not implemented yet.         */
+    GUI_STREAM_CODEC_H264,      /**< H.264 Annex-B, one Access Unit per frame.   */
 } gui_stream_codec_t;
 
 /**
@@ -57,8 +57,8 @@ typedef enum
  * never mutates the shared transport configuration.
  *
  * @note Unconditional drop is only safe for independently decodable frames
- *       (RAW / JPEG / intra-only).  For inter-coded streams (MSV1 / Cinepak)
- *       skipping frames corrupts decoder state, so the default is NONE.
+ *       (RAW / JPEG / intra-only).  For inter-coded streams (MSV1 / Cinepak /
+ *       H.264) skipping frames corrupts decoder state, so the default is NONE.
  */
 typedef enum
 {
@@ -105,6 +105,7 @@ typedef struct gui_stream
     {
         struct { msv1_decoder_t    *dec; } msv1;     /**< 16-bpp, no palette    */
         struct { cinepak_decoder_t *dec; } cinepak;
+        struct { void              *dec; } h264;     /**< GUI_H264BSD_DECODER*  */
     } u;
 
     uint32_t             update_interval; /**< ms between frame pulls           */

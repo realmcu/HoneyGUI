@@ -91,5 +91,58 @@ int gui_h264bsd_destroy_decoder(void *gui_decoder);
 void *gui_h264bsd_create_decoder(uint8_t *fileData, long fileSize);
 
 
+/*============================================================================*
+ *      Streaming API -- feed one Access Unit (AU) at a time
+ *
+ *  The functions above are file-oriented: the whole elementary stream is given
+ *  up front and the decoder walks it.  The streaming API below keeps a
+ *  persistent decoder fed one coded picture (Access Unit) per call, which is
+ *  what a live transport delivers.  H.264 is inter-coded and the decoder is
+ *  stateful (reference frames in the DPB), so AUs MUST be supplied in order and
+ *  never dropped.
+ *
+ *  Distinct names from the file API so a consumer (e.g. gui_stream) can declare
+ *  weak stubs for them without colliding with the file-API weak stubs declared
+ *  elsewhere (e.g. gui_video).
+ *============================================================================*/
+
+/**
+ * Create a decoder with no source bound -- the stream is fed later, one Access
+ * Unit at a time, via ::gui_h264bsd_decode_au.
+ *
+ * @return Pointer to the decoder upon success, or NULL upon failure.
+ */
+void *gui_h264bsd_create_decoder_stream(void);
+
+/**
+ * Decode one Access Unit (one coded picture, possibly multiple slices, with any
+ * leading SPS/PPS) and, when a picture completes, convert it to BGR565 into the
+ * caller's buffer.
+ *
+ * The decoder may modify @p au in place (RBSP extraction / emulation-prevention
+ * removal), so the buffer must be writable.
+ *
+ * @param gui_decoder Pointer to a decoder from ::gui_h264bsd_create_decoder_stream.
+ * @param au          Annex-B bytes of exactly one Access Unit (with start codes).
+ * @param au_len      Length of @p au in bytes.
+ * @param frame_buff  Destination for the BGR565 picture (16 bpp).
+ * @param buff_size   Size of @p frame_buff in bytes (must be >= width*height*2).
+ *
+ * @return H264BSD_SUCCESS when a picture was produced into @p frame_buff;
+ *         H264BSD_ERR_EOF when the AU carried no complete picture (e.g. only
+ *         parameter sets); other ::H264BSD_ERR_CODE on a decode error.
+ */
+int gui_h264bsd_decode_au(void *gui_decoder, const uint8_t *au, uint32_t au_len,
+                          uint8_t *frame_buff, uint32_t buff_size);
+
+/**
+ * Destroy a streaming decoder created by ::gui_h264bsd_create_decoder_stream.
+ *
+ * @param gui_decoder Pointer to the decoder instance to be destroyed.
+ *
+ * @return H264BSD_SUCCESS on success, or a ::H264BSD_ERR_CODE on failure.
+ */
+int gui_h264bsd_destroy_stream(void *gui_decoder);
+
 
 #endif

@@ -18,7 +18,7 @@ CPPDEFINES = []
 if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_STREAM_WIDGET'):
 
     src += ['example_gui_stream.c']
-    CPPDEFINES = ['DRV_LCD_WIDTH=410']
+    CPPDEFINES = ['DRV_LCD_WIDTH=460']
     CPPDEFINES += ['DRV_LCD_HEIGHT=502']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
     CPPDEFINES += ['DRV_LCD_CORNER_RADIUS=0']
@@ -40,6 +40,15 @@ if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_STREAM_WIDGET'):
         # in place from its own root_image (no copy into this demo).
         BIN_FILE = os.path.join(BIN_SUBDIR, 'earth_420_410_502_40_lq.mjpg')
         OBJ_FILE = os.path.join(BIN_SUBDIR, 'earth_420_410_502_40_lq_mjpg.o')
+        result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
+        if result_node:
+            additional_objs.append(result_node)
+
+        # H.264 source: birds clip in the custom "H264" container (24-byte
+        # header + Annex-B elementary stream).  Only referenced by the opt-in
+        # STREAM_DEMO_BIRDS build; embedded unconditionally so the symbol exists.
+        BIN_FILE = os.path.join(BIN_SUBDIR, 'birds_header.h264')
+        OBJ_FILE = os.path.join(BIN_SUBDIR, 'birds_header_h264.o')
         result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
         if result_node:
             additional_objs.append(result_node)

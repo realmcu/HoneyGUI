@@ -23,6 +23,38 @@
 #define STREAM_HEAD_SZ       ((uint32_t)sizeof(gui_rgb_data_head_t))
 
 /*============================================================================*
+ *                    H.264 streaming decoder (weak stubs)
+ *
+ *  Resolved to the real implementation in realgui/3rd/h264bsd/src/gui_h264bsd.c
+ *  when CONFIG_REALTEK_H264BSD is enabled; otherwise these no-op stubs let the
+ *  widget link and the H264 path degrades gracefully (create fails / decode
+ *  returns nonzero -> keep the previous frame).  Distinct names from the
+ *  file-oriented gui_h264bsd_* weak stubs in gui_video.c so the two never clash.
+ *============================================================================*/
+__attribute__((weak)) void *gui_h264bsd_create_decoder_stream(void)
+{
+    gui_log("h264bsd decoder is not enabled\n");
+    return NULL;
+}
+__attribute__((weak)) int gui_h264bsd_decode_au(void *gui_decoder, const uint8_t *au,
+                                                uint32_t au_len, uint8_t *frame_buff,
+                                                uint32_t buff_size)
+{
+    GUI_UNUSED(gui_decoder); GUI_UNUSED(au); GUI_UNUSED(au_len);
+    GUI_UNUSED(frame_buff);  GUI_UNUSED(buff_size);
+    return -1;
+}
+__attribute__((weak)) int gui_h264bsd_destroy_stream(void *gui_decoder)
+{
+    GUI_UNUSED(gui_decoder);
+    return 0;
+}
+extern void *gui_h264bsd_create_decoder_stream(void);
+extern int gui_h264bsd_decode_au(void *gui_decoder, const uint8_t *au, uint32_t au_len,
+                                 uint8_t *frame_buff, uint32_t buff_size);
+extern int gui_h264bsd_destroy_stream(void *gui_decoder);
+
+/*============================================================================*
  *                    Private: Helpers
  *============================================================================*/
 
@@ -122,8 +154,16 @@ static bool stream_decode_frame(gui_stream_t *this, const stp_frame_t *f,
             return true;
         }
 
-    case GUI_STREAM_CODEC_RLE:
     case GUI_STREAM_CODEC_H264:
+        {
+            int r = gui_h264bsd_decode_au(this->u.h264.dec,
+                                          (const uint8_t *)f->addr, f->used,
+                                          this->render_buf + STREAM_HEAD_SZ,
+                                          this->buf_pixel_sz);
+            return (r == 0);
+        }
+
+    case GUI_STREAM_CODEC_RLE:
     default:
         if (!this->placeholder_warned)
         {
@@ -248,6 +288,14 @@ static void stream_destroy(gui_obj_t *obj)
             this->u.cinepak.dec = NULL;
         }
     }
+    else if (this->codec == GUI_STREAM_CODEC_H264)
+    {
+        if (this->u.h264.dec)
+        {
+            gui_h264bsd_destroy_stream(this->u.h264.dec);
+            this->u.h264.dec = NULL;
+        }
+    }
 
     if (this->jpeg_cur)
     {
@@ -344,6 +392,20 @@ static gui_stream_t *stream_ctor(gui_obj_t *parent, const char *name,
         if (!this->u.cinepak.dec)
         {
             gui_log("gui_stream: Cinepak decoder create failed\n");
+            gui_free(this->render_buf);
+            gui_free(this);
+            return NULL;
+        }
+    }
+    else if (codec == GUI_STREAM_CODEC_H264)
+    {
+        /* Persistent decoder fed one Access Unit per frame.  It converts into
+         * render_buf + head on each decode, so (unlike MSV1 / Cinepak) it is
+         * not bound to pixel_buf at creation time. */
+        this->u.h264.dec = gui_h264bsd_create_decoder_stream();
+        if (!this->u.h264.dec)
+        {
+            gui_log("gui_stream: H264 decoder create failed\n");
             gui_free(this->render_buf);
             gui_free(this);
             return NULL;

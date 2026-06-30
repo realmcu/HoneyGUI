@@ -33,6 +33,7 @@
  * Sources:
  *   STREAM_DEMO_DUCK  -- duck.avi    -> Microsoft Video 1, 272x272 (inter-frame)
  *   STREAM_DEMO_EARTH -- earth MJPEG -> baseline JPEG, 410x502     (intra-frame)
+ *   STREAM_DEMO_BIRDS -- birds .h264 -> H.264 baseline, 432x240    (inter-frame)
  *
  * ===========================================================================
  *  Where the transport comes from
@@ -98,14 +99,16 @@
 
 #define STREAM_DEMO_DUCK    1   /**< MSV1 via AVI  (inter-frame, order-sensitive) */
 #define STREAM_DEMO_EARTH   2   /**< JPEG via MJPEG (intra-frame, drop-safe)      */
+#define STREAM_DEMO_BIRDS   3   /**< H.264 Annex-B  (inter-frame, NEVER drop)     */
 
 #ifndef STREAM_DEMO_SELECTION
-#define STREAM_DEMO_SELECTION  STREAM_DEMO_EARTH
+#define STREAM_DEMO_SELECTION  STREAM_DEMO_BIRDS
 #endif
 
-#if (STREAM_DEMO_SELECTION != STREAM_DEMO_DUCK) && \
-    (STREAM_DEMO_SELECTION != STREAM_DEMO_EARTH)
-#error "STREAM_DEMO_SELECTION must be exactly STREAM_DEMO_DUCK or STREAM_DEMO_EARTH"
+#if (STREAM_DEMO_SELECTION != STREAM_DEMO_DUCK)  && \
+    (STREAM_DEMO_SELECTION != STREAM_DEMO_EARTH) && \
+    (STREAM_DEMO_SELECTION != STREAM_DEMO_BIRDS)
+#error "STREAM_DEMO_SELECTION must be STREAM_DEMO_DUCK, STREAM_DEMO_EARTH or STREAM_DEMO_BIRDS"
 #endif
 
 /*============================================================================*
@@ -120,7 +123,7 @@ extern const unsigned char _binary_duck_avi_start[];
 #define STREAM_DEMO_FLASH_ADDR   0x240F400UL
 #endif
 
-#else /* STREAM_DEMO_EARTH */
+#elif (STREAM_DEMO_SELECTION == STREAM_DEMO_EARTH)
 
 #ifdef _HONEYGUI_SIMULATOR_
 extern const unsigned char _binary_earth_420_410_502_40_lq_mjpg_start[];
@@ -128,6 +131,16 @@ extern const unsigned char _binary_earth_420_410_502_40_lq_mjpg_end[];
 #else
 #define STREAM_DEMO_FLASH_ADDR   0x7004D100UL
 #define STREAM_DEMO_FLASH_SIZE   5574973UL
+#endif
+
+#else /* STREAM_DEMO_BIRDS */
+
+#ifdef _HONEYGUI_SIMULATOR_
+extern const unsigned char _binary_birds_header_h264_start[];
+extern const unsigned char _binary_birds_header_h264_end[];
+#else
+#define STREAM_DEMO_FLASH_ADDR   0x7004D100UL   /* set to the birds flash address on HW */
+#define STREAM_DEMO_FLASH_SIZE   3232535UL
 #endif
 
 #endif /* STREAM_DEMO_SELECTION */
@@ -446,7 +459,7 @@ static bool source_open(stream_producer_t *prod, stream_spec_t *spec)
 #define DEMO_NAME       "stream_msv1"
 #define DEMO_LABEL      "duck-MSV1"
 
-#else /* STREAM_DEMO_EARTH */
+#elif (STREAM_DEMO_SELECTION == STREAM_DEMO_EARTH)
 
 #define JPEG_MARK   0xFF
 #define JPEG_SOI    0xD8
@@ -533,6 +546,149 @@ static bool source_open(stream_producer_t *prod, stream_spec_t *spec)
 #define PRODUCER_ENTRY  mjpeg_producer_entry
 #define DEMO_NAME       "stream_jpeg"
 #define DEMO_LABEL      "earth-MJPEG"
+
+#else /* STREAM_DEMO_BIRDS */
+
+/* H.264 Annex-B NAL unit types used for access-unit (AU) splitting. */
+#define H264_NAL_SLICE      1u   /* coded slice of a non-IDR picture */
+#define H264_NAL_SLICE_IDR  5u   /* coded slice of an IDR picture    */
+#define H264_NAL_SPS        7u   /* sequence parameter set           */
+
+/* Return the next 3-byte (00 00 01) start-code prefix at or after p, else NULL.
+ * A 4-byte (00 00 00 01) code matches on its trailing three bytes; the extra
+ * leading zero stays with the previous AU as a harmless trailing_zero_8bits. */
+static const uint8_t *h264_next_start_code(const uint8_t *p, const uint8_t *end)
+{
+    while (p + 3 <= end)
+    {
+        if (p[0] == 0u && p[1] == 0u && p[2] == 1u)
+        {
+            return p;
+        }
+        p++;
+    }
+    return NULL;
+}
+
+/* Regroup the Annex-B NAL stream into access units (one decodable picture each)
+ * and emit every AU as a frame.  An AU boundary is a VCL slice whose
+ * first_mb_in_slice == 0 once a VCL was already seen, or a non-VCL NAL after a
+ * VCL.  H.264 is inter-coded, so AUs are emitted strictly in order and the
+ * transport/widget never drop (DROP_NONE). */
+static void h264_producer_entry(void *param)
+{
+    stream_producer_t *prod = (stream_producer_t *)param;
+    const uint8_t     *base = prod->src;
+    const uint8_t     *end  = base + prod->src_len;
+
+    while (prod->running)
+    {
+        const uint8_t *sc        = h264_next_start_code(base, end);
+        const uint8_t *au_start  = sc;
+        bool           seen_vcl  = false;
+        bool           au_is_key = false;
+
+        while (prod->running && sc != NULL)
+        {
+            const uint8_t *nal  = sc + 3;
+            const uint8_t *next = h264_next_start_code(nal, end);
+            if (nal >= end)
+            {
+                break;
+            }
+
+            uint8_t nal_type  = (uint8_t)(nal[0] & 0x1Fu);
+            bool    is_vcl    = (nal_type == H264_NAL_SLICE ||
+                                 nal_type == H264_NAL_SLICE_IDR);
+            /* first_mb_in_slice == 0 -> the top bit of the byte after the NAL
+             * header is set, since ue(0) encodes as a single '1' bit. */
+            bool    first_mb0 = is_vcl && (nal + 1 < end) &&
+                                ((nal[1] & 0x80u) != 0u);
+            bool    boundary  = (is_vcl && first_mb0 && seen_vcl) ||
+                                (!is_vcl && seen_vcl);
+
+            if (boundary)
+            {
+                uint32_t sz = (uint32_t)(sc - au_start);
+                if (sz > 0u && sz <= MAX_FRAME)
+                {
+                    producer_post_frame(prod, au_start, sz, au_is_key);
+                    gui_thread_mdelay(prod->interval_ms);
+                }
+                au_start  = sc;
+                seen_vcl  = false;
+                au_is_key = false;
+            }
+
+            if (is_vcl)
+            {
+                seen_vcl = true;
+            }
+            if (nal_type == H264_NAL_SLICE_IDR || nal_type == H264_NAL_SPS)
+            {
+                au_is_key = true;
+            }
+            sc = next;
+        }
+
+        /* Flush the trailing AU [au_start, end) once the scan runs dry. */
+        if (prod->running && au_start != NULL)
+        {
+            uint32_t sz = (uint32_t)(end - au_start);
+            if (sz > 0u && sz <= MAX_FRAME)
+            {
+                producer_post_frame(prod, au_start, sz, au_is_key);
+                gui_thread_mdelay(prod->interval_ms);
+            }
+        }
+    }
+}
+
+/* Validate the "H264" container header, publish geometry/fps into the spec and
+ * stash the raw Annex-B payload (right after the 24-byte header) as the source. */
+static bool source_open(stream_producer_t *prod, stream_spec_t *spec)
+{
+#ifdef _HONEYGUI_SIMULATOR_
+    const uint8_t *blob = (const uint8_t *)_binary_birds_header_h264_start;
+    /* Convert to integers before subtracting: the linker emits start/end as two
+     * distinct symbols, so a direct pointer subtraction trips the static
+     * analyzer's comparePointers (UB) check. */
+    uint32_t       blen = (uint32_t)((uintptr_t)_binary_birds_header_h264_end -
+                                     (uintptr_t)_binary_birds_header_h264_start);
+#else
+    const uint8_t *blob = (const uint8_t *)STREAM_DEMO_FLASH_ADDR;
+    uint32_t       blen = (uint32_t)STREAM_DEMO_FLASH_SIZE;
+#endif
+
+    if (!blob || blen < sizeof(gui_h264_header_t))
+    {
+        gui_log("stream demo: bad H264 blob\n");
+        return false;
+    }
+
+    const gui_h264_header_t *hdr = (const gui_h264_header_t *)blob;
+    if (memcmp(hdr->symbol, "H264", 4) != 0)
+    {
+        gui_log("stream demo: not an H264 container\n");
+        return false;
+    }
+
+    uint32_t frame_ms = (hdr->frame_time != 0u) ? hdr->frame_time : 40u;
+
+    spec->w       = (uint16_t)hdr->w;
+    spec->h       = (uint16_t)hdr->h;
+    spec->fps_num = 1000u;
+    spec->fps_den = frame_ms;
+    spec->codec   = GUI_STREAM_CODEC_H264;
+
+    prod->src     = blob + sizeof(gui_h264_header_t);
+    prod->src_len = hdr->size;
+    return true;
+}
+
+#define PRODUCER_ENTRY  h264_producer_entry
+#define DEMO_NAME       "stream_h264"
+#define DEMO_LABEL      "birds-H264"
 
 #endif /* STREAM_DEMO_SELECTION */
 
