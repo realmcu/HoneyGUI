@@ -140,7 +140,8 @@ typedef struct _gui_obj_t
     //end of run time
     uint32_t type                       : 8;    // T_OBJ_TYPE; no need this, only use name
     uint32_t active                     : 1;    // this_widget flag means obj location in screen
-    uint32_t not_show                   : 1;
+uint32_t hidden                     :
+    1;    // if true, object is not rendered and does not receive events; replaces not_show
 
     uint32_t suppress_conflict_obj_cnt  : 6;
     uint32_t opacity_value              : 8;

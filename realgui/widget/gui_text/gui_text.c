@@ -318,7 +318,7 @@ static void gui_text_prepare(gui_obj_t *obj)
     }
 
     /* --- Heavy section: skip when hidden to avoid wasted work --- */
-    if (obj->not_show)
+    if (obj->hidden)
     {
         return;
     }

@@ -280,7 +280,7 @@ static void create_bubble(int x, int y)
     for (int i = 0; i < MAX_BUBBLES; i++)
     {
         Bubble *bubble = bubbles + i;
-        if (!bubble->img || bubble->img->base.not_show)
+        if (!bubble->img || gui_obj_is_hidden(GUI_BASE(bubble->img)))
         {
             if (!bubble->img)
             {
@@ -291,7 +291,7 @@ static void create_bubble(int x, int y)
             {
                 bubble->img->base.x = x;
                 bubble->img->base.y = y;
-                bubble->img->base.not_show = false;
+                gui_obj_hidden(&bubble->img->base, false);
             }
 
             bubble->scale = 0.3f + (xorshift16() % 7) / 20.0f;
@@ -316,7 +316,7 @@ static void update_all_bubbles(void)
     for (int i = 0; i < MAX_BUBBLES; i++)
     {
         Bubble *bubble = bubbles + i;
-        if (bubble->img && !bubble->img->base.not_show)
+        if (bubble->img && !gui_obj_is_hidden(GUI_BASE(bubble->img)))
         {
             uint32_t elapsed = current_time - bubble->create_time;
 
@@ -332,7 +332,7 @@ static void update_all_bubbles(void)
 
             if (elapsed > 2500 || bubble->img->opacity_value <= 0)
             {
-                bubble->img->base.not_show = true;
+                gui_obj_hidden(&bubble->img->base, true);
                 active_bubble_count--;
             }
         }

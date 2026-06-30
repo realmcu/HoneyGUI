@@ -121,23 +121,12 @@ gui_obj_t *gui_obj_create(void       *parent,
                           int16_t     h);
 
 /**
-  * @brief Set object show or not.
-  * @param obj Root of the widget tree.
-  * @param enable True for show, false for hide.
-  * * <b>Example usage</b>
-  * \code{.c}
-  * static void app_main_task(void)
-  * {
-  *     gui_img_t *hour;
-  *     gui_obj_show(hour,false);
-  *     gui_obj_show(hour,true);
-  *
-  * }
-  *
-  * \endcode
-  */
+ * @brief Set object show or not.
+ * @deprecated Use gui_obj_hidden() instead.
+ * @param obj Root of the widget tree.
+ * @param enable True for show, false for hide.
+ */
 void gui_obj_show(void *obj, bool enable);
-
 
 /**
  * @brief Judge the obj if out of screen.
@@ -254,6 +243,14 @@ void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y);
  * @param hidden Boolean flag indicating whether the object should be hidden (true) or shown (false).
  */
 void gui_obj_hidden(gui_obj_t *obj, bool hidden);
+
+/**
+ * @brief Get the hidden state of a GUI object.
+ *
+ * @param obj Pointer to the GUI object.
+ * @return true if the object is hidden, false if it is visible.
+ */
+bool gui_obj_is_hidden(gui_obj_t *obj);
 
 /**
  * @brief Set or retrieve the name of a GUI widget.

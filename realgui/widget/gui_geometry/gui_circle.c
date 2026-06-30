@@ -683,9 +683,9 @@ static void gui_circle_prepare(gui_obj_t *obj)
                                     sizeof(this->use_gradient));
     new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->gradient_type,
                                     sizeof(this->gradient_type));
-    // Handle bit-field not_show with temporary variable
-    uint32_t not_show_val = obj->not_show;
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&not_show_val, sizeof(not_show_val));
+    // Handle bit-field hidden with temporary variable
+    uint32_t hidden_val = obj->hidden;
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&hidden_val, sizeof(hidden_val));
 
     // Include gradient data if present
     if (this->gradient != NULL)

@@ -174,7 +174,7 @@ static void draw_timecard(void *parent)
                  32);
     gui_text_type_set(timecard_time_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_time_text, RIGHT);
-    GUI_BASE(canvas_timecard)->not_show = 1;
+    gui_obj_hidden(GUI_BASE(canvas_timecard), true);
 }
 
 static void timer_cb(void *obj)
@@ -193,13 +193,13 @@ static void timer_cb(void *obj)
     GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas_timecard, __WIN1_NAME, gui_view_get_current());
     if (list->offset < 93)
     {
-        img_timecard->not_show = 1;
-        canvas_timecard->not_show = 0;
+        gui_obj_hidden(img_timecard, true);
+        gui_obj_hidden(canvas_timecard, false);
     }
     else
     {
-        img_timecard->not_show = 0;
-        canvas_timecard->not_show = 1;
+        gui_obj_hidden(img_timecard, false);
+        gui_obj_hidden(canvas_timecard, true);
     }
 }
 

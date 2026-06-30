@@ -237,7 +237,7 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     gui_text_t *_this = &text->base;
     gui_point3f_t point = {0, 0, 1};
 
-    if (!_this->base.not_show)
+    if (!gui_obj_is_hidden(GUI_BASE(_this)))
     {
         if (scroll_skip_frame == 0)
         {
@@ -612,7 +612,7 @@ void gui_scroll_text_content_set(gui_scroll_text_t *_this, void *text, uint16_t 
 
 void gui_scroll_text_reset(gui_scroll_text_t *_this)
 {
-    gui_obj_show(_this, true);
+    gui_obj_hidden(GUI_BASE(_this), false);
     _this->base.layout_refresh = true;
     _this->base.content_refresh = true;
     _this->scrolling = true;
@@ -624,7 +624,7 @@ void gui_scroll_text_reset(gui_scroll_text_t *_this)
 void gui_scroll_text_stop(gui_scroll_text_t *_this)
 {
     _this->scrolling = false;
-    gui_obj_show(_this, false);
+    gui_obj_hidden(GUI_BASE(_this), true);
     gui_fb_change();
 }
 

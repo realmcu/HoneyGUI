@@ -814,9 +814,9 @@ static void gui_rect_prepare(gui_obj_t *obj)
                                     sizeof(this->gradient_dir));
     new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->base.w, sizeof(this->base.w));
     new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->base.h, sizeof(this->base.h));
-    // Handle bit-field not_show with temporary variable
-    uint32_t not_show_val = obj->not_show;
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&not_show_val, sizeof(not_show_val));
+    // Handle bit-field hidden with temporary variable
+    uint32_t hidden_val = obj->hidden;
+    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&hidden_val, sizeof(hidden_val));
 
     if (this->gradient != NULL)
     {

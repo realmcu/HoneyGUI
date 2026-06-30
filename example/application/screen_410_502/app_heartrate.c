@@ -206,11 +206,11 @@ static void draw_heartrate_graph(NVGcontext *vg)
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_percentile, "hr_content_percentile", win_hb);
         if (number / 100)
         {
-            img_percentile->not_show = 0;
+            gui_obj_hidden(img_percentile, false);
         }
         else
         {
-            img_percentile->not_show = 1;
+            gui_obj_hidden(img_percentile, true);
         }
         // gui_log("number = %d\n", number);
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_decimal, "hr_content_decimal", win_hb);
@@ -294,7 +294,7 @@ static void heartrate_design(gui_view_t *view)
         gui_img_t *img = gui_img_create_from_mem(win_hb, "hr_content_percentile", text_num_array[1],
                                                  51, 368, 0, 0);
         gui_img_set_quality(img, true);
-        GUI_BASE(img)->not_show = 1;
+        gui_obj_hidden(GUI_BASE(img), true);
         img = gui_img_create_from_mem(win_hb, "hr_content_decimal", text_num_array[6],
                                       51 + text_w, 368, 0, 0);
         gui_img_set_quality(img, true);

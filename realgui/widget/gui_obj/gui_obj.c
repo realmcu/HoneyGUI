@@ -207,14 +207,16 @@ uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len)
 
 
 
-
 void gui_obj_show(void *obj, bool enable)
 {
-    if (obj != NULL)
-    {
-        GET_BASE(obj)->not_show = !enable;
-    }
+    GUI_ASSERT(obj != NULL);
+    GUI_ASSERT((GET_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    gui_log("[DEPRECATED] gui_obj_show() is deprecated, use gui_obj_hidden() instead.\n");
+    gui_obj_hidden(GET_BASE(obj), !enable);
 }
+
+
+
 
 bool gui_obj_out_screen(gui_obj_t *obj)
 {
@@ -487,7 +489,13 @@ gui_obj_t *gui_get_root(gui_obj_t *object)
 void gui_obj_hidden(gui_obj_t *obj, bool hidden)
 {
     GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
-    obj->not_show = hidden;
+    obj->hidden = hidden;
+}
+
+bool gui_obj_is_hidden(gui_obj_t *obj)
+{
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    return obj->hidden;
 }
 
 #define MAX_WIDGET_NAME_LENGTH 128

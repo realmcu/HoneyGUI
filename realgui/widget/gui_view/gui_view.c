@@ -423,11 +423,11 @@ static void gui_view_cache_snapshot_data(gui_view_t *_this)
 
             uint8_t opacity_rec = _this->opacity;
             _this->opacity = UINT8_MAX;
-            bool hidden_rec = _this->base.not_show;
-            _this->base.not_show = false;
+            bool hidden_rec = gui_obj_is_hidden((gui_obj_t *)_this);
+            gui_obj_hidden((gui_obj_t *)_this, false);
             gui_img_tree_convert_to_img((gui_obj_t *)_this, NULL, *cache);
             _this->opacity = opacity_rec;
-            _this->base.not_show = hidden_rec;
+            gui_obj_hidden((gui_obj_t *)_this, hidden_rec);
             gui_log("%s cache snapshot\n", _this->descriptor->name);
         }
     }
@@ -975,7 +975,7 @@ gui_view_t *gui_view_create(void       *parent,
 
         gui_obj_t *obj = (gui_obj_t *)_this;
         obj->parent = parent;
-        obj->not_show = false;
+        gui_obj_hidden(obj, false);
         obj->x = 0;
         obj->y = 0;
         gui_list_remove(&obj->brother_list);

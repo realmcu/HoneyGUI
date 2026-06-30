@@ -60,7 +60,7 @@ static bool is_arc_dirty(gui_arc_t *this)
             this->end_angle != this->cached_end_angle ||
             this->line_width != this->cached_line_width ||
             this->color.color.argb_full != this->cached_color.color.argb_full ||
-            obj->not_show != this->cached_not_show);
+            obj->hidden != this->cached_hidden);
 }
 
 /** Update cached parameters */
@@ -74,7 +74,7 @@ static void update_cache(gui_arc_t *this)
     this->cached_end_angle = this->end_angle;
     this->cached_line_width = this->line_width;
     this->cached_color = this->color;
-    this->cached_not_show = obj->not_show;
+    this->cached_hidden = obj->hidden;
 }
 
 /** Set image data header */

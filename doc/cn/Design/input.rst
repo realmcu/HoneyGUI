@@ -83,18 +83,18 @@
     {
         if (GET_BASE(hour) == false)
         {
-            gui_obj_show(hour, false);
-            gui_obj_show(minute, false);
-            gui_obj_show(second, false);
+            gui_obj_hidden(GUI_BASE(hour), true);
+            gui_obj_hidden(GUI_BASE(minute), true);
+            gui_obj_hidden(GUI_BASE(second), true);
             gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
             gui_img_set_src((gui_img_t *)home_bg, home[1], ((gui_img_t *)home_bg)->storage_type);
 
         }
         else
         {
-            gui_obj_show(hour, true);
-            gui_obj_show(minute, true);
-            gui_obj_show(second, true);
+            gui_obj_hidden(GUI_BASE(hour), false);
+            gui_obj_hidden(GUI_BASE(minute), false);
+            gui_obj_hidden(GUI_BASE(second), false);
             gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
             gui_img_set_src((gui_img_t *)home_bg, home[0], ((gui_img_t *)home_bg)->storage_type);
         }

@@ -133,7 +133,7 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_code_t event, const void *in
 {
     touch_info_t *tp = tp_get_info();
 
-    if (gui_obj_seek_event(obj, event) == false || obj->not_show == true)
+    if (gui_obj_seek_event(obj, event) == false || obj->hidden == true)
     {
         return;
     }

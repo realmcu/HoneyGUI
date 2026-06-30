@@ -145,7 +145,7 @@ static void obj_input_prepare(gui_obj_t *object)
     {
         GUI_ASSERT(node != NULL);
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->not_show)
+        if (obj->hidden)
         {
             continue;
         }
@@ -196,7 +196,7 @@ static void obj_draw_prepare(gui_obj_t *object)
         extern void gui_obj_timer_handler(gui_obj_t *obj); // not called for application
         gui_obj_timer_handler(obj);
 
-        if (obj->not_show)
+        if (obj->hidden)
         {
             continue;
         }

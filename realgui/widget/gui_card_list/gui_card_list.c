@@ -99,7 +99,7 @@ static void card_slot_init(gui_card_list_t *cl, int idx)
     s->base.create_done       = true;
     s->virtual_id             = CARD_LIST_SLOT_FREE_ID;
     s->card_id                = -1;
-    s->base.not_show          = true;
+    gui_obj_hidden(&s->base, true);
 
     /* Append to card_list's child_list (z-order is rebuilt every frame). */
     gui_list_insert_before(&cl->base.child_list, &s->base.brother_list);
@@ -305,7 +305,7 @@ static void card_list_update_pool(gui_card_list_t *cl)
             gui_obj_child_free(&s->base);   /* Frees children, reinits child_list. */
             s->virtual_id     = CARD_LIST_SLOT_FREE_ID;
             s->card_id        = -1;
-            s->base.not_show  = true;
+            gui_obj_hidden(&s->base, true);
         }
     }
 
@@ -321,7 +321,7 @@ static void card_list_update_pool(gui_card_list_t *cl)
                 gui_card_slot_t *s = &cl->slots[i];
                 s->virtual_id    = needed_vids[j];
                 s->card_id       = needed_cids[j];
-                s->base.not_show = false;
+                gui_obj_hidden(&s->base, false);
                 cl->card_design(&s->base, s->card_id, cl->design_param);
                 break;
             }
@@ -335,7 +335,7 @@ static void card_list_update_pool(gui_card_list_t *cl)
  * Buffer slots (abs_pos >= half+1) are hidden so only display_count cards are
  * visible at rest.  They are re-shown as they scroll into the visible zone.
  * Must be called in INPUT_PREPARE (after card_list_update_pool) so the
- * not_show flag is honoured by the subsequent obj_draw_prepare traversal.
+ * hidden flag is honoured by the subsequent obj_draw_prepare traversal.
  */
 static void card_list_update_visibility(gui_card_list_t *cl)
 {
@@ -347,12 +347,12 @@ static void card_list_update_visibility(gui_card_list_t *cl)
 
         if (s->virtual_id == CARD_LIST_SLOT_FREE_ID)
         {
-            s->base.not_show = true;
+            gui_obj_hidden(&s->base, true);
             continue;
         }
 
         float sp    = (float)s->virtual_id + (float)cl->offset / (float)cl->slot_size;
-        s->base.not_show = (fabsf(sp) >= max_abs);
+        gui_obj_hidden(&s->base, fabsf(sp) >= max_abs);
     }
 }
 
@@ -781,11 +781,10 @@ void gui_card_list_set_card_count(gui_card_list_t *cl, uint16_t count)
             gui_obj_child_free(&s->base);
             s->virtual_id    = CARD_LIST_SLOT_FREE_ID;
             s->card_id       = -1;
-            s->base.not_show = true;
+            gui_obj_hidden(&s->base, true);
         }
     }
 
-    /* Reset scroll to card[0]. */
     cl->offset           = 0;
     cl->hold             = 0;
     cl->speed            = 0;

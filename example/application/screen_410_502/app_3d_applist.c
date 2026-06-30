@@ -176,7 +176,7 @@ static void gui_app_switch(gui_lite3d_t *this)
 
             if (app != this)
             {
-                app->base.not_show = true;
+                gui_obj_hidden(&app->base, true);
             }
         }
 
@@ -202,7 +202,7 @@ static void gui_app_switch(gui_lite3d_t *this)
 
         for (int i = 0; i < APP_NUM; i++)
         {
-            app_3d_list[i]->base.not_show = false;
+            gui_obj_hidden(&app_3d_list[i]->base, false);
         }
     }
 

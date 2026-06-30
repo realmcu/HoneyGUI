@@ -144,7 +144,7 @@ static void widget_nanovg_canvas_img_draw_cb(gui_obj_t *obj)
             }
         }
 
-        mpCanvasImg->bpImageCtr->base.not_show = false;
+        gui_obj_hidden(&mpCanvasImg->bpImageCtr->base, false);
         mpCanvasImg->bImageActive = true;
 #ifdef CHECK_REFRESH
 #ifndef _HONEYGUI_SIMULATOR_
@@ -240,7 +240,7 @@ static void widget_nanovg_img_ctor(gui_canvas_img_t *this, gui_obj_t *parent, co
         this->bpImageCtr = gui_img_create_from_mem(parent, "czb_image", this->bpImageBuff, x, y, w, h);
         if (this->bpImageCtr)
         {
-            this->bpImageCtr->base.not_show = true;
+            gui_obj_hidden(&this->bpImageCtr->base, true);
         }
         else if (this->bpImageBuff)
         {

@@ -127,8 +127,8 @@ static void update_flower_animation(void *param)
                 gui_img_translate(petals[i].ghosts[1], petals[i].driftX + ghost1_offset,
                                   petals[i].driftY - petals[i].scale * 32.0f);
 
-                petals[i].ghosts[0]->base.not_show = false;
-                petals[i].ghosts[1]->base.not_show = false;
+                gui_obj_hidden(&petals[i].ghosts[0]->base, false);
+                gui_obj_hidden(&petals[i].ghosts[1]->base, false);
             }
         }
         else // petals drift towards touch point
@@ -149,8 +149,8 @@ static void update_flower_animation(void *param)
                         petals[i].driftX += direction * petals[i].move_speed;
                     }
 
-                    petals[i].ghosts[0]->base.not_show = true;
-                    petals[i].ghosts[1]->base.not_show = true;
+                    gui_obj_hidden(&petals[i].ghosts[0]->base, true);
+                    gui_obj_hidden(&petals[i].ghosts[1]->base, true);
 
                 }
                 tp->history_x = new_x;
@@ -171,8 +171,8 @@ static void update_flower_animation(void *param)
         {
             petals[i].driftY += 3.0f * petals[i].scale; // big petals drift faster
 
-            petals[i].ghosts[0]->base.not_show = true;
-            petals[i].ghosts[1]->base.not_show = true;
+            gui_obj_hidden(&petals[i].ghosts[0]->base, true);
+            gui_obj_hidden(&petals[i].ghosts[1]->base, true);
         }
     }
 
@@ -227,8 +227,8 @@ static void single_petal_init(Petal *single_petal, gui_obj_t *obj, gui_dispdev_t
 
     gui_img_scale(single_petal->ghosts[0], single_petal->scale, single_petal->scale);
     gui_img_scale(single_petal->ghosts[1], single_petal->scale, single_petal->scale);
-    single_petal->ghosts[0]->base.not_show = true;
-    single_petal->ghosts[1]->base.not_show = true;
+    gui_obj_hidden(&single_petal->ghosts[0]->base, true);
+    gui_obj_hidden(&single_petal->ghosts[1]->base, true);
     single_petal->ghosts[0]->opacity_value = 100;
     single_petal->ghosts[1]->opacity_value = 150;
 }

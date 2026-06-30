@@ -29,8 +29,8 @@ static void button_click_handler(void *obj_ptr, gui_event_t *event)
 
     // Toggle state
     state->current_state = !state->current_state;
-    GUI_BASE(state->img_on)->not_show = !state->current_state;
-    GUI_BASE(state->img_off)->not_show = state->current_state;
+    gui_obj_hidden(GUI_BASE(state->img_on), !state->current_state);
+    gui_obj_hidden(GUI_BASE(state->img_off), state->current_state);
 }
 
 /**
@@ -84,8 +84,8 @@ gui_obj_t *hml_create_button(gui_obj_t *parent, ezxml_t node)
 
     // Set initial visibility
     bool is_on = (strcmp(init_state, "on") == 0);
-    GUI_BASE(img_on)->not_show = !is_on;
-    GUI_BASE(img_off)->not_show = is_on;
+    gui_obj_hidden(GUI_BASE(img_on), !is_on);
+    gui_obj_hidden(GUI_BASE(img_off), is_on);
 
     // Allocate and store state
     hml_button_state_t *state = (hml_button_state_t *)gui_malloc(sizeof(hml_button_state_t));

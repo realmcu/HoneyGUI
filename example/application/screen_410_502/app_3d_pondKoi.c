@@ -224,13 +224,13 @@ static void wave_animate_cb(void *param)
     }
     if (wave_animating)
     {
-        wave_img->base.not_show = false;
+        gui_obj_hidden(&wave_img->base, false);
         wave_scale += 0.1f;
         wave_opa -= 5.0f;
         if (wave_opa <= 0)
         {
             wave_opa = 0;
-            wave_img->base.not_show = true;
+            gui_obj_hidden(&wave_img->base, true);
             wave_animating = false;
         }
 
@@ -239,7 +239,7 @@ static void wave_animate_cb(void *param)
     }
     else
     {
-        wave_img->base.not_show = true;
+        gui_obj_hidden(&wave_img->base, true);
     }
 }
 
@@ -424,7 +424,7 @@ static void app_ui_pond_koi_design(gui_view_t *view)
     gui_img_t *wave_img = gui_img_create_from_mem(obj, "wave", WAVE_BIN, 0, 0, 0, 0);
     gui_img_set_mode(wave_img, IMG_SRC_OVER_MODE);
     gui_img_set_focus(wave_img, 32, 32);
-    wave_img->base.not_show = true;
+    gui_obj_hidden(&wave_img->base, true);
 
     gui_lite3d_on_click(lite3d_koi[0], koi_click_cb, NULL);
     gui_lite3d_on_click(lite3d_koi[1], koi_click_cb, NULL);

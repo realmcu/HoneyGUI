@@ -114,7 +114,7 @@ static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
             gui_log("@name:%s, @type:%d\n", object->name, object->type);
             return;
         }
-        obj->not_show = !enable;
+        gui_obj_hidden(obj, !enable);
         gui_obj_tree_child_show(obj, enable);
     }
 }
@@ -192,7 +192,7 @@ void gui_obj_tree_free_async(void *obj)
 void gui_obj_tree_show(gui_obj_t *obj, bool enable)
 {
     gui_obj_tree_child_show(obj, enable);
-    GET_BASE(obj)->not_show = !enable;
+    gui_obj_hidden(GET_BASE(obj), !enable);
 }
 
 gui_obj_t *gui_obj_tree_get_root(gui_obj_t *obj)
