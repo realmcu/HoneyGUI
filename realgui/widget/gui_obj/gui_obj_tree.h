@@ -117,11 +117,11 @@ gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 /**
  * @brief Get widget in tree by name.
  *
- * @param obj Tree.
+ * @param obj Tree. If NULL, then use root object.
  * @param name Widget name.
- * @param output Widget.
+ * @return Widget handle. If not found, then NULL is returned.
  */
-void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
+gui_obj_t *gui_obj_get_handle(gui_obj_t *obj, const char *name);
 
 /**
  * @brief Print name by bfs order.

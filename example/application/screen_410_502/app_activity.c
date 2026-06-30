@@ -115,19 +115,28 @@ static void arc_activity_cb(NVGcontext *vg)
                 stand_val = stand->valueint;
 
                 {
-                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "move_text", current_view_line_48);
-                    sprintf(move_content, "Move:%d/20000steps", move_val);
-                    gui_text_content_set((gui_text_t *)obj, move_content, strlen(move_content));
+                    gui_obj_t *obj = gui_obj_get_handle((void *)current_view_line_48, "move_text");
+                    if (obj)
+                    {
+                        sprintf(move_content, "Move:%d/20000steps", move_val);
+                        gui_text_content_set((gui_text_t *)obj, move_content, strlen(move_content));
+                    }
                 }
                 {
-                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "ex_text", current_view_line_48);
-                    sprintf(ex_content, "Exercise:%d/60min", ex_val);
-                    gui_text_content_set((gui_text_t *)obj, ex_content, strlen(ex_content));
+                    gui_obj_t *obj = gui_obj_get_handle((void *)current_view_line_48, "ex_text");
+                    if (obj)
+                    {
+                        sprintf(ex_content, "Exercise:%d/60min", ex_val);
+                        gui_text_content_set((gui_text_t *)obj, ex_content, strlen(ex_content));
+                    }
                 }
                 {
-                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "stand_text", current_view_line_48);
-                    sprintf(stand_content, "Stand:%d/30times", stand_val);
-                    gui_text_content_set((gui_text_t *)obj, stand_content, strlen(stand_content));
+                    gui_obj_t *obj = gui_obj_get_handle((void *)current_view_line_48, "stand_text");
+                    if (obj)
+                    {
+                        sprintf(stand_content, "Stand:%d/30times", stand_val);
+                        gui_text_content_set((gui_text_t *)obj, stand_content, strlen(stand_content));
+                    }
                 }
             }
         }

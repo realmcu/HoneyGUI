@@ -57,29 +57,47 @@ static void time_update_cb(void *p)
         return;
     }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "date_text", gui_view_get_current());
-    sprintf(date_text_content, "%s %d", day[timeinfo->tm_wday], timeinfo->tm_mday);
-    gui_text_content_set((gui_text_t *)text, date_text_content, strlen(date_text_content));
+    gui_obj_t *text = gui_obj_get_handle((void *)current_view_line_41, "date_text");
+    if (text)
+    {
+        sprintf(date_text_content, "%s %d", day[timeinfo->tm_wday], timeinfo->tm_mday);
+        gui_text_content_set((gui_text_t *)text, date_text_content, strlen(date_text_content));
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
-                    ((gui_img_t *)img_hour_decimal)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_hour_decimal);
+    gui_obj_t *img_hour_decimal = gui_obj_get_handle((void *)current_view_line_41,
+                                                     "watch_hour_decimal");
+    if (img_hour_decimal)
+    {
+        gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
+                        ((gui_img_t *)img_hour_decimal)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_hour_decimal);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
-                    ((gui_img_t *)img_hour_single)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_hour_single);
+    gui_obj_t *img_hour_single = gui_obj_get_handle((void *)current_view_line_41, "watch_hour_single");
+    if (img_hour_single)
+    {
+        gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
+                        ((gui_img_t *)img_hour_single)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_hour_single);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
-                    ((gui_img_t *)img_minute_decimal)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_minute_decimal);
+    gui_obj_t *img_minute_decimal = gui_obj_get_handle((void *)current_view_line_41,
+                                                       "watch_minute_decimal");
+    if (img_minute_decimal)
+    {
+        gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
+                        ((gui_img_t *)img_minute_decimal)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_minute_decimal);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
-                    ((gui_img_t *)img_minute_single)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_minute_single);
+    gui_obj_t *img_minute_single = gui_obj_get_handle((void *)current_view_line_41,
+                                                      "watch_minute_single");
+    if (img_minute_single)
+    {
+        gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
+                        ((gui_img_t *)img_minute_single)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_minute_single);
+    }
 }
 
 static void enter_cb(void *p)

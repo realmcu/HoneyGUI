@@ -29,7 +29,7 @@
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define NOTE_HEIGHT 220
 #define NOTE_INTERVAL 20
-#define NOTE_START 140
+#define NOTE_START -100
 #define INFOR_NUM_MAX 4
 #define CURRENT_VIEW_NAME "app_top_view"
 
@@ -51,6 +51,8 @@ static bool clear_flag = false; // 1: not create new information note
 static bool in_view_more = false; // 1: not create new information note
 static bool note_dur_animation = false; // 1: not create new information note
 static uint16_t view_more_cnt = 0; // for view_more animation
+static bool up_slide_quick = false;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -249,7 +251,7 @@ static void clear_list_note(gui_list_note_t *note)
         index++;
     }
     infor_num--;
-    gui_list_set_note_num(list, infor_num);
+    gui_list_set_note_num(list, infor_num + 1);
     clear_flag = false;
 }
 
@@ -308,6 +310,8 @@ static void create_inform_note(gui_obj_t *obj, void *param)
 {
     // gui_log("create_inform_note\n");
     uint16_t index = ((gui_list_note_t *)obj)->index;
+    if (index == 0) { return; }
+    index--;
     information_t *inform = ((information_t **)param)[index];
     const char *informer = inform->informer;
     const char *content = inform->content;
@@ -383,17 +387,22 @@ static void create_inform_note(gui_obj_t *obj, void *param)
 static void list_timer_cb(void *param)
 {
     (void)param;
+    touch_info_t *tp = tp_get_info();
 
     static uint8_t local_infor_num = 0;
     gui_view_t *next_view = gui_view_get_next();
     if (!note_dur_animation && !clear_flag &&
         (next_view == current_view_line_44 || next_view == NULL) && local_infor_num != infor_num)
     {
-        gui_list_set_note_num(list, infor_num);
+        gui_list_set_note_num(list, infor_num + 1);
         local_infor_num = infor_num;
     }
+    if (tp->type == TOUCH_UP_SLIDE_QUICK)
+    {
+        up_slide_quick = true;
+    }
 
-    if (current_view_line_44 != gui_view_get_current())
+    if (next_view == current_view_line_44 || up_slide_quick)
     {
         gui_node_list_t *node = NULL;
         gui_list_for_each(node, &(list->base.child_list))
@@ -439,7 +448,7 @@ static void clear_all_timer_cb(void *widget)
             gui_free(infor_rec[infor_num]);
             infor_rec[infor_num] = NULL;
         }
-        gui_list_set_note_num(list, infor_num);
+        gui_list_set_note_num(list, infor_num + 1);
         gui_obj_stop_timer(GUI_BASE(widget));
         clear_flag = false;
     }
@@ -496,11 +505,12 @@ static void top_view_design(gui_view_t *view)
     list = gui_list_create(view, "list", 0, NOTE_START, 0, 0, NOTE_HEIGHT,
                            NOTE_INTERVAL, VERTICAL, create_inform_note, infor_rec, true);
     gui_list_set_style(list, LIST_CLASSIC);
-    gui_list_set_note_num(list, infor_num);
+    gui_list_set_note_num(list, infor_num + 1);
     gui_list_set_bar_color(list, APP_COLOR_GRAY);
     gui_list_set_out_scope(list, 50);
     gui_list_set_inertia(list, false);
     gui_obj_create_timer(GUI_BASE(list), 20, true, list_timer_cb);
+    up_slide_quick = false;
 }
 
 /*============================================================================*

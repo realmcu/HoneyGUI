@@ -679,14 +679,8 @@ extern "C" {
     }
     static void app_fruit_ninja_design(gui_view_t *view)
     {
-        gui_view_t *view_c = gui_view_get_current();
-        if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
-        {
-            gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
-            // gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
-            // gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
-            gui_obj_focus_set(view);
-        }
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_focus_set(view);
 
         gui_obj_t *obj = GUI_BASE(view);
         app_fruit_ninja::fruit_ninja_design(obj);

@@ -262,8 +262,6 @@ void win_press_callback(void *obj, gui_event_t *e)
 
 bool init()
 {
-    GUI_WIDGET_TRY_EXCEPT(parent)
-
     gui_win_t *win = gui_win_create(parent, "Heart Particle", 5, 51, 400, 400);
 
     if (!win)

@@ -94,19 +94,19 @@ static void gui_fps_cb(void *p)
     int fps_num = gui_fps();
     gui_obj_t *fps_rect = GUI_BASE(p);
     sprintf(fps, "FPS:%d", fps_num);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(t_fps, "t_fps", fps_rect);
+    gui_obj_t *t_fps = gui_obj_get_handle((void *)fps_rect, "t_fps");
     gui_text_content_set((gui_text_t *)t_fps, fps, strlen(fps));
     int widget_count_number = gui_get_obj_count();
     sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(widget_count, "widget_count", fps_rect);
+    gui_obj_t *widget_count = gui_obj_get_handle((void *)fps_rect, "widget_count");
     gui_text_content_set((gui_text_t *)widget_count, widget_count_string, strlen(widget_count_string));
     uint32_t mem_number =  gui_mem_used();
     uint32_t low_mem_number =  gui_low_mem_used();
     sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(mem, "mem", fps_rect);
+    gui_obj_t *mem = gui_obj_get_handle((void *)fps_rect, "mem");
     gui_text_content_set((gui_text_t *)mem, mem_string, strlen(mem_string));
     sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(low_mem, "low_mem", fps_rect);
+    gui_obj_t *low_mem = gui_obj_get_handle((void *)fps_rect, "low_mem");
     gui_text_content_set((gui_text_t *)low_mem, low_mem_string, strlen(low_mem_string));
 }
 

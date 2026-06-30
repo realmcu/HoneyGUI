@@ -30,36 +30,11 @@ static void start_engine_design(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *dashboard_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = start_engine_design,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, start_engine_design, NULL);
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    dashboard_view = gui_view_descriptor_get("dashboard_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 
 static void press_start(void *obj, gui_event_t *e)
 {
@@ -82,7 +57,7 @@ static void release_start(void *obj, gui_event_t *e)
     if ((gui_obj_point_in_obj_rect(parent, tp->x + tp->deltaX - parent->x,
                                    tp->y + tp->deltaY - parent->y) == true))
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "gloom", current_view);
+        gui_obj_t *o = gui_obj_get_handle((void *)current_view_line_33, "gloom");
         gui_obj_start_timer(GUI_BASE(o));
         gui_obj_hidden(o, false);
     }
@@ -103,8 +78,8 @@ static void exit_animation(void *p)
     {
         cnt = 0;
         gui_obj_stop_timer(obj);
-        gui_view_set_animate_step(current_view, 800);
-        gui_view_switch_direct(current_view, dashboard_view->name, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_set_animate_step(current_view_line_33, 800);
+        gui_view_switch_direct(current_view_line_33, "dashboard_view", SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
 }
@@ -129,14 +104,14 @@ static void start_engine_design(gui_view_t *view)
  *============================================================================*/
 void app_dashboard_start_view_to_main(void)
 {
-    if (current_view == NULL)
+    if (current_view_line_33 == NULL)
     {
         gui_log("Error: start_view not initialized\n");
         return;
     }
 
     // Show gloom animation and switch to dashboard view
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "gloom", current_view);
+    gui_obj_t *o = gui_obj_get_handle((void *)current_view_line_33, "gloom");
     if (o != NULL)
     {
         gui_obj_start_timer(GUI_BASE(o));

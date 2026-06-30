@@ -405,13 +405,13 @@ static void view_switch_out_about(gui_view_t *view)
 #include "gui_text.h"
 static void view_switch_in_about(gui_view_t *view)
 {
-    char *bd_addr, *bb2u, *wifi;
+    char *bd_addr, *chip, *wifi;
 #ifndef _HONEYGUI_SIMULATOR_
-    extern void wifi_about_enter_cb(char **bd_addr, char **bb2u, char **wifi);
-    wifi_about_enter_cb(&bd_addr, &bb2u, &wifi);
+    extern void wifi_about_enter_cb(char **bd_addr, char **chip, char **wifi);
+    wifi_about_enter_cb(&bd_addr, &chip, &wifi);
 #else
     bd_addr = "bd_addr";
-    bb2u = "bb2u";
+    chip = "chip_name"; // For pass CI check
     wifi = "wifi";
 #endif
     gui_view_switch_on_event(view, gui_view_descriptor_image_466_466.name,
@@ -467,7 +467,7 @@ static void view_switch_in_about(gui_view_t *view)
         {
             gui_text_t *text = gui_text_create(view, 0, 120, 276 - 5, 466, 26);
             // const char *string = "2ABCD123ab c:;.'!@#$";
-            gui_text_set(text, (void *)bb2u, GUI_FONT_SRC_BMP, gui_color_css("#666666"), strlen(bb2u), 24);
+            gui_text_set(text, (void *)chip, GUI_FONT_SRC_BMP, gui_color_css("#666666"), strlen(chip), 24);
             gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
                               FONT_SRC_MEMADDR);
             gui_text_mode_set(text, LEFT);
@@ -603,8 +603,7 @@ static void view_switch_in_keyboard(gui_view_t *view)
         }
         if (0)//(password_flag)
         {
-            gui_img_t *enter_img = NULL;
-            gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
+            gui_img_t *enter_img = (gui_img_t *)gui_obj_get_handle(NULL, WIFI_ENTER_IMAGE_NAME);
             if (enter_img)
             {
                 gui_img_set_src(enter_img,
@@ -1158,8 +1157,7 @@ static void release_setting_cb_key(void *obj, gui_event_t *e)
                     {
                         gui_log("valid ip string:%s\n", ipstring);
                         password_flag = true;
-                        gui_img_t *enter_img = NULL;
-                        gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
+                        gui_img_t *enter_img = (gui_img_t *)gui_obj_get_handle(NULL, WIFI_ENTER_IMAGE_NAME);
                         if (enter_img)
                         {
                             gui_img_set_src(enter_img,
@@ -1169,8 +1167,7 @@ static void release_setting_cb_key(void *obj, gui_event_t *e)
                     else if (count < 3 || (count == 3 && ipstring[strlen(ipstring) - 1] == '.'))
                     {
                         password_flag = false;
-                        gui_img_t *enter_img = NULL;
-                        gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
+                        gui_img_t *enter_img = (gui_img_t *)gui_obj_get_handle(NULL, WIFI_ENTER_IMAGE_NAME);
                         if (enter_img)
                         {
                             gui_img_set_src(enter_img,

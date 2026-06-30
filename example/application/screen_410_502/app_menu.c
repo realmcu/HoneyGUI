@@ -648,6 +648,11 @@ static void app_menu_design(gui_view_t *view)
         color_t[0] = APP_COLOR_SILVER_OPACITY(150);
         color_t[1] = APP_COLOR_WHITE_OPACITY;
 
+        gui_view_t *current_view = gui_view_get_current();
+        if (current_view && strcmp(current_view->base.name, "watchface_view") == 0)
+        {
+            list_offset_his = 0;
+        }
         int length = 100;
         uint8_t space = 5;
         gui_list_t *list = gui_list_create(win, "list", 0, 0, 0, 0, length, space,

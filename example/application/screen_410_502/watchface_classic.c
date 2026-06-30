@@ -90,29 +90,44 @@ static void time_update_cb(void *param)
     {
         return;
     }
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", win_watch);
-    gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
-                    ((gui_img_t *)img_hour_decimal)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_hour_decimal);
+    gui_obj_t *img_hour_decimal = gui_obj_get_handle((void *)win_watch, "watch_hour_decimal");
+    if (img_hour_decimal)
+    {
+        gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
+                        ((gui_img_t *)img_hour_decimal)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_hour_decimal);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", win_watch);
-    gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
-                    ((gui_img_t *)img_hour_single)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_hour_single);
+    gui_obj_t *img_hour_single = gui_obj_get_handle((void *)win_watch, "watch_hour_single");
+    if (img_hour_single)
+    {
+        gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
+                        ((gui_img_t *)img_hour_single)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_hour_single);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", win_watch);
-    gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
-                    ((gui_img_t *)img_minute_decimal)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_minute_decimal);
+    gui_obj_t *img_minute_decimal = gui_obj_get_handle((void *)win_watch, "watch_minute_decimal");
+    if (img_minute_decimal)
+    {
+        gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
+                        ((gui_img_t *)img_minute_decimal)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_minute_decimal);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", win_watch);
-    gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
-                    ((gui_img_t *)img_minute_single)->storage_type);
-    gui_img_refresh_size((gui_img_t *)img_minute_single);
+    gui_obj_t *img_minute_single = gui_obj_get_handle((void *)win_watch, "watch_minute_single");
+    if (img_minute_single)
+    {
+        gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
+                        ((gui_img_t *)img_minute_single)->storage_type);
+        gui_img_refresh_size((gui_img_t *)img_minute_single);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(date_text, "date_text", win_watch);
-    sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
-    gui_text_content_set((gui_text_t *)date_text, date_text_content, strlen(date_text_content));
+    gui_obj_t *date_text = gui_obj_get_handle((void *)win_watch, "date_text");
+    if (date_text)
+    {
+        sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
+        gui_text_content_set((gui_text_t *)date_text, date_text_content, strlen(date_text_content));
+    }
 
     // refresh weather date
     uint8_t index = timeinfo->tm_wday + 1;
@@ -232,37 +247,40 @@ static void update_weather_image(cJSON *weather, uint8_t i)
     sprintf(key, "condition_%d", i);
     // gui_log("%s\r\n", key);
     // GUI_WIDGET_POINTER_BY_NAME(obj, key);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, key, win_watch);
-    cJSON *condition = cJSON_GetObjectItemCaseSensitive(weather, key);
-    if (strcmp(condition->valuestring, "Sunny") == 0)
+    gui_obj_t *obj = gui_obj_get_handle((void *)win_watch, key);
+    if (obj)
     {
-        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_SUNNY_BIN, IMG_SRC_MEMADDR);
+        cJSON *condition = cJSON_GetObjectItemCaseSensitive(weather, key);
+        if (strcmp(condition->valuestring, "Sunny") == 0)
+        {
+            gui_img_set_src((gui_img_t *)obj, UI_WEATHER_SUNNY_BIN, IMG_SRC_MEMADDR);
+        }
+        else if (strcmp(condition->valuestring, "Light rain") == 0)
+        {
+            gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN, IMG_SRC_MEMADDR);
+        }
+        else if (strcmp(condition->valuestring, "Showers") == 0)
+        {
+            gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN, IMG_SRC_MEMADDR);
+        }
+        else if (strcmp(condition->valuestring, "Moderate rain") == 0)
+        {
+            gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_M_BIN, IMG_SRC_MEMADDR);
+        }
+        else if (strcmp(condition->valuestring, "Heavy rain") == 0)
+        {
+            gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_L_BIN, IMG_SRC_MEMADDR);
+        }
+        else if (strcmp(condition->valuestring, "Cloudy") == 0)
+        {
+            gui_img_set_src((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN, IMG_SRC_MEMADDR);
+        }
+        else // need to add more weather icon
+        {
+            gui_img_set_src((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN, IMG_SRC_MEMADDR);
+        }
+        gui_img_refresh_size((gui_img_t *)obj);
     }
-    else if (strcmp(condition->valuestring, "Light rain") == 0)
-    {
-        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN, IMG_SRC_MEMADDR);
-    }
-    else if (strcmp(condition->valuestring, "Showers") == 0)
-    {
-        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN, IMG_SRC_MEMADDR);
-    }
-    else if (strcmp(condition->valuestring, "Moderate rain") == 0)
-    {
-        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_M_BIN, IMG_SRC_MEMADDR);
-    }
-    else if (strcmp(condition->valuestring, "Heavy rain") == 0)
-    {
-        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_RAIN_L_BIN, IMG_SRC_MEMADDR);
-    }
-    else if (strcmp(condition->valuestring, "Cloudy") == 0)
-    {
-        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN, IMG_SRC_MEMADDR);
-    }
-    else // need to add more weather icon
-    {
-        gui_img_set_src((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN, IMG_SRC_MEMADDR);
-    }
-    gui_img_refresh_size((gui_img_t *)obj);
 }
 
 static void weather_cb(void *param)
@@ -298,18 +316,24 @@ static void weather_cb(void *param)
     cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
     cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "current");
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(weather_cur, "weather_cur", win_watch);
-    sprintf(content_cur, "%d°", cur->valueint);
-    gui_text_content_set((gui_text_t *)weather_cur, content_cur, strlen(content_cur));
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(weather_range, "weather_range", win_watch);
-    sprintf(content_range, "H:%d° L:%d°", high->valueint, low->valueint);
-    gui_text_content_set((gui_text_t *)weather_range, content_range, strlen(content_range));
-    for (uint8_t i = 1; i <= 5; i++)
+    gui_obj_t *weather_cur = gui_obj_get_handle((void *)win_watch, "weather_cur");
+    if (weather_cur)
     {
-        update_weather_image(weather, i);
+        sprintf(content_cur, "%d°", cur->valueint);
+        gui_text_content_set((gui_text_t *)weather_cur, content_cur, strlen(content_cur));
     }
-    cJSON_Delete(root);
-    json_refresh_flag &= 0b1110;
+    gui_obj_t *weather_range = gui_obj_get_handle((void *)win_watch, "weather_range");
+    if (weather_range)
+    {
+        sprintf(content_range, "H:%d° L:%d°", high->valueint, low->valueint);
+        gui_text_content_set((gui_text_t *)weather_range, content_range, strlen(content_range));
+        for (uint8_t i = 1; i <= 5; i++)
+        {
+            update_weather_image(weather, i);
+        }
+        cJSON_Delete(root);
+        json_refresh_flag &= 0b1110;
+    }
 }
 
 static void arc_temperature_cb(NVGcontext *vg)
@@ -364,7 +388,7 @@ static void arc_temperature_cb(NVGcontext *vg)
         // nvgCircle(vg, ax, ay, 5.0f);
         // nvgFillColor(vg, nvgRGB(dot_r, dot_g, dot_b));
         // nvgFill(vg);
-        // GUI_WIDGET_POINTER_BY_NAME_ROOT(temp_cur, "temp_cur", win_watch);
+        // gui_obj_t *temp_cur = gui_obj_get_handle((void *)win_watch, "temp_cur");
         // sprintf(temp_cur_content, "%d", (int)(temp * (37 - 18) + 18 + 0.5));
         // gui_text_content_set((gui_text_t *)temp_cur, (void *)temp_cur_content, strlen(temp_cur_content));
         return;
@@ -466,16 +490,25 @@ static void arc_temperature_cb(NVGcontext *vg)
 
             if (weather_syn_flag)
             {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(temp_cur, "temp_cur", win_watch);
-                sprintf(temp_cur_content, "%d", cur_val);
-                gui_text_content_set((gui_text_t *)temp_cur, temp_cur_content, strlen(temp_cur_content));
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(temp_low, "temp_low", win_watch);
-                sprintf(temp_low_content, "%d", low_val);
-                gui_text_content_set((gui_text_t *)temp_low, temp_low_content, strlen(temp_low_content));
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(temp_high, "temp_high", win_watch);
-                sprintf(temp_high_content, "%d", high_val);
-                gui_text_content_set((gui_text_t *)temp_high, temp_high_content, strlen(temp_high_content));
-                weather_syn_flag = false;
+                gui_obj_t *temp_cur = gui_obj_get_handle((void *)win_watch, "temp_cur");
+                if (temp_cur)
+                {
+                    sprintf(temp_cur_content, "%d", cur_val);
+                    gui_text_content_set((gui_text_t *)temp_cur, temp_cur_content, strlen(temp_cur_content));
+                }
+                gui_obj_t *temp_low = gui_obj_get_handle((void *)win_watch, "temp_low");
+                if (temp_low)
+                {
+                    sprintf(temp_low_content, "%d", low_val);
+                    gui_text_content_set((gui_text_t *)temp_low, temp_low_content, strlen(temp_low_content));
+                }
+                gui_obj_t *temp_high = gui_obj_get_handle((void *)win_watch, "temp_high");
+                if (temp_high)
+                {
+                    sprintf(temp_high_content, "%d", high_val);
+                    gui_text_content_set((gui_text_t *)temp_high, temp_high_content, strlen(temp_high_content));
+                    weather_syn_flag = false;
+                }
             }
         }
     }
@@ -556,23 +589,29 @@ static void compass_cb(void *param)
     // gui_img_translate (compass_pointer, ax, ay);
     gui_img_rotation(compass_pointer, (float)degree_val);
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(compass_degree, "compass_degree", win_watch);
-    sprintf(degree_content, "%d°", degree_val);
-    gui_text_content_set((gui_text_t *)compass_degree, degree_content, strlen(degree_content));
-    uint16_t progress_compass = degree_val;
-    if (progress_compass == 0)        {sprintf(orien_content, "N");}
-    else if (progress_compass < 90)   {sprintf(orien_content, "NE");}
-    else if (progress_compass == 90)  {sprintf(orien_content, "E");}
-    else if (progress_compass < 180)  {sprintf(orien_content, "SE");}
-    else if (progress_compass == 180) {sprintf(orien_content, "S");}
-    else if (progress_compass < 270)  {sprintf(orien_content, "SW");}
-    else if (progress_compass == 270) {sprintf(orien_content, "W");}
-    else if (progress_compass < 360)  {sprintf(orien_content, "NW");}
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(compass_orien, "compass_orien", win_watch);
-    gui_text_content_set((gui_text_t *)compass_orien, orien_content, strlen(orien_content));
-    // clear
-    cJSON_Delete(root);
-    json_refresh_flag &= 0b0111;
+    gui_obj_t *compass_degree = gui_obj_get_handle((void *)win_watch, "compass_degree");
+    if (compass_degree)
+    {
+        sprintf(degree_content, "%d°", degree_val);
+        gui_text_content_set((gui_text_t *)compass_degree, degree_content, strlen(degree_content));
+        uint16_t progress_compass = degree_val;
+        if (progress_compass == 0)        {sprintf(orien_content, "N");}
+        else if (progress_compass < 90)   {sprintf(orien_content, "NE");}
+        else if (progress_compass == 90)  {sprintf(orien_content, "E");}
+        else if (progress_compass < 180)  {sprintf(orien_content, "SE");}
+        else if (progress_compass == 180) {sprintf(orien_content, "S");}
+        else if (progress_compass < 270)  {sprintf(orien_content, "SW");}
+        else if (progress_compass == 270) {sprintf(orien_content, "W");}
+        else if (progress_compass < 360)  {sprintf(orien_content, "NW");}
+    }
+    gui_obj_t *compass_orien = gui_obj_get_handle((void *)win_watch, "compass_orien");
+    if (compass_orien)
+    {
+        gui_text_content_set((gui_text_t *)compass_orien, orien_content, strlen(orien_content));
+        // clear
+        cJSON_Delete(root);
+        json_refresh_flag &= 0b0111;
+    }
 }
 
 static void activity_timer_cb(void *obj)

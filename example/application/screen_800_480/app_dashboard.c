@@ -125,15 +125,7 @@ typedef struct
  *                            Variables
  *============================================================================*/
 /* View Management */
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *start_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = dashboard_design,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, dashboard_design, NULL);
 
 // Common dashboard
 uint8_t scene_flag = 0; // 0: start_engine, 1: dail, 2: digital
@@ -172,23 +164,6 @@ static gui_win_t *win_dail_line = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    start_view = gui_view_descriptor_get("start_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 // Dashboard digital functions
 static void dashboard_digital_exit_animation(void *p)
 {
@@ -213,7 +188,7 @@ static void dashboard_digital_exit_animation(void *p)
             offset = 0;
             cnt = 0;
         }
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(line, "line", GUI_BASE(win_digital_line));
+        gui_obj_t *line = gui_obj_get_handle((void *)GUI_BASE(win_digital_line), "line");
         line->x = WIN_DIGITAL_LINE_TARGET_X - win_digital_line->base.x;
         return;
     }
@@ -221,11 +196,11 @@ static void dashboard_digital_exit_animation(void *p)
     {
         // Img faing out
         uint8_t opacity = (cnt_max - cnt) * 255 / cnt_max;
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(l_wing, "l_wing", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(r_wing, "r_wing", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(l_gloom, "l_gloom", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(r_gloom, "r_gloom", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(battery, "battery", GUI_BASE(win_digital));
+        gui_obj_t *l_wing = gui_obj_get_handle((void *)GUI_BASE(win_digital), "l_wing");
+        gui_obj_t *r_wing = gui_obj_get_handle((void *)GUI_BASE(win_digital), "r_wing");
+        gui_obj_t *l_gloom = gui_obj_get_handle((void *)GUI_BASE(win_digital), "l_gloom");
+        gui_obj_t *r_gloom = gui_obj_get_handle((void *)GUI_BASE(win_digital), "r_gloom");
+        gui_obj_t *battery = gui_obj_get_handle((void *)GUI_BASE(win_digital), "battery");
         gui_img_set_opacity((gui_img_t *)l_wing, opacity);
         gui_img_set_opacity((gui_img_t *)r_wing, opacity);
         gui_img_set_opacity((gui_img_t *)l_gloom, opacity);
@@ -233,8 +208,8 @@ static void dashboard_digital_exit_animation(void *p)
         gui_img_set_opacity((gui_img_t *)battery, opacity);
 
         // Img moving out
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(l_win_needle, "win_wing_left", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(r_win_needle, "win_wing_right", GUI_BASE(win_digital));
+        gui_obj_t *l_win_needle = gui_obj_get_handle((void *)GUI_BASE(win_digital), "win_wing_left");
+        gui_obj_t *r_win_needle = gui_obj_get_handle((void *)GUI_BASE(win_digital), "win_wing_right");
         l_win_needle->x = -WIN_DIGITAL_NEEDLE_W + (WIN_DIGITAL_NEEDLE_X + WIN_DIGITAL_NEEDLE_W) *
                           (cnt_max - cnt) / cnt_max;
         r_win_needle->x = SCREEN_WIDTH - (WIN_DIGITAL_NEEDLE_X + WIN_DIGITAL_NEEDLE_W) *
@@ -257,12 +232,12 @@ static void dashboard_digital_entrance_animation(void *p)
         uint16_t cnt_led = 10;
         if (cnt <= cnt_led)
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", win_common);
+            gui_obj_t *led0 = gui_obj_get_handle((void *)win_common, "led0");
+            gui_obj_t *led1 = gui_obj_get_handle((void *)win_common, "led1");
+            gui_obj_t *led2 = gui_obj_get_handle((void *)win_common, "led2");
+            gui_obj_t *led3 = gui_obj_get_handle((void *)win_common, "led3");
+            gui_obj_t *led4 = gui_obj_get_handle((void *)win_common, "led4");
+            gui_obj_t *led5 = gui_obj_get_handle((void *)win_common, "led5");
             led0->x = DAIL_LED0_X + (DIGITAL_LED0_X - DAIL_LED0_X) * cnt / cnt_led;
             led0->y = DAIL_LED0_Y + (DIGITAL_LED0_Y - DAIL_LED0_Y) * cnt / cnt_led;
             led1->x = DAIL_LED1_X + (DIGITAL_LED1_X - DAIL_LED1_X) * cnt / cnt_led;
@@ -284,11 +259,11 @@ static void dashboard_digital_entrance_animation(void *p)
 
         // Img faing in
         uint8_t opacity = (cnt - cnt_max_1) * 255 / (cnt_max_2 - cnt_max_1);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(l_wing, "l_wing", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(r_wing, "r_wing", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(l_gloom, "l_gloom", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(r_gloom, "r_gloom", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(battery, "battery", GUI_BASE(win_digital));
+        gui_obj_t *l_wing = gui_obj_get_handle((void *)GUI_BASE(win_digital), "l_wing");
+        gui_obj_t *r_wing = gui_obj_get_handle((void *)GUI_BASE(win_digital), "r_wing");
+        gui_obj_t *l_gloom = gui_obj_get_handle((void *)GUI_BASE(win_digital), "l_gloom");
+        gui_obj_t *r_gloom = gui_obj_get_handle((void *)GUI_BASE(win_digital), "r_gloom");
+        gui_obj_t *battery = gui_obj_get_handle((void *)GUI_BASE(win_digital), "battery");
         gui_img_set_opacity((gui_img_t *)l_wing, opacity);
         gui_img_set_opacity((gui_img_t *)r_wing, opacity);
         gui_img_set_opacity((gui_img_t *)l_gloom, opacity);
@@ -296,8 +271,8 @@ static void dashboard_digital_entrance_animation(void *p)
         gui_img_set_opacity((gui_img_t *)battery, opacity);
 
         // Img moving in
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(l_win_needle, "win_wing_left", GUI_BASE(win_digital));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(r_win_needle, "win_wing_right", GUI_BASE(win_digital));
+        gui_obj_t *l_win_needle = gui_obj_get_handle((void *)GUI_BASE(win_digital), "win_wing_left");
+        gui_obj_t *r_win_needle = gui_obj_get_handle((void *)GUI_BASE(win_digital), "win_wing_right");
         l_win_needle->x = -WIN_DIGITAL_NEEDLE_W + (WIN_DIGITAL_NEEDLE_X + WIN_DIGITAL_NEEDLE_W) *
                           (cnt - cnt_max_1) / (cnt_max_2 - cnt_max_1);
         r_win_needle->x = SCREEN_WIDTH - (WIN_DIGITAL_NEEDLE_X + WIN_DIGITAL_NEEDLE_W) *
@@ -307,7 +282,7 @@ static void dashboard_digital_entrance_animation(void *p)
 
     static int16_t offset = 0;
     int16_t step = 10;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(line, "line", GUI_BASE(win_digital_line));
+    gui_obj_t *line = gui_obj_get_handle((void *)GUI_BASE(win_digital_line), "line");
     if (win_digital_line->base.x > WIN_DIGITAL_LINE_TARGET_X)
     {
         // Show line
@@ -364,7 +339,7 @@ static void exit_dashboard_digital(void)
 {
     gui_obj_create_timer(GUI_BASE(win_digital), 10, true, dashboard_digital_exit_animation);
     gui_obj_start_timer(GUI_BASE(win_digital));
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(line, "line", GUI_BASE(win_digital_line));
+    gui_obj_t *line = gui_obj_get_handle((void *)GUI_BASE(win_digital_line), "line");
     ((gui_img_t *)line)->need_clip = true;
 }
 
@@ -529,8 +504,8 @@ static void dashboard_dail_exit_animation(void *p)
             gui_obj_stop_timer(GUI_BASE(p));
             gui_obj_tree_free_async(GUI_BASE(p));
         }
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(left, "line_left", GUI_BASE(win_dail_line));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(right, "line_right", GUI_BASE(win_dail_line));
+        gui_obj_t *left = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_left");
+        gui_obj_t *right = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_right");
         left->x = WIN_DAIL_LINE_TARGET_X - win_dail_line->base.x;
         right->x = win_dail_line->base.w / 2;
         // Img faing out
@@ -551,12 +526,12 @@ static void dashboard_dail_entrance_animation(void *p)
         uint16_t cnt_led = 10;
         if (cnt <= cnt_led)
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", win_common);
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", win_common);
+            gui_obj_t *led0 = gui_obj_get_handle((void *)win_common, "led0");
+            gui_obj_t *led1 = gui_obj_get_handle((void *)win_common, "led1");
+            gui_obj_t *led2 = gui_obj_get_handle((void *)win_common, "led2");
+            gui_obj_t *led3 = gui_obj_get_handle((void *)win_common, "led3");
+            gui_obj_t *led4 = gui_obj_get_handle((void *)win_common, "led4");
+            gui_obj_t *led5 = gui_obj_get_handle((void *)win_common, "led5");
             led0->x = DIGITAL_LED0_X + (DAIL_LED0_X - DIGITAL_LED0_X) * cnt / cnt_led;
             led0->y = DIGITAL_LED0_Y + (DAIL_LED0_Y - DIGITAL_LED0_Y) * cnt / cnt_led;
             led1->x = DIGITAL_LED1_X + (DAIL_LED1_X - DIGITAL_LED1_X) * cnt / cnt_led;
@@ -588,8 +563,8 @@ static void dashboard_dail_entrance_animation(void *p)
             win_dail_line->base.w = WIN_DAIL_LINE_TARGET_W;
             offset = 0;
         }
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(left, "line_left", GUI_BASE(win_dail_line));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(right, "line_right", GUI_BASE(win_dail_line));
+        gui_obj_t *left = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_left");
+        gui_obj_t *right = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_right");
         left->x = WIN_DAIL_LINE_TARGET_X - win_dail_line->base.x;
         right->x = win_dail_line->base.w / 2;
 
@@ -606,8 +581,8 @@ static void dashboard_dail_entrance_animation(void *p)
         {
             win_dail_line->base.h = WIN_DAIL_LINE_TARGET_H;
             offset = 0;
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(left, "line_left", GUI_BASE(win_dail_line));
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(right, "line_right", GUI_BASE(win_dail_line));
+            gui_obj_t *left = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_left");
+            gui_obj_t *right = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_right");
             ((gui_img_t *)left)->need_clip = false;
             ((gui_img_t *)right)->need_clip = false;
             gui_obj_stop_timer(GUI_BASE(p));
@@ -622,8 +597,8 @@ static void exit_dashboard_dail(void)
     gui_obj_create_timer(GUI_BASE(win_dail), 10, true, dashboard_dail_exit_animation);
     gui_obj_start_timer(GUI_BASE(win_dail));
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(left, "line_left", GUI_BASE(win_dail_line));
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(right, "line_right", GUI_BASE(win_dail_line));
+    gui_obj_t *left = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_left");
+    gui_obj_t *right = gui_obj_get_handle((void *)GUI_BASE(win_dail_line), "line_right");
     ((gui_img_t *)left)->need_clip = true;
     ((gui_img_t *)right)->need_clip = true;
 }
@@ -737,7 +712,7 @@ static void release_icon(void *obj, gui_event_t *e)
             }
             scene_flag = 0;
             animate_flag = 1;
-            gui_obj_create_timer(GUI_BASE(current_view), 10, true, dashboard_exit_animation);
+            gui_obj_create_timer(GUI_BASE(current_view_line_128), 10, true, dashboard_exit_animation);
             exit_map();
 
         }
@@ -821,7 +796,7 @@ static void dashboard_exit_animation(void *p)
     cnt++;
     if (cnt == 1)
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(win_common, "win_common", obj);
+        gui_obj_t *win_common = gui_obj_get_handle((void *)obj, "win_common");
         gui_obj_create_timer(win_common, 10, true, win_common_exit_animation);
         gui_obj_start_timer(win_common);
     }
@@ -835,8 +810,8 @@ static void dashboard_exit_animation(void *p)
     else if (cnt >= cnt_max + 50)
     {
         cnt = 0;
-        gui_view_set_animate_step(current_view, 800);
-        gui_view_switch_direct(current_view, start_view->name, SWITCH_OUT_ANIMATION_FADE,
+        gui_view_set_animate_step(current_view_line_128, 800);
+        gui_view_switch_direct(current_view_line_128, "start_view", SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
         speed_val = 0;
         power_val = 0;
@@ -861,37 +836,37 @@ static void dashboard_entrance_animation(void *p)
     }
     else if (cnt == (cnt_max + cnt_max / 7))
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", GUI_BASE(win_common));
+        gui_obj_t *led2 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led2");
+        gui_obj_t *led5 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led5");
         gui_img_set_src(((gui_img_t *)led2), LED2_ON_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led5), LED5_ON_BIN, IMG_SRC_MEMADDR);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
+        gui_obj_t *led_turn_l = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_l");
+        gui_obj_t *led_turn_r = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_r");
         gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 2 * cnt_max / 7))
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", GUI_BASE(win_common));
+        gui_obj_t *led1 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led1");
+        gui_obj_t *led4 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led4");
         gui_img_set_src(((gui_img_t *)led1), LED1_ON_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led4), LED4_ON_BIN, IMG_SRC_MEMADDR);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
+        gui_obj_t *led_turn_l = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_l");
+        gui_obj_t *led_turn_r = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_r");
         gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 3 * cnt_max / 7))
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", GUI_BASE(win_common));
+        gui_obj_t *led0 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led0");
+        gui_obj_t *led3 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led3");
         gui_img_set_src(((gui_img_t *)led0), LED0_ON_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led3), LED3_ON_BIN, IMG_SRC_MEMADDR);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
+        gui_obj_t *led_turn_l = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_l");
+        gui_obj_t *led_turn_r = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_r");
         gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
     }
@@ -916,44 +891,44 @@ static void dashboard_entrance_animation(void *p)
     }
     else if (cnt == (cnt_max + 5 * cnt_max / 7))
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", GUI_BASE(win_common));
+        gui_obj_t *led0 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led0");
+        gui_obj_t *led3 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led3");
         gui_img_set_src(((gui_img_t *)led0), LED0_OFF_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led3), LED3_OFF_BIN, IMG_SRC_MEMADDR);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
+        gui_obj_t *led_turn_l = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_l");
+        gui_obj_t *led_turn_r = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_r");
         gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 6 * cnt_max / 7))
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", GUI_BASE(win_common));
+        gui_obj_t *led1 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led1");
+        gui_obj_t *led4 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led4");
         gui_img_set_src(((gui_img_t *)led1), LED1_OFF_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led4), LED4_OFF_BIN, IMG_SRC_MEMADDR);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
+        gui_obj_t *led_turn_l = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_l");
+        gui_obj_t *led_turn_r = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_r");
         gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN, IMG_SRC_MEMADDR);
     }
     else if (cnt == (cnt_max + 7 * cnt_max / 7))
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", GUI_BASE(win_common));
+        gui_obj_t *led2 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led2");
+        gui_obj_t *led5 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led5");
         gui_img_set_src(((gui_img_t *)led2), LED2_OFF_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led5), LED5_OFF_BIN, IMG_SRC_MEMADDR);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
+        gui_obj_t *led_turn_l = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_l");
+        gui_obj_t *led_turn_r = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_r");
         gui_img_set_src(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN, IMG_SRC_MEMADDR);
 
         map_design(); //show map
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(switch_icon, "switch_icon", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(off_icon, "off_icon", GUI_BASE(win_common));
+        gui_obj_t *switch_icon = gui_obj_get_handle((void *)GUI_BASE(win_common), "switch_icon");
+        gui_obj_t *off_icon = gui_obj_get_handle((void *)GUI_BASE(win_common), "off_icon");
         gui_img_set_src(((gui_img_t *)switch_icon), SWITCHICON_RELEASE_BIN, IMG_SRC_MEMADDR);
         gui_img_set_src(((gui_img_t *)off_icon), OFFICON_RELEASE_BIN, IMG_SRC_MEMADDR);
     }
@@ -974,19 +949,19 @@ static void update_text_display(void)
     sprintf(soc_str, "BATT %d%%", soc_val);
 
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "speed_text", win_speed_display);
+        gui_obj_t *text = gui_obj_get_handle((void *)win_speed_display, "speed_text");
         gui_text_content_set((gui_text_t *)text, (void *)speed_str, strlen(speed_str));
     }
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "power_text", win_power_display);
+        gui_obj_t *text = gui_obj_get_handle((void *)win_power_display, "power_text");
         gui_text_content_set((gui_text_t *)text, (void *)power_str, strlen(power_str));
     }
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "odo_text", win_speed_display);
+        gui_obj_t *text = gui_obj_get_handle((void *)win_speed_display, "odo_text");
         gui_text_content_set((gui_text_t *)text, (void *)odo_str, strlen(odo_str));
     }
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "soc_text", win_power_display);
+        gui_obj_t *text = gui_obj_get_handle((void *)win_power_display, "soc_text");
         gui_text_content_set((gui_text_t *)text, (void *)soc_str, strlen(soc_str));
     }
 }
@@ -1014,7 +989,7 @@ static void update_inform(void *p)
         sprintf(temp_str, "%d°C", dashboard_info->temp_val);
     }
     sprintf(top_infor_str, "%s %s\n%s", loction_str, temp_str, time_str);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "top_infor", current_view);
+    gui_obj_t *text = gui_obj_get_handle((void *)current_view_line_128, "top_infor");
     gui_text_content_set((gui_text_t *)text, top_infor_str, strlen(top_infor_str));
 
     if (dashboard_info)
@@ -1024,16 +999,16 @@ static void update_inform(void *p)
         odo_val = dashboard_info->odo_val;
         soc_val = dashboard_info->soc_val;
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(bt, "bt", GUI_BASE(win_common));
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(wifi, "wifi", GUI_BASE(win_common));
+        gui_obj_t *led0 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led0");
+        gui_obj_t *led1 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led1");
+        gui_obj_t *led2 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led2");
+        gui_obj_t *led3 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led3");
+        gui_obj_t *led4 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led4");
+        gui_obj_t *led5 = gui_obj_get_handle((void *)GUI_BASE(win_common), "led5");
+        gui_obj_t *led_turn_l = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_l");
+        gui_obj_t *led_turn_r = gui_obj_get_handle((void *)GUI_BASE(win_common), "led_turn_r");
+        gui_obj_t *bt = gui_obj_get_handle((void *)GUI_BASE(win_common), "bt");
+        gui_obj_t *wifi = gui_obj_get_handle((void *)GUI_BASE(win_common), "wifi");
 
         if (dashboard_info->bt_status)
         {
@@ -1138,7 +1113,7 @@ static void update_inform(void *p)
         if (dashboard_info->map_data_update)
         {
             dashboard_info->map_data_update = 0;
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(map, "map", GUI_BASE(win_map));
+            gui_obj_t *map = gui_obj_get_handle((void *)GUI_BASE(win_map), "map");
             gui_img_set_src(((gui_img_t *)map),
                             dashboard_info->map_data[dashboard_info->map_data_index], ((gui_img_t *)map)->storage_type);
         }
@@ -1305,7 +1280,7 @@ static void dashboard_design(gui_view_t *view)
  */
 void app_dashboard_switch_display_mode(void)
 {
-    if (current_view == NULL)
+    if (current_view_line_128 == NULL)
     {
         gui_log("Dashboard view not initialized, ignoring switch request\n");
         return;
@@ -1342,7 +1317,7 @@ void app_dashboard_switch_display_mode(void)
  */
 void app_dashboard_exit_to_start(void)
 {
-    if (current_view == NULL)
+    if (current_view_line_128 == NULL)
     {
         gui_log("Dashboard view not initialized, ignoring exit request\n");
         return;
@@ -1365,7 +1340,7 @@ void app_dashboard_exit_to_start(void)
 
     scene_flag = 0;
     animate_flag = 1;
-    gui_obj_create_timer(GUI_BASE(current_view), 10, true, dashboard_exit_animation);
+    gui_obj_create_timer(GUI_BASE(current_view_line_128), 10, true, dashboard_exit_animation);
     exit_map();
 
     gui_log("Exiting dashboard to start view\n");

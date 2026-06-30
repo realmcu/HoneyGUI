@@ -248,14 +248,17 @@ static void update_wing_position_and_scale(gui_img_t *wing, l3_vertex_t vertexes
 #include "l3_obj.h"
 static void update_butterfly_wing_bg(gui_lite3d_t *lite3d_butterfly, gui_win_t *win)
 {
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(wing1, "wing1", GUI_BASE(win))
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(wing2, "wing2", GUI_BASE(win))
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(wing3, "wing3", GUI_BASE(win))
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(wing4, "wing4", GUI_BASE(win))
-    gui_obj_hidden(wing1, false);
-    gui_obj_hidden(wing2, false);
-    gui_obj_hidden(wing3, false);
-    gui_obj_hidden(wing4, false);
+    gui_obj_t *wing1 = gui_obj_get_handle((void *)GUI_BASE(win), "wing1");
+    gui_obj_t *wing2 = gui_obj_get_handle((void *)GUI_BASE(win), "wing2");
+    gui_obj_t *wing3 = gui_obj_get_handle((void *)GUI_BASE(win), "wing3");
+    gui_obj_t *wing4 = gui_obj_get_handle((void *)GUI_BASE(win), "wing4");
+    if (wing4)
+    {
+        gui_obj_hidden(wing1, false);
+        gui_obj_hidden(wing2, false);
+        gui_obj_hidden(wing3, false);
+        gui_obj_hidden(wing4, false);
+    }
 
     l3_obj_model_t *this = (l3_obj_model_t *)lite3d_butterfly->model;
 

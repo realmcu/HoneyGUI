@@ -14,7 +14,7 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "cJSON.h"
-#include "gui_canvas_img.h"
+#include "gui_canvas.h"
 #include "gui_rect.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
@@ -203,23 +203,32 @@ static void draw_heartrate_graph(NVGcontext *vg)
     // gui_text_content_set((gui_text_t *)t, hr_content, strlen(hr_content));
     uint8_t number = (uint8_t)samples[2];
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_percentile, "hr_content_percentile", win_hb);
-        if (number / 100)
+        gui_obj_t *img_percentile = gui_obj_get_handle((void *)win_hb, "hr_content_percentile");
+        if (img_percentile)
         {
-            gui_obj_hidden(img_percentile, false);
+            if (number / 100)
+            {
+                gui_obj_hidden(img_percentile, false);
+            }
+            else
+            {
+                gui_obj_hidden(img_percentile, true);
+            }
+            // gui_log("number = %d\n", number);
         }
-        else
+        gui_obj_t *img_decimal = gui_obj_get_handle((void *)win_hb, "hr_content_decimal");
+        if (img_decimal)
         {
-            gui_obj_hidden(img_percentile, true);
+            gui_img_set_src((gui_img_t *)img_decimal, text_num_array[(number % 100) / 10],
+                            ((gui_img_t *)img_decimal)->storage_type);
         }
-        // gui_log("number = %d\n", number);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_decimal, "hr_content_decimal", win_hb);
-        gui_img_set_src((gui_img_t *)img_decimal, text_num_array[(number % 100) / 10],
-                        ((gui_img_t *)img_decimal)->storage_type);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_single, "hr_content_single", win_hb);
-        gui_img_set_src((gui_img_t *)img_single, text_num_array[number % 10],
-                        ((gui_img_t *)img_single)->storage_type);
+        gui_obj_t *img_single = gui_obj_get_handle((void *)win_hb, "hr_content_single");
+        if (img_single)
+        {
+            gui_img_set_src((gui_img_t *)img_single, text_num_array[number % 10],
+                            ((gui_img_t *)img_single)->storage_type);
+        }
 
     }
 

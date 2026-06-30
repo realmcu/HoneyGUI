@@ -184,7 +184,6 @@ public:
     {
         if (win_cover_y >= 0)
         {
-            GUI_WIDGET_TRY_EXCEPT(img_cover)
             float progress = ((float)win_cover_y / (float)(SCREEN_H - MINIMIZE_WINDOW_HEIGHT));
 
             int cover_w = lerp(COVER_W, MINIMIZE_COVER_HEIGHT, progress);
@@ -209,7 +208,6 @@ public:
         }
         if (win_cover_y <= 0)
         {
-            GUI_WIDGET_TRY_EXCEPT(img_cover)
             float progress = (-(float)win_cover_y / (float)(SCREEN_H - MINIMIZE_WINDOW_HEIGHT));
 
             int cover_w = lerp(COVER_W, MINIMIZE_COVER_HEIGHT, progress);

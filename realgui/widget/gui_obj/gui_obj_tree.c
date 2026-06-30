@@ -273,8 +273,13 @@ void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
 
 
 
-void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
+gui_obj_t *gui_obj_get_handle(gui_obj_t *object, const char *name)
 {
+    if (object == NULL)
+    {
+        object = gui_obj_get_root();
+    }
+    gui_obj_t *ret = NULL;
     gui_node_list_t *node = NULL;
     gui_node_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &object->child_list)
@@ -284,17 +289,18 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_ob
         {
             gui_log("list NULL @line:%d, @%p", __LINE__, object);
             gui_log("@name:%s, @type:%d\n", object->name, object->type);
-            return;
+            return NULL;
         }
         if ((strlen(name) == strlen(obj->name)) && (strcmp(name, obj->name) == 0))
         {
-            *output = obj;
             GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
-            return;
+            return obj;
         }
 
-        gui_obj_tree_get_widget_by_name(obj, name, output);
+        ret = gui_obj_get_handle(obj, name);
+        if (ret != NULL) { break; }
     }
+    return ret;
 }
 
 

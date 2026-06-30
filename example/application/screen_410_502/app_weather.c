@@ -77,8 +77,11 @@ static void update_panel_animation(void *param)
     float scale = fabsf((abs(diff) - dc->screen_width / 2.0f)) / (dc->screen_width / 2.0f);
 
     float panel_below_driftY = (1.0f - scale) * 50.0f;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(panel_img, "panel1", note);
-    gui_img_translate((gui_img_t *)panel_img, 0, panel_below_driftY);
+    gui_obj_t *panel_img = gui_obj_get_handle((void *)note, "panel1");
+    if (panel_img)
+    {
+        gui_img_translate((gui_img_t *)panel_img, 0, panel_below_driftY);
+    }
 
 }
 

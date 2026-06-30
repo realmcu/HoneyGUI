@@ -199,8 +199,11 @@ static void click_number_tab_cb(void *o, gui_event_t *e)
     {
         dial_number_display++;
     }
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "dial_number", gui_view_get_current())
-    gui_text_content_set((gui_text_t *)text, dial_number_display, strlen(dial_number_display));
+    gui_obj_t *text = gui_obj_get_handle((void *)gui_view_get_current(), "dial_number");
+    if (text)
+    {
+        gui_text_content_set((gui_text_t *)text, dial_number_display, strlen(dial_number_display));
+    }
 }
 
 static void click_back_cb(void *o, gui_event_t *e)
@@ -220,8 +223,11 @@ static void click_back_cb(void *o, gui_event_t *e)
     {
         dial_number_display--;
     }
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "dial_number", gui_view_get_current())
-    gui_text_content_set((gui_text_t *)text, dial_number_display, strlen(dial_number_display));
+    gui_obj_t *text = gui_obj_get_handle((void *)gui_view_get_current(), "dial_number");
+    if (text)
+    {
+        gui_text_content_set((gui_text_t *)text, dial_number_display, strlen(dial_number_display));
+    }
 }
 
 static void number_tab_design(char *number, int x, int y)

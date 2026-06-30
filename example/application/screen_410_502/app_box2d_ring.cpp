@@ -190,8 +190,6 @@ static void limit_max_angular_velocity(b2Body *ball)
 
 bool init(gui_obj_t *parent)
 {
-    GUI_WIDGET_TRY_EXCEPT(parent)
-
     gui_win_t *win = gui_win_create(parent, "APP_BOX2D ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Set the animation function of the window
@@ -319,7 +317,7 @@ static void canvas_callback(NVGcontext *vg)
 static void render()
 {
     count = 0;
-    gui_rect_create((gui_obj_t *)gui_view_get_current(), 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+    gui_rect_create((gui_obj_t *)current_view_line_37, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0,
                     gui_rgba(255, 255, 255, 255));
 
     // Draw balls
@@ -336,7 +334,7 @@ static void render()
 
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
                                           BALL_RADIUS * 2, canvas_callback, img_data);
-        gui_img_t *img = gui_img_create_from_mem((gui_obj_t *)gui_view_get_current(), 0, (void *)img_data,
+        gui_img_t *img = gui_img_create_from_mem((gui_obj_t *)current_view_line_37, 0, (void *)img_data,
                                                  ballX - BALL_RADIUS,
                                                  ballY - BALL_RADIUS, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
@@ -372,14 +370,10 @@ static int ui_design(gui_obj_t *obj)
 extern "C" {
     static void app_box2d_ring_ui_design(gui_view_t *view)
     {
-        gui_view_t *view_c = gui_view_get_current();
-        if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
-        {
-            gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
-            gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
-            gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
-            gui_obj_focus_set(view);
-        }
+        gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
+        gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
+        gui_obj_focus_set(view);
 
         gui_obj_t *obj = GUI_BASE(view);
         // gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);

@@ -23,6 +23,9 @@
  *                            Macros
  *============================================================================*/
 #define CURRENT_VIEW_NAME "box2d_countdown_view"
+#define SCREEN_W 410
+#define SCREEN_H 502
+
 
 /*============================================================================*
  *                                  C Interface
@@ -73,8 +76,6 @@ static const uint8_t COUNTDOWN_START = 30; // Countdown from 30
 static const float COUNTDOWN_INTERVAL = 1.0f; // Updated every second
 static Particle *particles_img = NULL;
 static int active_particle_count = 0;
-static uint32_t screen_w = 0;
-static uint32_t screen_h = 0;
 static uint8_t currentNumber = COUNTDOWN_START;
 float countdownTimer = COUNTDOWN_INTERVAL;
 
@@ -157,9 +158,9 @@ static Particle *getAvailableParticle()
 static std::vector<b2Vec2> getNumberShape(int number)
 {
     std::vector<b2Vec2> shape;
-    float scale = std::min(screen_w, screen_h) * 0.3f;
-    float centerX = screen_w / 2.0f;
-    float centerY = screen_h / 2.0f;
+    float scale = std::min(SCREEN_W, SCREEN_H) * 0.3f;
+    float centerX = SCREEN_W / 2.0f;
+    float centerY = SCREEN_H / 2.0f;
 
     const float segLen = scale * 0.8f;
     const float hOffset = segLen * 0.5f;
@@ -253,7 +254,7 @@ static void createNumber(int number)
         fixtureDef.restitution = PARTICLE_RESTITUTION;
         p->body->CreateFixture(&fixtureDef);
 
-        p->img = gui_img_create_from_mem(gui_view_get_current(), 0, p->img_data,
+        p->img = gui_img_create_from_mem(current_view_line_37, 0, p->img_data,
                                          (int)(pos.x - PARTICLE_RADIUS),
                                          (int)(pos.y - PARTICLE_RADIUS),
                                          0, 0);
@@ -367,13 +368,11 @@ static void app_box2d_cb(void *obj)
 
 static bool init()
 {
-    GUI_WIDGET_TRY_EXCEPT(gui_view_get_current())
-
-    gui_win_t *win = gui_win_create(gui_view_get_current(), "Countdown", 0, 0, screen_w, screen_h);
+    gui_win_t *win = gui_win_create(current_view_line_37, "Countdown", 0, 0, SCREEN_W, SCREEN_H);
     if (!win) { return false; }
 
     // background
-    gui_rect_create((gui_obj_t *)gui_view_get_current(), 0, 0, 0, screen_w, screen_h, 0, gui_rgb(30, 30,
+    gui_rect_create((gui_obj_t *)current_view_line_37, 0, 0, 0, SCREEN_W, SCREEN_H, 0, gui_rgb(30, 30,
                     30));
 
     gui_obj_create_timer(GUI_BASE(win), 16, true, app_box2d_cb);
@@ -421,8 +420,6 @@ static void close()
 static int ui_design(gui_obj_t *obj)
 {
     (void)obj;
-    screen_w = gui_get_screen_width();
-    screen_h = gui_get_screen_height();
     isExploding = false;
 
 
@@ -445,17 +442,6 @@ static int ui_design(gui_obj_t *obj)
  *                                  C Interface
  *============================================================================*/
 extern "C" {
-    // static void return_cb()
-    // {
-    //     gui_view_switch_direct(gui_view_get_current(), "menu_view", SWITCH_OUT_ANIMATION_FADE,
-    //                            SWITCH_IN_ANIMATION_FADE);
-    // }
-    // static void return_timer_cb(void *obj)
-    // {
-    //     touch_info_t *tp = tp_get_info();
-    //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-    // }
-
     static void clear_mem(gui_view_t *view)
     {
         (void)view;
@@ -474,8 +460,6 @@ extern "C" {
         }
 
         gui_obj_t *obj = GUI_BASE(view);
-        // gui_win_t *win = gui_win_create(view, "win_time", 0, 0, 0, 0);
-        // gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
 
         app_box2d_countdown::ui_design(obj);
     }

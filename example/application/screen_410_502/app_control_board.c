@@ -57,96 +57,114 @@ static gui_img_t *img_capsule_mute;
 void switch_bt(bool state)
 {
     sw_state.sw_1 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_bt", gui_view_get_current());
-    gui_img_t *img = (gui_img_t *)obj;
-    if (sw_state.sw_1)
+    gui_obj_t *obj = gui_obj_get_handle((void *)gui_view_get_current(), "sw_bt");
+    if (obj)
     {
-        gui_img_set_src(img, CONTROL_BT_ON_BIN, IMG_SRC_MEMADDR);
-    }
-    else
-    {
-        gui_img_set_src(img, CONTROL_BT_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_t *img = (gui_img_t *)obj;
+        if (sw_state.sw_1)
+        {
+            gui_img_set_src(img, CONTROL_BT_ON_BIN, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            gui_img_set_src(img, CONTROL_BT_OFF_BIN, IMG_SRC_MEMADDR);
+        }
     }
 }
 
 void switch_local_play(bool state)
 {
     sw_state.sw_2 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_local_play", gui_view_get_current());
-    gui_img_t *img = (gui_img_t *)obj;
-    if (sw_state.sw_2)
+    gui_obj_t *obj = gui_obj_get_handle((void *)gui_view_get_current(), "sw_local_play");
+    if (obj)
     {
-        gui_img_set_src(img, CONTROL_PLAY_ON_BIN, IMG_SRC_MEMADDR);
-    }
-    else
-    {
-        gui_img_set_src(img, CONTROL_PLAY_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_t *img = (gui_img_t *)obj;
+        if (sw_state.sw_2)
+        {
+            gui_img_set_src(img, CONTROL_PLAY_ON_BIN, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            gui_img_set_src(img, CONTROL_PLAY_OFF_BIN, IMG_SRC_MEMADDR);
+        }
     }
 }
 
 void switch_phone(bool state)
 {
     sw_state.sw_3 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_phone", gui_view_get_current());
-    gui_img_t *img = (gui_img_t *)obj;
-    if (sw_state.sw_3)
+    gui_obj_t *obj = gui_obj_get_handle((void *)gui_view_get_current(), "sw_phone");
+    if (obj)
     {
-        gui_img_set_src(img, CONTROL_PHONE_ON_BIN, IMG_SRC_MEMADDR);
-        gui_img_set_src(img_capsule_phone, PHONE_ON_ICON_BIN, IMG_SRC_MEMADDR);
-    }
-    else
-    {
-        gui_img_set_src(img, CONTROL_PHONE_OFF_BIN, IMG_SRC_MEMADDR);
-        gui_img_set_src(img_capsule_phone, PHONE_OFF_ICON_BIN, IMG_SRC_MEMADDR);
+        gui_img_t *img = (gui_img_t *)obj;
+        if (sw_state.sw_3)
+        {
+            gui_img_set_src(img, CONTROL_PHONE_ON_BIN, IMG_SRC_MEMADDR);
+            gui_img_set_src(img_capsule_phone, PHONE_ON_ICON_BIN, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            gui_img_set_src(img, CONTROL_PHONE_OFF_BIN, IMG_SRC_MEMADDR);
+            gui_img_set_src(img_capsule_phone, PHONE_OFF_ICON_BIN, IMG_SRC_MEMADDR);
+        }
     }
 }
 
 void switch_earphone(bool state)
 {
     sw_state.sw_4 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_earphone", gui_view_get_current());
-    gui_img_t *img = (gui_img_t *)obj;
-    if (sw_state.sw_4)
+    gui_obj_t *obj = gui_obj_get_handle((void *)gui_view_get_current(), "sw_earphone");
+    if (obj)
     {
-        gui_img_set_src(img, CONTROL_EARPHONE_ON_BIN, IMG_SRC_MEMADDR);
-    }
-    else
-    {
-        gui_img_set_src(img, CONTROL_EARPHONE_OFF_BIN, IMG_SRC_MEMADDR);
+        gui_img_t *img = (gui_img_t *)obj;
+        if (sw_state.sw_4)
+        {
+            gui_img_set_src(img, CONTROL_EARPHONE_ON_BIN, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            gui_img_set_src(img, CONTROL_EARPHONE_OFF_BIN, IMG_SRC_MEMADDR);
+        }
     }
 }
 
 void switch_mute(bool state)
 {
     sw_state.sw_5 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_mute", gui_view_get_current());
-    gui_img_t *img = (gui_img_t *)obj;
-    if (sw_state.sw_5)
+    gui_obj_t *obj = gui_obj_get_handle((void *)gui_view_get_current(), "sw_mute");
+    if (obj)
     {
-        gui_img_set_src(img, CONTROL_MUTE_ON_BIN, IMG_SRC_MEMADDR);
-        gui_img_set_src(img_capsule_mute, MUTE_ON_ICON_BIN, IMG_SRC_MEMADDR);
-    }
-    else
-    {
-        gui_img_set_src(img, CONTROL_MUTE_OFF_BIN, IMG_SRC_MEMADDR);
-        gui_img_set_src(img_capsule_mute, MUTE_OFF_ICON_BIN, IMG_SRC_MEMADDR);
+        gui_img_t *img = (gui_img_t *)obj;
+        if (sw_state.sw_5)
+        {
+            gui_img_set_src(img, CONTROL_MUTE_ON_BIN, IMG_SRC_MEMADDR);
+            gui_img_set_src(img_capsule_mute, MUTE_ON_ICON_BIN, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            gui_img_set_src(img, CONTROL_MUTE_OFF_BIN, IMG_SRC_MEMADDR);
+            gui_img_set_src(img_capsule_mute, MUTE_OFF_ICON_BIN, IMG_SRC_MEMADDR);
+        }
     }
 }
 
 void switch_nobother(bool state)
 {
     sw_state.sw_6 = state;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_nobother", gui_view_get_current());
-    gui_img_t *img = (gui_img_t *)obj;
-    if (sw_state.sw_6)
+    gui_obj_t *obj = gui_obj_get_handle((void *)gui_view_get_current(), "sw_nobother");
+    if (obj)
     {
-        gui_img_set_src(img, CONTROL_NOBOTHER_ON_BIN, IMG_SRC_MEMADDR);
-        gui_img_set_src(img_capsule_nobother, NOBOTHER_ON_ICON_BIN, IMG_SRC_MEMADDR);
-    }
-    else
-    {
-        gui_img_set_src(img, CONTROL_NOBOTHER_OFF_BIN, IMG_SRC_MEMADDR);
-        gui_img_set_src(img_capsule_nobother, NOBOTHER_OFF_ICON_BIN, IMG_SRC_MEMADDR);
+        gui_img_t *img = (gui_img_t *)obj;
+        if (sw_state.sw_6)
+        {
+            gui_img_set_src(img, CONTROL_NOBOTHER_ON_BIN, IMG_SRC_MEMADDR);
+            gui_img_set_src(img_capsule_nobother, NOBOTHER_ON_ICON_BIN, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            gui_img_set_src(img, CONTROL_NOBOTHER_OFF_BIN, IMG_SRC_MEMADDR);
+            gui_img_set_src(img_capsule_nobother, NOBOTHER_OFF_ICON_BIN, IMG_SRC_MEMADDR);
+        }
     }
 }
 

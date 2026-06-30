@@ -62,21 +62,36 @@ static void time_update_cb(void *p)
     extern struct tm *timeinfo;
 #endif
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
-                    ((gui_img_t *)img_hour_decimal)->storage_type);
+    gui_obj_t *img_hour_decimal = gui_obj_get_handle((void *)current_view_line_37,
+                                                     "watch_hour_decimal");
+    if (img_hour_decimal)
+    {
+        gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
+                        ((gui_img_t *)img_hour_decimal)->storage_type);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
-                    ((gui_img_t *)img_hour_single)->storage_type);
+    gui_obj_t *img_hour_single = gui_obj_get_handle((void *)current_view_line_37, "watch_hour_single");
+    if (img_hour_single)
+    {
+        gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
+                        ((gui_img_t *)img_hour_single)->storage_type);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
-                    ((gui_img_t *)img_minute_decimal)->storage_type);
+    gui_obj_t *img_minute_decimal = gui_obj_get_handle((void *)current_view_line_37,
+                                                       "watch_minute_decimal");
+    if (img_minute_decimal)
+    {
+        gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
+                        ((gui_img_t *)img_minute_decimal)->storage_type);
+    }
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", gui_view_get_current());
-    gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
-                    ((gui_img_t *)img_minute_single)->storage_type);
+    gui_obj_t *img_minute_single = gui_obj_get_handle((void *)current_view_line_37,
+                                                      "watch_minute_single");
+    if (img_minute_single)
+    {
+        gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
+                        ((gui_img_t *)img_minute_single)->storage_type);
+    }
 }
 
 static void flower_change_cb(void *obj, gui_event_t *e)

@@ -112,42 +112,62 @@ static void time_update_cb(void)
     else
     {
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_time", gui_view_get_current());
-            sprintf(time_timecard_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-            gui_text_content_set((gui_text_t *)obj, time_timecard_content, strlen(time_timecard_content));
+            gui_obj_t *obj = gui_obj_get_handle((void *)current_view_line_40, "timecard_time");
+            if (obj)
+            {
+                sprintf(time_timecard_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+                gui_text_content_set((gui_text_t *)obj, time_timecard_content, strlen(time_timecard_content));
+            }
         }
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_date_1", gui_view_get_current());
-            sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
-            gui_text_content_set((gui_text_t *)obj, date_timecard_content, strlen(date_timecard_content));
+            gui_obj_t *obj = gui_obj_get_handle((void *)current_view_line_40, "timecard_date_1");
+            if (obj)
+            {
+                sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
+                gui_text_content_set((gui_text_t *)obj, date_timecard_content, strlen(date_timecard_content));
+            }
         }
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_date_2", gui_view_get_current());
-            sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
-                    day[timeinfo->tm_wday]);
-            gui_text_content_set((gui_text_t *)obj, date_content, strlen(date_content));
+            gui_obj_t *obj = gui_obj_get_handle((void *)current_view_line_40, "timecard_date_2");
+            if (obj)
+            {
+                sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
+                        day[timeinfo->tm_wday]);
+                gui_text_content_set((gui_text_t *)obj, date_content, strlen(date_content));
+            }
         }
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "circle_hour_decimal",
-                                        gui_view_get_current());
-        gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
-                        ((gui_img_t *)img_hour_decimal)->storage_type);
-        gui_img_refresh_size((gui_img_t *)img_hour_decimal);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "circle_hour_single",
-                                        gui_view_get_current());
-        gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
-                        ((gui_img_t *)img_hour_single)->storage_type);
-        gui_img_refresh_size((gui_img_t *)img_hour_single);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "circle_minute_decimal",
-                                        gui_view_get_current());
-        gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
-                        ((gui_img_t *)img_minute_decimal)->storage_type);
-        gui_img_refresh_size((gui_img_t *)img_minute_decimal);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "circle_minute_single",
-                                        gui_view_get_current());
-        gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
-                        ((gui_img_t *)img_minute_single)->storage_type);
-        gui_img_refresh_size((gui_img_t *)img_minute_single);
+        gui_obj_t *img_hour_decimal = gui_obj_get_handle((void *)current_view_line_40,
+                                                         "circle_hour_decimal");
+        if (img_hour_decimal)
+        {
+            gui_img_set_src((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10],
+                            ((gui_img_t *)img_hour_decimal)->storage_type);
+            gui_img_refresh_size((gui_img_t *)img_hour_decimal);
+        }
+        gui_obj_t *img_hour_single = gui_obj_get_handle((void *)current_view_line_40, "circle_hour_single");
+        if (img_hour_single)
+        {
+            gui_img_set_src((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10],
+                            ((gui_img_t *)img_hour_single)->storage_type);
+            gui_img_refresh_size((gui_img_t *)img_hour_single);
+        }
+        gui_obj_t *img_minute_decimal = gui_obj_get_handle((void *)current_view_line_40,
+                                                           "circle_minute_decimal");
+        if (img_minute_decimal)
+        {
+            gui_img_set_src((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10],
+                            ((gui_img_t *)img_minute_decimal)->storage_type);
+            gui_img_refresh_size((gui_img_t *)img_minute_decimal);
+        }
+        gui_obj_t *img_minute_single = gui_obj_get_handle((void *)current_view_line_40,
+                                                          "circle_minute_single");
+        if (img_minute_single)
+        {
+            gui_img_set_src((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10],
+                            ((gui_img_t *)img_minute_single)->storage_type);
+            gui_img_refresh_size((gui_img_t *)img_minute_single);
+        }
     }
 }
 
@@ -189,17 +209,20 @@ static void timer_cb(void *obj)
     }
 
     // control timecard display
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_timecard, __WIN0_NAME, gui_view_get_current());
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas_timecard, __WIN1_NAME, gui_view_get_current());
-    if (list->offset < 93)
+    gui_obj_t *img_timecard = gui_obj_get_handle((void *)gui_view_get_current(), __WIN0_NAME);
+    gui_obj_t *canvas_timecard = gui_obj_get_handle((void *)gui_view_get_current(), __WIN1_NAME);
+    if (img_timecard && canvas_timecard)
     {
-        gui_obj_hidden(img_timecard, true);
-        gui_obj_hidden(canvas_timecard, false);
-    }
-    else
-    {
-        gui_obj_hidden(img_timecard, false);
-        gui_obj_hidden(canvas_timecard, true);
+        if (list->offset < 93)
+        {
+            gui_obj_hidden(img_timecard, true);
+            gui_obj_hidden(canvas_timecard, false);
+        }
+        else
+        {
+            gui_obj_hidden(img_timecard, false);
+            gui_obj_hidden(canvas_timecard, true);
+        }
     }
 }
 
@@ -300,19 +323,28 @@ static void arc_activity_cb(NVGcontext *vg)
             nvgStroke(vg);
 
             {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", gui_view_get_current());
-                sprintf(move_content, "Move: %d/20000 steps", move->valueint);
-                gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
+                gui_obj_t *move_text = gui_obj_get_handle((void *)current_view_line_40, "ac_move");
+                if (move_text)
+                {
+                    sprintf(move_content, "Move: %d/20000 steps", move->valueint);
+                    gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
+                }
             }
             {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(ex_text, "ac_ex", gui_view_get_current());
-                sprintf(ex_content, "Exercise: %d/60 min", ex->valueint);
-                gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
+                gui_obj_t *ex_text = gui_obj_get_handle((void *)current_view_line_40, "ac_ex");
+                if (ex_text)
+                {
+                    sprintf(ex_content, "Exercise: %d/60 min", ex->valueint);
+                    gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
+                }
             }
             {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "ac_stand", gui_view_get_current());
-                sprintf(stand_content, "Stand: %d/30 times", stand->valueint);
-                gui_text_content_set((gui_text_t *)stand_text, stand_content, strlen(stand_content));
+                gui_obj_t *stand_text = gui_obj_get_handle((void *)current_view_line_40, "ac_stand");
+                if (stand_text)
+                {
+                    sprintf(stand_content, "Stand: %d/30 times", stand->valueint);
+                    gui_text_content_set((gui_text_t *)stand_text, stand_content, strlen(stand_content));
+                }
             }
         }
     }

@@ -91,10 +91,10 @@ static void exit_animation(void *p)
 static void run_animation(void *p)
 {
     (void)p;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(map_1, "map_1", win_map);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(map_2, "map_2", win_map);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(dist, "distance", win_map);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(dir, "arrow", win_map);
+    gui_obj_t *map_1 = gui_obj_get_handle((void *)win_map, "map_1");
+    gui_obj_t *map_2 = gui_obj_get_handle((void *)win_map, "map_2");
+    gui_obj_t *dist = gui_obj_get_handle((void *)win_map, "distance");
+    gui_obj_t *dir = gui_obj_get_handle((void *)win_map, "arrow");
     // int8_t step = 0;
     int16_t distance_value = 0;
 
@@ -439,7 +439,7 @@ void exit_map(void)
 
 void change_pos_indicator_color(void)
 {
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "pos", win_map);
+    gui_obj_t *obj = gui_obj_get_handle((void *)win_map, "pos");
     gui_obj_create_timer(obj, 10, true, pos_indicator_timer);
     gui_obj_start_timer(obj);
 }
