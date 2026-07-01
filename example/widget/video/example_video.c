@@ -18,7 +18,8 @@ extern const unsigned char _binary_earth_420_410_502_40_lq_mjpg_start[];
 extern const unsigned char _binary_earth_420_410_502_40_lq_mjpg_end[];
 extern const unsigned char _binary_earth_420_410_502_40_lq_mjpg_size[];
 #else
-#define EARTH_420_410_502_40_LQ_MJPG     0x7004D100
+#include "flash_map.h"
+#define EARTH_420_410_502_40_LQ_MJPG     (USER_DATA1_ADDR)
 #endif
 
 /* gui video widget example start*/
