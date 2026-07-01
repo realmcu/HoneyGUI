@@ -220,7 +220,7 @@ li[class*="toctree-"] * {
     text-align: center;
 }
 #target-selector, #version-selector {
-    width: 126px;
+    width: 200px;
     margin: -6px auto 16px;
     border-radius:4px;
 }

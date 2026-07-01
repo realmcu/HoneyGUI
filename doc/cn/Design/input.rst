@@ -26,7 +26,7 @@
 
 .. code-block:: c
 
-   struct gui_touch_port_data *port_touchpad_get_data()
+   gui_touch_port_data_t *port_touchpad_get_data()
    {
        uint16_t x = 0;
        uint16_t y = 0;
@@ -68,53 +68,26 @@
 
 控件响应
 ~~~~~~~~
-一些控件可以对触摸板信息做出响应，例如窗口控件、按钮控件、选项卡控件、窗帘控件和进度条控件。其中，窗口和按钮主要响应点击事件，选项卡、窗帘和进度条主要响应滑动事件。此外，选项卡、窗帘和进度条的显示也取决于 ``touch_info_t`` 结构体中的实时触摸坐标。
+由于所有控件都继承自基类 ``gui_obj`` ，几乎所有控件都可以通过 ``gui_obj_add_event_cb`` 绑定回调函数来响应触摸事件。触摸事件类型丰富，例如点击 ``GUI_EVENT_TOUCH_CLICKED`` 、长按 ``GUI_EVENT_TOUCH_LONG`` ，以及上下左右各方向的滑动等。此外，控件也可以根据 ``touch_info_t`` 结构体中的实时触摸坐标来调整自身的显示。
 
-大多数控件在相应的准备函数中处理触摸信息，比如 ``win_prepare``。使用 ``tp_get_info`` 函数获取触摸信息。
+控件内部会在其准备函数（如 ``gui_win_prepare`` ）中通过 ``tp_get_info`` 函数获取触摸信息并进行处理。
 
-在应用程序层面，可以根据不同类型的事件绑定不同的回调函数，示例如下：
+在应用程序层面，可以为控件绑定事件回调函数。例如，下面的回调函数会在被触发时置位来电标志：
 
-.. code-block:: c
+.. literalinclude:: ../../../example/application/screen_410_502/watchface_classic.c
+   :language: c
+   :start-after: /* touch event callback start */
+   :end-before: /* touch event callback end */
 
-    gui_img_t *hour;
-    gui_img_t *minute;
-    gui_img_t *second;
-    void show_clock(void *obj, gui_event_code_t e)
-    {
-        if (GET_BASE(hour) == false)
-        {
-            gui_obj_hidden(GUI_BASE(hour), true);
-            gui_obj_hidden(GUI_BASE(minute), true);
-            gui_obj_hidden(GUI_BASE(second), true);
-            gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
-            gui_img_set_src((gui_img_t *)home_bg, home[1], ((gui_img_t *)home_bg)->storage_type);
+创建控件后，通过 ``gui_obj_add_event_cb`` 将该回调绑定到控件的点击事件 ``GUI_EVENT_TOUCH_CLICKED`` 上：
 
-        }
-        else
-        {
-            gui_obj_hidden(GUI_BASE(hour), false);
-            gui_obj_hidden(GUI_BASE(minute), false);
-            gui_obj_hidden(GUI_BASE(second), false);
-            gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
-            gui_img_set_src((gui_img_t *)home_bg, home[0], ((gui_img_t *)home_bg)->storage_type);
-        }
-    }
-    void enter_homelist(void *obj, gui_event_code_t e)
-    {
-        gui_log("enter_tablist \n");
-    }
-    void design_tab_home(void *parent)
-    {
-        hour = gui_img_create_from_mem(parent, "hour", TIME_HOUR_BIN, 160, 192, 0, 0);
-        minute = gui_img_create_from_mem(parent, "minute", TIME_MUNITE_BIN, 160, 192, 0, 0);
-        second = gui_img_create_from_mem(parent, "second", TIME_SECOND_BIN, 160, 192, 0, 0);
-        gui_win_t *clock = gui_win_create(parent, "clock", 0, 84, 320, 300);
-        gui_obj_add_event_cb(clock, (gui_event_cb_t)show_clock, GUI_EVENT_TOUCH_CLICKED, NULL);
-        gui_obj_add_event_cb(clock, (gui_event_cb_t)enter_homelist, GUI_EVENT_TOUCH_LONG, NULL);
-    }
+.. literalinclude:: ../../../example/application/screen_410_502/watchface_classic.c
+   :language: c
+   :dedent:
+   :start-after: /* touch img event bind start */
+   :end-before: /* touch img event bind end */
 
-
-在这个例子中，首先创建了一个名为 clock 的窗口，在点击时执行 ``show_clock`` 函数，在长按时执行 ``enter_homelist`` 函数。
+在这个例子中，创建了一个图片控件后，通过 ``gui_obj_add_event_cb`` 将其点击事件绑定到回调函数 ``switch_call_incoming`` ，当该控件被点击时便会执行此回调函数。
 
 键盘
 ----
@@ -131,31 +104,27 @@
 
 获取键盘数据
 ~~~~~~~~~~~~
-在 ``port_kb_get_data`` 函数中，可以获取到键盘信息。用户根据自己的功能需求填写 ``port_kb_get_data``，并将结构体填充为键盘输入信息。
+键盘输入通过 ``gui_kb_create`` 注册。每个物理按键调用一次 ``gui_kb_create`` ，传入按键名称，以及按键状态、按下时间戳和释放时间戳的变量指针：
+
+.. literalinclude:: ../../../win32_sim/port/realgui_port/gui_port_indev.c
+   :language: c
+   :dedent:
+   :start-after: /* keyboard register start */
+   :end-before: /* keyboard register end */
+
+移植时，用户需要在按键状态发生变化时（例如在 GPIO 中断中）更新这些状态变量和时间戳，系统会通过注册的指针读取按键信息。
 
 键盘算法处理器
 ~~~~~~~~~~~~~~
-键盘算法的代码实现在 ``kb_algo_process`` 函数中。通过按压时间的长短来确定输入的类型是短按还是长按。算法处理器将填充 ``kb_info_t`` 结构体，该结构体对所有控件都可用。
+键盘算法的代码实现在 ``kb_algo_process`` 函数中。当按键释放时，通过按压时长来判断输入类型是短按还是长按，并向当前焦点控件派发 ``GUI_EVENT_KB_SHORT_PRESSED`` 或 ``GUI_EVENT_KB_LONG_PRESSED`` 事件。算法处理器还会填充 ``kb_info_t`` 结构体，该结构体对所有控件都可用。
 
 响应
 ~~~~~
-对键盘的响应有两种方式，一种是在控件（如窗口）中响应经过处理的按键信息，另一种是在接收到按键时直接响应按下动作。
+控件通过 ``gui_obj_add_event_cb`` 绑定回调函数来响应键盘事件，短按对应 ``GUI_EVENT_KB_SHORT_PRESSED`` 事件，长按对应 ``GUI_EVENT_KB_LONG_PRESSED`` 事件。例如，为控件绑定短按事件的回调：
 
-第一种方式示例如下所示。
+.. literalinclude:: ../../../example/application/screen_410_502/app_soccer.c
+   :language: c
+   :dedent:
+   :start-after: /* keyboard event bind start */
+   :end-before: /* keyboard event bind end */
 
-.. code-block:: c
-
-    static void win_prepare(gui_obj_t *obj)  
-    {  
-        gui_dispdev_t *dc = gui_get_dc();  
-        touch_info_t *tp = tp_get_info();  
-        kb_info_t *kb = kb_get_info();  
-        if (kb->pressed == true)  
-        {  
-            gui_obj_enable_event(obj, GUI_EVENT_KB_DOWN_PRESSED);  
-        }  
-    ......
-    }  
-
-
-对于第二种方式，请参考 GPIO 用户手册。

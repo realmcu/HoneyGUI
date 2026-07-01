@@ -207,6 +207,19 @@ function toggleLanguage() {
     document.getElementById('toCN').href = newCnUrl;
 }
 
+/* ============ fix anchor position ============ */
+window.addEventListener('load', function () {
+  const urlHash = window.location.hash;
+  if (urlHash) {
+    const hashTarget = document.querySelector(urlHash);
+    if (hashTarget) {
+      setTimeout(() => {
+        hashTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+});
+
 $(document).ready(function () {
     const isMultilingual = window.isMultilingual == "True";
     if(isMultilingual) {

@@ -27,6 +27,7 @@ typedef enum
     BYTE_PIXEL_RGBA8888 = 4,
 } GUI_BYTE_PIXEL_ENUM;
 
+/* GUI_FormatType structure start*/
 /**
  * GUI_FormatType
  * Pixel and image format identifiers.
@@ -73,6 +74,7 @@ typedef enum
     I2           = 0x3a,   /* 2 bpp indexed (4 levels) */
     I1           = 0x3b,   /* 1 bpp indexed (2 levels) */
 } GUI_FormatType;
+/* GUI_FormatType structure end*/
 
 /* BLEND_MODE_TYPE structure start*/
 typedef enum

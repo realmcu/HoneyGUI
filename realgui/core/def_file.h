@@ -28,6 +28,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
+/* gui_rgb_data_head struct start*/
 typedef struct gui_rgb_data_head
 {
     unsigned char scan : 1;
@@ -43,6 +44,7 @@ typedef struct gui_rgb_data_head
     char version;
     char rsvd2;
 } gui_rgb_data_head_t;
+/* gui_rgb_data_head struct end*/
 
 typedef struct _gui_rect_file_head
 {
@@ -50,6 +52,7 @@ typedef struct _gui_rect_file_head
     gui_color_t color;
 } gui_rect_file_head_t;
 
+/* imdc_src_type struct start*/
 typedef enum
 {
     IMDC_SRC_1BIT = 0x00,
@@ -60,7 +63,9 @@ typedef enum
     IMDC_SRC_24BIT = 0x05,
     IMDC_SRC_32BIT = 0x06,
 } imdc_src_type;
+/* imdc_src_type struct end*/
 
+/* imdc_file_header struct start*/
 typedef struct imdc_file_header
 {
     struct
@@ -74,6 +79,7 @@ typedef struct imdc_file_header
     uint32_t raw_pic_width;
     uint32_t raw_pic_height;
 } imdc_file_header_t;
+/* imdc_file_header struct end*/
 
 typedef struct imdc_file
 {

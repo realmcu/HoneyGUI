@@ -28,7 +28,7 @@ In the ``port_touchpad_get_data`` function, the touch information will be fetche
 
 .. code-block:: c
 
-   struct gui_touch_port_data *port_touchpad_get_data()
+   gui_touch_port_data_t *port_touchpad_get_data()
    {
        uint16_t x = 0;
        uint16_t y = 0;
@@ -69,52 +69,26 @@ The algorithm processor fills in the ``touch_info_t`` structure, which is availa
 
 Widget Response
 ~~~~~~~~~~~~~~~~
-Some widgets can respond to touchpad information, such as window widgets, button widgets, tab widgets, curtain widgets and progress bar widgets. Among them, windows and buttons mainly respond to click events, tab, curtain and progress bar mainly respond to swipe events. In addition, the display of tabs, curtains, and progress bars also depends on the touch real-time coordinates in the ``touch_info_t`` structure.
+Since all widgets inherit from the base class ``gui_obj``, almost any widget can respond to touch events by binding a callback with ``gui_obj_add_event_cb``. A rich set of touch event types is available, such as click (``GUI_EVENT_TOUCH_CLICKED``), long press (``GUI_EVENT_TOUCH_LONG``), and slides in all directions. In addition, a widget can also adjust its display according to the real-time touch coordinates in the ``touch_info_t`` structure.
 
-Most of the widgets that process touch information are located in the corresponding preparation function, such as ``win_prepare``. Use ``tp_get_info`` to get touch information.
+Internally, a widget obtains and processes touch information via ``tp_get_info`` in its preparation function (such as ``gui_win_prepare``).
 
-At the application level, different callback functions can be bound to different kinds of events in the following ways.
+At the application level, a callback function can be bound to a widget's event. For example, the following callback sets the incoming-call flag when it is triggered:
 
-.. code-block:: c
+.. literalinclude:: ../../../example/application/screen_410_502/watchface_classic.c
+   :language: c
+   :start-after: /* touch event callback start */
+   :end-before: /* touch event callback end */
 
-    gui_img_t *hour;
-    gui_img_t *minute;
-    gui_img_t *second;
-    void show_clock(void *obj, gui_event_code_t e)
-    {
-        if (GET_BASE(hour) == false)
-        {
-            gui_obj_hidden(GUI_BASE(hour), true);
-            gui_obj_hidden(GUI_BASE(minute), true);
-            gui_obj_hidden(GUI_BASE(second), true);
-            gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
-            gui_img_set_src((gui_img_t *)home_bg, home[1], ((gui_img_t *)home_bg)->storage_type);
-        }
-        else
-        {
-            gui_obj_hidden(GUI_BASE(hour), false);
-            gui_obj_hidden(GUI_BASE(minute), false);
-            gui_obj_hidden(GUI_BASE(second), false);
-            gui_img_set_pos((gui_img_t *)home_bg, 0, 0);
-            gui_img_set_src((gui_img_t *)home_bg, home[0], ((gui_img_t *)home_bg)->storage_type);
-        }
-    }
-    void enter_homelist(void *obj, gui_event_code_t e)
-    {
-        gui_log("enter_tablist \n");
-    }
-    void design_tab_home(void *parent)
-    {
-        hour = gui_img_create_from_mem(parent, "hour", TIME_HOUR_BIN, 160, 192, 0, 0);
-        minute = gui_img_create_from_mem(parent, "minute", TIME_MUNITE_BIN, 160, 192, 0, 0);
-        second = gui_img_create_from_mem(parent, "second", TIME_SECOND_BIN, 160, 192, 0, 0);
-        gui_win_t *clock = gui_win_create(parent, "clock", 0, 84, 320, 300);
-        gui_obj_add_event_cb(clock, (gui_event_cb_t)show_clock, GUI_EVENT_TOUCH_CLICKED, NULL);
-        gui_obj_add_event_cb(clock, (gui_event_cb_t)enter_homelist, GUI_EVENT_TOUCH_LONG, NULL);
-    }
+After creating a widget, use ``gui_obj_add_event_cb`` to bind this callback to the widget's click event ``GUI_EVENT_TOUCH_CLICKED``:
 
+.. literalinclude:: ../../../example/application/screen_410_502/watchface_classic.c
+   :language: c
+   :dedent:
+   :start-after: /* touch img event bind start */
+   :end-before: /* touch img event bind end */
 
-In this example, a window named clock is created first, and when clicked, it executes the ``show_clock`` function. When prolonged, it executes the ``enter_homelist`` function.
+In this example, after an image widget is created, ``gui_obj_add_event_cb`` binds its click event to the callback ``switch_call_incoming``, which is executed whenever the widget is clicked.
 
 Keyboard
 --------
@@ -131,30 +105,26 @@ The hardware design and driver program of the keyboard are relatively simple. He
 
 Get Keyboard Data
 ~~~~~~~~~~~~~~~~~
-In the ``port_kb_get_data`` function, the touch information will be fetched. Users need to fill ``port_kb_get_data`` according to their functional requirements and fill the structure with keyboard input information.
+Keyboard input is registered through ``gui_kb_create``. Call ``gui_kb_create`` once for each physical key, passing the key name along with pointers to the key state, press timestamp, and release timestamp variables:
+
+.. literalinclude:: ../../../win32_sim/port/realgui_port/gui_port_indev.c
+   :language: c
+   :dedent:
+   :start-after: /* keyboard register start */
+   :end-before: /* keyboard register end */
+
+When porting, users need to update these state variables and timestamps whenever the key state changes (for example, in a GPIO interrupt); the system reads the key information through the registered pointers.
 
 Keyboard Algorithm Processor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The code implementation of the keyboard algorithm processing is in the ``kb_algo_process`` function. It can be determined whether the type of input is short press or long press by pressing for a long time. The algorithm processor fills in the ``kb_info_t`` structure, which is available to all widgets.
+The code implementation of the keyboard algorithm processing is in the ``kb_algo_process`` function. When a key is released, it judges whether the input is a short press or a long press based on the press duration, and dispatches a ``GUI_EVENT_KB_SHORT_PRESSED`` or ``GUI_EVENT_KB_LONG_PRESSED`` event to the currently focused widget. The algorithm processor also fills in the ``kb_info_t`` structure, which is available to all widgets.
 
 Response
 ~~~~~~~~~
-There are two ways to respond to the keyboard, one is to respond to the processed key information in the widget such as window, and the other is to respond directly to the press action when the key is received.
+A widget responds to keyboard events by binding a callback with ``gui_obj_add_event_cb``: a short press corresponds to ``GUI_EVENT_KB_SHORT_PRESSED`` and a long press to ``GUI_EVENT_KB_LONG_PRESSED``. For example, binding a callback to a widget's short-press event:
 
-The first way is as follow.
-
-.. code-block:: c
-
-    static void win_prepare(gui_obj_t *obj)  
-    {  
-        gui_dispdev_t *dc = gui_get_dc();  
-        touch_info_t *tp = tp_get_info();  
-        kb_info_t *kb = kb_get_info();  
-        if (kb->pressed == true)  
-        {  
-            gui_obj_enable_event(obj, GUI_EVENT_KB_DOWN_PRESSED);  
-        }  
-    ......
-    }  
-
-For the second type, please refer to the GPIO user manual.
+.. literalinclude:: ../../../example/application/screen_410_502/app_soccer.c
+   :language: c
+   :dedent:
+   :start-after: /* keyboard event bind start */
+   :end-before: /* keyboard event bind end */

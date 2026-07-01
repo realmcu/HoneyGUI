@@ -66,6 +66,7 @@ void gui_port_indev_init(void)
 {
     gui_indev_info_register(&indev);
 
+    /* keyboard register start */
     gui_kb_create("Home", &home_state,
                   &home_timestamp_ms_press,
                   &home_timestamp_ms_release);
@@ -78,6 +79,7 @@ void gui_port_indev_init(void)
     gui_kb_create("Power", &power_state,
                   &power_timestamp_ms_press,
                   &power_timestamp_ms_release);
+    /* keyboard register end */
 }
 
 

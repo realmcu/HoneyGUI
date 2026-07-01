@@ -651,6 +651,7 @@ static void switch_heartrate(void *obj, gui_event_t *e)
                            SWITCH_IN_ANIMATION_FADE);
 }
 
+/* touch event callback start */
 static void switch_call_incoming(void *obj, gui_event_t *e)
 {
     (void)obj;
@@ -658,6 +659,7 @@ static void switch_call_incoming(void *obj, gui_event_t *e)
 
     *gui_call_incoming_flag_get() = true;
 }
+/* touch event callback end */
 
 static void switch_menu(void *obj, gui_event_t *e)
 {
@@ -846,12 +848,14 @@ void create_watchface_classic(gui_view_t *view)
         gui_img_set_quality(img, true);
         gui_obj_create_timer(GUI_BASE(img), 2000, true, activity_timer_cb);
     }
+    /* touch img event bind start */
     // compass icon
     gui_img_t *img = gui_img_create_from_mem(win_watch, "CLOCK_COMPASS_DIAL",
                                              UI_CLOCK_COMPASS_DIAL_ICON_BIN, 155, 348, 0, 0);
     gui_img_set_quality(img, true);
     gui_obj_add_event_cb(img, (gui_event_cb_t)switch_call_incoming, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
+    /* touch img event bind end */
 
     compass_pointer = gui_img_create_from_mem(img, "CLOCK_COMPASS_POINTER",
                                               UI_CLOCK_COMPASS_POINTER_ICON_BIN, 42, 10, 0, 0);

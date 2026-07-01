@@ -772,6 +772,7 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint8_t index_unit_length = 4; //now set to 4 , todo
     bool crop = font->crop;
 
+    /* text charset convert start */
     uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
@@ -781,6 +782,7 @@ void gui_font_get_dot_info(gui_text_t *text)
         text->font_len = 0;
         return;
     }
+    /* text charset convert end */
     if (text->arabic)
     {
         unicode_len = process_ap_unicode(unicode_buf, unicode_len);

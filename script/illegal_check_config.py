@@ -10,4 +10,6 @@ ignore_declaration_check = [
 
 ignore_illgeal_check = [
     "script/illegal_check_config.py",
+    "doc/cn/_templates",
+    "doc/en/_templates",
 ]

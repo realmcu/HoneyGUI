@@ -16,6 +16,7 @@
 #include "gui_components_init.h"
 #include "gui_canvas.h"
 
+/* canvas draw callback start */
 static void draw_circle_callback(gui_canvas_t *canvas)
 {
     nvgBeginPath(canvas->vg);
@@ -29,12 +30,15 @@ static void draw_circle_callback(gui_canvas_t *canvas)
     nvgStrokeWidth(canvas->vg, 2.0f);
     nvgStroke(canvas->vg);
 }
+/* canvas draw callback end */
 
+/* canvas create start */
 void test_circle_drawing(void)
 {
     gui_canvas_t *canvas = gui_canvas_create(gui_obj_get_root(), "test_circle", NULL, 0, 0, 300, 200);
     gui_canvas_set_canvas_cb(canvas, draw_circle_callback);
 }
+/* canvas create end */
 static void canvas_rect_cb(gui_canvas_t *canvas)
 {
     NVGcontext *vg = canvas->vg;

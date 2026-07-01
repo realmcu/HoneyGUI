@@ -18,17 +18,11 @@
 在文件 ``font_mem.c`` ，函数 :cpp:any:`gui_font_get_dot_info` 中， :cpp:any:`process_content_by_charset` 会解析文本控件的文本内容，
 并保存为 unicode (UTF-32) 储存到 ``unicode_buf`` ，Unicode 数量作为返回值输入 ``unicode_len`` 。
 
-.. code-block:: c
-
-    uint32_t *unicode_buf = NULL;
-    uint16_t unicode_len = 0;
-    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
-    if (unicode_len == 0)
-    {
-        gui_log("Warning! After process, unicode len of text: %s is 0!\n", text->base.name);
-        text->font_len = 0;
-        return;
-    }
+.. literalinclude:: ../../../realgui/engine/font/font_mem.c
+   :language: c
+   :dedent:
+   :start-after: /* text charset convert start */
+   :end-before: /* text charset convert end */
 
 :cpp:any:`process_content_by_charset` 的具体实现请查阅 ``draw_font.c`` 。
 

@@ -89,7 +89,9 @@ static void soccer_app(gui_view_t *view)
     gui_view_t *view_c = gui_view_get_current();
     if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
     {
+        /* keyboard event bind start */
         gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
+        /* keyboard event bind end */
         gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, NULL);
         gui_obj_add_event_cb(view, slide_back_2_menu, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, NULL);
         gui_obj_focus_set(view);

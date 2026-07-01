@@ -34,7 +34,8 @@
 {% block sidebartitle %}
     {%- set _logo_url = logo_url|default(pathto('_static/' + (logo or ""), 1)) %}
     {%- set _root_doc = root_doc|default(master_doc) %}
-    <a href="{{ pathto(_root_doc) }}"{% if not theme_logo_only %} class="icon icon-home"{% endif %}>
+    {%- set _logo_link = logo_link if (logo_link is defined and logo_link) else pathto(_root_doc) %}
+    <a href="{{ _logo_link }}"{% if not theme_logo_only %} class="icon icon-home"{% endif %}>
         {% if not theme_logo_only %}{{ project }}{% endif %}
         {%- if logo or logo_url %}
             <img src="{{ _logo_url }}" class="logo" alt="{{ _('Logo') }}"/>
@@ -45,12 +46,12 @@
     {% if theme_display_version %}
         {% if is_multitarget %}
         <div class="target-container">
-            <select name="target-selector" id="target-selector" onchange="change_target()">
+            <select name="target-selector" id="target-selector" onchange="onTargetChange()">
             </select>
         </div>
         {% endif %}
         <div class="version-container">
-            <select name="version-selector" id="version-selector" onchange="change_version()">
+            <select name="version-selector" id="version-selector" onchange="onVersionChange()">
             </select>
         </div>
     {%- endif %}

@@ -26,9 +26,11 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+/* fruit ninja screen config start */
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define HEIGHT_OFFSET 100
+/* fruit ninja screen config end */
 #define CURRENT_VIEW_NAME "fruit_ninja_view"
 
 /*============================================================================*
@@ -88,7 +90,9 @@ extern "C" {
     static void app_fruit_ninja_design(gui_view_t *view);
     static void close_FN(gui_view_t *view);
 
+    /* fruit ninja view instance start */
     GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_fruit_ninja_design, close_FN);
+    /* fruit ninja view instance end */
 }
 
 /*============================================================================*
@@ -267,12 +271,14 @@ static bool line_has_two_intersections_with_rectangle(Point rect_min, float widt
 
     Point center = {(float)(rect_min.x + width / 2.0f), (float)(rect_min.y + height / 2.0f)}; // calculate center point
 
+    /* fruit ninja rotate points start */
     /* calculate rectangular's four rotated points */
 
     Point rotated_rect_min = rotate_point(rect_min, center, angle); // left-up
     Point rotated_rect_max = rotate_point(rect_max, center, angle); // right-down
     Point rotated_rect_p2 = rotate_point(rect_p2, center, angle); // left-down
     Point rotated_rect_p3 = rotate_point(rect_p3, center, angle); // right-top
+    /* fruit ninja rotate points end */
 
     /* four sides of a rectangle */
     Point rect_edges[4][2] =
@@ -362,8 +368,10 @@ static bool cut_judgment(gui_img_t *img, uint8_t index, void *pic_cut)
             Point img_coordinate = {(float)img_x, (float)img_y};
             Point tp_start = {(float)tp->x, (float)tp->y};
             Point tp_end = {(float)(tp->x + tp->deltaX), (float)(tp->y + tp->deltaY)};
+            /* fruit ninja cut check start */
             if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
                                                           img_rotate_angle))
+                /* fruit ninja cut check end */
             {
                 if (img == img_bomb) {return true;}
                 gui_img_set_src(img, (const uint8_t *)pic_cut, img->storage_type);
@@ -386,7 +394,9 @@ static bool cut_judgment(gui_img_t *img, uint8_t index, void *pic_cut)
 static bool score_judgment()
 {
     fruit_cut_cnt = 0;
+    /* fruit ninja cut judgment start */
     cut_judgment(img_strawberry, 0, FRUIT_NINJA_STRAWBERRY_HALF_1_BIN);
+    /* fruit ninja cut judgment end */
     cut_judgment(img_banana, 1, FRUIT_NINJA_BANANA_HALF_1_BIN);
     cut_judgment(img_peach, 2, FRUIT_NINJA_PEACH_HALF_1_BIN);
     cut_judgment(img_watermelon, 3, FRUIT_NINJA_WATERMELON_HALF_1_BIN);
@@ -400,6 +410,7 @@ static void app_design_core(void *parent)
     b2Vec2 gravity(0.0f, 9.8f);
     world = new (gui_malloc(sizeof(b2World))) b2World(gravity);
 
+    /* fruit ninja dynamic body start */
     // Add dynamic bodys
     b2BodyDef ballBodyDef;
     ballBodyDef.type = b2_dynamicBody;
@@ -407,6 +418,7 @@ static void app_design_core(void *parent)
     ballBodyDef.angularVelocity = -314;    //-PI rad/s
     ballBodyDef.linearVelocity.Set(5, -20); // move up
     body_st = world->CreateBody(&ballBodyDef);
+    /* fruit ninja dynamic body end */
 
     ballBodyDef.position.Set(8, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
     body_ba = world->CreateBody(&ballBodyDef);
@@ -419,9 +431,11 @@ static void app_design_core(void *parent)
 
     ballBodyDef.position.Set(20, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
     body_bomb = world->CreateBody(&ballBodyDef);
+    /* fruit ninja body shape start */
     //creat body shape and attach the shape to the Body
     b2CircleShape circleShape;
     circleShape.m_radius = 0.01; //RADIUS_ST * P2M; small number reducing the impact of collisions
+    /* fruit ninja body shape end */
     b2FixtureDef FixtureDef;
     FixtureDef.shape = &circleShape;
     FixtureDef.density = 1;
@@ -545,10 +559,13 @@ static void fruit_ninja_cb(void *p)
 
         // Get the position of the ball then set the image location and rotate it on the GUI
         {
+            /* fruit ninja get position start */
             b2Vec2 position = body_st->GetPosition();
             if (position_refresh((int)(position.x * M2P - RADIUS_ST), (int)(position.y * M2P - RADIUS_ST),
                                  img_strawberry, body_st) == 1)
+                /* fruit ninja get position end */
             {
+                /* fruit ninja restore cut start */
                 gui_img_set_src(img_strawberry, (const uint8_t *)FRUIT_NINJA_STRAWBERRY_BIN,
                                 img_strawberry->storage_type);
                 gui_img_refresh_size(img_strawberry);
@@ -556,6 +573,7 @@ static void fruit_ninja_cb(void *p)
 
                 fruit_cut_flag[0] = false;
                 gui_obj_hidden(GUI_BASE(img_cut_array[0]), true);
+                /* fruit ninja restore cut end */
             }
             // gui_log("img_strawberry->degrees: %f\r\n", img_strawberry->degrees);
 
@@ -601,6 +619,7 @@ static void fruit_ninja_cb(void *p)
                                  img_bomb,
                                  body_bomb) == 1) {;}
 
+            /* fruit ninja refresh half cut start */
             // Refresh half-cut fruits pos
             if (fruit_cut_flag[0])
             {
@@ -608,6 +627,7 @@ static void fruit_ninja_cb(void *p)
                                   img_strawberry->t_y + 10);
                 gui_img_rotation(img_cut_array[0], gui_img_get_transform_degrees(img_strawberry));
             }
+            /* fruit ninja refresh half cut end */
             if (fruit_cut_flag[1])
             {
                 gui_img_translate(img_cut_array[1], img_banana->t_x + 10, img_banana->t_y + 10);
@@ -677,6 +697,7 @@ extern "C" {
         gui_view_switch_direct(gui_view_get_current(), "menu_view", SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
+    /* fruit ninja design entry start */
     static void app_fruit_ninja_design(gui_view_t *view)
     {
         gui_obj_add_event_cb(view, click_button_back_2_watchface_or_menu, GUI_EVENT_KB_SHORT_PRESSED, NULL);
@@ -685,6 +706,7 @@ extern "C" {
         gui_obj_t *obj = GUI_BASE(view);
         app_fruit_ninja::fruit_ninja_design(obj);
     }
+    /* fruit ninja design entry end */
     static void close_FN(gui_view_t *view)
     {
         (void)view;

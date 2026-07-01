@@ -19,17 +19,11 @@ In the file ``font_mem.c``, within the function :cpp:any:`gui_font_get_dot_info`
 :cpp:any:`process_content_by_charset` parses the text content of the text widget and saves it as Unicode (UTF-32) in ``unicode_buf``.
 The number of Unicode characters is returned in ``unicode_len``.
 
-.. code-block:: c
-
-    uint32_t *unicode_buf = NULL;
-    uint16_t unicode_len = 0;
-    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
-    if (unicode_len == 0)
-    {
-        gui_log("Warning! After process, unicode len of text: %s is 0!\n", text->base.name);
-        text->font_len = 0;
-        return;
-    }
+.. literalinclude:: ../../../realgui/engine/font/font_mem.c
+   :language: c
+   :dedent:
+   :start-after: /* text charset convert start */
+   :end-before: /* text charset convert end */
 
 For the specific implementation of :cpp:any:`process_content_by_charset`, please refer to ``draw_font.c``.
 

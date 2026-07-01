@@ -32,68 +32,32 @@
 创建与初始化
 ~~~~~~~~~~~~
 
-1. 使用 ``gui_canvas_create`` 函数创建画布控件。
+1. 使用 ``gui_canvas_create`` 创建画布控件，并通过 ``gui_canvas_set_canvas_cb`` 绑定绘制回调。
 
-   此函数用于创建一个基于 NanoVG 的画布控件，返回画布对象指针。
+   .. literalinclude:: ../../../example/widget/canvas/example_canvas.c
+      :language: c
+      :start-after: /* canvas create start */
+      :end-before: /* canvas create end */
 
-   .. code-block:: c
-   
-       // 示例：创建200x200大小的画布
-       gui_canvas_t* canvas = gui_canvas_create(
-           parent,     // 父控件指针
-           "my_canvas", // 画布名称
-           NULL,       // 地址参数(保留)
-           0, 0,       // x,y坐标
-           200, 200    // 宽度,高度
-       );
-       
-       if (canvas == NULL) {
-           // 错误处理
-       }
+2. 绘制回调函数中通过 NanoVG 接口绘制图形，当需要刷新画布时系统会调用该回调。
 
-2. 使用 ``gui_canvas_set_canvas_cb`` 设置绘制回调。
+   .. literalinclude:: ../../../example/widget/canvas/example_canvas.c
+      :language: c
+      :start-after: /* canvas draw callback start */
+      :end-before: /* canvas draw callback end */
 
-   此函数用于设置画布的重绘回调函数，当需要刷新画布时会调用此回调。
-
-   .. code-block:: c
-   
-       // 示例绘制函数
-       static void my_draw_function(gui_canvas_t* canvas) {
-           NVGcontext* vg = canvas->vg;
-           
-           // 绘制红色矩形
-           nvgBeginPath(vg);
-           nvgRect(vg, 50, 50, 100, 100);
-           nvgFillColor(vg, nvgRGBA(255, 0, 0, 255));
-           nvgFill(vg);
-       }
-       
-       // 设置回调
-       gui_canvas_set_canvas_cb(canvas, my_draw_function);
-
-触发重绘：
-可通过设置 canvas->render = 1 来手动触发重绘，系统会在下一帧调用绘制回调。
+可通过设置 ``canvas->render = 1`` 手动触发重绘，系统会在下一帧调用绘制回调。
 
 图像输出
 ~~~~~~~~~~
 
-使用 ``gui_canvas_render_to_image_buffer`` 函数（预分配缓冲区）。
+使用 ``gui_canvas_render_to_image_buffer`` 函数可将画布内容渲染到预先分配的缓冲区，适用于需要重复渲染或内存受限的场景。缓冲区大小需按 宽 × 高 × 每像素字节数，再加上头部 ``gui_rgb_data_head_t`` 的大小来计算，示例如下：
 
-   此函数需要预先分配缓冲区，适用于需要重复渲染或内存受限的场景。
-
-   .. code-block:: c
-   
-        // 示例：输出到预分配的RGBA缓冲区
-        uint8_t img_head_size = sizeof(gui_rgb_data_head_t);
-        uint32_t img_size = img_head_size + 640 * 480 * 4;// RGBA 需分配 width*height*4 字节，加上头部
-        uint8_t *buffer = gui_lower_malloc(img_size); 
-        gui_canvas_render_to_image_buffer(
-            GUI_CANVAS_OUTPUT_RGBA,
-            false,
-            640, 480,
-            my_render_func,
-            buffer);
-
+.. literalinclude:: ../../../example/application/screen_410_502/app_heartrate.c
+   :language: c
+   :dedent:
+   :start-after: /* canvas render start */
+   :end-before: /* canvas render end */
 
 示例代码
 --------
@@ -107,7 +71,7 @@
    cd win32_sim
    menuconfig ../Kconfig.gui
 
-选择 ``Canvas Demo``（``CONFIG_REALTEK_BUILD_REAL_CANVAS``），保存到 ``win32_sim/.config``。
+选择画布示例（ ``CONFIG_REALTEK_BUILD_REAL_CANVAS``），保存到 ``win32_sim/.config``。
 
 .. literalinclude:: ../../../example/widget/canvas/example_canvas.c
    :language: c

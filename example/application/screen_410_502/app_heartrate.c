@@ -322,6 +322,7 @@ static void heartrate_design(gui_view_t *view)
         gui_text_rendermode_set(t, 2);
     }
     {
+        /* canvas render start */
         int image_h = 300;
         int image_w = SCREEN_WIDTH;
         int pixel_bytes = 4;
@@ -333,6 +334,7 @@ static void heartrate_design(gui_view_t *view)
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_heartrate_graph,
                                           img_data);
+        /* canvas render end */
         gui_img_t *img = gui_img_create_from_mem(win_hb, 0, (void *)img_data, 0, 0, SCREEN_WIDTH,
                                                  SCREEN_HEIGHT);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
