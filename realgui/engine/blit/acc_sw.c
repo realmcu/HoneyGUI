@@ -73,8 +73,11 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
     uint8_t  bpp   = dc->bit_depth / 8;
 
     const uint8_t *a8_base = (const uint8_t *)image->data + sizeof(gui_rgb_data_head_t);
+
+    int16_t  section_w = dc->section.x2 - dc->section.x1 + 1;
     uint8_t *buffer = dc->frame_buf +
-                      ((blur_rect.y1 - dc->section.y1) * dc->fb_width + blur_rect.x1) * bpp;
+                      ((blur_rect.y1 - dc->section.y1) * section_w +
+                       (blur_rect.x1 - dc->section.x1)) * bpp;
 
     uint8_t *orig_copy = (uint8_t *)gui_malloc((uint32_t)blur_w * (uint32_t)blur_h * bpp);
     if (orig_copy != NULL)
@@ -82,27 +85,30 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
         for (int16_t row = 0; row < blur_h; row++)
         {
             memcpy(orig_copy + (uint32_t)row * blur_w * bpp,
-                   buffer    + (uint32_t)row * dc->fb_width * bpp,
+                   buffer    + (uint32_t)row * section_w * bpp,
                    (uint32_t)blur_w * bpp);
         }
     }
 
     if (orig_copy != NULL)
     {
-        int16_t img_w = img_rect.x2 - img_rect.x1 + 1;
-        int16_t img_h = img_rect.y2 - img_rect.y1 + 1;
-        gui_rect_t local_rect = {0, 0, img_w - 1, img_h - 1};
+        int16_t onscreen_top    = img_rect.y1 < 0 ? 0 : img_rect.y1;
+        int16_t onscreen_bottom = img_rect.y2 > (int16_t)dc->screen_height - 1
+                                  ? (int16_t)dc->screen_height - 1 : img_rect.y2;
+        int16_t target_h        = onscreen_bottom - onscreen_top + 1;
+
+        gui_rect_t local_rect = {0, 0, blur_w - 1, target_h - 1};
 
         gui_dispdev_t fake_dc = {0};
         fake_dc.frame_buf     = orig_copy;
         fake_dc.fb_width      = (uint16_t)blur_w;
-        fake_dc.screen_width  = (uint16_t)img_w;
-        fake_dc.screen_height = dc->screen_height;
+        fake_dc.screen_width  = (uint16_t)blur_w;
+        fake_dc.screen_height = (uint16_t)target_h;
         fake_dc.bit_depth     = dc->bit_depth;
-        fake_dc.section.x1    = blur_rect.x1 - img_rect.x1;
-        fake_dc.section.y1    = blur_rect.y1 - img_rect.y1;
-        fake_dc.section.x2    = blur_rect.x2 - img_rect.x1;
-        fake_dc.section.y2    = blur_rect.y2 - img_rect.y1;
+        fake_dc.section.x1    = 0;
+        fake_dc.section.y1    = blur_rect.y1 - onscreen_top;
+        fake_dc.section.x2    = blur_w - 1;
+        fake_dc.section.y2    = blur_rect.y2 - onscreen_top;
 
         gui_get_acc()->blur(&fake_dc, &local_rect, GUI_A8_BLUR_DEGREE, image->acc_user);
 
@@ -111,9 +117,15 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
             for (y = 0; y < blur_h; y++)
             {
                 int16_t       screen_y = blur_rect.y1 + y;
-                const uint8_t *a8_row  = a8_base + (screen_y - image->img_target_y) * (int16_t)image->img_w;
-                uint8_t       *p_fb    = buffer  + (uint32_t)y * dc->fb_width * bpp;
+                int32_t       ay       = (int32_t)screen_y - image->img_target_y;
+                uint8_t       *p_fb    = buffer  + (uint32_t)y * section_w * bpp;
                 uint8_t       *p_blur  = orig_copy + (uint32_t)y * blur_w * bpp;
+
+                if ((uint32_t)ay >= (uint32_t)image->img_h)
+                {
+                    continue;
+                }
+                const uint8_t *a8_row = a8_base + ay * (int32_t)image->img_w;
 
                 if (dc->bit_depth == 32)
                 {
@@ -123,7 +135,9 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
                     for (x = 0; x < blur_w; x++)
                     {
                         int16_t screen_x = blur_rect.x1 + x;
-                        uint8_t a        = a8_row[screen_x - image->img_target_x];
+                        int32_t ax       = (int32_t)screen_x - image->img_target_x;
+                        uint8_t a        = ((uint32_t)ax < (uint32_t)image->img_w)
+                                           ? a8_row[ax] : 0;
 
                         if (a == 0)
                         {
@@ -154,7 +168,9 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
                     for (x = 0; x < blur_w; x++)
                     {
                         int16_t screen_x = blur_rect.x1 + x;
-                        uint8_t a        = a8_row[screen_x - image->img_target_x];
+                        int32_t ax       = (int32_t)screen_x - image->img_target_x;
+                        uint8_t a        = ((uint32_t)ax < (uint32_t)image->img_w)
+                                           ? a8_row[ax] : 0;
 
                         if (a == 0)
                         {
