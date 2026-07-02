@@ -118,13 +118,43 @@ static void draw_pre_canvas_cb(NVGcontext *vg)
 void test_pre_buffer_drawing(void)
 {
     gui_dispdev_t *dc = gui_get_dc();
+    dc->cache_need_clean = true;
     uint32_t image_w = dc->screen_width;
     uint32_t image_h = dc->screen_height;
-    uint8_t *image_buffer = gui_lower_malloc(image_w * image_h * 4 + sizeof(gui_rgb_data_head_t));
-    memset(image_buffer, 0, image_w * image_h * 4 + sizeof(gui_rgb_data_head_t));
+    uint8_t *image_buffer = gui_lower_malloc(image_w * image_h * 2 + sizeof(gui_rgb_data_head_t));
+    memset(image_buffer, 0, image_w * image_h * 2 + sizeof(gui_rgb_data_head_t));
 
+
+#ifdef _HONEYGUI_SIMULATOR_
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, draw_pre_canvas_cb,
                                       image_buffer);
+#else
+    extern uint32_t sys_timestamp_get_us(void);
+    uint32_t start_time = sys_timestamp_get_us();
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, draw_pre_canvas_cb,
+                                      image_buffer);
+    uint32_t end_time = sys_timestamp_get_us();
+    gui_log("canvas render time: %d us\n", end_time - start_time);
+
+    /* CRC32 over pixel bytes only (skip the gui_rgb_data_head_t prefix).
+     * Uses the reflected polynomial 0xEDB88320 (same as zlib/PNG). Small
+     * inline implementation -- table would cost 1 KB flash and is unnecessary
+     * for a one-shot benchmark. Prints in hex so it's easy to eyeball. */
+    const uint8_t *px = image_buffer + sizeof(gui_rgb_data_head_t);
+    uint32_t n_bytes  = image_w * image_h * 2;
+    uint32_t crc      = 0xFFFFFFFFu;
+    for (uint32_t i = 0; i < n_bytes; ++i)
+    {
+        crc ^= px[i];
+        for (int b = 0; b < 8; ++b)
+        {
+            uint32_t mask = -(int32_t)(crc & 1u);
+            crc = (crc >> 1) ^ (0xEDB88320u & mask);
+        }
+    }
+    crc ^= 0xFFFFFFFFu;
+    gui_log("canvas fb crc32: 0x%08x  (%u bytes)\n", crc, n_bytes);
+#endif
 
     gui_img_create_from_mem(gui_obj_get_root(), "canvas_img", image_buffer, 0, 0, 0,
                             0);

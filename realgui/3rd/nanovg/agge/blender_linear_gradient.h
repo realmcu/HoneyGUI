@@ -197,13 +197,18 @@ static inline void blender_lg_mve_bgr565(
     const float32x4_t v_db   = vdupq_n_f32((float)((int)ec.b - (int)sc.b));
     const float32x4_t v_da   = vdupq_n_f32((float)((int)ec.a - (int)sc.a));
 
+    /* Fast-path invariant: if both endpoints are fully opaque (very common
+     * -- nvgRGB(...) yields a==255), then src alpha is constant 255 for all
+     * lanes, so v_a := v_cov and we skip the alpha channel's fmul entirely.
+     * Combined with the "all lanes hi-alpha" per-vector fast path below, this
+     * eliminates a huge chunk of the mid-alpha mix work in solid gradient fills. */
+    const bool alpha_const_ff = (sc.a == 0xFF && ec.a == 0xFF);
+
     /* {0,1,2,3} lane offset */
     const int32_t lane_init[4] = {0, 1, 2, 3};
     const float32x4_t v_lane = vcvtq_f32_s32(vld1q_s32(lane_init));
 
     float x_cur = (float)x_base;
-    int   x_int = x_base;
-    (void)x_int;
 
     while (n > 0)
     {
@@ -223,17 +228,54 @@ static inline void blender_lg_mve_bgr565(
         float32x4_t v_pr  = vfmaq_f32(v_sc_r, v_dr, v_f);
         float32x4_t v_pg_ = vfmaq_f32(v_sc_g, v_dg, v_f);
         float32x4_t v_pb  = vfmaq_f32(v_sc_b, v_db, v_f);
-        float32x4_t v_pa  = vfmaq_f32(v_sc_a, v_da, v_f);
 
         /* As u32 lanes (we know each is 0..255) */
         uint32x4_t v_sr = vreinterpretq_u32_s32(vcvtq_s32_f32(v_pr));
         uint32x4_t v_sg = vreinterpretq_u32_s32(vcvtq_s32_f32(v_pg_));
         uint32x4_t v_sb = vreinterpretq_u32_s32(vcvtq_s32_f32(v_pb));
-        uint32x4_t v_sa = vreinterpretq_u32_s32(vcvtq_s32_f32(v_pa));
 
-        /* a_eff = (cover * src.a) >> 8 per lane */
+        /* a_eff = (cover * src.a) >> 8 per lane. When src.a is constant 0xFF
+         * for both endpoints, skip the alpha channel's fmul + f2i entirely
+         * (v_sa would be splat-255 anyway). Keeps the (cover*255)>>8 step to
+         * stay bit-exact vs the scalar path -- cover=255 yields 254, not 255. */
         uint32x4_t v_cov = vldrbq_z_u32(covers, pg);          /* u8->u32 widen */
-        uint32x4_t v_a   = vshrq_n_u32(vmulq_u32(v_cov, v_sa), 8);
+        uint32x4_t v_a;
+        if (alpha_const_ff)
+        {
+            v_a = vshrq_n_u32(vmulq_n_u32(v_cov, 0xFFu), 8);
+        }
+        else
+        {
+            float32x4_t v_pa = vfmaq_f32(v_sc_a, v_da, v_f);
+            uint32x4_t  v_sa = vreinterpretq_u32_s32(vcvtq_s32_f32(v_pa));
+            v_a = vshrq_n_u32(vmulq_u32(v_cov, v_sa), 8);
+        }
+
+        /* alpha-class predicates (combine with tail pg) */
+        mve_pred16_t p_hi  = vcmpcsq_m_n_u32(v_a, 0xf5, pg);                  /* a >= 0xf5 */
+
+        /* Fast path: all active lanes hi-alpha -> pack src channels directly
+         * and skip the destination load, unpack, mix and repack. */
+        if (p_hi == pg)
+        {
+            uint32x4_t v_sr5 = vshrq_n_u32(v_sr, 3);
+            uint32x4_t v_sg6 = vshrq_n_u32(v_sg, 2);
+            uint32x4_t v_sb5 = vshrq_n_u32(v_sb, 3);
+            uint32x4_t v_out = vorrq_u32(
+                                   vorrq_u32(vshlq_n_u32(v_sr5, 11),
+                                             vshlq_n_u32(v_sg6, 5)),
+                                   v_sb5);
+            vstrhq_p_u32((uint16_t *)pixels, v_out, pg);
+
+            pixels += lanes;
+            covers += lanes;
+            x_cur  += (float)lanes;
+            n      -= lanes;
+            continue;
+        }
+
+        mve_pred16_t p_mid = vcmpcsq_m_n_u32(v_a, 0x02, pg);                  /* a >= 0x02 */
+        mve_pred16_t p_mid_only = p_mid & (mve_pred16_t)(~p_hi);
 
         /* Load 4 destination BGR565 lanes (each lane holds one u16 in low 16 bits) */
         uint32x4_t v_px = vldrhq_z_u32((uint16_t *)pixels, pg);
@@ -242,11 +284,6 @@ static inline void blender_lg_mve_bgr565(
         uint32x4_t v_tb = vandq_u32(v_px, vdupq_n_u32(0x1F));
         uint32x4_t v_tg = vandq_u32(vshrq_n_u32(v_px, 5), vdupq_n_u32(0x3F));
         uint32x4_t v_tr = vshrq_n_u32(v_px, 11);              /* upper bits already cleared by u16 load */
-
-        /* alpha-class predicates (combine with tail pg) */
-        mve_pred16_t p_hi  = vcmpcsq_m_n_u32(v_a, 0xf5, pg);                  /* a >= 0xf5 */
-        mve_pred16_t p_mid = vcmpcsq_m_n_u32(v_a, 0x02, pg);                  /* a >= 0x02 */
-        mve_pred16_t p_mid_only = p_mid & (mve_pred16_t)(~p_hi);
 
         /* High-alpha: t = (sr>>3, sg>>2, sb>>3) */
         uint32x4_t v_sr5 = vshrq_n_u32(v_sr, 3);
