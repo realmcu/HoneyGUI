@@ -187,7 +187,6 @@
         <file category="sourceC" name="widget/gui_canvas_arc.c"/>
         <file category="header" name="widget/gui_canvas_arc.h"/>
         <file category="sourceC" name="widget/gui_canvas_img.c"/>
-        <file category="header" name="widget/gui_canvas_img.h"/>
         <file category="sourceC" name="widget/gui_canvas_rect.c"/>
         <file category="header" name="widget/gui_canvas_rect.h"/>
         <file category="sourceC" name="widget/gui_canvas_round_rect.c"/>

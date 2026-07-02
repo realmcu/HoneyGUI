@@ -63,9 +63,9 @@ void test_rect_drawing(void)
 }
 static void arc_cb(gui_canvas_t *canvas)
 {
-    static float  progress;
-    progress += 0.01f;
-    nvgArc(canvas->vg, 480 / 2, 480 / 2, 150, 0, 3.14f * (sinf(progress) + 1), NVG_CCW);
+    // static float  progress;
+    // progress += 0.01f;
+    nvgArc(canvas->vg, 480 / 2, 480 / 2, 150, 0, -6.14f, NVG_CCW);
     nvgStrokeWidth(canvas->vg, 20);
     nvgStrokeColor(canvas->vg, nvgRGB(178, 34, 34));
     nvgStroke(canvas->vg);
@@ -78,12 +78,65 @@ void test_arc_drawing(void)
     canvas->render = 1;
 }
 
+static void draw_pre_canvas_cb(NVGcontext *vg)
+{
+    /* Yellow filled circle */
+    nvgBeginPath(vg);
+    nvgCircle(vg, 100, 100, 50);
+    nvgFillColor(vg, nvgRGBA(255, 255, 0, 255));
+    nvgFill(vg);
+
+    /* Blue ellipse outline */
+    nvgBeginPath(vg);
+    nvgEllipse(vg, 200, 100, 80, 40);
+    nvgStrokeColor(vg, nvgRGBA(0, 0, 255, 255));
+    nvgStrokeWidth(vg, 2.0f);
+    nvgStroke(vg);
+
+    /* Rounded rect: gradient fill + red stroke share the same path */
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, 150, 150, 200, 180, 20);
+    {
+        NVGpaint gradient = nvgLinearGradient(vg, 150, 150, 350, 330,
+                                              nvgRGB(255, 0, 0),
+                                              nvgRGBA(0, 255, 0, 255));
+        nvgFillPaint(vg, gradient);
+        nvgFill(vg);
+    }
+    nvgStrokeWidth(vg, 8.0f);
+    nvgStrokeColor(vg, nvgRGB(255, 0, 0));
+    nvgStroke(vg);
+
+    /* Dark red arc */
+    nvgBeginPath(vg);
+    nvgArc(vg, 480 / 2, 480 / 2, 150, 0, -6.14f, NVG_CCW);
+    nvgStrokeWidth(vg, 20);
+    nvgStrokeColor(vg, nvgRGB(178, 34, 34));
+    nvgStroke(vg);
+}
+
+void test_pre_buffer_drawing(void)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    uint32_t image_w = dc->screen_width;
+    uint32_t image_h = dc->screen_height;
+    uint8_t *image_buffer = gui_lower_malloc(image_w * image_h * 4 + sizeof(gui_rgb_data_head_t));
+    memset(image_buffer, 0, image_w * image_h * 4 + sizeof(gui_rgb_data_head_t));
+
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, draw_pre_canvas_cb,
+                                      image_buffer);
+
+    gui_img_create_from_mem(gui_obj_get_root(), "canvas_img", image_buffer, 0, 0, 0,
+                            0);
+}
+
 
 static int app_init(void)
 {
-    test_rect_drawing();
-    test_arc_drawing();
-    test_circle_drawing();
+    // test_rect_drawing();
+    // test_arc_drawing();
+    // test_circle_drawing();
+    test_pre_buffer_drawing();
     return 0;
 }
 
