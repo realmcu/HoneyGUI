@@ -196,6 +196,23 @@ static inline uint16_t arm2d_local_rgb565_pack(arm2d_local_color_fast_rgb_t *ptR
     };
     return tOutput.tValue;
 }
+static inline bool arm2d_local_reverse_h_allowed(
+    const arm2d_local_region_t *ptValid,
+    const arm2d_local_region_t *ptTarget)
+{
+    return (ptValid->tLocation.iX <= ptTarget->tLocation.iX)
+           && ((ptValid->tLocation.iX + ptValid->tSize.iWidth)
+               >= (ptTarget->tLocation.iX + ptTarget->tSize.iWidth));
+}
+
+static inline bool arm2d_local_reverse_v_allowed(
+    const arm2d_local_region_t *ptValid,
+    const arm2d_local_region_t *ptTarget)
+{
+    return (ptValid->tLocation.iY <= ptTarget->tLocation.iY)
+           && ((ptValid->tLocation.iY + ptValid->tSize.iHeight)
+               >= (ptTarget->tLocation.iY + ptTarget->tSize.iHeight));
+}
 
 static inline void arm2d_local_rgb565_unpack_comp(uint16_t hwColor,
                                                   arm2d_local_color_fast_rgb_t *ptRGB)
@@ -234,6 +251,11 @@ void arm2d_local_rgb565_filter_iir_blur(
     int_fast16_t iWidth = ptValidRegionOnVirtualScreen->tSize.iWidth;
     int_fast16_t iHeight = ptValidRegionOnVirtualScreen->tSize.iHeight;
 
+    if (0 == chBlurDegree)
+    {
+        return;
+    }
+
     int16_t iY, iX;
     uint16_t hwRatio = 256 - chBlurDegree;
     arm2d_color_rgb565_t tAcc;
@@ -253,6 +275,13 @@ void arm2d_local_rgb565_filter_iir_blur(
         .iX = ptValidRegionOnVirtualScreen->tLocation.iX - ptTargetRegionOnVirtualScreen->tLocation.iX,
         .iY = ptValidRegionOnVirtualScreen->tLocation.iY - ptTargetRegionOnVirtualScreen->tLocation.iY,
     };
+
+    const bool bAllowReverseH = arm2d_local_reverse_h_allowed(
+                                    ptValidRegionOnVirtualScreen,
+                                    ptTargetRegionOnVirtualScreen);
+    const bool bAllowReverseV = arm2d_local_reverse_v_allowed(
+                                    ptValidRegionOnVirtualScreen,
+                                    ptTargetRegionOnVirtualScreen);
 
     if (ptThis->dir.bForwardHorizontal)
     {
@@ -307,6 +336,40 @@ void arm2d_local_rgb565_filter_iir_blur(
             }
 
             phwPixel += iTargetStride;
+        }
+    }
+
+    /* rows reverse path (right to left, bottom to top) */
+    if (ptThis->dir.bReverseHorizontal && bAllowReverseH)
+    {
+        uint16_t *phwPixel = &phwTarget[(iWidth - 1) + (iHeight - 1) * iTargetStride];
+
+        for (iY = iHeight - 1; iY >= 0; iY--)
+        {
+            /* seed the accumulator from the right-most pixel of the row */
+            arm2d_local_rgb565_unpack_comp(*phwPixel, &tPixel);
+            tAcc = *(arm2d_color_rgb565_t *)&tPixel;
+
+            uint16_t *phwTargetPixel = phwPixel;
+
+            for (iX = 0; iX < iWidth; iX++)
+            {
+                arm2d_local_rgb565_unpack_comp(*phwTargetPixel, &tPixel);
+
+                tAcc.hwB += (tPixel.B - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (tPixel.G - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (tPixel.R - tAcc.hwR) * hwRatio >> 8;
+
+                tPixel.B = tAcc.hwB;
+                tPixel.G = tAcc.hwG;
+                tPixel.R = tAcc.hwR;
+
+                *phwTargetPixel = arm2d_local_rgb565_pack(&tPixel);
+
+                phwTargetPixel--;
+            }
+
+            phwPixel -= iTargetStride;
         }
     }
 
@@ -365,6 +428,40 @@ void arm2d_local_rgb565_filter_iir_blur(
             }
         }
     }
+
+    /* columns reverse path (bottom to top, right to left) */
+    if (ptThis->dir.bReverseVertical && bAllowReverseV)
+    {
+        uint16_t *phwPixel = &phwTarget[(iWidth - 1) + (iHeight - 1) * iTargetStride];
+
+        for (iX = iWidth - 1; iX >= 0; iX--)
+        {
+            /* seed the accumulator from the bottom pixel of the column */
+            arm2d_local_rgb565_unpack_comp(*phwPixel, &tPixel);
+            tAcc = *(arm2d_color_rgb565_t *)&tPixel;
+
+            uint16_t *phwTargetPixel = phwPixel;
+
+            for (iY = 0; iY < iHeight; iY++)
+            {
+                arm2d_local_rgb565_unpack_comp(*phwTargetPixel, &tPixel);
+
+                tAcc.hwB += (tPixel.B - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (tPixel.G - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (tPixel.R - tAcc.hwR) * hwRatio >> 8;
+
+                tPixel.B = tAcc.hwB;
+                tPixel.G = tAcc.hwG;
+                tPixel.R = tAcc.hwR;
+
+                *phwTargetPixel = arm2d_local_rgb565_pack(&tPixel);
+
+                phwTargetPixel -= iTargetStride;
+            }
+
+            phwPixel--;
+        }
+    }
 }
 
 static void arm2d_local_argb8888_filter_iir_blur(
@@ -376,6 +473,11 @@ static void arm2d_local_argb8888_filter_iir_blur(
     arm2d_local_filter_iir_blur_descriptor_t *ptThis)
 {
     arm2d_local_scratch_mem_t *ptScratchMemory = &ptThis->tScratchMemory;
+
+    if (0 == chBlurDegree)
+    {
+        return;
+    }
 
     int_fast16_t iWidth  = ptValidRegionOnVirtualScreen->tSize.iWidth;
     int_fast16_t iHeight = ptValidRegionOnVirtualScreen->tSize.iHeight;
@@ -397,6 +499,13 @@ static void arm2d_local_argb8888_filter_iir_blur(
         .iX = ptValidRegionOnVirtualScreen->tLocation.iX - ptTargetRegionOnVirtualScreen->tLocation.iX,
         .iY = ptValidRegionOnVirtualScreen->tLocation.iY - ptTargetRegionOnVirtualScreen->tLocation.iY,
     };
+
+    const bool bAllowReverseH = arm2d_local_reverse_h_allowed(
+                                    ptValidRegionOnVirtualScreen,
+                                    ptTargetRegionOnVirtualScreen);
+    const bool bAllowReverseV = arm2d_local_reverse_v_allowed(
+                                    ptValidRegionOnVirtualScreen,
+                                    ptTargetRegionOnVirtualScreen);
 
     /* Forward horizontal pass */
     if (ptThis->dir.bForwardHorizontal)
@@ -443,6 +552,38 @@ static void arm2d_local_argb8888_filter_iir_blur(
             }
 
             pwPixel += iTargetStride;
+        }
+    }
+
+    /* Reverse horizontal pass (right to left, bottom to top) */
+    if (ptThis->dir.bReverseHorizontal && bAllowReverseH)
+    {
+        uint32_t *pwPixel = &pwTarget[(iWidth - 1) + (iHeight - 1) * iTargetStride];
+
+        for (iY = iHeight - 1; iY >= 0; iY--)
+        {
+            /* seed the accumulator from the right-most pixel of the row */
+            uint8_t *p = (uint8_t *)pwPixel;
+            tAcc.hwB = p[0];
+            tAcc.hwG = p[1];
+            tAcc.hwR = p[2];
+
+            uint32_t *pwTargetPixel = pwPixel;
+
+            for (iX = 0; iX < iWidth; iX++)
+            {
+                p = (uint8_t *)pwTargetPixel;
+                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;
+
+                p[0] = (uint8_t)tAcc.hwB;
+                p[1] = (uint8_t)tAcc.hwG;
+                p[2] = (uint8_t)tAcc.hwR;
+                pwTargetPixel--;
+            }
+
+            pwPixel -= iTargetStride;
         }
     }
 
@@ -493,6 +634,38 @@ static void arm2d_local_argb8888_filter_iir_blur(
             }
         }
     }
+
+    /* Reverse vertical pass (bottom to top, right to left) */
+    if (ptThis->dir.bReverseVertical && bAllowReverseV)
+    {
+        uint32_t *pwPixel = &pwTarget[(iWidth - 1) + (iHeight - 1) * iTargetStride];
+
+        for (iX = iWidth - 1; iX >= 0; iX--)
+        {
+            /* seed the accumulator from the bottom pixel of the column */
+            uint8_t *p = (uint8_t *)pwPixel;
+            tAcc.hwB = p[0];
+            tAcc.hwG = p[1];
+            tAcc.hwR = p[2];
+
+            uint32_t *pwTargetPixel = pwPixel;
+
+            for (iY = 0; iY < iHeight; iY++)
+            {
+                p = (uint8_t *)pwTargetPixel;
+                tAcc.hwB += (p[0] - tAcc.hwB) * hwRatio >> 8;
+                tAcc.hwG += (p[1] - tAcc.hwG) * hwRatio >> 8;
+                tAcc.hwR += (p[2] - tAcc.hwR) * hwRatio >> 8;
+
+                p[0] = (uint8_t)tAcc.hwB;
+                p[1] = (uint8_t)tAcc.hwG;
+                p[2] = (uint8_t)tAcc.hwR;
+                pwTargetPixel -= iTargetStride;
+            }
+
+            pwPixel--;
+        }
+    }
 }
 
 void sw_arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degree, void *cache_mem)
@@ -532,7 +705,7 @@ void sw_arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degre
     dsc.tScratchMemory = *mem_for_blur;
     dsc.dir.bForwardHorizontal = 1;
     dsc.dir.bForwardVertical = 1;
-    dsc.dir.bReverseHorizontal = 0;
+    dsc.dir.bReverseHorizontal = 1;
     dsc.dir.bReverseVertical = 0;
 
     if (dc->bit_depth == 32)
