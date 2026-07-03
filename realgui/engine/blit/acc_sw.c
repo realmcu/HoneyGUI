@@ -211,6 +211,14 @@ void blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     if (image->blend_mode == IMG_A8_BLUR && (head->type == A8 || head->type == ALPHAMASK))
     {
         sw_acc_blur_a8(image, dc);
+
+        if (image->fg_color_set & 0xFF000000)
+        {
+            uint32_t saved_mode = image->blend_mode;
+            image->blend_mode = IMG_2D_SW_FIX_A8_FG;
+            do_raster(image, dc, rect);
+            image->blend_mode = saved_mode;
+        }
         return;
     }
 
