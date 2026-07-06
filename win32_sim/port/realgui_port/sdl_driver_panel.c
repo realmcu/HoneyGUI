@@ -7,6 +7,34 @@
 #include "sdl_driver_panel.h"
 #include "gui_api.h"
 
+#include <stdio.h>
+#include <string.h>
+#if defined(_WIN32)
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
+/*
+ * Icon paths are written relative to the project root, but the exe
+ * lives in <root>/win32_sim/. Anchor to the exe's own directory so
+ * icons load regardless of CWD.
+ */
+static void resolve_icon_path(const char *rel, char *out, size_t out_sz)
+{
+    char exe[1024];
+#if defined(_WIN32)
+    GetModuleFileNameA(NULL, exe, sizeof(exe));
+#else
+    ssize_t n = readlink("/proc/self/exe", exe, sizeof(exe) - 1);
+    exe[n > 0 ? n : 0] = '\0';
+#endif
+    char *slash = strrchr(exe, '/');
+    if (!slash) { slash = strrchr(exe, '\\'); }
+    if (slash) { *slash = '\0'; }
+    snprintf(out, out_sz, "%s/../%s", exe, rel);
+}
+
 typedef struct
 {
     int x, y, w, h;
@@ -76,7 +104,9 @@ void sdl_panel_add_button(int x, int y, int w, int h, int radius,
     btn->icon = NULL;
     if (icon_path)
     {
-        btn->icon = SDL_LoadBMP(icon_path);
+        char full[1024];
+        resolve_icon_path(icon_path, full, sizeof(full));
+        btn->icon = SDL_LoadBMP(full);
         if (btn->icon)
         {
             SDL_SetColorKey(btn->icon, SDL_TRUE,
