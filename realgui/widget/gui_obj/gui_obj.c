@@ -13,6 +13,7 @@
 #include "gui_matrix.h"
 #include "gui_api.h"
 #include "def_type.h"
+#include "gui_dirty_region.h"
 
 /*============================================================================*
  *                           Types
@@ -169,6 +170,11 @@ void gui_obj_ctor(gui_obj_t  *_this,
 
     matrix_identity(_this->matrix);
     _this->magic = GUI_MAGIC_NUMBER;
+
+    _this->last_render_rect.x1 = 0;
+    _this->last_render_rect.y1 = 0;
+    _this->last_render_rect.x2 = -1;
+    _this->last_render_rect.y2 = -1;
 }
 
 gui_obj_t *gui_obj_create(void       *parent,
@@ -387,10 +393,19 @@ void gui_obj_get_area(gui_obj_t *obj,
         }
     }
 
-    *x = (int16_t)x_min;
-    *y = (int16_t)y_min;
-    *w = (int16_t)(x_max - x_min) + 1;
-    *h = (int16_t)(y_max - y_min) + 1;
+    /* Expand by 1px on each side: int16 truncation of matrix-transformed
+     * corners loses sub-pixel coverage (anti-aliasing writes outside the
+     * truncated AABB). The expansion guarantees no edge residue during
+     * rotation/translation when the bbox is consumed as a redraw region. */
+    int16_t ix_min = (int16_t)x_min - 1;
+    int16_t iy_min = (int16_t)y_min - 1;
+    int16_t ix_max = (int16_t)x_max + 1;
+    int16_t iy_max = (int16_t)y_max + 1;
+
+    *x = ix_min;
+    *y = iy_min;
+    *w = (int16_t)(ix_max - ix_min + 1);
+    *h = (int16_t)(iy_max - iy_min + 1);
 }
 
 bool gui_obj_in_rect(gui_obj_t *obj,
@@ -489,7 +504,16 @@ gui_obj_t *gui_get_root(gui_obj_t *object)
 void gui_obj_hidden(gui_obj_t *obj, bool hidden)
 {
     GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    if (obj->hidden == hidden)
+    {
+        return;
+    }
     obj->hidden = hidden;
+    /* Visibility flipped -- request a dirty pass so obj_track_dirty_region
+     * either erases the obj's last rect (show->hide) or re-registers it
+     * (hide->show). Without this, direct dirty-region rendering leaves
+     * ghosts of just-hidden widgets on the LCD. */
+    gui_obj_set_dirty(obj);
 }
 
 bool gui_obj_is_hidden(gui_obj_t *obj)

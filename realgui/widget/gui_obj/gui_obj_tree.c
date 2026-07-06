@@ -14,6 +14,7 @@
 #include "gui_obj_focus.h"
 #include "gui_api.h"
 #include "gui_message.h"
+#include "gui_dirty_region.h"
 
 /*============================================================================*
  *                           Types
@@ -41,6 +42,12 @@
 static void gui_obj_destroy_cb(gui_obj_t *obj)
 {
     //gui_log("do obj %s free(destroy), line = %d\n", obj->name, __LINE__);
+
+    if ((obj->last_render_rect.x2 >= obj->last_render_rect.x1) &&
+        (obj->last_render_rect.y2 >= obj->last_render_rect.y1))
+    {
+        gui_dirty_set_region(&obj->last_render_rect);
+    }
 
     if (obj->matrix != NULL)
     {

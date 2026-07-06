@@ -79,6 +79,24 @@ gui_dirty_region_manager_t *gui_dirty_region_get_manager(void);
  */
 void gui_dirty_region_clear(void);
 
+/**
+ * @brief Mark an object as dirty (request a self-area redraw on next frame)
+ *
+ * Replaces direct gui_fb_change() calls in widgets. The object's bounding box
+ * will be registered as a dirty region during obj_draw_prepare.
+ *
+ * @param obj Object pointer (gui_obj_t *), typed as void * to avoid header cycle
+ */
+void gui_obj_set_dirty(void *obj);
+
+/**
+ * @brief Request a full-screen refresh on next frame
+ *
+ * For system paths that have no specific widget context (display on, server
+ * init, etc.). Sets full_refresh=true and wakes the renderer.
+ */
+void gui_request_full_refresh(void);
+
 #ifdef __cplusplus
 }
 #endif

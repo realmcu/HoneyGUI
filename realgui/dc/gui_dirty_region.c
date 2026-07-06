@@ -8,6 +8,7 @@
 #include "def_fb.h"
 #include "gui_api.h"
 #include "gui_fb.h"
+#include "gui_obj.h"
 #include <string.h>
 
 /*============================================================================*
@@ -167,4 +168,20 @@ void gui_dirty_region_clear(void)
 {
     g_dirty_mgr.count = 0;
     g_dirty_mgr.full_refresh = false;
+}
+
+void gui_obj_set_dirty(void *obj)
+{
+    if (obj == NULL)
+    {
+        return;
+    }
+    ((gui_obj_t *)obj)->dirty = 1;
+    gui_fb_change();
+}
+
+void gui_request_full_refresh(void)
+{
+    g_dirty_mgr.full_refresh = true;
+    gui_fb_change();
 }
