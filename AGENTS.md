@@ -50,6 +50,10 @@ Embedded GUI framework for Realtek microcontrollers (RTL8762, RTL8773). C librar
 - **Gerrit push**: `git push origin HEAD:refs/for/master`. Gerrit warns on
   subjects >50 chars; treat the warning as an error -- amend the subject
   and re-push before landing.
+- **ASCII-only**: Commit messages and files outside
+  `script/ci-check-config.py:ignore_file_encoding` must be pure 7-bit
+  ASCII. Replace typography such as `<= -- -> ...` for Unicode
+  equivalents; CI fails on any multibyte byte.
 
 ## Anti-Patterns (DO NOT)
 

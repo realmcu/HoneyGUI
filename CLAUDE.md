@@ -298,7 +298,18 @@ HoneyGUI uses a structured commit message format. All commits must follow the te
   `warning: subject >50 characters` above 50; treat that warning as an
   error and shorten the subject before push. Capitalize first letter, no
   period at end.
-- **Language**: Commit messages must be in English only - no Chinese characters allowed
+- **Language / encoding**: Commit messages and all source/doc files
+  outside `script/ci-check-config.py:ignore_file_encoding` must be pure
+  7-bit ASCII. CI `ci-check-config.py` fails on any multibyte byte with
+  `encoding error illegal multibyte sequence`. Replace Unicode
+  typography with ASCII equivalents before pushing:
+  - `<= >=` for U+2264/U+2265 (less/greater-than-or-equal)
+  - `-- -` for U+2014/U+2013 (em dash / en dash)
+  - `->` for U+2192 (rightwards arrow)
+  - `[ok] [fail]` or drop, for U+2713/U+2717 (check / ballot X)
+  - `" '` for U+201C..U+201D and U+2018..U+2019 (curly quotes)
+  - `...` for U+2026 (horizontal ellipsis)
+  No Chinese characters in commit messages.
 - **JIRA**: Include JIRA ticket ID or `NA` if not applicable
 - **All sections required**: Issue description, reproduction, cause, solution, validation
 - **Validation**: Always include test results or validation method
