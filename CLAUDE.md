@@ -261,7 +261,7 @@ HoneyGUI uses a structured commit message format. All commits must follow the te
 ### Commit Message Format
 
 ```
-<MODULE>: <short description (max 72 chars)>
+<MODULE>: <short description (target <=50 chars, hard limit 72)>
 
 
 [JIRA] <JIRA-ID or NA>
@@ -294,7 +294,10 @@ HoneyGUI uses a structured commit message format. All commits must follow the te
   - Use `GUI-BypassTest:` when explicitly requested to skip CI/CD testing
   - Bypass testing only for: config changes, doc updates, non-functional changes
   - Example: `GUI-BypassTest: update VSCode debug configuration`
-- **Subject line**: Max 72 characters, capitalize first letter, no period at end
+- **Subject line**: Target <=50 characters, hard limit 72. Gerrit emits
+  `warning: subject >50 characters` above 50; treat that warning as an
+  error and shorten the subject before push. Capitalize first letter, no
+  period at end.
 - **Language**: Commit messages must be in English only - no Chinese characters allowed
 - **JIRA**: Include JIRA ticket ID or `NA` if not applicable
 - **All sections required**: Issue description, reproduction, cause, solution, validation

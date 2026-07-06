@@ -45,8 +45,11 @@ Embedded GUI framework for Realtek microcontrollers (RTL8762, RTL8773). C librar
 
 ## Git
 
-- **Commit prefix**: GUI: (max 48 chars title, 60 chars body)
-- **Gerrit push**: git push origin HEAD:refs/for/master
+- **Commit prefix**: `GUI:` (subject target <=50 chars, hard limit 72;
+  body wrap at 72 chars/line)
+- **Gerrit push**: `git push origin HEAD:refs/for/master`. Gerrit warns on
+  subjects >50 chars; treat the warning as an error -- amend the subject
+  and re-push before landing.
 
 ## Anti-Patterns (DO NOT)
 
