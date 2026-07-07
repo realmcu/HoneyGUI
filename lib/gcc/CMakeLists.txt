@@ -45,6 +45,11 @@ project(HoneyGUI)
 set(GUI_TARGET_NAME gui)
 
 add_library(${GUI_TARGET_NAME} STATIC)
+
+# PC simulator build: define _HONEYGUI_SIMULATOR_ so embedded-only logic
+# (e.g. the idle-sleep path in gui_message.c) is compiled out for the SDL sim.
+target_compile_definitions(${GUI_TARGET_NAME} PRIVATE _HONEYGUI_SIMULATOR_)
+
 add_subdirectory(../../realgui build/realgui)
 
 install(TARGETS ${GUI_TARGET_NAME}
