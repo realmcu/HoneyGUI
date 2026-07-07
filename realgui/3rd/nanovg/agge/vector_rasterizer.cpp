@@ -1,6 +1,6 @@
 #include <agge/vector_rasterizer.h>
 
-#include <agge/config.h>
+#include <agge/agge_config.h>
 #include <agge/precise_delta.h>
 
 namespace agge

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "config.h"
+#include "agge_config.h"
 
 namespace agge
 {

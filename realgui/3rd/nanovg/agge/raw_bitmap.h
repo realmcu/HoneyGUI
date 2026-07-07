@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <stdint.h>
-#include <agge/config.h>
+#include <agge/agge_config.h>
 #include <agge/pixel.h>
 
 typedef uint8_t *image_handle;
