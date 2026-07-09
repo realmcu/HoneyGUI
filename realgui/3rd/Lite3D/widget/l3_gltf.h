@@ -48,6 +48,7 @@ typedef struct
     uint32_t skin_count;
     uint32_t channel_count;
     uint32_t sampler_count;
+    uint32_t animation_count;
     uint32_t material_count;
     uint32_t texture_count;
 
@@ -59,6 +60,7 @@ typedef struct
     uint32_t skins_offset;
     uint32_t channels_offset;
     uint32_t samplers_offset;
+    uint32_t animations_offset;
     uint32_t materials_offset;
     uint32_t textures_offset;
 
@@ -171,6 +173,17 @@ typedef struct
     uint32_t target_node_index;
     uint32_t target_path;
 } g3m_channel_on_disk_t;
+
+// Animation on disk: describes one animation as a [start, count) range into the
+// flat channels/samplers arrays. sampler_index inside a channel stays relative
+// to this animation's sampler sub-range (i.e. relative to sampler_start).
+typedef struct
+{
+    uint32_t channel_start;
+    uint32_t channel_count;
+    uint32_t sampler_start;
+    uint32_t sampler_count;
+} g3m_animation_on_disk_t;
 
 #pragma pack()
 
@@ -302,7 +315,9 @@ typedef struct
     l3_gltf_skin_t *skins;
     uint32_t skin_count;
 
-    l3_gltf_single_animation_t *animation;
+    l3_gltf_single_animation_t *animations;
+    uint32_t animation_count;
+    uint32_t active_animation; // Index of the animation currently played
 
 } l3_gltf_model_description_t;
 
@@ -412,6 +427,23 @@ bool l3_gltf_model_on_click(l3_model_base_t *base, int16_t x, int16_t y);
  */
 void l3_gltf_trigger_deformation(l3_model_base_t *base, int16_t screen_x, int16_t screen_y,
                                  float radius, float depth, float duration);
+
+/**
+ * @brief Select which animation is played.
+ *
+ * @param base  Pointer to the 3D base model.
+ * @param index Animation index (clamped to [0, animation_count-1]). Resets the
+ *              playback time of the selected animation to 0.
+ */
+void l3_gltf_set_active_animation(l3_model_base_t *base, uint32_t index);
+
+/**
+ * @brief Get the number of animations kept in the model.
+ *
+ * @param base Pointer to the 3D base model.
+ * @return Animation count (0 if none).
+ */
+uint32_t l3_gltf_get_animation_count(l3_model_base_t *base);
 
 #ifdef __cplusplus
 }

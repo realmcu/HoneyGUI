@@ -77,6 +77,8 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
                                                       ptr + header->channels_offset);
     g3m_sampler_on_disk_t   *samplers_on_disk   = (g3m_sampler_on_disk_t *)(
                                                       ptr + header->samplers_offset);
+    g3m_animation_on_disk_t *animations_on_disk = (g3m_animation_on_disk_t *)(
+                                                      ptr + header->animations_offset);
     g3m_material_on_disk_t  *materials_on_disk  = (g3m_material_on_disk_t *)(
                                                       ptr + header->materials_offset);
     g3m_texture_on_disk_t   *textures_on_disk   = (g3m_texture_on_disk_t *)(
@@ -231,45 +233,56 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
         }
     }
 
-    // 2.6 Sampler Reconstruction
-    if (header->sampler_count > 0)
+    // 2.6 / 2.7 Animation Reconstruction (all animations)
+    desc->animation_count = header->animation_count;
+    desc->active_animation = 0;
+    if (header->animation_count > 0)
     {
-        desc->animation = (l3_gltf_single_animation_t *)l3_malloc(sizeof(l3_gltf_single_animation_t));
-        memset(desc->animation, 0, sizeof(l3_gltf_single_animation_t));
-        desc->animation->sampler_count = header->sampler_count;
-        desc->animation->samplers = (l3_gltf_sampler_t *)l3_malloc(sizeof(l3_gltf_sampler_t) *
-                                                                   desc->animation->sampler_count);
+        desc->animations = (l3_gltf_single_animation_t *)l3_malloc(
+                               sizeof(l3_gltf_single_animation_t) * header->animation_count);
+        memset(desc->animations, 0, sizeof(l3_gltf_single_animation_t) * header->animation_count);
 
-    }
-    for (uint32_t i = 0; i < header->sampler_count; ++i)
-    {
-        g3m_sampler_on_disk_t *src_sampler = &samplers_on_disk[i];
-        l3_gltf_sampler_t *dst_sampler = &desc->animation->samplers[i];
+        for (uint32_t a = 0; a < header->animation_count; ++a)
+        {
+            g3m_animation_on_disk_t *src_anim = &animations_on_disk[a];
+            l3_gltf_single_animation_t *dst_anim = &desc->animations[a];
 
-        dst_sampler->interpolation = (gltf_interpolation_type_t)src_sampler->interpolation_type;
-        dst_sampler->input_count = src_sampler->input_count;
-        dst_sampler->output_count = src_sampler->output_count;
-        dst_sampler->output_type = (gltf_data_type)src_sampler->output_type;
+            // Samplers of this animation (slice of the flat samplers array)
+            dst_anim->sampler_count = src_anim->sampler_count;
+            dst_anim->samplers = (l3_gltf_sampler_t *)l3_malloc(sizeof(l3_gltf_sampler_t) *
+                                                                dst_anim->sampler_count);
+            for (uint32_t i = 0; i < src_anim->sampler_count; ++i)
+            {
+                g3m_sampler_on_disk_t *src_sampler = &samplers_on_disk[src_anim->sampler_start + i];
+                l3_gltf_sampler_t *dst_sampler = &dst_anim->samplers[i];
 
-        dst_sampler->input_data = (float *)(uintptr_t)(data_blob_base + src_sampler->input_offset);
-        dst_sampler->output_data = (float *)(uintptr_t)(data_blob_base + src_sampler->output_offset);
-    }
+                dst_sampler->interpolation = (gltf_interpolation_type_t)src_sampler->interpolation_type;
+                dst_sampler->input_count = src_sampler->input_count;
+                dst_sampler->output_count = src_sampler->output_count;
+                dst_sampler->output_type = (gltf_data_type)src_sampler->output_type;
 
-    // 2.7 Channel Reconstruction
-    if (header->channel_count > 0)
-    {
-        desc->animation->channel_count = header->channel_count;
-        desc->animation->channels = (l3_gltf_channel_t *)l3_malloc(sizeof(l3_gltf_channel_t) *
-                                                                   desc->animation->channel_count);
-    }
-    for (uint32_t i = 0; i < header->channel_count; ++i)
-    {
-        g3m_channel_on_disk_t *src_channel = &channels_on_disk[i];
-        l3_gltf_channel_t *dst_channel = &desc->animation->channels[i];
+                dst_sampler->input_data = (float *)(uintptr_t)(data_blob_base + src_sampler->input_offset);
+                dst_sampler->output_data = (float *)(uintptr_t)(data_blob_base + src_sampler->output_offset);
+            }
 
-        dst_channel->sampler_index = src_channel->sampler_index;
-        dst_channel->target_node_index = src_channel->target_node_index;
-        dst_channel->target_path = (gltf_animation_path_t)src_channel->target_path;
+            // Channels of this animation (slice of the flat channels array)
+            dst_anim->channel_count = src_anim->channel_count;
+            dst_anim->channels = (l3_gltf_channel_t *)l3_malloc(sizeof(l3_gltf_channel_t) *
+                                                                dst_anim->channel_count);
+            for (uint32_t i = 0; i < src_anim->channel_count; ++i)
+            {
+                g3m_channel_on_disk_t *src_channel = &channels_on_disk[src_anim->channel_start + i];
+                l3_gltf_channel_t *dst_channel = &dst_anim->channels[i];
+
+                // sampler_index is relative to this animation's sampler slice
+                dst_channel->sampler_index = src_channel->sampler_index;
+                dst_channel->target_node_index = src_channel->target_node_index;
+                dst_channel->target_path = (gltf_animation_path_t)src_channel->target_path;
+            }
+
+            dst_anim->duration = get_animation_duration(dst_anim);
+            dst_anim->animation_time = 0.0f;
+        }
     }
 
     // 2.8 Material Reconstruction
@@ -303,12 +316,6 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
     // gui_log("Skins Array Size:%zu bytes\n", sizeof(g3m_skin_on_disk_t) * header->skin_count);
     // gui_log("Channels Array Size:%zu bytes\n", sizeof(g3m_channel_on_disk_t) * header->channel_count);
     // gui_log("Samplers Array Size:%zu bytes\n", sizeof(g3m_sampler_on_disk_t) * header->sampler_count);
-
-    if (desc->animation != NULL)
-    {
-        desc->animation->duration = get_animation_duration(desc->animation);
-        desc->animation->animation_time = 0.0f;
-    }
 
     return desc;
 }
@@ -422,6 +429,34 @@ void l3_gltf_draw(l3_model_base_t *base)
     l3_draw_rect_img_to_canvas(_this->base.combined_img, &_this->base.canvas, NULL);
 }
 
+uint32_t l3_gltf_get_animation_count(l3_model_base_t *base)
+{
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+    if (_this == NULL || _this->desc == NULL)
+    {
+        return 0;
+    }
+    return _this->desc->animation_count;
+}
+
+void l3_gltf_set_active_animation(l3_model_base_t *base, uint32_t index)
+{
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+    if (_this == NULL || _this->desc == NULL || _this->desc->animation_count == 0)
+    {
+        return;
+    }
+
+    if (index >= _this->desc->animation_count)
+    {
+        index = _this->desc->animation_count - 1;
+    }
+
+    _this->desc->active_animation = index;
+    // Restart the newly selected animation from the beginning.
+    _this->desc->animations[index].animation_time = 0.0f;
+}
+
 
 void l3_free_gltf_model(l3_model_base_t *base)
 {
@@ -473,20 +508,25 @@ void l3_free_gltf_model(l3_model_base_t *base)
             l3_free(_this->desc->skins);
             _this->desc->skins = NULL;
         }
-        if (_this->desc->animation != NULL)
+        if (_this->desc->animations != NULL)
         {
-            if (_this->desc->animation->channels != NULL)
+            for (uint32_t a = 0; a < _this->desc->animation_count; ++a)
             {
-                l3_free(_this->desc->animation->channels);
-                _this->desc->animation->channels = NULL;
+                l3_gltf_single_animation_t *anim = &_this->desc->animations[a];
+                if (anim->channels != NULL)
+                {
+                    l3_free(anim->channels);
+                    anim->channels = NULL;
+                }
+                if (anim->samplers != NULL)
+                {
+                    l3_free(anim->samplers);
+                    anim->samplers = NULL;
+                }
             }
-            if (_this->desc->animation->samplers != NULL)
-            {
-                l3_free(_this->desc->animation->samplers);
-                _this->desc->animation->samplers = NULL;
-            }
-            l3_free(_this->desc->animation);
-            _this->desc->animation = NULL;
+            l3_free(_this->desc->animations);
+            _this->desc->animations = NULL;
+            _this->desc->animation_count = 0;
         }
 
         l3_free(_this->desc);

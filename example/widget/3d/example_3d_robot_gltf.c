@@ -13,6 +13,7 @@
 #include "stdlib.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
+#include "gui_fb.h"
 
 #include "gui_lite3d.h"
 #include "tp_algo.h"
@@ -47,6 +48,7 @@ static void robot_global_cb(l3_model_base_t *this)
 static int app_init(void)
 {
     gui_dispdev_t *dc = gui_get_dc();
+    gui_set_bg_color(gui_color_css("#FFFFFF"));
 
     l3_model_base_t *robot_3d = l3_create_model((void *)_acgltf_desc_robot, L3_DRAW_FRONT_AND_SORT, 0,
                                                 0,

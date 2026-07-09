@@ -10,8 +10,8 @@ Copy your model files to the `3D-tool` directory:
 
 ```
 tool/3D-tool/
-├── extract_desc_v3.exe       (tool)
-├── extract_desc_v3.py        (tool)
+├── extract_desc.exe          (tool)
+├── extract_desc.py           (tool)
 ├── your_model.obj            ← Your model
 ├── your_model.mtl            ← Your model
 ├── texture1.png              ← Your textures
@@ -24,12 +24,12 @@ Open command prompt in the `3D-tool` directory and run:
 
 **Windows:**
 ```cmd
-extract_desc_v3.exe your_model.obj
+extract_desc.exe your_model.obj
 ```
 
 **Or use Python version:**
 ```cmd
-python extract_desc_v3.py your_model.obj
+python extract_desc.py your_model.obj
 ```
 
 ### Step 3: Choose Texture Conversion

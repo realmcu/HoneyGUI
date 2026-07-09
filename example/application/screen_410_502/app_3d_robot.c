@@ -17,6 +17,7 @@
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_lite3d.h"
+#include "gui_fb.h"
 
 /*============================================================================*
  *                            Macros
@@ -65,6 +66,7 @@ static void robot_global_cb(l3_model_base_t *this)
 // #include "gltf_desc_robot.txt"
 static void robot_app(gui_view_t *view)
 {
+    gui_set_bg_color(gui_color_css("#FFFFFF"));
     gui_view_t *view_c = gui_view_get_current();
     if (view_c && view_c->descriptor == gui_view_descriptor_get("menu_view"))
     {

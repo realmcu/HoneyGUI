@@ -119,7 +119,7 @@ static void update_node_global_transform_recursive(l3_gltf_model_t *_this, int n
 static void l3_gltf_update_animation(l3_gltf_model_t *_this, float dt)
 {
     l3_gltf_model_description_t *desc = _this->desc;
-    l3_gltf_single_animation_t *anim = desc->animation;
+    l3_gltf_single_animation_t *anim = &desc->animations[desc->active_animation];
 
     // 1. Update the animation time
     anim->animation_time += dt;
@@ -538,7 +538,7 @@ void l3_gltf_prepare(l3_gltf_model_t *_this, l3_3x3_matrix_t *parent_matrix)
     l3_img_head_t *head = (l3_img_head_t *)_this->base.combined_img->data;
     if (head->type == LITE_RGB565)
     {
-        memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0xFF, width * height * 2);
+        memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
     }
     else if (head->type == LITE_ARGB8888)
     {
@@ -551,7 +551,7 @@ void l3_gltf_prepare(l3_gltf_model_t *_this, l3_3x3_matrix_t *parent_matrix)
     _this->last_time_ms = current_time_ms;
 
     // Update animation
-    if (_this->desc->animation != NULL)
+    if (_this->desc->animation_count > 0)
     {
         l3_gltf_update_animation(_this, dt);
     }
@@ -632,7 +632,7 @@ void l3_gltf_prepare(l3_gltf_model_t *_this, l3_3x3_matrix_t *parent_matrix)
     {
         int root_node_index = _this->desc->scene_root_indices[i];
 
-        if (_this->desc->animation == NULL)
+        if (_this->desc->animation_count == 0)
         {
             l3_gltf_node_t *node = &_this->desc->nodes[root_node_index];
             l3_4x4_matrix_compose_trs(&node->global_transform, node->translation, node->rotation, node->scale);
