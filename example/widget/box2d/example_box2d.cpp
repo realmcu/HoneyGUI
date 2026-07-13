@@ -6,49 +6,56 @@
 
 #include "guidef.h"
 #include "gui_img.h"
-#include "gui_tabview.h"
-#include "gui_tab.h"
-#include "gui_img.h"
-#include "gui_img_scope.h"
 #include "gui_obj.h"
 #include "gui_canvas.h"
 
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "../../assets/tiger_blue.txt"
-#include "../../assets/tiger_grey.txt"
-#include "../../assets/tiger_laven.txt"
-#include "../../assets/tiger_lime.txt"
-#include "../../assets/tiger_turk.txt"
-#include "../../assets/tiger_white.txt"
-#include "../../assets/tiger_yellow.txt"
 #include "gui_server.h"
 #include "gui_components_init.h"
-#include "gui_cube.h"
-#include "gui_win.h"
-#include "gui_canvas_arc.h"
-#include "gui_canvas_round_rect.h"
-#include "../../assets/tiger_blue_compressed.txt"
-#include "acc_sw_rle.h"
 
 #include "box2d/box2d.h"
 
 #include <iostream>
 
-static gui_canvas_round_rect_t *round_rect;
+/* Box representation ------------------------------------------------------ */
+#define BOX_W   50
+#define BOX_H   50
+#define BOX_R   7   /* corner radius */
+
+static gui_img_t *box_img;
+
+/* Draw a rounded rect into the canvas buffer. Coordinates are relative to
+ * the image, so keep the shape at (0, 0). */
+static void draw_box_cb(NVGcontext *vg)
+{
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, 0, 0, BOX_W, BOX_H, BOX_R);
+    nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
+    nvgFill(vg);
+}
 
 // UI design function
 static void app_ui_design(void)
 {
-    round_rect = gui_canvas_round_rect_create(gui_obj_get_root(), "canva_rect", 100, 0, 50, 50, 7,
-                                              APP_COLOR_WHITE);
-    return;
+    /* RGB565 -> 2 bytes/pixel, plus the header the img widget expects. */
+    uint32_t buf_size = BOX_W * BOX_H * 2 + sizeof(gui_rgb_data_head_t);
+    uint8_t *image_buffer = (uint8_t *)gui_lower_malloc(buf_size);
+    memset(image_buffer, 0, buf_size);
+
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0,
+                                      BOX_W, BOX_H,
+                                      draw_box_cb, image_buffer);
+
+    box_img = gui_img_create_from_mem(gui_obj_get_root(), "box_img",
+                                      image_buffer, 100, 0, 0, 0);
 }
 
 static b2World *world;
 static void box2d_loop(void *p)
 {
+    GUI_UNUSED(p);
     // Create a Box2D world with gravity
     {
         b2Vec2 gravity(0.0f, -10.0f);
@@ -72,7 +79,7 @@ static void box2d_loop(void *p)
     b2Body *body = world->CreateBody(&bodyDef);
 
     b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(25.0f, 25.0f);
+    dynamicBox.SetAsBox(BOX_W / 2.0f, BOX_H / 2.0f);
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
@@ -95,7 +102,8 @@ static void box2d_loop(void *p)
         std::printf("Step %d: position=(%.2f, %.2f), angle=%.2f\n", i, position.x, position.y, angle);
         gui_thread_mdelay(1000 / 60);
 
-        gui_canvas_round_rect_set_location(round_rect, 100, 454 - position.y);
+        /* Box2D +Y is up, screen Y is down -- flip it. */
+        gui_img_set_pos(box_img, 100, (int16_t)(454 - position.y));
     }
 
     while (1)
