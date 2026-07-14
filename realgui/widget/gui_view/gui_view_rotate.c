@@ -120,8 +120,8 @@ void gui_view_rotate(gui_view_t *_this, int16_t release)
     if (rotate_degree_x > 90 || rotate_degree_x < -90 ||
         rotate_degree_y > 90 || rotate_degree_y < -90)
     {
-        matrix_translate((int)_this->base.w, \
-                         (int)_this->base.h, \
+        matrix_translate((int)2 * _this->base.w, \
+                         (int)2 * _this->base.h, \
                          obj->matrix);
     }
 

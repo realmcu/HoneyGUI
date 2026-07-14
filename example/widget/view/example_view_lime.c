@@ -39,7 +39,7 @@ static void app_ui_view_lime_design(gui_view_t *view)
     gui_view_set_animate_step(view, 20);
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_lime, 200, 100, 0,
                                              0);
-
+    gui_img_set_mode(img, IMG_BYPASS_MODE);
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_view_switch_on_event(view, "blue_view",

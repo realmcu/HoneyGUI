@@ -113,7 +113,9 @@ typedef struct gui_view
     void *blur_param;
     struct gui_view_on_event **on_event;
 
-    gui_img_t *snapshot;
+    draw_img_t *bg_img;
+    gui_color_t bg_color;
+
     gui_obj_t *obj_temp;
 } gui_view_t;
 
@@ -280,6 +282,13 @@ void gui_view_update_snapshot_async(gui_view_t *_this);
  * @param enable True to enable pre-cache, False to disable. Default is true.
  */
 void gui_view_enable_precache_snapshot(bool enable);
+
+/**
+ * @brief Set view background color. Default is black.
+ * @param _this Pointer to view.
+ * @param color Background color.
+ */
+void gui_view_set_bg_color(gui_view_t *_this, gui_color_t color);
 
 #ifdef __cplusplus
 }

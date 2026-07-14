@@ -45,7 +45,9 @@ static void switch_out_cb(gui_view_t *view)
 static void switch_in_cb(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 20);
+    gui_view_set_bg_color(view, APP_COLOR_WHITE);
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_blue, 200, 200, 0, 0);
+    gui_img_set_mode(img, IMG_BYPASS_MODE);
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_view_switch_on_event(view, "yellow_view", SWITCH_OUT_TO_RIGHT_USE_CUBE,
@@ -75,7 +77,7 @@ static void switch_in_cb(gui_view_t *view)
 
 static int app_init(void)
 {
-    gui_view_enable_precache_snapshot(false);
+    gui_view_enable_precache_snapshot(true);
     gui_view_create(gui_obj_get_root(), CURRENT_VIEW_NAME, 0, 0, 0, 0);
     return 0;
 }

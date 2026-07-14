@@ -381,7 +381,14 @@ void gui_img_a8_fix_bg(gui_img_t *_this, uint32_t bg_color_mix);
  */
 void gui_img_a8_mix_alpha(gui_img_t *_this, uint32_t alpha_mix);
 
-
+/**
+ * @brief Creates a solid-color RLE image buffer.
+ * @param color Color of the solid-color image.
+ * @param width Width of the image.
+ * @param height Height of the image.
+ * @return Pointer to the created image buffer.
+ */
+uint8_t *gui_rle_solid_color_create(uint16_t width, uint16_t height, gui_color_t color);
 
 
 #ifdef __cplusplus

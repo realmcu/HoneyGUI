@@ -21,13 +21,14 @@
 
 static void app_ui_view_yellow_design(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL, true);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL, false);
 
 static void app_ui_view_yellow_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 20);
-    gui_img_create_from_mem(view, "img", (void *)_actiger_yellow, 0, 0, 0,
-                            0);
+    gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_yellow, 0, 0, 0,
+                                             0);
+    gui_img_set_mode(img, IMG_BYPASS_MODE);
 
     gui_view_switch_on_event(view, "white_view",
                              SWITCH_OUT_TO_RIGHT_USE_ROTATE,
