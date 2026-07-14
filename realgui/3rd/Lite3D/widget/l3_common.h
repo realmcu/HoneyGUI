@@ -359,6 +359,7 @@ typedef struct l3_draw_tria_img
 
     void *fill_data;
     L3_FILL_TYPE fill_type;
+    uint16_t light;   // flat shading factor for texture fill, Q8 (256 = full bright, 0 = unset -> full)
 } l3_draw_tria_img_t;
 
 typedef struct l3_rect

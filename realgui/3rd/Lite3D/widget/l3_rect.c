@@ -145,10 +145,14 @@ static void __l3_push_rect_img_front_and_sort(l3_obj_model_t *_this, l3_3x3_matr
 
             if (tria_img->fill_data == NULL) // Fill with material color
             {
+                float nz = fabsf(vertices[0].normal.uz);
+                const float MIN_LIGHT_INTENSITY = 0.5f;
+                const float MAX_LIGHT_INTENSITY = 1.0f;
+                float light_intensity = fmaxf(MIN_LIGHT_INTENSITY, fminf(MAX_LIGHT_INTENSITY, nz));
                 float *color_diffuse = _this->desc->materials[material_id].diffuse;
-                uint8_t color_r = (uint8_t)(*(color_diffuse) * opacity_value);
-                uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * opacity_value);
-                uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * opacity_value);
+                uint8_t color_r = (uint8_t)(*(color_diffuse) * opacity_value * light_intensity);
+                uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * opacity_value * light_intensity);
+                uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * opacity_value * light_intensity);
 
                 render_color = ((color_r & 0xF8) << 8) |
                                ((color_g & 0xFC) << 3) |
@@ -159,6 +163,9 @@ static void __l3_push_rect_img_front_and_sort(l3_obj_model_t *_this, l3_3x3_matr
             }
             else // Fill with texture image
             {
+                float nz = fabsf(vertices[0].normal.uz);
+                float light_intensity = fmaxf(0.5f, fminf(1.0f, nz));
+                tria_img->light = (uint16_t)(light_intensity * 256.0f);
                 tria_img->fill_type = L3_FILL_IMAGE_RGB565;
                 for (int j = 0; j < 4; j++)
                 {
@@ -169,7 +176,7 @@ static void __l3_push_rect_img_front_and_sort(l3_obj_model_t *_this, l3_3x3_matr
         else
         {
             float nz = fabsf(vertices[0].normal.uz);
-            uint8_t color_intensity = (uint8_t)(opacity_value * fmaxf(0.0f, fminf(1.0f, nz)));
+            uint8_t color_intensity = (uint8_t)(opacity_value * fmaxf(0.5f, fminf(1.0f, nz)));
             render_color = ((color_intensity & 0xF8) << 8) |
                            ((color_intensity & 0xFC) << 3) |
                            ((color_intensity & 0xF8) >> 3);

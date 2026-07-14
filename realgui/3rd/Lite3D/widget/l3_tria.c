@@ -82,6 +82,9 @@ static void __l3_push_tria_img(l3_obj_model_t *_this, l3_3x3_matrix_t *parent_ma
             }
             else // Fill with texture image
             {
+                float nz = fabsf(tria_img.p0.normal.uz);
+                float light_intensity = fmaxf(0.5f, fminf(1.0f, nz));
+                tria_img.light = (uint16_t)(light_intensity * 256.0f);
                 tria_img.fill_type = L3_FILL_IMAGE_RGB565;
 
                 tria_img.p0.v = 1.0f - tria_img.p0.v; // Inverse v coordinate

@@ -261,6 +261,9 @@ static void l3_draw_single_tria(l3_gltf_model_t *_this, l3_gltf_primitive_t *pri
 
         if (prim->material && prim->material->texture_data != NULL)
         {
+            float nz = fabsf(tria_img.p0.normal.uz);
+            float light_intensity = fmaxf(0.5f, fminf(1.0f, nz));
+            tria_img.light = (uint16_t)(light_intensity * 256.0f);
             tria_img.fill_data = prim->material->texture_data;
 
             tria_img.fill_type = L3_FILL_IMAGE_RGB565;

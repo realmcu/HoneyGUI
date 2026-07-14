@@ -287,7 +287,8 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
                                    float oneoverz_step, \
                                    float soverz, float soverz_step, float toverz, float toverz_step, \
                                    float *zbuffer, uint16_t *writebuf, int width, \
-                                   l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data)
+                                   l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data,
+                                   uint16_t light)
 {
     int startX = (int)(xleft + 0.5f);
     int endX = ((int)(xright + 0.5f) > width) ? width : (int)(xright + 0.5f);
@@ -319,6 +320,13 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
 
                 gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
                                      image_addr, srcX + srcY * src_head->w, src_head->type, palette_data);
+
+                if (light < 256)   // flat shading: modulate texel RGB, keep alpha
+                {
+                    source_red   = (uint8_t)((source_red   * light) >> 8);
+                    source_green = (uint8_t)((source_green * light) >> 8);
+                    source_blue  = (uint8_t)((source_blue  * light) >> 8);
+                }
 
                 if (source_alpha > 0 && (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx]))
                 {
@@ -372,6 +380,13 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
 
                 gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
                                      image_addr, srcX + srcY * src_head->w, src_head->type, palette_data);
+
+                if (light < 256)   // flat shading: modulate texel RGB, keep alpha
+                {
+                    source_red   = (uint8_t)((source_red   * light) >> 8);
+                    source_green = (uint8_t)((source_green * light) >> 8);
+                    source_blue  = (uint8_t)((source_blue  * light) >> 8);
+                }
 
                 if (source_alpha > 0)
                 {
@@ -603,7 +618,8 @@ static void l3_render_with_texture_rgb565(float y, float y0, float y1, float y2,
                                           bool k01infinite, float k01, float b01, \
                                           bool k02infinite, float k02, float b02, \
                                           float *zbuffer, uint8_t *writebuf, int width, \
-                                          l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data)
+                                          l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data,
+                                          uint16_t light)
 {
     float xleft, xright, oneoverz_left, oneoverz_step, soverz_left, soverz_step, toverz_left,
           toverz_step;
@@ -621,7 +637,7 @@ static void l3_render_with_texture_rgb565(float y, float y0, float y1, float y2,
     l3_fill_texture_rgb565(y, xleft, xright, oneoverz_left, oneoverz_step,
                            soverz_left, soverz_step, toverz_left, toverz_step,
                            zbuffer, (uint16_t *)writebuf, width,
-                           src_head, image_addr, palette_data);
+                           src_head, image_addr, palette_data, light);
 }
 
 static void l3_render_with_texture_argb8888(float y, float y0, float y1, float y2, \
@@ -736,12 +752,13 @@ static void l3_render_triangle_half(l3_draw_tria_img_t *image,
 
         if (image->fill_type == L3_FILL_IMAGE_RGB565)
         {
+            uint16_t light = image->light ? image->light : 256;   // 0 = unset -> full bright
             for (float y = y_start; y <= y_end; y++)
             {
                 l3_render_with_texture_rgb565(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
                                               soverz0, soverz1, soverz2, toverz0, toverz1, toverz2,
                                               k01infinite, k01, b01, k02infinite, k02, b02,
-                                              zbuffer, writebuf, width, src_head, image_addr, palette_data);
+                                              zbuffer, writebuf, width, src_head, image_addr, palette_data, light);
             }
         }
         else
