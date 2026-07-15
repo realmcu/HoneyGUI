@@ -11,6 +11,7 @@
 #include "draw_img.h"
 #include "acc_api.h"
 #include "gui_components_init.h"
+#include "gui_vfs.h"
 
 void *l3_port_malloc(size_t size)
 {
@@ -23,6 +24,42 @@ void l3_port_free(void *ptr)
 int l3_port_ftl_read(uintptr_t addr, uint8_t *buf, uint32_t len)
 {
     return gui_ftl_read(addr, buf, len);
+}
+void *l3_port_fs_load(const char *path, bool *need_free)
+{
+    /* Prefer a zero-copy pointer when the file is memory-mapped. */
+    const void *data = gui_vfs_get_file_address(path);
+    if (data != NULL)
+    {
+        return (void *)data;
+    }
+
+    /* Fallback: read the whole file into a heap buffer. */
+    gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
+    if (f == NULL)
+    {
+        return NULL;
+    }
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
+    int size = gui_vfs_tell(f);
+    if (size <= 0)
+    {
+        gui_vfs_close(f);
+        return NULL;
+    }
+    gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+
+    void *buf = gui_malloc(size);
+    if (buf == NULL)
+    {
+        gui_vfs_close(f);
+        return NULL;
+    }
+    gui_vfs_read(f, buf, size);
+    gui_vfs_close(f);
+
+    *need_free = true;
+    return buf;
 }
 uint32_t l3_port_time_ms_get(void)
 {
@@ -52,6 +89,7 @@ int l3_init(void)
     l3_malloc_imp = l3_port_malloc;
     l3_free_imp = l3_port_free;
     l3_ftl_read_imp = l3_port_ftl_read;
+    l3_fs_load_imp = l3_port_fs_load;
     l3_draw_rect_img_to_canvas_imp = l3_port_draw_rect_img_to_canvas;
     l3_get_time_ms_imp = l3_port_time_ms_get;
     gui_log("Lite3D port initialized\n");

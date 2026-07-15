@@ -62,7 +62,7 @@ struct l3_model_base
     l3_draw_rect_img_t *combined_img;
     L3_DRAW_TYPE draw_type;
 
-    void *raw_data_from_ftl;
+    void *raw_data;
     l3_deformation_state_t deformation;
 
     void *user_data;  // User-defined data pointer for custom usage
@@ -126,6 +126,24 @@ l3_model_base_t *l3_create_model_ftl(void            *desc_addr,
                                      int16_t          y,
                                      int16_t          w,
                                      int16_t          h);
+
+/**
+ * @brief Create a new 3D model from a file system file.
+ *
+ * @param path Path of the model descriptor file in the virtual file system.
+ * @param draw_type Drawing type for the model.
+ * @param x X-coordinate of the model.
+ * @param y Y-coordinate of the model.
+ * @param w Width of the view.
+ * @param h Height of the view.
+ * @return Pointer to the created 3D model, or NULL on failure.
+ */
+l3_model_base_t *l3_create_model_fs(const char      *path,
+                                    L3_DRAW_TYPE     draw_type,
+                                    int16_t          x,
+                                    int16_t          y,
+                                    int16_t          w,
+                                    int16_t          h);
 /**
  * @brief Push the model's state to the rendering pipeline.
  *
@@ -225,6 +243,7 @@ char *l3_version(void);
 extern void *(*l3_malloc_imp)(size_t size);
 extern void (*l3_free_imp)(void *ptr);
 extern int (*l3_ftl_read_imp)(uintptr_t addr, uint8_t *buf, uint32_t len);
+extern void *(*l3_fs_load_imp)(const char *path, bool *need_free);
 extern uint32_t (*l3_get_time_ms_imp)(void);
 extern void (*l3_draw_tria_to_canvas_imp)(l3_draw_tria_img_t *image,
                                           l3_draw_rect_img_t *combined_image, float *zbuffer);

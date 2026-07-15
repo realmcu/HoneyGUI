@@ -494,6 +494,7 @@ void l3_apply_deformation_to_model_vertex(l3_deformation_state_t *deformation,
 void *l3_malloc(size_t size);
 void l3_free(void *ptr);
 int l3_ftl_read(uintptr_t addr, uint8_t *buf, uint32_t len);
+void *l3_fs_load(const char *path, bool *need_free);
 uint32_t l3_get_time_ms(void);
 
 #ifdef __cplusplus

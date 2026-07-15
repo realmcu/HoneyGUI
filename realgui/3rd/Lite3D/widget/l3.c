@@ -87,6 +87,11 @@ l3_model_base_t *l3_create_model_ftl(void            *desc_addr,
 
     l3_desc_file_head_t file_head;
     l3_ftl_read((uintptr_t)desc_addr, (uint8_t *)&file_head, sizeof(l3_desc_file_head_t));
+    if (file_head.magic != 0x3344)
+    {
+        return NULL;
+    }
+
     uint8_t *data = (uint8_t *)l3_malloc(file_head.file_size);
     l3_ftl_read((uintptr_t)desc_addr, data, file_head.file_size);
 
@@ -95,18 +100,68 @@ l3_model_base_t *l3_create_model_ftl(void            *desc_addr,
     case L3_MODEL_TYPE_OBJ:
         {
             l3_obj_model_t *obj_model = l3_create_obj_model((void *)data, draw_type, x, y, w, h);
-            obj_model->base.raw_data_from_ftl = data;
+            obj_model->base.raw_data = data;
             return &obj_model->base;
         }
 
     case L3_MODEL_TYPE_GLTF:
         {
             l3_gltf_model_t *gltf_model = l3_create_gltf_model((void *)data, draw_type, x, y, w, h);
-            gltf_model->base.raw_data_from_ftl = data;
+            gltf_model->base.raw_data = data;
             return &gltf_model->base;
         }
 
     default:
+        l3_free(data);
+        return NULL;
+
+    }
+}
+
+l3_model_base_t *l3_create_model_fs(const char      *path,
+                                    L3_DRAW_TYPE     draw_type,
+                                    int16_t          x,
+                                    int16_t          y,
+                                    int16_t          w,
+                                    int16_t          h)
+{
+    extern int l3_init(void);
+    l3_init();
+
+    /* Get the file bytes: a direct (zero-copy) pointer when the file is
+     * memory-mapped, otherwise a heap buffer that must be freed on destroy. */
+    bool need_free = false;
+    void *data = l3_fs_load(path, &need_free);
+    if (data == NULL)
+    {
+        return NULL;
+    }
+
+    l3_desc_file_head_t *file_head = (l3_desc_file_head_t *)data;
+    if (file_head->magic != 0x3344)
+    {
+        if (need_free) { l3_free(data); }
+        return NULL;
+    }
+
+    switch (file_head->model_type)
+    {
+    case L3_MODEL_TYPE_OBJ:
+        {
+            l3_obj_model_t *obj_model = l3_create_obj_model(data, draw_type, x, y, w, h);
+            obj_model->base.raw_data = need_free ? data : NULL;
+            return &obj_model->base;
+        }
+
+    case L3_MODEL_TYPE_GLTF:
+        {
+            l3_gltf_model_t *gltf_model = l3_create_gltf_model(data, draw_type, x, y, w, h);
+            gltf_model->base.raw_data = need_free ? data : NULL;
+            return &gltf_model->base;
+        }
+
+    default:
+        if (need_free) { l3_free(data); }
         return NULL;
 
     }

@@ -1043,6 +1043,7 @@ void l3_apply_deformation_to_model_vertex(l3_deformation_state_t *deformation,
 void *(*l3_malloc_imp)(size_t size) = NULL;
 void (*l3_free_imp)(void *ptr) = NULL;
 int (*l3_ftl_read_imp)(uintptr_t addr, uint8_t *buf, uint32_t len) = NULL;
+void *(*l3_fs_load_imp)(const char *path, bool *need_free) = NULL;
 uint32_t (*l3_get_time_ms_imp)(void) = NULL;
 
 void *l3_malloc(size_t size)
@@ -1069,6 +1070,18 @@ int l3_ftl_read(uintptr_t addr, uint8_t *buf, uint32_t len)
         return l3_ftl_read_imp(addr, buf, len);
     }
     return -1;
+}
+void *l3_fs_load(const char *path, bool *need_free)
+{
+    if (need_free != NULL)
+    {
+        *need_free = false;
+    }
+    if (l3_fs_load_imp != NULL)
+    {
+        return l3_fs_load_imp(path, need_free);
+    }
+    return NULL;
 }
 uint32_t l3_get_time_ms(void)
 {

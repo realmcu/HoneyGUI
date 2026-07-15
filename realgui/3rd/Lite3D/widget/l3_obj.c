@@ -374,10 +374,10 @@ void l3_free_obj_model(l3_model_base_t *base)
         _this->desc = NULL;
     }
 
-    if (_this->base.raw_data_from_ftl != NULL)
+    if (_this->base.raw_data != NULL)
     {
-        l3_free(_this->base.raw_data_from_ftl);
-        _this->base.raw_data_from_ftl = NULL;
+        l3_free(_this->base.raw_data);
+        _this->base.raw_data = NULL;
     }
 
     l3_free(_this);
