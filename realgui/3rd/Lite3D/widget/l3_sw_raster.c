@@ -222,7 +222,7 @@ void gui_get_rle_pixel(l3_draw_rect_img_t *image, int x, int y, uint8_t *pixel)/
     l3_img_head_t *head = image->data;
     char input_type = head->type;
     l3_imdc_file_t *compressed = (l3_imdc_file_t *)(&(file->data.imdc_file));
-    uint32_t line = (uintptr_t)compressed + compressed->compressed_addr[y];
+    uintptr_t line = (uintptr_t)compressed + compressed->compressed_addr[y];
     int location = 0;
     switch (input_type)
     {

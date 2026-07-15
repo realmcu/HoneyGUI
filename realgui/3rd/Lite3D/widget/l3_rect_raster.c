@@ -76,7 +76,7 @@ void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_r
         if (!l3_draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end)) { return; }
 
         char input_type = head->type;
-        uint32_t image_base;
+        uintptr_t image_base;
         uint8_t *palette_data = NULL;
 
         // Handle I8 format

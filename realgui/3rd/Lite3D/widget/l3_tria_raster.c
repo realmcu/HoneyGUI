@@ -287,7 +287,7 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
                                    float oneoverz_step, \
                                    float soverz, float soverz_step, float toverz, float toverz_step, \
                                    float *zbuffer, uint16_t *writebuf, int width, \
-                                   l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data,
+                                   l3_img_head_t *src_head, uintptr_t image_addr, uint8_t *palette_data,
                                    uint16_t light)
 {
     int startX = (int)(xleft + 0.5f);
@@ -430,7 +430,7 @@ static void l3_fill_texture_argb8888(int y, float xleft, float xright, float one
                                      float oneoverz_step, \
                                      float soverz, float soverz_step, float toverz, float toverz_step, \
                                      float *zbuffer, uint32_t *writebuf, int width, \
-                                     l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data)
+                                     l3_img_head_t *src_head, uintptr_t image_addr, uint8_t *palette_data)
 {
     int startX = (int)(xleft + 0.5f);
     int endX = ((int)(xright + 0.5f) > width) ? width : (int)(xright + 0.5f);
@@ -618,7 +618,7 @@ static void l3_render_with_texture_rgb565(float y, float y0, float y1, float y2,
                                           bool k01infinite, float k01, float b01, \
                                           bool k02infinite, float k02, float b02, \
                                           float *zbuffer, uint8_t *writebuf, int width, \
-                                          l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data,
+                                          l3_img_head_t *src_head, uintptr_t image_addr, uint8_t *palette_data,
                                           uint16_t light)
 {
     float xleft, xright, oneoverz_left, oneoverz_step, soverz_left, soverz_step, toverz_left,
@@ -647,7 +647,7 @@ static void l3_render_with_texture_argb8888(float y, float y0, float y1, float y
                                             bool k01infinite, float k01, float b01, \
                                             bool k02infinite, float k02, float b02, \
                                             float *zbuffer, uint8_t *writebuf, int width, \
-                                            l3_img_head_t *src_head, uint32_t image_addr, uint8_t *palette_data)
+                                            l3_img_head_t *src_head, uintptr_t image_addr, uint8_t *palette_data)
 {
     float xleft, xright, oneoverz_left, oneoverz_step, soverz_left, soverz_step, toverz_left,
           toverz_step;
@@ -733,7 +733,7 @@ static void l3_render_triangle_half(l3_draw_tria_img_t *image,
         float toverz0 = t0 * inv_z0, toverz1 = t1 * inv_z1, toverz2 = t2 * inv_z2;
 
         l3_img_head_t *src_head = (l3_img_head_t *)image->fill_data;
-        uint32_t image_addr;
+        uintptr_t image_addr;
         uint8_t *palette_data = NULL;
 
         // Handle I8 format
