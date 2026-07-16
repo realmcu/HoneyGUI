@@ -561,7 +561,7 @@ static void gui_fb_draw(gui_obj_t *root)
         {
             dc->frame_buf = dc->disp_buf_2;
         }
-        memset(dc->frame_buf, 0x00, ((size_t)dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
+        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
         dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
         obj_draw_scan(root);
         post_process_handle();
