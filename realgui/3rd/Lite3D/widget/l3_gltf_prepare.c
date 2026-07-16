@@ -509,7 +509,11 @@ void l3_gltf_prepare(l3_gltf_model_t *_this, l3_3x3_matrix_t *parent_matrix)
 
     uint32_t width = _this->base.viewPortWidth;
     uint32_t height = _this->base.viewPortHeight;
-    memset(_this->depthBuffer, 0x00, width * height * sizeof(float));
+
+    if (_this->depthBuffer)
+    {
+        memset(_this->depthBuffer, 0x00, width * height * sizeof(float));
+    }
 
     l3_img_head_t *head = (l3_img_head_t *)_this->base.combined_img->data;
     if (head->type == LITE_RGB565)

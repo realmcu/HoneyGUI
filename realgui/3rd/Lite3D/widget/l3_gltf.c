@@ -361,21 +361,28 @@ l3_gltf_model_t *l3_create_gltf_model(void                 *desc_addr,
     }
     memset(this->base.combined_img, 0x00, sizeof(l3_draw_rect_img_t));
 
-    size_t depth_buffer_size = (size_t)w * h * sizeof(float);
-    this->depthBuffer = l3_malloc(depth_buffer_size);
-    if (!this->depthBuffer)
+    this->depthBuffer = NULL;
+    if (draw_type == L3_DRAW_FRONT_AND_SORT)
     {
-        l3_free(this->base.combined_img);
-        l3_free(this);
-        return NULL;
+        size_t depth_buffer_size = (size_t)w * h * sizeof(float);
+        this->depthBuffer = l3_malloc(depth_buffer_size);
+        if (!this->depthBuffer)
+        {
+            l3_free(this->base.combined_img);
+            l3_free(this);
+            return NULL;
+        }
+        memset(this->depthBuffer, 0x00, depth_buffer_size);
     }
-    memset(this->depthBuffer, 0x00, depth_buffer_size);
 
     size_t img_buffer_size = (size_t)w * h * 2 + sizeof(l3_img_head_t);
     this->base.combined_img->data = l3_malloc(img_buffer_size);
     if (!this->base.combined_img->data)
     {
-        l3_free(this->depthBuffer);
+        if (this->depthBuffer)
+        {
+            l3_free(this->depthBuffer);
+        }
         l3_free(this->base.combined_img);
         l3_free(this);
         return NULL;
