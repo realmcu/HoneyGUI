@@ -12,7 +12,7 @@
 #include "gui_server.h"
 #include "gui_obj.h"
 #include "gui_view.h"
-#include "gui_view_transition.h"
+#include "gui_view_api.h"
 
 
 /*============================================================================*
@@ -27,10 +27,22 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+
+/* Clamp an animation progress value to the valid [0.0, 1.0] range. */
+static inline float clamp01(float t)
+{
+    if (t < 0.0f) { return 0.0f; }
+    if (t > 1.0f) { return 1.0f; }
+    return t;
+}
+
+/* Quadratic ease-in-out: slow at both ends, fastest in the middle. */
 static float ease_in_out(float t)
 {
     return t < 0.5f ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
+
+/* Ease-out bounce: overshoots then settles, giving a springy landing. */
 static float bounce_ease_out(float t)
 {
     if (t < 1 / 2.75f)
@@ -56,9 +68,7 @@ static float bounce_ease_out(float t)
 static void view_transition_animation_fade_in(float pro, gui_view_t *view, float *scale_x,
                                               float *scale_y)
 {
-    // Ensure progress is between 0.0 and 1.0
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function to transform progress
     float eased_pro = (pro);
@@ -86,9 +96,7 @@ static void view_transition_animation_fade_in(float pro, gui_view_t *view, float
 static void view_transition_animation_from_right(float pro, gui_view_t *view, float *scale_x,
                                                  float *scale_y)
 {
-    // Ensure progress is between 0.0 and 1.0
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function to transform progress
     float eased_pro = (pro);
@@ -124,9 +132,7 @@ static void view_transition_animation_from_right(float pro, gui_view_t *view, fl
 static void view_transition_animation_from_left(float pro, gui_view_t *view, float *scale_x,
                                                 float *scale_y)
 {
-    // Ensure progress is between 0.0 and 1.0
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function to transform progress
     float eased_pro = (pro);
@@ -160,18 +166,14 @@ static void view_transition_animation_from_left(float pro, gui_view_t *view, flo
 
 static void view_transition_animation_to_opacity0(float eased_pro, gui_view_t *view)
 {
-    // Ensure progress is between 0.0 and 1.0
-    if (eased_pro < 0.0f) { eased_pro = 0.0f; }
-    if (eased_pro > 1.0f) { eased_pro = 1.0f; }
+    eased_pro = clamp01(eased_pro);
     // Calculate and set opacity
     unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
     GUI_BASE(view)->opacity_value = opacity_value;
 }
 static void view_transition_animation_from_opacity0(float eased_pro, gui_view_t *view)
 {
-    // Ensure progress is between 0.0 and 1.0
-    if (eased_pro < 0.0f) { eased_pro = 0.0f; }
-    if (eased_pro > 1.0f) { eased_pro = 1.0f; }
+    eased_pro = clamp01(eased_pro);
     // Calculate and set opacity
     unsigned char opacity_value = (unsigned char)(255 * eased_pro);
     GUI_BASE(view)->opacity_value = opacity_value;
@@ -179,9 +181,7 @@ static void view_transition_animation_from_opacity0(float eased_pro, gui_view_t 
 static void view_transition_animation_to_right(float pro, gui_view_t *view, float *scale_x,
                                                float *scale_y)
 {
-    // Ensure progress is between 0.0 and 1.0
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function to transform progress
     float eased_pro = (pro);
@@ -217,9 +217,7 @@ static void view_transition_animation_to_right(float pro, gui_view_t *view, floa
 static void view_transition_animation_to_left(float pro, gui_view_t *view, float *scale_x,
                                               float *scale_y)
 {
-    // Ensure progress is between 0.0 and 1.0
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function to transform progress
     float eased_pro = (pro);
@@ -255,9 +253,7 @@ static void view_transition_animation_to_left(float pro, gui_view_t *view, float
 static void view_transition_animation_zoom_center(float pro, gui_view_t *view, float *scale_x,
                                                   float *scale_y)
 {
-    // Ensure progress is between 0.0f and 1.0f
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use an easing function to transform progress
     float eased_pro = pro; // Replace this with an actual easing function if desired
@@ -275,9 +271,7 @@ static void view_transition_animation_zoom_center(float pro, gui_view_t *view, f
 static void view_transition_animation_collapse_to_center(float pro, gui_view_t *view,
                                                          float *scale_x, float *scale_y)
 {
-    // Ensure progress is between 0.0f and 1.0f
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use an easing function to transform progress
     float eased_pro = pro; // Replace this with an actual easing function if desired
@@ -296,9 +290,7 @@ static void view_transition_animation_zoom_from_top_left(float pro, gui_view_t *
                                                          float *scale_x,
                                                          float *scale_y)
 {
-    // Ensure progress is between 0.0f and 1.0f
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function
     float eased_pro = ease_in_out(pro);
@@ -319,9 +311,7 @@ static void view_transition_animation_zoom_from_top_right(float pro, gui_view_t 
                                                           float *scale_x,
                                                           float *scale_y)
 {
-    // Ensure progress is between 0.0f and 1.0f
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function
     float eased_pro = ease_in_out(pro);
@@ -342,9 +332,7 @@ static void view_transition_animation_zoom_from_top_right(float pro, gui_view_t 
 static void view_transition_animation_zoom_to_top_left(float pro, gui_view_t *view, float *scale_x,
                                                        float *scale_y)
 {
-    // Ensure progress is between 0.0f and 1.0f
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function
     float eased_pro = ease_in_out(pro);
@@ -365,9 +353,7 @@ static void view_transition_animation_zoom_to_top_left(float pro, gui_view_t *vi
 static void view_transition_animation_zoom_to_top_right(float pro, gui_view_t *view, float *scale_x,
                                                         float *scale_y)
 {
-    // Ensure progress is between 0.0f and 1.0f
-    if (pro < 0.0f) { pro = 0.0f; }
-    if (pro > 1.0f) { pro = 1.0f; }
+    pro = clamp01(pro);
 
     // Use easing function
     float eased_pro = ease_in_out(pro);
@@ -520,7 +506,7 @@ static void animation_case(gui_view_t *this, float pro)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void view_transition_animation(void *obj, float pro)
+void gui_view_animation(void *obj, float pro)
 {
     gui_obj_move(obj, 0, 0);
     animation_case((gui_view_t *)obj, pro);

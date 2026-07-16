@@ -125,15 +125,19 @@ typedef struct gui_view_descriptor
     const char *name;
     gui_view_t **pView;
 
-    void (* on_switch_in)(gui_view_t *view);  // Callback function when view is switched in and created.
-    void (* on_switch_out)(gui_view_t
-                           *view); // Callback function when view is switched out and destroyed.
+    /* Called when the view is switched in and (re)created. */
+    void (*on_switch_in)(gui_view_t *view);
+    /* Called when the view is switched out and destroyed. */
+    void (*on_switch_out)(gui_view_t *view);
 
-uint8_t keep            :
-    1; // If keep is true, the view will not be destroyed when switch to other view and will be created when register view
-uint8_t use_snapshot   :
-    1; // If use_snapshot is true, the view will use snap shot to switch in and out. Need large memory.
-    void **snapshot_data; // Double pointer to snapshot_data in RAM (like pView pattern)
+    /* If set, the view is kept resident (not destroyed on switch-out) and is
+       pre-created when registered. */
+    uint8_t keep          : 1;
+    /* If set, the view is rendered from a cached snapshot during switch in/out.
+       Requires extra RAM for the snapshot buffer. */
+    uint8_t use_snapshot  : 1;
+    /* Double pointer to the snapshot buffer in RAM (same pattern as pView). */
+    void **snapshot_data;
 } gui_view_descriptor_t;
 /* gui_view_descriptor end*/
 
