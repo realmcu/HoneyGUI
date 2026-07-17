@@ -28,7 +28,7 @@ extern bool g_SnapShotPreCache; // whether cache all layout views or not
 void gui_view_transition(gui_view_t *_this, int16_t release);
 
 /* GUI view animation */
-void gui_view_animation(void *obj, float pro);
+void gui_view_animation(gui_view_t *_this, int16_t release);
 
 /* GUI view snapshot */
 void gui_view_show_snapshot(gui_view_t *_this, bool show);

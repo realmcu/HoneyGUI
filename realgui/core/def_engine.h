@@ -43,6 +43,7 @@ typedef struct draw_img
     uint32_t bg_color_fix;  //bg color fix for A8 image
     uint8_t alpha_mix;      //alpha mix for A8 image
     void *acc_user;
+    float raster_prog;
 } draw_img_t;
 
 typedef struct draw_circle

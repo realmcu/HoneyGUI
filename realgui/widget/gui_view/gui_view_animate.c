@@ -460,6 +460,42 @@ static void animation_case(gui_view_t *this, float pro)
             view_transition_animation_zoom_to_top_right(pro, this, &scale_x, &scale_y);
         }
         break;
+    case SWITCH_IN_ANIMATION_RASTER_HORIZONTAL:
+        {
+            if (this->bg_img != NULL)
+            {
+                this->bg_img->blend_mode = IMG_RASTER_HORIZONTAL;
+                this->bg_img->raster_prog = pro;
+            }
+        }
+        break;
+    case SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE:
+        {
+            if (this->bg_img != NULL)
+            {
+                this->bg_img->blend_mode = IMG_RASTER_HORIZONTAL;
+                this->bg_img->raster_prog = 1 - pro;
+            }
+        }
+        break;
+    case SWITCH_IN_ANIMATION_RASTER_VERTICAL:
+        {
+            if (this->bg_img != NULL)
+            {
+                this->bg_img->blend_mode = IMG_RASTER_VERTICAL;
+                this->bg_img->raster_prog = pro;
+            }
+        }
+        break;
+    case SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE:
+        {
+            if (this->bg_img != NULL)
+            {
+                this->bg_img->blend_mode = IMG_RASTER_VERTICAL;
+                this->bg_img->raster_prog = 1 - pro;
+            }
+        }
+        break;
 
     default:
         break;
@@ -506,8 +542,10 @@ static void animation_case(gui_view_t *this, float pro)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_view_animation(void *obj, float pro)
+void gui_view_animation(gui_view_t *_this, int16_t release)
 {
+    gui_obj_t *obj = GUI_BASE(_this);
     gui_obj_move(obj, 0, 0);
-    animation_case((gui_view_t *)obj, pro);
+    float pro = release / (float)obj->h;
+    animation_case(_this, pro);
 }

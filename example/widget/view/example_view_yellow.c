@@ -21,7 +21,7 @@
 
 static void app_ui_view_yellow_design(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL, false);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL, true);
 
 static void app_ui_view_yellow_design(gui_view_t *view)
 {
@@ -45,8 +45,8 @@ static void app_ui_view_yellow_design(gui_view_t *view)
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_view_switch_on_event(view, "blue_view",
-                             SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
-                             SWITCH_IN_FROM_TOP_USE_TRANSLATION,
+                             SWITCH_INIT_STATE,
+                             SWITCH_IN_ANIMATION_RASTER_VERTICAL,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
     gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_ANIMATION_FADE,

@@ -160,13 +160,13 @@ void gui_view_create_snapshot(gui_view_t *_this)
             _this->bg_img->img_h = dc->screen_height;
             _this->bg_img->data = (void *)*_this->descriptor->snapshot_data;
             _this->bg_img->opacity_value = _this->opacity;
-            BLEND_MODE_TYPE blend_mode = IMG_BYPASS_MODE;
-            // if (_this->opacity != UINT8_MAX || _this->current_transition_style >= SWITCH_IN_FROM_LEFT_USE_CUBE)
-            // {
-            //     blend_mode = IMG_FILTER_BLACK;
-            // }
-            _this->bg_img->blend_mode = blend_mode;
         }
+        BLEND_MODE_TYPE blend_mode = IMG_BYPASS_MODE;
+        // if (_this->opacity != UINT8_MAX || _this->current_transition_style >= SWITCH_IN_FROM_LEFT_USE_CUBE)
+        // {
+        //     blend_mode = IMG_FILTER_BLACK;
+        // }
+        _this->bg_img->blend_mode = blend_mode;
 
     }
 }

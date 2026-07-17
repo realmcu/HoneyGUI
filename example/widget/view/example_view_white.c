@@ -61,12 +61,9 @@ static void app_ui_view_white_design(gui_view_t *view)
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, "yellow_view", SWITCH_OUT_ANIMATION_ZOOM,
-                             SWITCH_IN_ANIMATION_ZOOM,
+    gui_view_switch_on_event(view, "blue_view", SWITCH_INIT_STATE,
+                             SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE,
                              GUI_EVENT_TOUCH_CLICKED);
-
-    gui_view_set_animate_step(view, 30);
-
 }
 /* view white end*/
 

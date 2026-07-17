@@ -84,9 +84,8 @@ static inline void gui_view_free_bg_img(gui_view_t *_this)
 static void gui_view_hidden(gui_view_t *_this)
 {
     if (_this == NULL) { return; }
-    gui_view_show_snapshot(_this, false);
 
-    if (_this == g_NextView && _this == g_PreView && g_SurpressEvent) { return; }
+    gui_view_show_snapshot(_this, false);
     gui_obj_t *obj = GUI_BASE(_this);
     gui_obj_hidden(obj, true);
     if (!_this->descriptor->keep)
@@ -350,6 +349,13 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
     }
+    else if (on_event->switch_in_style == SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE ||
+             on_event->switch_in_style == SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE)
+    {
+        gui_view_adjust_list(GUI_BASE(g_NextView), obj);
+        g_NextView->current_transition_style = SWITCH_INIT_STATE;
+        g_CurrentView->current_transition_style = on_event->switch_in_style;
+    }
     else
     {
         gui_obj_hidden(GUI_BASE(g_NextView), true);
@@ -419,6 +425,13 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
         on_event->switch_in_style == SWITCH_IN_NONE_ANIMATION) // cover CurrentView
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
+    }
+    else if (on_event->switch_in_style == SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE ||
+             on_event->switch_in_style == SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE)
+    {
+        gui_view_adjust_list(GUI_BASE(g_NextView), obj);
+        g_NextView->current_transition_style = SWITCH_INIT_STATE;
+        g_CurrentView->current_transition_style = on_event->switch_in_style;
     }
 
     if (e->code == GUI_EVENT_INVALID &&
@@ -512,7 +525,7 @@ static void gui_view_prepare(gui_obj_t *obj)
         }
         else
         {
-            gui_view_animation(obj, g_Release / (float)g_Target);
+            gui_view_animation(_this, abs(g_Release));
         }
     }
 

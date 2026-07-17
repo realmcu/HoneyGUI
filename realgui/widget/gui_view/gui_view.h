@@ -89,6 +89,10 @@ typedef enum
     SWITCH_IN_ANIMATION_MOVE_FROM_LEFT,
     SWITCH_IN_ANIMATION_BOUNCE_FROM_RIGHT,
 
+    SWITCH_IN_ANIMATION_RASTER_HORIZONTAL,         ///< Switch in with raster effect. Only support when use_snapshot is true.
+    SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE,
+    SWITCH_IN_ANIMATION_RASTER_VERTICAL,         ///< Switch in with raster effect.
+    SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE,
 
 } VIEW_SWITCH_STYLE;
 /* VIEW_SWITCH_STYLE enum end*/

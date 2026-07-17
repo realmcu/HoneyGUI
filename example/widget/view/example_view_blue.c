@@ -59,25 +59,23 @@ static void switch_in_cb(gui_view_t *view)
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
     gui_view_switch_on_event(view, "yellow_view",
-                             SWITCH_OUT_TO_TOP_USE_TRANSLATION,
-                             SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+                             SWITCH_INIT_STATE,
+                             SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_view_switch_on_event(view, "lime_view", SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, "white_view", SWITCH_OUT_ANIMATION_ZOOM,
-                             SWITCH_IN_ANIMATION_ZOOM,
+    gui_view_switch_on_event(view, "white_view", SWITCH_INIT_STATE,
+                             SWITCH_IN_ANIMATION_RASTER_HORIZONTAL,
                              GUI_EVENT_TOUCH_CLICKED);
-
-
 }
 
 
 static int app_init(void)
 {
-    gui_view_enable_precache_snapshot(true);
+    gui_view_enable_precache_snapshot(false);
     gui_view_create(gui_obj_get_root(), CURRENT_VIEW_NAME, 0, 0, 0, 0);
     return 0;
 }
