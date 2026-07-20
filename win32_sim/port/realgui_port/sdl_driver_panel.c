@@ -16,9 +16,8 @@
 #endif
 
 /*
- * Icon paths are written relative to the project root, but the exe
- * lives in <root>/win32_sim/. Anchor to the exe's own directory so
- * icons load regardless of CWD.
+ * Icon paths are relative to the executable directory so they load
+ * regardless of CWD or the directory that contains the simulator.
  */
 static void resolve_icon_path(const char *rel, char *out, size_t out_sz)
 {
@@ -32,7 +31,7 @@ static void resolve_icon_path(const char *rel, char *out, size_t out_sz)
     char *slash = strrchr(exe, '/');
     if (!slash) { slash = strrchr(exe, '\\'); }
     if (slash) { *slash = '\0'; }
-    snprintf(out, out_sz, "%s/../%s", exe, rel);
+    snprintf(out, out_sz, "%s/%s", exe, rel);
 }
 
 typedef struct
