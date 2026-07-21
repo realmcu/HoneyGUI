@@ -37,10 +37,8 @@ html_context = {
     "is_multilingual": True,
     # 左侧目录栏的拖拽宽度，不同的文档项目使用不同的名称，如：
     # docs.honeycomb.siderbar.width
-    # docs.bee4.siderbar.width
     # docs.honeygui.siderbar.width
     # docs.matter.siderbar.width
-    # docs.bee3plus.siderbar.width
     # docs.watch.siderbar.width
     # ...
     # RD 自行配置
@@ -138,7 +136,7 @@ html_show_sphinx = False
 
 html_static_path = ['_static']
 html_js_files = [
-    'js/auth.js',
+    # 'js/auth.js',
     # 'js/purify.min.js',
     # 'js/marked.min.js',
     'js/typed.umd.js',
