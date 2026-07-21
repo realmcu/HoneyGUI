@@ -1479,9 +1479,9 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         }
                         if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
                         {
-                            /* Line width up to the space (not including post-space chars) */
-                            int16_t line_used = last_space_cursor_x + chr[last_space_index].advance
-                                                + letter_spacing - rect->x1;
+                            /* Line width up to the space start; exclude the wrapping
+                             * space and its trailing letter spacing */
+                            int16_t line_used = last_space_cursor_x - letter_spacing - rect->x1;
                             line_buf[line].index = last_space_index;
                             line_buf[line].offset = (rect_w - line_used) / 2 * align_factor;
                             i = last_space_index + 1;
@@ -1547,9 +1547,17 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
                         {
                             i = last_space_index + 1;
+                            line_buf[line].index = i - 1;
+                            /* Exclude the wrapping space from line alignment width */
+                            line_buf[line].offset = (rect_w - chr[i - 1].x + rect->x1 + letter_spacing) / 2 *
+                                                    align_factor;
                         }
-                        line_buf[line].index = i - 1;
-                        line_buf[line].offset = (rect_w - chr[i].x + rect->x1 + letter_spacing) / 2 * align_factor;
+                        else
+                        {
+                            line_buf[line].index = i - 1;
+                            line_buf[line].offset = (rect_w - chr[i].x + rect->x1 + letter_spacing) / 2 *
+                                                    align_factor;
+                        }
                         line++;
                         line_start_index = i;
                         chr[i].x = rect->x1;
