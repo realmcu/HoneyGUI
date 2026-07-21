@@ -107,22 +107,23 @@ typedef struct gui_text
     int8_t extra_letter_spacing;
     int8_t extra_line_spacing;
     int16_t line_height;            /**< explicit line height (0 = use default) */
+    uint16_t space_width;           /**< fallback space width (0 = use default) */
     uint8_t bold_weight;
 
-    bool layout_refresh   : 1;
-    bool content_refresh  : 1;
-    bool use_img_blit     : 1;
-    bool inputable        : 1;
-    bool ispasswd         : 1;
-    bool wordwrap         : 1;
-    bool scope            : 1;
-    bool scope_self       : 1;  /**< scope set by gui_text_set_scope */
-    bool scope_absolute   : 1;  /**< 0=relative to text, 1=absolute screen coords */
-    bool arabic           : 1;
-    bool thai             : 1;
-    bool hebrew           : 1;
-    uint8_t rendermode    : 2;
-    uint8_t bold_mode     : 1;  /**< 0=BOLD_HORIZONTAL (fast), 1=BOLD_FULL */
+    bool layout_refresh    : 1;
+    bool content_refresh   : 1;
+    bool use_img_blit      : 1;
+    bool inputable         : 1;
+    bool ispasswd          : 1;
+    bool wordwrap          : 1;
+    bool scope             : 1;
+    bool scope_self        : 1;  /**< scope set by gui_text_set_scope */
+    bool scope_absolute    : 1;  /**< 0=relative to text, 1=absolute screen coords */
+    bool arabic            : 1;
+    bool thai              : 1;
+    bool hebrew            : 1;
+    uint8_t rendermode     : 2;
+    uint8_t bold_mode      : 1;  /**< 0=BOLD_HORIZONTAL (fast), 1=BOLD_FULL */
 bool font_cache_enable :
     1; /**< user opt-in: cross-frame glyph bitmap cache (identity/translate only) */
     bool font_cache_static : 1; /**< internal: chr[].buf currently holds a cross-frame static cache */
@@ -244,6 +245,14 @@ void gui_text_extra_line_spacing_set(gui_text_t *this_widget, int8_t extra_line_
  * @param line_height Line height in pixels. 0 = use default calculated line height.
  */
 void gui_text_set_line_height(gui_text_t *this_widget, int16_t line_height);
+
+/**
+ * @brief Set the fallback space width for legacy TTF fonts.
+ *
+ * @param this_widget Text box widget pointer.
+ * @param space_width Space width in pixels. 0 = use the default approximation.
+ */
+void gui_text_set_space_width(gui_text_t *this_widget, uint16_t space_width);
 
 /**
  * @brief Enable/disable matrix-based image rendering for text.

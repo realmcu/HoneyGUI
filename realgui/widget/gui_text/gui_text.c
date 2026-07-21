@@ -620,6 +620,13 @@ void gui_text_set_line_height(gui_text_t *this, int16_t line_height)
     this->line_height = line_height;
 }
 
+void gui_text_set_space_width(gui_text_t *this, uint16_t space_width)
+{
+    GUI_ASSERT(this != NULL);
+    this->space_width = space_width;
+    this->layout_refresh = true;
+}
+
 void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)
 {
     this->use_img_blit = use_img_blit;

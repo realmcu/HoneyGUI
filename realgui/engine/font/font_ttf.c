@@ -1600,6 +1600,8 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].w = 0;
             chr[chr_i].h = text->font_height;
             // chr[chr_i].char_y = 0;
+            uint16_t fallback_space_width = text->space_width > 0 ?
+                                            text->space_width : (text->font_height + 3) / 4;
 
 #if ENABLE_FONT_V3_TYPO
             if (typo_ctx.is_v3)
@@ -1679,14 +1681,14 @@ void gui_font_get_ttf_info(gui_text_t *text)
                         else
                         {
                             /* Fallback if file open fails */
-                            chr[chr_i].char_w = (text->font_height + 3) / 4;
+                            chr[chr_i].char_w = fallback_space_width;
                         }
                     }
                 }
                 else
                 {
                     /* Space glyph not found: fallback to legacy approximation */
-                    chr[chr_i].char_w = (text->font_height + 3) / 4;
+                    chr[chr_i].char_w = fallback_space_width;
                 }
 
                 if (space_fs_index_table != NULL)
@@ -1701,7 +1703,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
                  * @deprecated Legacy space width approximation (version[0] < 3).
                  * Scheduled for removal ~6-12 months after standard typography release.
                  */
-                chr[chr_i].char_w = (text->font_height + 3) / 4;
+                chr[chr_i].char_w = fallback_space_width;
             }
 
             chr[chr_i].char_h = (text->font_height + 3) / 4;
