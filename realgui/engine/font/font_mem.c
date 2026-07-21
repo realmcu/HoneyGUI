@@ -1466,12 +1466,15 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     int16_t next_cursor = cursor_x + chr[i].advance;
                     if ((next_cursor - 1) > rect->x2 && cursor_x != rect->x1)
                     {
-                        if (chr[i].unicode == 0x20 && cursor_x < rect->x2)
+                        if (chr[i].unicode == 0x20)
                         {
-                            /* Space at boundary, position and continue */
+                            /* Consume an overflowing space on the current line */
                             layout_position_bearing(&chr[i], &cursor_x, rect->y1 + line * line_height,
                                                     typo_ctx.baseline_px, letter_spacing);
-                            chr[i].char_w = rect->x2 + 1 - chr[i].x;
+                            chr[i].char_w = chr[i].x <= rect->x2 ?
+                                            rect->x2 + 1 - chr[i].x : 0;
+                            cursor_x = rect->x2 + 1;
+                            last_space_cursor_x = cursor_x - chr[i].advance - letter_spacing;
                             continue;
                         }
                         if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
@@ -1534,10 +1537,11 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 
                     if ((chr[i].x + chr[i].char_w - 1) > rect->x2)
                     {
-                        if (chr[i].unicode == 0x20 && chr[i].x < rect->x2)
+                        if (chr[i].unicode == 0x20)
                         {
                             chr[i].y = rect->y1 + line * line_height;
-                            chr[i].char_w = rect->x2 + 1 - chr[i].x;
+                            chr[i].char_w = chr[i].x <= rect->x2 ?
+                                            rect->x2 + 1 - chr[i].x : 0;
                             continue;
                         }
                         if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
@@ -1680,11 +1684,14 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     int16_t next_cursor = cursor_x + chr[i].advance;
                     if ((next_cursor - 1) > rect->x2 && cursor_x != rect->x1)
                     {
-                        if (chr[i].unicode == 0x20 && cursor_x < rect->x2)
+                        if (chr[i].unicode == 0x20)
                         {
+                            /* Consume an overflowing space on the current line */
                             layout_position_bearing(&chr[i], &cursor_x, rect->y1 + line * line_height,
                                                     typo_ctx.baseline_px, letter_spacing);
-                            chr[i].char_w = rect->x2 + 1 - chr[i].x;
+                            chr[i].char_w = chr[i].x <= rect->x2 ?
+                                            rect->x2 + 1 - chr[i].x : 0;
+                            cursor_x = rect->x2 + 1;
                             continue;
                         }
                         if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
@@ -1733,10 +1740,11 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     }
                     if ((chr[i].x + chr[i].char_w - 1) > rect->x2)
                     {
-                        if (chr[i].unicode == 0x20 && chr[i].x < rect->x2)
+                        if (chr[i].unicode == 0x20)
                         {
                             chr[i].y = rect->y1 + line * line_height;
-                            chr[i].char_w = rect->x2 + 1 - chr[i].x;
+                            chr[i].char_w = chr[i].x <= rect->x2 ?
+                                            rect->x2 + 1 - chr[i].x : 0;
                             continue;
                         }
                         if (wordwrap && last_space_index > line_start_index && chr[last_space_index].unicode == 0x20)
