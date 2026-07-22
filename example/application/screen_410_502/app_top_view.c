@@ -17,6 +17,7 @@
 #include "guidef.h"
 #include "gui_list.h"
 #include "app_main_watch.h"
+#include "gui_message.h"
 
 /*============================================================================*
  *                           Types
@@ -225,23 +226,15 @@ static void create_view_more(void *obj, gui_event_t *e)
     gui_obj_add_event_cb(GUI_BASE(canvas), view_more_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 }
 
+static void msg_2_reset_list_note_num(void *msg)
+{
+    GUI_UNUSED(msg);
+    gui_list_set_note_num(list, infor_num + 1);
+}
+
 static void clear_list_note(gui_list_note_t *note)
 {
-    gui_node_list_t *node = NULL;
-    uint8_t index = 0;
-    gui_list_for_each(node, &(list->base.child_list))
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        gui_list_note_t *list_note = (gui_list_note_t *)obj;
-        if (list_note == note) {break;}
-
-        list_note->start_y -= (list->note_length + list->space);
-        list_note->index -= 1;
-        gui_obj_move(obj, 0, list_note->start_y);
-        index++;
-    }
-    gui_obj_tree_free_async(GUI_BASE(note));
-    index = infor_num - 1 - index;
+    uint8_t index = infor_num - 1 - note->index;
     gui_free(infor_rec[index]);
     // gui_log("free infor_rec[%d]\n", index);
     while (index < infor_num - 1)
@@ -251,8 +244,15 @@ static void clear_list_note(gui_list_note_t *note)
         index++;
     }
     infor_num--;
-    gui_list_set_note_num(list, infor_num + 1);
+
     clear_flag = false;
+    gui_msg_t msg =
+    {
+        .event = GUI_EVENT_USER_DEFINE,
+        .cb = msg_2_reset_list_note_num,
+        .payload = NULL,
+    };
+    gui_send_msg_to_server(&msg);
 }
 
 // animation after sliding note
@@ -392,7 +392,7 @@ static void list_timer_cb(void *param)
     static uint8_t local_infor_num = 0;
     gui_view_t *next_view = gui_view_get_next();
     if (!note_dur_animation && !clear_flag &&
-        (next_view == current_view_line_44 || next_view == NULL) && local_infor_num != infor_num)
+        (next_view == current_view_line_45 || next_view == NULL) && local_infor_num != infor_num)
     {
         gui_list_set_note_num(list, infor_num + 1);
         local_infor_num = infor_num;
@@ -402,7 +402,7 @@ static void list_timer_cb(void *param)
         up_slide_quick = true;
     }
 
-    if (next_view == current_view_line_44 || up_slide_quick)
+    if (next_view == current_view_line_45 || up_slide_quick)
     {
         gui_node_list_t *node = NULL;
         gui_list_for_each(node, &(list->base.child_list))
@@ -441,7 +441,6 @@ static void clear_all_timer_cb(void *widget)
     }
     if (abs(note->start_x - note->t_x) >= SCREEN_WIDTH)
     {
-        gui_obj_child_free(GUI_BASE(list));
         while (infor_num)
         {
             infor_num--;
@@ -475,7 +474,7 @@ static void create_clear_note(void *parent)
 {
     gui_text_t *clear_text;
     canvas_clear = gui_rect_create(GUI_BASE(parent), "canvas_clear",
-                                   52, 40, 305, 80, 40, gui_rgb(39, 43, 44));
+                                   52, 40, 305, 80, 38, gui_rgb(39, 43, 44));
     gui_obj_add_event_cb(GUI_BASE(canvas_clear), (gui_event_cb_t)clear_all_note_cb,
                          GUI_EVENT_TOUCH_CLICKED, NULL);
     // text

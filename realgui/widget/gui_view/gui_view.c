@@ -152,7 +152,7 @@ static void gui_view_switch_done(void *obj)
     g_Target = 0;
     g_NextView = NULL;
     g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
-    // gui_obj_move(&g_CurrentView->base, 0, 0);
+    gui_obj_move(&g_CurrentView->base, 0, 0);
 
     gui_fb_change();
     gui_obj_delete_timer(obj);

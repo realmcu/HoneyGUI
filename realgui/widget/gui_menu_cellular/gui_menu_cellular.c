@@ -275,6 +275,7 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
         gui_img_set_focus(img, FOCUS_OFFSET, FOCUS_OFFSET);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
+        img->need_clip = false;
         this->ver_offset_min = -(start_y + HEIGHT_GAP - SCREEN_H);
     }
     this->icon_size = icon_size;

@@ -82,8 +82,8 @@ static void update_all_fireflys(void *param)
         if (fireflys[i].y < 0) { fireflys[i].y = dc->screen_height; }
         if (fireflys[i].y > dc->screen_height) { fireflys[i].y = 0; }
 
-        gui_img_translate(fireflys[i].img, fireflys[i].x, fireflys[i].y);
-        gui_img_translate(fireflys[i].fill, fireflys[i].x, fireflys[i].y);
+        gui_obj_move((void *)fireflys[i].img, fireflys[i].x, fireflys[i].y);
+        gui_obj_move((void *)fireflys[i].fill, fireflys[i].x, fireflys[i].y);
 
         if (xorshift16() % 100 < 5)
         {

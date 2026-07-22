@@ -665,7 +665,7 @@ static void app_menu_design(gui_view_t *view)
     }
     else
     {
-        void *cellilar_img_data_array[] =
+        void *cellular_img_data_array[] =
         {
             UI_CLOCK_HEARTRATE_ICON_BIN,
             UI_CLOCK_FRUIT_NINJA_ICON_BIN,
@@ -739,11 +739,11 @@ static void app_menu_design(gui_view_t *view)
             MUSIC_ICON_BIN,
             GLASS_ICON_BIN,
         };
-        int array_size = sizeof(cellilar_img_data_array) / sizeof(cellilar_img_data_array[0]);
+        int array_size = sizeof(cellular_img_data_array) / sizeof(cellular_img_data_array[0]);
         int16_t icon_size = 100;
         gui_rect_create(GUI_BASE(win), "background", 0, 0,
                         SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(76, 76, 76, 255));
-        gui_menu_cellular_t *menu = gui_menu_cellular_create(win, icon_size, cellilar_img_data_array,
+        gui_menu_cellular_t *menu = gui_menu_cellular_create(win, icon_size, cellular_img_data_array,
                                                              array_size, IMG_SRC_MEMADDR);
         menu_cellular = menu;
         gui_menu_cellular_offset(menu, cellular_offset_x, cellular_offset_y);
