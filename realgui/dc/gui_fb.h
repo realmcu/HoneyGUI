@@ -66,6 +66,13 @@ void gui_fb_change(void);
 void gui_set_bg_color(gui_color_t color);
 
 /**
+ * @brief Enable or disable skipping framebuffer clear before rendering.
+ *
+ * @param skip true to skip framebuffer clear, false to clear normally
+ */
+void gui_fb_skip_clear(bool skip);
+
+/**
  * @brief Get fps.
  *
  * @return fps

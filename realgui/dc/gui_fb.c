@@ -13,6 +13,7 @@
 
 
 static bool fb_change = false;
+static bool fb_skip_clear = false;
 static uint32_t gui_obj_count;
 static uint32_t obj_count;
 static int frame_count_per_second;
@@ -28,6 +29,11 @@ static gui_color_t fb_bg_color =
 void gui_set_bg_color(gui_color_t color)
 {
     fb_bg_color = color;
+}
+
+void gui_fb_skip_clear(bool skip)
+{
+    fb_skip_clear = skip;
 }
 
 uint32_t gui_get_obj_count(void)
@@ -446,7 +452,10 @@ static void gui_pfb_draw(gui_obj_t *root)
         dc->section_count = i;
 
         /* --- 4. Clear framebuffer and render --- */
-        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+        if (!fb_skip_clear)
+        {
+            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+        }
 
         if (mgr->full_refresh || mgr->count == 0)
         {
@@ -503,7 +512,10 @@ static void gui_fb_draw(gui_obj_t *root)
         {
             // Full screen refresh (fallback mode or no dirty regions)
             // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
-            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+            if (!fb_skip_clear)
+            {
+                gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+            }
             dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
             obj_draw_scan(root);
         }
@@ -511,7 +523,10 @@ static void gui_fb_draw(gui_obj_t *root)
         {
             // Dirty region optimized rendering
             // TODO: Performance optimization - clear only dirty regions instead of full framebuffer
-            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+            if (!fb_skip_clear)
+            {
+                gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+            }
 
             for (uint16_t i = 0; i < mgr->count; i++)
             {
@@ -561,7 +576,10 @@ static void gui_fb_draw(gui_obj_t *root)
         {
             dc->frame_buf = dc->disp_buf_2;
         }
-        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+        if (!fb_skip_clear)
+        {
+            gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+        }
         dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
         obj_draw_scan(root);
         post_process_handle();
