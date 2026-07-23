@@ -1032,7 +1032,9 @@ static void gui_list_released_cb(void *obj, gui_event_t *e)
         {
             gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
             gui_list_note_t *note = (gui_list_note_t *)o;
-            uint16_t index = note->index;
+            int16_t index = note->index;
+            index %= _this->note_num;
+            index += _this->note_num;
             index %= _this->note_num;
             // gui_log("index %d to %d\n", note->index, index);
             note->index = index;
