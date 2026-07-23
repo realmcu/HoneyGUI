@@ -84,6 +84,7 @@ void text_widget_example(void)
  * |13 | text_font_typo_rendering_test()  | Typography rendering: bitmap + vector baseline/line-height (swipeable)   |
  * |14 | text_font_fallback_test()        | Mixed-language fallback: CJK+EN in one string with priority chain        |
  * |15 | text_vector_scale_test()         | V3 vector font scaling: win-issued scale + text self-scale (looping)     |
+ * |16 | text_emoji_example()             | Inline color emoji drawn from .bin files, mixed with ASCII glyphs        |
  *
  * @return 0 on success
  */
@@ -106,6 +107,7 @@ static int app_init(void)
     // text_font_typo_rendering_test(); /* [13] Typography bitmap+vec  */
     // text_font_fallback_test();       /* [14] Mixed-lang fallback    */
     // text_vector_scale_test();        /* [15] Vector font scaling    */
+    // text_emoji_example();               /* [16] Inline emoji in text   */
 
     return 0;
 }

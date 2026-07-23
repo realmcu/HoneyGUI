@@ -12,6 +12,9 @@
 #include "font_rendering_utils.h"
 #include "gui_vfs.h"
 #include "font_glyph_cache.h"
+#include "draw_img.h"
+#include "gui_matrix.h"
+#include "acc_api.h"
 
 /*============================================================================*
  *                      Font Library Access Functions
@@ -473,6 +476,11 @@ static uint32_t load_emoji(mem_char_t *chr, gui_text_t *text,
         chr->char_w = 0;
         chr->char_h = 0;
     }
+#if ENABLE_FONT_V3_TYPO
+    /* V3 layout advances the cursor by chr->advance; without this emojis
+     * stack at the same x. */
+    chr->advance = chr->char_w;
+#endif
     return multi_len;
 }
 
@@ -1969,9 +1977,9 @@ void gui_font_mem_unload(gui_text_t *text)
 {
     if (text->data)
     {
+        mem_char_t *chr = text->data;
         if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
-            mem_char_t *chr = text->data;
             for (int i = 0; i < text->font_len; i++)
             {
                 if (chr[i].dot_addr && !font_glyph_cache_contains(chr[i].dot_addr))
@@ -1982,10 +1990,10 @@ void gui_font_mem_unload(gui_text_t *text)
         }
         for (int i = 0; i < text->font_len; i++)
         {
-            mem_char_t *chr = text->data;
             if (chr[i].emoji_img != NULL)
             {
                 gui_obj_tree_free(chr[i].emoji_img);
+                chr[i].emoji_img = NULL;
             }
         }
         gui_free(text->data);
@@ -1998,15 +2006,25 @@ void gui_font_mem_destroy(gui_text_t *text)
 {
     if (text->data)
     {
+        mem_char_t *chr = text->data;
         if (text->font_mode == FONT_SRC_FTL || text->font_mode == FONT_SRC_FILESYS)
         {
-            mem_char_t *chr = text->data;
             for (int i = 0; i < text->font_len; i++)
             {
                 if (chr[i].dot_addr && !font_glyph_cache_contains(chr[i].dot_addr))
                 {
                     gui_free(chr[i].dot_addr);
                 }
+            }
+        }
+        /* Free emoji child images (mirrors gui_font_mem_unload) to avoid
+         * leaking the gui_img widgets on destroy. */
+        for (int i = 0; i < text->font_len; i++)
+        {
+            if (chr[i].emoji_img != NULL)
+            {
+                gui_obj_tree_free(chr[i].emoji_img);
+                chr[i].emoji_img = NULL;
             }
         }
         gui_free(text->data);
@@ -2089,18 +2107,43 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t render_
 
     font_glyph_render(&df, &glyph);
 }
-void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data, int16_t x, int16_t y)
+void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data)
 {
-    if (data)
+    if (data == NULL)
     {
-        if (chr->emoji_img == NULL)
-        {
-            chr->emoji_img = gui_img_create_from_mem(text, "emoji", data, x, y, 0, 0);
-            float x_sccle = (float)(chr->char_w) / (float)(text->emoji_size);
-            float y_scale = (float)(chr->char_h) / (float)(text->emoji_size);
-            gui_img_scale((gui_img_t *)chr->emoji_img, x_sccle, y_scale);
-        }
+        return;
     }
+
+    /* Blit the ARGB8888 cell inline instead of spawning a child gui_img:
+     * creating a widget mid-draw corrupted the heap. */
+    gui_dispdev_t *dc = gui_get_dc();
+
+    float scale = (text->emoji_size != 0)
+                  ? (float)(chr->char_w) / (float)(text->emoji_size)
+                  : 1.0f;
+
+    draw_img_t img;
+    memset(&img, 0, sizeof(img));
+    img.data = data;
+    /* Emoji bins carry per-pixel alpha; SRC_OVER honors it (IMG_FILTER_BLACK
+     * would drop pure-black pixels). */
+    img.blend_mode = IMG_SRC_OVER_MODE;
+    img.opacity_value = (text->base.parent != NULL)
+                        ? text->base.parent->opacity_value : UINT8_MAX;
+
+    /* Scale the cell to the glyph box and place it at the glyph's
+     * absolute position. */
+    matrix_identity(&img.matrix);
+    matrix_translate(chr->x, chr->y, &img.matrix);
+    matrix_scale(scale, scale, &img.matrix);
+    memcpy(&img.inverse, &img.matrix, sizeof(img.inverse));
+    matrix_inverse(&img.inverse);
+
+    draw_img_load_scale(&img, IMG_SRC_MEMADDR);
+    draw_img_new_area(&img, NULL);
+    draw_img_cache(&img, IMG_SRC_MEMADDR, NULL);
+    gui_acc_blit_to_dc(&img, dc, NULL);
+    draw_img_free(&img, IMG_SRC_MEMADDR, NULL);
 }
 void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
@@ -2126,7 +2169,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
     {
         if (chr[i].unicode >= 0x10000)
         {
-            gui_font_draw_emoji(text, chr + i, chr[i].dot_addr, chr[i].x - rect->x1, chr[i].y - rect->y1);
+            gui_font_draw_emoji(text, chr + i, chr[i].dot_addr);
         }
         else
         {

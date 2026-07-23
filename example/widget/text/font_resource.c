@@ -15,11 +15,19 @@
 #include "gui_api_os.h"
 
 #include "font_mem.h"
+#include "romfs/hg_romfs.h"
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
 #define FONT_MEM_POOL_SIZE (1024 * 1024 * 100)
+
+/* Path to the packed emoji ROM filesystem (built by mkromfs_emoji.bat). */
+#define EMOJI_PACK_PATH    "./example/assets/font/emoji/emoji_pack.bin"
+
+/* mkromfs on-disk directory entry: four little-endian uint32 fields
+ * (type, name offset, data offset, size), 16 bytes total. */
+#define EMOJI_ROMFS_ENTRY_SIZE 16
 
 #if ENABLE_FONT_V3_TYPO
 #define FONT_DIR           "./example/assets/font/v3/"
@@ -113,6 +121,72 @@ static void *load_file_to_memory(const char *path, size_t *out_size)
     return buffer;
 }
 
+/*
+ * Rebuild a mkromfs image (example/assets/font/emoji/emoji_pack.bin, built with
+ * "-b -a 0x0") into native struct romfs_dirent nodes.
+ *
+ * mkromfs packs every directory entry as four little-endian uint32 fields
+ * (type / name offset / data offset / size), 16 bytes, with all offsets
+ * relative to the image start. On a 32-bit target that layout is byte-identical
+ * to struct romfs_dirent, so firmware just points hg_romfs_mount() at the flash
+ * image. This simulator is built 64-bit, where the two pointers inside struct
+ * romfs_dirent widen it to 32 bytes -- the raw image can no longer be walked in
+ * place. So parse it once: name and file payload point back into the resident
+ * image buffer, while a directory's data points at a freshly built child array.
+ */
+static uint32_t emoji_romfs_u32(const uint8_t *p)
+{
+    return (uint32_t)p[0]         | ((uint32_t)p[1] << 8) |
+           ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
+}
+
+static struct romfs_dirent *emoji_romfs_build_children(const uint8_t *base,
+                                                       uint32_t table_off,
+                                                       uint32_t count)
+{
+    struct romfs_dirent *arr = gui_malloc(count * sizeof(struct romfs_dirent));
+    if (arr == NULL)
+    {
+        return NULL;
+    }
+
+    for (uint32_t i = 0; i < count; i++)
+    {
+        const uint8_t *raw = base + table_off + i * EMOJI_ROMFS_ENTRY_SIZE;
+        uint32_t type     = emoji_romfs_u32(raw);
+        uint32_t name_off = emoji_romfs_u32(raw + 4);
+        uint32_t data_off = emoji_romfs_u32(raw + 8);
+        uint32_t size     = emoji_romfs_u32(raw + 12);
+
+        arr[i].type = type;
+        arr[i].name = (const char *)(base + name_off);
+        arr[i].size = size;
+        arr[i].data = (type == ROMFS_DIRENT_DIR)
+                      ? (const uint8_t *)emoji_romfs_build_children(base, data_off, size)
+                      : (base + data_off);
+    }
+    return arr;
+}
+
+/* Parse an in-RAM mkromfs image and return a root dirent ready for mounting. */
+static struct romfs_dirent *emoji_romfs_from_image(const uint8_t *base)
+{
+    struct romfs_dirent *root = gui_malloc(sizeof(struct romfs_dirent));
+    if (root == NULL)
+    {
+        return NULL;
+    }
+
+    /* The root entry occupies offset 0: {type, name off, data off, size}. */
+    root->type = emoji_romfs_u32(base);
+    root->name = (const char *)(base + emoji_romfs_u32(base + 4));
+    root->size = emoji_romfs_u32(base + 12);
+    root->data = (const uint8_t *)emoji_romfs_build_children(base,
+                                                             emoji_romfs_u32(base + 8),
+                                                             root->size);
+    return root;
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -123,6 +197,23 @@ static void *load_file_to_memory(const char *path, size_t *out_size)
 void font_file_init(void)
 {
     s_font_mem_offset = 0;
+
+    /* Load the packed emoji ROM filesystem into RAM and mount it under /emoji.
+     * The pack (built by mkromfs_emoji.bat) indexes every emoji bitmap by
+     * filename, mirroring how the emoji set is burned to flash on target. The
+     * text engine's emoji lookup then resolves "/emoji/emoji_u<hex>.bin"
+     * through the ROMFS backend with no per-frame file IO. On 32-bit targets
+     * the flash image is mounted directly; here (64-bit sim) it is parsed into
+     * native dirent nodes first -- see emoji_romfs_from_image(). */
+    void *emoji_pack = load_file_to_memory(EMOJI_PACK_PATH, NULL);
+    if (emoji_pack != NULL)
+    {
+        struct romfs_dirent *emoji_root = emoji_romfs_from_image(emoji_pack);
+        if (emoji_root != NULL)
+        {
+            gui_vfs_mount_romfs("/emoji", emoji_root, 0);
+        }
+    }
 
 #define LOAD_FONT(file) load_file_to_memory(FONT_PATH(file), NULL)
 
