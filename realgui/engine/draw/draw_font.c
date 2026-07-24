@@ -10,6 +10,7 @@
 
 #include "guidef.h"
 #include "draw_font.h"
+#include "emoji_unicode_property.h"
 #include <string.h>
 
 /*============================================================================*
@@ -454,7 +455,7 @@ static int is_combination_rule(uint32_t code)
            is_tag_character(code);
 }
 
-static int find_first_emoji(const uint32_t *unicode_buf, uint32_t len)
+static uint32_t find_first_emoji(const uint32_t *unicode_buf, uint32_t len)
 {
     if (len == 0)
     {
@@ -466,20 +467,73 @@ static int find_first_emoji(const uint32_t *unicode_buf, uint32_t len)
     {
         if (is_zwj(unicode_buf[i]))
         {
+            if (i + 1 >= len)
+            {
+                break;
+            }
             i++;
             continue;
         }
-        if (is_combination_rule(unicode_buf[i]))
-        {
-
-        }
-        else
+        if (!is_combination_rule(unicode_buf[i]))
         {
             break;
         }
     }
 
-    return i; // Emoji found successfully.
+    return i;
+}
+
+#define UNICODE_VARIATION_SELECTOR_TEXT  0xFE0E
+#define UNICODE_VARIATION_SELECTOR_EMOJI 0xFE0F
+
+bool gui_unicode_resolve_emoji(const uint32_t *unicode_buf, uint32_t len,
+                               gui_emoji_sequence_t *result)
+{
+    if (unicode_buf == NULL || len == 0 || result == NULL)
+    {
+        return false;
+    }
+
+    memset(result, 0, sizeof(*result));
+    uint32_t unicode = unicode_buf[0];
+
+    if (unicode >= 0x10000)
+    {
+        result->presentation = GUI_EMOJI_PRESENTATION_COLOR;
+        result->sequence_len = (uint16_t)find_first_emoji(unicode_buf, len);
+        return true;
+    }
+
+    if (!gui_emoji_unicode_has_property(unicode))
+    {
+        return false;
+    }
+
+    uint32_t selector = len > 1 ? unicode_buf[1] : 0;
+    if (selector == UNICODE_VARIATION_SELECTOR_TEXT)
+    {
+        result->presentation = GUI_EMOJI_PRESENTATION_TEXT;
+        result->sequence_len = 1;
+        result->selector_len = 1;
+        return true;
+    }
+
+    if (selector == UNICODE_VARIATION_SELECTOR_EMOJI)
+    {
+        result->presentation = GUI_EMOJI_PRESENTATION_COLOR;
+        result->sequence_len = (uint16_t)find_first_emoji(unicode_buf, len);
+        result->selector_len = 1;
+        return true;
+    }
+
+    result->sequence_len = 1;
+    result->presentation = gui_emoji_unicode_has_default_presentation(unicode) ?
+                           GUI_EMOJI_PRESENTATION_COLOR : GUI_EMOJI_PRESENTATION_TEXT;
+    if (result->presentation == GUI_EMOJI_PRESENTATION_COLOR)
+    {
+        result->sequence_len = (uint16_t)find_first_emoji(unicode_buf, len);
+    }
+    return true;
 }
 
 /*Arabic/Persian function*/
@@ -749,41 +803,30 @@ uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content,
     return unicode_len;
 }
 
-uint32_t generate_emoji_file_path_from_unicode(const uint32_t *unicode_buf, uint32_t len,
-                                               char *file_path)
+void gui_unicode_append_emoji_file_name(const uint32_t *unicode_buf, uint32_t sequence_len,
+                                        char *file_path)
 {
-    uint32_t emoji_len = find_first_emoji(unicode_buf, len);
-    // gui_log("first unicode %x ,emoji_len is %d \n",unicode_buf[0],emoji_len);
-
-    if (emoji_len == 0)
-    {
-        return 0; // No emoji found.
-    }
-
-    for (uint32_t i = 0; i < emoji_len; ++i)
+    for (uint32_t i = 0; i < sequence_len; ++i)
     {
         char buffer[12];
-        if (unicode_buf[i] == 0xfe0f)
+        if (unicode_buf[i] == UNICODE_VARIATION_SELECTOR_EMOJI)
         {
             continue;
         }
         snprintf(buffer, sizeof(buffer), "%04x", (unsigned int)unicode_buf[i]);
         strcat(file_path, buffer);
-        if (i < emoji_len - 1)
+        if (i < sequence_len - 1)
         {
             strcat(file_path, "_");
         }
     }
 
     uint32_t path_len = strlen(file_path);
-    if (file_path[path_len - 1] == 95)
+    if (file_path[path_len - 1] == '_')
     {
         file_path[path_len - 1] = '\0';
     }
-
     strcat(file_path, ".bin");
-
-    return emoji_len; // Success.
 }
 
 bool content_has_ap_unicode(uint32_t *unicode_buf, uint32_t len)

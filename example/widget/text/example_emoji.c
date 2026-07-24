@@ -20,13 +20,21 @@
 #define EMOJI_HEART_EYES       "\xF0\x9F\x98\x8D"
 #define EMOJI_ROFL             "\xF0\x9F\xA4\xA3"
 #define EMOJI_RAINBOW_FLAG     "\xF0\x9F\x8F\xB3\xE2\x80\x8D\xF0\x9F\x8C\x88"
+/* BMP presentation cases from Unicode emoji-data.txt. */
+#define SYMBOL_HEART_TEXT      "\xE2\x9D\xA4"              /* U+2764 */
+#define SYMBOL_HEART_EMOJI     "\xE2\x9D\xA4\xEF\xB8\x8F" /* U+2764 U+FE0F */
+#define EMOJI_STAR             "\xE2\xAD\x90"              /* U+2B50, emoji default */
+#define EMOJI_SPARKLES         "\xE2\x9C\xA8"              /* U+2728, emoji default */
+#define SYMBOL_SPARKLES_TEXT   "\xE2\x9C\xA8\xEF\xB8\x8E" /* U+2728 U+FE0E */
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static char scale_small[] = "20 " EMOJI_JOY;
-static char scale_normal[] = "32 " EMOJI_HEART_EYES;
-static char scale_large[] = "48 " EMOJI_ROFL;
+static char scale_small[] = "20 " EMOJI_JOY SYMBOL_HEART_EMOJI;
+static char scale_normal[] = "32 " EMOJI_HEART_EYES EMOJI_STAR;
+static char scale_large[] = "48 " EMOJI_ROFL EMOJI_SPARKLES;
+static char presentation_text[] = "Text " SYMBOL_HEART_TEXT " " SYMBOL_SPARKLES_TEXT;
+static char presentation_emoji[] = "Emoji " SYMBOL_HEART_EMOJI " " EMOJI_SPARKLES;
 static char align_left[] = "LEFT " EMOJI_JOY;
 static char align_center[] = "CENTER " EMOJI_HEART_EYES;
 static char align_right[] = "RIGHT " EMOJI_ROFL;
@@ -94,18 +102,23 @@ void text_emoji_example(void)
     emoji_text_create("emoji_right", align_right, 20, 134, DEMO_WIDTH, 34,
                       32, MID_RIGHT, APP_COLOR_YELLOW);
 
-    gui_text_t *wrapped = emoji_text_create("emoji_wrap", wrap_text, 20, 174,
-                                            DEMO_WIDTH, 112, 32, MULTI_LEFT,
+    emoji_text_create("emoji_presentation_text", presentation_text, 20, 170,
+                      DEMO_WIDTH, 34, 32, MID_LEFT, APP_COLOR_WHITE);
+    emoji_text_create("emoji_presentation_color", presentation_emoji, 20, 206,
+                      DEMO_WIDTH, 34, 32, MID_LEFT, APP_COLOR_WHITE);
+
+    gui_text_t *wrapped = emoji_text_create("emoji_wrap", wrap_text, 20, 246,
+                                            DEMO_WIDTH, 76, 32, MULTI_LEFT,
                                             APP_COLOR_WHITE);
     gui_text_wordwrap_set(wrapped, true);
     gui_text_extra_line_spacing_set(wrapped, 4);
 
     gui_scroll_text_t *scroll_x = emoji_scroll_text_create("emoji_scroll_x", scroll_x_text,
-                                                           294, 38, SCROLL_X);
+                                                           326, 38, SCROLL_X);
     gui_scroll_text_scroll_pause_set(scroll_x, 1000);
 
     gui_scroll_text_t *scroll_y = emoji_scroll_text_create("emoji_scroll_y", scroll_y_text,
-                                                           342, 64, SCROLL_Y);
+                                                           368, 38, SCROLL_Y);
     gui_text_wordwrap_set(&scroll_y->base, true);
     gui_scroll_text_loop_set(scroll_y, true, 0);
 }
