@@ -605,8 +605,8 @@ static void gui_list_note_circle(gui_obj_t *obj)
 
     int32_t r = list->circle_radius;
     int32_t diff = (list->dir == HORIZONTAL)
-                   ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
-                   : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
+                   ? (list->base.w / 2 - (obj->x + list->note_length / 2))
+                   : (list->base.h / 2 - (obj->y + list->note_length / 2));
     int32_t coord = abs(diff) >= r ? r : r - (int)sqrt(r * r - diff * diff);
     if (list->dir == HORIZONTAL)
     {
