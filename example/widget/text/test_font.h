@@ -92,6 +92,7 @@ void text_font_typo_rendering_test(void);
 void text_font_fallback_test(void);
 void text_vector_scale_test(void);
 void text_emoji_example(void);
+void text_ttf_emoji_example(void);
 
 #ifdef __cplusplus
 }

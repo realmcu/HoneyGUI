@@ -262,6 +262,29 @@ void gui_font_mem_unload(gui_text_t *text);
 void gui_font_mem_destroy(gui_text_t *text);
 
 /**
+ * @brief Try to load a color emoji cell using the shared Unicode rules.
+ *
+ * @param chr Output character cell.
+ * @param text Text widget containing the emoji resource configuration.
+ * @param baseline_px Font baseline offset in pixels.
+ * @param unicode_buf Unicode content buffer.
+ * @param p_uni_i Current Unicode index, advanced when a sequence is consumed.
+ * @param unicode_len Number of code points in unicode_buf.
+ * @return true if normal glyph lookup should be skipped.
+ */
+bool gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text, int16_t baseline_px,
+                             uint32_t *unicode_buf, uint32_t *p_uni_i, uint32_t unicode_len);
+
+/**
+ * @brief Draw a loaded color emoji cell.
+ *
+ * @param text Text widget.
+ * @param chr Emoji character cell.
+ * @param data Emoji image data.
+ */
+void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data);
+
+/**
  * @brief Get the font library node by size.
  *
  * @param font_size Font size.

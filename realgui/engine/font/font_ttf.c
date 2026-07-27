@@ -1534,6 +1534,11 @@ void gui_font_get_ttf_info(gui_text_t *text)
     float scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
 #endif /* ENABLE_FONT_V3_TYPO */
 
+    int16_t emoji_baseline_px = 0;
+#if ENABLE_FONT_V3_TYPO
+    emoji_baseline_px = typo_ctx.baseline_px;
+#endif
+
     uint8_t *preloaded_index_table = NULL;
     bool need_free_index_table = false;
 
@@ -1578,6 +1583,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
     for (uni_i = 0; uni_i < unicode_len; uni_i++)
     {
+        chr[chr_i].unicode = unicode_buf[uni_i];
         if (unicode_buf[uni_i] == 0x0A)
         {
             line_flag ++;
@@ -1708,6 +1714,11 @@ void gui_font_get_ttf_info(gui_text_t *text)
 
             chr[chr_i].char_h = (text->font_height + 3) / 4;
             // chr[chr_i].dot_addr = 0;
+        }
+        else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                         unicode_buf, &uni_i, unicode_len))
+        {
+            /* Emoji handled; uni_i may be advanced for a sequence. */
         }
         else
         {
@@ -1989,7 +2000,10 @@ void gui_font_ttf_destroy(gui_text_t *text)
         {
             for (int i = 0; i < text->font_len; i++)
             {
-                gui_free(chr[i].dot_addr);
+                if (!chr[i].is_emoji)
+                {
+                    gui_free(chr[i].dot_addr);
+                }
             }
         }
         for (int i = 0; i < text->font_len; i++)
@@ -2145,6 +2159,11 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
     for (uint16_t index = 0; index < text->active_font_len; index++)
     {
+        if (chr[index].is_emoji)
+        {
+            gui_font_draw_emoji(text, chr + index, chr[index].dot_addr);
+            continue;
+        }
         if (chr[index].buf)
         {
             bool now_static = (tm_type == FONT_IDENTITY || tm_type == FONT_TRANSFORM);

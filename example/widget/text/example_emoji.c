@@ -45,19 +45,42 @@ static char scroll_x_text[] = "MARQUEE " EMOJI_JOY EMOJI_HEART_EYES EMOJI_ROFL
 static char scroll_y_text[] = "Vertical " EMOJI_JOY " scroll\nMixed text " EMOJI_HEART_EYES
                               "\nZWJ flag " EMOJI_RAINBOW_FLAG;
 
+static char ttf_mixed_text[] = "TTF A" EMOJI_JOY "B " EMOJI_HEART_EYES " vector";
+static char ttf_presentation_color[] = "Color " SYMBOL_HEART_EMOJI " " EMOJI_SPARKLES;
+static char ttf_zwj_text[] = "ZWJ " EMOJI_RAINBOW_FLAG " inline";
+static char ttf_wrap_text[] = "Vector text " EMOJI_JOY " wraps with color emoji " EMOJI_ROFL
+                              " and keeps the baseline aligned.";
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
 static gui_text_t *emoji_text_create(const char *name, char *content,
                                      int16_t x, int16_t y, int16_t w, int16_t h,
-                                     uint16_t font_size, TEXT_MODE mode, gui_color_t color)
+                                     uint16_t font_size, TEXT_MODE mode, gui_color_t color,
+                                     FONT_SRC_TYPE font_type, void *font)
 {
     gui_text_t *text = gui_text_create(gui_obj_get_root(), name, x, y, w, h);
-    gui_text_set(text, content, GUI_FONT_SRC_BMP, color, strlen(content), font_size);
-    gui_text_type_set(text, font32b2, FONT_SRC_MEMADDR);
+    gui_text_set(text, content, font_type, color, strlen(content), font_size);
+    gui_text_type_set(text, font, FONT_SRC_MEMADDR);
     gui_text_emoji_set(text, EMOJI_PATH, EMOJI_SOURCE_SIZE);
     gui_text_mode_set(text, mode);
     return text;
+}
+
+static gui_text_t *bmp_emoji_text_create(const char *name, char *content,
+                                         int16_t x, int16_t y, int16_t w, int16_t h,
+                                         uint16_t font_size, TEXT_MODE mode, gui_color_t color)
+{
+    return emoji_text_create(name, content, x, y, w, h, font_size, mode, color,
+                             GUI_FONT_SRC_BMP, font32b2);
+}
+
+static gui_text_t *ttf_emoji_text_create(const char *name, char *content,
+                                         int16_t y, int16_t h, uint16_t font_size,
+                                         TEXT_MODE mode, gui_color_t color)
+{
+    return emoji_text_create(name, content, 20, y, DEMO_WIDTH, h, font_size, mode, color,
+                             GUI_FONT_SRC_TTF, font32vb4);
 }
 
 static gui_scroll_text_t *emoji_scroll_text_create(const char *name, char *content,
@@ -88,28 +111,28 @@ static gui_scroll_text_t *emoji_scroll_text_create(const char *name, char *conte
 /* gui text emoji example start */
 void text_emoji_example(void)
 {
-    emoji_text_create("emoji_20", scale_small, 20, 4, 120, 52,
-                      20, MID_LEFT, APP_COLOR_WHITE);
-    emoji_text_create("emoji_32", scale_normal, 150, 4, 130, 52,
-                      32, MID_LEFT, APP_COLOR_WHITE);
-    emoji_text_create("emoji_48", scale_large, 290, 4, 150, 52,
-                      48, MID_LEFT, APP_COLOR_WHITE);
+    bmp_emoji_text_create("emoji_20", scale_small, 20, 4, 120, 52,
+                          20, MID_LEFT, APP_COLOR_WHITE);
+    bmp_emoji_text_create("emoji_32", scale_normal, 150, 4, 130, 52,
+                          32, MID_LEFT, APP_COLOR_WHITE);
+    bmp_emoji_text_create("emoji_48", scale_large, 290, 4, 150, 52,
+                          48, MID_LEFT, APP_COLOR_WHITE);
 
-    emoji_text_create("emoji_left", align_left, 20, 62, DEMO_WIDTH, 34,
-                      32, MID_LEFT, APP_COLOR_WHITE);
-    emoji_text_create("emoji_center", align_center, 20, 98, DEMO_WIDTH, 34,
-                      32, MID_CENTER, APP_COLOR_GREEN);
-    emoji_text_create("emoji_right", align_right, 20, 134, DEMO_WIDTH, 34,
-                      32, MID_RIGHT, APP_COLOR_YELLOW);
+    bmp_emoji_text_create("emoji_left", align_left, 20, 62, DEMO_WIDTH, 34,
+                          32, MID_LEFT, APP_COLOR_WHITE);
+    bmp_emoji_text_create("emoji_center", align_center, 20, 98, DEMO_WIDTH, 34,
+                          32, MID_CENTER, APP_COLOR_GREEN);
+    bmp_emoji_text_create("emoji_right", align_right, 20, 134, DEMO_WIDTH, 34,
+                          32, MID_RIGHT, APP_COLOR_YELLOW);
 
-    emoji_text_create("emoji_presentation_text", presentation_text, 20, 170,
-                      DEMO_WIDTH, 34, 32, MID_LEFT, APP_COLOR_WHITE);
-    emoji_text_create("emoji_presentation_color", presentation_emoji, 20, 206,
-                      DEMO_WIDTH, 34, 32, MID_LEFT, APP_COLOR_WHITE);
+    bmp_emoji_text_create("emoji_presentation_text", presentation_text, 20, 170,
+                          DEMO_WIDTH, 34, 32, MID_LEFT, APP_COLOR_WHITE);
+    bmp_emoji_text_create("emoji_presentation_color", presentation_emoji, 20, 206,
+                          DEMO_WIDTH, 34, 32, MID_LEFT, APP_COLOR_WHITE);
 
-    gui_text_t *wrapped = emoji_text_create("emoji_wrap", wrap_text, 20, 246,
-                                            DEMO_WIDTH, 76, 32, MULTI_LEFT,
-                                            APP_COLOR_WHITE);
+    gui_text_t *wrapped = bmp_emoji_text_create("emoji_wrap", wrap_text, 20, 246,
+                                                DEMO_WIDTH, 76, 32, MULTI_LEFT,
+                                                APP_COLOR_WHITE);
     gui_text_wordwrap_set(wrapped, true);
     gui_text_extra_line_spacing_set(wrapped, 4);
 
@@ -123,3 +146,24 @@ void text_emoji_example(void)
     gui_scroll_text_loop_set(scroll_y, true, 0);
 }
 /* gui text emoji example end */
+
+/**
+ * @brief Render color emoji inline with vector font glyphs
+ */
+void text_ttf_emoji_example(void)
+{
+    ttf_emoji_text_create("ttf_emoji_mixed", ttf_mixed_text, 20, 60, 40,
+                          MID_LEFT, APP_COLOR_WHITE);
+    ttf_emoji_text_create("ttf_emoji_text", presentation_text, 84, 50, 32,
+                          MID_LEFT, APP_COLOR_CYAN);
+    ttf_emoji_text_create("ttf_emoji_color", ttf_presentation_color, 138, 50, 32,
+                          MID_LEFT, APP_COLOR_GREEN);
+    ttf_emoji_text_create("ttf_emoji_zwj", ttf_zwj_text, 192, 54, 36,
+                          MID_LEFT, APP_COLOR_YELLOW);
+
+    gui_text_t *wrapped = ttf_emoji_text_create("ttf_emoji_wrap", ttf_wrap_text,
+                                                252, 150, 32, MULTI_LEFT,
+                                                APP_COLOR_WHITE);
+    gui_text_wordwrap_set(wrapped, true);
+    gui_text_extra_line_spacing_set(wrapped, 6);
+}

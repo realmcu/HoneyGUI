@@ -449,7 +449,7 @@ static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB
  *
  * @return true if the emoji resource was found and loaded.
  */
-static bool load_emoji_resource(mem_char_t *chr, gui_text_t *text, GUI_FONT_HEAD_BMP *font,
+static bool load_emoji_resource(mem_char_t *chr, gui_text_t *text, int16_t baseline_px,
                                 const uint32_t *unicode_buf, uint16_t sequence_len)
 {
     if (text->emoji_path == NULL || sequence_len == 0)
@@ -472,11 +472,10 @@ static bool load_emoji_resource(mem_char_t *chr, gui_text_t *text, GUI_FONT_HEAD
     chr->char_h = text->font_height;
     chr->is_emoji = 1;
 #if ENABLE_FONT_V3_TYPO
-    gui_font_typo_context_t typo_ctx = gui_font_bmp_get_typo_context(font, text->font_height);
     chr->advance = chr->char_w;
-    chr->bearing_y = typo_ctx.baseline_px;
+    chr->bearing_y = baseline_px;
 #else
-    (void)font;
+    (void)baseline_px;
 #endif
     return true;
 }
@@ -486,7 +485,7 @@ static bool load_emoji_resource(mem_char_t *chr, gui_text_t *text, GUI_FONT_HEAD
  *
  * @return true if the caller should skip normal BMP glyph loading.
  */
-static bool try_handle_emoji(mem_char_t *chr, gui_text_t *text, GUI_FONT_HEAD_BMP *font,
+bool gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text, int16_t baseline_px,
                              uint32_t *unicode_buf, uint32_t *p_uni_i, uint32_t unicode_len)
 {
     uint32_t uni_i = *p_uni_i;
@@ -503,7 +502,7 @@ static bool try_handle_emoji(mem_char_t *chr, gui_text_t *text, GUI_FONT_HEAD_BM
         return false;
     }
 
-    if (load_emoji_resource(chr, text, font, &unicode_buf[uni_i], sequence.sequence_len))
+    if (load_emoji_resource(chr, text, baseline_px, &unicode_buf[uni_i], sequence.sequence_len))
     {
         *p_uni_i += sequence.sequence_len - 1;
         return true;
@@ -511,7 +510,9 @@ static bool try_handle_emoji(mem_char_t *chr, gui_text_t *text, GUI_FONT_HEAD_BM
 
     if (unicode_buf[uni_i] >= 0x10000)
     {
-        /* SMP code points must not enter the BMP font index lookup. */
+        /* SMP code points must not enter the font index lookup. Consume the
+         * complete sequence even when its color resource is unavailable. */
+        *p_uni_i += sequence.sequence_len - 1;
         return true;
     }
 
@@ -858,9 +859,11 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint32_t chr_i = 0;
 
     /* Build typography context once per text widget (V3 vs V1 detection) */
+    int16_t emoji_baseline_px = 0;
 #if ENABLE_FONT_V3_TYPO
     gui_font_typo_context_t typo_ctx = gui_font_bmp_get_typo_context(font, text->font_height);
     int16_t chr_h;
+    emoji_baseline_px = typo_ctx.baseline_px;
 
     if (typo_ctx.is_v3)
     {
@@ -909,8 +912,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].char_w = 0;
                     chr[chr_i].char_h = 0;
                 }
-                else if (try_handle_emoji(&chr[chr_i], text, font,
-                                          unicode_buf, &uni_i, unicode_len))
+                else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                 unicode_buf, &uni_i, unicode_len))
                 {
                     /* Emoji handled; uni_i may be advanced for a sequence. */
                 }
@@ -1023,8 +1026,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_w = 0;
                         chr[chr_i].char_h = 0;
                     }
-                    else if (try_handle_emoji(&chr[chr_i], text, font,
-                                              unicode_buf, &uni_i, unicode_len))
+                    else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                     unicode_buf, &uni_i, unicode_len))
                     {
                         /* Emoji handled; uni_i may be advanced for a sequence. */
                     }
@@ -1149,8 +1152,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].char_w = 0;
                     chr[chr_i].char_h = 0;
                 }
-                else if (try_handle_emoji(&chr[chr_i], text, font,
-                                          unicode_buf, &uni_i, unicode_len))
+                else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                 unicode_buf, &uni_i, unicode_len))
                 {
                     /* Emoji handled; uni_i may be advanced for a sequence. */
                 }
@@ -1216,8 +1219,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_h = text->font_height / 4;
                     }
 #endif
-                    else if (try_handle_emoji(&chr[chr_i], text, font,
-                                              unicode_buf, &uni_i, unicode_len))
+                    else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                     unicode_buf, &uni_i, unicode_len))
                     {
                         /* Emoji handled; uni_i may be advanced for a sequence. */
                     }
