@@ -42,9 +42,88 @@ static void argb8565_2_rgb565_1d_src_over(draw_img_t *image, gui_dispdev_t *dc, 
 
 }
 
+static void argb8565_2_rgb565_1d_src(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_1D(
+            color_argb8565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_1D(
+            color_argb8565_t,
+        {
+            uint16_t src = rgb565_fast_blending(pixel->color.rgb565, 0x0000, opacity_value);
+            writebuf[write_offset] = rgb565_fast_blending(src, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+}
+
+static void argb8565_2_rgb565_2d_src(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_2D(
+            color_argb8565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_2D(
+            color_argb8565_t,
+        {
+            uint16_t src = rgb565_fast_blending(pixel->color.rgb565, 0x0000, opacity_value);
+            writebuf[write_offset] = rgb565_fast_blending(src, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+}
+
+static void argb8565_2_rgb565_3d_src(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_argb8565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_argb8565_t,
+        {
+            uint16_t src = rgb565_fast_blending(pixel->color.rgb565, 0x0000, opacity_value);
+            writebuf[write_offset] = rgb565_fast_blending(src, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+}
+
 static void argb8565_2_rgb565_1d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
-    argb8565_2_rgb565_1d_src_over(image, dc, rect);
+    if (image->blend_mode == IMG_SRC_MODE)
+    {
+        argb8565_2_rgb565_1d_src(image, dc, rect);
+    }
+    else
+    {
+        argb8565_2_rgb565_1d_src_over(image, dc, rect);
+    }
 }
 
 static void argb8565_2_rgb565_2d_src_over(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
@@ -103,12 +182,26 @@ static void argb8565_2_rgb565_3d_src_over(draw_img_t *image, gui_dispdev_t *dc, 
 
 static void argb8565_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
-    argb8565_2_rgb565_2d_src_over(image, dc, rect);
+    if (image->blend_mode == IMG_SRC_MODE)
+    {
+        argb8565_2_rgb565_2d_src(image, dc, rect);
+    }
+    else
+    {
+        argb8565_2_rgb565_2d_src_over(image, dc, rect);
+    }
 }
 
 static void argb8565_2_rgb565_3d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
-    argb8565_2_rgb565_3d_src_over(image, dc, rect);
+    if (image->blend_mode == IMG_SRC_MODE)
+    {
+        argb8565_2_rgb565_3d_src(image, dc, rect);
+    }
+    else
+    {
+        argb8565_2_rgb565_3d_src_over(image, dc, rect);
+    }
 }
 
 

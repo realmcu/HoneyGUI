@@ -262,6 +262,17 @@ static void gui_apply_blend_mode(uint8_t *target_red, uint8_t *target_green, uin
             blend_colors(target_blue, source_blue, source_alpha);
             break;
         }
+    case IMG_SRC_MODE:
+        {
+            source_red   = (source_red   * opacity_value) / 255;
+            source_green = (source_green * opacity_value) / 255;
+            source_blue  = (source_blue  * opacity_value) / 255;
+            blend_colors(target_alpha, source_alpha, source_alpha);
+            blend_colors(target_red, source_red, source_alpha);
+            blend_colors(target_green, source_green, source_alpha);
+            blend_colors(target_blue, source_blue, source_alpha);
+            break;
+        }
     default:
         GUI_ASSERT(NULL != NULL); // Ensure an error is noticed
         break;

@@ -269,6 +269,30 @@ static void rgb565_2_rgb565_1d_raster(draw_img_t *image, gui_dispdev_t *dc, gui_
     }
 }
 
+static void rgb565_2_rgb565_1d_src(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_1D(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = pixel->color.rgb565;
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_1D(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, 0x0000, opacity_value);
+        };
+        );
+    }
+}
+
+
 static void rgb565_2_rgb565_1d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (image->blend_mode == IMG_BYPASS_MODE)
@@ -286,6 +310,10 @@ static void rgb565_2_rgb565_1d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
     else if (image->blend_mode == IMG_RASTER_HORIZONTAL || image->blend_mode == IMG_RASTER_VERTICAL)
     {
         rgb565_2_rgb565_1d_raster(image, dc, rect);
+    }
+    else if (image->blend_mode == IMG_SRC_MODE)
+    {
+        rgb565_2_rgb565_1d_src(image, dc, rect);
     }
     else
     {
@@ -461,6 +489,53 @@ static void rgb565_2_rgb565_3d_filter(draw_img_t *image, gui_dispdev_t *dc, gui_
     }
 }
 
+
+static void rgb565_2_rgb565_2d_src(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_2D(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = pixel->color.rgb565;
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_2D(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, 0x0000, opacity_value);
+        };
+        );
+    }
+}
+
+static void rgb565_2_rgb565_3d_src(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = pixel->color.rgb565;
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, 0x0000, opacity_value);
+        };
+        );
+    }
+}
+
 static void rgb565_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (image->blend_mode == IMG_BYPASS_MODE)
@@ -478,6 +553,10 @@ static void rgb565_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
             rgb565_2_rgb565_2d_filter(image, dc, rect);
         }
     }
+    else if (image->blend_mode == IMG_SRC_MODE)
+    {
+        rgb565_2_rgb565_2d_src(image, dc, rect);
+    }
     else
     {
         GUI_ASSERT(NULL);
@@ -493,6 +572,10 @@ static void rgb565_2_rgb565_3d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
     else if (image->blend_mode == IMG_FILTER_BLACK)
     {
         rgb565_2_rgb565_3d_filter(image, dc, rect);
+    }
+    else if (image->blend_mode == IMG_SRC_MODE)
+    {
+        rgb565_2_rgb565_3d_src(image, dc, rect);
     }
     else
     {
