@@ -30,6 +30,7 @@ p {
 }
 .wy-breadcrumbs {
     text-align: left;
+    padding: 24px 24px 0;
 }
 .wy-nav-content a:visited {
     color: #2980b9;
@@ -39,6 +40,15 @@ p {
     text-align: justify;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+/* ===== Fixed breadcrumb navigation ===== */
+.rst-content > div[role="navigation"] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 10;
 }
 .rst-content .line-block {
     margin-bottom: 0;
@@ -66,6 +76,7 @@ p {
     /* ----- left sider ----- */
     .wy-nav-side {
         width: var(--md-left-sider-width);
+        padding-bottom: 0;
     }
     .wy-side-scroll,
     .wy-side-nav-search,
@@ -83,7 +94,7 @@ p {
         max-width: 100%;
         min-width: 500px;
         margin:0;
-        padding: 1.618em 3.2%;
+        padding: 0 3.2% 1.618em;
         background:#fff;
     }
     /* ----- right contents ----- */
@@ -108,16 +119,15 @@ p {
         justify-content: center;
         width: 18px;
         height: 100%;
-        margin-right: -2px;
         position: absolute;
         top: 0px;
         cursor: col-resize;
-        color: #333;
-        background-color: #d0d0d0;
+        border-left: 1px solid #d0d0d0;
+        background-color: #fff;
     }
     /* 左侧导航拖拽组件 */
     .resize-handle-left {
-        right: 1px;
+        right: 0;
     }
     /* 右侧导航拖拽组件 */
     .resize-handle-right {
@@ -152,6 +162,12 @@ p {
     .wy-nav-content-wrap.shift {
         position: initial;
         height: auto;
+    }
+    .wy-nav-content-wrap .wy-nav-content {
+        padding-top: 0;
+    }
+    .rst-content > div[role="navigation"] {
+        background-color: #fcfcfc;
     }
 }
 
@@ -790,6 +806,95 @@ a.no-cursor-link {
 
 /* ====== Render image modal style ====== */
 
+
+/* ====== Render Mermaid Diagram Font ====== */
+/* 统一 mermaid 图文字字体与字号，覆盖 RTD 主题的 Lato 字体栈。
+   同时作用于 SVG <text> 与 htmlLabels 的 foreignObject 两条渲染路径。 */
+.mermaid text,
+.mermaid .nodeLabel,
+.mermaid .edgeLabel,
+.mermaid .label,
+.mermaid span,
+.mermaid foreignObject div {
+    font-family: "Calibri", Arial, sans-serif !important;
+    /* 12pt = 16px，与 RTD 正文字号对齐；!important 为字号的最终决定项，
+       覆盖各图 init 中的 fontSize 设置。 */
+    font-size: 12pt !important;
+}
+/* :align: center 在老版 sphinxcontrib-mermaid 不生效，CSS 兜底让图水平居中 */
+.mermaid {
+    text-align: center;
+}
+.mermaid svg {
+    display: block;
+    margin: 0 auto;
+    /* useMaxWidth:false 让图按原生像素渲染(多图尺寸一致)，但超宽图会横向撑破页宽。
+       这条上限让放得下的图保持原生尺寸、放不下的自动缩到页宽内，既一致又不溢出。 */
+    max-width: 100% !important;
+    height: auto !important;
+}
+/* 箭头小一点：mermaid 没有箭头大小配置项，CSS 把箭头标记缩到 70%。
+   箭尖钉在线尾：End 标记箭尖在右、Start 标记箭尖在左，分别以那一侧为缩放原点。 */
+.mermaid marker path {
+    transform: scale(0.7);
+    transform-box: fill-box;
+    transform-origin: center;
+}
+.mermaid marker[id*="End"] path {
+    transform-origin: right center;
+}
+.mermaid marker[id*="Start"] path {
+    transform-origin: left center;
+}
+/* 子图(subgraph)框：ELK 把子图渲染成 <rect class="subgraph ... node">（不是 dagre 的 .cluster），
+   还给灰色实心底、忽略源码里的 style xx fill:none。这里强制成透明底 + 深钢蓝虚线，
+   对齐公司原图的虚线分组框。.cluster 那几条留给 dagre 兜底。 */
+.mermaid rect.subgraph,
+.mermaid .subgraphs rect,
+.mermaid .cluster rect,
+.mermaid g.cluster > rect {
+    fill: none !important;
+    stroke: #3C6F9D !important;
+    stroke-width: 1px !important;
+    stroke-dasharray: 5 5 !important;
+}
+/* 时序图圆角：mermaid sequence 没有角色框/分节条圆角的配置项，
+   用 CSS 给 <rect class="actor"> 和 <rect class="note">（分节橙条）设 rx/ry
+   （SVG 几何属性，现代浏览器认 CSS 写法），对齐 wiki「框图用圆角矩形」。 */
+.mermaid rect.actor,
+.mermaid .actor-top,
+.mermaid .actor-bottom,
+.mermaid rect.note {
+    rx: 6px !important;
+    ry: 6px !important;
+}
+/* 时序图 alt/loop/opt 分支框：框边线 + 标签框描黑、分支标签加粗，让结构分隔更清楚。
+   仅作用于 loop/alt/opt 关键字渲染出的元素，当前图未用到时无副作用。
+   如需与主题统一，可把 #000000 换成连接线色 #3C6F9D。 */
+.mermaid .loopLine {
+    stroke: #000000 !important;
+}
+.mermaid .labelBox {
+    stroke: #000000 !important;
+}
+.mermaid .labelText,
+.mermaid .labelText tspan,
+.mermaid .loopText,
+.mermaid .loopText tspan {
+    font-weight: bold !important;
+}
+/* 分层架构图取消所有连接线：ELK 渲染器不认 ~~~ 隐形边、也不吃 linkStyle stroke:none，
+   会把本该隐形的布局脚手架边画成实线。这类图本就不要任何可见连线，故给它套专属外层 class
+   （RST 端 .. container:: arch-noline），用 CSS 把这一张图里的所有「边组」整体隐藏。
+   只作用于 .arch-noline 这张，其他流程图的可见箭头完全不受影响；
+   节点框/子图框在 .nodes / .clusters 里、class 不含 "edge"，不会被误伤。 */
+.arch-noline .mermaid .edgePaths,
+.arch-noline .mermaid .edgeLabels,
+.arch-noline .mermaid g.edges,
+.arch-noline .mermaid g[class*="edge"] {
+    display: none !important;
+}
+/* ====== Render Mermaid Diagram Font ====== */
 
 /* ====== Render ai summary style ====== */
 #AISummaryButton {

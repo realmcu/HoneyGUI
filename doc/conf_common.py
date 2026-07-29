@@ -35,6 +35,8 @@ html_context = {
     "is_multitarget": False,
     # 如果是多语言文档，is_multilingual设置为 True
     "is_multilingual": True,
+    "logo_link": os.getenv("Docs_Home_URL", None),
+    "proj_link": os.getenv("Proj_Home_URL", None),
     # 左侧目录栏的拖拽宽度，不同的文档项目使用不同的名称，如：
     # docs.honeycomb.siderbar.width
     # docs.honeygui.siderbar.width

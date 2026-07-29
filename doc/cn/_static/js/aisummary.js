@@ -1,49 +1,37 @@
 /* ================= get curren url info ================ */
 function getRootUrl() {
-    const contentRoot = document.documentElement.getAttribute('data-content_root');
-    const dirMatches = contentRoot.match(/\.\.\//g);
-    const upDirCount = dirMatches ? dirMatches.length : 0;
+    const contentRoot = document.documentElement.getAttribute('data-content_root') ?? './';
+    const upDirCount = (contentRoot.match(/\.\.\//g) ?? []).length;
 
-    // create URL Obiect
     const urlObj = new URL(window.location.href);
-    // get url path not include protocol, host, anchor and query params
-    let urlPaths = urlObj.pathname.split('/');
-
-    // delete empty string and doc name
-    if (urlPaths[urlPaths.length - 1] === '' || urlPaths[urlPaths.length - 1].includes('.')) {
-        urlPaths.pop();
+    const segments = urlObj.pathname.split('/');
+    if (segments.at(-1) === '' || segments.at(-1).includes('.')) {
+        segments.pop();
     }
-    // folder back off
-    urlPaths = urlPaths.slice(0, urlPaths.length - upDirCount);
-    // root path
-    let rootPath = urlPaths.join('/') + '/';
-    // create root url
-    const rootUrl = `${urlObj.origin}${rootPath}`;
-    return rootUrl;
+
+    // back upDirCount levels
+    const rootPath = segments.slice(0, segments.length - upDirCount).join('/') + '/';
+
+    return `${urlObj.origin}${rootPath}`;
 }
-
 function getAISummaryFile() {
-    // create URL Obiect
-    const urlObj = new URL(window.location.href);
-    // get url path not include protocol, host, anchor and query params
-    const urlPath = urlObj.pathname;
+    const { origin, pathname } = new URL(window.location.href);
 
-    // get root path index
-    const rootUrlPart = getRootUrl().slice(-15);
-    const rootIndex = urlPath.indexOf(rootUrlPart);
+    const rootUrl = getRootUrl();
+    const rootPath = new URL(rootUrl).pathname;
 
+    const rootIndex = pathname.indexOf(rootPath);
     if (rootIndex === -1) {
         return null;
     }
 
-    // 生成新的路径：在指定字符串之后插入新字符串
-    const beforeRoot = urlPath.slice(0, rootIndex + rootUrlPart.length);
-    const afterRoot = urlPath.slice(rootIndex + rootUrlPart.length);
-    const targetPath = beforeRoot + "ai_summary/" + afterRoot;
+    // build ai_summary folder
+    const splitIndex = rootIndex + rootPath.length;
+    const beforeRoot = pathname.slice(0, splitIndex);
+    const afterRoot  = pathname.slice(splitIndex);
+    const targetPath = `${beforeRoot}ai_summary/${afterRoot}`;
 
-    // 构建完整的新 URL
-    const targetUrl = (urlObj.origin + targetPath).replace(/\.html$/, '.txt');
-    return targetUrl;
+    return `${origin}${targetPath}`.replace(/\.html$/, '.txt');
 }
 
 /* ============== init ai summary component ============== */

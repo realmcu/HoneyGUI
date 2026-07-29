@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
     script.src = "https://widget.kapa.ai/kapa-widget.bundle.js";
     script.setAttribute("data-website-id", "0772149c-78b9-46aa-99c5-9db5f483c398");
     script.setAttribute("data-source-group-ids-include", "9f0877a0-77ad-4dd3-8bb0-d2637fffdfa9");
+    script.setAttribute("data-customization-id", "f6076ed3-8d7f-4e6a-a4a7-2f7a0ddfae63");
     script.setAttribute("data-project-name", "RealMCU AI");
     script.setAttribute("data-bot-protection-mechanism", "hcaptcha");
     script.setAttribute("data-project-color", "#1464FF");
