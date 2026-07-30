@@ -2065,14 +2065,14 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t render_
     const int x_start = _UI_MAX3(chr->x, rect->xboundleft, dc->section.x1);
     const int x_end = _UI_MIN3(
                           chr->x + chr->char_w - 1,
-                          rect->xboundright ? rect->xboundright : dc->section.x2,
+                          rect->xboundright,
                           dc->section.x2
                       );
 
     const int y_start = _UI_MAX3(chr->y + chr->char_y, rect->yboundtop, dc->section.y1);
     const int y_end = _UI_MIN3(
                           chr->y + chr->char_y + chr->char_h - 1,
-                          rect->yboundbottom ? rect->yboundbottom : dc->section.y2,
+                          rect->yboundbottom,
                           dc->section.y2
                       );
     if (x_start > x_end || y_start > y_end) { return; }

@@ -407,10 +407,10 @@ static bool rtk_draw_unicode_matrix_by_img(mem_char_t *chr, gui_color_t color, u
     const int font_y2 = chr->y + chr->char_y + chr->char_h - 1;
 
     const int x_start = _UI_MAX3(font_x1, rect->xboundleft, 0);
-    const int x_end = rect->xboundright ? _UI_MIN(font_x2, rect->xboundright) : font_x2;
+    const int x_end = _UI_MIN(font_x2, rect->xboundright);
 
     const int y_start = _UI_MAX3(font_y1, rect->yboundtop, 0);
-    const int y_end = rect->yboundbottom ? _UI_MIN(font_y2, rect->yboundbottom) : font_y2;
+    const int y_end = _UI_MIN(font_y2, rect->yboundbottom);
 
     if (x_start >= x_end || y_start >= y_end) { return false; }
 
