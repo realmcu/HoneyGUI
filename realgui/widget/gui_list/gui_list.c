@@ -352,8 +352,7 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         g_Limit = true;
         return;
     }
-
-    if (!tp->pressing)
+    if (!(tp->pressing || tp->released))
     {
         gui_list_inertia_motion(obj);
     }

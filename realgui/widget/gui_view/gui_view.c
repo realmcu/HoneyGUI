@@ -39,6 +39,8 @@ static bool g_TriggerMove = false; // whether trigger move event
 static int16_t g_Offset = 0; // offset of the g_Release
 
 static bool g_SwitchDone = false;
+static bool g_AutoMove = false; // whether auto moveMove
+static bool g_MoveStyle = false; // true: move by scroll continuously, false: move by trigger once
 
 static uint32_t g_SnapShotCacheTime = 0;
 bool g_SnapShotCacheNeedUpdate = true; // when switch done, don't update g_CurrentView's snapshot
@@ -147,6 +149,7 @@ static void gui_view_switch_done(void *obj)
     {
         gui_set_bg_color(g_CurrentView->bg_color);
     }
+    g_AutoMove = false;
     g_SwitchDone = true;
     g_Release = 0;
     g_Target = 0;
@@ -158,43 +161,6 @@ static void gui_view_switch_done(void *obj)
     gui_obj_delete_timer(obj);
 
     // gui_log("current view name = %s\n", g_CurrentView->base.name);
-}
-
-/*============================================================================*
- *         next is the private function for on obj timer cb
- *============================================================================*/
-static void gui_view_released_view_timer_cb(void *obj)
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_UNUSED(tp);
-    // gui_log("released in view timer cb, g_Release = %d!\n", g_Release);
-
-    if (g_Release != g_Target)
-    {
-        const float factor = 0.4f;
-        int16_t distance = g_Target - g_Release;
-        int delta = (int16_t)(distance * factor); //exponential decay
-        if (delta == 0)
-        {
-            delta = (distance > 0) ? 1 : -1;
-        }
-        g_Release += delta;
-    }
-    else
-    {
-        gui_view_switch_done(obj);
-    }
-}
-
-static void gui_view_animate_timer_cb(void *obj)
-{
-    gui_view_t *_this = (gui_view_t *)obj;
-
-    g_Release += _this->animate_step;
-    if (g_Release >= g_Target)
-    {
-        gui_view_switch_done(obj);
-    }
 }
 
 /*============================================================================*
@@ -261,16 +227,8 @@ static void gui_view_released_cb(void *obj, gui_event_t *e)
     // gui_log("g_Target = %d\n", g_Target);
     g_Offset = 0;
     g_TriggerMove = false;
-
-    if (g_Release == 0 && g_Target == 0)
-    {
-        gui_view_released_view_timer_cb(obj);
-    }
-    else
-    {
-        gui_obj_create_timer(o, 10, true, gui_view_released_view_timer_cb);
-        gui_obj_start_timer(o);
-    }
+    g_AutoMove = true;
+    g_MoveStyle = true;
 }
 
 static void gui_view_pressing_cb(void *obj, gui_event_t *e)
@@ -411,14 +369,13 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
         g_PreView = NULL;
     }
 
-    gui_obj_create_timer(obj, 10, true, gui_view_animate_timer_cb);
-    gui_obj_start_timer(obj);
-
     g_Release = g_CurrentView->animate_step; //prevent new view abnormal display of the first frame
     g_Target = obj->h;
 
     g_SurpressEvent = true;
     g_SurpressTP = true;
+    g_AutoMove = true;
+    g_MoveStyle = false;
     g_SnapShotCacheTime = gui_ms_get();
 
     if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR ||
@@ -500,6 +457,36 @@ static void gui_view_prepare(gui_obj_t *obj)
             gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, "touch");
             gui_obj_enable_event(obj, GUI_EVENT_TOUCH_UP_SLIDE_QUICK, "touch");
             gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
+        }
+
+        if (g_AutoMove)
+        {
+            if (g_MoveStyle)
+            {
+                if (g_Release != g_Target)
+                {
+                    const float factor = 0.4f;
+                    int16_t distance = g_Target - g_Release;
+                    int delta = (int16_t)(distance * factor); //exponential decay
+                    if (delta == 0)
+                    {
+                        delta = (distance > 0) ? 1 : -1;
+                    }
+                    g_Release += delta;
+                }
+                else
+                {
+                    gui_view_switch_done(obj);
+                }
+            }
+            else
+            {
+                g_Release += _this->animate_step;
+                if (g_Release >= g_Target)
+                {
+                    gui_view_switch_done(obj);
+                }
+            }
         }
 
         if (!g_SurpressTP)
