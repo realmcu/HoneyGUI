@@ -48,6 +48,11 @@ static void gui_lite3d_draw(gui_obj_t *obj)
 
     l3_set_target_canvas(this->model, dc->section.x1, dc->section.y1,
                          dc->fb_width, dc->fb_height, 16/*LITE_RGB565*/, dc->frame_buf);
+
+    if (this->cache_need_clean)
+    {
+        dc->cache_need_clean = true;
+    }
     l3_draw(this->model);
 
 }
@@ -148,5 +153,11 @@ gui_lite3d_t *gui_lite3d_create(void                  *parent,
 void gui_lite3d_on_click(gui_lite3d_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
+}
+
+void gui_lite3d_set_cache_clean(gui_lite3d_t *this, bool need_clean)
+{
+    GUI_ASSERT(this != NULL);
+    this->cache_need_clean = need_clean;
 }
 

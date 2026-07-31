@@ -32,6 +32,8 @@ typedef struct gui_lite3d
 
     l3_model_base_t *model;
 
+    bool cache_need_clean;
+
 } gui_lite3d_t;
 
 /*============================================================================*
@@ -78,6 +80,14 @@ gui_lite3d_t *gui_lite3d_create(void                  *parent,
  * @param parameter Parameter.
  */
 void gui_lite3d_on_click(gui_lite3d_t *this, void *callback, void *parameter);
+
+/**
+ * @brief Set whether this Lite3D model needs a D-cache clean before each PPE blit.
+ *
+ * @param this Widget object pointer.
+ * @param need_clean true if this model's data lives in PSRAM and needs a clean.
+ */
+void gui_lite3d_set_cache_clean(gui_lite3d_t *this, bool need_clean);
 
 #ifdef __cplusplus
 }
