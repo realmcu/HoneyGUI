@@ -107,25 +107,25 @@ jobs:
           retention-days: 90
 
   trigger-design-ci:
-    name: Trigger honeygui-design CI
+    name: Trigger HoneyDesigner CI
     needs: [build-gcc-lib]
     runs-on: ubuntu-22.04
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
-      - name: Repository Dispatch to honeygui-design
+      - name: Repository Dispatch to HoneyDesigner
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           curl -s -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GH_TOKEN" \
-            https://api.github.com/repos/realmcu/honeygui-design/dispatches \
+            https://api.github.com/repos/realmcu/HoneyDesigner/dispatches \
             -d '{
-              "event_type": "hgui-libs-updated",
+              "event_type": "honeygui-sdk-updated",
               "client_payload": {
                 "sha": "${{ github.sha }}",
                 "run_id": "${{ github.run_id }}",
                 "ref": "master"
               }
             }'
-          echo "Successfully triggered honeygui-design CI with event: hgui-libs-updated"
+          echo "Successfully triggered HoneyDesigner CI with event: honeygui-sdk-updated"
