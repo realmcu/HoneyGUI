@@ -302,15 +302,19 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     dr->yboundbottom = dr->y2;
 
     /* Compute scroll index */
+    uint32_t elapsed_total = text->cur_time_ms - text->init_time_ms;
+    uint32_t eff = (elapsed_total < text->start_delay_ms)
+                   ? 0
+                   : (elapsed_total - text->start_delay_ms);
     if (text->scroll_pause_ms > 0)
     {
         uint32_t cycle = text->interval_time_ms + text->scroll_pause_ms;
-        uint32_t elapsed = (text->cur_time_ms - text->init_time_ms) % cycle;
+        uint32_t elapsed = eff % cycle;
         index = (elapsed < text->interval_time_ms) ? elapsed : 0;
     }
     else
     {
-        index = (text->cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+        index = eff % text->interval_time_ms;
     }
 
     /* Font load: expand bounds so layout includes all characters for scrolling */
@@ -489,7 +493,8 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     }
 
     bool in_duration = (text->duration_time_ms == 0 ||
-                        text->cur_time_ms < (text->init_time_ms + text->duration_time_ms));
+                        text->cur_time_ms < (text->init_time_ms + text->start_delay_ms +
+                                             text->duration_time_ms));
 
     if (in_duration && gui_text_scope_rect_hit(&draw_rect, &dc->section))
     {
@@ -679,6 +684,11 @@ void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint16_t ga
 void gui_scroll_text_scroll_pause_set(gui_scroll_text_t *_this, uint16_t pause_ms)
 {
     _this->scroll_pause_ms = pause_ms;
+}
+
+void gui_scroll_text_start_delay_set(gui_scroll_text_t *_this, uint32_t delay_ms)
+{
+    _this->start_delay_ms = delay_ms;
 }
 
 

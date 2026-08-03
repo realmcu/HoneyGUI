@@ -32,6 +32,7 @@ typedef struct gui_scroll_text
     uint32_t init_time_ms;
     uint32_t cur_time_ms;
     uint32_t duration_time_ms;
+    uint32_t start_delay_ms;
     gui_text_rect_t draw_rect;
     uint16_t start_value;
     uint16_t end_value;
@@ -221,6 +222,17 @@ void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint16_t ga
  * @param pause_ms pause duration in milliseconds, 0 means no pause
  */
 void gui_scroll_text_scroll_pause_set(gui_scroll_text_t *_this, uint16_t pause_ms);
+
+/**
+ * @brief Set a start delay before scrolling begins.
+ * @note After creation/reset, the text stays still at its start position for
+ *       delay_ms, then begins scrolling from the beginning. The delay is
+ *       re-applied on every reset()/start(). Default is 0 (no delay).
+ *
+ * @param _this the scroll text widget pointer
+ * @param delay_ms delay in milliseconds before scrolling starts
+ */
+void gui_scroll_text_start_delay_set(gui_scroll_text_t *_this, uint32_t delay_ms);
 
 #ifdef __cplusplus
 }
