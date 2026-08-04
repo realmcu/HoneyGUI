@@ -768,7 +768,11 @@ gui_view_t *gui_view_create(void       *parent,
     }
 
     *descriptor->pView = _this;
-    if (*descriptor->snapshot_data == NULL)
+
+    bool has_snapshot = descriptor->use_snapshot
+                        && descriptor->snapshot_data != NULL
+                        && *descriptor->snapshot_data != NULL;
+    if (!has_snapshot)
     {
         descriptor->on_switch_in(_this);
         gui_log("create %s\n", GET_BASE(_this)->name);
