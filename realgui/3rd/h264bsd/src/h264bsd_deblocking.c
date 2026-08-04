@@ -752,7 +752,7 @@ void FilterVerLumaEdge(
                                        vsubq_s32(vaddq_s32(p2v, pq_half), vshlq_n_s32(p1v, 1)), 1);
                     int32x4_t p1_new = vaddq_s32(p1v,
                                                  vminq_s32(vmaxq_s32(v2, vnegq_s32(tc_v)), tc_v));
-                    vstrbq_scatter_offset_p_s32(data - 2, row_off, p1_new, p2_mask);
+                    vstrbq_scatter_offset_p_u32(data - 2, row_off, vreinterpretq_u32_s32(p1_new), p2_mask);
                 }
 
                 if (q2_mask)
@@ -761,7 +761,7 @@ void FilterVerLumaEdge(
                                        vsubq_s32(vaddq_s32(q2v, pq_half), vshlq_n_s32(q1v, 1)), 1);
                     int32x4_t q1_new = vaddq_s32(q1v,
                                                  vminq_s32(vmaxq_s32(v3, vnegq_s32(tc_v)), tc_v));
-                    vstrbq_scatter_offset_p_s32(data + 1, row_off, q1_new, q2_mask);
+                    vstrbq_scatter_offset_p_u32(data + 1, row_off, vreinterpretq_u32_s32(q1_new), q2_mask);
                 }
 
                 int32x4_t mval = vshrq_n_s32(vaddq_n_s32(
@@ -773,8 +773,8 @@ void FilterVerLumaEdge(
                                                  vaddq_s32(p0v, delta), vdupq_n_s32(0)), vdupq_n_s32(255));
                 int32x4_t q0_new = vminq_s32(vmaxq_s32(
                                                  vsubq_s32(q0v, delta), vdupq_n_s32(0)), vdupq_n_s32(255));
-                vstrbq_scatter_offset_p_s32(data - 1, row_off, p0_new, main_mask);
-                vstrbq_scatter_offset_p_s32(data,     row_off, q0_new, main_mask);
+                vstrbq_scatter_offset_p_u32(data - 1, row_off, vreinterpretq_u32_s32(p0_new), main_mask);
+                vstrbq_scatter_offset_p_u32(data,     row_off, vreinterpretq_u32_s32(q0_new), main_mask);
             }
         }
         else
@@ -812,30 +812,30 @@ void FilterVerLumaEdge(
                 int32x4_t p0_weak = vshrq_n_s32(vaddq_n_s32(
                                                     vaddq_s32(vaddq_s32(vshlq_n_s32(p1v, 1), p0v), q1v), 2), 2);
                 int32x4_t p0_new = vpselq_s32(p0_strong, p0_weak, p_strong);
-                vstrbq_scatter_offset_p_s32(data - 1, row_off, p0_new, main_mask);
+                vstrbq_scatter_offset_p_u32(data - 1, row_off, vreinterpretq_u32_s32(p0_new), main_mask);
 
                 int32x4_t p1_new = vshrq_n_s32(
                                        vaddq_n_s32(vaddq_s32(p2v, tmp_p), 2), 2);
-                vstrbq_scatter_offset_p_s32(data - 2, row_off, p1_new, p_strong);
+                vstrbq_scatter_offset_p_u32(data - 2, row_off, vreinterpretq_u32_s32(p1_new), p_strong);
 
                 int32x4_t p2_new = vshrq_n_s32(vaddq_n_s32(
                                                    vaddq_s32(vshlq_n_s32(p3v, 1), vmlaq_n_s32(tmp_p, p2v, 3)), 4), 3);
-                vstrbq_scatter_offset_p_s32(data - 3, row_off, p2_new, p_strong);
+                vstrbq_scatter_offset_p_u32(data - 3, row_off, vreinterpretq_u32_s32(p2_new), p_strong);
 
                 int32x4_t q0_strong = vshrq_n_s32(vaddq_n_s32(
                                                       vaddq_s32(vaddq_s32(p1v, vshlq_n_s32(tmp_q, 1)), q2v), 4), 3);
                 int32x4_t q0_weak = vshrq_n_s32(vaddq_n_s32(
                                                     vaddq_s32(vaddq_s32(vshlq_n_s32(q1v, 1), q0v), p1v), 2), 2);
                 int32x4_t q0_new = vpselq_s32(q0_strong, q0_weak, q_strong);
-                vstrbq_scatter_offset_p_s32(data, row_off, q0_new, main_mask);
+                vstrbq_scatter_offset_p_u32(data, row_off, vreinterpretq_u32_s32(q0_new), main_mask);
 
                 int32x4_t q1_new = vshrq_n_s32(
                                        vaddq_n_s32(vaddq_s32(q2v, tmp_q), 2), 2);
-                vstrbq_scatter_offset_p_s32(data + 1, row_off, q1_new, q_strong);
+                vstrbq_scatter_offset_p_u32(data + 1, row_off, vreinterpretq_u32_s32(q1_new), q_strong);
 
                 int32x4_t q2_new = vshrq_n_s32(vaddq_n_s32(
                                                    vaddq_s32(vshlq_n_s32(q3v, 1), vmlaq_n_s32(tmp_q, q2v, 3)), 4), 3);
-                vstrbq_scatter_offset_p_s32(data + 2, row_off, q2_new, q_strong);
+                vstrbq_scatter_offset_p_u32(data + 2, row_off, vreinterpretq_u32_s32(q2_new), q_strong);
             }
         }
         return;
