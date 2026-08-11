@@ -28,6 +28,23 @@ typedef struct line
     float dxy;
 } LINE_T;
 
+/* Raster geometry of one glyph: whole-pixel bitmap box plus the sub-pixel
+ * remainder fed to the rasterizer. out_x0/out_y0 live in whatever space the
+ * caller passed to ttf_split_placement() -- relative to chr.x/chr.y on the
+ * identity/translate path, absolute device pixels on the matrix path (where the
+ * pen offset is already folded into the transformed bbox). */
+typedef struct
+{
+    int out_x0;     /* bitmap left, in the caller's space (see above) */
+    int out_y0;     /* bitmap top, in the caller's space (see above) */
+    int out_w;      /* bitmap width in pixels */
+    int out_h;      /* bitmap height in pixels */
+    int render_w;   /* raster width in sub-samples */
+    int render_h;   /* raster height in sub-samples */
+    float sub_x;    /* sub-pixel remainder of the glyph origin, in sub-samples */
+    float sub_y;
+} ttf_raster_geo_t;
+
 
 /*============================================================================*
  *                           Constants
@@ -85,6 +102,9 @@ static const uint8_t lookup_table_4b[16] =
 #define ALIGN_TO(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
 #define ROUNDING_OFFSET 0.5f
 
+/* Bits per word of the XOR scanline buffer; render_w must be a multiple of it. */
+#define FONT_TTF_BLOCK_BIT 32
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -134,40 +154,6 @@ static void transformPoint(float x, float y, float m[3][3], float *x_out, float 
     *y_out = m[1][0] * x + m[1][1] * y + m[1][2];
 }
 
-static void computeBoundingBoxInt(int x0, int y0, int x1, int y1, float m[3][3],
-                                  TransformCase caseX, TransformCase caseY, int *xmin, int *xmax, int *ymin, int *ymax)
-{
-    float x_min, x_max, y_min, y_max;
-    float temp_x, temp_y;
-
-    if (caseX == POS_POS || caseX == POS_NEG)
-    {
-        transformPoint(x0, (caseX == POS_POS ? y0 : y1), m, &x_min, &temp_y);
-        transformPoint(x1, (caseX == POS_POS ? y1 : y0), m, &x_max, &temp_y);
-    }
-    else
-    {
-        transformPoint(x1, (caseX == NEG_POS ? y0 : y1), m, &x_min, &temp_y);
-        transformPoint(x0, (caseX == NEG_POS ? y1 : y0), m, &x_max, &temp_y);
-    }
-
-    if (caseY == POS_POS || caseY == POS_NEG)
-    {
-        transformPoint((caseY == POS_POS ? x0 : x1), y0, m, &temp_x, &y_min);
-        transformPoint((caseY == POS_POS ? x1 : x0), y1, m, &temp_x, &y_max);
-    }
-    else
-    {
-        transformPoint((caseY == NEG_POS ? x1 : x0), y0, m, &temp_x, &y_min);
-        transformPoint((caseY == NEG_POS ? x0 : x1), y1, m, &temp_x, &y_max);
-    }
-
-    *xmin = (int)x_min;
-    *xmax = (int)x_max;
-    *ymin = (int)y_min;
-    *ymax = (int)y_max;
-}
-
 static void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, float m[3][3],
                                     TransformCase caseX, TransformCase caseY, float *xmin, float *xmax, float *ymin, float *ymax)
 {
@@ -184,15 +170,18 @@ static void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, floa
         transformPoint(x0, (caseX == NEG_POS ? y1 : y0), m, xmax, &temp_y);
     }
 
-    if (caseY == POS_POS || caseY == POS_NEG)
+    /* caseY encodes (sign m[1][0], sign m[1][1]), so the y extreme is selected by
+     * m[1][1] and the x corner by m[1][0]. Grouping by m[1][1] used to be wrong
+     * for POS_NEG/NEG_NEG (vertical mirror, 180 deg), which swapped ymin/ymax. */
+    if (caseY == POS_POS || caseY == NEG_POS)
     {
         transformPoint((caseY == POS_POS ? x0 : x1), y0, m, &temp_x, ymin);
         transformPoint((caseY == POS_POS ? x1 : x0), y1, m, &temp_x, ymax);
     }
     else
     {
-        transformPoint((caseY == NEG_POS ? x1 : x0), y0, m, &temp_x, ymin);
-        transformPoint((caseY == NEG_POS ? x0 : x1), y1, m, &temp_x, ymax);
+        transformPoint((caseY == POS_NEG ? x0 : x1), y1, m, &temp_x, ymin);
+        transformPoint((caseY == POS_NEG ? x1 : x0), y0, m, &temp_x, ymax);
     }
 }
 
@@ -242,6 +231,101 @@ void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
         line->dxy = (p2.x - p1.x) / (p2.y - p1.y);
         line->x0 = p2.x - line->dxy * line->y0;
     }
+}
+
+/**
+ * @brief V3 bearing back-out from chr.x/chr.y to the pen origin, in pixels.
+ *
+ * V3 lays out chr.x/chr.y as the glyph bbox top-left with the rounded bearing
+ * applied, while the glyph-space formulas below re-apply it through gd->x0/y0 --
+ * every placement path has to cancel it exactly once. V1 keeps chr.x/chr.y at
+ * the line box top-left and needs no correction.
+ */
+static void ttf_calc_bearing_backout(const mem_char_t *chr, bool is_v3,
+                                     float *back_x, float *back_y)
+{
+#if ENABLE_FONT_V3_TYPO
+    if (is_v3)
+    {
+        *back_x = -chr->bearing_x;
+        *back_y = chr->bearing_y;
+        return;
+    }
+#else
+    (void)chr;
+    (void)is_v3;
+#endif
+    *back_x = 0.0f;
+    *back_y = 0.0f;
+}
+
+/**
+ * @brief Exact glyph bbox top-left in pixels, relative to chr.x / chr.y.
+ *
+ * The result keeps its fractional part on purpose: ttf_calc_raster_geometry()
+ * splits it into a whole-pixel bitmap position plus a sub-pixel offset that is
+ * fed to the rasterizer. Under V3 the caller passes ascent == 0, so what is left
+ * here is just the bearing rounding remainder.
+ */
+static void ttf_calc_glyph_origin(const FontGlyphData *gd, const mem_char_t *chr,
+                                  float scale, short ascent, bool is_v3,
+                                  float *origin_x, float *origin_y)
+{
+    float back_x, back_y;
+    ttf_calc_bearing_backout(chr, is_v3, &back_x, &back_y);
+
+    *origin_x = scale * gd->x0 + back_x;
+    *origin_y = scale * (ascent + gd->y0) + back_y;
+}
+
+/**
+ * @brief Split an exact bitmap placement into whole-pixel origin + sub-pixel remainder.
+ *
+ * The origin is floored to the pixel grid and the remainder is returned in
+ * sub_x/sub_y, so the outline is sampled on the shared target pixel grid.
+ * Rounding the origin per glyph instead (the previous behaviour) snapped every
+ * glyph to its own nearest pixel, which showed up as +-1px jitter between
+ * neighbouring glyphs.
+ *
+ * @param origin_x/y Exact bitmap top-left, in pixels, bold dilation included.
+ * @param span_x/y   Exact bitmap extent, in pixels, bold dilation included.
+ */
+static void ttf_split_placement(float origin_x, float origin_y, float span_x, float span_y,
+                                uint8_t raster_prec, ttf_raster_geo_t *geo)
+{
+    /* A negative span would make render_w/render_h negative and turn the
+     * render_size / out_size products into huge unsigned values downstream. */
+    if (span_x < 0) { span_x = 0; }
+    if (span_y < 0) { span_y = 0; }
+
+    geo->out_x0 = (int)floorf(origin_x);
+    geo->out_y0 = (int)floorf(origin_y);
+    geo->sub_x = (origin_x - geo->out_x0) * raster_prec;
+    geo->sub_y = (origin_y - geo->out_y0) * raster_prec;
+
+    /* sub_x/sub_y shift the outline, so they consume real raster width/height and
+     * must stay in the size; +2 sub-samples on top is the historical rounding
+     * margin. makeImageBuffer() needs render_h to be a multiple of raster_prec,
+     * and the XOR fill needs render_w to be a multiple of FONT_TTF_BLOCK_BIT. */
+    geo->render_h = ALIGN_TO((int)(geo->sub_y + span_y * raster_prec + 2), raster_prec);
+    geo->out_h = geo->render_h / raster_prec;
+    geo->render_w = ALIGN_TO((int)(geo->sub_x + span_x * raster_prec + 2), raster_prec);
+    geo->render_w = ALIGN_TO(geo->render_w, FONT_TTF_BLOCK_BIT);
+    geo->out_w = geo->render_w / raster_prec;
+}
+
+/**
+ * @brief Raster geometry for the identity/translate path, where the glyph bbox
+ *        needs no matrix and the origin is relative to chr.x / chr.y.
+ */
+static void ttf_calc_raster_geometry(const FontGlyphData *gd, float scale, uint8_t raster_prec,
+                                     uint8_t bold_weight, float origin_x, float origin_y,
+                                     ttf_raster_geo_t *geo)
+{
+    ttf_split_placement(origin_x - bold_weight, origin_y - bold_weight,
+                        scale * (gd->x1 - gd->x0) + bold_weight * 2,
+                        scale * (gd->y1 - gd->y0) + bold_weight * 2,
+                        raster_prec, geo);
 }
 
 /**
@@ -1131,7 +1215,7 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
 
                 if (alloc_index) { gui_free(alloc_index); }
                 if (need_free) { gui_free(ttfbin); }
-                // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d)\n",
+                // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d, MEMADDR)\n",
                 //         unicode, skip_file, best->font_file, best->priority);
                 return 0;
             }
@@ -1185,7 +1269,7 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                             gui_free(glyphData);
                             if (alloc_index) { gui_free(alloc_index); }
                             if (need_free) { gui_free(ttfbin); }
-                            // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d)\n",
+                            // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d, FTL)\n",
                             //         unicode, skip_file, best->font_file, best->priority);
                             return 0;
                         }
@@ -1251,7 +1335,7 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                                 gui_vfs_close(file);
                                 if (alloc_index) { gui_free(alloc_index); }
                                 if (need_free) { gui_free(ttfbin); }
-                                // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d)\n",
+                                // gui_log("[TTF fallback] U+%04X: primary=%p -> fallback=%p (prio=%d, FILESYS)\n",
                                 //         unicode, skip_file, best->font_file, best->priority);
                                 return 0;
                             }
@@ -1790,6 +1874,8 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 }
                 else
                 {
+                    // gui_log("[TTF fallback] U+%04X: not found in primary=%p or any fallback\n",
+                    //         unicode_buf[uni_i], text->path);
                     continue;
                 }
             }
@@ -2127,6 +2213,12 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
     uint8_t raster_prec = 1 << text->rendermode;
 
+#if ENABLE_FONT_V3_TYPO
+    const bool is_v3 = typo_ctx.is_v3;
+#else
+    const bool is_v3 = false;
+#endif
+
     gui_dispdev_t *dc = gui_get_dc();
 
     gui_matrix_t *tm = text->base.matrix;
@@ -2173,36 +2265,15 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                  * fields). chr[].x/y are re-laid out each frame, so translation
                  * follows for free -- the cached bitmap is position-independent. */
                 FontGlyphData *gd = (FontGlyphData *)chr[index].dot_addr;
-                float rscale = scale * raster_prec;
-                int   bw     = text->bold_weight;
-                int   bex    = bw * raster_prec;
-                float gx0c = rscale * gd->x0;
-                float gy0c = rscale * gd->y0;
-                float gx1c = rscale * gd->x1;
-                float gy1c = rscale * gd->y1;
-                int rw_c = ALIGN_TO((int)(gx1c - gx0c + 1 + bex * 2 + 1), raster_prec);
-                int rh_c = ALIGN_TO((int)(gy1c - gy0c + 1 + bex * 2 + 1), raster_prec);
-                rw_c = ALIGN_TO(rw_c, 32);
-                int ow_c = rw_c / raster_prec;
-                int oh_c = ALIGN_TO((int)(gy1c - gy0c + 1 + bex * 2 + 1), raster_prec) / raster_prec;
-                int ox0_c, oy0_c;
-#if ENABLE_FONT_V3_TYPO
-                if (typo_ctx.is_v3)
-                {
-                    ox0_c = (int)(ROUNDING_OFFSET) - bw;
-                    oy0_c = (int)(ROUNDING_OFFSET) - bw;
-                }
-                else
-#endif
-                {
-                    ox0_c = (int)(gx0c / raster_prec + ROUNDING_OFFSET) - bw;
-                    oy0_c = (int)(gy0c / raster_prec + ascent * scale + ROUNDING_OFFSET) - bw;
-                }
-                (void)rh_c;
+                float origin_x, origin_y;
+                ttf_raster_geo_t geo;
+                ttf_calc_glyph_origin(gd, &chr[index], scale, ascent, is_v3, &origin_x, &origin_y);
+                ttf_calc_raster_geometry(gd, scale, raster_prec, text->bold_weight,
+                                         origin_x, origin_y, &geo);
                 font_ttf_draw_bitmap_classic(text, chr[index].buf, rect,
-                                             chr[index].x + ox0_c,
-                                             chr[index].y + oy0_c,
-                                             ow_c, oh_c);
+                                             chr[index].x + geo.out_x0,
+                                             chr[index].y + geo.out_y0,
+                                             geo.out_w, geo.out_h);
                 continue;
             }
             if (dc->type == DC_RAMLESS && !prev_static)
@@ -2253,16 +2324,10 @@ ttf_rasterize:
         float glyph_y0 = 0;
         float glyph_x1 = 0;
         float glyph_y1 = 0;
-        float glyph_w = 0;
-        float glyph_h = 0;
-
         float glyph_x0m = 0;
         float glyph_y0m = 0;
         float glyph_x1m = 0;
         float glyph_y1m = 0;
-
-        int mx_offset = 0;
-        int my_offset = 0;
 
         int render_w = 0;
         int render_h = 0;
@@ -2274,7 +2339,7 @@ ttf_rasterize:
         int out_w = 0;
         int out_h = 0;
 
-        uint32_t block_bit = 32;
+        uint32_t block_bit = FONT_TTF_BLOCK_BIT;
         uint32_t line_word = 0;
 
         int mx0 = 0;
@@ -2303,291 +2368,136 @@ ttf_rasterize:
 
         switch (tm_type)
         {
+        /* Affine (scale/rotate) and perspective share one placement path: the only
+         * differences are which bbox helper and which point transform to use. The
+         * MVE variants that used to live here were measured as no faster than the
+         * auto-vectorized scalar loops, so they were dropped in the merge. */
         case FONT_HOMOGENEOUS:
-            {
-                glyph_x0 = scale * glyphData->x0;
-                glyph_y0 = scale * (ascent + glyphData->y0);
-                glyph_x1 = scale * (glyphData->x1);
-                glyph_y1 = scale * (ascent + glyphData->y1);
-
-                mx_offset = chr[index].x - text->offset_x;
-                my_offset = chr[index].y - text->offset_y;
-#if ENABLE_FONT_V3_TYPO
-                if (typo_ctx.is_v3)
-                {
-                    /* V3: chr.x/chr.y are the glyph bbox top-left (bearing applied).
-                     * The windings below re-add the glyph's own bearing through
-                     * scale*glyphData->x0/y0, so shift the origin back to the pen
-                     * position / baseline to avoid double-counting bearing.
-                     * (bearing_x = round(x0*scale), bearing_y = round(-y0*scale)) */
-                    mx_offset -= chr[index].bearing_x;
-                    my_offset += chr[index].bearing_y;
-                }
-#endif /* ENABLE_FONT_V3_TYPO */
-
-                computeBoundingBoxFloatV2(mx_offset + glyph_x0, my_offset + glyph_y0,
-                                          mx_offset + glyph_x1, my_offset + glyph_y1,
-                                          tm->m, &glyph_x0m, &glyph_x1m, &glyph_y0m, &glyph_y1m);
-
-                glyph_x0m *= raster_prec;
-                glyph_y0m *= raster_prec;
-                glyph_x1m *= raster_prec;
-                glyph_y1m *= raster_prec;
-
-                glyph_w = glyph_x1m - glyph_x0m + 1 + bold_extra * 2;
-                glyph_h = glyph_y1m - glyph_y0m + 1 + bold_extra * 2;
-
-                // gui_log("text out glyph_w %d  my0 %d out_w %d out_h %d\n",glyph_w,glyph_h);
-
-                render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
-                render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
-
-                render_w = ALIGN_TO(render_w, block_bit);
-                line_word = render_w / block_bit;
-
-                out_w = render_w / raster_prec;
-                out_h = render_h / raster_prec;
-
-                out_x0 = glyph_x0 + ROUNDING_OFFSET - bold_weight;
-                out_y0 = glyph_y0 + ROUNDING_OFFSET - bold_weight;
-                out_x1 = out_x0 + out_w - 1;
-                out_y1 = out_y0 + out_h - 1;
-
-                computeBoundingBoxIntV2(mx_offset + out_x0, my_offset + out_y0,
-                                        mx_offset + out_x1, my_offset + out_y1,
-                                        tm->m, &mx0, &mx1, &my0, &my1);
-
-#if defined FONT_TTF_USE_MVE && 0
-                /* MVE version: scalar load/store overhead cancels MVE benefit, not effective */
-                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
-                GUI_ASSERT(windingsfm != NULL);
-                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
-                GUI_ASSERT(windingsd != NULL);
-                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsd[i].x;
-                    windingsf[i].x = windingsf[i].x * scale;
-                    windingsf[i].x += mx_offset;
-
-                    windingsf[i].y = ascent - windingsd[i].y;
-                    windingsf[i].y = windingsf[i].y * scale;
-                    windingsf[i].y += my_offset;
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    transformPointV2(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m + bold_extra;
-                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m + bold_extra;
-                }
-                gui_free(windingsd);
-#else
-#if FIX_AUTO_VECTORIZE
-                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
-                GUI_ASSERT(windingsfm != NULL);
-                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
-                GUI_ASSERT(windingsd != NULL);
-                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsd[i].x;
-                    windingsf[i].x = windingsf[i].x * scale;
-                    windingsf[i].x += mx_offset;
-
-                    windingsf[i].y = ascent - windingsd[i].y;
-                    windingsf[i].y = windingsf[i].y * scale;
-                    windingsf[i].y += my_offset;
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    transformPointV2(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m + bold_extra;
-                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m + bold_extra;
-                }
-                gui_free(windingsfm);
-                gui_free(windingsd);
-#else
-                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
-                GUI_ASSERT(windingsfm != NULL);
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windings[i].x;
-                    windingsf[i].x = windingsf[i].x * scale;
-                    windingsf[i].x += mx_offset;
-
-                    windingsf[i].y = ascent - windings[i].y;
-                    windingsf[i].y = windingsf[i].y * scale;
-                    windingsf[i].y += my_offset;
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    transformPointV2(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m + bold_extra;
-                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m + bold_extra;
-                }
-                gui_free(windingsfm);
-#endif
-#endif
-            }
-            break;
         case FONT_SCALE:
             {
-                glyph_x0 = render_scale * glyphData->x0;
-                glyph_y0 = render_scale * (ascent + glyphData->y0);
-                glyph_x1 = render_scale * glyphData->x1;
-                glyph_y1 = render_scale * (ascent + glyphData->y1);
+                const bool perspective = (tm_type == FONT_HOMOGENEOUS);
 
-                computeBoundingBoxFloat(glyph_x0, glyph_y0,
-                                        glyph_x1, glyph_y1,
-                                        tm->m, caseX, caseY,
-                                        &glyph_x0m, &glyph_x1m, &glyph_y0m, &glyph_y1m);
+                /* Pen origin (pre-matrix, pixels); the outline below re-applies the
+                 * glyph bearing through glyphData->x0/y0. */
+                float back_x, back_y;
+                ttf_calc_bearing_backout(&chr[index], is_v3, &back_x, &back_y);
+                float pen_x = chr[index].x - text->offset_x + back_x;
+                float pen_y = chr[index].y - text->offset_y + back_y;
 
-                glyph_w = glyph_x1m - glyph_x0m + 1 + bold_extra * 2;
-                glyph_h = glyph_y1m - glyph_y0m + 1 + bold_extra * 2;
+                glyph_x0 = scale * glyphData->x0;
+                glyph_y0 = scale * (ascent + glyphData->y0);
+                glyph_x1 = scale * glyphData->x1;
+                glyph_y1 = scale * (ascent + glyphData->y1);
 
-                render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
-                render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
+                /* Exact device-space glyph bbox, in pixels. Deriving the bitmap
+                 * position from this -- rather than from a pen-local box that is
+                 * rounded first and transformed afterwards -- keeps the matrix from
+                 * amplifying the rounding error, and keeps the bold margin in the
+                 * same space as the dilation that actually happens on the bitmap. */
+                if (perspective)
+                {
+                    computeBoundingBoxFloatV2(pen_x + glyph_x0, pen_y + glyph_y0,
+                                              pen_x + glyph_x1, pen_y + glyph_y1, tm->m,
+                                              &glyph_x0m, &glyph_x1m, &glyph_y0m, &glyph_y1m);
+                }
+                else
+                {
+                    computeBoundingBoxFloat(pen_x + glyph_x0, pen_y + glyph_y0,
+                                            pen_x + glyph_x1, pen_y + glyph_y1, tm->m,
+                                            caseX, caseY,
+                                            &glyph_x0m, &glyph_x1m, &glyph_y0m, &glyph_y1m);
+                }
 
-                render_w = ALIGN_TO(render_w, block_bit);
+                ttf_raster_geo_t geo;
+                ttf_split_placement(glyph_x0m - bold_weight, glyph_y0m - bold_weight,
+                                    glyph_x1m - glyph_x0m + bold_weight * 2,
+                                    glyph_y1m - glyph_y0m + bold_weight * 2,
+                                    raster_prec, &geo);
+
+                render_w = geo.render_w;
+                render_h = geo.render_h;
                 line_word = render_w / block_bit;
+                out_w = geo.out_w;
+                out_h = geo.out_h;
 
-                out_w = render_w / raster_prec;
-                out_h = render_h / raster_prec;
+                mx0 = geo.out_x0;
+                my0 = geo.out_y0;
+                mx1 = mx0 + out_w - 1;
+                my1 = my0 + out_h - 1;
 
-                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET - bold_weight;
-                out_y0 = glyph_y0 / raster_prec + ROUNDING_OFFSET - bold_weight;
-#if ENABLE_FONT_V3_TYPO
-                if (typo_ctx.is_v3)
-                {
-                    /* V3: bearing already encoded in chr.x/chr.y, avoid double bearing */
-                    out_x0 = ROUNDING_OFFSET - bold_weight;
-                    out_y0 = ROUNDING_OFFSET - bold_weight;
-                }
-#endif /* ENABLE_FONT_V3_TYPO */
-                out_x1 = out_x0 + out_w - 1;
-                out_y1 = out_y0 + out_h - 1;
-
-                mx_offset = chr[index].x - text->offset_x;
-                my_offset = chr[index].y - text->offset_y;
-
-                computeBoundingBoxInt(mx_offset + out_x0, my_offset + out_y0,
-                                      mx_offset + out_x1, my_offset + out_y1,
-                                      tm->m, caseX, caseY,
-                                      &mx0, &mx1, &my0, &my1);
-
-#if defined FONT_TTF_USE_MVE && 0
-                //MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.
-                /*todo by luke*/
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
                 GUI_ASSERT(windingsfm != NULL);
-                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
-                GUI_ASSERT(windingsd != NULL);
-                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsd[i].x * render_scale;
-                    windingsf[i].y = (ascent - windingsd[i].y) * render_scale;
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    transformPoint(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsfm[i].x - glyph_x0m + bold_extra;
-                    windingsf[i].y = windingsfm[i].y - glyph_y0m + bold_extra;
-                }
-                gui_free(windingsfm);
-                gui_free(windingsd);
-#else
 #if FIX_AUTO_VECTORIZE
-                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
-                GUI_ASSERT(windingsfm != NULL);
+                /* Copy out of the packed/unaligned font data so the loops below can
+                 * be auto-vectorized. */
                 FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
                 GUI_ASSERT(windingsd != NULL);
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsd[i].x * render_scale;
-                    windingsf[i].y = (ascent - windingsd[i].y) * render_scale;
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    transformPoint(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
-                }
-                for (int i = 0; i < line_count; i++)
-                {
-                    windingsf[i].x = windingsfm[i].x - glyph_x0m + bold_extra;
-                    windingsf[i].y = windingsfm[i].y - glyph_y0m + bold_extra;
-                }
-                gui_free(windingsfm);
-                gui_free(windingsd);
+                const FontWindings *wsrc = windingsd;
 #else
-                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
-                GUI_ASSERT(windingsfm != NULL);
+                const FontWindings *wsrc = windings;
+#endif
+                /* font units, pen-local -> pixels, widget space */
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windings[i].x * render_scale;
-                    windingsf[i].y = (ascent - windings[i].y) * render_scale;
+                    windingsf[i].x = wsrc[i].x;
+                    windingsf[i].x = windingsf[i].x * scale;
+                    windingsf[i].x += pen_x;
+
+                    windingsf[i].y = ascent - wsrc[i].y;
+                    windingsf[i].y = windingsf[i].y * scale;
+                    windingsf[i].y += pen_y;
                 }
-                for (int i = 0; i < line_count; i++)
+                if (perspective)
                 {
-                    transformPoint(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
+                    for (int i = 0; i < line_count; i++)
+                    {
+                        transformPointV2(windingsf[i].x, windingsf[i].y, tm->m,
+                                         &windingsfm[i].x, &windingsfm[i].y);
+                    }
                 }
+                else
+                {
+                    for (int i = 0; i < line_count; i++)
+                    {
+                        transformPoint(windingsf[i].x, windingsf[i].y, tm->m,
+                                       &windingsfm[i].x, &windingsfm[i].y);
+                    }
+                }
+                /* pixels -> bitmap sub-samples. mx0/my0 is the floored exact bbox, so
+                 * this carries the sub-pixel remainder and the bold margin for free. */
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = windingsfm[i].x - glyph_x0m + bold_extra;
-                    windingsf[i].y = windingsfm[i].y - glyph_y0m + bold_extra;
+                    windingsf[i].x = (windingsfm[i].x - mx0) * raster_prec;
+                    windingsf[i].y = (windingsfm[i].y - my0) * raster_prec;
                 }
                 gui_free(windingsfm);
-#endif
+#if FIX_AUTO_VECTORIZE
+                gui_free(windingsd);
 #endif
             }
             break;
         case FONT_TRANSFORM:
         case FONT_IDENTITY:
             {
-                glyph_x0 = render_scale * glyphData->x0;
-                glyph_y0 = render_scale * glyphData->y0;
-                glyph_x1 = render_scale * glyphData->x1;
-                glyph_y1 = render_scale * glyphData->y1;
+                /* Exact glyph origin, split into a whole-pixel bitmap position and
+                 * a sub-pixel remainder that shifts the outline below, so every
+                 * glyph is sampled on the same target pixel grid. */
+                float origin_x, origin_y;
+                ttf_raster_geo_t geo;
+                ttf_calc_glyph_origin(glyphData, &chr[index], scale, ascent, is_v3,
+                                      &origin_x, &origin_y);
+                ttf_calc_raster_geometry(glyphData, scale, raster_prec, bold_weight,
+                                         origin_x, origin_y, &geo);
 
-                glyph_w = glyph_x1 - glyph_x0 + 1 + bold_extra * 2;
-                glyph_h = glyph_y1 - glyph_y0 + 1 + bold_extra * 2;
-
-                render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
-                render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
-
-                render_w = ALIGN_TO(render_w, block_bit);
+                render_w = geo.render_w;
+                render_h = geo.render_h;
                 line_word = render_w / block_bit;
+                out_w = geo.out_w;
+                out_h = geo.out_h;
 
-                out_w = render_w / raster_prec;
-                out_h = render_h / raster_prec;
-
-                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET - bold_weight;
-#if ENABLE_FONT_V3_TYPO
-                if (typo_ctx.is_v3)
-                {
-                    /* V3: bearing-based layout already positions chr.x/y correctly.
-                     * out_x0/y0 should not include glyph_x0/y0 (the bearing offsets)
-                     * because those are already encoded in bearing_x/y -> chr.x/y. */
-                    out_x0 = ROUNDING_OFFSET - bold_weight;
-                    out_y0 = ROUNDING_OFFSET - bold_weight;
-                }
-                else
-#endif /* ENABLE_FONT_V3_TYPO */
-                {
-                    out_y0 = glyph_y0 / raster_prec + ascent * scale + ROUNDING_OFFSET - bold_weight;
-                }
+                out_x0 = geo.out_x0;
+                out_y0 = geo.out_y0;
                 out_x1 = out_x0 + out_w - 1;
                 out_y1 = out_y0 + out_h - 1;
 
@@ -2603,8 +2513,8 @@ ttf_rasterize:
                     GUI_ASSERT(windingsd != NULL);
                     memcpy(windingsd, windings, line_count * sizeof(FontWindings));
 
-                    const float offset_x = -glyphData->x0 * render_scale + bold_extra;
-                    const float offset_y = -glyphData->y0 * render_scale + bold_extra;
+                    const float offset_x = -glyphData->x0 * render_scale + bold_extra + geo.sub_x;
+                    const float offset_y = -glyphData->y0 * render_scale + bold_extra + geo.sub_y;
                     const float32x4_t v_mul = {render_scale, -render_scale, render_scale, -render_scale};
                     const float32x4_t v_add = {offset_x, offset_y, offset_x, offset_y};
 
@@ -2618,8 +2528,8 @@ ttf_rasterize:
                     }
                     for (; i < line_count; i++)
                     {
-                        windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra;
-                        windingsf[i].y = (-glyphData->y0 - windingsd[i].y) * render_scale + bold_extra;
+                        windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra + geo.sub_x;
+                        windingsf[i].y = (-glyphData->y0 - windingsd[i].y) * render_scale + bold_extra + geo.sub_y;
                     }
                     gui_free(windingsd);
                 }
@@ -2630,15 +2540,15 @@ ttf_rasterize:
                 memcpy(windingsd, windings, line_count * sizeof(FontWindings));
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra;
-                    windingsf[i].y = (- glyphData->y0 - windingsd[i].y) * render_scale + bold_extra;
+                    windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra + geo.sub_x;
+                    windingsf[i].y = (- glyphData->y0 - windingsd[i].y) * render_scale + bold_extra + geo.sub_y;
                 }
                 gui_free(windingsd);
 #else
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = (windings[i].x - glyphData->x0) * render_scale + bold_extra;
-                    windingsf[i].y = (- glyphData->y0 - windings[i].y) * render_scale + bold_extra;
+                    windingsf[i].x = (windings[i].x - glyphData->x0) * render_scale + bold_extra + geo.sub_x;
+                    windingsf[i].y = (- glyphData->y0 - windings[i].y) * render_scale + bold_extra + geo.sub_y;
                 }
 #endif
 #endif

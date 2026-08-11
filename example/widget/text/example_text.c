@@ -93,7 +93,7 @@ static int app_init(void)
 {
     font_file_init();
 
-    // text_widget_example();              /* [1] Basic text widget       */
+    text_widget_example();              /* [1] Basic text widget       */
     // scroll_text_widget_example();    /* [2] Scroll text             */
     // custom_font_rendering_demo();    /* [3] Custom font rendering   */
     // text_font_rendering_test();      /* [4] Font rendering styles   */
@@ -109,7 +109,7 @@ static int app_init(void)
     // text_font_fallback_test();       /* [14] Mixed-lang fallback    */
     // text_vector_scale_test();        /* [15] Vector font scaling    */
     // text_emoji_example();            /* [16] Bitmap text + emoji    */
-    text_ttf_emoji_example();        /* [17] Vector text + emoji    */
+    // text_ttf_emoji_example();        /* [17] Vector text + emoji    */
 
     return 0;
 }

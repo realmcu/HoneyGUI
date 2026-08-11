@@ -634,29 +634,45 @@ void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)
 
 void gui_text_rendermode_set(gui_text_t *this, uint8_t rendermode)
 {
+    uint8_t mode = this->rendermode;
+
     switch (rendermode)
     {
     case 1:
-        this->rendermode = 0;
+        mode = 0;
         break;
     case 2:
-        this->rendermode = 1;
+        mode = 1;
         break;
     case 4:
-        this->rendermode = 2;
+        mode = 2;
         break;
     case 8:
-        this->rendermode = 3;
+        mode = 3;
         break;
 
     default:
         break;
     };
+
+    if (this->rendermode != mode)
+    {
+        /* raster_prec drives the glyph bitmap size, so a resident cross-frame
+         * cache would be read back at the wrong dimensions. Force a rebuild. */
+        this->content_refresh = true;
+    }
+    this->rendermode = mode;
 }
 
 void gui_text_bold_set(gui_text_t *this, uint8_t bold_weight, BOLD_MODE bold_mode)
 {
     GUI_ASSERT(this != NULL);
+    if (this->bold_weight != bold_weight || this->bold_mode != bold_mode)
+    {
+        /* Dilation margin grows the glyph bitmap, so a resident cross-frame cache
+         * would be read back at the wrong dimensions. Force a rebuild. */
+        this->content_refresh = true;
+    }
     this->bold_weight = bold_weight;
     this->bold_mode = bold_mode;
     this->layout_refresh = true;
