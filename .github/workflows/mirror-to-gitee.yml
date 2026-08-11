@@ -1,0 +1,21 @@
+name: Mirror to Gitee
+
+on:
+  push:
+    branches: ["*"]
+    tags: ["*"]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Gitee
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          git remote add gitee "https://oauth2:${{ secrets.GITEE_TOKEN }}@gitee.com/realmcu/${REPO_NAME}.git"
+          git push gitee --all --force
+          git push gitee --tags --force
