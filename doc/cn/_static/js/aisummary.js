@@ -20,15 +20,16 @@ function getAISummaryFile() {
     const rootUrl = getRootUrl();
     const rootPath = new URL(rootUrl).pathname;
 
-    const rootIndex = pathname.indexOf(rootPath);
-    if (rootIndex === -1) {
+    if (!pathname.startsWith(rootPath)) {
         return null;
     }
-
     // build ai_summary folder
-    const splitIndex = rootIndex + rootPath.length;
+    const splitIndex = rootPath.length;
     const beforeRoot = pathname.slice(0, splitIndex);
-    const afterRoot  = pathname.slice(splitIndex);
+    let afterRoot  = pathname.slice(splitIndex);
+    if (afterRoot === '' || afterRoot.endsWith('/')) {
+        afterRoot += 'index.html';
+    }
     const targetPath = `${beforeRoot}ai_summary/${afterRoot}`;
 
     return `${origin}${targetPath}`.replace(/\.html$/, '.txt');
@@ -83,14 +84,11 @@ function handleAISummaryButtonClick() {
         eleAIText.classList.remove('text-loading');
 
         // show ai response
-        let ouputHtml = "Invalid response data!";
-        if (text) {
-            ouputHtml = text;
-        }
-        eleAIText.innerHTML = ouputHtml;
+        eleAIText.innerHTML = text || "Invalid response data!";
         // typeWriter(eleAIText, ouputHtml, 1);
 
         // enable ai summary fetch button
+        summaryButton.disabled = false;
         summaryButton.classList.remove('disabled-button');
     }
     function handleAISummaryError(error) {
@@ -99,6 +97,7 @@ function handleAISummaryButtonClick() {
         // show ai request error
         eleAIText.innerHTML = error;
         // enable ai summary fetch button
+        summaryButton.disabled = false;
         summaryButton.classList.remove('disabled-button');
     }
 
@@ -110,8 +109,10 @@ function handleAISummaryButtonClick() {
 
             const isAITextEmpty = eleAIText.innerText.trim().length == 0;
             if(isAITextEmpty) {
+                summaryButton.disabled = true;
                 summaryButton.classList.add('disabled-button');
                 eleAIText.classList.add('text-loading');
+
                 // delay 3s
                 setTimeout(function() {
                     const fetchURL = getAISummaryFile();
@@ -120,7 +121,7 @@ function handleAISummaryButtonClick() {
                         return;
                     }
 
-                    return fetch(fetchURL)
+                    return fetch(fetchURL, { cache: 'no-store' })
                         .then(res => {
                             if (!res.ok) {
                                 throw new Error(`HTTP error! status: ${res.status}`);
