@@ -29,6 +29,14 @@ bool draw_img_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t 
     *y_start = _UI_MAX(image_y, dc->section.y1);
     *y_end = _UI_MIN(image_y + image_h - 1, dc->section.y2);
 
+    if (rect)
+    {
+        *y_start = _UI_MAX(*y_start, rect->y1);
+        *y_end   = _UI_MIN(*y_end,   rect->y2);
+        *x_start = _UI_MAX(*x_start, rect->x1);
+        *x_end   = _UI_MIN(*x_end,   rect->x2);
+    }
+
     if ((*x_start > *x_end) || (*y_start > *y_end))
     {
         return false;

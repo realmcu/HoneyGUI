@@ -390,6 +390,12 @@ void gui_img_a8_mix_alpha(gui_img_t *_this, uint32_t alpha_mix);
  */
 uint8_t *gui_rle_solid_color_create(uint16_t width, uint16_t height, gui_color_t color);
 
+/**
+ * @brief Sets the clipping state for the image widget.
+ * @param _this Pointer to the image widget.
+ * @param clip True to enable clipping, false to disable.
+ */
+void gui_img_clip(gui_img_t *_this, bool clip);
 
 #ifdef __cplusplus
 }

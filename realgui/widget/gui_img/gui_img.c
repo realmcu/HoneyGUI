@@ -140,7 +140,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
     if (_this->need_clip)
     {
         gui_rect_t rect = {0};
-        gui_obj_get_clip_rect(obj, &rect);
+        gui_obj_get_clip_rect(obj->parent, &rect);
         gui_acc_blit_to_dc(_this->draw_img, dc, &rect);
     }
     else
@@ -779,5 +779,11 @@ void gui_img_a8_fix_bg(gui_img_t *_this, uint32_t bg_color_fix)
 void gui_img_a8_mix_alpha(gui_img_t *_this, uint32_t alpha_mix)
 {
     _this->opacity_value = alpha_mix;
+}
+
+void gui_img_clip(gui_img_t *_this, bool clip)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    _this->need_clip = clip;
 }
 
