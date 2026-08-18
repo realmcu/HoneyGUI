@@ -874,8 +874,8 @@ void *gui_acc_decode(void *in)
         break;
     case I8:
         pixel_size = 1;
-        clut_num = *(uint32_t *)((uintptr_t)in + sizeof(gui_rgb_data_head_t)) + 1;
-        clut_offset = clut_num * 4;
+        clut_num = (*(uint32_t *)((uintptr_t)in + sizeof(gui_rgb_data_head_t)) >> 16) + 1;
+        clut_offset = clut_num * 4 + sizeof(uint32_t);
         break;
     case A8:
     case A4:
