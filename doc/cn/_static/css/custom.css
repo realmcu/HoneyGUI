@@ -204,16 +204,16 @@ p {
     display: inline-block;
 }
 /* div[role="search"] style */
-/*
-.wy-side-nav-search > div[role="search"] {
-    text-align: center;
+.wy-side-nav-search > a, .wy-side-nav-search > a:hover {
+    display: block;
+    width: 146px;
+    margin: .8em auto 1.8em;
+    background: #fff;
+    border-radius: 2px;
 }
-
-div.wy-menu,
-div.wy-menu-vertical {
-    text-align: left !important;
+.wy-side-nav-search>a img.logo {
+    width: 56%;
 }
-*/
 li[class*="toctree-"] * {
     font-size: 14px !important;
 }
