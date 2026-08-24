@@ -33,7 +33,6 @@ PLATFORM = menu_config.PLATFORM
 LITE3D_DIR = os.path.abspath('./../Lite3D/')
 NANOVG_DIR = os.path.abspath('./../nanovg/')
 H264BSD_DIR = os.path.abspath('./../h264bsd/')
-ARM2D_DIR = os.path.abspath('./../Arm2D/')
 RTE_ROOT = os.path.abspath('../../../lib/sim')
 
 Export('PLATFORM', 'TOOL_ROOT', 'env')
@@ -63,7 +62,7 @@ def ourspawn(sh, escape, cmd, args, e):
 if sys.platform == 'win32':
     env['SPAWN'] = ourspawn
 
-for path in [LITE3D_DIR, H264BSD_DIR, NANOVG_DIR, ARM2D_DIR, RTE_ROOT]:
+for path in [LITE3D_DIR, H264BSD_DIR, NANOVG_DIR, RTE_ROOT]:
     sconscript = os.path.join(path, 'SConscript')
     if os.path.exists(sconscript):
         objs.extend(SConscript(sconscript))

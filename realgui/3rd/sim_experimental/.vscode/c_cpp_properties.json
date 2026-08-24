@@ -6,8 +6,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../nanovg/**",
                 "${workspaceFolder}/../h264bsd/**",
-                "${workspaceFolder}/../Lite3D/**",
-                "${workspaceFolder}/../Arm2D/**"
+                "${workspaceFolder}/../Lite3D/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
@@ -21,8 +20,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../nanovg/**",
                 "${workspaceFolder}/../h264bsd/**",
-                "${workspaceFolder}/../Lite3D/**",
-                "${workspaceFolder}/../Arm2D/**"
+                "${workspaceFolder}/../Lite3D/**"
             ],
             "defines": ["__WIN32"],
             "compilerPath": "C:/mingw64/bin/gcc.exe",

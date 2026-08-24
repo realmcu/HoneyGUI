@@ -32,5 +32,4 @@ cmake ../ -G "MinGW Makefiles"
 - **ThorVG**: Vector graphics library
 - **GIFDEC**: GIF decoder
 - **Lite3D**: 3D rendering library (default: enabled)
-- **ARM2D**: Hardware acceleration (default: enabled)
 - **3D Demos**: Butterfly, Dog, Face, Disc, Prism, AppList

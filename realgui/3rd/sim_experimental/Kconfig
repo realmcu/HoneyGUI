@@ -32,11 +32,6 @@ config REALTEK_BUILD_LITE3D
     help
       Enable RTK Lite3D library
 
-config REALTEK_BUILD_GUI_USE_ARM2D
-    bool "ARM2D"
-    help
-      Enable ARM2D acceleration library
-
 config REALTEK_BUILD_H264
     bool "H264"
     help
