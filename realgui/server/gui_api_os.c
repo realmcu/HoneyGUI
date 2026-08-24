@@ -252,12 +252,7 @@ void *gui_realloc(void *ptr_old, size_t n)
     }
     else
     {
-        if (
-            (os_api->lower_mem_size != 0) && \
-            ((uintptr_t)ptr_old >= (uintptr_t)os_api->lower_mem_addr) && \
-            ((uintptr_t)ptr_old <= (uintptr_t)os_api->lower_mem_addr +
-             (uint32_t)os_api->lower_mem_size)
-        )
+        if (gui_mem_is_lower(ptr_old))
         {
             ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
             return ptr;
@@ -281,14 +276,25 @@ void *gui_realloc(void *ptr_old, size_t n)
 
 }
 
+bool gui_mem_is_lower(const void *ptr)
+{
+    if (ptr == NULL || os_api == NULL || os_api->lower_mem_addr == NULL ||
+        os_api->lower_mem_size == 0)
+    {
+        return false;
+    }
+
+    uintptr_t address = (uintptr_t)ptr;
+    uintptr_t lower_start = (uintptr_t)os_api->lower_mem_addr;
+    uintptr_t lower_end = lower_start + (uintptr_t)os_api->lower_mem_size;
+
+    return address >= lower_start && address < lower_end;
+}
+
 void gui_free(void *rmem)
 {
 
-    if ((rmem != NULL) && \
-        ((uintptr_t)rmem >= (uintptr_t)os_api->lower_mem_addr) && \
-        ((uintptr_t)rmem <= (uintptr_t)os_api->lower_mem_addr +
-         (uint32_t)os_api->lower_mem_size)
-       )
+    if (gui_mem_is_lower(rmem))
     {
         GUI_ASSERT((uintptr_t)os_api->lower_mem_addr != 0);
         GUI_ASSERT((uintptr_t)os_api->lower_mem_size != 0);

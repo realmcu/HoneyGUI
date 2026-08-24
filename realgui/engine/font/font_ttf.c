@@ -28,20 +28,17 @@ typedef struct line
     float dxy;
 } LINE_T;
 
-/* Raster geometry of one glyph: whole-pixel bitmap box plus the sub-pixel
- * remainder fed to the rasterizer. out_x0/out_y0 live in whatever space the
- * caller passed to ttf_split_placement() -- relative to chr.x/chr.y on the
- * identity/translate path, absolute device pixels on the matrix path (where the
- * pen offset is already folded into the transformed bbox). */
+/* Glyph bitmap bounds and the sub-pixel offset passed to the rasterizer.
+ * Positions use the coordinate space supplied to ttf_split_placement(). */
 typedef struct
 {
-    int out_x0;     /* bitmap left, in the caller's space (see above) */
-    int out_y0;     /* bitmap top, in the caller's space (see above) */
-    int out_w;      /* bitmap width in pixels */
-    int out_h;      /* bitmap height in pixels */
-    int render_w;   /* raster width in sub-samples */
-    int render_h;   /* raster height in sub-samples */
-    float sub_x;    /* sub-pixel remainder of the glyph origin, in sub-samples */
+    int out_x0;
+    int out_y0;
+    int out_w;
+    int out_h;
+    int render_w;
+    int render_h;
+    float sub_x;
     float sub_y;
 } ttf_raster_geo_t;
 
@@ -49,34 +46,8 @@ typedef struct
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-static const uint32_t masks[32] =
-{
-    0xFFFFFFFF, 0x7FFFFFFF, 0x3FFFFFFF, 0x1FFFFFFF,
-    0x0FFFFFFF, 0x07FFFFFF, 0x03FFFFFF, 0x01FFFFFF,
-    0x00FFFFFF, 0x007FFFFF, 0x003FFFFF, 0x001FFFFF,
-    0x000FFFFF, 0x0007FFFF, 0x0003FFFF, 0x0001FFFF,
-    0x0000FFFF, 0x00007FFF, 0x00003FFF, 0x00001FFF,
-    0x00000FFF, 0x000007FF, 0x000003FF, 0x000001FF,
-    0x000000FF, 0x0000007F, 0x0000003F, 0x0000001F,
-    0x0000000F, 0x00000007, 0x00000003, 0x00000001
-};
-
-static const uint8_t lookup_table_8b[256] =
-{
-#   define B2(n) n,     n+1,     n+1,     n+2
-#   define B4(n) B2(n), B2(n+1), B2(n+1), B2(n+2)
-#   define B6(n) B4(n), B4(n+1), B4(n+1), B4(n+2)
-    B6(0), B6(1), B6(1), B6(2)
-};
-
-static const uint8_t lookup_table_2b[4] =
-{
-    0, 1, 1, 2
-};
-static const uint8_t lookup_table_4b[16] =
-{
-    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
-};
+/* No lookup tables here on purpose: the prec 2/4/8 downsample paths compute
+ * all population counts of a word in parallel with SWAR operations instead. */
 
 
 /*============================================================================*
@@ -88,22 +59,44 @@ static const uint8_t lookup_table_4b[16] =
 #ifdef __ARM_FEATURE_MVE
 #if GUI_ENABLE_MVE
 #define FONT_TTF_USE_MVE
+/* Bit 0 of __ARM_FEATURE_MVE marks the integer MVE subset, bit 1 the floating
+ * point one. Targets built with +mve instead of +mve.fp only provide the
+ * integer subset, where float32x4_t and the f32 intrinsics do not exist. */
+#if (__ARM_FEATURE_MVE & 2)
+#define FONT_TTF_USE_MVE_FP
+#endif
 #include "arm_mve.h"
 #endif
 #endif
 
-/*
-    FIX_AUTO_VECTORIZE is used to adapt to auto-vectorization,
-    and it only needs to be enabled when the compiler's auto-vectorization feature is turned on.
-    It will reduce rendering speed and increase memory overhead.
-*/
+/* Copy packed winding data from flash to RAM before transformation.
+ * Keep enabled unless disassembly confirms that the compiler uses scalar loads. */
 #define FIX_AUTO_VECTORIZE   1
+
+/* Per-kernel explicit MVE switches. Keep these separate so a target platform
+ * can benchmark each implementation independently. A value of 1 means the
+ * MVE path is enabled when FONT_TTF_USE_MVE is available. */
+#define FONT_TTF_MVE_EMBOLDEN          1
+#define FONT_TTF_MVE_ADJUST_PRECISION  1
+/* Needs FONT_TTF_USE_MVE_FP, not just FONT_TTF_USE_MVE. */
+#define FONT_TTF_MVE_WINDING_TRANSFORM 1
+/* The prec 1 MVE kernel is retained for other targets, but disabled here:
+ * repeated end-to-end benchmarks are slower than the scalar nibble LUT. */
+#define FONT_TTF_MVE_DOWNSAMPLE_PREC1  0
+#define FONT_TTF_MVE_DOWNSAMPLE_PREC2  1
+#define FONT_TTF_MVE_DOWNSAMPLE_PREC4  1
+#define FONT_TTF_MVE_DOWNSAMPLE_PREC8  1
 
 #define ALIGN_TO(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
 #define ROUNDING_OFFSET 0.5f
 
 /* Bits per word of the XOR scanline buffer; render_w must be a multiple of it. */
 #define FONT_TTF_BLOCK_BIT 32
+
+/* Scanline kernel: choose 1 for wide/dense outlines such as CJK, or 0 for
+ * narrow/sparse outlines such as small ASCII. Benchmark the target workload. */
+#define FONT_TTF_SCANLINE_PREFIX_XOR 1
+
 
 /*============================================================================*
  *                            Variables
@@ -113,8 +106,18 @@ static const uint8_t lookup_table_4b[16] =
  *                           Private Functions
  *============================================================================*/
 
-/* Forward declaration - used by gui_font_ttf_fallback_search before definition */
 #if ENABLE_FONT_V3_TYPO
+/**
+ * @brief Populate glyph metrics using V3 or legacy rules.
+ * @param chr Output character metrics.
+ * @param glyphData Source glyph metrics in font units.
+ * @param unicode Unicode code point.
+ * @param font_height Requested font height in pixels.
+ * @param scale Font-unit to pixel scale.
+ * @param bold_weight Bold expansion in pixels.
+ * @param typo_ctx Typography mode and metrics.
+ * @param dot_addr Glyph data retained for rendering.
+ */
 static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *glyphData,
                                        uint32_t unicode, uint16_t font_height,
                                        float scale, uint8_t bold_weight,
@@ -122,6 +125,12 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
                                        uint8_t *dot_addr);
 #endif
 
+/**
+ * @brief Classify the signs of two transform coefficients.
+ * @param a First coefficient.
+ * @param b Second coefficient.
+ * @return Sign combination used to select bounding-box corners.
+ */
 static TransformCase determineTransformCase(float a, float b)
 {
     if (a >= 0 && b >= 0)
@@ -142,18 +151,71 @@ static TransformCase determineTransformCase(float a, float b)
     }
 }
 
+/**
+ * @brief Count set bits independently in each byte of a word.
+ * @param value Packed bytes to count.
+ * @return Per-byte population counts in the corresponding byte lanes.
+ */
+static inline uint32_t font_ttf_popcount_bytes(uint32_t value)
+{
+    value = value - ((value >> 1) & 0x55555555u);
+    value = (value & 0x33333333u) + ((value >> 2) & 0x33333333u);
+    return (value + (value >> 4)) & 0x0F0F0F0Fu;
+}
+
+/* Expand a source nibble from MSB to LSB into four 0x00/0xff coverage bytes.
+ * The constants account for the little-endian byte order of the uint32 store. */
+static const uint32_t font_ttf_expand_4bit[16] =
+{
+    0x00000000u, 0xFF000000u, 0x00FF0000u, 0xFFFF0000u,
+    0x0000FF00u, 0xFF00FF00u, 0x00FFFF00u, 0xFFFFFF00u,
+    0x000000FFu, 0xFF0000FFu, 0x00FF00FFu, 0xFFFF00FFu,
+    0x0000FFFFu, 0xFF00FFFFu, 0x00FFFFFFu, 0xFFFFFFFFu
+};
+
+/**
+ * @brief Apply a perspective transform to one point.
+ * @param x Input x coordinate.
+ * @param y Input y coordinate.
+ * @param m Transformation matrix.
+ * @param x_out Output x coordinate.
+ * @param y_out Output y coordinate.
+ */
 static void transformPointV2(float x, float y, float m[3][3], float *x_out, float *y_out)
 {
     float w = m[2][0] * x + m[2][1] * y + m[2][2];
     *x_out = (m[0][0] * x + m[0][1] * y + m[0][2]) / w;
     *y_out = (m[1][0] * x + m[1][1] * y + m[1][2]) / w;
 }
+
+/**
+ * @brief Apply an affine transform to one point.
+ * @param x Input x coordinate.
+ * @param y Input y coordinate.
+ * @param m Transformation matrix.
+ * @param x_out Output x coordinate.
+ * @param y_out Output y coordinate.
+ */
 static void transformPoint(float x, float y, float m[3][3], float *x_out, float *y_out)
 {
     *x_out = m[0][0] * x + m[0][1] * y + m[0][2];
     *y_out = m[1][0] * x + m[1][1] * y + m[1][2];
 }
 
+/**
+ * @brief Compute an affine-transformed bounding box.
+ * @param x0 Input minimum x coordinate.
+ * @param y0 Input minimum y coordinate.
+ * @param x1 Input maximum x coordinate.
+ * @param y1 Input maximum y coordinate.
+ * @param m Transformation matrix.
+ * @param caseX Sign case for selecting x extrema.
+ * @param caseY Sign case for selecting y extrema.
+ * @param xmin Output minimum x coordinate.
+ * @param xmax Output maximum x coordinate.
+ * @param ymin Output minimum y coordinate.
+ * @param ymax Output maximum y coordinate.
+ */
 static void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, float m[3][3],
                                     TransformCase caseX, TransformCase caseY, float *xmin, float *xmax, float *ymin, float *ymax)
 {
@@ -185,6 +247,18 @@ static void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, floa
     }
 }
 
+/**
+ * @brief Compute a perspective-transformed floating-point bounding box.
+ * @param x0 Input minimum x coordinate.
+ * @param y0 Input minimum y coordinate.
+ * @param x1 Input maximum x coordinate.
+ * @param y1 Input maximum y coordinate.
+ * @param m Transformation matrix.
+ * @param xmin Output minimum x coordinate.
+ * @param xmax Output maximum x coordinate.
+ * @param ymin Output minimum y coordinate.
+ * @param ymax Output maximum y coordinate.
+ */
 static void computeBoundingBoxFloatV2(float x0, float y0, float x1, float y1, float m[3][3],
                                       float *xmin, float *xmax, float *ymin, float *ymax)
 {
@@ -201,6 +275,18 @@ static void computeBoundingBoxFloatV2(float x0, float y0, float x1, float y1, fl
     *ymax = fmaxf(fmaxf(ty0, ty1), fmaxf(ty2, ty3));
 }
 
+/**
+ * @brief Compute a perspective-transformed integer bounding box.
+ * @param x0 Input minimum x coordinate.
+ * @param y0 Input minimum y coordinate.
+ * @param x1 Input maximum x coordinate.
+ * @param y1 Input maximum y coordinate.
+ * @param m Transformation matrix.
+ * @param xmin Output minimum x coordinate.
+ * @param xmax Output maximum x coordinate.
+ * @param ymin Output minimum y coordinate.
+ * @param ymax Output maximum y coordinate.
+ */
 static void computeBoundingBoxIntV2(int x0, int y0, int x1, int y1, float m[3][3], int *xmin,
                                     int *xmax, int *ymin, int *ymax)
 {
@@ -234,12 +320,11 @@ void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
 }
 
 /**
- * @brief V3 bearing back-out from chr.x/chr.y to the pen origin, in pixels.
- *
- * V3 lays out chr.x/chr.y as the glyph bbox top-left with the rounded bearing
- * applied, while the glyph-space formulas below re-apply it through gd->x0/y0 --
- * every placement path has to cancel it exactly once. V1 keeps chr.x/chr.y at
- * the line box top-left and needs no correction.
+ * @brief Undo the V3 bearing already included in chr.x/chr.y.
+ * @param chr Character containing the rounded bearing.
+ * @param is_v3 Whether V3 typography is active.
+ * @param back_x Output horizontal correction in pixels.
+ * @param back_y Output vertical correction in pixels.
  */
 static void ttf_calc_bearing_backout(const mem_char_t *chr, bool is_v3,
                                      float *back_x, float *back_y)
@@ -260,12 +345,14 @@ static void ttf_calc_bearing_backout(const mem_char_t *chr, bool is_v3,
 }
 
 /**
- * @brief Exact glyph bbox top-left in pixels, relative to chr.x / chr.y.
- *
- * The result keeps its fractional part on purpose: ttf_calc_raster_geometry()
- * splits it into a whole-pixel bitmap position plus a sub-pixel offset that is
- * fed to the rasterizer. Under V3 the caller passes ascent == 0, so what is left
- * here is just the bearing rounding remainder.
+ * @brief Return the fractional glyph origin relative to chr.x/chr.y.
+ * @param gd Glyph bounds in font units.
+ * @param chr Character placement and bearing.
+ * @param scale Font-unit to pixel scale.
+ * @param ascent Legacy ascent; zero for V3 typography.
+ * @param is_v3 Whether V3 typography is active.
+ * @param origin_x Output horizontal origin in pixels.
+ * @param origin_y Output vertical origin in pixels.
  */
 static void ttf_calc_glyph_origin(const FontGlyphData *gd, const mem_char_t *chr,
                                   float scale, short ascent, bool is_v3,
@@ -279,16 +366,13 @@ static void ttf_calc_glyph_origin(const FontGlyphData *gd, const mem_char_t *chr
 }
 
 /**
- * @brief Split an exact bitmap placement into whole-pixel origin + sub-pixel remainder.
- *
- * The origin is floored to the pixel grid and the remainder is returned in
- * sub_x/sub_y, so the outline is sampled on the shared target pixel grid.
- * Rounding the origin per glyph instead (the previous behaviour) snapped every
- * glyph to its own nearest pixel, which showed up as +-1px jitter between
- * neighbouring glyphs.
- *
- * @param origin_x/y Exact bitmap top-left, in pixels, bold dilation included.
- * @param span_x/y   Exact bitmap extent, in pixels, bold dilation included.
+ * @brief Split placement into a pixel origin and sub-pixel remainder.
+ * @param origin_x Exact bitmap left position in pixels.
+ * @param origin_y Exact bitmap top position in pixels.
+ * @param span_x Bitmap width before alignment in pixels.
+ * @param span_y Bitmap height before alignment in pixels.
+ * @param raster_prec Sub-samples per pixel axis.
+ * @param geo Output aligned raster geometry.
  */
 static void ttf_split_placement(float origin_x, float origin_y, float span_x, float span_y,
                                 uint8_t raster_prec, ttf_raster_geo_t *geo)
@@ -303,10 +387,8 @@ static void ttf_split_placement(float origin_x, float origin_y, float span_x, fl
     geo->sub_x = (origin_x - geo->out_x0) * raster_prec;
     geo->sub_y = (origin_y - geo->out_y0) * raster_prec;
 
-    /* sub_x/sub_y shift the outline, so they consume real raster width/height and
-     * must stay in the size; +2 sub-samples on top is the historical rounding
-     * margin. makeImageBuffer() needs render_h to be a multiple of raster_prec,
-     * and the XOR fill needs render_w to be a multiple of FONT_TTF_BLOCK_BIT. */
+    /* Include the sub-pixel shift and historical two-sample margin.
+     * Align dimensions for downsampling and the scanline buffer. */
     geo->render_h = ALIGN_TO((int)(geo->sub_y + span_y * raster_prec + 2), raster_prec);
     geo->out_h = geo->render_h / raster_prec;
     geo->render_w = ALIGN_TO((int)(geo->sub_x + span_x * raster_prec + 2), raster_prec);
@@ -315,8 +397,14 @@ static void ttf_split_placement(float origin_x, float origin_y, float span_x, fl
 }
 
 /**
- * @brief Raster geometry for the identity/translate path, where the glyph bbox
- *        needs no matrix and the origin is relative to chr.x / chr.y.
+ * @brief Build raster geometry for identity or translation transforms.
+ * @param gd Glyph bounds in font units.
+ * @param scale Font-unit to pixel scale.
+ * @param raster_prec Sub-samples per pixel axis.
+ * @param bold_weight Bold expansion in pixels.
+ * @param origin_x Exact horizontal origin in pixels.
+ * @param origin_y Exact vertical origin in pixels.
+ * @param geo Output aligned raster geometry.
  */
 static void ttf_calc_raster_geometry(const FontGlyphData *gd, float scale, uint8_t raster_prec,
                                      uint8_t bold_weight, float origin_x, float origin_y,
@@ -329,17 +417,12 @@ static void ttf_calc_raster_geometry(const FontGlyphData *gd, float scale, uint8
 }
 
 /**
- * @brief Apply bold effect to bitmap by dilation
- *
- * This function applies morphological dilation to create a bold effect.
- * BOLD_HORIZONTAL: Only horizontal dilation (fast, ~34ms vs 24ms baseline)
- * BOLD_FULL: Bidirectional dilation (horizontal + vertical, ~93ms)
- *
- * @param bitmap      Pointer to the bitmap buffer (modified in place)
- * @param width       Width of the bitmap
- * @param height      Height of the bitmap
- * @param bold_weight Bold weight (number of pixels to dilate in each direction)
- * @param bold_mode   Bold mode (BOLD_HORIZONTAL or BOLD_FULL)
+ * @brief Dilate the bitmap according to the selected bold mode.
+ * @param bitmap Bitmap modified in place.
+ * @param width Bitmap width in pixels.
+ * @param height Bitmap height in pixels.
+ * @param bold_weight Dilation radius in pixels.
+ * @param bold_mode Horizontal-only or full dilation mode.
  */
 static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uint8_t bold_weight,
                                      uint8_t bold_mode)
@@ -357,7 +440,7 @@ static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uin
     }
 
     /* First pass: horizontal dilation */
-#ifdef FONT_TTF_USE_MVE
+#if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_EMBOLDEN
     int padded_width = width + bold_weight * 2;
     uint8_t *padded_buf = gui_malloc(padded_width);
     if (padded_buf == NULL)
@@ -479,7 +562,10 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
 
     int y_start = _UI_MAX3(dc->section.y1, y, rect->yboundtop);
     int y_end = _UI_MIN3(y + h - 1, rect->yboundbottom, dc->section.y2);
-    if (x_start > x_end || y_start > y_end) { return; }
+    if (x_start > x_end || y_start > y_end)
+    {
+        return;
+    }
 
     gui_color_t outcolor = text->color;
     outcolor.color.rgba.a = _UI_UDIV255(text->color.color.rgba.a * text->base.opacity_value);
@@ -581,18 +667,13 @@ uint32_t font_index_bsearch_ttf(uint8_t *index_table,
 }
 
 /**
- * @brief Unified function to get glyph offset from ttf font
- *
- * This function merges the functionality of getGlyphOffsetFromMemory and getGlyphOffsetFromFtl.
- * For index_method=1, it uses binary search for O(log n) lookup performance.
- *
- * @param unicode Target Unicode code point
- * @param ttfbin ttf font header
- * @param table_ptr Pointer to the index table
- * @param font_mode Font source mode (FONT_SRC_MEMADDR or FONT_SRC_FTL)
- * @param preloaded_index_table For FTL mode with index_method=1, caller should provide
- *                              preloaded index table; NULL for other cases
- * @return uint32_t Glyph offset if found, 0 if not found
+ * @brief Look up a glyph offset in a direct or searchable index.
+ * @param unicode Unicode code point.
+ * @param ttfbin TTF header describing the index.
+ * @param table_ptr Direct index source or memory-resident table.
+ * @param font_mode Font source mode.
+ * @param preloaded_index_table Searchable index loaded into memory.
+ * @return Glyph offset, or 0 when absent.
  */
 static uint32_t getGlyphOffset(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint8_t *table_ptr,
                                FONT_SRC_MODE font_mode, uint8_t *preloaded_index_table)
@@ -644,7 +725,13 @@ static uint32_t getGlyphOffset(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint
     return 0;
 }
 
-void adjustImageBufferPrecision(uint8_t *img_out, uint32_t out_size, uint8_t raster_prec)
+/**
+ * @brief Map coverage values to 8-bit alpha.
+ * @param img_out Coverage buffer modified in place.
+ * @param out_size Buffer size in bytes.
+ * @param raster_prec Sub-samples per pixel axis.
+ */
+static void adjustImageBufferPrecision(uint8_t *img_out, uint32_t out_size, uint8_t raster_prec)
 {
     uint8_t shift_bit = 0;
     switch (raster_prec)
@@ -669,8 +756,9 @@ void adjustImageBufferPrecision(uint8_t *img_out, uint32_t out_size, uint8_t ras
     }
 
     uint32_t i = 0;
-#if defined FONT_TTF_USE_MVE && 1
-    //MVE CODE, quicker about 2ms
+#if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_ADJUST_PRECISION
+    /* Process 16 coverage bytes per iteration with saturating left shift.
+     * For valid coverage [0, raster_prec^2], saturation maps full coverage to 255. */
     for (; i + 16 <= out_size; i += 16)
     {
         uint8x16_t input = vldrbq_u8(img_out + i);
@@ -695,144 +783,302 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
                      int out_h, int render_w, int render_h, uint32_t line_word, uint32_t block_bit)
 {
     (void)render_w;
+    (void)block_bit;
     memset(img_out, 0, out_w * out_h);
     if (raster_prec == 4)
     {
-        for (int y = 0; y < render_h; y += raster_prec)
+        const uint32_t *row1 = img;
+        uint8_t *dst_row = img_out;
+
+        for (int y = 0; y < render_h;
+             y += 4, row1 += line_word * 4, dst_row += out_w)
         {
-            for (uint32_t ux = 0; ux < line_word; ux++)
+            const uint32_t *src1 = row1;
+            const uint32_t *src2 = row1 + line_word;
+            const uint32_t *src3 = row1 + line_word * 2;
+            const uint32_t *src4 = row1 + line_word * 3;
+            uint8_t *dst = dst_row;
+            uint32_t ux = 0;
+
+#if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_DOWNSAMPLE_PREC4
+            /* Count four words in parallel, split even/odd nibbles into bytes,
+             * then interleave them in output order. */
+            const uint32x4_t mask1 = vdupq_n_u32(0x55555555u);
+            const uint32x4_t mask2 = vdupq_n_u32(0x33333333u);
+            const uint32x4_t mask4 = vdupq_n_u32(0x0F0F0F0Fu);
+            for (; ux + 4 <= line_word;
+                 ux += 4, src1 += 4, src2 += 4, src3 += 4, src4 += 4, dst += 32)
             {
-                uint32_t pixel1 = img[y * line_word + ux];
-                uint32_t pixel2 = img[(y + 1) * line_word + ux];
-                uint32_t pixel3 = img[(y + 2) * line_word + ux];
-                uint32_t pixel4 = img[(y + 3) * line_word + ux];
-                if ((pixel1 + pixel2 + pixel3 + pixel4) == 0)
+#define FONT_TTF_MVE_NIBBLE_POPCOUNT(src) \
+    ({ \
+        uint32x4_t v = vldrwq_u32(src); \
+        v = vsubq_u32(v, vandq_u32(vshrq_n_u32(v, 1), mask1)); \
+        vaddq_u32(vandq_u32(v, mask2), \
+                  vandq_u32(vshrq_n_u32(v, 2), mask2)); \
+    })
+                uint32x4_t t = FONT_TTF_MVE_NIBBLE_POPCOUNT(src1);
+                uint32x4_t even = vandq_u32(t, mask4);
+                uint32x4_t odd = vandq_u32(vshrq_n_u32(t, 4), mask4);
+
+                t = FONT_TTF_MVE_NIBBLE_POPCOUNT(src2);
+                even = vaddq_u32(even, vandq_u32(t, mask4));
+                odd = vaddq_u32(odd, vandq_u32(vshrq_n_u32(t, 4), mask4));
+                t = FONT_TTF_MVE_NIBBLE_POPCOUNT(src3);
+                even = vaddq_u32(even, vandq_u32(t, mask4));
+                odd = vaddq_u32(odd, vandq_u32(vshrq_n_u32(t, 4), mask4));
+                t = FONT_TTF_MVE_NIBBLE_POPCOUNT(src4);
+                even = vaddq_u32(even, vandq_u32(t, mask4));
+                odd = vaddq_u32(odd, vandq_u32(vshrq_n_u32(t, 4), mask4));
+#undef FONT_TTF_MVE_NIBBLE_POPCOUNT
+
+                uint8x16x2_t output;
+                output.val[0] = vrev32q_u8(vreinterpretq_u8_u32(odd));
+                output.val[1] = vrev32q_u8(vreinterpretq_u8_u32(even));
+                vst2q_u8(dst, output);
+            }
+#endif
+
+            /* Scalar tail also serves as the complete non-MVE implementation. */
+            for (; ux < line_word;
+                 ux++, src1++, src2++, src3++, src4++, dst += 8)
+            {
+                uint32_t pixel1 = *src1;
+                uint32_t pixel2 = *src2;
+                uint32_t pixel3 = *src3;
+                uint32_t pixel4 = *src4;
+                /* Use OR: addition can wrap to zero and skip a covered block. */
+                if ((pixel1 | pixel2 | pixel3 | pixel4) == 0)
                 {
                     continue;
                 }
-                uint32_t offset = y / raster_prec * out_w + ux * block_bit / raster_prec;
-                img_out[offset + 0] = lookup_table_4b[(pixel1 >> 28) & 0xf] + lookup_table_4b[(pixel2 >> 28) & 0xf]
-                                      +
-                                      lookup_table_4b[(pixel3 >> 28) & 0xf] + lookup_table_4b[(pixel4 >> 28) & 0xf];
-                img_out[offset + 1] = lookup_table_4b[(pixel1 >> 24) & 0xf] + lookup_table_4b[(pixel2 >> 24) & 0xf]
-                                      +
-                                      lookup_table_4b[(pixel3 >> 24) & 0xf] + lookup_table_4b[(pixel4 >> 24) & 0xf];
-                img_out[offset + 2] = lookup_table_4b[(pixel1 >> 20) & 0xf] + lookup_table_4b[(pixel2 >> 20) & 0xf]
-                                      +
-                                      lookup_table_4b[(pixel3 >> 20) & 0xf] + lookup_table_4b[(pixel4 >> 20) & 0xf];
-                img_out[offset + 3] = lookup_table_4b[(pixel1 >> 16) & 0xf] + lookup_table_4b[(pixel2 >> 16) & 0xf]
-                                      +
-                                      lookup_table_4b[(pixel3 >> 16) & 0xf] + lookup_table_4b[(pixel4 >> 16) & 0xf];
-                img_out[offset + 4] = lookup_table_4b[(pixel1 >> 12) & 0xf] + lookup_table_4b[(pixel2 >> 12) & 0xf]
-                                      +
-                                      lookup_table_4b[(pixel3 >> 12) & 0xf] + lookup_table_4b[(pixel4 >> 12) & 0xf];
-                img_out[offset + 5] = lookup_table_4b[(pixel1 >> 8) & 0xf] + lookup_table_4b[(pixel2 >> 8) & 0xf] +
-                                      lookup_table_4b[(pixel3 >> 8) & 0xf] + lookup_table_4b[(pixel4 >> 8) & 0xf];
-                img_out[offset + 6] = lookup_table_4b[(pixel1 >> 4) & 0xf] + lookup_table_4b[(pixel2 >> 4) & 0xf] +
-                                      lookup_table_4b[(pixel3 >> 4) & 0xf] + lookup_table_4b[(pixel4 >> 4) & 0xf];
-                img_out[offset + 7] = lookup_table_4b[(pixel1 >> 0) & 0xf] + lookup_table_4b[(pixel2 >> 0) & 0xf] +
-                                      lookup_table_4b[(pixel3 >> 0) & 0xf] + lookup_table_4b[(pixel4 >> 0) & 0xf];
+                /* Count all eight nibbles of each source word in parallel. */
+                uint32_t t1 = pixel1 - ((pixel1 >> 1) & 0x55555555u);
+                uint32_t t2 = pixel2 - ((pixel2 >> 1) & 0x55555555u);
+                uint32_t t3 = pixel3 - ((pixel3 >> 1) & 0x55555555u);
+                uint32_t t4 = pixel4 - ((pixel4 >> 1) & 0x55555555u);
+                t1 = (t1 & 0x33333333u) + ((t1 >> 2) & 0x33333333u);
+                t2 = (t2 & 0x33333333u) + ((t2 >> 2) & 0x33333333u);
+                t3 = (t3 & 0x33333333u) + ((t3 >> 2) & 0x33333333u);
+                t4 = (t4 & 0x33333333u) + ((t4 >> 2) & 0x33333333u);
+
+                /* Accumulate even and odd nibbles in separate byte lanes to
+                 * prevent carries between fields. */
+                uint32_t even = (t1 & 0x0F0F0F0Fu) + (t2 & 0x0F0F0F0Fu) +
+                                (t3 & 0x0F0F0F0Fu) + (t4 & 0x0F0F0F0Fu);
+                uint32_t odd = ((t1 >> 4) & 0x0F0F0F0Fu) + ((t2 >> 4) & 0x0F0F0F0Fu) +
+                               ((t3 >> 4) & 0x0F0F0F0Fu) + ((t4 >> 4) & 0x0F0F0F0Fu);
+
+                dst[0] = (odd >> 24) & 0x1f;
+                dst[1] = (even >> 24) & 0x1f;
+                dst[2] = (odd >> 16) & 0x1f;
+                dst[3] = (even >> 16) & 0x1f;
+                dst[4] = (odd >> 8) & 0x1f;
+                dst[5] = (even >> 8) & 0x1f;
+                dst[6] = odd & 0x1f;
+                dst[7] = even & 0x1f;
             }
         }
     }
     else if (raster_prec == 2)
     {
-        for (int y = 0; y < render_h; y += raster_prec)
+        const uint32_t *row1 = img;
+        uint8_t *dst_row = img_out;
+
+        for (int y = 0; y < render_h;
+             y += 2, row1 += line_word * 2, dst_row += out_w)
         {
-            for (uint32_t ux = 0; ux < line_word; ux++)
+            const uint32_t *src1 = row1;
+            const uint32_t *src2 = row1 + line_word;
+            uint8_t *dst = dst_row;
+
+            for (uint32_t ux = 0; ux < line_word;
+                 ux++, src1++, src2++, dst += 16)
             {
-                uint32_t pixel1 = img[y * line_word + ux];
-                uint32_t pixel2 = img[y * line_word + ux + line_word];
-                if ((pixel1 + pixel2) == 0)
+                uint32_t pixel1 = *src1;
+                uint32_t pixel2 = *src2;
+                if ((pixel1 | pixel2) == 0)
                 {
                     continue;
                 }
-                uint32_t offset = y / raster_prec * out_w + ux * block_bit / raster_prec;
-                img_out[offset + 0] =  lookup_table_2b[(pixel1 >> 30) & 0x3] + lookup_table_2b[(pixel2 >> 30) &
-                                                                                               0x3];
-                img_out[offset + 1] =  lookup_table_2b[(pixel1 >> 28) & 0x3] + lookup_table_2b[(pixel2 >> 28) &
-                                                                                               0x3];
-                img_out[offset + 2] =  lookup_table_2b[(pixel1 >> 26) & 0x3] + lookup_table_2b[(pixel2 >> 26) &
-                                                                                               0x3];
-                img_out[offset + 3] =  lookup_table_2b[(pixel1 >> 24) & 0x3] + lookup_table_2b[(pixel2 >> 24) &
-                                                                                               0x3];
-                img_out[offset + 4] =  lookup_table_2b[(pixel1 >> 22) & 0x3] + lookup_table_2b[(pixel2 >> 22) &
-                                                                                               0x3];
-                img_out[offset + 5] =  lookup_table_2b[(pixel1 >> 20) & 0x3] + lookup_table_2b[(pixel2 >> 20) &
-                                                                                               0x3];
-                img_out[offset + 6] =  lookup_table_2b[(pixel1 >> 18) & 0x3] + lookup_table_2b[(pixel2 >> 18) &
-                                                                                               0x3];
-                img_out[offset + 7] =  lookup_table_2b[(pixel1 >> 16) & 0x3] + lookup_table_2b[(pixel2 >> 16) &
-                                                                                               0x3];
-                img_out[offset + 8] =  lookup_table_2b[(pixel1 >> 14) & 0x3] + lookup_table_2b[(pixel2 >> 14) &
-                                                                                               0x3];
-                img_out[offset + 9] =  lookup_table_2b[(pixel1 >> 12) & 0x3] + lookup_table_2b[(pixel2 >> 12) &
-                                                                                               0x3];
-                img_out[offset + 10] = lookup_table_2b[(pixel1 >> 10) & 0x3] + lookup_table_2b[(pixel2 >> 10) &
-                                                                                               0x3];
-                img_out[offset + 11] = lookup_table_2b[(pixel1 >> 8) & 0x3] + lookup_table_2b[(pixel2 >> 8) & 0x3];
-                img_out[offset + 12] = lookup_table_2b[(pixel1 >> 6) & 0x3] + lookup_table_2b[(pixel2 >> 6) & 0x3];
-                img_out[offset + 13] = lookup_table_2b[(pixel1 >> 4) & 0x3] + lookup_table_2b[(pixel2 >> 4) & 0x3];
-                img_out[offset + 14] = lookup_table_2b[(pixel1 >> 2) & 0x3] + lookup_table_2b[(pixel2 >> 2) & 0x3];
-                img_out[offset + 15] = lookup_table_2b[(pixel1 >> 0) & 0x3] + lookup_table_2b[(pixel2 >> 0) & 0x3];
+                /* Count all sixteen 2-bit fields in parallel. */
+                uint32_t t1 = pixel1 - ((pixel1 >> 1) & 0x55555555u);
+                uint32_t t2 = pixel2 - ((pixel2 >> 1) & 0x55555555u);
+
+                /* Split alternating 2-bit fields into 4-bit slots before adding
+                 * the two rows, preventing carries between adjacent fields. */
+                uint32_t lo = (t1 & 0x33333333u) + (t2 & 0x33333333u);
+                uint32_t hi = ((t1 >> 2) & 0x33333333u) + ((t2 >> 2) & 0x33333333u);
+
+                /* Emit fields from the most-significant nibble; hi contains even
+                 * pixels and lo contains odd pixels. */
+#if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_DOWNSAMPLE_PREC2
+                /* Gather and shift packed nibbles into 16 output bytes.
+                 * arm_mve.h supports little-endian MVE only. */
+                const uint32_t packed[2] = {hi, lo};
+                const uint8x16_t offsets = {3, 7, 3, 7, 2, 6, 2, 6,
+                                            1, 5, 1, 5, 0, 4, 0, 4
+                                           };
+                const int8x16_t shifts = {-4, -4, 0, 0, -4, -4, 0, 0,
+                                          -4, -4, 0, 0, -4, -4, 0, 0
+                                         };
+                uint8x16_t output = vldrbq_gather_offset_u8((const uint8_t *)packed, offsets);
+                output = vandq_u8(vshlq_u8(output, shifts), vdupq_n_u8(0x7));
+                vstrbq_u8(dst, output);
+#else
+                dst[0] = (hi >> 28) & 0x7;
+                dst[1] = (lo >> 28) & 0x7;
+                dst[2] = (hi >> 24) & 0x7;
+                dst[3] = (lo >> 24) & 0x7;
+                dst[4] = (hi >> 20) & 0x7;
+                dst[5] = (lo >> 20) & 0x7;
+                dst[6] = (hi >> 16) & 0x7;
+                dst[7] = (lo >> 16) & 0x7;
+                dst[8] = (hi >> 12) & 0x7;
+                dst[9] = (lo >> 12) & 0x7;
+                dst[10] = (hi >> 8) & 0x7;
+                dst[11] = (lo >> 8) & 0x7;
+                dst[12] = (hi >> 4) & 0x7;
+                dst[13] = (lo >> 4) & 0x7;
+                dst[14] = hi & 0x7;
+                dst[15] = lo & 0x7;
+#endif
             }
         }
     }
     else if (raster_prec == 1)
     {
-        for (int y = 0; y < render_h; y += raster_prec)
+        const uint32_t *src = img;
+        const uint32_t *end = img + (size_t)render_h * line_word;
+        uint32_t *dst = (uint32_t *)img_out;
+
+        /* Expand each word into 32 coverage bytes. MVE gathers bits by lane;
+         * the scalar path expands eight nibbles through a lookup table. */
+#if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_DOWNSAMPLE_PREC1
+        const uint8x16_t offsets_hi = {3, 3, 3, 3, 3, 3, 3, 3,
+                                       2, 2, 2, 2, 2, 2, 2, 2
+                                      };
+        const uint8x16_t offsets_lo = {1, 1, 1, 1, 1, 1, 1, 1,
+                                       0, 0, 0, 0, 0, 0, 0, 0
+                                      };
+        const int8x16_t shifts = {-7, -6, -5, -4, -3, -2, -1, 0,
+                                  -7, -6, -5, -4, -3, -2, -1, 0
+                                 };
+        const uint8x16_t bit_mask = vdupq_n_u8(1);
+        const uint8x16_t zero = vdupq_n_u8(0);
+#endif
+        for (; src < end; src++, dst += 8)
         {
-            for (uint32_t ux = 0; ux < line_word; ux++)
+            uint32_t pixel = *src;
+            if (pixel == 0)
             {
-                uint32_t pixel1 = img[y * line_word + ux];
-                if (!pixel1)
-                {
-                    continue;
-                }
-                int offset = y * out_w + ux * block_bit;
-                for (int i = 0; i < 32; i++)
-                {
-                    img_out[offset + i] = (pixel1 >> (31 - i)) & 1 ? 0xff : 0;
-                }
+                continue;
             }
+
+#if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_DOWNSAMPLE_PREC1
+            uint8x16_t output = vldrbq_gather_offset_u8((const uint8_t *)&pixel, offsets_hi);
+            output = vandq_u8(vshlq_u8(output, shifts), bit_mask);
+            vstrbq_u8((uint8_t *)dst, vsubq_u8(zero, output));
+
+            output = vldrbq_gather_offset_u8((const uint8_t *)&pixel, offsets_lo);
+            output = vandq_u8(vshlq_u8(output, shifts), bit_mask);
+            vstrbq_u8((uint8_t *)(dst + 4), vsubq_u8(zero, output));
+#else
+            dst[0] = font_ttf_expand_4bit[(pixel >> 28) & 0xf];
+            dst[1] = font_ttf_expand_4bit[(pixel >> 24) & 0xf];
+            dst[2] = font_ttf_expand_4bit[(pixel >> 20) & 0xf];
+            dst[3] = font_ttf_expand_4bit[(pixel >> 16) & 0xf];
+            dst[4] = font_ttf_expand_4bit[(pixel >> 12) & 0xf];
+            dst[5] = font_ttf_expand_4bit[(pixel >> 8) & 0xf];
+            dst[6] = font_ttf_expand_4bit[(pixel >> 4) & 0xf];
+            dst[7] = font_ttf_expand_4bit[pixel & 0xf];
+#endif
         }
     }
     else if (raster_prec == 8)
     {
-        for (int y = 0; y < render_h; y += raster_prec)
+        const uint32_t *row1 = img;
+        uint8_t *dst_row = img_out;
+
+        for (int y = 0; y < render_h;
+             y += 8, row1 += line_word * 8, dst_row += out_w)
         {
-            for (uint32_t ux = 0; ux < line_word; ux++)
+            const uint32_t *src1 = row1;
+            const uint32_t *src2 = row1 + line_word;
+            const uint32_t *src3 = row1 + line_word * 2;
+            const uint32_t *src4 = row1 + line_word * 3;
+            const uint32_t *src5 = row1 + line_word * 4;
+            const uint32_t *src6 = row1 + line_word * 5;
+            const uint32_t *src7 = row1 + line_word * 6;
+            const uint32_t *src8 = row1 + line_word * 7;
+            uint8_t *dst = dst_row;
+            uint32_t ux = 0;
+
+#if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_DOWNSAMPLE_PREC8
+            /* Apply byte-wise SWAR popcount to four words at once, sum eight rows,
+             * then reverse bytes to restore MSB-first pixel order. */
+            const uint32x4_t mask1 = vdupq_n_u32(0x55555555u);
+            const uint32x4_t mask2 = vdupq_n_u32(0x33333333u);
+            const uint32x4_t mask4 = vdupq_n_u32(0x0F0F0F0Fu);
+            for (; ux + 4 <= line_word;
+                 ux += 4, src1 += 4, src2 += 4, src3 += 4, src4 += 4,
+                 src5 += 4, src6 += 4, src7 += 4, src8 += 4, dst += 16)
             {
-                uint32_t pixel1 = img[y * line_word + ux];
-                uint32_t pixel2 = img[(y + 1) * line_word + ux];
-                uint32_t pixel3 = img[(y + 2) * line_word + ux];
-                uint32_t pixel4 = img[(y + 3) * line_word + ux];
-                uint32_t pixel5 = img[(y + 4) * line_word + ux];
-                uint32_t pixel6 = img[(y + 5) * line_word + ux];
-                uint32_t pixel7 = img[(y + 6) * line_word + ux];
-                uint32_t pixel8 = img[(y + 7) * line_word + ux];
+#define FONT_TTF_MVE_BYTE_POPCOUNT(src) \
+    ({ \
+        uint32x4_t v = vldrwq_u32(src); \
+        v = vsubq_u32(v, vandq_u32(vshrq_n_u32(v, 1), mask1)); \
+        v = vaddq_u32(vandq_u32(v, mask2), \
+                      vandq_u32(vshrq_n_u32(v, 2), mask2)); \
+        vandq_u32(vaddq_u32(v, vshrq_n_u32(v, 4)), mask4); \
+    })
+                uint8x16_t sum = vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src1));
+                sum = vaddq_u8(sum, vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src2)));
+                sum = vaddq_u8(sum, vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src3)));
+                sum = vaddq_u8(sum, vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src4)));
+                sum = vaddq_u8(sum, vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src5)));
+                sum = vaddq_u8(sum, vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src6)));
+                sum = vaddq_u8(sum, vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src7)));
+                sum = vaddq_u8(sum, vreinterpretq_u8_u32(FONT_TTF_MVE_BYTE_POPCOUNT(src8)));
+#undef FONT_TTF_MVE_BYTE_POPCOUNT
+                vstrbq_u8(dst, vrev32q_u8(sum));
+            }
+#endif
 
-                uint32_t offset = y / raster_prec * out_w + ux * block_bit / raster_prec;
-                img_out[offset + 0] = lookup_table_8b[(pixel1 >> 24) & 0xff] + lookup_table_8b[(pixel2 >> 24) &
-                                                                                               0xff] +
-                                      lookup_table_8b[(pixel3 >> 24) & 0xff] + lookup_table_8b[(pixel4 >> 24) & 0xff] +
-                                      lookup_table_8b[(pixel5 >> 24) & 0xff] + lookup_table_8b[(pixel6 >> 24) & 0xff] +
-                                      lookup_table_8b[(pixel7 >> 24) & 0xff] + lookup_table_8b[(pixel8 >> 24) & 0xff];
-                img_out[offset + 1] = lookup_table_8b[(pixel1 >> 16) & 0xff] + lookup_table_8b[(pixel2 >> 16) &
-                                                                                               0xff] +
-                                      lookup_table_8b[(pixel3 >> 16) & 0xff] + lookup_table_8b[(pixel4 >> 16) & 0xff] +
-                                      lookup_table_8b[(pixel5 >> 16) & 0xff] + lookup_table_8b[(pixel6 >> 16) & 0xff] +
-                                      lookup_table_8b[(pixel7 >> 16) & 0xff] + lookup_table_8b[(pixel8 >> 16) & 0xff];
-                img_out[offset + 2] = lookup_table_8b[(pixel1 >> 8) & 0xff] + lookup_table_8b[(pixel2 >> 8) & 0xff]
-                                      +
-                                      lookup_table_8b[(pixel3 >> 8) & 0xff] + lookup_table_8b[(pixel4 >> 8) & 0xff] +
-                                      lookup_table_8b[(pixel5 >> 8) & 0xff] + lookup_table_8b[(pixel6 >> 8) & 0xff] +
-                                      lookup_table_8b[(pixel7 >> 8) & 0xff] + lookup_table_8b[(pixel8 >> 8) & 0xff];
-                img_out[offset + 3] = lookup_table_8b[pixel1 & 0xff] + lookup_table_8b[pixel2 & 0xff] +
-                                      lookup_table_8b[pixel3 & 0xff] + lookup_table_8b[pixel4 & 0xff] +
-                                      lookup_table_8b[pixel5 & 0xff] + lookup_table_8b[pixel6 & 0xff] +
-                                      lookup_table_8b[pixel7 & 0xff] + lookup_table_8b[pixel8 & 0xff];
+            /* Scalar tail is also the non-MVE fallback. Keep its cheap per-word
+             * zero check; a vector-group check would add reduction overhead. */
+            for (; ux < line_word;
+                 ux++, src1++, src2++, src3++, src4++,
+                 src5++, src6++, src7++, src8++, dst += 4)
+            {
+                uint32_t pixel1 = *src1;
+                uint32_t pixel2 = *src2;
+                uint32_t pixel3 = *src3;
+                uint32_t pixel4 = *src4;
+                uint32_t pixel5 = *src5;
+                uint32_t pixel6 = *src6;
+                uint32_t pixel7 = *src7;
+                uint32_t pixel8 = *src8;
 
+                if ((pixel1 | pixel2 | pixel3 | pixel4 |
+                     pixel5 | pixel6 | pixel7 | pixel8) == 0)
+                {
+                    continue;
+                }
+
+                /* Count each word by byte; the eight-row sum fits in byte lanes. */
+                uint32_t sum = font_ttf_popcount_bytes(pixel1) +
+                               font_ttf_popcount_bytes(pixel2) +
+                               font_ttf_popcount_bytes(pixel3) +
+                               font_ttf_popcount_bytes(pixel4) +
+                               font_ttf_popcount_bytes(pixel5) +
+                               font_ttf_popcount_bytes(pixel6) +
+                               font_ttf_popcount_bytes(pixel7) +
+                               font_ttf_popcount_bytes(pixel8);
+
+                dst[0] = (sum >> 24) & 0xff;
+                dst[1] = (sum >> 16) & 0xff;
+                dst[2] = (sum >> 8) & 0xff;
+                dst[3] = sum & 0xff;
             }
         }
     }
@@ -1025,8 +1271,9 @@ uint8_t gui_font_ttf_delete(uint8_t *font_bin_addr)
 }
 
 /**
- * @brief Get cached TTF header from font_lib_manager
- * @return Cached header pointer, or NULL if not cached
+ * @brief Return the cached TTF header.
+ * @param font_file Font resource identifier.
+ * @return Cached header, or NULL if unavailable.
  */
 static GUI_FONT_HEAD_TTF *get_cached_ttf_header(uint8_t *font_file)
 {
@@ -1039,8 +1286,9 @@ static GUI_FONT_HEAD_TTF *get_cached_ttf_header(uint8_t *font_file)
 }
 
 /**
- * @brief Get cached index table from font_lib_manager
- * @return Cached index table pointer (after header), or NULL if not cached
+ * @brief Return the cached TTF index table.
+ * @param font_file Font resource identifier.
+ * @return Cached index table, or NULL if unavailable.
  */
 static uint8_t *get_cached_ttf_index_table(uint8_t *font_file)
 {
@@ -1053,13 +1301,8 @@ static uint8_t *get_cached_ttf_index_table(uint8_t *font_file)
     return NULL;
 }
 
-/**
- * @brief Search for a glyph in all registered TTF fonts (fallback).
- *
- * Iterates font_lib TTF nodes ordered by priority, skipping the primary font.
- * TTF fonts are scalable so font_size matching is not required.
- * Supports MEMADDR, FTL, and FILESYS modes.
- */
+/* Search registered TTF fonts by priority, excluding the primary font.
+ * Supports MEMADDR, FTL, and FILESYS sources. */
 int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
                                  uint8_t bold_weight, uint8_t *skip_file,
                                  mem_char_t *out_chr)
@@ -1398,11 +1641,8 @@ gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *h
     }
     else
     {
-        /**
-         * @deprecated Legacy fit-in-box rendering path (version[0] < 3).
-         * Scheduled for removal ~6-12 months after standard typography release.
-         * Regenerate font files with Font_Tool v3+ to use the standard typography model.
-         */
+        /* Deprecated legacy layout for pre-v3 fonts.
+         * Regenerate with Font_Tool v3+ before removing this path. */
         ctx.is_v3 = false;
         ctx.baseline_px = 0;
         ctx.default_line_height = (int16_t)font_height;
@@ -1412,22 +1652,7 @@ gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *h
 }
 
 /**
- * @brief Populate V3 standard bearing/advance fields in mem_char_t from glyph data.
- *
- * For V3 standard mode (typo_ctx.is_v3 = true), computes bearing_x, bearing_y,
- * advance from font units using the standard scale. Clamps bearing values to
- * int8_t range with gui_log() warning on overflow.
- *
- * For legacy mode, computes char_w using the legacy formula.
- *
- * @param chr        Output character info to populate.
- * @param glyphData  Glyph data with font-unit metrics.
- * @param unicode    Unicode code point.
- * @param font_height Font height in pixels.
- * @param scale      Rendering scale factor.
- * @param bold_weight Bold weight (0 = normal).
- * @param typo_ctx   Typography context (determines V3 vs legacy path).
- * @param dot_addr   Glyph data address for rendering.
+ * @copydoc ttf_populate_glyph_metrics
  */
 static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *glyphData,
                                        uint32_t unicode, uint16_t font_height,
@@ -1484,10 +1709,7 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
     }
     else
     {
-        /**
-         * @deprecated Legacy char_w calculation without bearing (version[0] < 3).
-         * Scheduled for removal ~6-12 months after standard typography release.
-         */
+        /* Deprecated width calculation for pre-v3 fonts. */
         chr->char_w = glyphData->advance * scale + bold_weight * 2;
         /* Combining marks (advance=0): set char_w from bbox to avoid draw-loop skip. */
         if (chr->char_w == 0 && glyphData->x1 > glyphData->x0)
@@ -1503,7 +1725,11 @@ static void ttf_populate_glyph_metrics(mem_char_t *chr, const FontGlyphData *gly
  *                           Public Functions
  *============================================================================*/
 
-void gui_font_get_ttf_info(gui_text_t *text)
+/**
+ * @brief Load glyph metadata for a text object.
+ * @param text Text object to populate.
+ */
+static void font_ttf_get_info(gui_text_t *text)
 {
     GUI_ASSERT(text->path != NULL);
     GUI_FONT_HEAD_TTF *ttfbin;
@@ -1606,10 +1832,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
     }
     else
     {
-        /**
-         * @deprecated Legacy scale path (version[0] < 3).
-         * Scheduled for removal ~6-12 months after standard typography release.
-         */
+        /* Deprecated scale calculation for pre-v3 fonts. */
         scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
     }
 #else
@@ -1787,10 +2010,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
             else
 #endif /* ENABLE_FONT_V3_TYPO */
             {
-                /**
-                 * @deprecated Legacy space width approximation (version[0] < 3).
-                 * Scheduled for removal ~6-12 months after standard typography release.
-                 */
+                /* Deprecated space-width fallback for pre-v3 fonts. */
                 chr[chr_i].char_w = fallback_space_width;
             }
 
@@ -1841,7 +2061,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
                 index_table_ptr = (uint8_t *)text->path + ttfbin->head_length;
             }
 
-            // Validate index_table_ptr before use to prevent null dereference
+            /* Skip the glyph when no index table is available. */
             if (index_table_ptr == NULL)
             {
                 if (fs_index_table != NULL)
@@ -2030,6 +2250,13 @@ void gui_font_get_ttf_info(gui_text_t *text)
     }
 }
 
+void gui_font_get_ttf_info(gui_text_t *text)
+{
+
+    font_ttf_get_info(text);
+
+}
+
 void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect)
 {
     gui_matrix_t *tm = text->base.matrix;
@@ -2118,7 +2345,12 @@ void gui_font_ttf_unload(gui_text_t *text)
     gui_font_ttf_destroy(text);
 }
 
-void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
+/**
+ * @brief Rasterize and draw all glyphs in a text object.
+ * @param text Text object containing glyphs and rendering settings.
+ * @param rect Text bounds and clipping rectangle.
+ */
+static void font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     GUI_ASSERT(text->path != NULL);
     GUI_FONT_HEAD_TTF *ttfbin;
@@ -2188,10 +2420,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
     }
     else
     {
-        /**
-         * @deprecated Legacy fit-in-box scale and ascent+y0 positioning (version[0] < 3).
-         * Scheduled for removal ~6-12 months after standard typography release.
-         */
+        /* Deprecated scale and ascent positioning for pre-v3 fonts. */
         ascent = ttfbin->ascent;
         scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
     }
@@ -2241,10 +2470,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         tm_type = FONT_IDENTITY;
     }
 
-    /* Frame-start snapshot: the put path below flips text->font_cache_static
-     * per glyph, but the hit dispatch must see one consistent value across the
-     * whole pass (esp. RAMLESS, one pass per section) so a transition-frame
-     * glyph[0] cannot misroute glyph[1] into the banding branch. */
+    /* Keep cache mode stable for this pass; glyph updates must not affect the
+     * dispatch of later glyphs, especially across RAMLESS sections. */
     const bool prev_static = text->font_cache_static;
 
     for (uint16_t index = 0; index < text->active_font_len; index++)
@@ -2259,9 +2486,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
             bool now_static = (tm_type == FONT_IDENTITY || tm_type == FONT_TRANSFORM);
             if (now_static && prev_static)
             {
-                /* Cross-frame cache hit: recompute geometry from dot_addr (no extra
-                 * fields). chr[].x/y are re-laid out each frame, so translation
-                 * follows for free -- the cached bitmap is position-independent. */
+                /* Recompute placement because chr[].x/y may change each frame;
+                 * the cached bitmap itself is position-independent. */
                 FontGlyphData *gd = (FontGlyphData *)chr[index].dot_addr;
                 float origin_x, origin_y;
                 ttf_raster_geo_t geo;
@@ -2276,10 +2502,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
             }
             if (dc->type == DC_RAMLESS && !prev_static)
             {
-                /* RAMLESS section-banding (scale/rotate, or cache disabled):
-                 * chr[].x/y store absolute bitmap position (mx0/my0), chr[].w/h
-                 * store bitmap size; free once the scan band passes the glyph.
-                 * Unchanged from the original per-frame behaviour. */
+                /* Reuse the bitmap across RAMLESS sections, then free it after
+                 * the scan band passes the glyph. */
                 font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x, chr[index].y,
                                              chr[index].w, chr[index].h);
                 if (dc->pfb_type == PFB_Y_DIRECTION)
@@ -2357,7 +2581,8 @@ ttf_rasterize:
         {
             continue;  /* glyph has advance but no outline (e.g. non-breaking space) */
         }
-        ttf_point *windingsf = gui_malloc(line_count * sizeof(ttf_point));
+        uint32_t windingsf_size = line_count * sizeof(ttf_point);
+        ttf_point *windingsf = gui_malloc(windingsf_size);
         GUI_ASSERT(windingsf != NULL);
 
         /* Calculate extra space needed for bold effect */
@@ -2366,10 +2591,8 @@ ttf_rasterize:
 
         switch (tm_type)
         {
-        /* Affine (scale/rotate) and perspective share one placement path: the only
-         * differences are which bbox helper and which point transform to use. The
-         * MVE variants that used to live here were measured as no faster than the
-         * auto-vectorized scalar loops, so they were dropped in the merge. */
+        /* Affine and perspective share placement; only bbox and point transforms differ.
+         * Prior MVE variants were not faster than the scalar loops. */
         case FONT_HOMOGENEOUS:
         case FONT_SCALE:
             {
@@ -2387,11 +2610,8 @@ ttf_rasterize:
                 glyph_x1 = scale * glyphData->x1;
                 glyph_y1 = scale * (ascent + glyphData->y1);
 
-                /* Exact device-space glyph bbox, in pixels. Deriving the bitmap
-                 * position from this -- rather than from a pen-local box that is
-                 * rounded first and transformed afterwards -- keeps the matrix from
-                 * amplifying the rounding error, and keeps the bold margin in the
-                 * same space as the dilation that actually happens on the bitmap. */
+                /* Derive placement from the exact device-space bbox to avoid
+                 * amplifying pre-transform rounding errors. */
                 if (perspective)
                 {
                     computeBoundingBoxFloatV2(pen_x + glyph_x0, pen_y + glyph_y0,
@@ -2423,14 +2643,16 @@ ttf_rasterize:
                 mx1 = mx0 + out_w - 1;
                 my1 = my0 + out_h - 1;
 
-                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                uint32_t windingsfm_size = line_count * sizeof(ttf_point);
+                windingsfm = gui_malloc(windingsfm_size);
                 GUI_ASSERT(windingsfm != NULL);
 #if FIX_AUTO_VECTORIZE
                 /* Copy out of the packed/unaligned font data so the loops below can
                  * be auto-vectorized. */
-                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                uint32_t windingsd_size = line_count * sizeof(FontWindings);
+                FontWindings *windingsd = gui_malloc(windingsd_size);
                 GUI_ASSERT(windingsd != NULL);
-                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, windingsd_size);
                 const FontWindings *wsrc = windingsd;
 #else
                 const FontWindings *wsrc = windings;
@@ -2504,12 +2726,15 @@ ttf_rasterize:
                 my0 = out_y0 + chr[index].y;
                 my1 = out_y1 + chr[index].y;
 
-#if defined FONT_TTF_USE_MVE && 0
-                /* MVE version: memcpy overhead cancels MVE benefit, not effective */
+#if defined(FONT_TTF_USE_MVE_FP) && FONT_TTF_MVE_WINDING_TRANSFORM
+                /* Stage packed flash data in RAM before explicit MVE loads. With
+                 * FIX_AUTO_VECTORIZE enabled, the scalar path pays the same copy
+                 * cost, which is why this implementation now has a net benefit. */
                 {
-                    FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                    uint32_t windingsd_size = line_count * sizeof(FontWindings);
+                    FontWindings *windingsd = gui_malloc(windingsd_size);
                     GUI_ASSERT(windingsd != NULL);
-                    memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                    memcpy(windingsd, windings, windingsd_size);
 
                     const float offset_x = -glyphData->x0 * render_scale + bold_extra + geo.sub_x;
                     const float offset_y = -glyphData->y0 * render_scale + bold_extra + geo.sub_y;
@@ -2532,21 +2757,26 @@ ttf_rasterize:
                     gui_free(windingsd);
                 }
 #else
+                /* Hoist glyph bounds because -fno-strict-aliasing prevents the
+                 * compiler from doing so. Keep expressions bit-identical. */
+                const int glyph_x0 = glyphData->x0;
+                const int glyph_y0 = glyphData->y0;
 #if FIX_AUTO_VECTORIZE
-                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                uint32_t windingsd_size = line_count * sizeof(FontWindings);
+                FontWindings *windingsd = gui_malloc(windingsd_size);
                 GUI_ASSERT(windingsd != NULL);
-                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, windingsd_size);
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra + geo.sub_x;
-                    windingsf[i].y = (- glyphData->y0 - windingsd[i].y) * render_scale + bold_extra + geo.sub_y;
+                    windingsf[i].x = (windingsd[i].x - glyph_x0) * render_scale + bold_extra + geo.sub_x;
+                    windingsf[i].y = (- glyph_y0 - windingsd[i].y) * render_scale + bold_extra + geo.sub_y;
                 }
                 gui_free(windingsd);
 #else
                 for (int i = 0; i < line_count; i++)
                 {
-                    windingsf[i].x = (windings[i].x - glyphData->x0) * render_scale + bold_extra + geo.sub_x;
-                    windingsf[i].y = (- glyphData->y0 - windings[i].y) * render_scale + bold_extra + geo.sub_y;
+                    windingsf[i].x = (windings[i].x - glyph_x0) * render_scale + bold_extra + geo.sub_x;
+                    windingsf[i].y = (- glyph_y0 - windings[i].y) * render_scale + bold_extra + geo.sub_y;
                 }
 #endif
 #endif
@@ -2556,7 +2786,9 @@ ttf_rasterize:
             break;
         }
 
-        LINE_T *line_list = gui_malloc(line_count * sizeof(LINE_T));
+
+        uint32_t line_list_size = line_count * sizeof(LINE_T);
+        LINE_T *line_list = gui_malloc(line_list_size);
         GUI_ASSERT(line_list != NULL);
 
         int lint_count_actual = 0;
@@ -2564,8 +2796,12 @@ ttf_rasterize:
         for (int i = 0; i < glyphData->winding_count; i++)
         {
             ttf_point *winding = windingsf + winding_offset;
-            winding_offset += winding_lengths[i];
-            for (int j = 0; j < winding_lengths[i] - 1; j++)
+            /* Hoisted for the same aliasing reason as glyph_x0 above: the
+             * line_list store may alias winding_lengths, so the length was
+             * reloaded once per edge just to re-evaluate the loop bound. */
+            const int winding_len = winding_lengths[i];
+            winding_offset += winding_len;
+            for (int j = 0; j < winding_len - 1; j++)
             {
                 if (winding[j].y == winding[j + 1].y)
                 {
@@ -2581,6 +2817,7 @@ ttf_rasterize:
         //             i,line_list[i].x0,line_list[i].y0,line_list[i].y1,line_list[i].dxy);
         // }
 
+
         uint32_t render_size = render_w * render_h / 8;
         uint32_t *img = gui_malloc(render_size);
         GUI_ASSERT(img != NULL);
@@ -2590,30 +2827,79 @@ ttf_rasterize:
         uint8_t *img_out = gui_malloc(out_size);
         GUI_ASSERT(img_out != NULL);
 
+        /* Even-odd fill: mark crossings, then propagate parity across each row.
+         * Hoist edge values because -fno-strict-aliasing blocks compiler hoisting. */
+#if FONT_TTF_SCANLINE_PREFIX_XOR
         for (int i = 0; i < lint_count_actual; i++)
         {
-            int y_start = line_list[i].y0;
-            int y_end = line_list[i].y1;
+            const float x0 = line_list[i].x0;
+            const float dxy = line_list[i].dxy;
+            const int y_end = line_list[i].y1;
+            uint32_t *row = img + (uint32_t)line_list[i].y0 * line_word;
 
-            for (int y = y_start; y < y_end; y++)
+            for (int y = line_list[i].y0; y < y_end; y++, row += line_word)
             {
-                uint32_t xint = (uint32_t)(line_list[i].x0 + line_list[i].dxy * y);
-                img[y * line_word + xint / block_bit] ^= masks[xint % block_bit];
-                for (uint32_t li = xint / block_bit + 1; li < line_word; li++)
+                uint32_t xint = (uint32_t)(x0 + dxy * y);
+
+                row[xint / FONT_TTF_BLOCK_BIT] ^=
+                    0x80000000u >> (xint % FONT_TTF_BLOCK_BIT);
+            }
+        }
+
+        uint32_t *prefix_row = img;
+
+        for (int y = 0; y < render_h; y++, prefix_row += line_word)
+        {
+            uint32_t carry = 0;
+
+            for (uint32_t li = 0; li < line_word; li++)
+            {
+                uint32_t w = prefix_row[li];
+
+                w ^= w >> 1;
+                w ^= w >> 2;
+                w ^= w >> 4;
+                w ^= w >> 8;
+                w ^= w >> 16;
+                w ^= carry;
+                prefix_row[li] = w;
+                carry = 0u - (w & 1u);
+            }
+        }
+#else
+        /* XOR each crossing to the row end. Choose this branch when sparse,
+         * narrow outlines outperform the fixed per-row prefix pass. */
+        for (int i = 0; i < lint_count_actual; i++)
+        {
+            const float x0 = line_list[i].x0;
+            const float dxy = line_list[i].dxy;
+            const int y_end = line_list[i].y1;
+            uint32_t *row = img + (uint32_t)line_list[i].y0 * line_word;
+
+            for (int y = line_list[i].y0; y < y_end; y++, row += line_word)
+            {
+                uint32_t xint = (uint32_t)(x0 + dxy * y);
+                uint32_t word = xint / FONT_TTF_BLOCK_BIT;
+
+                row[word] ^= 0xFFFFFFFFu >> (xint % FONT_TTF_BLOCK_BIT);
+                for (uint32_t li = word + 1; li < line_word; li++)
                 {
-                    img[y * line_word + li] ^= masks[0];
+                    row[li] = ~row[li];
                 }
             }
         }
+#endif
         makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h, line_word, block_bit);
 
-        /* Apply bold effect before anti-aliasing adjustment */
+        /* Apply bold effect before anti-aliasing adjustment. This is included in
+         * downsample because the current benchmark uses bold_weight == 0. */
         if (bold_weight > 0)
         {
             font_ttf_bitmap_embolden(img_out, out_w, out_h, bold_weight, text->bold_mode);
         }
 
         adjustImageBufferPrecision(img_out, out_size, raster_prec);
+
 
         font_ttf_draw_bitmap_classic(text, img_out, rect, mx0, my0, out_w, out_h);
 
@@ -2657,5 +2943,12 @@ ttf_rasterize:
     {
         gui_free(ttfbin);
     }
+}
+
+void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
+{
+
+    font_ttf_draw(text, rect);
+
 }
 

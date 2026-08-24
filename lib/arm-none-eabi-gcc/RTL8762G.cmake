@@ -6,7 +6,7 @@
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -xc \
-    -march=armv8.1-m.main+dsp+mve+fp \
+    -march=armv8.1-m.main+dsp+mve.fp+fp \
     -mthumb \
     -std=c11 \
     -mfloat-abi=hard \
@@ -16,7 +16,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -std=c++11 \
-    -march=armv8.1-m.main+dsp+mve+fp \
+    -march=armv8.1-m.main+dsp+mve.fp+fp \
     -mthumb \
     -std=c11 \
     -mfloat-abi=hard \

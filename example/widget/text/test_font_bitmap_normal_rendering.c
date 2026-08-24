@@ -113,8 +113,3 @@ static void ui_text_font(gui_view_t *view)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void text_font_rendering_test(void)
-{
-    gui_view_create(gui_obj_get_root(), CURRENT_VIEW_NAME, 0, 0, 0, 0);
-}
-
