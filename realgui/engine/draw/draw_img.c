@@ -297,9 +297,10 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode, const char
         }
         else if (head->compress)
         {
-            if (gui_get_acc()->idu_load != NULL)
+            struct acc_engine *acc = gui_get_acc();
+            if (acc != NULL && acc->idu_load != NULL && acc->idu_free != NULL)
             {
-                void *decoded = gui_get_acc()->idu_load(image->data);
+                void *decoded = acc->idu_load(image->data);
                 if (decoded != NULL)
                 {
                     image->data = decoded;
@@ -340,9 +341,10 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *p
         }
         else if (head->idu)
         {
-            if (gui_get_acc()->idu_free != NULL)
+            struct acc_engine *acc = gui_get_acc();
+            if (acc != NULL && acc->idu_free != NULL)
             {
-                gui_get_acc()->idu_free(img->data);
+                acc->idu_free(img->data);
             }
         }
     }

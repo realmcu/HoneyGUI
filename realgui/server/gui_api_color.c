@@ -472,9 +472,10 @@ void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
 void gui_fb_clear(uint8_t *addr, gui_color_t color, uint32_t len/*pixel count*/)
 {
     extern acc_engine_t *gui_get_acc(void);
-    if (gui_get_acc()->fb_clear != NULL)
+    acc_engine_t *acc = gui_get_acc();
+    if (acc != NULL && acc->fb_clear != NULL)
     {
-        gui_get_acc()->fb_clear(addr, color, len);
+        acc->fb_clear(addr, color, len);
         return;
     }
     extern gui_dispdev_t *gui_get_dc(void);
