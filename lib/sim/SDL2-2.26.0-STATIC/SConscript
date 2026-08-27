@@ -1,18 +1,17 @@
 from building import *
-import sys
 import os
 
 cwd = GetCurrentDir()
+Import('env')
 
 src = []
 
-if sys.platform == 'win32':
+if env['TARGET_OS'] == 'windows':
     # Library path and include path for Windows
     libpath = [os.path.join(cwd, 'lib')]
     include = [os.path.join(cwd, 'include', 'SDL2')]
     
     # Export library path to environment
-    Import('env')
     env.Append(LIBPATH = libpath)
     env.Append(CPPPATH = include)
 else:  # Linux/WSL - use system SDL2
@@ -24,7 +23,6 @@ else:  # Linux/WSL - use system SDL2
     include = os.environ.get('SDL2_INCLUDE_DIR', '/usr/include/SDL2').split(os.pathsep)
     libpath = [p for p in os.environ.get('SDL2_LIB_DIR', '').split(os.pathsep) if p]
 
-    Import('env')
     env.Append(CPPPATH = include, LIBPATH = libpath)
 
 

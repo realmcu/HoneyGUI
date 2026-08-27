@@ -82,6 +82,11 @@
  */
 
 #include <string.h>
+#ifdef _HONEYGUI_SIMULATOR_
+#include <stdlib.h>
+#include "gui_api_os.h"
+#include "gui_vfs.h"
+#endif
 #include "guidef.h"
 #include "gui_obj.h"
 #include "gui_api.h"
@@ -112,38 +117,97 @@
 #endif
 
 /*============================================================================*
- *                           Binary resource binding
+ *                              Resource binding
  *============================================================================*/
 
 #if (STREAM_DEMO_SELECTION == STREAM_DEMO_DUCK)
 
-#ifdef _HONEYGUI_SIMULATOR_
-extern const unsigned char _binary_duck_avi_start[];
-#else
+#ifndef _HONEYGUI_SIMULATOR_
 #define STREAM_DEMO_FLASH_ADDR   0x240F400UL
 #endif
 
 #elif (STREAM_DEMO_SELECTION == STREAM_DEMO_EARTH)
 
-#ifdef _HONEYGUI_SIMULATOR_
-extern const unsigned char _binary_earth_420_410_502_40_lq_mjpg_start[];
-extern const unsigned char _binary_earth_420_410_502_40_lq_mjpg_end[];
-#else
+#ifndef _HONEYGUI_SIMULATOR_
 #define STREAM_DEMO_FLASH_ADDR   0x7004D100UL
 #define STREAM_DEMO_FLASH_SIZE   5574973UL
 #endif
 
 #else /* STREAM_DEMO_BIRDS */
 
-#ifdef _HONEYGUI_SIMULATOR_
-extern const unsigned char _binary_birds_header_h264_start[];
-extern const unsigned char _binary_birds_header_h264_end[];
-#else
+#ifndef _HONEYGUI_SIMULATOR_
 #define STREAM_DEMO_FLASH_ADDR   0x7004D100UL   /* set to the birds flash address on HW */
 #define STREAM_DEMO_FLASH_SIZE   3232535UL
 #endif
 
 #endif /* STREAM_DEMO_SELECTION */
+
+#ifdef _HONEYGUI_SIMULATOR_
+/* The producer thread retains the selected resource for the demo lifetime. */
+static uint8_t *s_simulator_resource;
+static uint32_t s_simulator_resource_size;
+
+static const uint8_t *load_simulator_resource(const char *path, uint32_t *size)
+{
+    if (s_simulator_resource != NULL)
+    {
+        *size = s_simulator_resource_size;
+        return s_simulator_resource;
+    }
+
+    gui_vfs_stat_t stat;
+    if (gui_vfs_stat(path, &stat) != 0 ||
+        stat.type != GUI_VFS_TYPE_FILE ||
+        stat.size == 0u ||
+        stat.size > (size_t)0xFFFFFFFFu)
+    {
+        gui_log("stream demo: failed to stat simulator resource: %s\n", path);
+        return NULL;
+    }
+
+    gui_vfs_file_t *file = gui_vfs_open(path, GUI_VFS_READ);
+    if (file == NULL)
+    {
+        gui_log("stream demo: failed to open simulator resource: %s\n", path);
+        return NULL;
+    }
+
+    uint8_t *data = (uint8_t *)malloc(stat.size);
+    if (data == NULL)
+    {
+        gui_log("stream demo: failed to allocate simulator resource: %s\n", path);
+        gui_vfs_close(file);
+        return NULL;
+    }
+
+    size_t total = 0u;
+    while (total < stat.size)
+    {
+        int read_size = gui_vfs_read(file, data + total, stat.size - total);
+        if (read_size <= 0)
+        {
+            gui_log("stream demo: failed to read simulator resource: %s\n", path);
+            free(data);
+            gui_vfs_close(file);
+            return NULL;
+        }
+        total += (size_t)read_size;
+    }
+
+    gui_vfs_close(file);
+    s_simulator_resource = data;
+    s_simulator_resource_size = (uint32_t)stat.size;
+    *size = s_simulator_resource_size;
+    return s_simulator_resource;
+}
+
+static void release_simulator_resource(void)
+{
+    free(s_simulator_resource);
+    s_simulator_resource = NULL;
+    s_simulator_resource_size = 0u;
+}
+#endif
 
 /*============================================================================*
  *                             Demo configuration
@@ -238,24 +302,172 @@ typedef struct
     uint32_t       fps_den;
 } avi_info_t;
 
-static bool avi_parse(const uint8_t *data, avi_info_t *out)
+static bool avi_range_valid(uint32_t offset, uint32_t size, uint32_t limit)
 {
+    return offset <= limit && size <= limit - offset;
+}
+
+static bool avi_chunk_next(uint32_t offset, uint32_t size, uint32_t limit,
+                           uint32_t *next)
+{
+    if (!avi_range_valid(offset, 8u, limit))
+    {
+        return false;
+    }
+
+    uint32_t payload = offset + 8u;
+    uint32_t padding = size & 1u;
+    if (!avi_range_valid(payload, size, limit) ||
+        !avi_range_valid(payload + size, padding, limit))
+    {
+        return false;
+    }
+
+    *next = payload + size + padding;
+    return true;
+}
+
+static bool avi_capture_stream_chunk(const uint8_t *data, uint32_t cc,
+                                     uint32_t payload, uint32_t size,
+                                     uint32_t *strh_off, uint32_t *strf_off)
+{
+    if (cc == CC_strh && *strh_off == 0u)
+    {
+        if (size < 4u)
+        {
+            return false;
+        }
+        if (rd32(data + payload) == CC_vids)
+        {
+            if (size < 28u)
+            {
+                return false;
+            }
+            *strh_off = payload;
+        }
+    }
+    else if (cc == CC_strf && *strf_off == 0u && *strh_off != 0u)
+    {
+        if (size < 20u)
+        {
+            return false;
+        }
+        *strf_off = payload;
+    }
+
+    return true;
+}
+
+static bool avi_parse_hdrl(const uint8_t *data, uint32_t start, uint32_t end,
+                           uint32_t *strh_off, uint32_t *strf_off)
+{
+    uint32_t pos = start;
+
+    while (pos < end)
+    {
+        if (!avi_range_valid(pos, 8u, end))
+        {
+            return false;
+        }
+
+        uint32_t cc = rd32(data + pos);
+        uint32_t sz = rd32(data + pos + 4u);
+        uint32_t next;
+        if (!avi_chunk_next(pos, sz, end, &next))
+        {
+            return false;
+        }
+
+        if (cc == CC_LIST)
+        {
+            if (sz < 4u)
+            {
+                return false;
+            }
+
+            uint32_t nested_pos = pos + 12u;
+            uint32_t nested_end = pos + 8u + sz;
+            while (nested_pos < nested_end)
+            {
+                if (!avi_range_valid(nested_pos, 8u, nested_end))
+                {
+                    return false;
+                }
+
+                uint32_t nested_cc = rd32(data + nested_pos);
+                uint32_t nested_sz = rd32(data + nested_pos + 4u);
+                uint32_t nested_next;
+                if (!avi_chunk_next(nested_pos, nested_sz, nested_end, &nested_next) ||
+                    (nested_cc == CC_LIST && nested_sz < 4u) ||
+                    !avi_capture_stream_chunk(data, nested_cc, nested_pos + 8u, nested_sz,
+                                              strh_off, strf_off))
+                {
+                    return false;
+                }
+                nested_pos = nested_next;
+            }
+        }
+        else if (!avi_capture_stream_chunk(data, cc, pos + 8u, sz,
+                                           strh_off, strf_off))
+        {
+            return false;
+        }
+
+        pos = next;
+    }
+
+    return true;
+}
+
+static bool avi_parse(const uint8_t *data, uint32_t data_len, avi_info_t *out)
+{
+#ifdef _HONEYGUI_SIMULATOR_
+    if (data_len < 12u)
+    {
+        return false;
+    }
+#else
+    (void)data_len;
+#endif
+
     if (rd32(data) != CC_RIFF || rd32(data + 8) != CC_AVI)
     {
         return false;
     }
 
     uint32_t file_size = rd32(data + 4) + 8u;
+#ifdef _HONEYGUI_SIMULATOR_
+    if (file_size < 8u || file_size > data_len)
+    {
+        return false;
+    }
+#endif
+
     uint32_t strh_off = 0, strf_off = 0, movi_data = 0, movi_size = 0;
     uint32_t pos = 12;
 
-    while (pos + 8u <= file_size)
+    while (pos < file_size)
     {
+        if (!avi_range_valid(pos, 8u, file_size))
+        {
+            return false;
+        }
+
         uint32_t cc = rd32(data + pos);
         uint32_t sz = rd32(data + pos + 4);
+        uint32_t next;
+        if (!avi_chunk_next(pos, sz, file_size, &next))
+        {
+            return false;
+        }
 
         if (cc == CC_LIST)
         {
+            if (sz < 4u)
+            {
+                return false;
+            }
+
             uint32_t lt = rd32(data + pos + 8);
 
             if (lt == CC_movi)
@@ -266,32 +478,14 @@ static bool avi_parse(const uint8_t *data, avi_info_t *out)
             else if (lt == CC_hdrl)
             {
                 uint32_t hdrl_end = pos + 8u + sz;
-                uint32_t q = pos + 12u;
-
-                while (q + 8u <= hdrl_end && q + 8u <= file_size)
+                if (!avi_parse_hdrl(data, pos + 12u, hdrl_end,
+                                    &strh_off, &strf_off))
                 {
-                    uint32_t c2 = rd32(data + q);
-                    uint32_t s2 = rd32(data + q + 4);
-
-                    if (c2 == CC_LIST)
-                    {
-                        q += 12u;
-                        continue;
-                    }
-                    if (c2 == CC_strh && strh_off == 0 &&
-                        rd32(data + q + 8) == CC_vids)
-                    {
-                        strh_off = q + 8u;
-                    }
-                    else if (c2 == CC_strf && strf_off == 0 && strh_off != 0)
-                    {
-                        strf_off = q + 8u;
-                    }
-                    q += 8u + s2 + (s2 & 1u);
+                    return false;
                 }
             }
         }
-        pos += 8u + sz + (sz & 1u);
+        pos = next;
     }
 
     if (movi_data == 0 || strf_off == 0)
@@ -387,25 +581,38 @@ static void avi_producer_entry(void *param)
 {
     stream_producer_t *prod = (stream_producer_t *)param;
     const uint8_t     *movi = prod->src;
-    const uint8_t     *end  = movi + prod->src_len;
-    const uint8_t     *cur  = movi;
+    uint32_t           offset = 0u;
     bool               keyframe = true;
 
     while (prod->running)
     {
-        if (cur + 8u > end)
+        if (!avi_range_valid(offset, 8u, prod->src_len))
         {
-            cur = movi;
+            offset = 0u;
             keyframe = true;
             continue;
         }
 
+        const uint8_t *cur = movi + offset;
         uint32_t cc = rd32(cur);
         uint32_t sz = rd32(cur + 4);
+        uint32_t next;
+        if (!avi_chunk_next(offset, sz, prod->src_len, &next))
+        {
+            gui_log("stream demo: invalid AVI movi chunk\n");
+            prod->running = false;
+            return;
+        }
 
         if (cc == CC_LIST)
         {
-            cur += 12u;
+            if (sz < 4u)
+            {
+                gui_log("stream demo: invalid AVI movi LIST\n");
+                prod->running = false;
+                return;
+            }
+            offset += 12u;
             continue;
         }
 
@@ -416,7 +623,7 @@ static void avi_producer_entry(void *param)
             gui_thread_mdelay(prod->interval_ms);
         }
 
-        cur += 8u + sz + (sz & 1u);
+        offset = next;
     }
 }
 
@@ -425,13 +632,20 @@ static void avi_producer_entry(void *param)
 static bool source_open(stream_producer_t *prod, stream_spec_t *spec)
 {
 #ifdef _HONEYGUI_SIMULATOR_
-    const uint8_t *avi = (const uint8_t *)_binary_duck_avi_start;
+    uint32_t avi_len;
+    const uint8_t *avi = load_simulator_resource(
+                             "/pc/example/widget/gui_stream/root_image/duck.avi", &avi_len);
+    if (avi == NULL || avi_len == 0u)
+    {
+        return false;
+    }
 #else
     const uint8_t *avi = (const uint8_t *)STREAM_DEMO_FLASH_ADDR;
+    uint32_t avi_len = 0u;
 #endif
 
     avi_info_t info;
-    if (!avi_parse(avi, &info))
+    if (!avi_parse(avi, avi_len, &info))
     {
         gui_log("stream demo: AVI parse failed\n");
         return false;
@@ -515,12 +729,10 @@ static void mjpeg_producer_entry(void *param)
 static bool source_open(stream_producer_t *prod, stream_spec_t *spec)
 {
 #ifdef _HONEYGUI_SIMULATOR_
-    const uint8_t *blob = (const uint8_t *)_binary_earth_420_410_502_40_lq_mjpg_start;
-    /* Convert to integers before subtracting: the linker emits start/end as two
-     * distinct symbols, so a direct pointer subtraction trips the static
-     * analyzer's comparePointers (UB) check. */
-    uint32_t       blen = (uint32_t)((uintptr_t)_binary_earth_420_410_502_40_lq_mjpg_end -
-                                     (uintptr_t)_binary_earth_420_410_502_40_lq_mjpg_start);
+    uint32_t blen;
+    const uint8_t *blob = load_simulator_resource(
+                              "/pc/example/widget/gui_stream/root_image/"
+                              "earth_420_410_502_40_lq.mjpg", &blen);
 #else
     const uint8_t *blob = (const uint8_t *)STREAM_DEMO_FLASH_ADDR;
     uint32_t       blen = (uint32_t)STREAM_DEMO_FLASH_SIZE;
@@ -649,12 +861,9 @@ static void h264_producer_entry(void *param)
 static bool source_open(stream_producer_t *prod, stream_spec_t *spec)
 {
 #ifdef _HONEYGUI_SIMULATOR_
-    const uint8_t *blob = (const uint8_t *)_binary_birds_header_h264_start;
-    /* Convert to integers before subtracting: the linker emits start/end as two
-     * distinct symbols, so a direct pointer subtraction trips the static
-     * analyzer's comparePointers (UB) check. */
-    uint32_t       blen = (uint32_t)((uintptr_t)_binary_birds_header_h264_end -
-                                     (uintptr_t)_binary_birds_header_h264_start);
+    uint32_t blen;
+    const uint8_t *blob = load_simulator_resource(
+                              "/pc/example/widget/gui_stream/root_image/birds_header.h264", &blen);
 #else
     const uint8_t *blob = (const uint8_t *)STREAM_DEMO_FLASH_ADDR;
     uint32_t       blen = (uint32_t)STREAM_DEMO_FLASH_SIZE;
@@ -670,6 +879,11 @@ static bool source_open(stream_producer_t *prod, stream_spec_t *spec)
     if (memcmp(hdr->symbol, "H264", 4) != 0)
     {
         gui_log("stream demo: not an H264 container\n");
+        return false;
+    }
+    if (hdr->size > blen - sizeof(gui_h264_header_t))
+    {
+        gui_log("stream demo: H264 payload exceeds blob\n");
         return false;
     }
 
@@ -815,6 +1029,9 @@ static int app_init(void)
     stream_spec_t spec;
     if (!source_open(&s_producer, &spec))
     {
+#ifdef _HONEYGUI_SIMULATOR_
+        release_simulator_resource();
+#endif
         return 0;  /* reason already logged */
     }
 
@@ -833,6 +1050,9 @@ static int app_init(void)
     if (!tp)
     {
         gui_log("stream demo: stp_instance_create failed\n");
+#ifdef _HONEYGUI_SIMULATOR_
+        release_simulator_resource();
+#endif
         return 0;
     }
 

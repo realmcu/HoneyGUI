@@ -9,6 +9,11 @@
  *============================================================================*/
 #include <stdio.h>
 #include <time.h>
+#ifdef _HONEYGUI_SIMULATOR_
+#include <stdlib.h>
+#include "gui_api_os.h"
+#include "gui_vfs.h"
+#endif
 #include "gui_obj.h"
 #include "gui_text.h"
 #include "gui_win.h"
@@ -258,14 +263,61 @@ SHELL_EXPORT_CMD(
     cmd, dashboard_info_update, test);
 #endif
 #ifdef _HONEYGUI_SIMULATOR_
-extern const unsigned char _binary_root_0x4400000_bin_start[];
-extern const unsigned char _binary_root_0x4400000_bin_end[];
-extern const unsigned char _binary_root_0x4400000_bin_size[];
+static unsigned char *load_resource_file(const char *path)
+{
+    gui_vfs_stat_t stat;
+    if (gui_vfs_stat(path, &stat) != 0 ||
+        stat.type != GUI_VFS_TYPE_FILE ||
+        stat.size == 0)
+    {
+        gui_log("Failed to get simulator resource: %s\n", path);
+        return NULL;
+    }
+
+    gui_vfs_file_t *file = gui_vfs_open(path, GUI_VFS_READ);
+    if (file == NULL)
+    {
+        gui_log("Failed to open simulator resource: %s\n", path);
+        return NULL;
+    }
+
+    unsigned char *data = (unsigned char *)malloc(stat.size);
+    if (data == NULL)
+    {
+        gui_log("Failed to allocate simulator resource: %s\n", path);
+        gui_vfs_close(file);
+        return NULL;
+    }
+
+    size_t total = 0;
+    while (total < stat.size)
+    {
+        int read_size = gui_vfs_read(file, data + total, stat.size - total);
+        if (read_size <= 0)
+        {
+            gui_log("Failed to read simulator resource: %s\n", path);
+            free(data);
+            gui_vfs_close(file);
+            return NULL;
+        }
+        total += (size_t)read_size;
+    }
+
+    gui_vfs_close(file);
+    return data;
+}
 #endif
+
 static int app_init(void)
 {
 #ifdef _HONEYGUI_SIMULATOR_
-    resource_root = (uint8_t *)_binary_root_0x4400000_bin_start;
+    resource_root = load_resource_file(
+                        "/pc/example/application/screen_800_480/"
+                        "root_image_800_480/root_0x4400000.bin");
+    if (resource_root == NULL)
+    {
+        return -1;
+    }
     // Set initial values for simulator testing
     dashboard_info.bt_status = 1;
     dashboard_info.speed_val = 88;

@@ -32,6 +32,12 @@ if(CONFIG_REALTEK_BUILD_REAL_VIEW) #set to 1 to enable or variable to for depend
         target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
+    target_compile_definitions(${GUI_TARGET_NAME} PRIVATE
+        DRV_LCD_WIDTH=480
+        DRV_LCD_HEIGHT=480
+        DRV_PIXEL_BITS=16
+    )
+
     # Process subdirectories regardless
     file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
 

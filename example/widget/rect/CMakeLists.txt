@@ -4,22 +4,17 @@
 # SPDX-License-Identifier: MIT
 #
 
-cmake_minimum_required(VERSION 3.10)
-
-if(CONFIG_REALTEK_BUILD_EXAMPLE_STREAM_WIDGET)
+if(CONFIG_REALTEK_BUILD_REAL_LITE_RECT)
     target_sources(${GUI_TARGET_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/example_gui_stream.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/example_gui_rect.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/rect_view.c
     )
     target_include_directories(${GUI_TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/root_image
     )
-
     target_compile_definitions(${GUI_TARGET_NAME} PRIVATE
-        DRV_LCD_WIDTH=460
-        DRV_LCD_HEIGHT=502
+        DRV_LCD_WIDTH=480
+        DRV_LCD_HEIGHT=480
         DRV_PIXEL_BITS=16
-        DRV_LCD_CORNER_RADIUS=0
     )
-
 endif()

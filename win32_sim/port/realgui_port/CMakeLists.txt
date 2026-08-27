@@ -12,6 +12,10 @@ if(1) #set to 1 to enable or variable to for dependency
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 
+    if(NOT CONFIG_REALTEK_BUILD_AUDIO)
+        list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/gui_port_audio.c")
+    endif()
+
 
     # Determine if we should create a library
     if((NOT HEADERS) AND (NOT SOURCES))

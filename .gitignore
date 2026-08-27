@@ -117,6 +117,8 @@ tool/D2XML/Pixso_plugin/node_modules/
 # other
 .kiro/
 .kiro
+/.codex-build/
+/docs/
 AGENTS.md
 realgui/3rd/sim_experimental/sdl_sim.bin
 realgui/3rd/sim_experimental/sdl_sim

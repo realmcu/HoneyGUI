@@ -24,15 +24,63 @@
 #include "gui_components_init.h"
 #include "gui_obj_event.h"
 #include "gui_lite_video.h"
+#ifdef _HONEYGUI_SIMULATOR_
+#include <stdlib.h>
+#include "gui_api_os.h"
+#include "gui_vfs.h"
+#endif
 
 /* -----------------------------------------------------------------------
  * Resource binding
- * In the simulator AVI binaries are linked as object sections by SCons
- * (objcopy -I binary).  On device they sit at fixed Flash addresses.
+ * In the simulator AVI binaries are loaded into system RAM through VFS.
+ * On device they sit at fixed Flash addresses.
  * ----------------------------------------------------------------------- */
 #ifdef _HONEYGUI_SIMULATOR_
-extern const unsigned char _binary_cat_00_avi_start[];  /* Cinepak */
-extern const unsigned char _binary_duck_avi_start[];    /* MSV1    */
+static unsigned char *s_video_resources[2];
+
+static unsigned char *load_resource_file(const char *path)
+{
+    gui_vfs_stat_t stat;
+    if (gui_vfs_stat(path, &stat) != 0 ||
+        stat.type != GUI_VFS_TYPE_FILE ||
+        stat.size == 0)
+    {
+        gui_log("Failed to get simulator resource: %s\n", path);
+        return NULL;
+    }
+
+    gui_vfs_file_t *file = gui_vfs_open(path, GUI_VFS_READ);
+    if (file == NULL)
+    {
+        gui_log("Failed to open simulator resource: %s\n", path);
+        return NULL;
+    }
+
+    unsigned char *data = (unsigned char *)malloc(stat.size);
+    if (data == NULL)
+    {
+        gui_log("Failed to allocate simulator resource: %s\n", path);
+        gui_vfs_close(file);
+        return NULL;
+    }
+
+    size_t total = 0;
+    while (total < stat.size)
+    {
+        int read_size = gui_vfs_read(file, data + total, stat.size - total);
+        if (read_size <= 0)
+        {
+            gui_log("Failed to read simulator resource: %s\n", path);
+            free(data);
+            gui_vfs_close(file);
+            return NULL;
+        }
+        total += (size_t)read_size;
+    }
+
+    gui_vfs_close(file);
+    return data;
+}
 #else
 /* Replace with the actual Flash base addresses for the target board */
 #define LV_DEMO_FLASH_ADDR_A  0x240F400UL   /* primary   source (Cinepak) */
@@ -71,8 +119,7 @@ static void lv_double_click_cb(void *obj, gui_event_t *e)
     s_src_idx ^= 1;  /* toggle 0 <-> 1 */
 
 #ifdef _HONEYGUI_SIMULATOR_
-    void *next_src = (s_src_idx == 0) ? (void *)_binary_cat_00_avi_start
-                     : (void *)_binary_duck_avi_start;
+    void *next_src = s_video_resources[s_src_idx];
     gui_log("lv demo: switching to source %d\n", s_src_idx);
     gui_lite_video_set_src(lv, next_src, IMG_SRC_MEMADDR);
 #else
@@ -89,7 +136,23 @@ static void lv_double_click_cb(void *obj, gui_event_t *e)
 static int app_init(void)
 {
 #ifdef _HONEYGUI_SIMULATOR_
-    void *resource = (void *)_binary_cat_00_avi_start;
+    s_video_resources[0] = load_resource_file(
+                               "/pc/example/widget/lite_video/root_image/cat_00.avi");
+    if (s_video_resources[0] == NULL)
+    {
+        return -1;
+    }
+
+    s_video_resources[1] = load_resource_file(
+                               "/pc/example/widget/lite_video/root_image/duck.avi");
+    if (s_video_resources[1] == NULL)
+    {
+        free(s_video_resources[0]);
+        s_video_resources[0] = NULL;
+        return -1;
+    }
+
+    void *resource = s_video_resources[0];
 #else
     void *resource = (void *)LV_DEMO_FLASH_ADDR_A;
 #endif
@@ -107,6 +170,12 @@ static int app_init(void)
     if (!lv)
     {
         gui_log("ERROR: gui_lite_video_create_from_mem failed\n");
+#ifdef _HONEYGUI_SIMULATOR_
+        free(s_video_resources[0]);
+        free(s_video_resources[1]);
+        s_video_resources[0] = NULL;
+        s_video_resources[1] = NULL;
+#endif
         return -1;
     }
 

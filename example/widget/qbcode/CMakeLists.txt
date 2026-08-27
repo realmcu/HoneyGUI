@@ -4,12 +4,9 @@
 # SPDX-License-Identifier: MIT
 #
 
-cmake_minimum_required(VERSION 3.10)
-
-if(CONFIG_REALTEK_BUILD_REAL_CANVAS)
-    target_sources(${GUI_TARGET_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/example_canvas.c
-    )
+if(CONFIG_REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET)
+    file(GLOB SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+    target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
     target_include_directories(${GUI_TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
     )

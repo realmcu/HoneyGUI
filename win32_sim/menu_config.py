@@ -5,33 +5,40 @@
 #
 
 import os
-import sys
+import shutil
 
 # toolchains options
 ARCH='win32'
 CROSS_TOOL='gcc'
 PLATFORM    = 'gcc'
+TARGET_OS = os.environ.get(
+    'HONEYGUI_TARGET_OS', 'windows' if os.name == 'nt' else 'linux'
+).lower()
+if TARGET_OS not in ('windows', 'linux'):
+    raise RuntimeError("HONEYGUI_TARGET_OS must be 'windows' or 'linux'")
 
-# Auto-detect platform: use system gcc on Linux/WSL, MinGW on Windows
-if sys.platform.startswith('linux'):
-    EXEC_PATH = '/usr/bin'
-else:
-    EXEC_PATH = r'C:/mingw64/bin'
+PREFIX = os.environ.get('HONEYGUI_TOOLCHAIN_PREFIX', '')
+CC = PREFIX + 'gcc'
+AS = PREFIX + 'gcc'
+AR = PREFIX + 'ar'
+CXX = PREFIX + 'g++'
+LINK = PREFIX + 'g++'
+SIZE = PREFIX + 'size'
+OBJDUMP = PREFIX + 'objdump'
+OBJCPY = PREFIX + 'objcopy'
+WINDRES = PREFIX + 'windres'
+
+# Resolve compiler tools through the caller's PATH on every platform.
+_compiler = shutil.which(CC)
+if not _compiler:
+    raise RuntimeError("{} was not found in PATH".format(CC))
+EXEC_PATH = os.path.dirname(_compiler)
 
 BSP_LIBRARY_TYPE = None
 
 
 # toolchains
-PREFIX = ''
-CC = PREFIX + 'gcc'
-AS = PREFIX + 'gcc'
-AR = PREFIX + 'ar'
-CXX = PREFIX + 'g++'
-LINK = PREFIX + 'gcc'
 TARGET_EXT = 'elf'
-SIZE = PREFIX + 'size'
-OBJDUMP = PREFIX + 'objdump'
-OBJCPY = PREFIX + 'objcopy'
 
 CPATH = ''
 LPATH = ''
@@ -62,7 +69,7 @@ else:
     CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion -Werror=strict-prototypes'
     CXXFLAGS = CFLAGS_BASE + ' -std=c++11 -Wmissing-field-initializers'
 
-if sys.platform.startswith('linux'):
+if TARGET_OS == 'linux':
     LFLAGS = ' -T honeygui_linux.lds'  # Linux: use default linker script
     LFLAGS += ' -pthread'
     LFLAGS += ' -Wl,-z,noexecstack'
@@ -74,5 +81,3 @@ LFLAGS += ' -Wl,-Map=gui.map'
 
 POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n'
 POST_ACTION += SIZE + ' $TARGET \n'
-
-
