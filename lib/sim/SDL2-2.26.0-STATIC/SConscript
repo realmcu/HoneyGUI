@@ -16,11 +16,16 @@ if sys.platform == 'win32':
     env.Append(LIBPATH = libpath)
     env.Append(CPPPATH = include)
 else:  # Linux/WSL - use system SDL2
-    libpath = []
-    include = ['/usr/include/SDL2']
-    
+    # Override via SDL2_INCLUDE_DIR / SDL2_LIB_DIR for setups without root
+    # access, e.g. a locally-extracted libsdl2-dev package. Each may list
+    # multiple os.pathsep-separated dirs, since Debian/Ubuntu splits SDL2.h
+    # from the arch-specific SDL_config.h (under .../<triplet>/SDL2/).
+    # Falls back to the standard system location.
+    include = os.environ.get('SDL2_INCLUDE_DIR', '/usr/include/SDL2').split(os.pathsep)
+    libpath = [p for p in os.environ.get('SDL2_LIB_DIR', '').split(os.pathsep) if p]
+
     Import('env')
-    env.Append(CPPPATH = include)
+    env.Append(CPPPATH = include, LIBPATH = libpath)
 
 
 objs = DefineGroup('rtk_gui', src, depend = [''])
