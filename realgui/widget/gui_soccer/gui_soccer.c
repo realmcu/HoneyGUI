@@ -426,7 +426,38 @@ static void gui_soccer_draw_cb(gui_obj_t *obj)
         {
             if (matrix_is_full_rank(&draw_img->matrix))
             {
-                gui_acc_blit_to_dc(draw_img, dc, NULL);
+                if (this->decode_cache_enabled)
+                {
+                    uint32_t decode_bit = 1UL << i;
+                    if ((this->decode_attempted_mask & decode_bit) == 0)
+                    {
+                        struct acc_engine *acc = gui_get_acc();
+                        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->src_data[i];
+                        if (head == NULL || !head->compress)
+                        {
+                            this->decode_attempted_mask |= decode_bit;
+                        }
+                        else if (acc != NULL && acc->idu_load != NULL && acc->idu_free != NULL)
+                        {
+                            this->decoded_data[i] = acc->idu_load(this->src_data[i]);
+                            if (this->decoded_data[i] != NULL)
+                            {
+                                this->decoded_free[i] = acc->idu_free;
+                            }
+                            this->decode_attempted_mask |= decode_bit;
+                        }
+                    }
+                    draw_img->data = this->decoded_data[i] != NULL ? this->decoded_data[i] :
+                                     this->src_data[i];
+                }
+                else
+                {
+                    draw_img->data = this->src_data[i];
+                }
+                if (draw_img->data != NULL)
+                {
+                    gui_acc_blit_to_dc(draw_img, dc, NULL);
+                }
             }
 
         }
@@ -502,10 +533,25 @@ static void gui_soccer_end(gui_obj_t *obj)
     }
 }
 
+static void gui_soccer_decode_cache_free(gui_soccer_t *this)
+{
+    for (uint8_t i = 0; i < 20; i++)
+    {
+        if (this->decoded_data[i] != NULL && this->decoded_free[i] != NULL)
+        {
+            this->decoded_free[i](this->decoded_data[i]);
+        }
+        this->decoded_data[i] = NULL;
+        this->decoded_free[i] = NULL;
+        this->draw_img[i].data = this->src_data[i];
+    }
+    this->decode_attempted_mask = 0;
+}
+
 static void gui_soccer_destroy(gui_obj_t *obj)
 {
-    (void)obj;
-    return;
+    GUI_ASSERT(obj != NULL);
+    gui_soccer_decode_cache_free((gui_soccer_t *)obj);
 }
 
 static void gui_soccer_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -591,6 +637,7 @@ static void gui_soccer_ctor(gui_soccer_t       *this,
     {
         this->draw_img[i].opacity_value = UINT8_MAX;
         this->draw_img[i].blend_mode = IMG_SRC_OVER_MODE;
+        this->src_data[i] = frame_array[i];
         this->draw_img[i].data = frame_array[i];
         this->draw_img[i].img_w = 100;
         this->draw_img[i].img_h = 100;
@@ -629,11 +676,13 @@ static void gui_soccer_ctor_ftl(gui_soccer_t       *this,
     root->has_destroy_cb = true;
 
     //for self
+    this->source_is_ftl = true;
 
     for (int i = 0; i < 20; i++)
     {
         this->draw_img[i].opacity_value = UINT8_MAX;
         this->draw_img[i].blend_mode = IMG_SRC_OVER_MODE;
+        this->src_data[i] = frame_array[i];
         this->draw_img[i].data = frame_array[i];
         this->draw_img[i].img_w = 100;
         this->draw_img[i].img_h = 100;
@@ -744,10 +793,28 @@ void gui_soccer_set_img(gui_soccer_t *soccer, uint32_t *frame_array[])
 {
     GUI_ASSERT(soccer != NULL);
 
+    gui_soccer_decode_cache_free(soccer);
     for (int i = 0; i < 20; i++)
     {
+        soccer->src_data[i] = frame_array[i];
         soccer->draw_img[i].data = frame_array[i];
     }
+}
+
+void gui_soccer_set_decode_cache(gui_soccer_t *soccer, bool enable)
+{
+    GUI_ASSERT(soccer != NULL);
+    if (soccer == NULL || soccer->source_is_ftl || soccer->decode_cache_enabled == enable)
+    {
+        return;
+    }
+
+    if (!enable)
+    {
+        gui_soccer_decode_cache_free(soccer);
+    }
+    soccer->decode_cache_enabled = enable;
+    gui_fb_change();
 }
 
 void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y)

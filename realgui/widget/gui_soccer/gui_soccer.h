@@ -41,6 +41,12 @@ typedef struct gui_soccer
 {
     gui_obj_t base;                 //!< base structure
     draw_img_t draw_img[20];         // please refer to enum T_SOCCER_SIDE_TYPE.
+    void *src_data[20];
+    void *decoded_data[20];
+    void (*decoded_free[20])(void *);
+    uint32_t decode_attempted_mask;
+    bool decode_cache_enabled;
+    bool source_is_ftl;
     float xrot;
     float yrot;
     float zrot;
@@ -157,6 +163,21 @@ void gui_soccer_set_opacity(gui_soccer_t *soccer, uint8_t opacity);
  * @param frame_array Image file data.
  */
 void gui_soccer_set_img(gui_soccer_t *soccer, uint32_t *frame_array[]);
+
+/**
+ * @brief Enable or disable persistent decoding of compressed images.
+ *
+ * When enabled, each image is decoded on first use and retained until the
+ * cache is disabled, the image is replaced, or the widget is destroyed.
+ * The cache is disabled by default.
+ *
+ * If the current source or acceleration engine does not support persistent
+ * decoding, rendering transparently falls back to the original compressed data.
+ *
+ * @param soccer Soccer widget pointer.
+ * @param enable Whether to keep decoded images cached.
+ */
+void gui_soccer_set_decode_cache(gui_soccer_t *soccer, bool enable);
 
 /**
  * @brief Set center.

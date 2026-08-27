@@ -129,6 +129,7 @@ static void soccer_app(gui_view_t *view)
     gui_dispdev_t *dc = gui_get_dc();
 
     gui_soccer_t *soccer = gui_soccer_create(obj, "soccer", gui_soccer_array, 0, 0);
+    gui_soccer_set_decode_cache(soccer, true);
     gui_soccer_set_center(soccer, dc->screen_width / 2, dc->screen_height / 2);
 
 
