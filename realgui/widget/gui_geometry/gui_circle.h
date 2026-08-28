@@ -54,7 +54,7 @@ typedef struct
     int radius;                 /**< Circle radius. */
     gui_color_t color;          /**< Circle color. */
     uint8_t opacity_value;      /**< Opacity value. */
-    uint8_t checksum;           /**< Checksum for change detection. */
+    uint32_t checksum;          /**< Checksum for change detection. */
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */

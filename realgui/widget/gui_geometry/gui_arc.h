@@ -31,9 +31,11 @@ typedef struct
     // Drawing resources
     draw_img_t *draw_img;       /**< Drawing image object. */
     uint8_t *pixel_buffer;      /**< Cached pixel buffer. */
-    uint32_t buffer_size;       /**< Buffer size. */
+    uint32_t buffer_size;       /**< Current payload size, header included. */
     int buffer_w;               /**< Actual buffer width (may be optimized). */
     int buffer_h;               /**< Actual buffer height (may be optimized). */
+    int buffer_off_x;           /**< Buffer left edge within the widget box. */
+    int buffer_off_y;           /**< Buffer top edge within the widget box. */
     bool buffer_valid;          /**< Buffer cache valid flag. */
 
     // Drawing context

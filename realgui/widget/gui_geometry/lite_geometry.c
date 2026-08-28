@@ -1368,6 +1368,102 @@ static inline bool is_in_angle_range_fast(float dx, float dy, uint16_t start_ang
     }
 }
 
+/** Ink margin beyond the outer radius: the 1.5px AA band plus rounding slack. */
+#define LG_ARC_AA_MARGIN 3.0f
+
+/** Sweep tolerance for treating an arc as a complete ring. */
+#define LG_ARC_FULL_EPS 0.01f
+
+/**
+ * Angular slack the rasterisers can ink past the requested end angle.
+ *
+ * draw_arc_df_aa() and draw_arc_df_aa_gradient() classify a pixel as inside or
+ * outside the sweep from lg_atan2((int)dy, (int)dx) -- an integer-degree
+ * approximation good to about +/-1 degree, fed offsets already truncated to
+ * int.  Pixels just outside the sweep therefore round into it and get full body
+ * coverage, so the ink runs a degree or two long at each end.  Pad the sweep by
+ * that much: the overshoot is angular, so the pixel cost scales with radius the
+ * same way the error does.
+ */
+#define LG_ARC_ANGLE_GUARD 2.0f
+
+/**
+ * Axis-aligned bounds of the ink an arc lays down, relative to its centre.
+ *
+ * A 30-degree arc only inks a small sliver of its bounding square, so callers
+ * that size a pixel buffer per arc want the sweep bounded, not the whole
+ * circle.  The centreline arc is bounded first -- its two endpoints, plus
+ * whichever of the four axis extremes the sweep actually crosses -- and then
+ * inflated by half the line width.  That inflation also covers the round caps,
+ * since they are centred on the centreline, and by the anti-aliasing margin the
+ * draw_arc_* rasterisers feather over.
+ *
+ * Y grows downward, matching the rasterisers' screen-space convention.
+ */
+void lg_arc_ink_bounds(float radius, float line_width,
+                       float start_angle, float end_angle,
+                       float *min_x, float *min_y, float *max_x, float *max_y)
+{
+    float r = radius;
+    float grow = line_width / 2.0f + LG_ARC_AA_MARGIN;
+    float raw_span = end_angle - start_angle;
+
+    /* Match draw_arc_df_aa()'s full-circle test: a 360-degree sweep normalizes
+     * to a zero span, which it then treats as the complete ring.  The gradient
+     * rasteriser also accepts near-zero and near-360 spans as a full circle, so
+     * keep the allocation conservative for either renderer. */
+    float sweep = fmodf(raw_span, 360.0f);
+    if (sweep <= 0.0f) { sweep += 360.0f; }
+
+    if (r <= 0.0f || line_width <= 0.0f)
+    {
+        *min_x = *min_y = *max_x = *max_y = 0.0f;
+        return;
+    }
+
+    if (fabsf(raw_span) < 0.1f || fabsf(raw_span) >= 359.9f ||
+        sweep + 2.0f * LG_ARC_ANGLE_GUARD >= 360.0f - LG_ARC_FULL_EPS)
+    {
+        *min_x = -r - grow; *max_x = r + grow;
+        *min_y = -r - grow; *max_y = r + grow;
+        return;
+    }
+
+    float a0 = fmodf(start_angle, 360.0f);
+    if (a0 < 0.0f) { a0 += 360.0f; }
+    a0 -= LG_ARC_ANGLE_GUARD;
+    sweep += 2.0f * LG_ARC_ANGLE_GUARD;
+    float a1 = a0 + sweep;                  /* left unwrapped, may exceed 360 */
+
+    float c0 = cosf(a0 * M_PI / 180.0f);
+    float s0 = sinf(a0 * M_PI / 180.0f);
+    float c1 = cosf(a1 * M_PI / 180.0f);
+    float s1 = sinf(a1 * M_PI / 180.0f);
+
+    float lo_x = LG_MIN(c0, c1) * r, hi_x = LG_MAX(c0, c1) * r;
+    float lo_y = LG_MIN(s0, s1) * r, hi_y = LG_MAX(s0, s1) * r;
+
+    /* An axis extreme only counts when the sweep actually passes over it. */
+    for (int k = 0; k < 4; k++)
+    {
+        float ak = 90.0f * (float)k;
+        if (!((ak >= a0 && ak <= a1) || (ak + 360.0f >= a0 && ak + 360.0f <= a1)))
+        {
+            continue;
+        }
+        switch (k)
+        {
+        case 0: hi_x =  r; break;           /* 0 deg   -> rightmost */
+        case 1: hi_y =  r; break;           /* 90 deg  -> bottommost */
+        case 2: lo_x = -r; break;           /* 180 deg -> leftmost */
+        default: lo_y = -r; break;          /* 270 deg -> topmost */
+        }
+    }
+
+    *min_x = lo_x - grow; *max_x = hi_x + grow;
+    *min_y = lo_y - grow; *max_y = hi_y + grow;
+}
+
 /**
  * Draw arc with anti-aliasing - hybrid approach for performance + quality
  * Key features:
@@ -1735,18 +1831,10 @@ void gradient_init(Gradient *grad, GradientType type)
 {
     if (grad == NULL) { return; }
 
+    /* Descriptors compare the complete Gradient byte-for-byte.  Clear inactive
+     * stops as well as active fields so equivalent gradients share cache data. */
+    memset(grad, 0x00, sizeof(*grad));
     grad->type = type;
-    grad->stop_count = 0;
-    grad->linear_x1 = 0;
-    grad->linear_y1 = 0;
-    grad->linear_x2 = 0;
-    grad->linear_y2 = 0;
-    grad->radial_cx = 0;
-    grad->radial_cy = 0;
-    grad->radial_r = 0;
-    grad->angular_cx = 0;
-    grad->angular_cy = 0;
-    grad->angular_start = 0;
     grad->angular_end = 360;
 }
 

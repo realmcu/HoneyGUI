@@ -41,16 +41,14 @@ typedef struct
     draw_img_t *circle_01;
     draw_img_t *circle_10;
     draw_img_t *circle_11;
-    uint8_t *circle_data;
     draw_img_t *rect_0;
     draw_img_t *rect_1;
     draw_img_t *rect_2;
-    uint8_t *rect_data;
     uint8_t opacity_value;      /**< Opacity value. */
 
     int radius;                 /**< Rect radius. */
     gui_color_t color;          /**< Rect color. */
-    uint8_t checksum;           /**< Checksum for change detection. */
+    uint32_t checksum;          /**< Checksum for change detection. */
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */

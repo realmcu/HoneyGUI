@@ -15,6 +15,7 @@
 #include "acc_api.h"
 #include "tp_algo.h"
 #include "gui_circle.h"
+#include "gui_shape_cache.h"
 
 /*============================================================================*
  *                           Configuration
@@ -22,22 +23,195 @@
 // 1 = Enable Dither (Better gradients), 0 = Disable (Max speed)
 #define GUI_CIRCLE_ENABLE_DITHER 1
 
+/**
+ * 1 = store solid circles as A8 coverage masks, 0 = always ARGB8888.
+ *
+ * A8 costs a quarter of the memory, drops colour from the cache key so circles
+ * differing only in colour share one payload, and reaches acc_sw's dedicated A8
+ * blit instead of the generic rasteriser.
+ *
+ * Set to 0 when bringing up a hardware accelerator whose blit may not handle A8.
+ * An unsupported source format usually shows up as a garbled or missing shape
+ * rather than a clean fallback, so flipping this is the quickest way to rule it
+ * out.  The same switch isolates what A8 alone contributes to frame time -- the
+ * shape cache stays active either way.
+ *
+ * Overridable from the build, so a bring-up run needs no source edit:
+ *   scons GUI_CIRCLE_ENABLE_A8=0
+ */
+#ifndef GUI_CIRCLE_ENABLE_A8
+#define GUI_CIRCLE_ENABLE_A8 1
+#endif
+
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+
+/** Which rasterised part a cached payload holds. */
+typedef enum
+{
+    CIRCLE_PART_FULL = 1,       /**< Whole circle in one ARGB8888 buffer. */
+    CIRCLE_PART_SOLID_RECT,     /**< Solid inscribed square, used when transformed. */
+    CIRCLE_PART_ARC_STRIP,      /**< Left arc strip; the other three mirror it. */
+} gui_circle_part_t;
+
+/**
+ * Identity of a cached circle payload.
+ *
+ * Everything that changes a pixel goes in here and nothing else does; notably
+ * position stays out, since it only ever reaches the draw_img matrix.  Gradient
+ * parts pass the whole struct, solid ones stop short of the gradient -- see
+ * circle_desc_len().
+ */
+typedef struct
+{
+    uint32_t part;              /**< gui_circle_part_t. */
+    int32_t size_a;             /**< Radius, or width for CIRCLE_PART_SOLID_RECT. */
+    int32_t size_b;             /**< Height for CIRCLE_PART_SOLID_RECT, else 0. */
+    uint32_t color;             /**< ARGB baked into the pixels; 0 when A8. */
+    uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
+    uint32_t gradient_type;     /**< CIRCLE_GRADIENT_*, or UINT32_MAX for none. */
+    Gradient gradient;          /**< Only present when gradient_type is set. */
+} circle_desc_t;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
 
-/** Safely free a draw_img_t and its data */
+/** Descriptor bytes to compare: solid parts stop before the gradient. */
+static uint16_t circle_desc_len(const circle_desc_t *desc)
+{
+    if (desc->gradient_type == UINT32_MAX)
+    {
+        return (uint16_t)offsetof(circle_desc_t, gradient);
+    }
+    return (uint16_t)sizeof(circle_desc_t);
+}
+
+/**
+ * Whether this circle can be stored as an A8 coverage mask.
+ *
+ * A mask carries no RGB, so one payload serves every colour of the same shape --
+ * which is the point, since "same size, different colour" is otherwise a full
+ * cache miss.  Only a gradient rules it out, since that genuinely needs per-pixel
+ * RGB.
+ *
+ * A translucent colour is fine: its alpha is folded into the mask values, not
+ * carried in fg_color_set.  That matters because the two blit paths disagree
+ * about fg_color_set's alpha -- acc_sw_raster multiplies it in, a8_2_rgb565
+ * discards it -- so it is pinned at 255 and the mask carries everything.
+ */
+static bool circle_use_a8(gui_circle_t *this)
+{
+#if GUI_CIRCLE_ENABLE_A8
+    return !(this->use_gradient && this->gradient != NULL && this->gradient->stop_count >= 2);
+#else
+    GUI_UNUSED(this);
+    return false;
+#endif
+}
+
+/**
+ * Fill in a descriptor for one part of this circle.
+ *
+ * Zeroes first: gui_shape_cache_acquire() compares descriptors byte for byte, so
+ * a padding hole left uninitialised would make two identical circles miss.
+ */
+static void circle_desc_init(circle_desc_t *desc, gui_circle_t *this,
+                             gui_circle_part_t part, int size_a, int size_b)
+{
+    memset(desc, 0x00, sizeof(*desc));
+
+    desc->part = (uint32_t)part;
+    desc->size_a = size_a;
+    desc->size_b = size_b;
+    desc->gradient_type = UINT32_MAX;
+
+    /* RGB is deliberately left out of an A8 key -- that is what lets circles
+     * differing only in colour share one mask.  Alpha stays in, because it is
+     * folded into the mask values themselves. */
+    if (circle_use_a8(this))
+    {
+        desc->is_a8 = 1u;
+        desc->color = this->color.color.rgba.a;
+    }
+    else
+    {
+        desc->color = this->color.color.argb_full;
+    }
+
+    /* Only the full-circle part reads the gradient; the strip and the inscribed
+     * square are always solid. */
+    if (part == CIRCLE_PART_FULL && this->use_gradient && this->gradient != NULL &&
+        this->gradient->stop_count >= 2)
+    {
+        desc->gradient_type = (uint32_t)this->gradient_type;
+        memcpy(&desc->gradient, this->gradient, sizeof(Gradient));
+    }
+}
+
+/** Safely free a draw_img_t, dropping its reference on the shared pixel data */
 static void free_draw_img_circle(draw_img_t **img)
 {
     if (img == NULL || *img == NULL) { return; }
 
+    /* Free HW-acceleration user data (e.g. boundary-line cache from hw_acc_prepare_cb). */
+    if ((*img)->acc_user != NULL)
+    {
+        gui_free((*img)->acc_user);
+        (*img)->acc_user = NULL;
+    }
+
     if ((*img)->data != NULL)
     {
-        gui_free((void *)(*img)->data);
+        /* An IMG_RECT payload is a bare header with no pixels, so it is owned
+         * outright rather than shared -- see set_rect_img(). */
+        if ((*img)->blend_mode == IMG_RECT)
+        {
+            gui_free((void *)(*img)->data);
+        }
+        else
+        {
+            gui_shape_cache_release((*img)->data);
+        }
         (*img)->data = NULL;
     }
     gui_free(*img);
     *img = NULL;
+}
+
+/**
+ * Free the whole arc buffer set used by multi-part rendering.
+ *
+ * All four hold a reference to the same strip payload, so all four release the
+ * same way and the pixels go when the last one does.
+ */
+static void free_arc_buffers_circle(gui_circle_t *this)
+{
+    free_draw_img_circle(&this->arc_right);
+    free_draw_img_circle(&this->arc_top);
+    free_draw_img_circle(&this->arc_bottom);
+
+    free_draw_img_circle(&this->arc_left);
+}
+
+/**
+ * FNV-1a accumulator used for change detection.
+ *
+ * gui_obj_checksum() only returns 8 bits, so 1/256 of the property changes
+ * would collide and skip a needed buffer regeneration.
+ */
+static uint32_t circle_checksum(uint32_t seed, const void *data, size_t len)
+{
+    const uint8_t *p = (const uint8_t *)data;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        seed ^= p[i];
+        seed *= 16777619u;
+    }
+
+    return seed;
 }
 
 /** Check if a point is inside the circle's bounding circle */
@@ -105,27 +279,107 @@ static inline uint32_t fast_dither(uint32_t color, int x, int y)
     return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
 }
 
-/** Create a complete circle in a single buffer with Symmetry Optimization */
-static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw_img_t **old_img)
+/** Set the image header for an A8 coverage mask */
+static void set_a8_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
 {
-    // Free old buffer first to prevent memory leak
-    free_draw_img_circle(old_img);
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 0;
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = A8;
+    head->w = w;
+    head->h = h;
+    head->version = 0;
+    head->rsvd2 = 0;
+}
 
+/**
+ * Point a draw_img at a payload, in whichever format it holds.
+ *
+ * An A8 payload only draws under IMG_2D_SW_FIX_A8_FG -- the blit routines ignore
+ * an A8 image in any other blend mode -- and takes its colour from fg_color_set.
+ */
+static void set_img_payload(gui_circle_t *this, draw_img_t *img, uint8_t *payload, bool is_a8)
+{
+    img->data = payload;
+    img->opacity_value = this->opacity_value;
+    img->high_quality = 1;
+
+    if (is_a8)
+    {
+        img->blend_mode = IMG_2D_SW_FIX_A8_FG;
+        /* Alpha pinned at 255: the mask already carries this->color's alpha, and
+         * the two blit paths disagree about fg_color_set's alpha anyway. */
+        img->fg_color_set = 0xFF000000u | (this->color.color.argb_full & 0x00FFFFFFu);
+    }
+    else
+    {
+        img->blend_mode = IMG_SRC_OVER_MODE;
+    }
+}
+
+/**
+ * Rasterise a circle coverage mask, one byte per pixel.
+ *
+ * Same quadrant mirroring and same coverage maths as the ARGB8888 path, minus
+ * the dithering a mask cannot carry.  The colour's alpha is folded in with the
+ * same arithmetic that path uses, so the two agree byte for byte: interior
+ * pixels take colour alpha unchanged, and only edge pixels scale it by coverage.
+ */
+static void rasterize_circle_mask_a8(gui_circle_t *this, uint8_t *buffer, uint32_t buffer_size)
+{
+    int r = this->radius;
+    int diameter = r * 2;
+    uint8_t color_a = this->color.color.rgba.a;
+
+    memset(buffer, 0x00, buffer_size);
+    set_a8_header((gui_rgb_data_head_t *)buffer, (uint16_t)diameter, (uint16_t)diameter);
+
+    uint8_t *mask = buffer + sizeof(gui_rgb_data_head_t);
+
+    float center = (float)r;
+    float r_in = r - 0.5f;
+    float r_out = r + 0.5f;
+    float r_in_sq = r_in * r_in;
+    float r_out_sq = r_out * r_out;
+
+    /* Walk the top-left quadrant and mirror into the other three. */
+    for (int y = 0; y < r; y++)
+    {
+        uint8_t *row_top = mask + y * diameter;
+        uint8_t *row_bottom = mask + (diameter - 1 - y) * diameter;
+
+        for (int x = 0; x < r; x++)
+        {
+            float dx = x + 0.5f - center;
+            float dy = y + 0.5f - center;
+            float dist_sq = dx * dx + dy * dy;
+
+            if (dist_sq >= r_out_sq) { continue; }
+
+            uint8_t coverage = color_a;
+            if (dist_sq > r_in_sq)
+            {
+                uint8_t edge = (uint8_t)((r_out - sqrtf(dist_sq)) * 255.0f);
+                coverage = (uint8_t)(((uint32_t)edge * color_a) >> 8);
+            }
+
+            int x_mirror = diameter - 1 - x;
+            row_top[x] = coverage;
+            row_top[x_mirror] = coverage;
+            row_bottom[x] = coverage;
+            row_bottom[x_mirror] = coverage;
+        }
+    }
+}
+
+/** Rasterise a complete circle into a payload, with Symmetry Optimization */
+static void rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32_t buffer_size)
+{
     int r = this->radius;
     int diameter = r * 2; // Keep diameter even for perfect symmetry logic
 
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    // Create pixel buffer
-    uint32_t buffer_size = diameter * diameter * 4 + sizeof(gui_rgb_data_head_t);
-    uint8_t *buffer = gui_malloc(buffer_size);
-    if (buffer == NULL)
-    {
-        gui_free(img);
-        return NULL;
-    }
     memset(buffer, 0x00, buffer_size);
 
     // Set header
@@ -308,11 +562,50 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw
     {
         gui_free(gradient_lut);
     }
+}
 
-    img->data = buffer;
-    img->blend_mode = IMG_SRC_OVER_MODE;
-    img->opacity_value = this->opacity_value;
-    img->high_quality = 1;
+/** Create a complete circle in a single buffer, shared with identical circles */
+static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw_img_t **old_img)
+{
+    // Free old buffer first to prevent memory leak
+    free_draw_img_circle(old_img);
+
+    int diameter = this->radius * 2;
+
+    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
+    if (img == NULL) { return NULL; }
+    memset(img, 0x00, sizeof(draw_img_t));
+
+    /* Every circle of the same radius and gradient draws from one payload; only
+     * this draw_img_t and its matrix are per widget.  An opaque solid circle
+     * stores a colourless mask, so colour does not split the cache either. */
+    bool is_a8 = circle_use_a8(this);
+    circle_desc_t desc;
+    bool is_new = false;
+    circle_desc_init(&desc, this, CIRCLE_PART_FULL, this->radius, 0);
+
+    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
+    uint32_t buffer_size = diameter * diameter * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    uint8_t *buffer = gui_shape_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
+    if (buffer == NULL)
+    {
+        gui_free(img);
+        return NULL;
+    }
+
+    if (is_new)
+    {
+        if (is_a8)
+        {
+            rasterize_circle_mask_a8(this, buffer, buffer_size);
+        }
+        else
+        {
+            rasterize_circle_payload(this, buffer, buffer_size);
+        }
+    }
+
+    set_img_payload(this, img, buffer, is_a8);
 
     // Apply transformation matrix
     if (obj->matrix != NULL)
@@ -351,11 +644,28 @@ static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
 }
 
 /** Create a solid color image buffer for better anti-aliasing with transformations */
-static uint8_t *create_solid_color_buffer_circle(uint16_t w, uint16_t h, gui_color_t color)
+static uint8_t *create_solid_color_buffer_circle(gui_circle_t *this, uint16_t w, uint16_t h,
+                                                 gui_color_t color)
 {
-    uint32_t buffer_size = w * h * 4 + sizeof(gui_rgb_data_head_t);
-    uint8_t *buffer = gui_malloc(buffer_size);
+    bool is_a8 = circle_use_a8(this);
+    circle_desc_t desc;
+    bool is_new = false;
+    circle_desc_init(&desc, this, CIRCLE_PART_SOLID_RECT, w, h);
+
+    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
+    uint32_t buffer_size = w * h * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    uint8_t *buffer = gui_shape_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
     if (buffer == NULL) { return NULL; }
+    if (!is_new) { return buffer; }
+
+    if (is_a8)
+    {
+        /* Fully covered everywhere, so the mask is just the colour's alpha and
+         * every inscribed square of this size and alpha shares it. */
+        set_a8_header((gui_rgb_data_head_t *)buffer, w, h);
+        memset(buffer + sizeof(gui_rgb_data_head_t), color.color.rgba.a, (size_t)w * h);
+        return buffer;
+    }
 
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
     head->scan = 0;
@@ -384,17 +694,8 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
 {
     gui_obj_t *obj = (gui_obj_t *)this;
 
-    // Clean up previous image if exists
-    if (*input_img != NULL)
-    {
-        if ((*input_img)->data != NULL)
-        {
-            gui_free((*input_img)->data);
-            (*input_img)->data = NULL;
-        }
-        gui_free(*input_img);
-        *input_img = NULL;
-    }
+    // Clean up previous image if exists (also releases its acc_user scratch data)
+    free_draw_img_circle(input_img);
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return; }
@@ -406,27 +707,31 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
 
     if (has_transform)
     {
-        img->blend_mode = IMG_SRC_OVER_MODE;
-        img->high_quality = 1;
-        img->data = create_solid_color_buffer_circle(w, h, this->color);
-        if (img->data == NULL)
+        uint8_t *payload = create_solid_color_buffer_circle(this, w, h, this->color);
+        if (payload == NULL)
         {
             gui_free(img);
             *input_img = NULL;
             return;
         }
+        set_img_payload(this, img, payload, circle_use_a8(this));
     }
     else
     {
-        img->blend_mode = IMG_RECT;
+        /* Deliberately not cached: this payload is 12 bytes of header with no
+         * pixels, and its width and height make it near-unique anyway, so the
+         * per-node bookkeeping would cost several times the payload. */
         gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
         if (rect_data == NULL)
         {
             gui_free(img);
+            *input_img = NULL;
             return;
         }
 
         set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
+
+        img->blend_mode = IMG_RECT;
         img->data = rect_data;
     }
 
@@ -450,6 +755,31 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
     *input_img = img;
 }
 
+/** Attach a strip payload to its draw_img and compute its screen area */
+static draw_img_t *finish_arc_strip(gui_circle_t *this, gui_obj_t *obj, draw_img_t *img,
+                                    uint8_t *arc_data)
+{
+    set_img_payload(this, img, arc_data, circle_use_a8(this));
+
+    // Copy parent matrix (don't reinitialize - it may contain parent transformations)
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+
+    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(&img->inverse);
+
+    draw_img_load_scale(img, IMG_SRC_MEMADDR);
+    draw_img_new_area(img, NULL);
+
+    return img;
+}
+
 /** create vertical arc strip (Legacy/Fallback) */
 static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
                                              draw_img_t **old_img)
@@ -469,28 +799,50 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
     if (img == NULL) { return NULL; }
     memset(img, 0x00, sizeof(draw_img_t));
 
-    uint32_t buffer_size = arc_width * arc_height * 4 + sizeof(gui_rgb_data_head_t);
-    uint8_t *arc_data = gui_malloc(buffer_size);
+    bool is_a8 = circle_use_a8(this);
+    circle_desc_t desc;
+    bool is_new = false;
+    circle_desc_init(&desc, this, CIRCLE_PART_ARC_STRIP, this->radius, 0);
+
+    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
+    uint32_t buffer_size = arc_width * arc_height * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    uint8_t *arc_data = gui_shape_cache_acquire(&desc, circle_desc_len(&desc), buffer_size,
+                                                &is_new);
     if (arc_data == NULL)
     {
         gui_free(img);
         return NULL;
     }
+    if (!is_new)
+    {
+        // Identical circle already built this strip
+        return finish_arc_strip(this, obj, img, arc_data);
+    }
     memset(arc_data, 0x00, buffer_size);
 
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)arc_data;
-    head->scan = 0;
-    head->align = 0;
-    head->resize = 0;
-    head->compress = 0;
-    head->rsvd = 0;
-    head->type = ARGB8888;
-    head->w = arc_width;
-    head->h = arc_height;
-    head->version = 0;
-    head->rsvd2 = 0;
+    if (is_a8)
+    {
+        set_a8_header((gui_rgb_data_head_t *)arc_data, (uint16_t)arc_width, (uint16_t)arc_height);
+    }
+    else
+    {
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)arc_data;
+        head->scan = 0;
+        head->align = 0;
+        head->resize = 0;
+        head->compress = 0;
+        head->rsvd = 0;
+        head->type = ARGB8888;
+        head->w = arc_width;
+        head->h = arc_height;
+        head->version = 0;
+        head->rsvd2 = 0;
+    }
 
+    /* One of these is used, depending on the payload format; the coverage maths
+     * below is shared. */
     uint32_t *pixels = (uint32_t *)(arc_data + sizeof(gui_rgb_data_head_t));
+    uint8_t *mask = arc_data + sizeof(gui_rgb_data_head_t);
     uint32_t solid_color = this->color.color.argb_full;
 
     float center_y = (float)arc_height / 2.0f;
@@ -500,7 +852,7 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
     float *exact_boundaries = gui_malloc(arc_height * sizeof(float));
     if (exact_boundaries == NULL)
     {
-        gui_free(arc_data);
+        gui_shape_cache_release(arc_data);
         gui_free(img);
         return NULL;
     }
@@ -522,7 +874,14 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
         float exact_boundary = exact_boundaries[y];
         if (exact_boundary < -500.0f)
         {
-            for (int x = 0; x < arc_width; x++) { pixels[y * arc_width + x] = solid_color; }
+            if (is_a8)
+            {
+                memset(mask + y * arc_width, this->color.color.rgba.a, (size_t)arc_width);
+            }
+            else
+            {
+                for (int x = 0; x < arc_width; x++) { pixels[y * arc_width + x] = solid_color; }
+            }
             continue;
         }
 
@@ -540,7 +899,15 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
                 coverage = 0.5f - 0.5f * cosf(M_PI * t);
             }
 
-            if (coverage > 0.999f) { pixels[y * arc_width + x] = solid_color; }
+            if (is_a8)
+            {
+                /* Mirror the ARGB8888 path's three bands below, so the two agree. */
+                uint8_t color_a = this->color.color.rgba.a;
+                if (coverage > 0.999f)      { mask[y * arc_width + x] = color_a; }
+                else if (coverage > 0.001f) { mask[y * arc_width + x] = (uint8_t)(coverage * (float)color_a); }
+                else                        { mask[y * arc_width + x] = 0; }
+            }
+            else if (coverage > 0.999f) { pixels[y * arc_width + x] = solid_color; }
             else if (coverage > 0.001f)
             {
                 gui_color_t color = this->color;
@@ -556,28 +923,7 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
 
     gui_free(exact_boundaries);
 
-    img->data = arc_data;
-    img->blend_mode = IMG_SRC_OVER_MODE;
-    img->opacity_value = this->opacity_value;
-    img->high_quality = 1;
-
-    // Copy parent matrix (don't reinitialize - it may contain parent transformations)
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-
-    return img;
+    return finish_arc_strip(this, obj, img, arc_data);
 }
 
 /** Create other three arc segments through transformation (Legacy/Fallback)*/
@@ -591,19 +937,21 @@ static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
     GUI_UNUSED(this);
     if (base_img == NULL || base_img->data == NULL) { return NULL; }
 
-    // Free old img structure (but not data, as it's shared with base_img)
-    if (old_img != NULL && *old_img != NULL)
-    {
-        // Don't free data - it's shared with base_img
-        gui_free(*old_img);
-        *old_img = NULL;
-    }
+    free_draw_img_circle(old_img);
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return NULL; }
 
     memcpy(img, base_img, sizeof(draw_img_t));
+
+    /* Take our own reference on the strip: the mirrored copies and the original
+     * are then interchangeable, and the pixels live until the last one goes. */
     img->data = base_img->data;
+    gui_shape_cache_addref(img->data);
+
+    /* Accelerator scratch data is per draw_img and per frame, so it must not be
+     * inherited from the copy -- releasing it would double-free base_img's. */
+    img->acc_user = NULL;
 
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)base_img->data;
     int base_width = head->w;
@@ -644,7 +992,7 @@ static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
 static void gui_circle_prepare(gui_obj_t *obj)
 {
     gui_circle_t *this = (gui_circle_t *)obj;
-    uint8_t last = this->checksum;
+    uint32_t last = this->checksum;
 
     // obj->matrix is already initialized by gui_obj_ctor
     // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
@@ -667,30 +1015,27 @@ static void gui_circle_prepare(gui_obj_t *obj)
 
     // Calculate checksum only for key properties (exclude pointers)
     // Manually calculate checksum for critical fields only
-    uint8_t new_checksum = 0;
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->x, sizeof(this->x));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->y, sizeof(this->y));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->radius, sizeof(this->radius));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->color, sizeof(this->color));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->opacity_value,
-                                    sizeof(this->opacity_value));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->degrees, sizeof(this->degrees));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->scale_x, sizeof(this->scale_x));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->scale_y, sizeof(this->scale_y));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->offset_x, sizeof(this->offset_x));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->offset_y, sizeof(this->offset_y));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->use_gradient,
-                                    sizeof(this->use_gradient));
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&this->gradient_type,
-                                    sizeof(this->gradient_type));
+    uint32_t new_checksum = 2166136261u;
+    new_checksum = circle_checksum(new_checksum, &this->x, sizeof(this->x));
+    new_checksum = circle_checksum(new_checksum, &this->y, sizeof(this->y));
+    new_checksum = circle_checksum(new_checksum, &this->radius, sizeof(this->radius));
+    new_checksum = circle_checksum(new_checksum, &this->color, sizeof(this->color));
+    new_checksum = circle_checksum(new_checksum, &this->opacity_value, sizeof(this->opacity_value));
+    new_checksum = circle_checksum(new_checksum, &this->degrees, sizeof(this->degrees));
+    new_checksum = circle_checksum(new_checksum, &this->scale_x, sizeof(this->scale_x));
+    new_checksum = circle_checksum(new_checksum, &this->scale_y, sizeof(this->scale_y));
+    new_checksum = circle_checksum(new_checksum, &this->offset_x, sizeof(this->offset_x));
+    new_checksum = circle_checksum(new_checksum, &this->offset_y, sizeof(this->offset_y));
+    new_checksum = circle_checksum(new_checksum, &this->use_gradient, sizeof(this->use_gradient));
+    new_checksum = circle_checksum(new_checksum, &this->gradient_type, sizeof(this->gradient_type));
     // Handle bit-field hidden with temporary variable
     uint32_t hidden_val = obj->hidden;
-    new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)&hidden_val, sizeof(hidden_val));
+    new_checksum = circle_checksum(new_checksum, &hidden_val, sizeof(hidden_val));
 
     // Include gradient data if present
     if (this->gradient != NULL)
     {
-        new_checksum = gui_obj_checksum(new_checksum, (uint8_t *)this->gradient, sizeof(Gradient));
+        new_checksum = circle_checksum(new_checksum, this->gradient, sizeof(Gradient));
     }
 
     // Only regenerate buffers if properties changed
@@ -706,6 +1051,9 @@ static void gui_circle_prepare(gui_obj_t *obj)
     {
         if (need_regenerate || this->center_rect == NULL)
         {
+            // Properties may have switched us out of multi-part mode; the stale arc
+            // buffers would otherwise stay allocated and keep being blitted.
+            free_arc_buffers_circle(this);
             this->center_rect = create_circle_buffer(this, obj, &this->center_rect);
         }
     }
@@ -714,6 +1062,11 @@ static void gui_circle_prepare(gui_obj_t *obj)
         // Use optimized multi-part rendering for large opaque circles
         if (need_regenerate || this->center_rect == NULL)
         {
+            // Drop the whole set before rebuilding: arc_right/top/bottom alias
+            // arc_left's pixel data, so a failed arc_left alloc below would leave
+            // them dangling.
+            free_arc_buffers_circle(this);
+
             int inner_half = (int)floorf(this->radius * M_SQRT1_2);
             int inner_size = inner_half * 2;
             int arc_width = this->radius - inner_half;
@@ -920,9 +1273,20 @@ static void gui_circle_draw(gui_obj_t *obj)
 /** End phase processing - Memory management */
 static void gui_circle_end(gui_circle_t *this)
 {
-    // DO NOT free buffers here - they are cached for reuse
-    // Buffers will be freed in gui_circle_destroy() when widget is destroyed
-    (void)this; // Suppress unused parameter warning
+    /* Pixel buffers are cached across frames and must NOT be freed here; they
+     * are released in gui_circle_destroy() or when the render mode changes.
+     * HW-acceleration user data (acc_user) is different: a hardware
+     * draw_img_acc_prepare_cb allocates it every frame inside
+     * draw_img_new_area, so it must be released now or the next frame's
+     * prepare call orphans the old pointer. */
+    if (draw_img_acc_end_cb != NULL)
+    {
+        if (this->center_rect != NULL) { draw_img_acc_end_cb(this->center_rect); }
+        if (this->arc_left   != NULL) { draw_img_acc_end_cb(this->arc_left);   }
+        if (this->arc_right  != NULL) { draw_img_acc_end_cb(this->arc_right);  }
+        if (this->arc_top    != NULL) { draw_img_acc_end_cb(this->arc_top);    }
+        if (this->arc_bottom != NULL) { draw_img_acc_end_cb(this->arc_bottom); }
+    }
 }
 
 static void gui_circle_destroy(gui_circle_t *this)
@@ -935,26 +1299,7 @@ static void gui_circle_destroy(gui_circle_t *this)
     }
 
     // Free cached buffers
-    // Note: For transformed arcs (arc_right, arc_top, arc_bottom),
-    // they share pixel data with arc_left, so we only free the structure
-    if (this->arc_right != NULL)
-    {
-        gui_free(this->arc_right);
-        this->arc_right = NULL;
-    }
-    if (this->arc_top != NULL)
-    {
-        gui_free(this->arc_top);
-        this->arc_top = NULL;
-    }
-    if (this->arc_bottom != NULL)
-    {
-        gui_free(this->arc_bottom);
-        this->arc_bottom = NULL;
-    }
-
-    // Free arc_left (which owns the pixel data)
-    free_draw_img_circle(&this->arc_left);
+    free_arc_buffers_circle(this);
 
     // Free center_rect
     free_draw_img_circle(&this->center_rect);
@@ -1005,7 +1350,9 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
 
     memset(circle, 0x00, sizeof(gui_circle_t));
 
-    circle->opacity_value = color.color.rgba.a;
+    /* Colour alpha is stored in the raster payload.  Widget opacity is an
+     * independent multiplier and therefore starts fully opaque. */
+    circle->opacity_value = UINT8_MAX;
     gui_obj_ctor((gui_obj_t *)circle, parent, name, x - radius, y - radius, radius * 2, radius * 2);
     GET_BASE(circle)->obj_cb = gui_circle_cb;
     GET_BASE(circle)->has_input_prepare_cb = true;
@@ -1061,7 +1408,6 @@ void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_co
     circle->y = radius;
     circle->radius = radius;
     circle->color = color;
-    circle->opacity_value = color.color.rgba.a;
 }
 
 void gui_circle_set_position(gui_circle_t *circle, int x, int y)
@@ -1103,7 +1449,6 @@ void gui_circle_set_color(gui_circle_t *circle, gui_color_t color)
     if (circle->color.color.argb_full != color.color.argb_full)
     {
         circle->color = color;
-        circle->opacity_value = color.color.rgba.a;
     }
 }
 

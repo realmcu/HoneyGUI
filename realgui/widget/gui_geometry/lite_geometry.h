@@ -174,6 +174,9 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                     PixelColor stroke_color);
 void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
                       float arc_radius, float line_width, PixelColor color);
+void lg_arc_ink_bounds(float radius, float line_width,
+                       float start_angle, float end_angle,
+                       float *min_x, float *min_y, float *max_x, float *max_y);
 void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
                              float radius, float line_width,
                              float start_angle, float end_angle,
