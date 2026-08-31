@@ -12,7 +12,6 @@ src = Split("""
 """)
 
 
-CPPDEFINES = ['GUI_KEIL_SIM']
 
 
 path = [cwd]

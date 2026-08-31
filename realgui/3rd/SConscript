@@ -9,7 +9,7 @@ inc = [cwd]
 src = Glob('*.c') + Glob('*.cpp')
 
 if GetDepend(['']):
-    objs = DefineGroup('3rd', src, depend = [''], CPPPATH = inc)
+    objs = DefineGroup('realgui/3rd', src, depend = [''], CPPPATH = inc)
     list = os.listdir(cwd)
     for d in list:
         if d == 'sim_experimental':

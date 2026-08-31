@@ -1,28 +1,24 @@
-# building script for HoneyGUI
+# for module compiling
+import os
+import sys
 
 from building import *
-import os
 
 cwd = GetCurrentDir()
-CPPPATH = [cwd]
-CPPPATH += [cwd + '\\root_image']
-CPPPATH += [os.path.join(cwd, '..', '..', '..', 'realgui', 'widget', 'gui_particle', 'effects')]
+inc = [cwd, os.path.join(cwd, 'root_image'), os.path.join(cwd, '..', '..', '..', 'realgui', 'widget', 'gui_particle', 'effects')]
+src = ['particle_demo.c', 'particle_launcher.c', 'example_particle.c']
 
-objs = []
-CPPDEFINES = []
-src = []
-
-# Demo, launcher, example: depend on particle demo selection
-if GetDepend('CONFIG_REALTEK_BUILD_PARTICLE_DEMO'):
+if GetDepend(['CONFIG_REALTEK_BUILD_PARTICLE_DEMO']):
     CPPDEFINES = ['DRV_LCD_WIDTH=410']
     CPPDEFINES += ['DRV_LCD_HEIGHT=502']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
-    src += [os.path.join(cwd, f) for f in [
-        'particle_demo.c',
-        'particle_launcher.c',
-        'example_particle.c',
-    ]]
-
-objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    objs = DefineGroup('example/widget', src, depend = [''], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

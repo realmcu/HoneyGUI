@@ -36,13 +36,6 @@ if(1) #set to 1 to enable or variable to for dependency
         target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
-    # Add compile definitions
-    if(CONFIG_REALTEK_BUILD_AUDIO)
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE
-            GUI_ENABLE_AUDIO
-        )
-    endif()
-
     # Process subdirectories regardless
     file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
 

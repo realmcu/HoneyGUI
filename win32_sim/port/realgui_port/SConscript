@@ -6,18 +6,19 @@ from building import *
 
 cwd = GetCurrentDir()
 inc = [cwd]
-src = Glob('*.c')
-
-CPPDEFINES = []
+src = Glob('*.c') + Glob('*.cpp')
 
 if not GetDepend(['CONFIG_REALTEK_BUILD_AUDIO']):
     SrcRemove(src, ['gui_port_audio.c'])
 
-objs = DefineGroup('rtk_gui', src, depend = [], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
-list = os.listdir(cwd)
-for d in list:
-    path = os.path.join(cwd, d)
-    if os.path.isfile(os.path.join(path, 'SConscript')):
-        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+if GetDepend(['']):
+    objs = DefineGroup('win32_sim/port', src, depend = [''], CPPPATH = inc)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

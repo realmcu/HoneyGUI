@@ -23,7 +23,6 @@ if(CONFIG_REALTEK_BUILD_GUI_240_240_DEMO)
     
     # Add compile definitions
     target_compile_definitions(${GUI_TARGET_NAME} PRIVATE
-        ENABLE_RTK_GUI_240_240_DEMO
         DRV_LCD_WIDTH=240
         DRV_LCD_HEIGHT=240
         DRV_PIXEL_BITS=16

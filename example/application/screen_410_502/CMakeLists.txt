@@ -25,7 +25,6 @@ if(CONFIG_REALTEK_BUILD_GUI_410_502_DEMO)
     
     # Add compile definitions
     target_compile_definitions(${GUI_TARGET_NAME} PRIVATE
-        ENABLE_RTK_GUI_410_502_DEMO
         DRV_LCD_WIDTH=410
         DRV_LCD_HEIGHT=502
         DRV_PIXEL_BITS=16

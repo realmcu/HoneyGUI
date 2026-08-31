@@ -1,13 +1,20 @@
 # for module compiling
 import os
+import sys
+
 from building import *
 
 cwd = GetCurrentDir()
-inc = [cwd, cwd + '/../../../3rd/particle', cwd + '/..']
+inc = [cwd, os.path.join(cwd, '..', '..', '..', '3rd', 'particle'), os.path.join(cwd, '..')]
 src = Glob('*.c') + Glob('*.cpp')
 
 if GetDepend(['CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM']):
-    objs = DefineGroup('effects', src, depend = [''], CPPPATH = inc)
+    objs = DefineGroup('realgui/widget', src, depend = [''], CPPPATH = inc)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
 else:
     objs = []
 

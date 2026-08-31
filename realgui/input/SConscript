@@ -9,7 +9,7 @@ inc = [cwd]
 src = Glob('*.c') + Glob('*.cpp')
 
 if GetDepend(['']):
-    objs = DefineGroup('input', src, depend = [''], CPPPATH = inc)
+    objs = DefineGroup('realgui/input', src, depend = [''], CPPPATH = inc)
     list = os.listdir(cwd)
     for d in list:
         path = os.path.join(cwd, d)

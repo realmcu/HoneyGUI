@@ -1,22 +1,24 @@
-# SConscript
+# for module compiling
+import os
+import sys
 
 from building import *
-import os
-
-Import('env')
 
 cwd = GetCurrentDir()
-src = Glob('*.c')
-CPPDEFINES = []
-CPPPATH = [cwd]
-CPPPATH += [os.path.join(cwd, 'root_image_800_480')]
+inc = [cwd, os.path.join(cwd, 'root_image_800_480')]
+src = Glob('*.c') + Glob('*.cpp')
 
-
-if GetDepend('CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'):
-    CPPDEFINES += ['ENABLE_RTK_GUI_800_480_DEMO']
-    CPPDEFINES += ['DRV_LCD_WIDTH=800']
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO']):
+    CPPDEFINES = ['DRV_LCD_WIDTH=800']
     CPPDEFINES += ['DRV_LCD_HEIGHT=480']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
-objs = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    objs = DefineGroup('example/application', src, depend = [''], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

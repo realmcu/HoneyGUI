@@ -1,22 +1,24 @@
-# HoneyGUI building script
+# for module compiling
+import os
+import sys
+
 from building import *
 
-Import('env')
-
 cwd = GetCurrentDir()
-src = Split("""
-""")
+inc = [cwd]
+src = Glob('*.c') + Glob('*.cpp')
 
-src = Glob('*.c')
-CPPPATH = [cwd]
-
-CPPDEFINES = []
-if GetDepend('CONFIG_REALTEK_BUILD_GUI_240_240_DEMO'):
-    CPPDEFINES += ['ENABLE_RTK_GUI_240_240_DEMO']
-    CPPDEFINES += ['DRV_LCD_WIDTH=240']
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI_240_240_DEMO']):
+    CPPDEFINES = ['DRV_LCD_WIDTH=240']
     CPPDEFINES += ['DRV_LCD_HEIGHT=240']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
-
-objs = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_240_240_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    objs = DefineGroup('example/application', src, depend = [''], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')

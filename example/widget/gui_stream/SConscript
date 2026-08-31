@@ -1,27 +1,25 @@
-# building script for HoneyGUI
+# for module compiling
+import os
+import sys
 
 from building import *
 
-Import('env')
-
 cwd = GetCurrentDir()
-CPPPATH = [cwd]
-CPPPATH += [cwd + '\\root_image']
-src = Split("""
-""")
+inc = [cwd, os.path.join(cwd, 'root_image')]
+src = Glob('*.c') + Glob('*.cpp')
 
-objs = []
-
-CPPDEFINES = []
-
-if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_STREAM_WIDGET'):
-
-    src += ['example_gui_stream.c']
+if GetDepend(['CONFIG_REALTEK_BUILD_EXAMPLE_STREAM_WIDGET']):
     CPPDEFINES = ['DRV_LCD_WIDTH=460']
     CPPDEFINES += ['DRV_LCD_HEIGHT=502']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
     CPPDEFINES += ['DRV_LCD_CORNER_RADIUS=0']
-
-objs = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    objs = DefineGroup('example/widget', src, depend = [''], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
 
 Return('objs')
