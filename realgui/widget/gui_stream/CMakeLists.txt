@@ -5,17 +5,23 @@
 #
 
 cmake_minimum_required(VERSION 3.10)
+if(1)
+    file(GLOB SOURCES "*.c" "*.cpp")
+    file(GLOB HEADERS "*.h" "*.hpp")
 
-if(1) #set to 1 to enable or variable to for dependency
-
-    file(GLOB SOURCES "*.c")
-    file(GLOB HEADERS "*.h")
-
-    if(SOURCES AND HEADERS)
+    if(SOURCES)
         target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    elseif(HEADERS)
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
+    target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+    foreach(subdir ${SUBDIRS})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
+                add_subdirectory(${subdir})
+            endif()
+        endif()
+    endforeach()
 endif()

@@ -11,7 +11,5 @@ if(CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM)
         target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
     endif()
 
-    if(HEADERS)
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
+    target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
