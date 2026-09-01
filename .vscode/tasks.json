@@ -32,7 +32,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: gcc.exe 生成活动文件",
-            "command": "C:\\mingw64\\bin\\gcc.exe",
+            "command": "gcc.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",

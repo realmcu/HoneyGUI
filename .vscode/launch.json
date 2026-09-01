@@ -19,7 +19,7 @@
             "MIMode": "gdb",
             "windows": {
                 "program": "${workspaceFolder}\\win32_sim\\gui.exe",
-                "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe"
+                "miDebuggerPath": "gdb.exe"
             },
             "linux": {
                 "program": "${workspaceFolder}/win32_sim/gui",
