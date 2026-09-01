@@ -114,8 +114,14 @@ win32_sim/gui.exe
 tool/D2XML/MasterGo_plugin/node_modules/
 tool/D2XML/Pixso_plugin/node_modules/
 
+# CI build scripts: scratch build tree and per-stage reports
+/.ci-build/
+example/ci_build_scripts/test_report.txt
+example/ci_build_scripts/build_errors*.log
+
 # other
 .kiro/
+.omo/
 .kiro
 /.codex-build/
 /docs/

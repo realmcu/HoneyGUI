@@ -65,9 +65,15 @@ Embedded GUI framework for Realtek microcontrollers (RTL8762, RTL8773). C librar
 
 ## Testing
 
-    cd example/test && python run_all_tests.py    # All tests
-    python test_widgets.py                          # Widget demos
-    python test_gui_lib_build.py                    # Cross-compile tests
+    cd example/ci_build_scripts && python all_build.py   # Every stage
+    python widget_build_by_scons.py                     # example/widget, SCons
+    python widget_build_by_cmake.py                     # example/widget, CMake
+    python application_build_by_scons.py                # example/application, SCons
+    python application_build_by_cmake.py                # example/application, CMake
+    python lib_build_by_cmake.py --tools gcc            # lib/, host gcc only
+
+Each demo uses one checked-in minimal dependency config. `all_build.py` runs
+the application and widget demo configs with SCons and CMake.
 
 ## Platform Ports
 

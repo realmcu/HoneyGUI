@@ -25,7 +25,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libsdl2-dev python3-pip python-is-python3
-          pip install scons kconfiglib
+          pip install scons
 
       - name: Build with SCons
         run: cd win32_sim && scons -j$(nproc)
@@ -39,9 +39,6 @@ jobs:
           name: gui-binary
           path: win32_sim/gui
           retention-days: 30
-
-  # CMake build is Windows/MinGW-only (links mingw32, gdi32, etc.)
-  # Skipped on Linux CI - use SCons build instead
 
   lint:
     name: Static Analysis (cppcheck)
@@ -69,7 +66,6 @@ jobs:
     name: Widget Tests
     runs-on: ubuntu-22.04
     needs: [build-scons]
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -80,20 +76,22 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libsdl2-dev python3-pip xvfb python-is-python3
-          pip install scons kconfiglib
+          pip install scons
 
       - name: Build
         run: cd win32_sim && scons -j$(nproc)
 
       - name: Run widget tests
         run: |
-          cd example/test
-          xvfb-run -a python test_widgets.py 2>&1
+          cd example/ci_build_scripts
+          # lib_build_by_cmake needs the ARM toolchains, which this runner
+          # does not have. Simulator CMake uses the native Linux path here.
+          xvfb-run -a python3 all_build.py --skip lib_build_by_cmake.py 2>&1
 
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: example/test/test_report.txt
+          path: example/ci_build_scripts/test_report.txt
           retention-days: 30

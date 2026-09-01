@@ -4,7 +4,7 @@
 /* compiler configure file for RT-Thread in GCC*/
 
 
-#define GCC_VERSION_STR "13.3.0"
+#define GCC_VERSION_STR "9.5.0"
 #define STDC "1989"
 
 #endif

@@ -3,8 +3,15 @@
 menuconfig REALTEK_HONEYGUI
     bool "Enable HoneyGUI Framework"
     default n
+    select REALTEK_GUI_WIDGET_OBJ
+    select REALTEK_GUI_WIDGET_IMG
+    select REALTEK_GUI_WIDGET_WIN
+    select REALTEK_GUI_WIDGET_TEXT
     help
       Enable Realtek HoneyGUI graphics framework
+
+      The four selected widgets are the mandatory core of this release; see
+      "HoneyGUI Widget Configuration" for why they cannot be turned off yet.
 
 if REALTEK_HONEYGUI
 
@@ -24,118 +31,141 @@ config REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
 
 config REALTEK_BUILD_EXAMPLE_SVG_WIDGET
     bool "SVG Widget Demo"
+    select REALTEK_GUI_WIDGET_SVG
     help
       RTK GUI Base Demo - SVG Widget
 
 config REALTEK_BUILD_EXAMPLE_GIF_WIDGET
     bool "GIF Widget Demo"
+    select REALTEK_GUI_WIDGET_GIF
     help
       RTK GUI Base Demo - GIF Widget (Animated GIF support)
 
 config REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
     bool "Text Widget Demo"
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    select REALTEK_GUI_WIDGET_LIST
+    select REALTEK_GUI_WIDGET_VIEW
     help
       RTK GUI Base Demo - Text Widget
-
-config REALTEK_BUILD_EXAMPLE_GRAY_WIDGET
-    bool "Gray Widget Demo"
-    help
-      RTK GUI Base Demo - Gray Widget
 
 config REALTEK_BUILD_REAL_DOG_3D
     bool "3D Dog Demo"
     select REALTEK_BUILD_LITE3D
+    select REALTEK_GUI_WIDGET_LITE3D
     help
       RTK GUI 3D Demo
 
 config REALTEK_BUILD_REAL_EARTH_3D
     bool "3D Earth Demo"
     select REALTEK_BUILD_LITE3D
+    select REALTEK_GUI_WIDGET_LITE3D
     help
       RTK GUI 3D Demo
 
 config REALTEK_BUILD_REAL_DONUT_3D
     bool "3D Donut Demo"
     select REALTEK_BUILD_LITE3D
+    select REALTEK_GUI_WIDGET_LITE3D
     help
       RTK GUI 3D Demo
 
 config REALTEK_BUILD_REAL_PIKACHU_GLTF_3D
     bool "3D Pikachu GLTF Demo"
     select REALTEK_BUILD_LITE3D
+    select REALTEK_GUI_WIDGET_LITE3D
     help
       RTK GUI 3D GLTF Demo
 
 config REALTEK_BUILD_REAL_FLAG_GLTF_3D
     bool "3D Flag GLTF Demo"
     select REALTEK_BUILD_LITE3D
+    select REALTEK_GUI_WIDGET_LITE3D
     help
       RTK GUI 3D GLTF Demo
 
 config REALTEK_BUILD_REAL_ROBOT_GLTF_3D
     bool "3D Robot GLTF Demo"
     select REALTEK_BUILD_LITE3D
+    select REALTEK_GUI_WIDGET_LITE3D
     help
       RTK GUI 3D GLTF Demo
 
 config REALTEK_BUILD_REAL_VIEW
     bool "View Demo"
+    select REALTEK_GUI_WIDGET_VIEW
     help
       RTK GUI View Demo
 
 config REALTEK_BUILD_EXAMPLE_LIST_WIDGET
     bool "List Widget Demo"
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    select REALTEK_GUI_WIDGET_LIST
     help
       RTK GUI List Demo
 
 config REALTEK_BUILD_EXAMPLE_CARD_LIST_WIDGET
     bool "Card List Widget Demo"
+    select REALTEK_GUI_WIDGET_CARD_LIST
+    select REALTEK_GUI_WIDGET_GEOMETRY
     help
       RTK GUI Card List Demo: 3-D perspective carousel with inertia scrolling,
       auto-snap, loop mode, and horizontal/vertical orientations.
 
 config REALTEK_BUILD_EXAMPLE_MENU_CELLULAR_WIDGET
     bool "Menu Cellular Widget Demo"
+    select REALTEK_GUI_WIDGET_CANVAS
+    select REALTEK_GUI_WIDGET_MENU_CELLULAR
     help
       RTK GUI Menu Cellular Demo
 
 config REALTEK_BUILD_REAL_CANVAS
     bool "Canvas Demo"
+    select REALTEK_GUI_WIDGET_CANVAS
     help
       RTK GUI Canvas Demo
 
 config REALTEK_BUILD_REAL_LITE_ARC
     bool "Geometry ARC Demo"
+    select REALTEK_GUI_WIDGET_GEOMETRY
     help
       RTK GUI Geometry ARC Demo
 
 config REALTEK_BUILD_REAL_LITE_RECT
     bool "Geometry RECT Demo"
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    select REALTEK_GUI_WIDGET_VIEW
     help
       RTK GUI Geometry RECT Demo
 
 config REALTEK_BUILD_REAL_LITE_CIRCLE
     bool "Geometry CIRCLE Demo"
+    select REALTEK_GUI_WIDGET_GEOMETRY
     help
       RTK GUI Geometry CIRCLE Demo
 
 config REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET
     bool "QRCode Widget Demo"
+    select REALTEK_GUI_WIDGET_QBCODE
     help
       RTK GUI QRCode Widget Demo
 
 config REALTEK_BUILD_EXAMPLE_GLASS_EFFECT_WIDGET
     bool "Glass Effect Demo"
+    select REALTEK_GUI_WIDGET_GLASS
+    select REALTEK_GUI_WIDGET_VIDEO
     help
       RTK GUI Glass Effect Demo
 
 config REALTEK_BUILD_EXAMPLE_VIDEO_WIDGET
     bool "Video Widget Demo"
+    select REALTEK_GUI_WIDGET_VIDEO
     help
       RTK GUI Video Widget Demo
 
 config REALTEK_BUILD_EXAMPLE_LITE_VIDEO_WIDGET
     bool "Lite Video Unified Widget Demo (MSV1 + Cinepak)"
+    select REALTEK_GUI_WIDGET_LITE_VIDEO
     help
       RTK GUI Lite Video unified widget demo.
       Auto-detects and plays both Microsoft Video 1 (MSV1) and Cinepak AVI files
@@ -144,34 +174,40 @@ config REALTEK_BUILD_EXAMPLE_LITE_VIDEO_WIDGET
 
 config REALTEK_BUILD_EXAMPLE_STREAM_WIDGET
     bool "Stream Widget Demo (live RAW video stream)"
+    select REALTEK_GUI_WIDGET_STREAM
     help
       RTK GUI Stream widget demo.
       A background producer thread feeds synthetic RGB565 frames through the
       stream_transport FIFO and the gui_stream widget displays them live.
       Tap to toggle play/pause.
 
-config REALTEK_BUILD_REAL_PAINTENGINE
-    bool "Paint Engine Demo"
-    help
-      RTK GUI Paint Engine Demo
-
-config REALTEK_BUILD_REAL_NANOVG
-    bool "NanoVG Demo"
-    help
-      RTK GUI NanoVG Demo
-
 config REALTEK_BUILD_REAL_BOX2D
     bool "Box2D Demo"
+    select REALTEK_BUILD_GUI_BOX2D
+    select REALTEK_GUI_WIDGET_CANVAS
     help
       RTK GUI Box2D Demo
 
 config REALTEK_BUILD_GUI_410_502_DEMO
     bool "GUI Demo 410x502"
+    select REALTEK_BUILD_LITE3D
+    select REALTEK_BUILD_GUI_BOX2D
+    select REALTEK_GUI_WIDGET_LITE3D
+    select REALTEK_GUI_WIDGET_VIEW
+    select REALTEK_GUI_WIDGET_CANVAS
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    select REALTEK_GUI_WIDGET_LIST
+    select REALTEK_GUI_WIDGET_GLASS
+    select REALTEK_GUI_WIDGET_VIDEO
+    select REALTEK_GUI_WIDGET_QBCODE
+    select REALTEK_GUI_WIDGET_SOCCER
+    select REALTEK_GUI_WIDGET_MENU_CELLULAR
     help
       RTK GUI Demo for 410x502 resolution
 
 config REALTEK_BUILD_GUI_466_466_DEMO
     bool "GUI Demo 466x466"
+    select REALTEK_GUI_WIDGET_VIEW
     help
       RTK GUI Demo for 466x466 resolution
 
@@ -194,26 +230,27 @@ config REALTEK_BUILD_GUI_240_240_DEMO
 
 config REALTEK_BUILD_GUI_800_480_DEMO
     bool "GUI Demo 800x480"
+    select REALTEK_GUI_WIDGET_VIEW
+    select REALTEK_GUI_WIDGET_CANVAS
+    select REALTEK_GUI_WIDGET_GEOMETRY
     help
       RTK GUI Demo for 800x480 resolution
 
 config REALTEK_BUILD_HML_DESIGNER
     bool "HML Designer Application"
+    select REALTEK_BUILD_XML_LOADER
     help
       Load UI from HML files generated by HoneyGUI Designer
 
 config REALTEK_BUILD_PARTICLE_DEMO
     bool "Particle System Demo"
-    depends on REALTEK_BUILD_PARTICLE_SYSTEM
+    select REALTEK_BUILD_PARTICLE_SYSTEM
+    select REALTEK_GUI_WIDGET_PARTICLE
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    select REALTEK_GUI_WIDGET_LIST
     help
       RTK GUI Particle System Demo - includes firework, trail, touch,
       snow and bubble effects examples
-
-config REALTEK_BUILD_MAP_NAVIGATION
-    bool "Map Navigation Demo"
-    help
-      Offline map navigation system with GPS integration,
-      A* pathfinding, and TRVG vector graphics rendering
 
 endchoice
 
@@ -241,7 +278,7 @@ config REALTEK_H264_DECODER
                 bool "Enable REALTEK H264BSD"
 
         endif
-        
+
 config REALTEK_BUILD_GUI_BOX2D
     bool "Enable Box2D"
     default n
@@ -259,6 +296,10 @@ config REALTEK_BUILD_XML_LOADER
     default n
     select REALTEK_BUILD_LITE3D
     select REALTEK_H264_DECODER
+    select REALTEK_GUI_WIDGET_VIEW
+    select REALTEK_GUI_WIDGET_LIST
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    select REALTEK_GUI_WIDGET_VIDEO
     help
       RTK GUI Enable XML Loader (ezXML)
 
@@ -281,7 +322,117 @@ config REALTEK_BUILD_AUDIO
     bool "Enable Audio"
     default n
     help
-      RTK GUI Enable Audio, depending on "Minimp3" for simulator 
+      RTK GUI Enable Audio, depending on "Minimp3" for simulator
+
+endmenu
+
+menu "HoneyGUI Widget Configuration"
+
+config REALTEK_GUI_WIDGET_OBJ
+    bool "gui_obj - base object (mandatory)"
+    help
+      Base object every widget inherits from. Locked on: core, server, dc
+      and input all depend on it.
+
+config REALTEK_GUI_WIDGET_IMG
+    bool "gui_img - image display (mandatory in this release)"
+    help
+      Locked on: gui_text depends on gui_img. Becomes optional once
+      engine/font is decoupled from gui_text.
+
+config REALTEK_GUI_WIDGET_WIN
+    bool "gui_win - window (mandatory in this release)"
+    help
+      Locked on: gui_text.h includes gui_win.h. Becomes optional once
+      engine/font is decoupled from gui_text.
+
+config REALTEK_GUI_WIDGET_TEXT
+    bool "gui_text - text rendering (mandatory in this release)"
+    help
+      Locked on: the whole engine/font API is expressed in terms of
+      gui_text_t (font_mem.h, font_ttf.h, font_stb.h, font_custom.h,
+      font_mem_img.h, font_mem_matrix.h).
+
+config REALTEK_GUI_WIDGET_VIEW
+    bool "gui_view - view container, button, transitions"
+    default y
+
+config REALTEK_GUI_WIDGET_CANVAS
+    bool "gui_canvas - custom drawing canvas"
+    default y
+
+config REALTEK_GUI_WIDGET_GEOMETRY
+    bool "gui_geometry - arc, circle, rect"
+    default y
+
+config REALTEK_GUI_WIDGET_LIST
+    bool "gui_list - scrollable list"
+    default y
+    select REALTEK_GUI_WIDGET_CANVAS
+    select REALTEK_GUI_WIDGET_VIEW
+
+config REALTEK_GUI_WIDGET_SVG
+    bool "gui_svg - SVG vector graphics"
+    default y
+
+config REALTEK_GUI_WIDGET_GIF
+    bool "gui_gif - animated GIF"
+    default y
+
+config REALTEK_GUI_WIDGET_GLASS
+    bool "gui_glass - glass / blur effect"
+    default y
+
+config REALTEK_GUI_WIDGET_LOTTIE
+    bool "gui_lottie - Lottie animation"
+    default y
+
+config REALTEK_GUI_WIDGET_VIDEO
+    bool "gui_video - video playback"
+    default y
+
+config REALTEK_GUI_WIDGET_LITE_VIDEO
+    bool "gui_lite_video - MSV1 + Cinepak unified video"
+    default y
+    select REALTEK_GUI_WIDGET_VIDEO
+
+config REALTEK_GUI_WIDGET_STREAM
+    bool "gui_stream - live RAW video stream"
+    default y
+    select REALTEK_GUI_WIDGET_LITE_VIDEO
+
+config REALTEK_GUI_WIDGET_QBCODE
+    bool "gui_qbcode - barcode / QR code"
+    default y
+
+config REALTEK_GUI_WIDGET_SOCCER
+    bool "gui_soccer - 2.5D soccer"
+    default y
+
+config REALTEK_GUI_WIDGET_CARD_LIST
+    bool "gui_card_list - 3D perspective carousel"
+    default y
+
+config REALTEK_GUI_WIDGET_MENU_CELLULAR
+    bool "gui_menu_cellular - cellular menu"
+    default y
+
+config REALTEK_GUI_WIDGET_LITE3D
+    bool "gui_lite3d - 3D rendering widget"
+    depends on REALTEK_BUILD_LITE3D
+    default y
+    help
+      Widget adapter for the Lite3D library. Kept separate from
+      REALTEK_BUILD_LITE3D so the library can be used without the widget.
+
+config REALTEK_GUI_WIDGET_PARTICLE
+    bool "gui_particle - particle effect widget"
+    depends on REALTEK_BUILD_PARTICLE_SYSTEM
+    default y
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    help
+      Widget adapter for the particle system core. The core in 3rd/particle
+      is independent and can be used without HoneyGUI.
 
 endmenu
 

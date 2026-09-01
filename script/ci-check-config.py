@@ -46,7 +46,6 @@ ci_check_config = {
         r"realgui/engine/draw/draw_font.c",
         r"doxygen_graphviz/readme.md",
         r"tool/",
-        r"example/map",
         r"todo/",
     ],
     "ignore_cpp_astyle_check":[
@@ -79,7 +78,7 @@ ci_check_config = {
                 "function": "do_commit_check",
                 "fail-fast": True,
                 "gerrit-label": True,
-                "fail-label-value": "-1", # to set this value if fail，-1 by default
+                "fail-label-value": "-1", # to set this value if fail, -1 by default
                 "pass-label-value": "+1", # to set this value if pass, +1 by default
             },
             "Static-Check": {

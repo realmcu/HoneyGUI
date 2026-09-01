@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # Particle System Widget Adapter Layer
 # This module depends on both particle system core and HoneyGUI
-if(CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM)
+if(CONFIG_REALTEK_GUI_WIDGET_PARTICLE)
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 

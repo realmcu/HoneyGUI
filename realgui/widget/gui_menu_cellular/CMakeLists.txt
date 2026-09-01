@@ -5,7 +5,7 @@
 #
 
 cmake_minimum_required(VERSION 3.10)
-if(1)
+if(CONFIG_REALTEK_GUI_WIDGET_MENU_CELLULAR)
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 

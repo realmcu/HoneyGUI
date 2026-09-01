@@ -196,13 +196,27 @@ HML provides XML-based UI development through the ezXML loader (in `realgui/3rd/
 ## Testing
 
 ```shell
-cd example/test
-python run_all_tests.py        # Run all tests
-python test_widgets.py         # Test widget functionality
-python test_gui_lib_build.py   # Test library build
+cd example/ci_build_scripts
+
+python all_build.py                    # Every stage, writes test_report.txt
+
+# Individual stages
+python widget_build_by_scons.py         # example/widget demos, SCons
+python widget_build_by_cmake.py         # example/widget demos, CMake
+python application_build_by_scons.py    # example/application demos, SCons
+python application_build_by_cmake.py    # example/application demos, CMake
+python lib_build_by_cmake.py            # lib/ prebuilt libraries, CMake
+python lib_build_by_cmake.py --tools gcc  # only the host-gcc target
 ```
 
-Test results are written to `test_report.txt` and errors to `test_errors.log`.
+All stages share `ci_common.py`; the per-stage scripts are thin wrappers.
+
+Each demo uses one checked-in minimal dependency config. The configs are split
+into `application/` and `widget/` to match the source layout. The default
+`all_build.py` run builds both groups with SCons and CMake.
+
+`all_build.py` writes `test_report.txt`; failing stages also write
+`build_errors_<stage>.log`.
 
 ## Toolchain Requirements
 

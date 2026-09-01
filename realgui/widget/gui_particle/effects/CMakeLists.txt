@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-if(CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM)
+if(CONFIG_REALTEK_GUI_WIDGET_PARTICLE)
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 

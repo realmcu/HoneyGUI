@@ -8,7 +8,7 @@ cwd = GetCurrentDir()
 inc = [cwd, os.path.join(cwd, '..', '..', '3rd', 'particle')]
 src = Glob('*.c') + Glob('*.cpp')
 
-if GetDepend(['CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM']):
+if GetDepend(['CONFIG_REALTEK_GUI_WIDGET_PARTICLE']):
     objs = DefineGroup('realgui/widget', src, depend = [''], CPPPATH = inc)
     list = os.listdir(cwd)
     for d in list:

@@ -131,15 +131,15 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
 
 
 def Test_handler(module, submodule, manifest_path, repo_home, chip_type):
-    os.chdir('./example/test')
+    os.chdir('./example/ci_build_scripts')
     try:
-        result_lines = subprocess.check_output([r'python', r'run_all_tests.py'], universal_newlines=True, stderr=subprocess.STDOUT)
-        print('run_all_tests.py\r\n{}'.format(result_lines))
+        result_lines = subprocess.check_output([sys.executable, r'all_build.py'], universal_newlines=True, stderr=subprocess.STDOUT)
+        print('all_build.py\r\n{}'.format(result_lines))
         if 'FINAL RESULT: [FAIL] SOME TESTS FAILED' in result_lines or 'FINAL RESULT: [OK] ALL TESTS PASSED' not in result_lines:
-            print("run_all_tests fail")
+            print("all_build fail")
             return False
     except Exception as e:
-        print("run_all_tests.py fail: {}".format(e.output))
+        print("all_build.py fail: {}".format(e.output))
         return False
     os.chdir('./../..')
     return True
@@ -148,7 +148,7 @@ def Test_handler(module, submodule, manifest_path, repo_home, chip_type):
 def DOC_handler(module, submodule, manifest_path, repo_home, chip_type):
     print("build sphinx document\n")
     try:
-        cmd = ["python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "../doc/build.py")]
+        cmd = [sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "../doc/build.py")]
         print(" ".join(cmd), flush=True)
         subprocess.check_call(cmd, universal_newlines=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
