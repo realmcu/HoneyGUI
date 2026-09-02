@@ -239,6 +239,58 @@ static void free_draw_img(draw_img_t **img)
     *img = NULL;
 }
 
+static void free_rect_draw_imgs(gui_rounded_rect_t *rect)
+{
+    free_draw_img(&rect->rect_0);
+    free_draw_img(&rect->rect_1);
+    free_draw_img(&rect->rect_2);
+    free_draw_img(&rect->circle_00);
+    free_draw_img(&rect->circle_01);
+    free_draw_img(&rect->circle_10);
+    free_draw_img(&rect->circle_11);
+}
+
+static int get_effective_radius(const gui_rounded_rect_t *rect)
+{
+    if (rect->radius <= 0 || rect->base.w <= 0 || rect->base.h <= 0)
+    {
+        return 0;
+    }
+
+    int max_radius = _UI_MIN(rect->base.w, rect->base.h) / 2;
+    return _UI_MIN(rect->radius, max_radius);
+}
+
+static bool get_rect_buffer_size(int32_t w, int32_t h, uint32_t pixel_bytes,
+                                 uint32_t *buffer_size)
+{
+    if (buffer_size == NULL || w <= 0 || h <= 0 || w > UINT16_MAX || h > UINT16_MAX ||
+        pixel_bytes == 0)
+    {
+        return false;
+    }
+
+    uint64_t size = (uint64_t)(uint32_t)w * (uint32_t)h * pixel_bytes +
+                    sizeof(gui_rgb_data_head_t);
+    if (size > UINT32_MAX)
+    {
+        return false;
+    }
+
+    *buffer_size = (uint32_t)size;
+    return true;
+}
+
+static bool rect_position_is_valid(int value)
+{
+    return value >= INT16_MIN && value <= INT16_MAX;
+}
+
+static bool rect_size_is_valid(int value)
+{
+    return value >= 0 && value <= INT16_MAX;
+}
+
 /** Set image data header for rectangle */
 static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, gui_color_t color)
 {
@@ -266,7 +318,12 @@ static uint8_t *create_solid_color_buffer(gui_rounded_rect_t *this, uint16_t w, 
     rect_desc_init(&desc, this, RECT_PART_SOLID, w, h);
 
     uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size = w * h * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    uint32_t buffer_size;
+    if (!get_rect_buffer_size(w, h, pixel_bytes, &buffer_size))
+    {
+        return NULL;
+    }
+
     uint8_t *buffer = gui_shape_cache_acquire(&desc, rect_desc_len(&desc), buffer_size, &is_new);
     if (buffer == NULL) { return NULL; }
     if (!is_new) { return buffer; }
@@ -294,7 +351,8 @@ static uint8_t *create_solid_color_buffer(gui_rounded_rect_t *this, uint16_t w, 
 
     uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
     uint32_t argb = color.color.argb_full;
-    for (int i = 0; i < w * h; i++)
+    uint32_t pixel_count = (uint32_t)w * h;
+    for (uint32_t i = 0; i < pixel_count; i++)
     {
         pixels[i] = argb;
     }
@@ -303,21 +361,29 @@ static uint8_t *create_solid_color_buffer(gui_rounded_rect_t *this, uint16_t w, 
 
 /** Create a rectangle image object (Legacy/Fallback) */
 static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16_t x,
-                         int16_t y, uint16_t w, uint16_t h)
+                         int16_t y, int32_t w, int32_t h)
 {
     // Free old buffer first to prevent memory leak
     free_draw_img(input_img);
 
+    if (w <= 0 || h <= 0 || w > UINT16_MAX || h > UINT16_MAX)
+    {
+        return;
+    }
+
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    GUI_ASSERT(img != NULL);
+    if (img == NULL)
+    {
+        return;
+    }
     memset(img, 0x00, sizeof(draw_img_t));
 
     bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f);
 
     if (has_transform)
     {
-        uint8_t *payload = create_solid_color_buffer(this, w, h, this->color);
+        uint8_t *payload = create_solid_color_buffer(this, (uint16_t)w, (uint16_t)h, this->color);
         if (payload == NULL)
         {
             gui_free(img);
@@ -332,8 +398,12 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
          * pixels, and its width and height make it near-unique anyway, so the
          * per-node bookkeeping would cost several times the payload. */
         gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
-        GUI_ASSERT(rect_data != NULL);
-        set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
+        if (rect_data == NULL)
+        {
+            gui_free(img);
+            return;
+        }
+        set_rect_header((gui_rgb_data_head_t *)rect_data, (uint16_t)w, (uint16_t)h, this->color);
 
         img->blend_mode = IMG_RECT;
         img->data = rect_data;
@@ -366,19 +436,19 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
  *              The geometry and supersampling are identical either way.
  */
 static void prepare_arc_img(gui_rounded_rect_t *this, uint8_t *circle_data, int corner_type,
-                            bool is_a8)
+                            bool is_a8, int radius)
 {
-    if (this->radius == 0) { return; }
+    if (radius <= 0) { return; }
     uint32_t *data = (uint32_t *)(circle_data + sizeof(gui_rgb_data_head_t));
     uint8_t *mask = circle_data + sizeof(gui_rgb_data_head_t);
-    uint16_t img_size = this->radius + 1;
+    uint16_t img_size = (uint16_t)(radius + 1);
     memset(circle_data + sizeof(gui_rgb_data_head_t), 0,
            (size_t)img_size * img_size * (is_a8 ? 1u : 4u));
 
-    float center = (float)this->radius;
-    float radius_sq = this->radius * this->radius;
-    float inner_sq = (this->radius - 0.5f) * (this->radius - 0.5f);
-    float outer_sq = (this->radius + 0.5f) * (this->radius + 0.5f);
+    float center = (float)radius;
+    float radius_sq = radius * radius;
+    float inner_sq = (radius - 0.5f) * (radius - 0.5f);
+    float outer_sq = (radius + 0.5f) * (radius + 0.5f);
     uint32_t color_full = this->color.color.argb_full;
 
     int is_right = (corner_type == 1 || corner_type == 2);
@@ -462,10 +532,18 @@ static void prepare_arc_img(gui_rounded_rect_t *this, uint8_t *circle_data, int 
  *                   identical rect, in which case out_body must not be written.
  */
 static draw_img_t *alloc_rect_img_buffer(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                         uint8_t **out_body, bool *out_is_new)
+                                         uint8_t **out_body, bool *out_is_new, int radius)
 {
     int w = this->base.w;
     int h = this->base.h;
+    uint32_t buffer_size;
+
+    if (out_body == NULL || out_is_new == NULL)
+    {
+        return NULL;
+    }
+    *out_body = NULL;
+    *out_is_new = false;
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return NULL; }
@@ -478,9 +556,15 @@ static draw_img_t *alloc_rect_img_buffer(gui_rounded_rect_t *this, gui_obj_t *ob
     rect_desc_t desc;
     bool is_new = false;
     rect_desc_init(&desc, this, RECT_PART_ROUNDED, w, h);
+    desc.radius = radius;
 
     uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size = w * h * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    if (!get_rect_buffer_size(w, h, pixel_bytes, &buffer_size))
+    {
+        gui_free(img);
+        return NULL;
+    }
+
     uint8_t *buffer = gui_shape_cache_acquire(&desc, rect_desc_len(&desc), buffer_size, &is_new);
     if (buffer == NULL)
     {
@@ -505,8 +589,8 @@ static draw_img_t *alloc_rect_img_buffer(gui_rounded_rect_t *this, gui_obj_t *ob
             head->compress = 0;
             head->rsvd = 0;
             head->type = ARGB8888;
-            head->w = w;
-            head->h = h;
+            head->w = (uint16_t)w;
+            head->h = (uint16_t)h;
         }
     }
 
@@ -538,7 +622,14 @@ static draw_img_t *alloc_rect_img_buffer(gui_rounded_rect_t *this, gui_obj_t *ob
 static uint8_t *generate_corner_mask(int r)
 {
     if (r <= 0) { return NULL; }
-    uint8_t *mask = gui_malloc(r * r);
+
+    uint64_t mask_size = (uint64_t)(uint32_t)r * (uint32_t)r;
+    if (mask_size > UINT32_MAX)
+    {
+        return NULL;
+    }
+
+    uint8_t *mask = gui_malloc((uint32_t)mask_size);
     if (!mask) { return NULL; }
 
     float r_sq = (float)((r - 0.5f) * (r - 0.5f));
@@ -808,16 +899,17 @@ static void fill_horizontal_gradient_opt(uint32_t *pixels, int w, int h, int r, 
     }
 }
 
-static void fill_gradient_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, int w, int h,
+static bool fill_gradient_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, int w, int h,
                                        int r)
 {
-    // Clamp radius
-    if (r * 2 > w) { r = w / 2; }
-    if (r * 2 > h) { r = h / 2; }
+    if (pixels == NULL || w <= 0 || h <= 0 || r < 0)
+    {
+        return false;
+    }
 
     int lut_size = (this->gradient_dir == RECT_GRADIENT_VERTICAL) ? h : w;
-    uint32_t *lut = gui_malloc(lut_size * sizeof(uint32_t));
-    if (!lut) { return; }
+    uint32_t *lut = gui_malloc((size_t)lut_size * sizeof(uint32_t));
+    if (!lut) { return false; }
 
     // Generate LUT
     float step = (lut_size > 1) ? 1.0f / (float)(lut_size - 1) : 0.0f;
@@ -831,7 +923,11 @@ static void fill_gradient_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixel
     if (r > 0)
     {
         mask = generate_corner_mask(r);
-        if (!mask) { gui_free(lut); return; }
+        if (!mask)
+        {
+            gui_free(lut);
+            return false;
+        }
     }
 
     bool use_dither = GUI_RECT_ENABLE_DITHER;
@@ -849,23 +945,26 @@ static void fill_gradient_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixel
 
     if (mask) { gui_free(mask); }
     if (lut) { gui_free(lut); }
+    return true;
 }
 
 /**
  * Fill solid color with optimization
  * Reuse the mask logic to avoid sqrt loops
  */
-static void fill_solid_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, int w, int h, int r)
+static bool fill_solid_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, int w, int h, int r)
 {
-    if (r * 2 > w) { r = w / 2; }
-    if (r * 2 > h) { r = h / 2; }
+    if (pixels == NULL || w <= 0 || h <= 0 || r < 0)
+    {
+        return false;
+    }
 
     uint32_t solid_color = this->color.color.argb_full;
     uint8_t *mask = NULL;
     if (r > 0)
     {
         mask = generate_corner_mask(r);
-        if (!mask) { return; }
+        if (!mask) { return false; }
     }
 
     // Zone 1 & 3: Corners (Top/Bottom)
@@ -935,6 +1034,7 @@ static void fill_solid_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, 
     }
 
     if (mask) { gui_free(mask); }
+    return true;
 }
 
 /**
@@ -945,11 +1045,13 @@ static void fill_solid_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, 
  * is folded in with that twin's exact arithmetic so the two agree byte for byte:
  * fully covered pixels take colour alpha, corner pixels scale it by coverage.
  */
-static void fill_solid_rounded_mask_a8(gui_rounded_rect_t *this, uint8_t *mask_out,
+static bool fill_solid_rounded_mask_a8(gui_rounded_rect_t *this, uint8_t *mask_out,
                                        int w, int h, int r)
 {
-    if (r * 2 > w) { r = w / 2; }
-    if (r * 2 > h) { r = h / 2; }
+    if (mask_out == NULL || w <= 0 || h <= 0 || r < 0)
+    {
+        return false;
+    }
 
     uint8_t color_a = this->color.color.rgba.a;
 
@@ -957,7 +1059,7 @@ static void fill_solid_rounded_mask_a8(gui_rounded_rect_t *this, uint8_t *mask_o
     if (r > 0)
     {
         corner = generate_corner_mask(r);
-        if (corner == NULL) { return; }
+        if (corner == NULL) { return false; }
     }
 
     /* One corner row: coverage 255 keeps colour alpha, 0 stays clear (the buffer
@@ -999,17 +1101,18 @@ static void fill_solid_rounded_mask_a8(gui_rounded_rect_t *this, uint8_t *mask_o
     }
 
     if (corner != NULL) { gui_free(corner); }
+    return true;
 }
 
 static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                              draw_img_t **old_img)
+                                              draw_img_t **old_img, int radius)
 {
     // Free old buffer first to prevent memory leak
     free_draw_img(old_img);
 
     uint8_t *body = NULL;
     bool is_new = false;
-    draw_img_t *img = alloc_rect_img_buffer(this, obj, &body, &is_new);
+    draw_img_t *img = alloc_rect_img_buffer(this, obj, &body, &is_new, radius);
     if (img == NULL) { return NULL; }
 
     if (!is_new)
@@ -1020,29 +1123,37 @@ static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_
 
     int w = this->base.w;
     int h = this->base.h;
-    int r = this->radius;
 
     bool use_gradient = (this->use_gradient && this->gradient != NULL &&
                          this->gradient->stop_count >= 2);
 
+    bool filled;
     if (rect_use_a8(this))
     {
-        fill_solid_rounded_mask_a8(this, body, w, h, r);
+        filled = fill_solid_rounded_mask_a8(this, body, w, h, radius);
     }
     else if (use_gradient)
     {
-        fill_gradient_rounded_rect(this, (uint32_t *)body, w, h, r);
+        filled = fill_gradient_rounded_rect(this, (uint32_t *)body, w, h, radius);
     }
     else
     {
-        fill_solid_rounded_rect(this, (uint32_t *)body, w, h, r);
+        filled = fill_solid_rounded_rect(this, (uint32_t *)body, w, h, radius);
     }
+
+    if (!filled)
+    {
+        free_draw_img(&img);
+        return NULL;
+    }
+
     return img;
 }
 
 /** Create corner image for specific corner (Legacy/Fallback) */
 static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                     int corner_idx, int x, int y, draw_img_t **old_img)
+                                     int corner_idx, int x, int y, draw_img_t **old_img,
+                                     int radius)
 {
     // Free old buffer first to prevent memory leak
     free_draw_img(old_img);
@@ -1051,7 +1162,11 @@ static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
     if (img == NULL) { return NULL; }
     memset(img, 0x00, sizeof(draw_img_t));
 
-    int size = this->radius + 1;
+    int size = radius + 1;
+    if (radius <= 0)
+    {
+        return NULL;
+    }
 
     /* Keyed by corner index as well as radius, so all four corners of every rect
      * with this radius come from just four payloads -- and as a mask, regardless
@@ -1059,10 +1174,17 @@ static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
     bool is_a8 = rect_use_a8(this);
     rect_desc_t desc;
     bool is_new = false;
-    rect_desc_init(&desc, this, RECT_PART_CORNER, this->radius, corner_idx);
+    rect_desc_init(&desc, this, RECT_PART_CORNER, radius, corner_idx);
+    desc.radius = radius;
 
     uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size = size * size * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    uint32_t buffer_size;
+    if (!get_rect_buffer_size(size, size, pixel_bytes, &buffer_size))
+    {
+        gui_free(img);
+        return NULL;
+    }
+
     uint8_t *circle_data = gui_shape_cache_acquire(&desc, rect_desc_len(&desc), buffer_size,
                                                    &is_new);
     if (circle_data == NULL)
@@ -1088,11 +1210,11 @@ static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
             head->compress = 0;
             head->rsvd = 0;
             head->type = ARGB8888;
-            head->w = size;
-            head->h = size;
+            head->w = (uint16_t)size;
+            head->h = (uint16_t)size;
         }
 
-        prepare_arc_img(this, circle_data, corner_idx, is_a8);
+        prepare_arc_img(this, circle_data, corner_idx, is_a8, radius);
     }
 
     set_img_payload(this, img, circle_data, is_a8);
@@ -1120,6 +1242,14 @@ static void gui_rect_prepare(gui_obj_t *obj)
 {
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
     uint32_t last = this->checksum;
+
+    if (this->base.w <= 0 || this->base.h <= 0)
+    {
+        free_rect_draw_imgs(this);
+        return;
+    }
+
+    int radius = get_effective_radius(this);
 
     // obj->matrix is already initialized by gui_obj_ctor
     // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
@@ -1175,13 +1305,17 @@ static void gui_rect_prepare(gui_obj_t *obj)
 
     bool need_regenerate = (last != new_checksum);
 
+    int split_margin = 2 * (radius + 1);
+    bool split_degenerate = (this->base.w <= split_margin) || (this->base.h <= split_margin);
+    uint64_t rect_area = (uint64_t)(uint16_t)this->base.w * (uint16_t)this->base.h;
+
     // FORCE single buffer for gradient or alpha for consistency
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
-                              (this->base.w * this->base.h <= 10000) ||
+                              (rect_area <= 10000) ||
                               (this->use_gradient && this->gradient != NULL) ||
-                              has_transform || parent_has_non_translate;
+                              has_transform || parent_has_non_translate || split_degenerate;
 
-    if (this->radius == 0 && !this->use_gradient)
+    if (radius == 0 && !this->use_gradient)
     {
         if (need_regenerate || this->rect_0 == NULL)
         {
@@ -1200,7 +1334,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
         free_draw_img(&this->circle_11);
         if (need_regenerate || this->rect_0 == NULL)
         {
-            this->rect_0 = create_rounded_rect_buffer(this, obj, &this->rect_0);
+            this->rect_0 = create_rounded_rect_buffer(this, obj, &this->rect_0, radius);
         }
     }
     else
@@ -1209,30 +1343,30 @@ static void gui_rect_prepare(gui_obj_t *obj)
         if (need_regenerate || this->rect_0 == NULL)
         {
             set_rect_img(this, &this->rect_0, \
-                         this->radius + 1,  \
+                         radius + 1,  \
                          0,
-                         this->base.w - 2 * (this->radius + 1), \
-                         this->radius + 1);
+                         this->base.w - 2 * (radius + 1), \
+                         radius + 1);
 
             set_rect_img(this, &this->rect_1, \
                          0, \
-                         this->radius + 1, \
+                         radius + 1, \
                          this->base.w, \
-                         this->base.h - 2 * (this->radius + 1));
+                         this->base.h - 2 * (radius + 1));
 
             set_rect_img(this, &this->rect_2, \
-                         this->radius + 1,  \
-                         this->base.h - this->radius - 1,
-                         this->base.w - 2 * (this->radius + 1), \
-                         this->radius + 1);
+                         radius + 1,  \
+                         this->base.h - radius - 1,
+                         this->base.w - 2 * (radius + 1), \
+                         radius + 1);
 
-            this->circle_00 = create_corner_img(this, obj, 0, 0, 0, &this->circle_00);
-            this->circle_01 = create_corner_img(this, obj, 1, this->base.w - this->radius - 1, 0,
-                                                &this->circle_01);
-            this->circle_10 = create_corner_img(this, obj, 3, 0, this->base.h - this->radius - 1,
-                                                &this->circle_10);
-            this->circle_11 = create_corner_img(this, obj, 2, this->base.w - this->radius - 1,
-                                                this->base.h - this->radius - 1, &this->circle_11);
+            this->circle_00 = create_corner_img(this, obj, 0, 0, 0, &this->circle_00, radius);
+            this->circle_01 = create_corner_img(this, obj, 1, this->base.w - radius - 1, 0,
+                                                &this->circle_01, radius);
+            this->circle_10 = create_corner_img(this, obj, 3, 0, this->base.h - radius - 1,
+                                                &this->circle_10, radius);
+            this->circle_11 = create_corner_img(this, obj, 2, this->base.w - radius - 1,
+                                                this->base.h - radius - 1, &this->circle_11, radius);
         }
     }
 
@@ -1246,7 +1380,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
     {
         memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
 
-        if (this->radius == 0 && !this->use_gradient)
+        if (radius == 0 && !this->use_gradient)
         {
             // Simple rect case - rect_0 covers the whole area
             if (this->rect_0 != NULL)
@@ -1274,7 +1408,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
             if (this->rect_0 != NULL)
             {
                 memcpy(&this->rect_0->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate(this->radius + 1, 0, &this->rect_0->matrix);
+                matrix_translate(radius + 1, 0, &this->rect_0->matrix);
                 memcpy(&this->rect_0->inverse, &this->rect_0->matrix, sizeof(struct gui_matrix));
                 matrix_inverse(&this->rect_0->inverse);
                 draw_img_new_area(this->rect_0, NULL);
@@ -1282,7 +1416,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
             if (this->rect_1 != NULL)
             {
                 memcpy(&this->rect_1->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate(0, this->radius + 1, &this->rect_1->matrix);
+                matrix_translate(0, radius + 1, &this->rect_1->matrix);
                 memcpy(&this->rect_1->inverse, &this->rect_1->matrix, sizeof(struct gui_matrix));
                 matrix_inverse(&this->rect_1->inverse);
                 draw_img_new_area(this->rect_1, NULL);
@@ -1290,7 +1424,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
             if (this->rect_2 != NULL)
             {
                 memcpy(&this->rect_2->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate(this->radius + 1, this->base.h - this->radius - 1, &this->rect_2->matrix);
+                matrix_translate(radius + 1, this->base.h - radius - 1, &this->rect_2->matrix);
                 memcpy(&this->rect_2->inverse, &this->rect_2->matrix, sizeof(struct gui_matrix));
                 matrix_inverse(&this->rect_2->inverse);
                 draw_img_new_area(this->rect_2, NULL);
@@ -1305,7 +1439,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
             if (this->circle_01 != NULL)
             {
                 memcpy(&this->circle_01->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate(this->base.w - this->radius - 1, 0, &this->circle_01->matrix);
+                matrix_translate(this->base.w - radius - 1, 0, &this->circle_01->matrix);
                 memcpy(&this->circle_01->inverse, &this->circle_01->matrix, sizeof(struct gui_matrix));
                 matrix_inverse(&this->circle_01->inverse);
                 draw_img_new_area(this->circle_01, NULL);
@@ -1313,7 +1447,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
             if (this->circle_10 != NULL)
             {
                 memcpy(&this->circle_10->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate(0, this->base.h - this->radius - 1, &this->circle_10->matrix);
+                matrix_translate(0, this->base.h - radius - 1, &this->circle_10->matrix);
                 memcpy(&this->circle_10->inverse, &this->circle_10->matrix, sizeof(struct gui_matrix));
                 matrix_inverse(&this->circle_10->inverse);
                 draw_img_new_area(this->circle_10, NULL);
@@ -1321,7 +1455,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
             if (this->circle_11 != NULL)
             {
                 memcpy(&this->circle_11->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate(this->base.w - this->radius - 1, this->base.h - this->radius - 1,
+                matrix_translate(this->base.w - radius - 1, this->base.h - radius - 1,
                                  &this->circle_11->matrix);
                 memcpy(&this->circle_11->inverse, &this->circle_11->matrix, sizeof(struct gui_matrix));
                 matrix_inverse(&this->circle_11->inverse);
@@ -1412,14 +1546,7 @@ static void gui_rect_destroy(gui_obj_t *obj)
         this->gradient = NULL;
     }
 
-    // Free cached buffers using the helper function
-    free_draw_img(&this->rect_0);
-    free_draw_img(&this->rect_1);
-    free_draw_img(&this->rect_2);
-    free_draw_img(&this->circle_00);
-    free_draw_img(&this->circle_01);
-    free_draw_img(&this->circle_10);
-    free_draw_img(&this->circle_11);
+    free_rect_draw_imgs(this);
 }
 
 static void gui_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -1454,9 +1581,20 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
                                     int w, int h,
                                     int radius, gui_color_t color)
 {
-    GUI_ASSERT(parent != NULL);
+    if (parent == NULL || !rect_position_is_valid(x) || !rect_position_is_valid(y) ||
+        !rect_size_is_valid(w) || !rect_size_is_valid(h))
+    {
+        GUI_ASSERT(parent != NULL && rect_position_is_valid(x) && rect_position_is_valid(y) &&
+                   rect_size_is_valid(w) && rect_size_is_valid(h));
+        return NULL;
+    }
+
     gui_rounded_rect_t *round_rect = gui_malloc(sizeof(gui_rounded_rect_t));
-    GUI_ASSERT(round_rect != NULL);
+    if (round_rect == NULL)
+    {
+        GUI_ASSERT(round_rect != NULL);
+        return NULL;
+    }
     memset(round_rect, 0x00, sizeof(gui_rounded_rect_t));
 
     round_rect->opacity_value = UINT8_MAX;
@@ -1475,7 +1613,7 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
                                &(GET_BASE(round_rect)->brother_list));
     }
     GET_BASE(round_rect)->create_done = true;
-    round_rect->radius = radius;
+    round_rect->radius = _UI_MAX(radius, 0);
     round_rect->color = color;
     round_rect->degrees = 0.0f;
     round_rect->scale_x = 1.0f;
@@ -1494,21 +1632,37 @@ void gui_rect_set_style(gui_rounded_rect_t *rect,
                         int radius, gui_color_t color)
 {
     GUI_ASSERT(rect != NULL);
+    if (rect == NULL || !rect_position_is_valid(x) || !rect_position_is_valid(y) ||
+        !rect_size_is_valid(w) || !rect_size_is_valid(h))
+    {
+        return;
+    }
+
     rect->base.x = x;
     rect->base.y = y;
     rect->base.w = w;
     rect->base.h = h;
-    rect->radius = radius;
+    rect->radius = _UI_MAX(radius, 0);
     rect->color = color;
 }
 void gui_rect_set_opacity(gui_rounded_rect_t *rect, uint8_t opacity)
 {
     GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
     rect->opacity_value = opacity;
 }
 void gui_rect_set_position(gui_rounded_rect_t *rect, int x, int y)
 {
     GUI_ASSERT(rect != NULL);
+    if (rect == NULL || !rect_position_is_valid(x) || !rect_position_is_valid(y))
+    {
+        return;
+    }
+
     rect->base.x = x;
     rect->base.y = y;
 }
@@ -1516,6 +1670,11 @@ void gui_rect_set_position(gui_rounded_rect_t *rect, int x, int y)
 void gui_rect_set_size(gui_rounded_rect_t *rect, int w, int h)
 {
     GUI_ASSERT(rect != NULL);
+    if (rect == NULL || !rect_size_is_valid(w) || !rect_size_is_valid(h))
+    {
+        return;
+    }
+
     rect->base.w = w;
     rect->base.h = h;
 }
@@ -1523,7 +1682,12 @@ void gui_rect_set_size(gui_rounded_rect_t *rect, int w, int h)
 void gui_rect_set_radius(gui_rounded_rect_t *rect, int radius)
 {
     GUI_ASSERT(rect != NULL);
-    rect->radius = radius;
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    rect->radius = _UI_MAX(radius, 0);
 }
 
 void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color)

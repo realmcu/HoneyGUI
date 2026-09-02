@@ -195,6 +195,67 @@ static void free_arc_buffers_circle(gui_circle_t *this)
     free_draw_img_circle(&this->arc_left);
 }
 
+static void free_circle_draw_imgs(gui_circle_t *circle)
+{
+    free_arc_buffers_circle(circle);
+    free_draw_img_circle(&circle->center_rect);
+}
+
+static bool get_circle_buffer_size(int32_t w, int32_t h, uint32_t pixel_bytes,
+                                   uint32_t *buffer_size)
+{
+    if (buffer_size == NULL || w <= 0 || h <= 0 || w > UINT16_MAX || h > UINT16_MAX ||
+        pixel_bytes == 0)
+    {
+        return false;
+    }
+
+    uint64_t size = (uint64_t)(uint32_t)w * (uint32_t)h * pixel_bytes +
+                    sizeof(gui_rgb_data_head_t);
+    if (size > UINT32_MAX)
+    {
+        return false;
+    }
+
+    *buffer_size = (uint32_t)size;
+    return true;
+}
+
+static bool circle_geometry_is_valid(int x, int y, int radius, bool allow_zero)
+{
+    if (radius < 0 || (!allow_zero && radius == 0) || radius > INT16_MAX / 2)
+    {
+        return false;
+    }
+
+    int64_t base_x = (int64_t)x - radius;
+    int64_t base_y = (int64_t)y - radius;
+    int64_t diameter = (int64_t)radius * 2;
+    return base_x >= INT16_MIN && base_x <= INT16_MAX &&
+           base_y >= INT16_MIN && base_y <= INT16_MAX &&
+           diameter <= INT16_MAX;
+}
+
+static void update_circle_gradient_geometry(gui_circle_t *circle)
+{
+    if (circle->gradient == NULL)
+    {
+        return;
+    }
+
+    if (circle->gradient_type == CIRCLE_GRADIENT_RADIAL)
+    {
+        circle->gradient->radial_cx = (float)circle->radius;
+        circle->gradient->radial_cy = (float)circle->radius;
+        circle->gradient->radial_r = (float)circle->radius;
+    }
+    else
+    {
+        circle->gradient->angular_cx = (float)circle->radius;
+        circle->gradient->angular_cy = (float)circle->radius;
+    }
+}
+
 /**
  * FNV-1a accumulator used for change detection.
  *
@@ -217,10 +278,10 @@ static uint32_t circle_checksum(uint32_t seed, const void *data, size_t len)
 /** Check if a point is inside the circle's bounding circle */
 static bool is_point_in_circle(gui_circle_t *circle, int x, int y)
 {
-    int dx = x - circle->x;
-    int dy = y - circle->y;
-    int distance_sq = dx * dx + dy * dy;
-    int radius_sq = circle->radius * circle->radius;
+    int64_t dx = (int64_t)x - circle->x;
+    int64_t dy = (int64_t)y - circle->y;
+    int64_t distance_sq = dx * dx + dy * dy;
+    int64_t radius_sq = (int64_t)circle->radius * circle->radius;
 
     return (distance_sq <= radius_sq);
 }
@@ -375,7 +436,7 @@ static void rasterize_circle_mask_a8(gui_circle_t *this, uint8_t *buffer, uint32
 }
 
 /** Rasterise a complete circle into a payload, with Symmetry Optimization */
-static void rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32_t buffer_size)
+static bool rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32_t buffer_size)
 {
     int r = this->radius;
     int diameter = r * 2; // Keep diameter even for perfect symmetry logic
@@ -411,35 +472,38 @@ static void rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32
     if (use_radial)
     {
         lut_size = r + 1;
-        gradient_lut = gui_malloc(lut_size * sizeof(uint32_t));
-        if (gradient_lut)
+        gradient_lut = gui_malloc((size_t)lut_size * sizeof(uint32_t));
+        if (gradient_lut == NULL)
         {
-            for (int i = 0; i < lut_size; i++)
-            {
-                float t = (float)i / (float)r;
-                gradient_lut[i] = gradient_get_color(this->gradient, t);
-            }
+            return false;
+        }
+        for (int i = 0; i < lut_size; i++)
+        {
+            float t = (float)i / (float)r;
+            gradient_lut[i] = gradient_get_color(this->gradient, t);
         }
     }
     else if (use_angular)
     {
         lut_size = 360;
-        gradient_lut = gui_malloc(lut_size * sizeof(uint32_t));
-        if (gradient_lut)
+        gradient_lut = gui_malloc((size_t)lut_size * sizeof(uint32_t));
+        if (gradient_lut == NULL)
         {
-            float start_angle = this->gradient->angular_start;
-            float end_angle = this->gradient->angular_end;
-            float angle_range = end_angle - start_angle;
-            if (angle_range <= 0) { angle_range = 360.0f; }
+            return false;
+        }
 
-            for (int i = 0; i < lut_size; i++)
-            {
-                float angle = (float)i;
-                float t = (angle - start_angle) / angle_range;
-                if (t < 0) { t += 1.0f; } if (t > 1.0f) { t -= 1.0f; }
-                t = (t < 0) ? 0 : ((t > 1.0f) ? 1.0f : t);
-                gradient_lut[i] = gradient_get_color(this->gradient, t);
-            }
+        float start_angle = this->gradient->angular_start;
+        float end_angle = this->gradient->angular_end;
+        float angle_range = end_angle - start_angle;
+        if (angle_range <= 0) { angle_range = 360.0f; }
+
+        for (int i = 0; i < lut_size; i++)
+        {
+            float angle = (float)i;
+            float t = (angle - start_angle) / angle_range;
+            if (t < 0) { t += 1.0f; } if (t > 1.0f) { t -= 1.0f; }
+            t = (t < 0) ? 0 : ((t > 1.0f) ? 1.0f : t);
+            gradient_lut[i] = gradient_get_color(this->gradient, t);
         }
     }
 
@@ -562,6 +626,7 @@ static void rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32
     {
         gui_free(gradient_lut);
     }
+    return true;
 }
 
 /** Create a complete circle in a single buffer, shared with identical circles */
@@ -571,6 +636,13 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw
     free_draw_img_circle(old_img);
 
     int diameter = this->radius * 2;
+    uint32_t buffer_size;
+    uint32_t pixel_bytes = circle_use_a8(this) ? 1u : 4u;
+    if (this->radius <= 0 ||
+        !get_circle_buffer_size(diameter, diameter, pixel_bytes, &buffer_size))
+    {
+        return NULL;
+    }
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return NULL; }
@@ -579,13 +651,11 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw
     /* Every circle of the same radius and gradient draws from one payload; only
      * this draw_img_t and its matrix are per widget.  An opaque solid circle
      * stores a colourless mask, so colour does not split the cache either. */
-    bool is_a8 = circle_use_a8(this);
+    bool is_a8 = (pixel_bytes == 1u);
     circle_desc_t desc;
     bool is_new = false;
     circle_desc_init(&desc, this, CIRCLE_PART_FULL, this->radius, 0);
 
-    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size = diameter * diameter * pixel_bytes + sizeof(gui_rgb_data_head_t);
     uint8_t *buffer = gui_shape_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
     if (buffer == NULL)
     {
@@ -601,7 +671,12 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw
         }
         else
         {
-            rasterize_circle_payload(this, buffer, buffer_size);
+            if (!rasterize_circle_payload(this, buffer, buffer_size))
+            {
+                gui_shape_cache_release(buffer);
+                gui_free(img);
+                return NULL;
+            }
         }
     }
 
@@ -653,7 +728,12 @@ static uint8_t *create_solid_color_buffer_circle(gui_circle_t *this, uint16_t w,
     circle_desc_init(&desc, this, CIRCLE_PART_SOLID_RECT, w, h);
 
     uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size = w * h * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    uint32_t buffer_size;
+    if (!get_circle_buffer_size(w, h, pixel_bytes, &buffer_size))
+    {
+        return NULL;
+    }
+
     uint8_t *buffer = gui_shape_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
     if (buffer == NULL) { return NULL; }
     if (!is_new) { return buffer; }
@@ -681,7 +761,8 @@ static uint8_t *create_solid_color_buffer_circle(gui_circle_t *this, uint16_t w,
 
     uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
     uint32_t argb = color.color.argb_full;
-    for (int i = 0; i < w * h; i++)
+    uint32_t pixel_count = (uint32_t)w * h;
+    for (uint32_t i = 0; i < pixel_count; i++)
     {
         pixels[i] = argb;
     }
@@ -690,12 +771,17 @@ static uint8_t *create_solid_color_buffer_circle(gui_circle_t *this, uint16_t w,
 
 /** Create a rectangle image object */
 static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
-                         int16_t y, uint16_t w, uint16_t h)
+                         int16_t y, int32_t w, int32_t h)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
 
     // Clean up previous image if exists (also releases its acc_user scratch data)
     free_draw_img_circle(input_img);
+
+    if (w <= 0 || h <= 0 || w > UINT16_MAX || h > UINT16_MAX)
+    {
+        return;
+    }
 
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL) { return; }
@@ -707,7 +793,8 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
 
     if (has_transform)
     {
-        uint8_t *payload = create_solid_color_buffer_circle(this, w, h, this->color);
+        uint8_t *payload = create_solid_color_buffer_circle(this, (uint16_t)w, (uint16_t)h,
+                                                            this->color);
         if (payload == NULL)
         {
             gui_free(img);
@@ -729,7 +816,7 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
             return;
         }
 
-        set_rect_header((gui_rgb_data_head_t *)rect_data, w, h, this->color);
+        set_rect_header((gui_rgb_data_head_t *)rect_data, (uint16_t)w, (uint16_t)h, this->color);
 
         img->blend_mode = IMG_RECT;
         img->data = rect_data;
@@ -782,16 +869,16 @@ static draw_img_t *finish_arc_strip(gui_circle_t *this, gui_obj_t *obj, draw_img
 
 /** create vertical arc strip (Legacy/Fallback) */
 static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
-                                             draw_img_t **old_img)
+                                             draw_img_t **old_img, int radius)
 {
     // Free old buffer first to prevent memory leak
     free_draw_img_circle(old_img);
 
-    if (this->radius <= 0) { return NULL; }
+    if (radius <= 0) { return NULL; }
 
-    int inner_half = (int)(this->radius * M_SQRT1_2);
+    int inner_half = (int)(radius * M_SQRT1_2);
     int inner_size = inner_half * 2;
-    int arc_width = this->radius - inner_half;
+    int arc_width = radius - inner_half;
     if (arc_width < 1) { arc_width = 1; }
     int arc_height = inner_size;
 
@@ -802,10 +889,16 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
     bool is_a8 = circle_use_a8(this);
     circle_desc_t desc;
     bool is_new = false;
-    circle_desc_init(&desc, this, CIRCLE_PART_ARC_STRIP, this->radius, 0);
+    circle_desc_init(&desc, this, CIRCLE_PART_ARC_STRIP, radius, 0);
 
     uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size = arc_width * arc_height * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    uint32_t buffer_size;
+    if (!get_circle_buffer_size(arc_width, arc_height, pixel_bytes, &buffer_size))
+    {
+        gui_free(img);
+        return NULL;
+    }
+
     uint8_t *arc_data = gui_shape_cache_acquire(&desc, circle_desc_len(&desc), buffer_size,
                                                 &is_new);
     if (arc_data == NULL)
@@ -833,8 +926,8 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
         head->compress = 0;
         head->rsvd = 0;
         head->type = ARGB8888;
-        head->w = arc_width;
-        head->h = arc_height;
+        head->w = (uint16_t)arc_width;
+        head->h = (uint16_t)arc_height;
         head->version = 0;
         head->rsvd2 = 0;
     }
@@ -846,10 +939,10 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
     uint32_t solid_color = this->color.color.argb_full;
 
     float center_y = (float)arc_height / 2.0f;
-    float radius = (float)this->radius;
-    float radius_sq = radius * radius;
+    float radius_f = (float)radius;
+    float radius_sq = radius_f * radius_f;
 
-    float *exact_boundaries = gui_malloc(arc_height * sizeof(float));
+    float *exact_boundaries = gui_malloc((size_t)arc_height * sizeof(float));
     if (exact_boundaries == NULL)
     {
         gui_shape_cache_release(arc_data);
@@ -865,7 +958,7 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
         else
         {
             float dx = sqrtf(radius_sq - py_sq);
-            exact_boundaries[y] = radius - dx;
+            exact_boundaries[y] = radius_f - dx;
         }
     }
 
@@ -994,6 +1087,16 @@ static void gui_circle_prepare(gui_obj_t *obj)
     gui_circle_t *this = (gui_circle_t *)obj;
     uint32_t last = this->checksum;
 
+    if (this->radius <= 0 || this->radius > INT16_MAX / 2 ||
+        this->base.w <= 0 || this->base.h <= 0)
+    {
+        free_circle_draw_imgs(this);
+        return;
+    }
+
+    int radius = this->radius;
+    int diameter = radius * 2;
+
     // obj->matrix is already initialized by gui_obj_ctor
     // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
 
@@ -1003,8 +1106,8 @@ static void gui_circle_prepare(gui_obj_t *obj)
 
     if (has_transform)
     {
-        float center_x = (float)this->radius;
-        float center_y = (float)this->radius;
+        float center_x = (float)radius;
+        float center_y = (float)radius;
 
         matrix_translate(this->offset_x, this->offset_y, obj->matrix);
         matrix_translate(center_x, center_y, obj->matrix);
@@ -1042,34 +1145,32 @@ static void gui_circle_prepare(gui_obj_t *obj)
     bool need_regenerate = (last != new_checksum);
 
     // Force single buffer for Gradient or Alpha or Small Circles
-    int diameter = this->radius * 2;
+    uint64_t circle_area = (uint64_t)(uint32_t)diameter * (uint32_t)diameter;
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
-                              (diameter * diameter < 10000) ||
+                              (circle_area < 10000) ||
                               (this->use_gradient && this->gradient != NULL);
 
     if (need_single_buffer)
     {
-        if (need_regenerate || this->center_rect == NULL)
+        bool switching_from_split = this->arc_left != NULL || this->arc_right != NULL ||
+                                    this->arc_top != NULL || this->arc_bottom != NULL;
+        free_arc_buffers_circle(this);
+        if (need_regenerate || switching_from_split || this->center_rect == NULL)
         {
-            // Properties may have switched us out of multi-part mode; the stale arc
-            // buffers would otherwise stay allocated and keep being blitted.
-            free_arc_buffers_circle(this);
             this->center_rect = create_circle_buffer(this, obj, &this->center_rect);
         }
     }
     else
     {
         // Use optimized multi-part rendering for large opaque circles
-        if (need_regenerate || this->center_rect == NULL)
+        if (need_regenerate || this->center_rect == NULL || this->arc_left == NULL ||
+            this->arc_right == NULL || this->arc_top == NULL || this->arc_bottom == NULL)
         {
-            // Drop the whole set before rebuilding: arc_right/top/bottom alias
-            // arc_left's pixel data, so a failed arc_left alloc below would leave
-            // them dangling.
-            free_arc_buffers_circle(this);
+            free_circle_draw_imgs(this);
 
-            int inner_half = (int)floorf(this->radius * M_SQRT1_2);
+            int inner_half = (int)floorf(radius * M_SQRT1_2);
             int inner_size = inner_half * 2;
-            int arc_width = this->radius - inner_half;
+            int arc_width = radius - inner_half;
 
             if (inner_size < 1) { inner_size = 1; }
             if (arc_width < 1) { arc_width = 1; }
@@ -1083,7 +1184,7 @@ static void gui_circle_prepare(gui_obj_t *obj)
                 set_rect_img(this, &this->center_rect, inner_x, inner_y, inner_size, inner_size);
             }
 
-            this->arc_left = create_vertical_arc_strip(this, obj, &this->arc_left);
+            this->arc_left = create_vertical_arc_strip(this, obj, &this->arc_left, radius);
 
             if (this->arc_left != NULL)
             {
@@ -1114,6 +1215,12 @@ static void gui_circle_prepare(gui_obj_t *obj)
                                                           bottom_x, bottom_y,
                                                           false, true, true, &this->arc_bottom);
             }
+
+            if (this->center_rect == NULL || this->arc_left == NULL ||
+                this->arc_right == NULL || this->arc_top == NULL || this->arc_bottom == NULL)
+            {
+                free_circle_draw_imgs(this);
+            }
         }
     }
 
@@ -1131,10 +1238,6 @@ static void gui_circle_prepare(gui_obj_t *obj)
         if (this->center_rect != NULL)
         {
             // For single-buffer rendering (gradient/alpha/small circles), no offset needed
-            bool need_single_buffer = (this->color.color.rgba.a < 255) ||
-                                      (diameter * diameter < 10000) ||
-                                      (this->use_gradient && this->gradient != NULL);
-
             if (need_single_buffer)
             {
                 // Single buffer - no offset
@@ -1143,8 +1246,8 @@ static void gui_circle_prepare(gui_obj_t *obj)
             else
             {
                 // Multi-part rendering - need to add center rect offset
-                int inner_half = (int)floorf(this->radius * M_SQRT1_2);
-                int arc_width = this->radius - inner_half;
+                int inner_half = (int)floorf(radius * M_SQRT1_2);
+                int arc_width = radius - inner_half;
                 int inner_x = arc_width;
                 int inner_y = arc_width;
 
@@ -1160,10 +1263,8 @@ static void gui_circle_prepare(gui_obj_t *obj)
         // Update arc matrices (for multi-part rendering)
         if (this->arc_left != NULL)
         {
-            int diameter = this->radius * 2;
-            GUI_UNUSED(diameter);
-            int inner_half = (int)floorf(this->radius * M_SQRT1_2);
-            int arc_width = this->radius - inner_half;
+            int inner_half = (int)floorf(radius * M_SQRT1_2);
+            int arc_width = radius - inner_half;
 
             // Update arc_left
             memcpy(&this->arc_left->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -1298,11 +1399,7 @@ static void gui_circle_destroy(gui_circle_t *this)
         this->gradient = NULL;
     }
 
-    // Free cached buffers
-    free_arc_buffers_circle(this);
-
-    // Free center_rect
-    free_draw_img_circle(&this->center_rect);
+    free_circle_draw_imgs(this);
 }
 
 static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -1339,7 +1436,11 @@ static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
                                 int radius, gui_color_t color)
 {
-    GUI_ASSERT(parent != NULL);
+    if (parent == NULL || !circle_geometry_is_valid(x, y, radius, false))
+    {
+        GUI_ASSERT(parent != NULL && circle_geometry_is_valid(x, y, radius, false));
+        return NULL;
+    }
 
     gui_circle_t *circle = gui_malloc(sizeof(gui_circle_t));
     if (circle == NULL)
@@ -1391,6 +1492,10 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
 void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_color_t color)
 {
     GUI_ASSERT(circle != NULL);
+    if (circle == NULL || !circle_geometry_is_valid(x, y, radius, true))
+    {
+        return;
+    }
 
     // Calculate new widget bounding box
     int new_base_x = x - radius;
@@ -1408,11 +1513,16 @@ void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_co
     circle->y = radius;
     circle->radius = radius;
     circle->color = color;
+    update_circle_gradient_geometry(circle);
 }
 
 void gui_circle_set_position(gui_circle_t *circle, int x, int y)
 {
     GUI_ASSERT(circle != NULL);
+    if (circle == NULL || !circle_geometry_is_valid(x, y, circle->radius, true))
+    {
+        return;
+    }
 
     // Calculate new widget bounding box position
     int new_base_x = x - circle->radius;
@@ -1433,9 +1543,29 @@ void gui_circle_set_position(gui_circle_t *circle, int x, int y)
 void gui_circle_set_radius(gui_circle_t *circle, int radius)
 {
     GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    int center_x = circle->base.x + circle->x;
+    int center_y = circle->base.y + circle->y;
+    if (!circle_geometry_is_valid(center_x, center_y, radius, true))
+    {
+        return;
+    }
+
     if (circle->radius != radius)
     {
+        free_circle_draw_imgs(circle);
+        circle->base.x = center_x - radius;
+        circle->base.y = center_y - radius;
+        circle->base.w = radius * 2;
+        circle->base.h = radius * 2;
+        circle->x = radius;
+        circle->y = radius;
         circle->radius = radius;
+        update_circle_gradient_geometry(circle);
     }
 }
 void gui_circle_set_opacity(gui_circle_t *circle, uint8_t opacity)

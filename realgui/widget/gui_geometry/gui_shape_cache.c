@@ -104,6 +104,7 @@ static uint8_t *shape_node_desc(gui_shape_cache_node_t *node)
     return node->data + node->capacity;
 }
 
+#if GUI_SHAPE_CACHE_ENABLE
 static uint32_t shape_resizable_capacity(uint32_t size)
 {
     uint32_t capacity = GUI_SHAPE_CACHE_RESIZABLE_MIN_CAPACITY;
@@ -115,6 +116,7 @@ static uint32_t shape_resizable_capacity(uint32_t size)
 
     return capacity < size ? size : capacity;
 }
+#endif
 
 static gui_shape_cache_node_t *shape_node_alloc(const void *desc, uint16_t desc_len,
                                                 uint32_t size, uint32_t capacity,
