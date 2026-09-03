@@ -239,6 +239,22 @@ uint32_t stp_ready_count(stp_transport_t *t);
 /** @brief Fill @p usage with a best-effort occupancy snapshot. */
 void stp_get_usage(stp_transport_t *t, stp_usage_t *usage);
 
+/**
+ * @brief Largest frame this transport can ever accept, in bytes.
+ *
+ * The buf_size of the biggest size class, i.e. the largest @p frame_size for
+ * which ::stp_acquire_free can succeed at all.  Anything above it is refused
+ * regardless of occupancy and regardless of @c allow_oversize_fit, which only
+ * escalates UPWARD through the classes.
+ *
+ * For a producer that assembles frames before it can size them, this is the
+ * number to compare against WHILE assembling: a frame that has already grown
+ * past it cannot be delivered, so there is no reason to keep buffering it.
+ *
+ * @return 0 if @p t is NULL.
+ */
+uint32_t stp_max_frame_size(const stp_transport_t *t);
+
 /** @brief Log a human-readable pool / class / occupancy report via the port. */
 void stp_dump_usage(stp_transport_t *t);
 

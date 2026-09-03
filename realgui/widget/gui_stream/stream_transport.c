@@ -600,6 +600,19 @@ void stp_get_usage(stp_transport_t *t, stp_usage_t *usage)
     usage->ready_count    = stp_ready_count(t);
 }
 
+uint32_t stp_max_frame_size(const stp_transport_t *t)
+{
+    if (t == NULL || t->class_count == 0u)
+    {
+        return 0u;
+    }
+    /* The last class, not a scan: stp_instance_create() rejects a configuration
+     * whose buf_size is not ascending, so the last one is the largest by
+     * construction -- the same invariant stp_acquire_free() uses for its best
+     * fit. */
+    return t->classes[t->class_count - 1u].buf_size;
+}
+
 void stp_dump_usage(stp_transport_t *t)
 {
     uint32_t c;

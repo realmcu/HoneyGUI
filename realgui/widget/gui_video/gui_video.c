@@ -792,42 +792,49 @@ static void gui_video_draw_end(gui_obj_t *obj)
     // not free fb here
 }
 
+/**
+ * @brief Release the decoded frame buffer and the decoder of one source.
+ *
+ * The frame buffer has to go back to the allocator that produced it: MJPEG and
+ * AVI frames come out of the JPEG accelerator, H264 frames out of gui_malloc().
+ * The H264 decoder is bound to that source's index array, so it dies with it.
+ *
+ * @param this     Widget pointer.
+ * @param img_type Container type the resources were allocated for. Passed in
+ *                 explicitly so gui_video_set_src() can release the previous
+ *                 source after this->img_type already holds the new one.
+ */
+static void video_release_frame(gui_video_t *this, uint8_t img_type)
+{
+    if (this->frame_buff_raw != NULL)
+    {
+        if (img_type == VIDEO_TYPE_MJPEG || img_type == VIDEO_TYPE_AVI)
+        {
+            gui_acc_jpeg_free(this->frame_buff_raw);
+        }
+        else if (img_type == VIDEO_TYPE_H264)
+        {
+            gui_free(this->frame_buff_raw);
+        }
+    }
+    this->frame_buff_raw = NULL;
+    this->frame_buff = NULL;
+
+    if (img_type == VIDEO_TYPE_H264 && this->decoder != NULL)
+    {
+        gui_h264bsd_destroy_decoder(this->decoder);
+    }
+    this->decoder = NULL;
+}
+
 static void gui_video_destory(gui_obj_t *obj)
 {
     gui_video_t *this = (gui_video_t *)obj;
 
-    if (this->storage_type == IMG_SRC_FILESYS)
-    {
-
-    }
-    else
-    {
-
-    }
+    video_release_frame(this, this->img_type);
 
     gui_free(this->array);
-    if (this->frame_buff_raw)
-    {
-        if (this->img_type == VIDEO_TYPE_MJPEG)
-        {
-            gui_acc_jpeg_free(this->frame_buff_raw);
-        }
-        else if (this->img_type == VIDEO_TYPE_H264)
-        {
-
-        }
-
-        this->frame_buff_raw = NULL;
-        this->frame_buff = NULL;
-    }
-
-    if (this->decoder)
-    {
-        if (this->img_type == VIDEO_TYPE_H264)
-        {
-            gui_h264bsd_destroy_decoder(this->decoder);
-        }
-    }
+    this->array = NULL;
 }
 
 static void gui_video_prepare(gui_obj_t *obj)
@@ -1824,8 +1831,8 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     }
                     array[slice_cnt - 1] = offset;
                     array[slice_cnt] = pdata + 2 - buff + cur_start;
-                    gui_log("%d: %d -> %d ,sz %d\n", slice_cnt - 1, array[slice_cnt - 1], array[slice_cnt],
-                            array[slice_cnt] - array[slice_cnt - 1]);
+                    // gui_log("%d: %d -> %d ,sz %d\n", slice_cnt - 1, array[slice_cnt - 1], array[slice_cnt],
+                    //         array[slice_cnt] - array[slice_cnt - 1]);
                     pdata++; // +1 +1 -> EOI
                     // scan_state = MJPEG_SCAN_INIT;
                 }
@@ -1940,8 +1947,8 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     }
                     array[slice_cnt - 1] = offset;
                     array[slice_cnt] = pdata + 2 - buff + cur_start;
-                    gui_log("%d: %d -> %d ,sz %d\n", slice_cnt - 1, array[slice_cnt - 1], array[slice_cnt],
-                            array[slice_cnt] - array[slice_cnt - 1]);
+                    // gui_log("%d: %d -> %d ,sz %d\n", slice_cnt - 1, array[slice_cnt - 1], array[slice_cnt],
+                    //         array[slice_cnt] - array[slice_cnt - 1]);
                     pdata++; // +1 +1 -> EOI
                     // scan_state = MJPEG_SCAN_INIT;
                 }
@@ -2161,6 +2168,43 @@ static void gui_video_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
+/**
+ * @brief Build the RGB header template handed to the child image widget.
+ *
+ * Must run after the source has been parsed: the geometry comes from the base
+ * object and the pixel format from img_type. The JPEG containers follow the
+ * decoder that is actually available -- the accelerator outputs RGB565, the
+ * software fallback (stb) outputs RGB888.
+ */
+static void video_build_header(gui_video_t *this)
+{
+    gui_obj_t *obj = (gui_obj_t *)this;
+
+    memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
+    this->header.w = obj->w;
+    this->header.h = obj->h;
+
+    if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
+    {
+        if (gui_get_acc()->jpeg_load)
+        {
+            this->header.type = 0x00; // RGB565
+        }
+        else
+        {
+            this->header.type = 0x03; // RGB888
+        }
+    }
+    else if (this->img_type == VIDEO_TYPE_H264)
+    {
+        this->header.type = 0x00; // RGB565
+    }
+    else
+    {
+        gui_log("video unknown RGB type\n");
+    }
+}
+
 static void gui_img_video_ctor(gui_video_t  *this,
                                gui_obj_t      *parent,
                                const char     *name,
@@ -2203,31 +2247,7 @@ static void gui_img_video_ctor(gui_video_t  *this,
         gui_log("video src err\n");
     }
     // prepare a temp header for image(child widget)
-    if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
-    {
-        memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
-        this->header.w = root->w;
-        this->header.h = root->h;
-        if (gui_get_acc()->jpeg_load)
-        {
-            this->header.type = 0x00; // RGB565
-        }
-        else
-        {
-            this->header.type = 0x03; // RGB888
-        }
-    }
-    else if (this->img_type == VIDEO_TYPE_H264)
-    {
-        memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
-        this->header.w = root->w;
-        this->header.h = root->h;
-        this->header.type = 0x00; // RGB565
-    }
-    else
-    {
-        gui_log("video unknown RGB type\n");
-    }
+    video_build_header(this);
 
 
     gui_list_init(&(GET_BASE(this)->child_list));
@@ -2407,6 +2427,116 @@ void gui_video_refresh_type(gui_video_t *this)
         }
         while (0);
     }
+}
+
+void gui_video_set_src(gui_video_t *this, void *src, uint8_t storage_type)
+{
+    gui_obj_t *obj;
+    void      *old_data;
+    void      *old_array;
+    uint32_t   old_chunk_num;
+    uint32_t   old_num_frame;
+    uint32_t   old_frame_time;
+    uint8_t    old_storage_type;
+    uint8_t    old_img_type;
+    int16_t    old_w;
+    int16_t    old_h;
+    int        res;
+
+    if (this == NULL || src == NULL)
+    {
+        return;
+    }
+    if (storage_type != IMG_SRC_MEMADDR &&
+        storage_type != IMG_SRC_FILESYS &&
+        storage_type != IMG_SRC_FTL)
+    {
+        gui_log("video set_src: bad storage type %d\n", storage_type);
+        return;
+    }
+
+    obj = (gui_obj_t *)this;
+
+    /* ------------------------------------------------------------------ *
+     * Save every field the parsers may overwrite so the widget can fall
+     * back to the source it is currently playing if the new one is bad.
+     * ------------------------------------------------------------------ */
+    old_data         = this->data;
+    old_storage_type = this->storage_type;
+    old_img_type     = this->img_type;
+    old_array        = this->array;
+    old_chunk_num    = this->chunk_num;
+    old_num_frame    = this->num_frame;
+    old_frame_time   = this->frame_time;
+    old_w            = obj->w;
+    old_h            = obj->h;
+
+    /* Detach the index array so the parser builds a fresh one; the previous
+     * allocation stays reachable through old_array until the commit point. */
+    this->array     = NULL;
+    this->chunk_num = 0;
+    this->num_frame = 0;
+
+    this->data         = src;
+    this->storage_type = storage_type;
+
+    /* Detects the container from the magic bytes and dispatches to the
+     * matching parser, which fills img_type, obj->w/h, frame_time, num_frame,
+     * array and chunk_num. */
+    res = gui_video_src_init(this);
+
+    /* video_src_init_mjpg() reports success even when the slicer bailed out,
+     * and a zero frame count divides by zero in gui_video_play_cb(), so the
+     * parse result is validated here instead of being trusted. */
+    if (res < 0 || this->array == NULL || this->num_frame == 0 ||
+        obj->w <= 0 || obj->h <= 0)
+    {
+        gui_log("video set_src: parse failed -- keeping old source\n");
+
+        gui_free(this->array);
+
+        this->array        = old_array;
+        this->chunk_num    = old_chunk_num;
+        this->num_frame    = old_num_frame;
+        this->frame_time   = old_frame_time;
+        this->data         = old_data;
+        this->storage_type = old_storage_type;
+        this->img_type     = old_img_type;
+        obj->w             = old_w;
+        obj->h             = old_h;
+        return;
+    }
+
+    /* ================================================================== *
+     * COMMIT -- the new source is usable, so the old one can go away.
+     * ================================================================== */
+
+    /* Keyed on old_img_type: this->img_type already describes the new source. */
+    video_release_frame(this, old_img_type);
+    gui_free(old_array);
+
+    /* Rebuild the header for the new geometry and pixel format, then re-point
+     * the child image at it -- the frame buffer it referenced is now freed. */
+    video_build_header(this);
+
+    if (this->img != NULL)
+    {
+        GET_BASE(this->img)->w = obj->w;
+        GET_BASE(this->img)->h = obj->h;
+        gui_img_set_src(this->img, (const uint8_t *) & (this->header), IMG_SRC_MEMADDR);
+        gui_img_refresh_size(this->img);
+    }
+
+    /* Frame period comes from the new container. */
+    gui_obj_create_timer(obj, this->frame_time, true, gui_video_play_cb);
+
+    /* Restart from the first frame. frame_chunk_cur caches the last non-empty
+     * AVI video chunk and would otherwise index into the new chunk array. */
+    gui_video_reset(this);
+    this->frame_chunk_cur = 0;
+    this->state = GUI_VIDEO_STATE_PLAYING;
+
+    gui_fb_change();
 }
 
 gui_video_t *gui_video_create_from_ftl(void           *parent,

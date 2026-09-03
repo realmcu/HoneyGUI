@@ -294,6 +294,36 @@ void gui_video_refresh_size(gui_video_t *this);
 
 void gui_video_refresh_type(gui_video_t *this);
 
+/**
+ * @brief Switch the video source at runtime.
+ *
+ * Both the container type and the storage location may change: any
+ * MJPEG / H264 / AVI source in memory, in FTL, or in the filesystem can
+ * replace any other. The new container is parsed, the widget geometry and
+ * frame period are taken from it, and playback restarts from the first frame.
+ *
+ * All resources held for the previous source are released -- the decoded frame
+ * buffer (returned to the allocator that produced it), the H264 decoder, and
+ * the frame index array. Nothing is reallocated in place.
+ *
+ * On any failure the widget keeps playing its current source unchanged.
+ *
+ * @param this         Widget pointer (must not be NULL).
+ * @param src          New source: pointer to the data in RAM/Flash for
+ *                     IMG_SRC_MEMADDR, base address for IMG_SRC_FTL, or a
+ *                     NUL-terminated VFS path for IMG_SRC_FILESYS.
+ * @param storage_type IMG_SRC_MEMADDR, IMG_SRC_FTL, or IMG_SRC_FILESYS.
+ *
+ * @note The widget does not copy @p src. For IMG_SRC_FILESYS the path string
+ *       must stay valid for as long as the source is in use, since it is
+ *       reopened on every frame.
+ * @note Call from the GUI thread (event callback or server hook) so the swap
+ *       cannot interleave with a draw pass.
+ * @note Playback state is forced to GUI_VIDEO_STATE_PLAYING; the repeat count
+ *       set through gui_video_set_repeat_count() is kept.
+ */
+void gui_video_set_src(gui_video_t *this, void *src, uint8_t storage_type);
+
 
 
 /**
