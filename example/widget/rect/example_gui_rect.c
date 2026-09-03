@@ -87,21 +87,23 @@ static void app_rect_round_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, "rect_view", SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_PRESSED);
+                             GUI_EVENT_TOUCH_CLICKED);
     gui_view_set_animate_step(view, 500);
     uint8_t alpha = 200;
     gui_rect_create(gui_obj_get_root(), "bg", 0, 0, 480, 480, 0, gui_rgba(255, 200, 200,
                                                                           255));
 
-    gui_rect_create(gui_obj_get_root(), "geometry1", 20, 20, 200, 200, 20, gui_rgba(255, 0,
-                                                                                    0, alpha));
+    gui_rounded_rect_t *geometry1 = gui_rect_create(gui_obj_get_root(), "geometry1",
+                                                    20, 20, 200, 200, 20,
+                                                    gui_rgba(255, 0, 0, alpha));
+    gui_rect_set_stroke(geometry1, 6.0f, gui_rgba(255, 255, 255, 255));
     gui_rect_create(gui_obj_get_root(), "geometry2", 50, 50, 200, 200, 20, gui_rgba(0, 255,
                                                                                     0, alpha));
     gui_rect_create(gui_obj_get_root(), "geometry3", 80, 80, 200, 200, 20, gui_rgba(0, 0,
                                                                                     255, alpha));
-    gui_rect_create(gui_obj_get_root(), "geometry1", 150, 150, 200, 200, 20, gui_rgba(255, 0,
+    gui_rect_create(gui_obj_get_root(), "geometry4", 150, 150, 200, 200, 20, gui_rgba(255, 0,
                     0, alpha));
-    gui_rect_create(gui_obj_get_root(), "geometry2", 210, 210, 200, 200, 20, gui_rgba(0, 255,
+    gui_rect_create(gui_obj_get_root(), "geometry5", 210, 210, 200, 200, 20, gui_rgba(0, 255,
                     0, alpha));
 
     // rect_click_demo();

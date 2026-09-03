@@ -30,8 +30,12 @@
      - :cpp:any:`gui_rect_set_position` 
    * - 设置尺寸
      - :cpp:any:`gui_rect_set_size` 
-   * - 设置颜色 
+   * - 设置颜色
      - :cpp:any:`gui_rect_set_color`
+   * - 设置描边
+     - :cpp:any:`gui_rect_set_stroke`
+   * - 清除描边
+     - :cpp:any:`gui_rect_clear_stroke`
    * - 设置不透明度
      - :cpp:any:`gui_rect_set_opacity`
    * - 注册点击事件回调
@@ -56,6 +60,7 @@
 
 - **radius = 0**: 绘制直角矩形
 - **radius > 0**: 绘制圆角矩形，半径值决定圆角弧度
+- **内部描边**: 描边向矩形内部扩展，不改变控件尺寸
 
 渐变色填充
 ----------

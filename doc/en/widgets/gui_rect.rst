@@ -32,6 +32,10 @@ Core Features
      - :cpp:any:`gui_rect_set_size`
    * - Set Color
      - :cpp:any:`gui_rect_set_color`
+   * - Set Stroke
+     - :cpp:any:`gui_rect_set_stroke`
+   * - Clear Stroke
+     - :cpp:any:`gui_rect_clear_stroke`
    * - Set Opacity
      - :cpp:any:`gui_rect_set_opacity`
    * - Register Click Event Callback
@@ -56,6 +60,7 @@ The rounded rectangle supports the same corner radius for all four corners:
 
 - **radius = 0**: Draw a rectangle with sharp corners
 - **radius > 0**: Draw a rounded rectangle, with the radius determining the arc of the corners
+- **Inset Stroke**: Draws the stroke inside the rectangle without changing widget size
 
 Gradient Fill
 -------------

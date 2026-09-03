@@ -58,6 +58,18 @@ extern "C" {
  */
 #define GUI_SHAPE_DESC_MAX 160
 
+/**
+ * Compile-time guard that a descriptor type fits GUI_SHAPE_DESC_MAX.
+ *
+ * Place one per descriptor struct, at file scope.  Written as a negative array
+ * bound rather than static_assert: armclang defines both __ARMCC_VERSION and
+ * __clang__, and armcc's __STATIC_ASSERT does not exist there, so any macro
+ * keyed on those predefines picks the wrong branch.  This form needs no
+ * predefines at all and matches the idiom already used in misc/tlsf/tlsf.c.
+ */
+#define GUI_SHAPE_DESC_SIZE_CHECK(type) \
+    typedef char gui_shape_desc_fits_##type[(sizeof(type) <= GUI_SHAPE_DESC_MAX) ? 1 : -1]
+
 /*============================================================================*
  *                         Functions
  *============================================================================*/

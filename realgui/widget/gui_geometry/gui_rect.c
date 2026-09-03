@@ -54,6 +54,7 @@ typedef enum
     RECT_PART_ROUNDED = 1,      /**< Whole rounded rect in one ARGB8888 buffer. */
     RECT_PART_SOLID,            /**< Solid sub-rectangle, used when transformed. */
     RECT_PART_CORNER,           /**< One rounded corner, keyed by corner index. */
+    RECT_PART_STROKE,           /**< Whole inset stroke in one buffer. */
 } gui_rect_part_t;
 
 /**
@@ -73,8 +74,11 @@ typedef struct
     uint32_t color;             /**< ARGB baked into the pixels; 0 when A8. */
     uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
     uint32_t flags;             /**< Dither on/off, and gradient direction plus 1. */
+    float stroke_width;         /**< Inset width for rounded fill or stroke payload. */
     Gradient gradient;          /**< Only present when flags say a gradient is used. */
 } rect_desc_t;
+
+GUI_SHAPE_DESC_SIZE_CHECK(rect_desc_t);
 
 /*============================================================================*
  *                           Private Functions
@@ -127,6 +131,15 @@ static bool rect_use_a8(gui_rounded_rect_t *this)
 #endif
 }
 
+static bool rect_stroke_use_a8(void)
+{
+#if GUI_RECT_ENABLE_A8
+    return true;
+#else
+    return false;
+#endif
+}
+
 /** Set the image header for an A8 coverage mask */
 static void set_a8_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
 {
@@ -149,7 +162,7 @@ static void set_a8_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
  * an A8 image in any other blend mode -- and takes its colour from fg_color_set.
  */
 static void set_img_payload(gui_rounded_rect_t *this, draw_img_t *img, uint8_t *payload,
-                            bool is_a8)
+                            bool is_a8, gui_color_t color)
 {
     img->data = payload;
     img->opacity_value = this->opacity_value;
@@ -158,9 +171,9 @@ static void set_img_payload(gui_rounded_rect_t *this, draw_img_t *img, uint8_t *
     if (is_a8)
     {
         img->blend_mode = IMG_2D_SW_FIX_A8_FG;
-        /* Alpha pinned at 255: the mask already carries this->color's alpha, and
+        /* Alpha pinned at 255: the mask already carries the source colour alpha, and
          * the two blit paths disagree about fg_color_set's alpha anyway. */
-        img->fg_color_set = 0xFF000000u | (this->color.color.argb_full & 0x00FFFFFFu);
+        img->fg_color_set = 0xFF000000u | (color.color.argb_full & 0x00FFFFFFu);
     }
     else
     {
@@ -179,23 +192,29 @@ static void rect_desc_init(rect_desc_t *desc, gui_rounded_rect_t *this,
 {
     memset(desc, 0x00, sizeof(*desc));
 
+    bool is_stroke = (part == RECT_PART_STROKE);
     desc->part = (uint32_t)part;
     desc->size_a = size_a;
     desc->size_b = size_b;
     desc->radius = this->radius;
-    desc->flags = this->enable_dither ? 1u : 0u;
+    desc->flags = (!is_stroke && this->enable_dither) ? 1u : 0u;
+    desc->stroke_width = (part == RECT_PART_ROUNDED || part == RECT_PART_STROKE) ?
+                         this->stroke_width : 0.0f;
 
     /* RGB is deliberately left out of an A8 key -- that is what lets rects
      * differing only in colour share one mask.  Alpha stays in, because it is
      * folded into the mask values themselves. */
-    if (rect_use_a8(this))
+    bool is_a8 = is_stroke ? rect_stroke_use_a8() : rect_use_a8(this);
+    gui_color_t payload_color = is_stroke ? this->stroke_color : this->color;
+
+    if (is_a8)
     {
         desc->is_a8 = 1u;
-        desc->color = this->color.color.rgba.a;
+        desc->color = payload_color.color.rgba.a;
     }
     else
     {
-        desc->color = this->color.color.argb_full;
+        desc->color = payload_color.color.argb_full;
     }
 
     /* Only the whole-rect part reads the gradient; sub-rectangles and corners
@@ -248,6 +267,9 @@ static void free_rect_draw_imgs(gui_rounded_rect_t *rect)
     free_draw_img(&rect->circle_01);
     free_draw_img(&rect->circle_10);
     free_draw_img(&rect->circle_11);
+    free_draw_img(&rect->stroke_img);
+    gui_shape_path_release(rect->stroke_spans);
+    rect->stroke_spans = NULL;
 }
 
 static int get_effective_radius(const gui_rounded_rect_t *rect)
@@ -390,7 +412,7 @@ static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16
             *input_img = NULL;
             return;
         }
-        set_img_payload(this, img, payload, rect_use_a8(this));
+        set_img_payload(this, img, payload, rect_use_a8(this), this->color);
     }
     else
     {
@@ -594,7 +616,7 @@ static draw_img_t *alloc_rect_img_buffer(gui_rounded_rect_t *this, gui_obj_t *ob
         }
     }
 
-    set_img_payload(this, img, buffer, is_a8);
+    set_img_payload(this, img, buffer, is_a8, this->color);
 
     if (obj->matrix != NULL)
     {
@@ -691,6 +713,168 @@ static inline uint32_t fast_dither(uint32_t color, int x, int y)
     else if (b > 255) { b = 255; }
 
     return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+}
+
+static float rounded_rect_distance(float px, float py,
+                                   float x, float y, float w, float h, float radius)
+{
+    float half_w = w * 0.5f;
+    float half_h = h * 0.5f;
+    float r = LG_CLAMP(radius, 0.0f, LG_MIN(half_w, half_h));
+    float qx = fabsf(px - (x + half_w)) - (half_w - r);
+    float qy = fabsf(py - (y + half_h)) - (half_h - r);
+    float outside_x = LG_MAX(qx, 0.0f);
+    float outside_y = LG_MAX(qy, 0.0f);
+    float inside = LG_MIN(LG_MAX(qx, qy), 0.0f);
+
+    return inside + sqrtf(outside_x * outside_x + outside_y * outside_y) - r;
+}
+
+static uint8_t rounded_rect_coverage(float distance)
+{
+    float coverage = LG_CLAMP(0.5f - distance, 0.0f, 1.0f);
+    return (uint8_t)(coverage * 255.0f);
+}
+
+static uint32_t rect_fill_color_at(gui_rounded_rect_t *this, int x, int y, int w, int h)
+{
+    bool use_gradient = this->use_gradient && this->gradient != NULL &&
+                        this->gradient->stop_count >= 2;
+    if (!use_gradient)
+    {
+        return this->color.color.argb_full;
+    }
+
+    float tx = (w > 1) ? (float)x / (float)(w - 1) : 0.0f;
+    float ty = (h > 1) ? (float)y / (float)(h - 1) : 0.0f;
+    float t;
+
+    switch (this->gradient_dir)
+    {
+    case RECT_GRADIENT_VERTICAL:
+        t = ty;
+        break;
+    case RECT_GRADIENT_DIAGONAL_TL_BR:
+        t = (tx + ty) * 0.5f;
+        break;
+    case RECT_GRADIENT_DIAGONAL_TR_BL:
+        t = ((1.0f - tx) + ty) * 0.5f;
+        break;
+    case RECT_GRADIENT_HORIZONTAL:
+    default:
+        t = tx;
+        break;
+    }
+
+    uint32_t color = gradient_get_color(this->gradient, t);
+    return this->enable_dither ? fast_dither(color, x, y) : color;
+}
+
+static bool fill_inner_rounded_payload(gui_rounded_rect_t *this, uint8_t *body,
+                                       int w, int h, int radius, bool is_a8)
+{
+    if (body == NULL || w <= 0 || h <= 0 || radius < 0)
+    {
+        return false;
+    }
+
+    float stroke_width = LG_CLAMP(this->stroke_width, 0.0f,
+                                  LG_MIN((float)w, (float)h) * 0.5f);
+    float inner_w = (float)w - stroke_width * 2.0f;
+    float inner_h = (float)h - stroke_width * 2.0f;
+    float inner_radius = LG_MAX((float)radius - stroke_width, 0.0f);
+
+    if (inner_w <= 0.0f || inner_h <= 0.0f) { return true; }
+
+    uint8_t fill_alpha_base = this->color.color.rgba.a;
+    uint32_t *pixels = (uint32_t *)body;
+
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            float distance = rounded_rect_distance(x + 0.5f, y + 0.5f,
+                                                   stroke_width, stroke_width,
+                                                   inner_w, inner_h, inner_radius);
+            uint8_t coverage = rounded_rect_coverage(distance);
+            if (coverage == 0) { continue; }
+
+            if (is_a8)
+            {
+                body[y * w + x] = coverage == 255 ? fill_alpha_base :
+                                  (uint8_t)(((uint32_t)fill_alpha_base * coverage) >> 8);
+            }
+            else
+            {
+                uint32_t color = rect_fill_color_at(this, x, y, w, h);
+                if (coverage < 255)
+                {
+                    uint8_t alpha = (color >> 24) & 0xFF;
+                    alpha = (uint8_t)(((uint32_t)alpha * coverage) >> 8);
+                    color = (color & 0x00FFFFFFu) | ((uint32_t)alpha << 24);
+                }
+                pixels[y * w + x] = color;
+            }
+        }
+    }
+
+    return true;
+}
+
+static bool rasterize_rect_stroke(gui_rounded_rect_t *this, uint8_t *body,
+                                  int w, int h, int radius, bool is_a8)
+{
+    if (body == NULL || w <= 0 || h <= 0 || radius < 0)
+    {
+        return false;
+    }
+
+    float stroke_width = LG_CLAMP(this->stroke_width, 0.0f,
+                                  LG_MIN((float)w, (float)h) * 0.5f);
+    if (stroke_width <= 0.0f) { return true; }
+
+    float inner_w = (float)w - stroke_width * 2.0f;
+    float inner_h = (float)h - stroke_width * 2.0f;
+    float inner_radius = LG_MAX((float)radius - stroke_width, 0.0f);
+    uint8_t stroke_alpha = this->stroke_color.color.rgba.a;
+    uint32_t stroke_color = this->stroke_color.color.argb_full;
+    uint32_t *pixels = (uint32_t *)body;
+
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            float px = x + 0.5f;
+            float py = y + 0.5f;
+            float outer_distance = rounded_rect_distance(px, py, 0.0f, 0.0f,
+                                                         (float)w, (float)h,
+                                                         (float)radius);
+            uint8_t coverage = rounded_rect_coverage(outer_distance);
+            if (coverage == 0) { continue; }
+
+            if (inner_w > 0.0f && inner_h > 0.0f)
+            {
+                float inner_distance = rounded_rect_distance(px, py,
+                                                             stroke_width, stroke_width,
+                                                             inner_w, inner_h, inner_radius);
+                if (inner_distance <= -0.5f) { continue; }
+            }
+
+            uint8_t alpha = coverage == 255 ? stroke_alpha :
+                            (uint8_t)(((uint32_t)stroke_alpha * coverage) >> 8);
+            if (is_a8)
+            {
+                body[y * w + x] = alpha;
+            }
+            else
+            {
+                pixels[y * w + x] =
+                    (stroke_color & 0x00FFFFFFu) | ((uint32_t)alpha << 24);
+            }
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -1128,7 +1312,11 @@ static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_
                          this->gradient->stop_count >= 2);
 
     bool filled;
-    if (rect_use_a8(this))
+    if (this->stroke_width > 0.0f)
+    {
+        filled = fill_inner_rounded_payload(this, body, w, h, radius, rect_use_a8(this));
+    }
+    else if (rect_use_a8(this))
     {
         filled = fill_solid_rounded_mask_a8(this, body, w, h, radius);
     }
@@ -1146,6 +1334,91 @@ static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_
         free_draw_img(&img);
         return NULL;
     }
+
+    return img;
+}
+
+static draw_img_t *create_rect_stroke_buffer(gui_rounded_rect_t *this, gui_obj_t *obj,
+                                             draw_img_t **old_img, int radius)
+{
+    free_draw_img(old_img);
+
+    if (this->stroke_width <= 0.0f || this->base.w <= 0 || this->base.h <= 0)
+    {
+        return NULL;
+    }
+
+    int w = this->base.w;
+    int h = this->base.h;
+    bool is_a8 = rect_stroke_use_a8();
+    uint32_t buffer_size;
+    if (!get_rect_buffer_size(w, h, is_a8 ? 1u : 4u, &buffer_size))
+    {
+        return NULL;
+    }
+
+    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
+    if (img == NULL) { return NULL; }
+    memset(img, 0x00, sizeof(draw_img_t));
+
+    rect_desc_t desc;
+    bool is_new = false;
+    rect_desc_init(&desc, this, RECT_PART_STROKE, w, h);
+    desc.radius = radius;
+
+    uint8_t *buffer = gui_shape_cache_acquire(&desc, rect_desc_len(&desc), buffer_size, &is_new);
+    if (buffer == NULL)
+    {
+        gui_free(img);
+        return NULL;
+    }
+
+    if (is_new)
+    {
+        memset(buffer, 0x00, buffer_size);
+        if (is_a8)
+        {
+            set_a8_header((gui_rgb_data_head_t *)buffer, (uint16_t)w, (uint16_t)h);
+        }
+        else
+        {
+            gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
+            head->scan = 0;
+            head->align = 0;
+            head->resize = 0;
+            head->compress = 0;
+            head->rsvd = 0;
+            head->type = ARGB8888;
+            head->w = (uint16_t)w;
+            head->h = (uint16_t)h;
+            head->version = 0;
+            head->rsvd2 = 0;
+        }
+
+        if (!rasterize_rect_stroke(this, buffer + sizeof(gui_rgb_data_head_t),
+                                   w, h, radius, is_a8))
+        {
+            gui_shape_cache_release(buffer);
+            gui_free(img);
+            return NULL;
+        }
+    }
+
+    set_img_payload(this, img, buffer, is_a8, this->stroke_color);
+
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(&img->inverse);
+
+    draw_img_load_scale(img, IMG_SRC_MEMADDR);
+    draw_img_new_area(img, NULL);
 
     return img;
 }
@@ -1217,7 +1490,7 @@ static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
         prepare_arc_img(this, circle_data, corner_idx, is_a8, radius);
     }
 
-    set_img_payload(this, img, circle_data, is_a8);
+    set_img_payload(this, img, circle_data, is_a8, this->color);
 
     if (obj->matrix != NULL)
     {
@@ -1284,6 +1557,8 @@ static void gui_rect_prepare(gui_obj_t *obj)
     new_checksum = rect_checksum(new_checksum, &this->opacity_value, sizeof(this->opacity_value));
     new_checksum = rect_checksum(new_checksum, &this->radius, sizeof(this->radius));
     new_checksum = rect_checksum(new_checksum, &this->color, sizeof(this->color));
+    new_checksum = rect_checksum(new_checksum, &this->stroke_width, sizeof(this->stroke_width));
+    new_checksum = rect_checksum(new_checksum, &this->stroke_color, sizeof(this->stroke_color));
     new_checksum = rect_checksum(new_checksum, &this->degrees, sizeof(this->degrees));
     new_checksum = rect_checksum(new_checksum, &this->scale_x, sizeof(this->scale_x));
     new_checksum = rect_checksum(new_checksum, &this->scale_y, sizeof(this->scale_y));
@@ -1304,6 +1579,17 @@ static void gui_rect_prepare(gui_obj_t *obj)
     }
 
     bool need_regenerate = (last != new_checksum);
+    uint32_t stroke_path_checksum = 2166136261u;
+    stroke_path_checksum = rect_checksum(stroke_path_checksum,
+                                         &this->base.w, sizeof(this->base.w));
+    stroke_path_checksum = rect_checksum(stroke_path_checksum,
+                                         &this->base.h, sizeof(this->base.h));
+    stroke_path_checksum = rect_checksum(stroke_path_checksum,
+                                         &radius, sizeof(radius));
+    stroke_path_checksum = rect_checksum(stroke_path_checksum,
+                                         &this->stroke_width,
+                                         sizeof(this->stroke_width));
+    bool stroke_path_dirty = (stroke_path_checksum != this->stroke_path_checksum);
 
     int split_margin = 2 * (radius + 1);
     bool split_degenerate = (this->base.w <= split_margin) || (this->base.h <= split_margin);
@@ -1313,9 +1599,10 @@ static void gui_rect_prepare(gui_obj_t *obj)
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
                               (rect_area <= 10000) ||
                               (this->use_gradient && this->gradient != NULL) ||
-                              has_transform || parent_has_non_translate || split_degenerate;
+                              has_transform || parent_has_non_translate || split_degenerate ||
+                              (this->stroke_width > 0.0f);
 
-    if (radius == 0 && !this->use_gradient)
+    if (radius == 0 && !this->use_gradient && this->stroke_width <= 0.0f)
     {
         if (need_regenerate || this->rect_0 == NULL)
         {
@@ -1370,7 +1657,63 @@ static void gui_rect_prepare(gui_obj_t *obj)
         }
     }
 
+    if (this->stroke_width > 0.0f)
+    {
+        gui_dispdev_t *dc = gui_get_dc();
+        bool use_path = gui_shape_path_can_draw(obj->matrix) &&
+                        dc != NULL && (dc->bit_depth == 16 || dc->bit_depth == 32);
+
+        if (use_path)
+        {
+            if (stroke_path_dirty || this->stroke_spans == NULL)
+            {
+                gui_shape_path_t path;
+                gui_shape_path_init_rounded_rect(&path,
+                                                 this->base.w, this->base.h,
+                                                 radius, this->stroke_width);
+                gui_shape_span_data_t *spans = gui_shape_path_acquire(&path);
+                if (spans != NULL)
+                {
+                    gui_shape_path_release(this->stroke_spans);
+                    this->stroke_spans = spans;
+                }
+                else
+                {
+                    gui_shape_path_release(this->stroke_spans);
+                    this->stroke_spans = NULL;
+                }
+            }
+
+            if (this->stroke_spans != NULL)
+            {
+                free_draw_img(&this->stroke_img);
+            }
+            else if (need_regenerate || this->stroke_img == NULL)
+            {
+                this->stroke_img =
+                    create_rect_stroke_buffer(this, obj, &this->stroke_img, radius);
+            }
+        }
+        else
+        {
+            gui_shape_path_release(this->stroke_spans);
+            this->stroke_spans = NULL;
+            if (need_regenerate || this->stroke_img == NULL)
+            {
+                this->stroke_img =
+                    create_rect_stroke_buffer(this, obj, &this->stroke_img, radius);
+            }
+        }
+    }
+    else
+    {
+        free_draw_img(&this->stroke_img);
+        gui_shape_path_release(this->stroke_spans);
+        this->stroke_spans = NULL;
+    }
+
     this->checksum = new_checksum;
+    this->stroke_path_checksum = stroke_path_checksum;
 
     // Check if matrix changed (important for list scrolling optimization)
     bool matrix_changed = (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0);
@@ -1462,6 +1805,14 @@ static void gui_rect_prepare(gui_obj_t *obj)
                 draw_img_new_area(this->circle_11, NULL);
             }
         }
+
+        if (this->stroke_img != NULL)
+        {
+            memcpy(&this->stroke_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+            memcpy(&this->stroke_img->inverse, obj->matrix, sizeof(struct gui_matrix));
+            matrix_inverse(&this->stroke_img->inverse);
+            draw_img_new_area(this->stroke_img, NULL);
+        }
     }
 
     if (last != this->checksum)
@@ -1479,6 +1830,16 @@ static void gui_rect_draw(gui_obj_t *obj)
     // Update opacity value to consider parent's opacity (like gui_img does)
     uint8_t final_opacity = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
 
+    if (this->stroke_spans != NULL)
+    {
+        gui_shape_path_draw(this->stroke_spans, obj->matrix,
+                            this->stroke_color, final_opacity, dc);
+    }
+    if (this->stroke_img != NULL)
+    {
+        this->stroke_img->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->stroke_img, dc, NULL);
+    }
     if (this->rect_0 != NULL)
     {
         this->rect_0->opacity_value = final_opacity;
@@ -1525,6 +1886,7 @@ static void gui_rect_end(gui_obj_t *obj)
     if (draw_img_acc_end_cb != NULL)
     {
         gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
+        if (this->stroke_img != NULL) { draw_img_acc_end_cb(this->stroke_img); }
         if (this->rect_0   != NULL) { draw_img_acc_end_cb(this->rect_0);   }
         if (this->rect_1   != NULL) { draw_img_acc_end_cb(this->rect_1);   }
         if (this->rect_2   != NULL) { draw_img_acc_end_cb(this->rect_2);   }
@@ -1615,6 +1977,8 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
     GET_BASE(round_rect)->create_done = true;
     round_rect->radius = _UI_MAX(radius, 0);
     round_rect->color = color;
+    round_rect->stroke_width = 0.0f;
+    round_rect->stroke_color = gui_rgba(0, 0, 0, 0);
     round_rect->degrees = 0.0f;
     round_rect->scale_x = 1.0f;
     round_rect->scale_y = 1.0f;
@@ -1622,6 +1986,7 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
     round_rect->offset_y = 0.0f;
     round_rect->gradient = NULL;
     round_rect->use_gradient = false;
+    round_rect->enable_dither = (GUI_RECT_ENABLE_DITHER != 0);
     round_rect->gradient_dir = RECT_GRADIENT_HORIZONTAL;
 
     return round_rect;
@@ -1693,7 +2058,35 @@ void gui_rect_set_radius(gui_rounded_rect_t *rect, int radius)
 void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color)
 {
     GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
     rect->color = color;
+}
+
+void gui_rect_set_stroke(gui_rounded_rect_t *rect, float width, gui_color_t color)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    rect->stroke_width = (width > 0.0f) ? width : 0.0f;
+    rect->stroke_color = color;
+}
+
+void gui_rect_clear_stroke(gui_rounded_rect_t *rect)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    rect->stroke_width = 0.0f;
 }
 
 void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter)
@@ -1757,4 +2150,15 @@ void gui_rect_clear_gradient(gui_rounded_rect_t *rect)
         rect->gradient = NULL;
     }
     rect->use_gradient = false;
+}
+
+void gui_rect_set_dither(gui_rounded_rect_t *rect, bool enable)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    rect->enable_dither = enable;
 }

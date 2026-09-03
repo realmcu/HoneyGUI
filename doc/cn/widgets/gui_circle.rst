@@ -32,6 +32,10 @@
      - :cpp:any:`gui_circle_set_radius`
    * - 设置颜色
      - :cpp:any:`gui_circle_set_color`
+   * - 设置描边
+     - :cpp:any:`gui_circle_set_stroke`
+   * - 清除描边
+     - :cpp:any:`gui_circle_clear_stroke`
    * - 设置不透明度
      - :cpp:any:`gui_circle_set_opacity`
    * - 注册点击事件回调
@@ -60,6 +64,7 @@
 - **半径控制**: 支持任意大小的半径值
 - **完美圆形**: 确保绘制完美的几何圆形
 - **边界处理**: 自动处理圆形与边界的裁剪
+- **内部描边**: 描边向圆形内部扩展，不改变控件尺寸
 
 渐变色填充
 ----------

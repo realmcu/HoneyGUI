@@ -53,6 +53,7 @@ typedef enum
     CIRCLE_PART_FULL = 1,       /**< Whole circle in one ARGB8888 buffer. */
     CIRCLE_PART_SOLID_RECT,     /**< Solid inscribed square, used when transformed. */
     CIRCLE_PART_ARC_STRIP,      /**< Left arc strip; the other three mirror it. */
+    CIRCLE_PART_STROKE,         /**< Whole inset stroke in one buffer. */
 } gui_circle_part_t;
 
 /**
@@ -71,8 +72,11 @@ typedef struct
     uint32_t color;             /**< ARGB baked into the pixels; 0 when A8. */
     uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
     uint32_t gradient_type;     /**< CIRCLE_GRADIENT_*, or UINT32_MAX for none. */
+    float stroke_width;         /**< Inset width for full fill or stroke payload. */
     Gradient gradient;          /**< Only present when gradient_type is set. */
 } circle_desc_t;
+
+GUI_SHAPE_DESC_SIZE_CHECK(circle_desc_t);
 
 /*============================================================================*
  *                           Private Functions
@@ -111,6 +115,15 @@ static bool circle_use_a8(gui_circle_t *this)
 #endif
 }
 
+static bool circle_stroke_use_a8(void)
+{
+#if GUI_CIRCLE_ENABLE_A8
+    return true;
+#else
+    return false;
+#endif
+}
+
 /**
  * Fill in a descriptor for one part of this circle.
  *
@@ -126,18 +139,24 @@ static void circle_desc_init(circle_desc_t *desc, gui_circle_t *this,
     desc->size_a = size_a;
     desc->size_b = size_b;
     desc->gradient_type = UINT32_MAX;
+    desc->stroke_width = (part == CIRCLE_PART_FULL || part == CIRCLE_PART_STROKE) ?
+                         this->stroke_width : 0.0f;
 
     /* RGB is deliberately left out of an A8 key -- that is what lets circles
      * differing only in colour share one mask.  Alpha stays in, because it is
      * folded into the mask values themselves. */
-    if (circle_use_a8(this))
+    bool is_stroke = (part == CIRCLE_PART_STROKE);
+    bool is_a8 = is_stroke ? circle_stroke_use_a8() : circle_use_a8(this);
+    gui_color_t payload_color = is_stroke ? this->stroke_color : this->color;
+
+    if (is_a8)
     {
         desc->is_a8 = 1u;
-        desc->color = this->color.color.rgba.a;
+        desc->color = payload_color.color.rgba.a;
     }
     else
     {
-        desc->color = this->color.color.argb_full;
+        desc->color = payload_color.color.argb_full;
     }
 
     /* Only the full-circle part reads the gradient; the strip and the inscribed
@@ -199,6 +218,9 @@ static void free_circle_draw_imgs(gui_circle_t *circle)
 {
     free_arc_buffers_circle(circle);
     free_draw_img_circle(&circle->center_rect);
+    free_draw_img_circle(&circle->stroke_img);
+    gui_shape_path_release(circle->stroke_spans);
+    circle->stroke_spans = NULL;
 }
 
 static bool get_circle_buffer_size(int32_t w, int32_t h, uint32_t pixel_bytes,
@@ -289,24 +311,33 @@ static bool is_point_in_circle(gui_circle_t *circle, int x, int y)
 static void gui_circle_input_prepare(gui_obj_t *obj)
 {
     gui_circle_t *this = (gui_circle_t *)obj;
-
-    // Check for touch events
     touch_info_t *tp = tp_get_info();
-    if (tp->type == TOUCH_SHORT)
-    {
-        // Convert touch coordinates to widget local coordinates
-        int local_x = tp->x - obj->x;
-        int local_y = tp->y - obj->y;
+    int absolute_x = 0;
+    int absolute_y = 0;
 
-        // Check if touch point is inside the arc
-        if (is_point_in_circle(this, local_x, local_y))
-        {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
-        }
+    /* Touch coordinates are absolute while obj->x/y are parent relative, so the
+     * widget origin has to be accumulated up the tree. */
+    gui_obj_absolute_xy(obj, &absolute_x, &absolute_y);
+
+    if (!is_point_in_circle(this, tp->x - absolute_x, tp->y - absolute_y))
+    {
+        return;
     }
+
+    /* No extra touch-state condition here: gui_obj_enable_event() checks the
+     * state that belongs to each event code (TOUCH_SHORT for CLICKED,
+     * tp->pressed for PRESSED, tp->released for RELEASED, ...). Gating all of
+     * them on TOUCH_SHORT made everything except CLICKED unreachable, because
+     * at press time the type is still TOUCH_INIT/TOUCH_HOLD_* and TOUCH_SHORT
+     * only appears once a short tap is released. */
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
+    /* PRESSING repeats every frame while the touch is held, which is what a
+     * drag needs. tp->x/tp->y stay at the press origin for the whole press, so
+     * the hit test above means "the press started on the circle". */
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
 }
 
 /**
@@ -361,7 +392,8 @@ static void set_a8_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
  * An A8 payload only draws under IMG_2D_SW_FIX_A8_FG -- the blit routines ignore
  * an A8 image in any other blend mode -- and takes its colour from fg_color_set.
  */
-static void set_img_payload(gui_circle_t *this, draw_img_t *img, uint8_t *payload, bool is_a8)
+static void set_img_payload(gui_circle_t *this, draw_img_t *img, uint8_t *payload, bool is_a8,
+                            gui_color_t color)
 {
     img->data = payload;
     img->opacity_value = this->opacity_value;
@@ -370,9 +402,9 @@ static void set_img_payload(gui_circle_t *this, draw_img_t *img, uint8_t *payloa
     if (is_a8)
     {
         img->blend_mode = IMG_2D_SW_FIX_A8_FG;
-        /* Alpha pinned at 255: the mask already carries this->color's alpha, and
+        /* Alpha pinned at 255: the mask already carries the source colour alpha, and
          * the two blit paths disagree about fg_color_set's alpha anyway. */
-        img->fg_color_set = 0xFF000000u | (this->color.color.argb_full & 0x00FFFFFFu);
+        img->fg_color_set = 0xFF000000u | (color.color.argb_full & 0x00FFFFFFu);
     }
     else
     {
@@ -393,15 +425,18 @@ static void rasterize_circle_mask_a8(gui_circle_t *this, uint8_t *buffer, uint32
     int r = this->radius;
     int diameter = r * 2;
     uint8_t color_a = this->color.color.rgba.a;
+    float fill_radius = LG_MAX((float)r - this->stroke_width, 0.0f);
 
     memset(buffer, 0x00, buffer_size);
     set_a8_header((gui_rgb_data_head_t *)buffer, (uint16_t)diameter, (uint16_t)diameter);
 
+    if (fill_radius <= 0.0f) { return; }
+
     uint8_t *mask = buffer + sizeof(gui_rgb_data_head_t);
 
     float center = (float)r;
-    float r_in = r - 0.5f;
-    float r_out = r + 0.5f;
+    float r_in = LG_MAX(fill_radius - 0.5f, 0.0f);
+    float r_out = fill_radius + 0.5f;
     float r_in_sq = r_in * r_in;
     float r_out_sq = r_out * r_out;
 
@@ -458,6 +493,9 @@ static bool rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32
 
     uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
     uint32_t solid_color = this->color.color.argb_full;
+    float fill_radius = LG_MAX((float)r - this->stroke_width, 0.0f);
+
+    if (fill_radius <= 0.0f) { return true; }
 
     // --- Pre-compute Gradient LUT ---
     uint32_t *gradient_lut = NULL;
@@ -515,8 +553,8 @@ static bool rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32
     bool dither = GUI_CIRCLE_ENABLE_DITHER;
 
     // Optimization: Calculate r_sq once
-    float r_in = r - 0.5f;
-    float r_out = r + 0.5f;
+    float r_in = LG_MAX(fill_radius - 0.5f, 0.0f);
+    float r_out = fill_radius + 0.5f;
     float r_in_sq = r_in * r_in;
     float r_out_sq = r_out * r_out;
 
@@ -629,6 +667,99 @@ static bool rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32
     return true;
 }
 
+static void rasterize_circle_stroke(gui_circle_t *this, uint8_t *buffer,
+                                    uint32_t buffer_size, bool is_a8)
+{
+    int radius = this->radius;
+    int diameter = radius * 2;
+
+    memset(buffer, 0x00, buffer_size);
+    if (is_a8)
+    {
+        set_a8_header((gui_rgb_data_head_t *)buffer, (uint16_t)diameter, (uint16_t)diameter);
+    }
+    else
+    {
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
+        head->scan = 0;
+        head->align = 0;
+        head->resize = 0;
+        head->compress = 0;
+        head->rsvd = 0;
+        head->type = ARGB8888;
+        head->w = (uint16_t)diameter;
+        head->h = (uint16_t)diameter;
+        head->version = 0;
+        head->rsvd2 = 0;
+    }
+
+    float stroke_width = LG_CLAMP(this->stroke_width, 0.0f, (float)radius);
+    if (radius <= 0 || stroke_width <= 0.0f) { return; }
+
+    uint8_t *mask = buffer + sizeof(gui_rgb_data_head_t);
+    uint32_t *pixels = (uint32_t *)mask;
+    uint32_t stroke_color = this->stroke_color.color.argb_full;
+    uint8_t stroke_alpha = this->stroke_color.color.rgba.a;
+
+    float center = (float)radius;
+    float outer_in = (float)radius - 0.5f;
+    float outer_out = (float)radius + 0.5f;
+    float outer_in_sq = outer_in * outer_in;
+    float outer_out_sq = outer_out * outer_out;
+    float inner_radius = (float)radius - stroke_width;
+    float inner_cut = LG_MAX(inner_radius - 0.5f, 0.0f);
+    float inner_cut_sq = inner_cut * inner_cut;
+
+    for (int y = 0; y < radius; y++)
+    {
+        int y_mirror = diameter - 1 - y;
+        for (int x = 0; x < radius; x++)
+        {
+            float dx = x + 0.5f - center;
+            float dy = y + 0.5f - center;
+            float dist_sq = dx * dx + dy * dy;
+
+            if (dist_sq >= outer_out_sq ||
+                (inner_radius > 0.0f && dist_sq < inner_cut_sq))
+            {
+                continue;
+            }
+
+            float coverage = 1.0f;
+            if (dist_sq > outer_in_sq)
+            {
+                coverage = outer_out - sqrtf(dist_sq);
+                coverage = LG_CLAMP(coverage, 0.0f, 1.0f);
+            }
+
+            uint8_t alpha = stroke_alpha;
+            if (coverage < 0.999f)
+            {
+                alpha = (uint8_t)(coverage * (float)stroke_alpha);
+            }
+
+            int x_mirror = diameter - 1 - x;
+            int offsets[4] =
+            {
+                y *diameter + x,
+                y *diameter + x_mirror,
+                y_mirror *diameter + x,
+                y_mirror *diameter + x_mirror
+            };
+
+            if (is_a8)
+            {
+                for (int i = 0; i < 4; i++) { mask[offsets[i]] = alpha; }
+            }
+            else
+            {
+                uint32_t color = (stroke_color & 0x00FFFFFFu) | ((uint32_t)alpha << 24);
+                for (int i = 0; i < 4; i++) { pixels[offsets[i]] = color; }
+            }
+        }
+    }
+}
+
 /** Create a complete circle in a single buffer, shared with identical circles */
 static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw_img_t **old_img)
 {
@@ -680,9 +811,63 @@ static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw
         }
     }
 
-    set_img_payload(this, img, buffer, is_a8);
+    set_img_payload(this, img, buffer, is_a8, this->color);
 
     // Apply transformation matrix
+    if (obj->matrix != NULL)
+    {
+        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    }
+    else
+    {
+        matrix_identity(&img->matrix);
+    }
+    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(&img->inverse);
+
+    draw_img_load_scale(img, IMG_SRC_MEMADDR);
+    draw_img_new_area(img, NULL);
+
+    return img;
+}
+
+static draw_img_t *create_circle_stroke_buffer(gui_circle_t *this, gui_obj_t *obj,
+                                               draw_img_t **old_img)
+{
+    free_draw_img_circle(old_img);
+
+    if (this->stroke_width <= 0.0f || this->radius <= 0) { return NULL; }
+
+    int diameter = this->radius * 2;
+    bool is_a8 = circle_stroke_use_a8();
+    uint32_t buffer_size;
+    if (!get_circle_buffer_size(diameter, diameter, is_a8 ? 1u : 4u, &buffer_size))
+    {
+        return NULL;
+    }
+
+    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
+    if (img == NULL) { return NULL; }
+    memset(img, 0x00, sizeof(draw_img_t));
+
+    circle_desc_t desc;
+    bool is_new = false;
+    circle_desc_init(&desc, this, CIRCLE_PART_STROKE, this->radius, 0);
+
+    uint8_t *buffer = gui_shape_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
+    if (buffer == NULL)
+    {
+        gui_free(img);
+        return NULL;
+    }
+
+    if (is_new)
+    {
+        rasterize_circle_stroke(this, buffer, buffer_size, is_a8);
+    }
+
+    set_img_payload(this, img, buffer, is_a8, this->stroke_color);
+
     if (obj->matrix != NULL)
     {
         memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -801,7 +986,7 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
             *input_img = NULL;
             return;
         }
-        set_img_payload(this, img, payload, circle_use_a8(this));
+        set_img_payload(this, img, payload, circle_use_a8(this), this->color);
     }
     else
     {
@@ -846,7 +1031,7 @@ static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
 static draw_img_t *finish_arc_strip(gui_circle_t *this, gui_obj_t *obj, draw_img_t *img,
                                     uint8_t *arc_data)
 {
-    set_img_payload(this, img, arc_data, circle_use_a8(this));
+    set_img_payload(this, img, arc_data, circle_use_a8(this), this->color);
 
     // Copy parent matrix (don't reinitialize - it may contain parent transformations)
     if (obj->matrix != NULL)
@@ -1123,6 +1308,8 @@ static void gui_circle_prepare(gui_obj_t *obj)
     new_checksum = circle_checksum(new_checksum, &this->y, sizeof(this->y));
     new_checksum = circle_checksum(new_checksum, &this->radius, sizeof(this->radius));
     new_checksum = circle_checksum(new_checksum, &this->color, sizeof(this->color));
+    new_checksum = circle_checksum(new_checksum, &this->stroke_width, sizeof(this->stroke_width));
+    new_checksum = circle_checksum(new_checksum, &this->stroke_color, sizeof(this->stroke_color));
     new_checksum = circle_checksum(new_checksum, &this->opacity_value, sizeof(this->opacity_value));
     new_checksum = circle_checksum(new_checksum, &this->degrees, sizeof(this->degrees));
     new_checksum = circle_checksum(new_checksum, &this->scale_x, sizeof(this->scale_x));
@@ -1143,12 +1330,20 @@ static void gui_circle_prepare(gui_obj_t *obj)
 
     // Only regenerate buffers if properties changed
     bool need_regenerate = (last != new_checksum);
+    uint32_t stroke_path_checksum = 2166136261u;
+    stroke_path_checksum = circle_checksum(stroke_path_checksum,
+                                           &this->radius, sizeof(this->radius));
+    stroke_path_checksum = circle_checksum(stroke_path_checksum,
+                                           &this->stroke_width,
+                                           sizeof(this->stroke_width));
+    bool stroke_path_dirty = (stroke_path_checksum != this->stroke_path_checksum);
 
     // Force single buffer for Gradient or Alpha or Small Circles
     uint64_t circle_area = (uint64_t)(uint32_t)diameter * (uint32_t)diameter;
     bool need_single_buffer = (this->color.color.rgba.a < 255) ||
                               (circle_area < 10000) ||
-                              (this->use_gradient && this->gradient != NULL);
+                              (this->use_gradient && this->gradient != NULL) ||
+                              (this->stroke_width > 0.0f);
 
     if (need_single_buffer)
     {
@@ -1224,7 +1419,61 @@ static void gui_circle_prepare(gui_obj_t *obj)
         }
     }
 
+    if (this->stroke_width > 0.0f)
+    {
+        gui_dispdev_t *dc = gui_get_dc();
+        bool use_path = gui_shape_path_can_draw(obj->matrix) &&
+                        dc != NULL && (dc->bit_depth == 16 || dc->bit_depth == 32);
+
+        if (use_path)
+        {
+            if (stroke_path_dirty || this->stroke_spans == NULL)
+            {
+                gui_shape_path_t path;
+                gui_shape_path_init_circle(&path, radius, this->stroke_width);
+                gui_shape_span_data_t *spans = gui_shape_path_acquire(&path);
+                if (spans != NULL)
+                {
+                    gui_shape_path_release(this->stroke_spans);
+                    this->stroke_spans = spans;
+                }
+                else
+                {
+                    gui_shape_path_release(this->stroke_spans);
+                    this->stroke_spans = NULL;
+                }
+            }
+
+            if (this->stroke_spans != NULL)
+            {
+                free_draw_img_circle(&this->stroke_img);
+            }
+            else if (need_regenerate || this->stroke_img == NULL)
+            {
+                this->stroke_img =
+                    create_circle_stroke_buffer(this, obj, &this->stroke_img);
+            }
+        }
+        else
+        {
+            gui_shape_path_release(this->stroke_spans);
+            this->stroke_spans = NULL;
+            if (need_regenerate || this->stroke_img == NULL)
+            {
+                this->stroke_img =
+                    create_circle_stroke_buffer(this, obj, &this->stroke_img);
+            }
+        }
+    }
+    else
+    {
+        free_draw_img_circle(&this->stroke_img);
+        gui_shape_path_release(this->stroke_spans);
+        this->stroke_spans = NULL;
+    }
+
     this->checksum = new_checksum;
+    this->stroke_path_checksum = stroke_path_checksum;
 
     // Check if matrix changed (important for list scrolling optimization)
     bool matrix_changed = (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0);
@@ -1258,6 +1507,14 @@ static void gui_circle_prepare(gui_obj_t *obj)
             memcpy(&this->center_rect->inverse, &this->center_rect->matrix, sizeof(struct gui_matrix));
             matrix_inverse(&this->center_rect->inverse);
             draw_img_new_area(this->center_rect, NULL);
+        }
+
+        if (this->stroke_img != NULL)
+        {
+            memcpy(&this->stroke_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+            memcpy(&this->stroke_img->inverse, obj->matrix, sizeof(struct gui_matrix));
+            matrix_inverse(&this->stroke_img->inverse);
+            draw_img_new_area(this->stroke_img, NULL);
         }
 
         // Update arc matrices (for multi-part rendering)
@@ -1344,6 +1601,16 @@ static void gui_circle_draw(gui_obj_t *obj)
     // Update opacity value to consider parent's opacity (like gui_img does)
     uint8_t final_opacity = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
 
+    if (this->stroke_spans != NULL)
+    {
+        gui_shape_path_draw(this->stroke_spans, obj->matrix,
+                            this->stroke_color, final_opacity, dc);
+    }
+    if (this->stroke_img != NULL)
+    {
+        this->stroke_img->opacity_value = final_opacity;
+        gui_acc_blit_to_dc(this->stroke_img, dc, NULL);
+    }
     if (this->center_rect != NULL)
     {
         this->center_rect->opacity_value = final_opacity;
@@ -1382,6 +1649,7 @@ static void gui_circle_end(gui_circle_t *this)
      * prepare call orphans the old pointer. */
     if (draw_img_acc_end_cb != NULL)
     {
+        if (this->stroke_img != NULL) { draw_img_acc_end_cb(this->stroke_img); }
         if (this->center_rect != NULL) { draw_img_acc_end_cb(this->center_rect); }
         if (this->arc_left   != NULL) { draw_img_acc_end_cb(this->arc_left);   }
         if (this->arc_right  != NULL) { draw_img_acc_end_cb(this->arc_right);  }
@@ -1473,6 +1741,8 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->y = radius;
     circle->radius = radius;
     circle->color = color;
+    circle->stroke_width = 0.0f;
+    circle->stroke_color = gui_rgba(0, 0, 0, 0);
     circle->checksum = 0;
     circle->degrees = 0.0f;
     circle->scale_x = 1.0f;
@@ -1576,10 +1846,38 @@ void gui_circle_set_opacity(gui_circle_t *circle, uint8_t opacity)
 void gui_circle_set_color(gui_circle_t *circle, gui_color_t color)
 {
     GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
     if (circle->color.color.argb_full != color.color.argb_full)
     {
         circle->color = color;
     }
+}
+
+void gui_circle_set_stroke(gui_circle_t *circle, float width, gui_color_t color)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    circle->stroke_width = (width > 0.0f) ? width : 0.0f;
+    circle->stroke_color = color;
+}
+
+void gui_circle_clear_stroke(gui_circle_t *circle)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    circle->stroke_width = 0.0f;
 }
 
 void gui_circle_on_click(gui_circle_t *circle, void *callback, void *parameter)

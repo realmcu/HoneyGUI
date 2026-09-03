@@ -32,6 +32,10 @@ Core Features
      - :cpp:any:`gui_circle_set_radius`
    * - Set Color
      - :cpp:any:`gui_circle_set_color`
+   * - Set Stroke
+     - :cpp:any:`gui_circle_set_stroke`
+   * - Clear Stroke
+     - :cpp:any:`gui_circle_clear_stroke`
    * - Set Opacity
      - :cpp:any:`gui_circle_set_opacity`
    * - Register Click Event Callback
@@ -60,6 +64,7 @@ The circle widget has the following geometric characteristics:
 - **Radius Control**: Support any size radius value
 - **Perfect Circle**: Ensure perfect geometric circular rendering
 - **Boundary Handling**: Automatically handle clipping with boundaries
+- **Inset Stroke**: Draws the stroke inside the circle without changing widget size
 
 Gradient Fill
 -------------

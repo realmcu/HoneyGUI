@@ -24,6 +24,7 @@ extern "C" {
 #include "acc_api.h"
 #include "tp_algo.h"
 #include "lite_geometry.h"
+#include "gui_shape_path.h"
 
 /*============================================================================*
  *                         Types
@@ -47,14 +48,19 @@ typedef struct
     draw_img_t *arc_right;    /**< Right arc. */
     draw_img_t *arc_top;    /**< Top arc. */
     draw_img_t *arc_bottom;    /**< Bottom arc. */
+    draw_img_t *stroke_img;    /**< Optional inset stroke image. */
+    gui_shape_span_data_t *stroke_spans; /**< Cached path scanline spans. */
 
     // Circle geometry data
     int x;                      /**< Center X coordinate relative to widget. */
     int y;                      /**< Center Y coordinate relative to widget. */
     int radius;                 /**< Circle radius. */
     gui_color_t color;          /**< Circle color. */
+    float stroke_width;         /**< Inset stroke width. Zero disables stroke. */
+    gui_color_t stroke_color;   /**< Stroke color. */
     uint8_t opacity_value;      /**< Opacity value. */
     uint32_t checksum;          /**< Checksum for change detection. */
+    uint32_t stroke_path_checksum; /**< Geometry-only span checksum. */
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */
@@ -130,6 +136,22 @@ void gui_circle_set_opacity(gui_circle_t *circle, uint8_t opacity);
  * @param color Circle color.
  */
 void gui_circle_set_color(gui_circle_t *circle, gui_color_t color);
+
+/**
+ * @brief Set an inset stroke for the circle.
+ *
+ * @param circle Circle widget pointer.
+ * @param width Stroke width in pixels. A non-positive value disables stroke.
+ * @param color Stroke color.
+ */
+void gui_circle_set_stroke(gui_circle_t *circle, float width, gui_color_t color);
+
+/**
+ * @brief Disable the circle stroke.
+ *
+ * @param circle Circle widget pointer.
+ */
+void gui_circle_clear_stroke(gui_circle_t *circle);
 
 /**
  * @brief Set click callback for the circle.

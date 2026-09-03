@@ -66,6 +66,7 @@ static int geometry_circle_demo_init(void)
     gui_circle_t *big_circle = gui_circle_create(gui_obj_get_root(), "big_circle", W / 2,
                                                  H / 2, big_d / 2, gui_rgba(0, 255,
                                                                             0, 255));
+    gui_circle_set_stroke(big_circle, 8.0f, gui_rgba(255, 255, 255, 255));
 
     gui_circle_create(gui_obj_get_root(), "top_left", margin + small_d / 2, margin + small_d / 2,
                       small_d / 2,

@@ -19,6 +19,7 @@ extern "C" {
 #include "gui_obj.h"
 #include "draw_img.h"
 #include "lite_geometry.h"
+#include "gui_shape_path.h"
 
 /*============================================================================*
  *                         Types
@@ -44,11 +45,16 @@ typedef struct
     draw_img_t *rect_0;
     draw_img_t *rect_1;
     draw_img_t *rect_2;
+    draw_img_t *stroke_img;    /**< Optional inset stroke image. */
+    gui_shape_span_data_t *stroke_spans; /**< Cached path scanline spans. */
     uint8_t opacity_value;      /**< Opacity value. */
 
     int radius;                 /**< Rect radius. */
     gui_color_t color;          /**< Rect color. */
+    float stroke_width;         /**< Inset stroke width. Zero disables stroke. */
+    gui_color_t stroke_color;   /**< Stroke color. */
     uint32_t checksum;          /**< Checksum for change detection. */
+    uint32_t stroke_path_checksum; /**< Geometry-only span checksum. */
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */
@@ -137,20 +143,28 @@ void gui_rect_set_radius(gui_rounded_rect_t *rect, int radius);
 void gui_rect_set_color(gui_rounded_rect_t *rect, gui_color_t color);
 
 /**
+ * @brief Set an inset stroke for the rect.
+ *
+ * @param rect Pointer to the rect widget.
+ * @param width Stroke width in pixels. A non-positive value disables stroke.
+ * @param color Stroke color.
+ */
+void gui_rect_set_stroke(gui_rounded_rect_t *rect, float width, gui_color_t color);
+
+/**
+ * @brief Disable the rect stroke.
+ *
+ * @param rect Pointer to the rect widget.
+ */
+void gui_rect_clear_stroke(gui_rounded_rect_t *rect);
+
+/**
  * @brief Register a click event callback for the rect widget.
  * @param rect Pointer to the rect widget.
  * @param callback Callback function pointer.
  * @param parameter Optional parameter to pass to the callback.
  */
 void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter);
-
-/**
- * @brief Register a press event callback for the rect widget.
- * @param rect Pointer to the rect widget.
- * @param callback Callback function pointer.
- * @param parameter Optional parameter to pass to the callback.
- */
-void gui_rect_on_press(gui_rounded_rect_t *rect, void *callback, void *parameter);
 
 /**
  * @brief Apply rotation transformation to the rect widget.
