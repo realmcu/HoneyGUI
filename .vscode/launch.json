@@ -23,6 +23,7 @@
             },
             "linux": {
                 "program": "${workspaceFolder}/win32_sim/gui",
+                "cwd": "${workspaceFolder}/win32_sim",
                 "miDebuggerPath": "/usr/bin/gdb",
                 "miDebuggerArgs": "-iex 'set debuginfod enabled off' -iex 'set debuginfod urls \"\"' -iex 'set auto-solib-add off'"
             },
