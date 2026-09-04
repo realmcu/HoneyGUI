@@ -186,10 +186,9 @@ static void l3_fill_color_argb8888(float y, float xleft, float xright, float one
             for (int ix = startX; ix < endX; ++ix)
             {
                 int pixelIdx = ix + rowOffset;
-                const float originalZ = 1.0f / oneoverz;
-                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                if (zbuffer[pixelIdx] == 0 || oneoverz > zbuffer[pixelIdx])
                 {
-                    zbuffer[pixelIdx] = originalZ;
+                    zbuffer[pixelIdx] = oneoverz;
                     l3_color_argb8888_t *pixel = (l3_color_argb8888_t *)(uintptr_t)writebuf + pixelIdx;
 
                     pixel->a = (alpha * alpha + pixel->a * inv_alpha) / 255;
@@ -328,9 +327,9 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
                     source_blue  = (uint8_t)((source_blue  * light) >> 8);
                 }
 
-                if (source_alpha > 0 && (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx]))
+                if (source_alpha > 0 && (zbuffer[pixelIdx] == 0 || oneoverz > zbuffer[pixelIdx]))
                 {
-                    zbuffer[pixelIdx] = originalZ;
+                    zbuffer[pixelIdx] = oneoverz;
 
                     if (source_alpha == 255)
                     {
@@ -463,9 +462,9 @@ static void l3_fill_texture_argb8888(int y, float xleft, float xright, float one
                 gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
                                      image_addr, srcX + srcY * src_head->w, src_head->type, palette_data);
 
-                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                if (zbuffer[pixelIdx] == 0 || oneoverz > zbuffer[pixelIdx])
                 {
-                    zbuffer[pixelIdx] = originalZ;
+                    zbuffer[pixelIdx] = oneoverz;
                     // Completely opaque pixel processing
                     if (source_alpha == 255)
                     {
