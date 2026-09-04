@@ -39,6 +39,13 @@ Export('PLATFORM', 'TOOL_ROOT', 'env')
 
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
 
+if GetDepend(['CONFIG_REALTEK_BUILD_H264']):
+    AddDepend('CONFIG_REALTEK_H264BSD')
+
+if (GetDepend(['CONFIG_REALTEK_BUILD_H264']) or
+        GetDepend(['CONFIG_REALTEK_BUILD_LITE3D'])):
+    env.AppendUnique(CPPDEFINES=['DRV_PIXEL_BITS=16'])
+
 def ourspawn(sh, escape, cmd, args, e):
     filename = str(uuid.uuid4())
     cmdline = cmd + " " + ' '.join(args[1:])
@@ -62,7 +69,10 @@ def ourspawn(sh, escape, cmd, args, e):
 if sys.platform == 'win32':
     env['SPAWN'] = ourspawn
 
-for path in [LITE3D_DIR, H264BSD_DIR, NANOVG_DIR, RTE_ROOT]:
+if GetDepend(['CONFIG_REALTEK_BUILD_LITE3D']):
+    objs.extend(SConscript(os.path.join(LITE3D_DIR, 'widget', 'SConscript')))
+
+for path in [H264BSD_DIR, NANOVG_DIR, RTE_ROOT]:
     sconscript = os.path.join(path, 'SConscript')
     if os.path.exists(sconscript):
         objs.extend(SConscript(sconscript))

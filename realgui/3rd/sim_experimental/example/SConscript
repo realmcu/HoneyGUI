@@ -8,6 +8,10 @@ cwd = GetCurrentDir()
 inc = [cwd]
 src = []
 
+if GetDepend(['CONFIG_REALTEK_BUILD_LITE3D']):
+    inc.append(os.path.abspath(os.path.join(cwd, '../../Lite3D/widget')))
+    src += ['Lite3D-port-sim.c']
+
 if GetDepend(['CONFIG_REALTEK_BUILD_H264']):
     src += ['H264-demo.c']
 
