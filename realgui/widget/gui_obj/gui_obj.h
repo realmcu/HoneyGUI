@@ -366,6 +366,8 @@ void gui_obj_start_timer(gui_obj_t *obj);
 
 void gui_obj_stop_timer(gui_obj_t *obj);
 
+void gui_obj_timer_handler(gui_obj_t *obj);
+
 
 #ifdef __cplusplus
 }

@@ -206,7 +206,6 @@ static void obj_draw_prepare(gui_obj_t *object)
             obj->obj_cb(obj, OBJ_PREPARE);
         }
 
-        extern void gui_obj_timer_handler(gui_obj_t *obj); // not called for application
         gui_obj_timer_handler(obj);
 
         if (obj->hidden)
@@ -647,6 +646,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     obj_reset_active(root);
 
     draw_prepare_start_time = gui_ms_get();
+    gui_obj_timer_handler(root);
     obj_draw_prepare(root);
     draw_prepare_end_time = gui_ms_get();
 
@@ -672,5 +672,3 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
 
 
 }
-
-
