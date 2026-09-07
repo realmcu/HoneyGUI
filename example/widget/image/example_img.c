@@ -60,7 +60,8 @@ void img_timer_cb(void *param)
 
     gui_img_rotation(img, angle++);
 
-    gui_log("Handler[img] timer cb, render time: %d ms!\n", gui_fb_render_time_ms());
+    gui_log("Handler[img] timer cb, [angle=%f]render time: %d ms!\n", (double)angle,
+            gui_fb_render_time_ms());
 }
 
 
