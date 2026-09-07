@@ -16,7 +16,14 @@ static bool fb_change = false;
 static bool fb_skip_clear = false;
 static uint32_t gui_obj_count;
 static uint32_t obj_count;
-static int frame_count_per_second;
+
+static uint32_t render_time_ms = 0 ;
+
+static uint32_t draw_fb_measure_start_time = 0;
+static uint32_t draw_fb_measure_end_time = 0;
+
+static uint32_t draw_prepare_start_time = 0;
+static uint32_t draw_prepare_end_time = 0;
 
 static gui_color_t fb_bg_color =
 {
@@ -487,7 +494,7 @@ static void gui_pfb_draw(gui_obj_t *root)
 
 static void gui_fb_draw(gui_obj_t *root)
 {
-    uint32_t measure_start_time = gui_ms_get();
+    draw_fb_measure_start_time = gui_ms_get();
     gui_dispdev_t *dc = gui_get_dc();
 
     if (dc->reset_lcd_timer != NULL)
@@ -590,17 +597,28 @@ static void gui_fb_draw(gui_obj_t *root)
         dc->lcd_update(dc);
     }
     post_process_end();
-    uint32_t measure_end_time = gui_ms_get();
+    draw_fb_measure_end_time = gui_ms_get();
+
+    render_time_ms = (draw_fb_measure_end_time - draw_fb_measure_start_time) +
+                     (draw_prepare_end_time - draw_prepare_start_time);
+
     if (dc->draw_fb_measure_enable == true)
     {
-        gui_log("[DEBUG LOG]fb draw time %d ms \n", measure_end_time - measure_start_time);
+        gui_log("[DEBUG LOG]fb draw time %d ms \n", draw_fb_measure_end_time - draw_fb_measure_start_time);
     }
 }
 
-uint32_t gui_fps()
+uint32_t gui_fb_fps(void)
 {
-    return frame_count_per_second;
+    return 1000 / render_time_ms;
 }
+
+
+uint32_t gui_fb_render_time_ms(void)
+{
+    return render_time_ms;
+}
+
 void gui_fb_change(void)
 {
     fb_change = true;
@@ -624,40 +642,16 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         return;
     }
 
-    uint32_t input_prepare_start_time = gui_ms_get();
     obj_input_prepare(root);
-    uint32_t input_prepare_end_time = gui_ms_get();
 
     obj_reset_active(root);
 
-    uint32_t draw_prepare_start_time = gui_ms_get();
+    draw_prepare_start_time = gui_ms_get();
     obj_draw_prepare(root);
-    uint32_t draw_prepare_end_time = gui_ms_get();
+    draw_prepare_end_time = gui_ms_get();
 
-    if ((dc->input_prepare_measure_enable == true) && (fb_change == true))
-    {
-        gui_log("[DEBUG LOG]input prepare time %d ms \n",
-                input_prepare_end_time - input_prepare_start_time);
-    }
-
-    if ((dc->draw_prepare_measure_enable == true) && (fb_change == true))
-    {
-        gui_log("[DEBUG LOG]draw prepare time %d ms \n", draw_prepare_end_time - draw_prepare_start_time);
-    }
-
-    static uint32_t one_second = 0;
-    uint32_t tick = gui_ms_get();
-    static int frame_count;
-    if (tick - one_second >= 1000)
-    {
-        one_second = tick;
-        frame_count_per_second = frame_count;
-        frame_count = 0;
-        // gui_log("fps:%d\r", frame_count_per_second);
-    }
     if (fb_change == true)
     {
-        frame_count++;
         gui_fb_draw(root);
         fb_change = false;
     }

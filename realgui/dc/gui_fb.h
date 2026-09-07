@@ -72,21 +72,28 @@ void gui_set_bg_color(gui_color_t color);
  */
 void gui_fb_skip_clear(bool skip);
 
-/**
- * @brief Get fps.
- *
- * @return fps
- */
-uint32_t gui_fps(void);
 
+/**
+ * @brief Get the theoretical FPS based on CPU render time.
+ *
+ * @return Theoretical render FPS.
+ */
+uint32_t gui_fb_fps(void);
+
+/**
+ * @brief Get the CPU render time of the latest frame.
+ *
+ * Tear-effect waiting, display synchronization and LCD update time are excluded.
+ *
+ * @return CPU render time in milliseconds.
+ */
+uint32_t gui_fb_render_time_ms(void);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
 
 
 

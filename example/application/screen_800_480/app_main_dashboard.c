@@ -96,7 +96,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 #if 0
 static void gui_fps_cb(void *p)
 {
-    int fps_num = gui_fps();
+    int fps_num = gui_fb_fps();
     gui_obj_t *fps_rect = GUI_BASE(p);
     sprintf(fps, "FPS:%d", fps_num);
     gui_obj_t *t_fps = gui_obj_get_handle((void *)fps_rect, "t_fps");
@@ -126,7 +126,7 @@ static void fps_create(void *parent)
                                                    70, 0,
                                                    APP_COLOR_GRAY_OPACITY(150));
     gui_obj_create_timer(GUI_BASE(fps_rect), 10, true, gui_fps_cb);
-    sprintf(fps, "FPS:%d", (int)gui_fps());
+    sprintf(fps, "FPS:%d", (int)gui_fb_fps());
     text = fps;
     gui_text_t *t_fps = gui_text_create(fps_rect, "t_fps", 10, 0, gui_get_screen_width(), font_size);
     gui_text_set(t_fps, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);

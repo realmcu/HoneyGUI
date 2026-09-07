@@ -107,7 +107,7 @@ static void fps_timer_cb(void *user_data)
     {
         return;
     }
-    uint32_t fps_num = gui_fps();
+    uint32_t fps_num = gui_fb_fps();
     snprintf(s_fps_buffer, sizeof(s_fps_buffer), "FPS:%d", (int)fps_num);
     gui_text_content_set(s_fps_text, s_fps_buffer, strlen(s_fps_buffer));
 }
@@ -231,7 +231,7 @@ static void effect_start(int index)
 
     /* FPS display at bottom center */
     s_fps_text = gui_text_create(s_effect_win, "fps_text", 0, s_screen_h - 24, 0, 24);
-    snprintf(s_fps_buffer, sizeof(s_fps_buffer), "FPS:%d", (int)gui_fps());
+    snprintf(s_fps_buffer, sizeof(s_fps_buffer), "FPS:%d", (int)gui_fb_fps());
     gui_text_set(s_fps_text, s_fps_buffer, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(s_fps_buffer), 24);
     gui_text_mode_set(s_fps_text, CENTER);
     gui_obj_create_timer((gui_obj_t *)s_fps_text, 500, true, fps_timer_cb);
