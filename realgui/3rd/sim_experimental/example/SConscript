@@ -18,7 +18,7 @@ if GetDepend(['CONFIG_REALTEK_BUILD_H264']):
 if GetDepend(['CONFIG_REALTEK_BUILD_TVG']):
     src += ['NanoVG-demo.c']
 
-if GetDepend(['CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D']):
+if GetDepend(['CONFIG_REALTEK_BUILD_REAL_EARTH_3D']):
     src += ['Lite3D-demo-Earth.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_REAL_FACE_3D']):

@@ -16,14 +16,16 @@
 #define MODEL_CANVAS_HEIGHT 480
 
 
+static float rot_angle = 5.0f;
+
 static void face_global_cb(l3_model_base_t *this)
 {
-    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 60), 1,
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 1), 1,
                              32767,
                              90,
                              this->viewPortWidth, this->viewPortHeight);
 
-    l3_world_initialize(&this->world, 0, 22, 60, 0, 0, 0, 5);
+    l3_world_initialize(&this->world, 0, 0, 37, 0, rot_angle, 0, 5);
 }
 
 static int lite3D_example(void)
@@ -33,7 +35,8 @@ static int lite3D_example(void)
     uint8_t *pixel = malloc(DRV_LCD_WIDTH * DRV_LCD_HEIGHT * sizeof(uint16_t));
     memset(pixel, 0x0, DRV_LCD_WIDTH * DRV_LCD_HEIGHT * sizeof(uint16_t));
 
-    l3_model_base_t *face_3d = l3_create_model((void *)(_acdesc_face), L3_DRAW_FRONT_AND_SORT, 0, 0,
+    l3_model_base_t *face_3d = l3_create_model((void *)_acdesc_face_v3,
+                                               L3_DRAW_FRONT_AND_SORT, 0, 0,
                                                MODEL_CANVAS_WIDTH, MODEL_CANVAS_HEIGHT);
     if (face_3d == NULL)
     {

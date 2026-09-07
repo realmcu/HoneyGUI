@@ -47,7 +47,10 @@ endchoice
 choice
     prompt "Lite3D Source Configuration"
     depends on REALTEK_BUILD_LITE3D
-    default REALTEK_BUILD_REAL_BUTTERFLY_3D
+    default REALTEK_BUILD_REAL_EARTH_3D
+
+config REALTEK_BUILD_REAL_EARTH_3D
+    bool "Earth 3D Demo"
 
 config REALTEK_BUILD_REAL_BUTTERFLY_3D
     bool "Butterfly 3D Demo"
