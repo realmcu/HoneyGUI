@@ -591,9 +591,9 @@ static void gui_fb_draw(gui_obj_t *root)
     }
     post_process_end();
     uint32_t measure_end_time = gui_ms_get();
-    if (dc->fb_measure_enable == true)
+    if (dc->draw_fb_measure_enable == true)
     {
-        gui_log("fb draw time %d ms", measure_end_time - measure_start_time);
+        gui_log("[DEBUG LOG]fb draw time %d ms \n", measure_end_time - measure_start_time);
     }
 }
 
@@ -624,11 +624,26 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         return;
     }
 
+    uint32_t input_prepare_start_time = gui_ms_get();
     obj_input_prepare(root);
+    uint32_t input_prepare_end_time = gui_ms_get();
+
     obj_reset_active(root);
 
+    uint32_t draw_prepare_start_time = gui_ms_get();
     obj_draw_prepare(root);
+    uint32_t draw_prepare_end_time = gui_ms_get();
 
+    if ((dc->input_prepare_measure_enable == true) && (fb_change == true))
+    {
+        gui_log("[DEBUG LOG]input prepare time %d ms \n",
+                input_prepare_end_time - input_prepare_start_time);
+    }
+
+    if ((dc->draw_prepare_measure_enable == true) && (fb_change == true))
+    {
+        gui_log("[DEBUG LOG]draw prepare time %d ms \n", draw_prepare_end_time - draw_prepare_start_time);
+    }
 
     static uint32_t one_second = 0;
     uint32_t tick = gui_ms_get();

@@ -77,7 +77,9 @@ typedef struct gui_dispdev
     void (*lcd_draw_sync)(void);
     uint8_t *lcd_gram;
     uint32_t frame_count;
-    bool fb_measure_enable;
+    bool input_prepare_measure_enable;
+    bool draw_prepare_measure_enable;
+    bool draw_fb_measure_enable;
     bool cache_need_clean;
 } gui_dispdev_t;
 /* gui_dispdev struct define end */
