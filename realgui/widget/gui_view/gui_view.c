@@ -289,12 +289,15 @@ static void gui_view_pressing_cb(void *obj, gui_event_t *e)
     // gui_log("g_release = %d\n", g_Release);
 }
 
-static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
+static void gui_view_on_event_prepare(gui_obj_t *obj, gui_event_t *e)
 {
     gui_view_t *next_view_rec = g_NextView;
     gui_view_on_event_t *on_event = e->user_data;
     g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
-    if (g_NextView != next_view_rec) {gui_view_hidden(next_view_rec);}
+    if (g_NextView != next_view_rec)
+    {
+        gui_view_hidden(next_view_rec);
+    }
     if (g_PreView && g_NextView != g_PreView)
     {
         gui_view_hidden(g_PreView);
@@ -303,6 +306,9 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
 
     g_NextView->current_transition_style = on_event->switch_in_style;
     g_CurrentView->current_transition_style = on_event->switch_out_style;
+    g_NextView->current_event_code = e->code;
+    g_CurrentView->current_event_code = e->code;
+
     if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR) // cover CurrentView
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
@@ -319,13 +325,19 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
         gui_obj_hidden(GUI_BASE(g_NextView), true);
     }
 
-    g_NextView->current_event_code = e->code;
-    g_CurrentView->current_event_code = e->code;
+
+    g_SnapShotCacheTime = gui_ms_get();
+    gui_view_create_snapshot(g_CurrentView);
+    gui_view_create_snapshot(g_NextView);
+}
+
+static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
+{
+    gui_view_on_event_prepare(obj, e);
 
     g_SurpressTP = false;
     g_TriggerMove = true;
     g_Offset = 0;
-    g_SnapShotCacheTime = gui_ms_get();
 
     switch (e->code)
     {
@@ -346,28 +358,13 @@ static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
         break;
     }
 
-    gui_view_create_snapshot(g_CurrentView);
-    gui_view_create_snapshot(g_NextView);
     // gui_log("gui_view_on_event_trigger_move_cb next view name = %s\n", g_NextView->base.name);
 }
 
 static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
 {
-    gui_view_hidden(g_NextView);
-    gui_view_on_event_t *on_event = e->user_data;
-    g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
-
-    g_NextView->current_transition_style = on_event->switch_in_style;
-    g_CurrentView->current_transition_style = on_event->switch_out_style;
-
-    g_NextView->current_event_code = e->code;
-    g_CurrentView->current_event_code = e->code;
-
-    if (g_PreView && g_NextView != g_PreView)
-    {
-        gui_view_hidden(g_PreView);
-        g_PreView = NULL;
-    }
+    gui_view_on_event_prepare(obj, e);
+    gui_obj_hidden(GUI_BASE(g_NextView), false);
 
     g_Release = g_CurrentView->animate_step; //prevent new view abnormal display of the first frame
     g_Target = obj->h;
@@ -376,29 +373,12 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
     g_SurpressTP = true;
     g_AutoMove = true;
     g_MoveStyle = false;
-    g_SnapShotCacheTime = gui_ms_get();
-
-    if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR ||
-        on_event->switch_in_style == SWITCH_IN_NONE_ANIMATION) // cover CurrentView
-    {
-        gui_view_adjust_list(GUI_BASE(g_NextView), obj);
-    }
-    else if (on_event->switch_in_style == SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE ||
-             on_event->switch_in_style == SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE)
-    {
-        gui_view_adjust_list(GUI_BASE(g_NextView), obj);
-        g_NextView->current_transition_style = SWITCH_INIT_STATE;
-        g_CurrentView->current_transition_style = on_event->switch_in_style;
-    }
 
     if (e->code == GUI_EVENT_INVALID &&
         g_NextView->current_transition_style >= SWITCH_OUT_NONE_ANIMATION)
     {
         g_NextView->base.x = gui_get_screen_width();
     }
-
-    gui_view_create_snapshot(g_CurrentView);
-    gui_view_create_snapshot(g_NextView);
 
     // gui_log("gui_view_on_event_cb\n");
 }
