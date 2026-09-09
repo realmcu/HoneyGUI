@@ -54,37 +54,27 @@
 - **许可证**: Apache-2.0
 - **版权**: Copyright (c) 2026, Realtek Semiconductor Corporation
 
-### 9. litegfx
-- **描述**: 轻量级图形库（基于 VGLite）
-- **作者**: Shanghai QDay Technology Co., Ltd. / LiteGFX Team
-- **用途**: 矢量图形渲染加速
-- **许可证**: 专有许可证 (Proprietary)
-- **版权**: 
-  - 核心库: Copyright (c) 2021-2023 Shanghai QDay Technology Co., Ltd.
-  - HoneyGUI 适配层: Copyright (c) 2026 Realtek Semiconductor Corporation
-- **说明**: 核心库为闭源，提供预编译库文件
-
-### 10. nanosvg
+### 9. nanosvg
 - **描述**: SVG 图像解析和光栅化库
 - **用途**: SVG 矢量图形解析和渲染
 - **许可证**: Zlib License
 - **来源**: https://github.com/memononen/nanosvg
 
-### 11. nanovg
+### 10. nanovg
 - **描述**: 矢量图形渲染库
 - **作者**: Mikko Mononen
 - **用途**: 2D 矢量图形渲染
 - **许可证**: Zlib License
 - **版权**: Copyright (c) 2013 Mikko Mononen
 
-### 12. particle
+### 11. particle
 - **描述**: 粒子系统引擎
 - **作者**: Realtek Semiconductor Corp.
 - **用途**: 粒子特效渲染和动画
 - **许可证**: Apache-2.0
 - **版权**: Copyright (c) 2026 Realtek Semiconductor Corp.
 
-### 13. stb
+### 12. stb
 - **描述**: STB 单头文件库集合
 - **作者**: Sean Barrett
 - **用途**: 图像加载、字体渲染等
@@ -92,7 +82,7 @@
 - **版权**: Copyright (c) 2017 Sean Barrett
 - **来源**: https://github.com/nothings/stb
 
-### 14. tinyobj
+### 13. tinyobj
 - **描述**: Wavefront OBJ 文件加载器
 - **作者**: Syoyo Fujita
 - **用途**: 加载 OBJ 3D 模型文件
@@ -100,7 +90,7 @@
 - **版权**: Copyright (c) 2016-2019 Syoyo Fujita
 - **来源**: https://github.com/syoyo/tinyobjloader
 
-### 15. tjpgd
+### 14. tjpgd
 - **描述**: 微型 JPEG 解码器
 - **作者**: ChaN
 - **用途**: JPEG 图像解码

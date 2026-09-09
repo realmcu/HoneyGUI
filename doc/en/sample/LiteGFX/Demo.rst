@@ -2,6 +2,13 @@
 LiteGFX
 ===========
 
+.. warning::
+
+   LiteGFX source code, wrapper, and prebuilt libraries have been removed
+   from HoneyGUI. The last revision that contains them is commit
+   ``80502f177531393a210821bb206a49a1bc48ee28``. This document is retained
+   for historical reference only.
+
 QuDai Introduction
 ----------------------
 

@@ -154,7 +154,7 @@ Event callbacks use: `void (*gui_event_cb_t)(void *obj, gui_event_t *e)`
 
 3D functionality is provided by Lite3D (in `realgui/3rd/Lite3D/`):
 - Supports glTF model loading via cgltf
-- Hardware acceleration via litegfx/vglite
+- Hardware acceleration via the NanoVG VGLite backend
 - Integration through `gui_lite3d` widget
 
 ### HML (HoneyGUI Markup Language) Low-Code Development
