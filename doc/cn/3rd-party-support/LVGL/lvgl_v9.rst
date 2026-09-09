@@ -297,71 +297,130 @@ LVGL 基准测试的官方文档位于 :file:`your lvgl dir\\lvgl\\demos\\README
 参考 Benchmark
 -----------------------------
 
-平台背景， 8773G 平台， 200MHz 主频， QSPI 410*502 屏幕， 96KB RAM 搭配 3MB PSRAM ，双 buffer 模式，推屏方式 direct 。
+测试配置
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-编译环境： armclang6.22 版本，优化方式 -Ofast 开启 LTO ； gcc 12.2 版本，优化方式 -Ofast。
+以下数据在 RTL87X3E 和 RTL87X3G 两个平台上实测得到，除 CPU 主频和 GPU 配置外，两者的测试配置完全相同。
 
-使用1000除以渲染时间（ms），可以得到当前场景下的极限帧率，单位为帧率/秒。
 
-.. csv-table:: Benchmark 不同加速方式测试结果
-   :header: 场景, SW 渲染时间(ms), SW+MVE+ARM2D 渲染时间(ms), SW+MVE+ARM2D+PPE 渲染时间(ms)
-   :widths: 60 50 50 50
+.. csv-table:: 测试配置
+   :header: 配置项, RTL87X3E, RTL87X3G
+   :widths: 60 50 50
    :align: center
 
-   Empty screen, 4, 4, 4
-   Moving wallpaper, 16, 16, 11
-   Single rectangle, 0, 0, 0
-   Multiple rectangles, 4, 4, 2
-   Multiple RGB images, 5, 5, 2
-   Multiple ARGB images, 10, 9, 2
-   Rotated ARGB images, 11, 12, 0
-   Multiple labels, 8, 9, 9
-   Screen sized text, 32, 31, 30
-   Multiple arcs, 6, 6, 5
-   Containers, 6, 6, 6
-   Containers with overlay, 27, 21, 24
-   Containers with opa, 9, 11, 7
-   Containers with opa_layer, 15, 11, 10
-   Containers with scrolling, 23, 20, 21
-   Widget demo, 31, 29, 30
-   All screen, 12, 11, 10
+   CPU 主频, 100 MHz, 200 MHz
+   PPE 版本, PPE2.0, PPE2.2
+   内存配置, 64 KB RAM + 3 MB PSRAM, 96 KB RAM + 3 MB PSRAM
+   屏幕分辨率, 410 x 502, 410 x 502
+   色深, 16-bit RGB565, 16-bit RGB565
+   屏幕接口, QSPI, QSPI
+   屏幕接口频率, 40 MHz, 40 MHz
+   Framebuffer 模式, Direct Rendering, Direct Rendering
+   Buffer 配置, Double Buffer, Double Buffer
+   LVGL 版本, 9.4.0, 9.4.0
 
+编译环境：
 
-.. csv-table:: Benchmark 不同编译环境测试结果
-  :header: 场景, 加速方式, ARMCLANG, GCC
-  :widths: 60 50 50 50
-  :align: center
+- RTL87X3E ： armclang 6.22 ，优化方式 -O2 并开启 LTO 。
+- RTL87X3G ： arm-zephyr-eabi-gcc 12.2.0 ，优化方式 -Ofast ，未开启 LTO 。
 
-   Empty screen, SW+MVE+PPE, 5, 5
-   Moving wallpaper, SW+MVE+PPE, 16, 16
-   Single rectangle, SW+MVE+PPE, 0, 0
-   Multiple rectangles, SW+MVE+PPE, 2, 4
-   Multiple RGB images, SW+MVE+PPE, 2, 5
-   Multiple ARGB images, SW+MVE+PPE, 3, 3
-   Rotated ARGB images, SW+MVE+PPE, 1, 0
-   Multiple labels, SW+MVE+PPE, 11, 13
-   Screen sized text, SW+MVE+PPE, 38, 37
-   Multiple arcs, SW+MVE+PPE, 6, 8
-   Containers, SW+MVE+PPE, 6, 6
-   Containers with overlay, SW+MVE+PPE, 24, 25
-   Containers with opa, SW+MVE+PPE, 6, 6
-   Containers with opa_layer, SW+MVE+PPE, 11, 10
-   Containers with scrolling, SW+MVE+PPE, 21, 22
-   Widget demo, SW+MVE+PPE, 30, 34
-   All screen, SW+MVE+PPE, 11, 12
+表格中各项指标的含义如下：
+
+- **实测帧率（Measured FPS）** ：该场景下实际测得的刷新帧率，单位为帧/秒。
+- **LVGL 任务占用率（LVGL Task Active Ratio）** ：测量期间，处于 ``lv_timer_handler()`` 调用过程中的累计时间占总时长的百分比，
+  可近似理解为 LVGL 任务的 CPU 占用率。由于该值按经过时间计算，可能包含 OS 抢占及 DMA/GPU 阻塞等待时间，
+  因此不等同于 OS 统计的任务或系统 CPU 利用率。
+- **渲染时间（Render Time）** ：该场景下完成一帧渲染所消耗的时间，单位为 ms 。
+
+RTL87X3E Benchmark 结果
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table:: RTL87X3E Benchmark 测试结果
+   :header: 场景, 实测帧率(FPS), LVGL 任务占用率, 渲染时间(ms)
+   :widths: 60 40 40 40
+   :align: center
+
+   Empty screen, 36, 88%, 3
+   Moving wallpaper, 39, 99%, 12
+   Single rectangle, 54, 72%, 0
+   Multiple rectangles, 53, 97%, 5
+   Multiple RGB images, 50, 68%, 4
+   Multiple ARGB images, 49, 88%, 12
+   Rotated ARGB images, 49, 59%, 5
+   Multiple labels, 38, 92%, 17
+   Screen-sized text, 16, 99%, 57
+   Multiple arcs, 50, 53%, 3
+   Containers, 48, 58%, 10
+   Containers with overlay, 30, 97%, 23
+   Containers with opacity, 43, 74%, 18
+   Containers with opacity layer, 37, 79%, 23
+   Containers with scrolling, 25, 98%, 37
+   Widgets demo, 11, 99%, 56
+   **平均值**, **39**, **82%**, **17**
+
+刷新周期可以按需调整，以便在视觉流畅度和 CPU 负载之间取得平衡，而平均渲染时间保持不变（ 17 ms ）。
+
+.. csv-table:: RTL87X3E 不同刷新档位测试结果
+   :header: 运行档位, 刷新周期, 实测平均帧率, LVGL 任务占用率
+   :widths: 50 40 40 40
+   :align: center
+
+   High Refresh, 16 ms, 39 FPS, 82%
+   Balanced, 22 ms, 30 FPS, 58%
+   Low Load, 33 ms, 22 FPS, 46%
+
+RTL87X3G Benchmark 结果
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table:: RTL87X3G Benchmark 测试结果
+   :header: 场景, 实测帧率(FPS), LVGL 任务占用率, 渲染时间(ms)
+   :widths: 60 40 40 40
+   :align: center
+
+   Empty screen, 55, 88%, 6
+   Moving wallpaper, 59, 98%, 10
+   Single rectangle, 58, 24%, 0
+   Multiple rectangles, 60, 89%, 5
+   Multiple RGB images, 58, 59%, 2
+   Multiple ARGB images, 56, 65%, 4
+   Rotated ARGB images, 58, 38%, 3
+   Multiple labels, 56, 84%, 11
+   Screen-sized text, 29, 99%, 32
+   Multiple arcs, 59, 85%, 2
+   Containers, 58, 43%, 5
+   Containers with overlay, 35, 89%, 24
+   Containers with opacity, 58, 44%, 7
+   Containers with opacity layer, 56, 48%, 11
+   Containers with scrolling, 38, 98%, 23
+   Widgets demo, 19, 99%, 34
+   **平均值**, **50**, **71%**, **11**
+
+刷新周期可以按需调整，以便在视觉流畅度和 CPU 负载之间取得平衡，而平均渲染时间保持不变（ 11 ms ）。
+
+.. csv-table:: RTL87X3G 不同刷新档位测试结果
+   :header: 运行档位, 刷新周期, 实测平均帧率, LVGL 任务占用率
+   :widths: 50 40 40 40
+   :align: center
+
+   High Refresh, 16 ms, 50 FPS, 71%
+   Balanced, 22 ms, 39 FPS, 52%
+   Low Load, 33 ms, 28 FPS, 39%
+
+不同平台渲染加速
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. csv-table:: 不同平台渲染加速
   :header: 芯片型号, 处理器主频, 硬件加速器, 填充, 边框, 阴影, 字符, 标签, 图像, 图层, 线条, 圆弧, 三角形, 矩形蒙版, 矢量, 3D
   :align: center
 
-  RTL8772G, 125MHz, PPE1.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
-  RTL8773E, 100MHz, PPE2.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
-  RTL8773G, 200MHz, PPE2.2, HW, HW, HW, SW, HW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL87X2G, 125MHz, PPE1.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL87X3E, 100MHz, PPE2.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL87X3G, 200MHz, PPE2.2, HW, HW, HW, SW, HW, HW, HW, SW, SW, SW, SW, SW, SW
 
 
 .. note::
   1. 涉及 LVGL Mask 的效果均需要 SW 处理
-  2. RTL8772G 支持 Helium 硬件加速器
+  2. RTL87X2G 和 RTL87X3G 支持 Helium 硬件加速器
 
 
 从 Demo 入门开发

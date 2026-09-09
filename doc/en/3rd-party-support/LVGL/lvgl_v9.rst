@@ -294,71 +294,129 @@ The official documentation for LVGL benchmarking can be found at :file:`your lvg
 Benchmark Reference
 -----------------------------
 
-Platform background: 8773G platform, 200MHz main frequency, QSPI410*502 screen, 96KB RAM with 3M PSRAM, dual buffer mode, direct screen push mode.
+Test Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Compilation environment: armclang6.22 version, optimization mode -Ofast to enable LTO; gcc 12.2 version, optimization mode -Ofast.
+The following results were measured on the RTL87X3E and RTL87X3G platforms. Except for the CPU frequency and GPU configuration, both platforms used the same test configuration.
 
-Divide 1000 by the rendering time (ms) to obtain the maximum frame rate in the current scene, measured in frames per second.
-
-.. csv-table:: Benchmark Test Results with Different Acceleration Methods
-   :header: Scenario, SW Rendering Time, SW+MVE+ARM2D Rendering Time, SW+MVE+ARM2D+PPE Rendering Time
-   :widths: 60 50 50 50
+.. csv-table:: Test Configuration
+   :header: Configuration, RTL87X3E, RTL87X3G
+   :widths: 60 50 50
    :align: center
 
-   Empty screen, 4, 4, 4
-   Moving wallpaper, 16, 16, 11
-   Single rectangle, 0, 0, 0
-   Multiple rectangles, 4, 4, 2
-   Multiple RGB images, 5, 5, 2
-   Multiple ARGB images, 10, 9, 2
-   Rotated ARGB images, 11, 12, 0
-   Multiple labels, 8, 9, 9
-   Screen sized text, 32, 31, 30
-   Multiple arcs, 6, 6, 5
-   Containers, 6, 6, 6
-   Containers with overlay, 27, 21, 24
-   Containers with opa, 9, 11, 7
-   Containers with opa_layer, 15, 11, 10
-   Containers with scrolling, 23, 20, 21
-   Widget demo, 31, 29, 30
-   All screen, 12, 11, 10
+   CPU Frequency, 100 MHz, 200 MHz
+   PPE Version, PPE2.0, PPE2.2
+   Memory Configuration, 64 KB RAM + 3 MB PSRAM, 96 KB RAM + 3 MB PSRAM
+   Display Resolution, 410 x 502, 410 x 502
+   Color Depth, 16-bit RGB565, 16-bit RGB565
+   Display Interface, QSPI, QSPI
+   Display Interface Frequency, 40 MHz, 40 MHz
+   Framebuffer Mode, Direct Rendering, Direct Rendering
+   Buffer Configuration, Double Buffer, Double Buffer
+   LVGL Version, 9.4.0, 9.4.0
 
+Compilation environments:
 
-.. csv-table:: Benchmark Test Results in Different Compilation Environments
-  :header: Scenario, Acceleration Method, ARMCLANG, GCC
-  :widths: 60 50 50 50
-  :align: center
+- RTL87X3E: armclang 6.22 with -O2 optimization and LTO enabled.
+- RTL87X3G: arm-zephyr-eabi-gcc 12.2.0 with -Ofast optimization and LTO disabled.
 
-   Empty screen, SW+MVE+PPE, 5, 5
-   Moving wallpaper, SW+MVE+PPE, 16, 16
-   Single rectangle, SW+MVE+PPE, 0, 0
-   Multiple rectangles, SW+MVE+PPE, 2, 4
-   Multiple RGB images, SW+MVE+PPE, 2, 5
-   Multiple ARGB images, SW+MVE+PPE, 3, 3
-   Rotated ARGB images, SW+MVE+PPE, 1, 0
-   Multiple labels, SW+MVE+PPE, 11, 13
-   Screen sized text, SW+MVE+PPE, 38, 37
-   Multiple arcs, SW+MVE+PPE, 6, 8
-   Containers, SW+MVE+PPE, 6, 6
-   Containers with overlay, SW+MVE+PPE, 24, 25
-   Containers with opa, SW+MVE+PPE, 6, 6
-   Containers with opa_layer, SW+MVE+PPE, 11, 10
-   Containers with scrolling, SW+MVE+PPE, 21, 22
-   Widget demo, SW+MVE+PPE, 30, 34
-   All screen, SW+MVE+PPE, 11, 12
+The metrics in the following tables are defined as follows:
+
+- **Measured FPS**: The actual refresh frame rate measured in the scenario, in frames per second.
+- **LVGL Task Active Ratio**: The percentage of the total measurement duration spent inside calls to ``lv_timer_handler()``.
+  It can be regarded as an approximation of the LVGL task's CPU utilization. Because it is calculated using elapsed time,
+  it may include OS preemption and time blocked waiting for DMA or the GPU. It therefore differs from task or system CPU utilization reported by the OS.
+- **Render Time**: The time required to render one frame in the scenario, in ms.
+
+RTL87X3E Benchmark Results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table:: RTL87X3E Benchmark Results
+   :header: Scenario, Measured FPS, LVGL Task Active Ratio, Render Time (ms)
+   :widths: 60 40 40 40
+   :align: center
+
+   Empty screen, 36, 88%, 3
+   Moving wallpaper, 39, 99%, 12
+   Single rectangle, 54, 72%, 0
+   Multiple rectangles, 53, 97%, 5
+   Multiple RGB images, 50, 68%, 4
+   Multiple ARGB images, 49, 88%, 12
+   Rotated ARGB images, 49, 59%, 5
+   Multiple labels, 38, 92%, 17
+   Screen-sized text, 16, 99%, 57
+   Multiple arcs, 50, 53%, 3
+   Containers, 48, 58%, 10
+   Containers with overlay, 30, 97%, 23
+   Containers with opacity, 43, 74%, 18
+   Containers with opacity layer, 37, 79%, 23
+   Containers with scrolling, 25, 98%, 37
+   Widgets demo, 11, 99%, 56
+   **Average**, **39**, **82%**, **17**
+
+The refresh period can be adjusted as needed to balance visual smoothness and CPU load, while the average render time remains unchanged at 17 ms.
+
+.. csv-table:: RTL87X3E Refresh Profile Results
+   :header: Operating Profile, Refresh Period, Measured Average FPS, LVGL Task Active Ratio
+   :widths: 50 40 40 40
+   :align: center
+
+   High Refresh, 16 ms, 39 FPS, 82%
+   Balanced, 22 ms, 30 FPS, 58%
+   Low Load, 33 ms, 22 FPS, 46%
+
+RTL87X3G Benchmark Results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table:: RTL87X3G Benchmark Results
+   :header: Scenario, Measured FPS, LVGL Task Active Ratio, Render Time (ms)
+   :widths: 60 40 40 40
+   :align: center
+
+   Empty screen, 55, 88%, 6
+   Moving wallpaper, 59, 98%, 10
+   Single rectangle, 58, 24%, 0
+   Multiple rectangles, 60, 89%, 5
+   Multiple RGB images, 58, 59%, 2
+   Multiple ARGB images, 56, 65%, 4
+   Rotated ARGB images, 58, 38%, 3
+   Multiple labels, 56, 84%, 11
+   Screen-sized text, 29, 99%, 32
+   Multiple arcs, 59, 85%, 2
+   Containers, 58, 43%, 5
+   Containers with overlay, 35, 89%, 24
+   Containers with opacity, 58, 44%, 7
+   Containers with opacity layer, 56, 48%, 11
+   Containers with scrolling, 38, 98%, 23
+   Widgets demo, 19, 99%, 34
+   **Average**, **50**, **71%**, **11**
+
+The refresh period can be adjusted as needed to balance visual smoothness and CPU load, while the average render time remains unchanged at 11 ms.
+
+.. csv-table:: RTL87X3G Refresh Profile Results
+   :header: Operating Profile, Refresh Period, Measured Average FPS, LVGL Task Active Ratio
+   :widths: 50 40 40 40
+   :align: center
+
+   High Refresh, 16 ms, 50 FPS, 71%
+   Balanced, 22 ms, 39 FPS, 52%
+   Low Load, 33 ms, 28 FPS, 39%
+
+Rendering Acceleration on Different Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. csv-table:: Rendering Acceleration on Different Platforms
   :header: Chip Model, Processor Frequency, Hardware Accelerator, Fill, Border, Shadow, Letter, Label, Image, Layer, Line, Arc, Triangle, Rectangle Mask, Vector, 3D
   :align: center
 
-  RTL8772G, 125MHz, PPE1.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
-  RTL8773E, 100MHz, PPE2.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
-  RTL8773G, 200MHz, PPE2.2, HW, SW, HW, HW, HW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL87X2G, 125MHz, PPE1.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL87X3E, 100MHz, PPE2.0, HW, SW, SW, SW, SW, HW, HW, SW, SW, SW, SW, SW, SW
+  RTL87X3G, 200MHz, PPE2.2, HW, HW, HW, SW, HW, HW, HW, SW, SW, SW, SW, SW, SW
 
 
 .. note::
-  1. Effects involving LVGL Mask require SW processing
-  2. RTL8772G supports Helium hardware accelerator
+  1. Effects involving LVGL Mask require SW processing.
+  2. RTL87X2G and RTL87X3G support the Helium hardware accelerator.
 
 
 Getting Started with Demo Development
