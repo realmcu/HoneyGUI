@@ -5,7 +5,7 @@
 #
 
 cmake_minimum_required(VERSION 3.10)
-if(1)
+if(CONFIG_REALTEK_GUI_WIDGET_GEOMETRY)
     option(GUI_CIRCLE_ENABLE_A8 "Use A8 masks for solid circle geometry" ON)
     option(GUI_RECT_ENABLE_A8 "Use A8 masks for solid rectangle geometry" ON)
     option(GUI_ARC_ENABLE_INK_BOUNDS "Crop arc buffers to their actual ink bounds" ON)
