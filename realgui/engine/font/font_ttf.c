@@ -97,6 +97,16 @@ typedef struct
  * narrow/sparse outlines such as small ASCII. Benchmark the target workload. */
 #define FONT_TTF_SCANLINE_PREFIX_XOR 1
 
+/* Rasterize a few output rows at a time instead of retaining the whole
+ * supersampled bitmap. The band height is derived from raster_prec, so one
+ * output row always spans raster_prec source rows. */
+#define FONT_TTF_BAND_OUTPUT_ROWS 8
+
+/* Band only above these bounds. The supersampled bitmap is raster_prec^2 / 8
+ * times the output size, so below them it is already no larger than the output
+ * and the repeated per-band edge scans cost more than the bytes they save. */
+#define FONT_TTF_BAND_MIN_RASTER_PREC 4
+#define FONT_TTF_BAND_MIN_RENDER_H 128
 
 /*============================================================================*
  *                            Variables
@@ -432,20 +442,12 @@ static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uin
         return;
     }
 
-    uint32_t size = width * height;
-    uint8_t *temp_buf = gui_malloc(size);
-    if (temp_buf == NULL)
-    {
-        return;
-    }
-
     /* First pass: horizontal dilation */
 #if defined(FONT_TTF_USE_MVE) && FONT_TTF_MVE_EMBOLDEN
     int padded_width = width + bold_weight * 2;
     uint8_t *padded_buf = gui_malloc(padded_width);
     if (padded_buf == NULL)
     {
-        gui_free(temp_buf);
         return;
     }
 
@@ -489,7 +491,6 @@ static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uin
     uint8_t *padded_buf = gui_malloc(padded_width);
     if (padded_buf == NULL)
     {
-        gui_free(temp_buf);
         return;
     }
 
@@ -519,6 +520,14 @@ static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uin
     /* Second pass: vertical dilation (only for BOLD_FULL) */
     if (bold_mode == BOLD_FULL)
     {
+        /* Only this pass needs a copy of the bitmap, and it is as large as the
+         * bitmap itself, so keep the allocation out of the horizontal-only path. */
+        uint32_t size = width * height;
+        uint8_t *temp_buf = gui_malloc(size);
+        if (temp_buf == NULL)
+        {
+            return;
+        }
         memcpy(temp_buf, bitmap, size);
 
         for (int x = 0; x < width; x++)
@@ -544,9 +553,9 @@ static void font_ttf_bitmap_embolden(uint8_t *bitmap, int width, int height, uin
                 bitmap[y * width + x] = max_val;
             }
         }
-    }
 
-    gui_free(temp_buf);
+        gui_free(temp_buf);
+    }
 }
 
 
@@ -2786,7 +2795,6 @@ ttf_rasterize:
             break;
         }
 
-
         uint32_t line_list_size = line_count * sizeof(LINE_T);
         LINE_T *line_list = gui_malloc(line_list_size);
         GUI_ASSERT(line_list != NULL);
@@ -2817,82 +2825,123 @@ ttf_rasterize:
         //             i,line_list[i].x0,line_list[i].y0,line_list[i].y1,line_list[i].dxy);
         // }
 
-
-        uint32_t render_size = render_w * render_h / 8;
-        uint32_t *img = gui_malloc(render_size);
-        GUI_ASSERT(img != NULL);
-        memset(img, 0, render_size);
+        /* Retain only one band of supersample scanlines instead of the whole
+         * render_h bitmap. Both heights are multiples of raster_prec, so a band
+         * always covers whole output rows; glyphs not worth banding use one band. */
+        const int use_band = raster_prec >= FONT_TTF_BAND_MIN_RASTER_PREC &&
+                             render_h >= FONT_TTF_BAND_MIN_RENDER_H;
+        const int band_render_h = use_band ? FONT_TTF_BAND_OUTPUT_ROWS * raster_prec : render_h;
+        const uint32_t band_row_bytes = line_word * sizeof(uint32_t);
+        uint32_t band_size = band_row_bytes * band_render_h;
+        uint32_t *band_buf = gui_malloc(band_size);
+        GUI_ASSERT(band_buf != NULL);
 
         uint32_t out_size = out_w * out_h;
         uint8_t *img_out = gui_malloc(out_size);
         GUI_ASSERT(img_out != NULL);
 
-        /* Even-odd fill: mark crossings, then propagate parity across each row.
-         * Hoist edge values because -fno-strict-aliasing blocks compiler hoisting. */
+        /* Even-odd fill, one band at a time: mark crossings, propagate parity per
+         * row, then downsample into img_out. Rows are independent, so banding
+         * cannot change the result. Edge values are hoisted for -fno-strict-aliasing. */
+        for (int band_y0 = 0; band_y0 < render_h; band_y0 += band_render_h)
+        {
+            int band_y1 = band_y0 + band_render_h;
+
+            if (band_y1 > render_h)
+            {
+                band_y1 = render_h;
+            }
+
+            const int band_h = band_y1 - band_y0;
+
+            memset(band_buf, 0, band_row_bytes * band_h);
+
 #if FONT_TTF_SCANLINE_PREFIX_XOR
-        for (int i = 0; i < lint_count_actual; i++)
-        {
-            const float x0 = line_list[i].x0;
-            const float dxy = line_list[i].dxy;
-            const int y_end = line_list[i].y1;
-            uint32_t *row = img + (uint32_t)line_list[i].y0 * line_word;
-
-            for (int y = line_list[i].y0; y < y_end; y++, row += line_word)
+            for (int i = 0; i < lint_count_actual; i++)
             {
-                uint32_t xint = (uint32_t)(x0 + dxy * y);
+                const int edge_y0 = line_list[i].y0;
+                const int edge_y1 = line_list[i].y1;
 
-                row[xint / FONT_TTF_BLOCK_BIT] ^=
-                    0x80000000u >> (xint % FONT_TTF_BLOCK_BIT);
-            }
-        }
-
-        uint32_t *prefix_row = img;
-
-        for (int y = 0; y < render_h; y++, prefix_row += line_word)
-        {
-            uint32_t carry = 0;
-
-            for (uint32_t li = 0; li < line_word; li++)
-            {
-                uint32_t w = prefix_row[li];
-
-                w ^= w >> 1;
-                w ^= w >> 2;
-                w ^= w >> 4;
-                w ^= w >> 8;
-                w ^= w >> 16;
-                w ^= carry;
-                prefix_row[li] = w;
-                carry = 0u - (w & 1u);
-            }
-        }
-#else
-        /* XOR each crossing to the row end. Choose this branch when sparse,
-         * narrow outlines outperform the fixed per-row prefix pass. */
-        for (int i = 0; i < lint_count_actual; i++)
-        {
-            const float x0 = line_list[i].x0;
-            const float dxy = line_list[i].dxy;
-            const int y_end = line_list[i].y1;
-            uint32_t *row = img + (uint32_t)line_list[i].y0 * line_word;
-
-            for (int y = line_list[i].y0; y < y_end; y++, row += line_word)
-            {
-                uint32_t xint = (uint32_t)(x0 + dxy * y);
-                uint32_t word = xint / FONT_TTF_BLOCK_BIT;
-
-                row[word] ^= 0xFFFFFFFFu >> (xint % FONT_TTF_BLOCK_BIT);
-                for (uint32_t li = word + 1; li < line_word; li++)
+                if (edge_y1 <= band_y0 || edge_y0 >= band_y1)
                 {
-                    row[li] = ~row[li];
+                    continue;
+                }
+
+                const float x0 = line_list[i].x0;
+                const float dxy = line_list[i].dxy;
+                const int y_start = edge_y0 > band_y0 ? edge_y0 : band_y0;
+                const int y_end = edge_y1 < band_y1 ? edge_y1 : band_y1;
+                uint32_t *row = band_buf + (uint32_t)(y_start - band_y0) * line_word;
+
+                /* y stays in global render coordinates -- only the store address
+                 * is band-local. Using a band-local y here would skew the edge. */
+                for (int y = y_start; y < y_end; y++, row += line_word)
+                {
+                    uint32_t xint = (uint32_t)(x0 + dxy * y);
+                    row[xint / FONT_TTF_BLOCK_BIT] ^=
+                        0x80000000u >> (xint % FONT_TTF_BLOCK_BIT);
                 }
             }
-        }
-#endif
-        makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h, line_word, block_bit);
 
-        /* Apply bold effect before anti-aliasing adjustment. This is included in
-         * downsample because the current benchmark uses bold_weight == 0. */
+            uint32_t *prefix_row = band_buf;
+
+            for (int y = 0; y < band_h; y++, prefix_row += line_word)
+            {
+                uint32_t carry = 0;
+
+                for (uint32_t li = 0; li < line_word; li++)
+                {
+                    uint32_t w = prefix_row[li];
+
+                    w ^= w >> 1;
+                    w ^= w >> 2;
+                    w ^= w >> 4;
+                    w ^= w >> 8;
+                    w ^= w >> 16;
+                    w ^= carry;
+                    prefix_row[li] = w;
+                    carry = 0u - (w & 1u);
+                }
+            }
+#else
+            /* XOR each crossing to the row end. Choose this branch when sparse,
+             * narrow outlines outperform the fixed per-row prefix pass. */
+            for (int i = 0; i < lint_count_actual; i++)
+            {
+                const int edge_y0 = line_list[i].y0;
+                const int edge_y1 = line_list[i].y1;
+
+                if (edge_y1 <= band_y0 || edge_y0 >= band_y1)
+                {
+                    continue;
+                }
+
+                const float x0 = line_list[i].x0;
+                const float dxy = line_list[i].dxy;
+                const int y_start = edge_y0 > band_y0 ? edge_y0 : band_y0;
+                const int y_end = edge_y1 < band_y1 ? edge_y1 : band_y1;
+                uint32_t *row = band_buf + (uint32_t)(y_start - band_y0) * line_word;
+
+                for (int y = y_start; y < y_end; y++, row += line_word)
+                {
+                    uint32_t xint = (uint32_t)(x0 + dxy * y);
+                    uint32_t word = xint / FONT_TTF_BLOCK_BIT;
+                    row[word] ^= 0xFFFFFFFFu >> (xint % FONT_TTF_BLOCK_BIT);
+                    for (uint32_t li = word + 1; li < line_word; li++)
+                    {
+                        row[li] = ~row[li];
+                    }
+                }
+            }
+#endif
+            makeImageBuffer(img_out + (uint32_t)(band_y0 / raster_prec) * out_w, band_buf,
+                            raster_prec, out_w, band_h / raster_prec, render_w, band_h,
+                            line_word, block_bit);
+        }
+
+        /* Apply bold effect before anti-aliasing adjustment. It stays outside the
+         * band loop because BOLD_FULL dilates vertically across +/- bold_weight
+         * rows, which a single band cannot see. */
         if (bold_weight > 0)
         {
             font_ttf_bitmap_embolden(img_out, out_w, out_h, bold_weight, text->bold_mode);
@@ -2900,12 +2949,11 @@ ttf_rasterize:
 
         adjustImageBufferPrecision(img_out, out_size, raster_prec);
 
-
         font_ttf_draw_bitmap_classic(text, img_out, rect, mx0, my0, out_w, out_h);
 
         gui_free(windingsf);
         gui_free(line_list);
-        gui_free(img);
+        gui_free(band_buf);
 
         if ((tm_type == FONT_IDENTITY || tm_type == FONT_TRANSFORM) && text->font_cache_enable)
         {
