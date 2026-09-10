@@ -4,6 +4,6 @@
 #ifndef HGCONFIG_H__
 #define HGCONFIG_H__
 
-#define CONFIG_REALTEK_BUILD_NONE 1
+#define CONFIG_REALTEK_BUILD_OPENGL 1
 
 #endif /* HGCONFIG_H__ */

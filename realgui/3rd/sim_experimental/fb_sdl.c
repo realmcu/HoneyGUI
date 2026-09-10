@@ -17,6 +17,7 @@ static SDL_Texture *texture = NULL;
 static SDL_Surface *surface = NULL;
 static pthread_mutex_t sdl_ok_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t sdl_ok_event = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t surface_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int sim_screen_width = DRV_LCD_WIDTH;
 int sim_screen_height = DRV_LCD_HEIGHT;
@@ -35,6 +36,7 @@ int32_t sim_get_height(void) { return sim_screen_height; }
 void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t height,
                                     const uint8_t *bitmap)
 {
+    pthread_mutex_lock(&surface_mutex);
 #if (DRV_PIXEL_BITS == 32)
     uint32_t *src = (uint32_t *)bitmap;
     uint32_t *dst = (uint32_t *)surface->pixels;
@@ -49,6 +51,7 @@ void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t
             dst[i * sim_screen_width + j] = *src++;
         }
     }
+    pthread_mutex_unlock(&surface_mutex);
 }
 
 static void *rtk_gui_sdl(void *arg)
@@ -126,7 +129,9 @@ static void *rtk_gui_sdl(void *arg)
             }
         }
 
+        pthread_mutex_lock(&surface_mutex);
         SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
+        pthread_mutex_unlock(&surface_mutex);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
         usleep(16000);

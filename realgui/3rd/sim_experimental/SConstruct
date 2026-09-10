@@ -84,6 +84,8 @@ if sys.platform == 'win32':
         'shell32', 'dinput8', 'opengl32', 'glfw3', 'm'
     ])
 else:
-    env.Append(LIBS=['SDL2', 'glfw', 'GL', 'GLU', 'X11', 'Xext', 'pthread', 'm', 'dl'])
+    env.Append(LIBS=['SDL2', 'pthread', 'm', 'dl'])
+    if GetDepend(['CONFIG_REALTEK_BUILD_OPENGL']):
+        env.Append(LIBS=['EGL', 'GLESv2'])
 
 DoBuilding(TARGET, objs)
