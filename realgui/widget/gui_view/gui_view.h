@@ -298,6 +298,12 @@ void gui_view_enable_precache_snapshot(bool enable);
  */
 void gui_view_set_bg_color(gui_view_t *_this, gui_color_t color);
 
+/**
+ * @brief Enable trigger move region, only influence GUI_EVENT_TOUCH_MOVE_* event. Valid region is 20% of screen's width/height.
+ * @param enable True to enable, False to disable. Default is false.
+ */
+void gui_view_enable_trigger_move_region(bool enable);
+
 #ifdef __cplusplus
 }
 #endif

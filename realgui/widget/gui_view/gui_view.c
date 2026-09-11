@@ -21,7 +21,8 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define SNAPSHOT_CACHE_INTERVAL 4000 //ms
+#define SNAPSHOT_CACHE_INTERVAL             4000 //ms
+#define TRIGGER_MOVE_REGION_RATION          0.2f
 
 /*============================================================================*
  *                            Variables
@@ -37,6 +38,7 @@ static int16_t g_Target = 0;
 
 static bool g_TriggerMove = false; // whether trigger move event
 static int16_t g_Offset = 0; // offset of the g_Release
+static bool g_TriggerMoveRegion = false;
 
 static bool g_SwitchDone = false;
 static bool g_AutoMove = false; // whether auto moveMove
@@ -333,6 +335,23 @@ static void gui_view_on_event_prepare(gui_obj_t *obj, gui_event_t *e)
 
 static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
 {
+    if (g_TriggerMoveRegion)
+    {
+        touch_info_t *tp = tp_get_info();
+        int16_t region_x0 = obj->w * TRIGGER_MOVE_REGION_RATION;
+        int16_t region_x1 = obj->w * (1 - TRIGGER_MOVE_REGION_RATION);
+        int16_t region_y0 = obj->h * TRIGGER_MOVE_REGION_RATION;
+        int16_t region_y1 = obj->h * (1 - TRIGGER_MOVE_REGION_RATION);
+        /* Allow trigger move region event only when touch point is in the region. */
+        if ((e->code == GUI_EVENT_TOUCH_MOVE_LEFT && tp->x < region_x1) ||
+            (e->code == GUI_EVENT_TOUCH_MOVE_RIGHT && tp->x > region_x0) ||
+            (e->code == GUI_EVENT_TOUCH_MOVE_UP && tp->y < region_y1) ||
+            (e->code == GUI_EVENT_TOUCH_MOVE_DOWN && tp->y > region_y0))
+        {
+            return;
+        }
+    }
+
     gui_view_on_event_prepare(obj, e);
 
     g_SurpressTP = false;
@@ -946,4 +965,9 @@ void gui_view_set_bg_color(gui_view_t *_this, gui_color_t color)
     {
         gui_set_bg_color(color);
     }
+}
+
+void gui_view_enable_trigger_move_region(bool enable)
+{
+    g_TriggerMoveRegion = enable;
 }
