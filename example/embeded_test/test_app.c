@@ -7,6 +7,7 @@
 #include "gui_components_init.h"
 #include "gui_fb.h"
 #include "gui_obj.h"
+#include "gui_server.h"
 #include "test_cases.h"
 
 typedef uint32_t (*test_case_func_t)(void);
@@ -15,6 +16,15 @@ static const test_case_func_t test_cases[] =
 {
     test_case_00,
     test_case_01,
+    test_case_02,
+    test_case_03,
+    test_case_04,
+    test_case_05,
+    test_case_06,
+    test_case_07,
+    test_case_08,
+    test_case_09,
+    test_case_10,
 };
 
 static uint32_t test_case_index = 0;
@@ -61,7 +71,19 @@ void test_app_timer_cb(void *param)
 
 static int test_init(void)
 {
-    gui_obj_create_timer(gui_obj_get_root(), 1000, true, test_app_timer_cb);
+    /* The GUI server sleeps the frame loop after keep_active_time (5 s by
+     * default) without touch/key input, which stops the root timer and stalls
+     * the run part way through. */
+    gui_set_keep_active_time(0xFFFFFFFF);
+
+    /* Splits the number gui_fb_render_time_ms() reports.  gui_fb_draw() then
+     * logs its own half ("fb draw time"), which is blit + QSPI flush, so
+     * render_time - fb_draw_time is the prepare half, i.e. the one-off software
+     * rasterisation of the shape buffers.  Also unlocks 4 one-shot
+     * "[geom dirty]" lines showing the dirty-region count per frame. */
+    // gui_get_dc()->draw_fb_measure_enable = true;
+
+    gui_obj_create_timer(gui_obj_get_root(), 200, true, test_app_timer_cb);
     gui_obj_start_timer(gui_obj_get_root());
 
     return 0;

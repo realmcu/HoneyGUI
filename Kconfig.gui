@@ -213,6 +213,11 @@ config REALTEK_BUILD_GUI_466_466_DEMO
 
 config REALTEK_BUILD_EMBEDED_TEST
     bool "GUI Embedded Test"
+    select REALTEK_BUILD_LITE3D
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    select REALTEK_GUI_WIDGET_LIST
+    select REALTEK_GUI_WIDGET_LITE3D
+    select REALTEK_GUI_WIDGET_VIDEO
     help
       HoneyGUI embedded test
 

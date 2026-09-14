@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 if(CONFIG_REALTEK_GUI_WIDGET_GEOMETRY)
     option(GUI_CIRCLE_ENABLE_A8 "Use A8 masks for solid circle geometry" ON)
     option(GUI_RECT_ENABLE_A8 "Use A8 masks for solid rectangle geometry" ON)
@@ -12,37 +12,23 @@ if(CONFIG_REALTEK_GUI_WIDGET_GEOMETRY)
     option(GUI_SHAPE_CACHE_ENABLE "Share identical geometry pixel payloads" ON)
     option(GUI_SHAPE_CACHE_USE_LOWER_HEAP "Store geometry cache nodes in lower memory" OFF)
 
-    if(GUI_CIRCLE_ENABLE_A8)
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_CIRCLE_ENABLE_A8=1)
-    else()
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_CIRCLE_ENABLE_A8=0)
-    endif()
+    foreach(geometry_option
+            GUI_CIRCLE_ENABLE_A8
+            GUI_RECT_ENABLE_A8
+            GUI_ARC_ENABLE_INK_BOUNDS
+            GUI_SHAPE_CACHE_ENABLE
+            GUI_SHAPE_CACHE_USE_LOWER_HEAP)
+        if(NOT "${${geometry_option}}" STREQUAL "")
+            if(${${geometry_option}})
+                target_compile_definitions(${GUI_TARGET_NAME} PRIVATE ${geometry_option}=1)
+            else()
+                target_compile_definitions(${GUI_TARGET_NAME} PRIVATE ${geometry_option}=0)
+            endif()
+            message(STATUS "gui_geometry: ${geometry_option} overridden to ${${geometry_option}}")
+        endif()
+    endforeach()
 
-    if(GUI_RECT_ENABLE_A8)
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_RECT_ENABLE_A8=1)
-    else()
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_RECT_ENABLE_A8=0)
-    endif()
-
-    if(GUI_ARC_ENABLE_INK_BOUNDS)
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_ARC_ENABLE_INK_BOUNDS=1)
-    else()
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_ARC_ENABLE_INK_BOUNDS=0)
-    endif()
-
-    if(GUI_SHAPE_CACHE_ENABLE)
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_SHAPE_CACHE_ENABLE=1)
-    else()
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_SHAPE_CACHE_ENABLE=0)
-    endif()
-
-    if(GUI_SHAPE_CACHE_USE_LOWER_HEAP)
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_SHAPE_CACHE_USE_LOWER_HEAP=1)
-    else()
-        target_compile_definitions(${GUI_TARGET_NAME} PRIVATE GUI_SHAPE_CACHE_USE_LOWER_HEAP=0)
-    endif()
-
-    file(GLOB SOURCES "*.c" "*.cpp")
+    file(GLOB SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 
     if(SOURCES)

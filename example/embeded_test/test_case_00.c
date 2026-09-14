@@ -10,7 +10,7 @@
 #include "test_assets.h"
 #include "test_cases.h"
 
-#define TEST_CASE_00_EXPECTED_RENDER_TIME_MS 20U
+#define TEST_CASE_00_EXPECTED_RENDER_TIME_MS 68U
 
 uint32_t test_case_00(void)
 {

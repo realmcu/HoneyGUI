@@ -134,6 +134,7 @@ void gui_obj_child_free(gui_obj_t *object)
 {
     gui_obj_tree_child_free(object);
     gui_list_init(&object->child_list);
+    gui_request_full_refresh();
 }
 
 

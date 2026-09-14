@@ -8,10 +8,34 @@ cwd = GetCurrentDir()
 inc = [cwd]
 src = Glob('*.c') + Glob('*.cpp')
 
+def font_bin_to_c_include(target, source, env):
+    with open(str(source[0]), 'rb') as input_file:
+        font_data = bytearray(input_file.read())
+
+    with open(str(target[0]), 'w') as output_file:
+        for offset in range(0, len(font_data), 16):
+            output_file.write(', '.join('0x%02x' % value
+                                        for value in font_data[offset:offset + 16]))
+            output_file.write(',\n')
+
+    return 0
+
 if GetDepend(['CONFIG_REALTEK_BUILD_EMBEDED_TEST']):
     CPPDEFINES = ['DRV_LCD_WIDTH=410']
     CPPDEFINES += ['DRV_LCD_HEIGHT=502']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
+
+    font_assets = [
+        Env.Command(os.path.join(cwd, 'test_font_noto_bitmap.inc'),
+                    os.path.join(cwd, '../assets/font/v3/NotoSans_Regular_size32_bits4_bitmap.bin'),
+                    font_bin_to_c_include),
+        Env.Command(os.path.join(cwd, 'test_font_noto_vector.inc'),
+                    os.path.join(cwd, '../assets/font/v3/NotoSans_Regular_vector.bin'),
+                    font_bin_to_c_include),
+    ]
+    Env.Depends(os.path.join(cwd, 'test_font_assets.o'), font_assets)
+    Env.Clean(os.path.join(cwd, 'test_font_assets.o'), font_assets)
+
     objs = DefineGroup('example/widget', src, depend = [''], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
     list = os.listdir(cwd)
     for d in list:
