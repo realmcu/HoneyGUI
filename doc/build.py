@@ -176,7 +176,7 @@ for l, p in en_cn_build:
   # BUILD PDF
   if not skip_latex:
     # Silly workaround to include the more or less correct PDF download link in the PDF
-    #cmd("cp -f " + lang +"/latex/RTKIOT GUI.pdf RTKIOT GUI.pdf | true")
+    #cmd("cp -f " + lang +"/latex/HoneyGUI.pdf HoneyGUI.pdf | true")
     os.chdir(l_doc_path)
     latex_out_path = os.path.join(doc_path, output_path, latex_out)
     if os.path.exists(latex_out_path):
@@ -185,9 +185,9 @@ for l, p in en_cn_build:
     cmd("pipenv run sphinx-build -b latex . {}".format(latex_out_path))
 
     # Generate PDF
-    cmd("cd {} && latexmk -xelatex 'RTKIOT GUI.tex'".format(latex_out_path))
+    cmd("cd {} && latexmk -xelatex 'HoneyGUI.tex'".format(latex_out_path))
     # Copy the result PDF to the main directory to make it available for the HTML build
-    cmd("cd {} && cp -f 'RTKIOT GUI.pdf' '../../{}/RTKIOT GUI.pdf'".format(latex_out_path, p))
+    cmd("cd {} && cp -f 'HoneyGUI.pdf' '../../{}/HoneyGUI.pdf'".format(latex_out_path, p))
   else:
     print("skipping latex build as requested")
 
@@ -265,4 +265,3 @@ if archive:
   doc_zip_name = "doc-{}".format(os.environ['BRANCH_NAME'].replace("/", "-"))
   shutil.make_archive(base_name=doc_zip_name, format='zip', root_dir=os.path.join(doc_path, html_out))
   print(f"doc zip name: {doc_zip_name}")
-

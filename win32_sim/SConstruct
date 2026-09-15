@@ -59,7 +59,7 @@ print("CFLAGS:", env['CFLAGS'])
 print("CXXFLAGS:", env['CXXFLAGS'])
 print("LINKFLAGS:", env['LINKFLAGS'])
 print('TOOL ROOT =', TOOL_ROOT)
-print('RTK GUI ENGINE ROOT =', RTK_GUI_ENGINE)
+print('HoneyGUI ENGINE ROOT =', RTK_GUI_ENGINE)
 
 def compile_resource(rc_file, output_file):
     windres = env.WhereIs(env['WINDRES']) or env['WINDRES']

@@ -58,8 +58,8 @@ html_context = {
     "chat_aibase": "RS_gui",
 }
 
-project = 'RTKIOT GUI'
-author = 'RTKIOT GUI'
+project = 'HoneyGUI'
+author = 'HoneyGUI'
 release = 'v0.0.0.1'
 
 ai_ask_split_exclude_patterns = [
@@ -213,8 +213,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'RTKIOT GUI.tex', 'RTKIOT GUI Documentation',
-     'RTKIOT GUI community', 'manual'),
+    (master_doc, 'HoneyGUI.tex', 'HoneyGUI Documentation',
+     'HoneyGUI community', 'manual'),
 ]
 
 
@@ -223,7 +223,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'RTKIOT GUI', 'RTKIOT GUI Documentation',
+    (master_doc, 'HoneyGUI', 'HoneyGUI Documentation',
      [author], 1)
 ]
 
@@ -234,8 +234,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'RTKIOT GUI', 'RTKIOT GUI Documentation',
-     author, 'Contributors of RTKIOT GUI', 'One line description of project.',
+    (master_doc, 'HoneyGUI', 'HoneyGUI Documentation',
+     author, 'Contributors of HoneyGUI', 'One line description of project.',
      'Miscellaneous'),
 ]
 

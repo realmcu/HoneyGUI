@@ -143,7 +143,7 @@ void *sdl_driver_thread(void *arg)
     }
 
     char str[50];
-    sprintf(str, "RTKIOT GUI Simulator %u x %u", simulator_width, simulator_height);
+    sprintf(str, "HoneyGUI Simulator %u x %u", simulator_width, simulator_height);
 
     int win_w = canvas_mode ? canvas_width : (int)simulator_width;
     int win_h = canvas_mode ? canvas_height : (int)simulator_height;
