@@ -2132,10 +2132,10 @@ static int gui_video_src_init(gui_video_t  *this)
 
     return res;
 }
-static void gui_video_input_prepare(gui_obj_t *obj)
+static void gui_video_input_process(gui_obj_t *obj)
 {
     (void)obj;
-    // gui_log("gui_video_input_prepare \n");
+    // gui_log("gui_video_input_process \n");
 }
 
 static void gui_video_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -2144,17 +2144,17 @@ static void gui_video_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
-            gui_video_input_prepare(obj);
+        case OBJ_INPUT_PROCESS:
+            gui_video_input_process(obj);
             break;
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_video_prepare(obj);
             break;
 
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_video_draw(obj);
             break;
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_video_draw_end(obj);
             break;
 
@@ -2227,10 +2227,10 @@ static void gui_img_video_ctor(gui_video_t  *this,
     gui_obj_ctor(root, parent, name, x, y, w, h);
     root->type = IMAGE_FROM_MEM;
     root->obj_cb = gui_video_cb;
-    root->has_input_prepare_cb = true;
-    root->has_prepare_cb = true;
-    root->has_draw_cb = true;
-    root->has_end_cb = true;
+    root->has_input_process_cb = true;
+    root->has_pre_process_cb = true;
+    root->has_process_cb = true;
+    root->has_post_process_cb = true;
     root->has_destroy_cb = true;
 
     //for self

@@ -535,15 +535,15 @@ static void gui_scroll_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_scroll_text_prepare(obj);
             break;
 
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_scroll_text_draw(obj);
             break;
 
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_scroll_text_end(obj);
             break;
 
@@ -575,9 +575,9 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *_this,
     //for root class
     root->type = SCROLLTEXTBOX;
     root->obj_cb = gui_scroll_text_cb;
-    root->has_prepare_cb = true;
-    root->has_draw_cb = true;
-    root->has_end_cb = true;
+    root->has_pre_process_cb = true;
+    root->has_process_cb = true;
+    root->has_post_process_cb = true;
     root->has_destroy_cb = true;
 
     _this->init_time_ms = gui_ms_get();

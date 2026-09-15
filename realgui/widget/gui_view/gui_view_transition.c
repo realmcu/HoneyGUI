@@ -424,7 +424,7 @@ static void gui_view_blur(gui_view_t *this, int16_t release)
         }
         this = current_view;
     }
-    this->base.need_preprocess = true;
+    this->base.extension_process_enabled = true;
     gui_rect_t new_rect = {.x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2};
     prepare_blur_param(this, new_rect, blur_ratio, dir);
 }

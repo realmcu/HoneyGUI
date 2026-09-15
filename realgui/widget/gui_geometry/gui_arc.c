@@ -73,7 +73,7 @@ static void render_arc_to_buffer(gui_arc_t *this);
 static bool is_arc_dirty(gui_arc_t *this);
 
 /** Touch input preparation - simplified version like round_rect */
-static void gui_arc_input_prepare(gui_obj_t *obj)
+static void gui_arc_input_process(gui_obj_t *obj)
 {
     // Arc widget uses the bounding box for touch detection
     // The event is already enabled in prepare phase
@@ -291,18 +291,18 @@ static void gui_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
-            gui_arc_input_prepare(obj);
+        case OBJ_INPUT_PROCESS:
+            gui_arc_input_process(obj);
             break;
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_arc_prepare((gui_arc_t *)obj);
             break;
 
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_arc_draw((gui_arc_t *)obj);
             break;
 
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_arc_end((gui_arc_t *)obj);
             break;
 
@@ -586,10 +586,10 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
 
     gui_obj_ctor((gui_obj_t *)arc, parent, name, box_x, box_y, box_size, box_size);
     GET_BASE(arc)->obj_cb = gui_arc_cb;
-    GET_BASE(arc)->has_input_prepare_cb = true;
-    GET_BASE(arc)->has_prepare_cb = true;
-    GET_BASE(arc)->has_draw_cb = true;
-    GET_BASE(arc)->has_end_cb = true;
+    GET_BASE(arc)->has_input_process_cb = true;
+    GET_BASE(arc)->has_pre_process_cb = true;
+    GET_BASE(arc)->has_process_cb = true;
+    GET_BASE(arc)->has_post_process_cb = true;
     GET_BASE(arc)->has_destroy_cb = true;
 
     gui_list_init(&(GET_BASE(arc)->child_list));
@@ -733,7 +733,7 @@ void gui_arc_set_angular_gradient(gui_arc_t *arc, float start_angle, float end_a
 
     // REMOVED: Auto-compensation for full circle gradient
     // The draw_arc_df_aa_gradient function now handles full circles efficiently
-    // without needing the +1° trick for end caps
+    // without needing the +1 degree trick for end caps
 
     // Initialize angular gradient
     gradient_init(arc->gradient, GRADIENT_ANGULAR);

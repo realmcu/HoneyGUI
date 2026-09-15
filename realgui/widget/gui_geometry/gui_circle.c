@@ -308,7 +308,7 @@ static bool is_point_in_circle(gui_circle_t *circle, int x, int y)
     return (distance_sq <= radius_sq);
 }
 
-static void gui_circle_input_prepare(gui_obj_t *obj)
+static void gui_circle_input_process(gui_obj_t *obj)
 {
     gui_circle_t *this = (gui_circle_t *)obj;
     touch_info_t *tp = tp_get_info();
@@ -1676,16 +1676,16 @@ static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
-            gui_circle_input_prepare(obj);
+        case OBJ_INPUT_PROCESS:
+            gui_circle_input_process(obj);
             break;
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_circle_prepare(obj);
             break;
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_circle_draw(obj);
             break;
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_circle_end((gui_circle_t *)obj);
             break;
         case OBJ_DESTROY:
@@ -1724,10 +1724,10 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->opacity_value = UINT8_MAX;
     gui_obj_ctor((gui_obj_t *)circle, parent, name, x - radius, y - radius, radius * 2, radius * 2);
     GET_BASE(circle)->obj_cb = gui_circle_cb;
-    GET_BASE(circle)->has_input_prepare_cb = true;
-    GET_BASE(circle)->has_prepare_cb = true;
-    GET_BASE(circle)->has_draw_cb = true;
-    GET_BASE(circle)->has_end_cb = true;
+    GET_BASE(circle)->has_input_process_cb = true;
+    GET_BASE(circle)->has_pre_process_cb = true;
+    GET_BASE(circle)->has_process_cb = true;
+    GET_BASE(circle)->has_post_process_cb = true;
     GET_BASE(circle)->has_destroy_cb = true;
 
     gui_list_init(&(GET_BASE(circle)->child_list));

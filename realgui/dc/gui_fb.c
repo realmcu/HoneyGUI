@@ -149,7 +149,7 @@ static bool obj_is_active(gui_obj_t *obj)
     return false;
 }
 
-static void obj_input_prepare(gui_obj_t *object)
+static void obj_input_process(gui_obj_t *object)
 {
     GUI_ASSERT(object->name != NULL);
     gui_node_list_t *node = NULL;
@@ -167,15 +167,15 @@ static void obj_input_prepare(gui_obj_t *object)
             memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
         }
         matrix_translate(obj->x, obj->y, obj->matrix);
-        if (obj->has_input_prepare_cb)
+        if (obj->has_input_process_cb)
         {
-            obj->obj_cb(obj, OBJ_INPUT_PREPARE);
+            obj->obj_cb(obj, OBJ_INPUT_PROCESS);
         }
         if (obj_is_active(obj) == false)
         {
             continue;
         }
-        obj_input_prepare(obj);
+        obj_input_process(obj);
     }
 }
 
@@ -201,9 +201,9 @@ static void obj_draw_prepare(gui_obj_t *object)
         }
         matrix_translate(obj->x, obj->y, obj->matrix);
 
-        if (obj->has_prepare_cb)
+        if (obj->has_pre_process_cb)
         {
-            obj->obj_cb(obj, OBJ_PREPARE);
+            obj->obj_cb(obj, OBJ_PRE_PROCESS);
         }
 
         gui_obj_timer_handler(obj);
@@ -233,18 +233,18 @@ static void obj_draw_scan(gui_obj_t *obj)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->active)
         {
-            if (obj->has_draw_cb)
+            if (obj->has_process_cb)
             {
-                obj->obj_cb(obj, OBJ_DRAW);
+                obj->obj_cb(obj, OBJ_PROCESS);
             }
         }
         else
         {
             continue;
         }
-        if (obj->need_preprocess)
+        if (obj->extension_process_enabled)
         {
-            obj->obj_cb(obj, OBJ_PREPROCESS);
+            obj->obj_cb(obj, OBJ_EXTENSION_PROCESS);
         }
         obj_draw_scan(obj);
     }
@@ -258,9 +258,9 @@ static void obj_draw_end(gui_obj_t *obj)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         obj_count++;
-        if (obj->has_end_cb)
+        if (obj->has_post_process_cb)
         {
-            obj->obj_cb(obj, OBJ_END);
+            obj->obj_cb(obj, OBJ_POST_PROCESS);
         }
 
         matrix_identity(obj->matrix);
@@ -641,7 +641,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         return;
     }
 
-    obj_input_prepare(root);
+    obj_input_process(root);
 
     obj_reset_active(root);
 

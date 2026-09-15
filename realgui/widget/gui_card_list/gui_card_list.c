@@ -38,7 +38,7 @@
 /*============================================================================*
  *                           Forward Declarations
  *============================================================================*/
-static void gui_card_list_input_prepare(gui_obj_t *obj);
+static void gui_card_list_input_process(gui_obj_t *obj);
 static void gui_card_list_prepare(gui_obj_t *obj);
 static void gui_card_list_destroy(gui_obj_t *obj);
 static void gui_card_list_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
@@ -94,7 +94,7 @@ static void card_slot_init(gui_card_list_t *cl, int idx)
 
     gui_list_init(&s->base.child_list);
     s->base.obj_cb            = gui_card_slot_cb;
-    s->base.has_prepare_cb    = true;
+    s->base.has_pre_process_cb    = true;
     s->base.type              = CARD_LIST_SLOT;
     s->base.create_done       = true;
     s->virtual_id             = CARD_LIST_SLOT_FREE_ID;
@@ -425,7 +425,7 @@ static void card_list_sort_zorder(gui_card_list_t *cl)
  *                      card_list - Lifecycle Callbacks
  *============================================================================*/
 
-static void gui_card_list_input_prepare(gui_obj_t *obj)
+static void gui_card_list_input_process(gui_obj_t *obj)
 {
     gui_card_list_t *cl = (gui_card_list_t *)obj;
 
@@ -517,8 +517,8 @@ static void gui_card_list_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     if (!obj) { return; }
     switch (cb_type)
     {
-    case OBJ_INPUT_PREPARE: gui_card_list_input_prepare(obj); break;
-    case OBJ_PREPARE:       gui_card_list_prepare(obj);       break;
+    case OBJ_INPUT_PROCESS: gui_card_list_input_process(obj); break;
+    case OBJ_PRE_PROCESS:   gui_card_list_prepare(obj);       break;
     case OBJ_DESTROY:       gui_card_list_destroy(obj);       break;
     default:                                                   break;
     }
@@ -529,7 +529,7 @@ static void gui_card_list_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
  *============================================================================*/
 
 /**
- * @brief Apply the 3-D perspective transform for this slot in OBJ_PREPARE.
+ * @brief Apply the 3-D perspective transform for this slot in OBJ_PRE_PROCESS.
  *
  * By the time this is called, obj->matrix already holds:
  *   parent_chain_transforms * T(slot->base.x, slot->base.y)
@@ -659,7 +659,7 @@ static void gui_card_slot_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     if (!obj) { return; }
     switch (cb_type)
     {
-    case OBJ_PREPARE: gui_card_slot_prepare(obj); break;
+    case OBJ_PRE_PROCESS: gui_card_slot_prepare(obj); break;
     default:                                       break;
     }
 }
@@ -729,8 +729,8 @@ gui_card_list_t *gui_card_list_create(void       *parent,
     cl->design_param  = param;
 
     GET_BASE(cl)->obj_cb          = gui_card_list_cb;
-    GET_BASE(cl)->has_input_prepare_cb = true;
-    GET_BASE(cl)->has_prepare_cb  = true;
+    GET_BASE(cl)->has_input_process_cb = true;
+    GET_BASE(cl)->has_pre_process_cb  = true;
     GET_BASE(cl)->has_destroy_cb  = true;
     GET_BASE(cl)->type            = CARD_LIST;
     GET_BASE(cl)->create_done     = true;

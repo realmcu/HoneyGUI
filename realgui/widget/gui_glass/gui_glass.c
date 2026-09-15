@@ -631,19 +631,19 @@ static void gui_glass_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             {
                 gui_glass_prepare(obj);
             }
             break;
 
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             {
                 gui_glass_draw_cb(obj);
             }
             break;
 
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             {
                 gui_glass_end(obj);
             }
@@ -696,10 +696,10 @@ static void gui_glass_ctor(gui_glass_t            *_this,
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
     obj->obj_cb = gui_glass_cb;
-    obj->has_input_prepare_cb = false;
-    obj->has_prepare_cb = true;
-    obj->has_draw_cb = true;
-    obj->has_end_cb = true;
+    obj->has_input_process_cb = false;
+    obj->has_pre_process_cb = true;
+    obj->has_process_cb = true;
+    obj->has_post_process_cb = true;
     obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
     _this->history_x = obj->x;

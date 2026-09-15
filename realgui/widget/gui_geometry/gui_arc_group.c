@@ -132,7 +132,7 @@ static void calculate_arc_bbox(float cx, float cy, float radius, float line_widt
     }
 }
 
-static void gui_arc_group_input_prepare(gui_obj_t *obj)
+static void gui_arc_group_input_process(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
 }
@@ -360,16 +360,16 @@ static void gui_arc_group_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
-            gui_arc_group_input_prepare(obj);
+        case OBJ_INPUT_PROCESS:
+            gui_arc_group_input_process(obj);
             break;
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_arc_group_prepare((gui_arc_group_t *)obj);
             break;
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_arc_group_draw((gui_arc_group_t *)obj);
             break;
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_arc_group_end((gui_arc_group_t *)obj);
             break;
         case OBJ_DESTROY:
@@ -400,10 +400,10 @@ gui_arc_group_t *gui_arc_group_create(void *parent, const char *name,
 
     gui_obj_ctor((gui_obj_t *)group, parent, name, x, y, w, h);
     GET_BASE(group)->obj_cb = gui_arc_group_cb;
-    GET_BASE(group)->has_input_prepare_cb = true;
-    GET_BASE(group)->has_prepare_cb = true;
-    GET_BASE(group)->has_draw_cb = true;
-    GET_BASE(group)->has_end_cb = true;
+    GET_BASE(group)->has_input_process_cb = true;
+    GET_BASE(group)->has_pre_process_cb = true;
+    GET_BASE(group)->has_process_cb = true;
+    GET_BASE(group)->has_post_process_cb = true;
     GET_BASE(group)->has_destroy_cb = true;
 
     gui_list_init(&(GET_BASE(group)->child_list));

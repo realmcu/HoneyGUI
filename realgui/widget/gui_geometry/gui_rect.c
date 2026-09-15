@@ -1917,13 +1917,13 @@ static void gui_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_rect_prepare(obj);
             break;
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_rect_draw(obj);
             break;
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_rect_end(obj);
             break;
         case OBJ_DESTROY:
@@ -1962,10 +1962,10 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
     round_rect->opacity_value = UINT8_MAX;
     gui_obj_ctor((gui_obj_t *)round_rect, parent, name, x, y, w, h);
     GET_BASE(round_rect)->obj_cb = gui_rect_cb;
-    GET_BASE(round_rect)->has_input_prepare_cb = true;
-    GET_BASE(round_rect)->has_prepare_cb = true;
-    GET_BASE(round_rect)->has_draw_cb = true;
-    GET_BASE(round_rect)->has_end_cb = true;
+    GET_BASE(round_rect)->has_input_process_cb = true;
+    GET_BASE(round_rect)->has_pre_process_cb = true;
+    GET_BASE(round_rect)->has_process_cb = true;
+    GET_BASE(round_rect)->has_post_process_cb = true;
     GET_BASE(round_rect)->has_destroy_cb = true;
 
     gui_list_init(&(GET_BASE(round_rect)->child_list));

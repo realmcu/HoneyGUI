@@ -74,11 +74,11 @@ static void gui_lite3d_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_lite3d_prepare(obj);
             break;
 
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_lite3d_draw(obj);
             break;
 
@@ -107,9 +107,9 @@ static void gui_lite3d_ctor(gui_lite3d_t  *this,
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
     obj->obj_cb = gui_lite3d_cb;
-    obj->has_prepare_cb = true;
-    obj->has_draw_cb = true;
-    obj->has_end_cb = false;
+    obj->has_pre_process_cb = true;
+    obj->has_process_cb = true;
+    obj->has_post_process_cb = false;
     obj->has_destroy_cb = true;
 }
 

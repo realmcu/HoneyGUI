@@ -316,9 +316,9 @@ static void stream_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
     switch (cb_type)
     {
-    case OBJ_PREPARE: stream_prepare(obj); break;
-    case OBJ_DRAW:    stream_draw(obj);    break;
-    case OBJ_DESTROY: stream_destroy(obj); break;
+    case OBJ_PRE_PROCESS: stream_prepare(obj); break;
+    case OBJ_PROCESS:     stream_draw(obj);    break;
+    case OBJ_DESTROY:     stream_destroy(obj); break;
     default: break;
     }
 }
@@ -339,8 +339,8 @@ static gui_stream_t *stream_ctor(gui_obj_t *parent, const char *name,
     gui_obj_ctor(root, parent, name, x, y, w, h);
     root->type           = IMAGE_FROM_MEM;
     root->obj_cb         = stream_cb;
-    root->has_prepare_cb = true;
-    root->has_draw_cb    = true;
+    root->has_pre_process_cb = true;
+    root->has_process_cb    = true;
     root->has_destroy_cb = true;
 
     this->src             = src;

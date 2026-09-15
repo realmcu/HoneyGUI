@@ -625,7 +625,7 @@ static void gui_view_end(gui_obj_t *obj)
     {
         g_SurpressEvent = false;
     }
-    if (obj->need_preprocess)
+    if (obj->extension_process_enabled)
     {
         post_process_event *blur_param = (post_process_event *)_this->blur_param;
         if (blur_param != NULL)
@@ -644,7 +644,7 @@ static void gui_view_end(gui_obj_t *obj)
             _this->blur_param = NULL;
         }
     }
-    obj->need_preprocess = false;
+    obj->extension_process_enabled = false;
 }
 
 static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -653,22 +653,22 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             {
                 gui_view_prepare(obj);
             }
             break;
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             {
                 gui_view_draw(obj);
             }
             break;
-        case OBJ_PREPROCESS:
+        case OBJ_EXTENSION_PROCESS:
             {
                 gui_view_preprocess(obj);
             }
             break;
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             {
                 gui_view_end(obj);
             }
@@ -752,10 +752,10 @@ gui_view_t *gui_view_create(void       *parent,
     gui_obj_ctor(&_this->base, parent, descriptor->name, x, y, w, h);
 
     GET_BASE(_this)->obj_cb = gui_view_cb;
-    GET_BASE(_this)->has_input_prepare_cb = true;
-    GET_BASE(_this)->has_prepare_cb = true;
-    GET_BASE(_this)->has_draw_cb = true;
-    GET_BASE(_this)->has_end_cb = true;
+    GET_BASE(_this)->has_input_process_cb = true;
+    GET_BASE(_this)->has_pre_process_cb = true;
+    GET_BASE(_this)->has_process_cb = true;
+    GET_BASE(_this)->has_post_process_cb = true;
     GET_BASE(_this)->has_destroy_cb  = true;
     GET_BASE(_this)->type = VIEW;
     GET_BASE(_this)->create_done = true;

@@ -189,7 +189,7 @@ static void gui_menu_cellular_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             {
                 gui_menu_cellular_prepare(obj);
             }
@@ -219,7 +219,7 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
     gui_obj_ctor(&this->base, parent, "cellular", 0, 0, dc->screen_width, dc->screen_height);
 
     GET_BASE(this)->obj_cb = gui_menu_cellular_cb;
-    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_pre_process_cb = true;
     GET_BASE(this)->type = MENU_CELLULAR;
 
     gui_list_init(&(GET_BASE(this)->child_list));

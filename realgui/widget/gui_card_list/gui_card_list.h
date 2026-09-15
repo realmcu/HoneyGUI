@@ -33,7 +33,8 @@ extern "C" {
  * Each slot is a fixed object whose children are created / destroyed each
  * time the slot is assigned to a new card_id.  Slots are always parented to
  * the card_list and sit at position (0, 0).  All visual placement (scale,
- * rotation, translation) is encoded in the slot's matrix inside OBJ_PREPARE.
+ * rotation, translation) is encoded in the slot's matrix inside
+ * OBJ_PRE_PROCESS.
  */
 typedef struct gui_card_slot
 {

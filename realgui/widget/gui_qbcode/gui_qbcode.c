@@ -237,19 +237,19 @@ static void gui_qbcode_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             {
                 gui_qbcode_prepare(obj);
             }
             break;
 
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             {
                 gui_qbcode_draw(obj);
             }
             break;
 
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             {
                 gui_qbcode_end(obj);
             }
@@ -278,9 +278,9 @@ void gui_qbcode_ctor(gui_qbcode_t *this, gui_obj_t *parent, const char *name, in
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = QRCODE;
     root->obj_cb = gui_qbcode_cb;
-    root->has_prepare_cb = true;
-    root->has_draw_cb = true;
-    root->has_end_cb = true;
+    root->has_pre_process_cb = true;
+    root->has_process_cb = true;
+    root->has_post_process_cb = true;
     root->has_destroy_cb = true;
 
     //for qrcodeself

@@ -932,10 +932,10 @@ static void ltv_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
     switch (cb_type)
     {
-    case OBJ_PREPARE:  ltv_prepare(obj);  break;
-    case OBJ_DRAW:     ltv_draw(obj);     break;
-    case OBJ_END:      ltv_draw_end(obj); break;
-    case OBJ_DESTROY:  ltv_destroy(obj);  break;
+    case OBJ_PRE_PROCESS:  ltv_prepare(obj);  break;
+    case OBJ_PROCESS:      ltv_draw(obj);     break;
+    case OBJ_POST_PROCESS: ltv_draw_end(obj); break;
+    case OBJ_DESTROY:      ltv_destroy(obj);  break;
     default: break;
     }
 }
@@ -961,9 +961,9 @@ static gui_lite_video_t *ltv_ctor(gui_obj_t   *parent,
     gui_obj_ctor(root, parent, name, x, y, w, h);
     root->type           = IMAGE_FROM_MEM;
     root->obj_cb         = ltv_cb;
-    root->has_prepare_cb = true;
-    root->has_draw_cb    = true;
-    root->has_end_cb     = true;
+    root->has_pre_process_cb = true;
+    root->has_process_cb    = true;
+    root->has_post_process_cb     = true;
     root->has_destroy_cb = true;
 
     this->data         = addr;

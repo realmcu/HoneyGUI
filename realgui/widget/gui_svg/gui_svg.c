@@ -177,13 +177,13 @@ static void gui_svg_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
     switch (cb_type)
     {
-    case OBJ_PREPARE:
+    case OBJ_PRE_PROCESS:
         gui_svg_prepare(obj);
         break;
-    case OBJ_DRAW:
+    case OBJ_PROCESS:
         gui_svg_draw(obj);
         break;
-    case OBJ_END:
+    case OBJ_POST_PROCESS:
         gui_svg_end(obj);
         break;
     case OBJ_DESTROY:
@@ -205,9 +205,9 @@ static void gui_svg_ctor(gui_svg_t  *_this,
     gui_obj_ctor(&_this->base, parent, name, x, y, w, h);
     GET_BASE(_this)->type = IMAGE;
     GET_BASE(_this)->obj_cb = gui_svg_cb;
-    GET_BASE(_this)->has_prepare_cb = true;
-    GET_BASE(_this)->has_draw_cb = true;
-    GET_BASE(_this)->has_end_cb = true;
+    GET_BASE(_this)->has_pre_process_cb = true;
+    GET_BASE(_this)->has_process_cb = true;
+    GET_BASE(_this)->has_post_process_cb = true;
     GET_BASE(_this)->has_destroy_cb = true;
 
     _this->scale = 1.0f;

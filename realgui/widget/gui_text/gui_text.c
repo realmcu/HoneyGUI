@@ -276,7 +276,7 @@ static void gui_text_resize_rect(gui_text_t *text, gui_text_rect_t *rect)
     }
 }
 
-static void gui_text_input_prepare(gui_obj_t *obj)
+static void gui_text_input_process(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_text_t *this = (gui_text_t *)obj;
@@ -442,18 +442,18 @@ static void gui_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
-            gui_text_input_prepare(obj);
+        case OBJ_INPUT_PROCESS:
+            gui_text_input_process(obj);
             break;
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_text_prepare(obj);
             break;
 
-        case OBJ_DRAW:
+        case OBJ_PROCESS:
             gui_text_draw(obj);
             break;
 
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_text_end(obj);
             break;
 
@@ -482,10 +482,10 @@ void gui_text_ctor(gui_text_t *this,
 
     root->type = TEXTBOX;
     root->obj_cb = gui_text_cb;
-    root->has_input_prepare_cb = true;
-    root->has_prepare_cb = true;
-    root->has_draw_cb = true;
-    root->has_end_cb = true;
+    root->has_input_process_cb = true;
+    root->has_pre_process_cb = true;
+    root->has_process_cb = true;
+    root->has_post_process_cb = true;
     root->has_destroy_cb = true;
     //for self
     this->mode = LEFT;

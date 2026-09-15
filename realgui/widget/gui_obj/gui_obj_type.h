@@ -104,14 +104,16 @@ typedef enum t_obj_type
     CARD_LIST,
     CARD_LIST_SLOT,
 } T_OBJ_TYPE;
+
+/* Listed in execution order. Explicit values preserve the existing ABI. */
 typedef enum
 {
-    OBJ_INPUT_PREPARE,
-    OBJ_PREPARE,
-    OBJ_PREPROCESS,
-    OBJ_DRAW,
-    OBJ_END,
-    OBJ_DESTROY,
+    OBJ_INPUT_PROCESS     = 0, /* Update input state before frame preparation. */
+    OBJ_PRE_PROCESS       = 1, /* Run once before rendering the frame. */
+    OBJ_PROCESS           = 3, /* Draw the current framebuffer section. */
+    OBJ_EXTENSION_PROCESS = 2, /* Extend processing after the object and before its children. */
+    OBJ_POST_PROCESS      = 4, /* Run once after all framebuffer sections. */
+    OBJ_DESTROY           = 5, /* Run before object memory is released. */
 } T_OBJ_CB_TYPE;
 
 typedef struct gui_obj_timer
@@ -147,12 +149,12 @@ uint32_t hidden                     :
     uint32_t opacity_value              : 8;
     uint32_t event_dsc_cnt              : 5;
     uint32_t create_done                : 1;
-    uint32_t has_input_prepare_cb       : 1;
-    uint32_t has_prepare_cb             : 1;
-    uint32_t has_draw_cb                : 1;
-    uint32_t has_end_cb                 : 1;
+    uint32_t has_input_process_cb       : 1;
+    uint32_t has_pre_process_cb         : 1;
+    uint32_t has_process_cb             : 1;
+    uint32_t has_post_process_cb        : 1;
     uint32_t has_destroy_cb             : 1;
-    uint32_t need_preprocess            : 1;
+    uint32_t extension_process_enabled  : 1;
     uint32_t has_subscribe              : 1;
     uint32_t dirty                      : 1;    // widget self-redraw request flag
     uint32_t magic                      : 4;

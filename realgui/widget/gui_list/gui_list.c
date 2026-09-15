@@ -340,7 +340,7 @@ static void gui_list_free_notes(gui_obj_t *obj)
     }
 }
 
-static void gui_list_input_prepare(gui_obj_t *obj)
+static void gui_list_input_process(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
@@ -519,19 +519,19 @@ static void gui_list_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
+        case OBJ_INPUT_PROCESS:
             {
-                gui_list_input_prepare(obj);
+                gui_list_input_process(obj);
             }
             break;
 
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             {
                 gui_list_prepare(obj);
             }
             break;
 
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             {
                 gui_list_end(obj);
             }
@@ -558,7 +558,7 @@ static inline void gui_list_note_start_anim(gui_list_note_t *note, gui_obj_t *o,
     note->animate_cnt = 1;
 }
 
-static void gui_list_note_input_prepare(gui_obj_t *obj)
+static void gui_list_note_input_process(gui_obj_t *obj)
 {
     gui_list_note_t *_this = (gui_list_note_t *)obj;
     gui_list_t *list = (gui_list_t *)obj->parent;
@@ -915,13 +915,13 @@ static void gui_list_note_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
+        case OBJ_INPUT_PROCESS:
             {
-                gui_list_note_input_prepare(obj);
+                gui_list_note_input_process(obj);
             }
             break;
 
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             {
                 gui_list_note_prepare(obj);
             }
@@ -1136,9 +1136,9 @@ static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
 
     gui_obj_ctor(&_this->base, &list->base, "list_note", x, y, w, h);
     GET_BASE(_this)->obj_cb = gui_list_note_cb;
-    GET_BASE(_this)->has_input_prepare_cb = true;
-    GET_BASE(_this)->has_prepare_cb = true;
-    GET_BASE(_this)->has_end_cb = false;
+    GET_BASE(_this)->has_input_process_cb = true;
+    GET_BASE(_this)->has_pre_process_cb = true;
+    GET_BASE(_this)->has_post_process_cb = false;
     GET_BASE(_this)->has_destroy_cb  = false;
     GET_BASE(_this)->type = LIST_NOTE;
     GET_BASE(_this)->create_done = true;
@@ -1212,9 +1212,9 @@ gui_list_t *gui_list_create(void       *parent,
         _this->circle_radius = _this->base.w;
     }
     GET_BASE(_this)->obj_cb = gui_list_cb;
-    GET_BASE(_this)->has_input_prepare_cb = true;
-    GET_BASE(_this)->has_prepare_cb = true;
-    GET_BASE(_this)->has_end_cb = true;
+    GET_BASE(_this)->has_input_process_cb = true;
+    GET_BASE(_this)->has_pre_process_cb = true;
+    GET_BASE(_this)->has_post_process_cb = true;
     GET_BASE(_this)->has_destroy_cb  = true;
     GET_BASE(_this)->type = LIST;
     GET_BASE(_this)->create_done = true;

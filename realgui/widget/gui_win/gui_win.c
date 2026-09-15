@@ -37,7 +37,7 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void gui_win_input_prepare(gui_obj_t *obj)
+static void gui_win_input_process(gui_obj_t *obj)
 {
     (void)obj;
 }
@@ -63,7 +63,7 @@ static void prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
     matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);
 
-    if (obj->need_preprocess && blur_prepare != NULL)
+    if (obj->extension_process_enabled && blur_prepare != NULL)
     {
         int16_t x1 = (int16_t)obj->matrix->m[0][2];
         int16_t y1 = (int16_t)obj->matrix->m[1][2];
@@ -105,7 +105,7 @@ static void gui_win_preprocess(gui_obj_t *obj)
 
 static void gui_win_end(gui_obj_t *obj)
 {
-    if (obj->need_preprocess)
+    if (obj->extension_process_enabled)
     {
         gui_win_t *this = (gui_win_t *)obj;
         post_process_event *blur_param = (post_process_event *)this->blur_param;
@@ -138,16 +138,16 @@ static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
-            gui_win_input_prepare(obj);
+        case OBJ_INPUT_PROCESS:
+            gui_win_input_process(obj);
             break;
-        case OBJ_PREPARE:
+        case OBJ_PRE_PROCESS:
             gui_win_prepare(obj);
             break;
-        case OBJ_PREPROCESS:
+        case OBJ_EXTENSION_PROCESS:
             gui_win_preprocess(obj);
             break;
-        case OBJ_END:
+        case OBJ_POST_PROCESS:
             gui_win_end(obj);
             break;
         case OBJ_DESTROY:
@@ -170,8 +170,8 @@ void gui_win_ctor(gui_win_t  *this,
 {
     gui_obj_ctor(&this->base, parent, name, x, y, w, h);
     GET_BASE(this)->obj_cb = gui_win_cb;
-    GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_end_cb = true;
+    GET_BASE(this)->has_pre_process_cb = true;
+    GET_BASE(this)->has_post_process_cb = true;
     GET_BASE(this)->type = WINDOW;
     this->blur_degree = 225;
 }
@@ -343,7 +343,7 @@ void gui_win_enable_blur(gui_win_t *win, bool enable)
         gui_log("Cannot use_blur: win is NULL\n");
         return;
     }
-    win->base.need_preprocess = enable;
+    win->base.extension_process_enabled = enable;
 }
 
 void gui_win_set_blur_degree(gui_win_t *win, uint8_t degree)
@@ -356,4 +356,3 @@ void gui_win_set_blur_degree(gui_win_t *win, uint8_t degree)
     }
     win->blur_degree = degree;
 }
-
