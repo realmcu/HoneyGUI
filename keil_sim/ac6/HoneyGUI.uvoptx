@@ -934,8 +934,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\realgui\engine\blit\acc_sw.c</PathWithFileName>
-      <FilenameWithoutPath>acc_sw.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\realgui\engine\blit\acc_sw_uncompressed.c</PathWithFileName>
+      <FilenameWithoutPath>acc_sw_uncompressed.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -958,8 +958,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\realgui\engine\blit\acc_sw_raster.c</PathWithFileName>
-      <FilenameWithoutPath>acc_sw_raster.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\realgui\engine\blit\acc_sw_generic.c</PathWithFileName>
+      <FilenameWithoutPath>acc_sw_generic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1042,8 +1042,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\realgui\engine\codec\rle\acc_sw_rle.c</PathWithFileName>
-      <FilenameWithoutPath>acc_sw_rle.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\realgui\engine\blit\acc_sw_compressed\acc_sw_compressed.c</PathWithFileName>
+      <FilenameWithoutPath>acc_sw_compressed.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1054,7 +1054,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\realgui\engine\codec\rle\acc_sw_rle_bypass.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\blit\acc_sw_compressed\acc_sw_rle_bypass.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_rle_bypass.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1066,7 +1066,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\realgui\engine\codec\rle\acc_sw_rle_cover.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\blit\acc_sw_compressed\acc_sw_rle_cover.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_rle_cover.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1078,7 +1078,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\realgui\engine\codec\rle\acc_sw_rle_filter.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\blit\acc_sw_compressed\acc_sw_rle_filter.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_rle_filter.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#ifndef __ACC_SW_RLE_H__
-#define __ACC_SW_RLE_H__
+#ifndef __ACC_SW_COMPRESSED_H__
+#define __ACC_SW_COMPRESSED_H__
 
 #include "guidef.h"
 #include "draw_img.h"
@@ -18,8 +18,8 @@ extern "C" {
 #endif
 
 
-void blit_compressed(draw_img_t *image, gui_dispdev_t *dc,
-                     gui_rect_t *rect);
+void sw_acc_blit_compressed(draw_img_t *image, gui_dispdev_t *dc,
+                            gui_rect_t *rect);
 
 void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf);

@@ -118,7 +118,7 @@ static uint32_t rect_checksum(uint32_t seed, const void *data, size_t len)
  *
  * A translucent colour is fine: its alpha is folded into the mask values, not
  * carried in fg_color_set.  That matters because the two blit paths disagree
- * about fg_color_set's alpha -- acc_sw_raster multiplies it in, a8_2_rgb565
+ * about fg_color_set's alpha -- acc_sw_generic multiplies it in, a8_2_rgb565
  * discards it -- so it is pinned at 255 and the mask carries everything.
  */
 static bool rect_use_a8(gui_rounded_rect_t *this)

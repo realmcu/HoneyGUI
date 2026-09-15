@@ -102,7 +102,7 @@ static uint16_t circle_desc_len(const circle_desc_t *desc)
  *
  * A translucent colour is fine: its alpha is folded into the mask values, not
  * carried in fg_color_set.  That matters because the two blit paths disagree
- * about fg_color_set's alpha -- acc_sw_raster multiplies it in, a8_2_rgb565
+ * about fg_color_set's alpha -- acc_sw_generic multiplies it in, a8_2_rgb565
  * discards it -- so it is pinned at 255 and the mask carries everything.
  */
 static bool circle_use_a8(gui_circle_t *this)

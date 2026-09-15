@@ -354,7 +354,7 @@ done
 - [官方 Image Convert Tool 文档](https://docs.realmcu.com/tools/media_convert_tool/)
 - [GUI_FormatType 定义](../../realgui/engine/draw_img.h)
 - [解压实现参考](../../realgui/engine/sw/idu/acc_sw_idu.c)
-- [RLE 解压参考](../../realgui/engine/sw/rle/acc_sw_rle.c)
+- [RLE 解压参考](../../realgui/engine/blit/acc_sw_compressed/acc_sw_compressed.c)
 
 ## 版本历史
 

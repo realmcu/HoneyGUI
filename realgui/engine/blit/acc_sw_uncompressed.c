@@ -10,9 +10,8 @@
 #include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_sw_rle.h"
-#include "acc_sw_raster.h"
-#include "acc_sw.h"
+#include "acc_sw_generic.h"
+#include "acc_sw_uncompressed.h"
 #include "rgb565_2_rgb565.h"
 #include "argb8565_2_rgb565.h"
 #include "a8_2_rgb565.h"
@@ -201,7 +200,7 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
 }
 
 
-void blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+void sw_acc_blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (image == NULL || image->data == NULL || dc == NULL) { return; }
     if (image->img_w <= 0 || image->img_h <= 0) { return; }
@@ -216,7 +215,7 @@ void blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         {
             uint32_t saved_mode = image->blend_mode;
             image->blend_mode = IMG_2D_SW_FIX_A8_FG;
-            do_raster(image, dc, rect);
+            sw_acc_blit_generic(image, dc, rect);
             image->blend_mode = saved_mode;
         }
         return;
@@ -249,64 +248,5 @@ void blit_uncompressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             return;
         }
     }
-    do_raster(image, dc, rect);
+    sw_acc_blit_generic(image, dc, rect);
 }
-
-
-
-
-/*============================================================================*
- *                           Public Functions
- *============================================================================*/
-
-/**
- * @brief show image to display
- *
- * @param image image
- * @param dc display
- * @param rect scope
- */
-
-void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
-{
-    (void)image;
-    (void)rect;
-    // GUI_LINE(1);
-    return;
-}
-void sw_acc_end_cb(draw_img_t *image)
-{
-    if (image->acc_user != NULL && blur_depose != NULL)
-    {
-        blur_depose(&image->acc_user);
-    }
-    return;
-}
-
-
-void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
-{
-    gui_rgb_data_head_t *header = (gui_rgb_data_head_t *)image->data;
-
-    if (header == NULL)
-    {
-        return;
-    }
-
-    if (header->compress)
-    {
-        blit_compressed(image, dc, rect);
-    }
-    else
-    {
-        blit_uncompressed(image, dc, rect);
-    }
-}
-void sw_acc_init(void)
-{
-    extern void (* draw_img_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
-    extern void (* draw_img_acc_end_cb)(struct draw_img * image);
-    draw_img_acc_prepare_cb = sw_acc_prepare_cb;
-    draw_img_acc_end_cb = sw_acc_end_cb;
-}
-

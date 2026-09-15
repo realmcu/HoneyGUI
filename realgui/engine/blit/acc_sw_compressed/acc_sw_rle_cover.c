@@ -10,7 +10,7 @@
 #include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_sw_rle.h"
+#include "acc_sw_compressed.h"
 
 void rle_cover_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
                              struct gui_rect *rect)

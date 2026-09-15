@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdint.h>
-#include "draw_img.h"
+#include "acc_sw_generic.h"
 //#define HONEYGUI_SUPPORT_DITHER
 typedef struct
 {
@@ -482,7 +482,18 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
     }
 }
 
-void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+/**
+ * @brief Blit an image with the generic pixel-by-pixel software path.
+ *
+ * This is the common software fallback for both uncompressed images and
+ * RLE-compressed images. Uncompressed pixels are read directly from the image
+ * buffer, while RLE pixels are decoded on demand before blending.
+ *
+ * @param image Image source and rendering parameters.
+ * @param dc Display device containing the destination frame buffer.
+ * @param rect Optional clipping rectangle, or NULL to use the image bounds.
+ */
+void sw_acc_blit_generic(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     GUI_ASSERT(image->data != NULL);
     int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;

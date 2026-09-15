@@ -10,8 +10,8 @@
 #include "draw_img.h"
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_sw_rle.h"
-#include "acc_sw_raster.h"
+#include "acc_sw_compressed.h"
+#include "acc_sw_generic.h"
 #include "acc_sw_rle_bypass.h"
 #include "acc_sw_rle_cover.h"
 #include "acc_sw_rle_filter.h"
@@ -181,18 +181,18 @@ void handle_image_blend_mode(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *r
         break;
     default:
         // Handle other cases if necessary
-        do_raster(image, dc, rect);
+        sw_acc_blit_generic(image, dc, rect);
         break;
     }
 }
-void blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+void sw_acc_blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (image == NULL || image->data == NULL || dc == NULL) { return; }
     if (image->img_w <= 0 || image->img_h <= 0) { return; }
 
     if (!is_identity_matrix(&image->matrix))
     {
-        do_raster(image, dc, rect);
+        sw_acc_blit_generic(image, dc, rect);
         return;
     }
 
@@ -207,5 +207,5 @@ void blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         return;
     }
 
-    do_raster(image, dc, rect);
+    sw_acc_blit_generic(image, dc, rect);
 }

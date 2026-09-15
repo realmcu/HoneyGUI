@@ -59,8 +59,10 @@
       <files>
         <file category="sourceC" name="engine/acc_init.c"/>
         <file category="header" name="engine/acc_init.h"/>
-        <file category="sourceC" name="engine/acc_sw.c"/>
-        <file category="header" name="engine/acc_sw.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_uncompressed.c"/>
+        <file category="header" name="engine/blit/acc_sw_uncompressed.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_entry.c"/>
+        <file category="header" name="engine/blit/acc_sw_entry.h"/>
         <file category="sourceC" name="engine/acc_sw_basegeo.c"/>
         <file category="sourceC" name="engine/acc_sw_blend.c"/>
         <file category="header" name="engine/acc_sw_blend.h"/>
@@ -72,16 +74,16 @@
         <file category="sourceC" name="engine/acc_sw_filter.c"/>
         <file category="header" name="engine/acc_sw_filter.h"/>
         <file category="header" name="engine/acc_sw_filter_matrix.h"/>
-        <file category="sourceC" name="engine/acc_sw_raster.c"/>
-        <file category="header" name="engine/acc_sw_raster.h"/>
-        <file category="sourceC" name="engine/acc_sw_rle.c"/>
-        <file category="header" name="engine/acc_sw_rle.h"/>
-        <file category="sourceC" name="engine/acc_sw_rle_bypass.c"/>
-        <file category="header" name="engine/acc_sw_rle_bypass.h"/>
-        <file category="sourceC" name="engine/acc_sw_rle_cover.c"/>
-        <file category="header" name="engine/acc_sw_rle_cover.h"/>
-        <file category="sourceC" name="engine/acc_sw_rle_filter.c"/>
-        <file category="header" name="engine/acc_sw_rle_filter.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_generic.c"/>
+        <file category="header" name="engine/blit/acc_sw_generic.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_compressed/acc_sw_compressed.c"/>
+        <file category="header" name="engine/blit/acc_sw_compressed/acc_sw_compressed.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_compressed/acc_sw_rle_bypass.c"/>
+        <file category="header" name="engine/blit/acc_sw_compressed/acc_sw_rle_bypass.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_compressed/acc_sw_rle_cover.c"/>
+        <file category="header" name="engine/blit/acc_sw_compressed/acc_sw_rle_cover.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_compressed/acc_sw_rle_filter.c"/>
+        <file category="header" name="engine/blit/acc_sw_compressed/acc_sw_rle_filter.h"/>
         <file category="header" name="engine/acc_sw_source_over.h"/>
         <file category="sourceC" name="engine/acc_vg_lite.c"/>
         <file category="sourceC" name="engine/draw_font.c"/>
