@@ -39,6 +39,7 @@ def pad_to_alignment(data, alignment):
 def pad_string_to_alignment(string, alignment):
     """Pad string to specified alignment with null bytes."""
     data = string.encode('utf-8') if isinstance(string, str) else string
+    data = data + b'\0'
     remainder = len(data) % alignment
     if remainder != 0:
         return data + b'\0' * (alignment - remainder)
