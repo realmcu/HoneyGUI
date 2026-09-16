@@ -12,7 +12,6 @@
 #include "guidef.h"
 #include "gui_obj.h"
 #include "gui_fb.h"
-#include "gui_dirty_region.h"
 #include "draw_img.h"
 #include "acc_api.h"
 #include "lite_geometry.h"
@@ -84,29 +83,21 @@ static void gui_arc_input_process(gui_obj_t *obj)
 /** Check if arc parameters have changed */
 static bool is_arc_dirty(gui_arc_t *this)
 {
-    gui_obj_t *obj = (gui_obj_t *)this;
-    return (this->x != this->cached_x ||
-            this->y != this->cached_y ||
-            this->radius != this->cached_radius ||
+    return (this->radius != this->cached_radius ||
             this->start_angle != this->cached_start_angle ||
             this->end_angle != this->cached_end_angle ||
             this->line_width != this->cached_line_width ||
-            this->color.color.argb_full != this->cached_color.color.argb_full ||
-            obj->hidden != this->cached_hidden);
+            this->color.color.argb_full != this->cached_color.color.argb_full);
 }
 
 /** Update cached parameters */
 static void update_cache(gui_arc_t *this)
 {
-    gui_obj_t *obj = (gui_obj_t *)this;
-    this->cached_x = this->x;
-    this->cached_y = this->y;
     this->cached_radius = this->radius;
     this->cached_start_angle = this->start_angle;
     this->cached_end_angle = this->end_angle;
     this->cached_line_width = this->line_width;
     this->cached_color = this->color;
-    this->cached_hidden = obj->hidden;
 }
 
 /** Set image data header */
@@ -129,35 +120,6 @@ static int gui_arc_box_size(int radius, float line_width)
 {
     float outer_r = (float)radius + line_width / 2.0f + GUI_ARC_BOX_MARGIN;
     return (int)(outer_r * 2) + 4;
-}
-
-static void gui_arc_mark_dirty(gui_arc_t *arc)
-{
-    gui_obj_t *obj = GUI_BASE(arc);
-    int absolute_x;
-    int absolute_y;
-    float half_w = ((float)obj->w - 1.0f) * 0.5f;
-    float half_h = ((float)obj->h - 1.0f) * 0.5f;
-    float radians = arc->degrees * 0.01745329251994329577f;
-    float cos_angle = fabsf(cosf(radians));
-    float sin_angle = fabsf(sinf(radians));
-    float scaled_w = half_w * fabsf(arc->scale_x);
-    float scaled_h = half_h * fabsf(arc->scale_y);
-    float extent_x = cos_angle * scaled_w + sin_angle * scaled_h;
-    float extent_y = sin_angle * scaled_w + cos_angle * scaled_h;
-    float center_x;
-    float center_y;
-    gui_rect_t dirty;
-
-    gui_obj_absolute_xy(obj, &absolute_x, &absolute_y);
-    center_x = (float)absolute_x + half_w + arc->offset_x;
-    center_y = (float)absolute_y + half_h + arc->offset_y;
-
-    dirty.x1 = (int16_t)floorf(center_x - extent_x) - 1;
-    dirty.y1 = (int16_t)floorf(center_y - extent_y) - 1;
-    dirty.x2 = (int16_t)ceilf(center_x + extent_x) + 1;
-    dirty.y2 = (int16_t)ceilf(center_y + extent_y) + 1;
-    gui_dirty_set_region(&dirty);
 }
 
 static void gui_arc_prepare(gui_arc_t *this)
@@ -430,7 +392,6 @@ static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render)
     this->buffer_h = buffer_h;
     this->buffer_off_x = off_x;
     this->buffer_off_y = off_y;
-    this->buffer_size = required_size;
 
     // Allocate draw_img if needed
     if (this->draw_img == NULL)
@@ -467,14 +428,14 @@ static void render_arc_to_buffer(gui_arc_t *this)
     uint8_t *pixel_data = this->pixel_buffer + sizeof(gui_rgb_data_head_t);
     memset(pixel_data, 0x00, (size_t)(buffer_w * buffer_h * 4));
 
-    // Initialize draw context
-    init_draw_context(&this->draw_ctx, pixel_data, buffer_w, buffer_h, PIXEL_FORMAT_ARGB8888);
-    this->draw_ctx.enable_aa = true;
-    this->draw_ctx.clip_rect.x = 0;
-    this->draw_ctx.clip_rect.y = 0;
-    this->draw_ctx.clip_rect.w = buffer_w;
-    this->draw_ctx.clip_rect.h = buffer_h;
-    this->draw_ctx.gradient = this->gradient;
+    DrawContext draw_ctx;
+    init_draw_context(&draw_ctx, pixel_data, buffer_w, buffer_h, PIXEL_FORMAT_ARGB8888);
+    draw_ctx.enable_aa = true;
+    draw_ctx.clip_rect.x = 0;
+    draw_ctx.clip_rect.y = 0;
+    draw_ctx.clip_rect.w = buffer_w;
+    draw_ctx.clip_rect.h = buffer_h;
+    draw_ctx.gradient = this->gradient;
 
     // The buffer covers only the inked sub-rect of the widget box, so the arc
     // centre sits at the widget-local centre minus that sub-rect's origin.
@@ -485,7 +446,7 @@ static void render_arc_to_buffer(gui_arc_t *this)
     // Draw arc using gradient or solid color
     if (this->use_gradient && this->gradient != NULL)
     {
-        draw_arc_df_aa_gradient(&this->draw_ctx,
+        draw_arc_df_aa_gradient(&draw_ctx,
                                 center_x,
                                 center_y,
                                 this->radius,
@@ -497,7 +458,7 @@ static void render_arc_to_buffer(gui_arc_t *this)
     else
     {
         // Draw arc using optimized SDF-based algorithm
-        draw_arc_df_aa(&this->draw_ctx,
+        draw_arc_df_aa(&draw_ctx,
                        center_x,
                        center_y,
                        this->radius,
@@ -550,11 +511,7 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
     arc->opacity_value = UINT8_MAX;
     arc->draw_img = NULL;
     arc->pixel_buffer = NULL;
-    arc->buffer_size = 0;
     arc->buffer_valid = false;
-    arc->draw_ctx.format = PIXEL_FORMAT_ARGB8888;
-    arc->draw_ctx.enable_aa = true;
-    arc->draw_ctx.gradient = NULL;
 
     // Initialize gradient support
     arc->gradient = NULL;
@@ -576,8 +533,6 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
     arc->color = color;
 
     // Initialize cache as invalid
-    arc->cached_x = -1;
-    arc->cached_y = -1;
     arc->cached_radius = -1;
     arc->cached_start_angle = -1.0f;
     arc->cached_end_angle = -1.0f;
@@ -614,7 +569,6 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
 void gui_arc_set_position(gui_arc_t *arc, int x, int y)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
 
     // Calculate widget bounding box size
     int box_size = gui_arc_box_size(arc->radius, arc->line_width);
@@ -627,61 +581,49 @@ void gui_arc_set_position(gui_arc_t *arc, int x, int y)
     arc->base.h = box_size;
     arc->x = box_size / 2;
     arc->y = box_size / 2;
-    gui_arc_mark_dirty(arc);
+    gui_fb_change();
 }
 
 void gui_arc_set_radius(gui_arc_t *arc, int radius)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->radius = radius;
     gui_arc_refit_box(arc);
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }
 void gui_arc_set_opacity(gui_arc_t *arc, uint8_t opacity)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->opacity_value = opacity;
-    arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
+    gui_fb_change();
 }
 void gui_arc_set_color(gui_arc_t *arc, gui_color_t color)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->color = color;
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }
 
 void gui_arc_set_start_angle(gui_arc_t *arc, float start_angle)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->start_angle = start_angle;
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }
 
 void gui_arc_set_end_angle(gui_arc_t *arc, float end_angle)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->end_angle = end_angle;
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }
 
 void gui_arc_set_line_width(gui_arc_t *arc, float line_width)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->line_width = line_width;
     gui_arc_refit_box(arc);
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }
 
 void gui_arc_on_click(gui_arc_t *arc, void *callback, void *parameter)
@@ -693,36 +635,29 @@ void gui_arc_on_click(gui_arc_t *arc, void *callback, void *parameter)
 void gui_arc_rotate(gui_arc_t *arc, float degrees)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->degrees = degrees;
-    arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
+    gui_fb_change();
 }
 
 void gui_arc_scale(gui_arc_t *arc, float scale_x, float scale_y)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->scale_x = scale_x;
     arc->scale_y = scale_y;
-    arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
+    gui_fb_change();
 }
 
 void gui_arc_translate(gui_arc_t *arc, float tx, float ty)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
     arc->offset_x = tx;
     arc->offset_y = ty;
-    arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
+    gui_fb_change();
 }
 
 void gui_arc_set_angular_gradient(gui_arc_t *arc, float start_angle, float end_angle)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
 
     // Allocate gradient if not exists
     if (arc->gradient == NULL)
@@ -744,13 +679,11 @@ void gui_arc_set_angular_gradient(gui_arc_t *arc, float start_angle, float end_a
 
     arc->use_gradient = true;
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }
 
 void gui_arc_add_gradient_stop(gui_arc_t *arc, float position, gui_color_t color)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
 
     if (arc->gradient == NULL)
     {
@@ -760,13 +693,11 @@ void gui_arc_add_gradient_stop(gui_arc_t *arc, float position, gui_color_t color
 
     gradient_add_stop(arc->gradient, position, color.color.argb_full);
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }
 
 void gui_arc_clear_gradient(gui_arc_t *arc)
 {
     GUI_ASSERT(arc != NULL);
-    gui_arc_mark_dirty(arc);
 
     if (arc->gradient != NULL)
     {
@@ -776,5 +707,4 @@ void gui_arc_clear_gradient(gui_arc_t *arc)
 
     arc->use_gradient = false;
     arc->buffer_valid = false;
-    gui_arc_mark_dirty(arc);
 }

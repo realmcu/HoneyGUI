@@ -12,7 +12,7 @@
 #include "test_cases.h"
 
 /* Six stroked rings plus a gradient; simulator measures ~36 ms. */
-#define TEST_CASE_04_EXPECTED_RENDER_TIME_MS 110U
+#define TEST_CASE_04_EXPECTED_RENDER_TIME_MS 60U
 
 #define TEST_CASE_04_RING_THICKNESS 22.0f
 

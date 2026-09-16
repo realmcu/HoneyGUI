@@ -31,15 +31,12 @@ typedef struct
     // Drawing resources
     draw_img_t *draw_img;       /**< Drawing image object. */
     uint8_t *pixel_buffer;      /**< Cached pixel buffer. */
-    uint32_t buffer_size;       /**< Current payload size, header included. */
     int buffer_w;               /**< Actual buffer width (may be optimized). */
     int buffer_h;               /**< Actual buffer height (may be optimized). */
     int buffer_off_x;           /**< Buffer left edge within the widget box. */
     int buffer_off_y;           /**< Buffer top edge within the widget box. */
     bool buffer_valid;          /**< Buffer cache valid flag. */
 
-    // Drawing context
-    DrawContext draw_ctx;       /**< Drawing context. */
     uint8_t opacity_value;      /**< Opacity value. */
 
     // Arc geometry data
@@ -51,15 +48,12 @@ typedef struct
     float line_width;           /**< Line width. */
     gui_color_t color;             /**< Arc color (stored as uint32_t internally). */
 
-    // Cache for dirty checking
-    int cached_x;
-    int cached_y;
+    // Cache for raster payload invalidation
     int cached_radius;
     float cached_start_angle;
     float cached_end_angle;
     float cached_line_width;
     gui_color_t cached_color;
-    uint32_t cached_hidden;
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */

@@ -114,7 +114,14 @@ static bool circle_use_a8(gui_circle_t *this)
     return false;
 #endif
 }
+static bool circle_split_use_a8(gui_circle_t *this)
+{
+    gui_obj_t *obj = GUI_BASE(this);
 
+    return circle_use_a8(this) &&
+           this->opacity_value == UINT8_MAX &&
+           obj->parent->opacity_value == UINT8_MAX;
+}
 static bool circle_stroke_use_a8(void)
 {
 #if GUI_CIRCLE_ENABLE_A8
@@ -1071,7 +1078,7 @@ static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
     if (img == NULL) { return NULL; }
     memset(img, 0x00, sizeof(draw_img_t));
 
-    bool is_a8 = circle_use_a8(this);
+    bool is_a8 = circle_split_use_a8(this);
     circle_desc_t desc;
     bool is_new = false;
     circle_desc_init(&desc, this, CIRCLE_PART_ARC_STRIP, radius, 0);
