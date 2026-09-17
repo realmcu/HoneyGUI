@@ -784,6 +784,7 @@ gui_view_t *gui_view_create(void       *parent,
         g_SurpressEvent = false;
         g_SurpressTP = true;
         g_SwitchDone = false;
+        g_AutoMove = false;
         gui_view_cache_snapshot_data(_this);
         gui_set_bg_color(g_CurrentView->bg_color);
     }
