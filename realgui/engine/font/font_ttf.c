@@ -2752,18 +2752,18 @@ ttf_rasterize:
                     const float32x4_t v_mul = {render_scale, -render_scale, render_scale, -render_scale};
                     const float32x4_t v_add = {offset_x, offset_y, offset_x, offset_y};
 
-                    int i = 0;
-                    for (; i + 1 < line_count; i += 2)
+                    /* All points, including an odd tail, must use this one vfma.
+                     * A scalar mul+add tail rounds 1 ULP off the fused vfma, which
+                     * leaves a duplicated closing point != the first point: the
+                     * contour opens and the scanline parity leaks along the row.
+                     * Predicate lanes are (x,y) pairs, hence 2x the point count. */
+                    for (int i = 0; i < line_count; i += 2)
                     {
-                        int32x4_t vi = vldrhq_s32((int16_t *)&windingsd[i].x);
+                        mve_pred16_t p = vctp32q((uint32_t)((line_count - i) * 2));
+                        int32x4_t vi = vldrhq_z_s32((int16_t *)&windingsd[i].x, p);
                         float32x4_t vf = vcvtq_f32_s32(vi);
                         vf = vfmaq_f32(v_add, vf, v_mul);
-                        vstrwq_f32(&windingsf[i].x, vf);
-                    }
-                    for (; i < line_count; i++)
-                    {
-                        windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale + bold_extra + geo.sub_x;
-                        windingsf[i].y = (-glyphData->y0 - windingsd[i].y) * render_scale + bold_extra + geo.sub_y;
+                        vstrwq_p_f32(&windingsf[i].x, vf, p);
                     }
                     gui_free(windingsd);
                 }
