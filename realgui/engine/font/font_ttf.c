@@ -2326,11 +2326,13 @@ void gui_font_ttf_destroy(gui_text_t *text)
                 }
             }
         }
+        gui_font_free_emoji_cache(text);
         for (int i = 0; i < text->font_len; i++)
         {
-            if (chr[i].buf != NULL)
+            if (!chr[i].is_emoji && chr[i].buf != NULL)
             {
                 gui_free(chr[i].buf);
+                chr[i].buf = NULL;
             }
         }
         gui_free(text->data);
@@ -2997,6 +2999,5 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
 
     font_ttf_draw(text, rect);
-
 }
 

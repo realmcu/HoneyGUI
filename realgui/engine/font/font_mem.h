@@ -285,6 +285,13 @@ bool gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text, int16_t baseline
 void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data);
 
 /**
+ * @brief Release decoded emoji cells cached in mem_char_t::buf.
+ *
+ * @param text Text widget.
+ */
+void gui_font_free_emoji_cache(gui_text_t *text);
+
+/**
  * @brief Get the font library node by size.
  *
  * @param font_size Font size.

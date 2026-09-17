@@ -2028,6 +2028,8 @@ void gui_font_mem_unload(gui_text_t *text)
                 }
             }
         }
+        /* Free decoded emoji buffers before the cells holding them. */
+        gui_font_free_emoji_cache(text);
         gui_free(text->data);
         text->data = NULL;
     }
@@ -2050,6 +2052,7 @@ void gui_font_mem_destroy(gui_text_t *text)
                 }
             }
         }
+        gui_font_free_emoji_cache(text);
         gui_free(text->data);
         text->data = NULL;
     }
@@ -2162,10 +2165,53 @@ void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data)
     memcpy(&img.inverse, &img.matrix, sizeof(img.inverse));
     matrix_inverse(&img.inverse);
 
+    const gui_rgb_data_head_t *head = (const gui_rgb_data_head_t *)data;
+    if (head->compress && chr->buf == NULL)
+    {
+        struct acc_engine *acc = gui_get_acc();
+        if (acc != NULL && acc->idu_load != NULL && acc->idu_free != NULL)
+        {
+            chr->buf = acc->idu_load(data);
+            if (chr->buf == NULL && dc->section_count == 0)
+            {
+                gui_log("emoji U+%04X: idu_load failed, blitting compressed data\n", chr->unicode);
+            }
+        }
+    }
+    if (head->compress && chr->buf != NULL)
+    {
+        img.data = chr->buf;
+    }
+
     draw_img_load_scale(&img, IMG_SRC_MEMADDR);
     draw_img_new_area(&img, NULL);
     gui_acc_blit_to_dc(&img, dc, NULL);
 }
+
+void gui_font_free_emoji_cache(gui_text_t *text)
+{
+    mem_char_t *chr = text->data;
+    if (chr == NULL)
+    {
+        return;
+    }
+
+    struct acc_engine *acc = gui_get_acc();
+    if (acc == NULL || acc->idu_free == NULL)
+    {
+        return;
+    }
+
+    for (uint16_t i = 0; i < text->font_len; i++)
+    {
+        if (chr[i].is_emoji && chr[i].buf != NULL)
+        {
+            acc->idu_free(chr[i].buf);
+            chr[i].buf = NULL;
+        }
+    }
+}
+
 void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;

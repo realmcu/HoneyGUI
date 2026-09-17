@@ -179,6 +179,7 @@ static void gui_text_font_unload(gui_text_t *text)
     case GUI_FONT_SRC_BMP:
         {
             // gui_font_mem_unload(text);
+            gui_font_free_emoji_cache(text);
         }
         break;
 
@@ -202,6 +203,9 @@ static void gui_text_font_unload(gui_text_t *text)
 
     case GUI_FONT_SRC_TTF:
         {
+            /* Before ttf_unload(), which returns early for a static or
+             * non-RAMLESS cache and would leave the emoji cells allocated. */
+            gui_font_free_emoji_cache(text);
             gui_font_ttf_unload(text);
         }
         break;
