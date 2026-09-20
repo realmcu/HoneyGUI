@@ -15,8 +15,9 @@
 #include "draw_img.h"
 #include "acc_api.h"
 #include "lite_geometry.h"
+#include "gui_geometry_image.h"
 #include "gui_arc.h"
-#include "gui_shape_cache.h"
+#include "gui_geometry_cache.h"
 
 /*============================================================================*
  *                           Constants
@@ -69,7 +70,6 @@ typedef struct
  *============================================================================*/
 static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render);
 static void render_arc_to_buffer(gui_arc_t *this);
-static bool is_arc_dirty(gui_arc_t *this);
 
 /** Touch input preparation - simplified version like round_rect */
 static void gui_arc_input_process(gui_obj_t *obj)
@@ -78,41 +78,6 @@ static void gui_arc_input_process(gui_obj_t *obj)
     // The event is already enabled in prepare phase
     // System will handle touch detection based on widget's x, y, w, h
     GUI_UNUSED(obj);
-}
-
-/** Check if arc parameters have changed */
-static bool is_arc_dirty(gui_arc_t *this)
-{
-    return (this->radius != this->cached_radius ||
-            this->start_angle != this->cached_start_angle ||
-            this->end_angle != this->cached_end_angle ||
-            this->line_width != this->cached_line_width ||
-            this->color.color.argb_full != this->cached_color.color.argb_full);
-}
-
-/** Update cached parameters */
-static void update_cache(gui_arc_t *this)
-{
-    this->cached_radius = this->radius;
-    this->cached_start_angle = this->start_angle;
-    this->cached_end_angle = this->end_angle;
-    this->cached_line_width = this->line_width;
-    this->cached_color = this->color;
-}
-
-/** Set image data header */
-static void set_img_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
-{
-    head->scan = 0;
-    head->align = 0;
-    head->resize = 0;
-    head->compress = 0;
-    head->rsvd = 0;
-    head->type = ARGB8888;
-    head->w = w;
-    head->h = h;
-    head->version = 0;
-    head->rsvd2 = 0;
 }
 
 /** Widget box side length that holds an arc of this radius and line width. */
@@ -151,8 +116,13 @@ static void gui_arc_prepare(gui_arc_t *this)
     matrix_translate(-center_x, -center_y, obj->matrix);
 
     gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED, "touch");
-    // Check if we need to re-render
-    if (!this->buffer_valid || is_arc_dirty(this))
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_PRESSED, "touch");
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_RELEASED, "touch");
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_LONG, "touch");
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
+    /* Every setter that changes a pixel clears buffer_valid, so this flag alone
+     * decides whether the payload has to be re-acquired and redrawn. */
+    if (!this->buffer_valid)
     {
         bool need_render = false;
 
@@ -165,7 +135,6 @@ static void gui_arc_prepare(gui_arc_t *this)
         {
             render_arc_to_buffer(this);
         }
-        update_cache(this);
         this->buffer_valid = true;
         gui_fb_change();
     }
@@ -227,7 +196,7 @@ static void gui_arc_destroy(gui_arc_t *this)
      * arcs with the same geometry may still be drawing from it. */
     if (this->pixel_buffer != NULL)
     {
-        gui_shape_cache_release(this->pixel_buffer);
+        gui_geometry_cache_release(this->pixel_buffer);
         this->pixel_buffer = NULL;
     }
 
@@ -339,7 +308,7 @@ static uint16_t arc_desc_len(const arc_desc_t *desc)
  * The payload dimensions and centre offset are part of the identity, not just
  * the geometry: they decide where in the buffer the ink lands.
  *
- * Zeroes first: gui_shape_cache_acquire() compares descriptors byte for byte, so
+ * Zeroes first: gui_geometry_cache_acquire() compares descriptors byte for byte, so
  * a padding hole left uninitialised would make two identical arcs miss.
  */
 static void arc_desc_init(arc_desc_t *desc, gui_arc_t *this,
@@ -382,8 +351,8 @@ static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render)
     uint16_t desc_len = arc_desc_len(&desc);
 
     uint8_t *buffer =
-        gui_shape_cache_refresh_resizable(this->pixel_buffer, &desc, desc_len,
-                                          required_size, out_need_render);
+        gui_geometry_cache_refresh_resizable(this->pixel_buffer, &desc, desc_len,
+                                             required_size, out_need_render);
     if (buffer == NULL) { return false; }
     this->pixel_buffer = buffer;
 
@@ -422,7 +391,7 @@ static void render_arc_to_buffer(gui_arc_t *this)
 
     // Setup image header
     gui_rgb_data_head_t *img_header = (gui_rgb_data_head_t *)this->pixel_buffer;
-    set_img_header(img_header, (uint16_t)buffer_w, (uint16_t)buffer_h);
+    gui_geometry_data_head_set(img_header, (int16_t)buffer_w, (int16_t)buffer_h, ARGB8888);
 
     // Clear pixel data
     uint8_t *pixel_data = this->pixel_buffer + sizeof(gui_rgb_data_head_t);
@@ -532,13 +501,6 @@ gui_arc_t *gui_arc_create(void *parent, const char *name, int x, int y, int radi
     arc->line_width = line_width;
     arc->color = color;
 
-    // Initialize cache as invalid
-    arc->cached_radius = -1;
-    arc->cached_start_angle = -1.0f;
-    arc->cached_end_angle = -1.0f;
-    arc->cached_line_width = -1.0f;
-    arc->cached_color.color.argb_full = 0;
-
     gui_obj_ctor((gui_obj_t *)arc, parent, name, box_x, box_y, box_size, box_size);
     GET_BASE(arc)->obj_cb = gui_arc_cb;
     GET_BASE(arc)->has_input_process_cb = true;
@@ -581,7 +543,6 @@ void gui_arc_set_position(gui_arc_t *arc, int x, int y)
     arc->base.h = box_size;
     arc->x = box_size / 2;
     arc->y = box_size / 2;
-    gui_fb_change();
 }
 
 void gui_arc_set_radius(gui_arc_t *arc, int radius)
@@ -595,7 +556,6 @@ void gui_arc_set_opacity(gui_arc_t *arc, uint8_t opacity)
 {
     GUI_ASSERT(arc != NULL);
     arc->opacity_value = opacity;
-    gui_fb_change();
 }
 void gui_arc_set_color(gui_arc_t *arc, gui_color_t color)
 {
@@ -636,7 +596,6 @@ void gui_arc_rotate(gui_arc_t *arc, float degrees)
 {
     GUI_ASSERT(arc != NULL);
     arc->degrees = degrees;
-    gui_fb_change();
 }
 
 void gui_arc_scale(gui_arc_t *arc, float scale_x, float scale_y)
@@ -644,7 +603,6 @@ void gui_arc_scale(gui_arc_t *arc, float scale_x, float scale_y)
     GUI_ASSERT(arc != NULL);
     arc->scale_x = scale_x;
     arc->scale_y = scale_y;
-    gui_fb_change();
 }
 
 void gui_arc_translate(gui_arc_t *arc, float tx, float ty)
@@ -652,7 +610,6 @@ void gui_arc_translate(gui_arc_t *arc, float tx, float ty)
     GUI_ASSERT(arc != NULL);
     arc->offset_x = tx;
     arc->offset_y = ty;
-    gui_fb_change();
 }
 
 void gui_arc_set_angular_gradient(gui_arc_t *arc, float start_angle, float end_angle)

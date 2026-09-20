@@ -19,7 +19,7 @@ extern "C" {
 #include "gui_obj.h"
 #include "draw_img.h"
 #include "lite_geometry.h"
-#include "gui_shape_path.h"
+#include "gui_geometry_span.h"
 
 /*============================================================================*
  *                         Types
@@ -46,7 +46,7 @@ typedef struct
     draw_img_t *rect_1;
     draw_img_t *rect_2;
     draw_img_t *stroke_img;    /**< Optional inset stroke image. */
-    gui_shape_span_data_t *stroke_spans; /**< Cached path scanline spans. */
+    gui_geometry_span_t *stroke_span; /**< Cached path scanline spans. */
     uint8_t opacity_value;      /**< Opacity value. */
 
     int radius;                 /**< Rect radius. */
@@ -73,7 +73,34 @@ typedef struct
     gui_matrix_t last_matrix;   /**< Cached matrix for change detection. */
 } gui_rounded_rect_t;
 
+/** Which rasterised part a cached payload holds. */
+typedef enum
+{
+    RECT_PART_ROUNDED = 1,      /**< Whole rounded rect in one buffer. */
+    RECT_PART_CORNER,           /**< One rounded corner, keyed by corner index. */
+    RECT_PART_STROKE,           /**< Whole inset stroke in one buffer. */
+} gui_rect_part_t;
 
+/**
+ * Identity of a cached rect payload.
+ *
+ * Everything that changes a pixel goes in here and nothing else does; position
+ * stays out, since it only ever reaches the draw_img matrix.  Gradient parts
+ * pass the whole struct, solid ones stop short of the gradient -- see
+ * rect_desc_len().
+ */
+typedef struct
+{
+    uint32_t part;              /**< gui_rect_part_t. */
+    int32_t size_a;             /**< Width, or radius for a corner. */
+    int32_t size_b;             /**< Height, or corner index for a corner. */
+    int32_t radius;             /**< Corner radius. */
+    uint32_t color;             /**< ARGB baked into the pixels; 0 when A8. */
+    uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
+    uint32_t flags;             /**< Dither on/off, and gradient direction plus 1. */
+    float stroke_width;         /**< Inset width for rounded fill or stroke payload. */
+    Gradient gradient;          /**< Only present when flags say a gradient is used. */
+} rect_desc_t;
 /*============================================================================*
  *                         Functions
  *============================================================================*/

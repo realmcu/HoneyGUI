@@ -11,26 +11,13 @@
 #include "draw_img.h"
 #include "acc_api.h"
 #include "lite_geometry.h"
+#include "gui_geometry_image.h"
 #include "gui_arc_group.h"
 
 static void gui_arc_group_prepare(gui_arc_group_t *this);
 static void gui_arc_group_draw(gui_arc_group_t *this);
 static void gui_arc_group_end(gui_arc_group_t *this);
 static void gui_arc_group_destroy(gui_arc_group_t *this);
-
-static void set_img_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
-{
-    head->scan = 0;
-    head->align = 0;
-    head->resize = 0;
-    head->compress = 0;
-    head->rsvd = 0;
-    head->type = ARGB8888;
-    head->w = w;
-    head->h = h;
-    head->version = 0;
-    head->rsvd2 = 0;
-}
 
 /**
  * Calculate the bounding box for a single arc
@@ -244,7 +231,8 @@ static void gui_arc_group_prepare(gui_arc_group_t *this)
 
     // Setup image header
     gui_rgb_data_head_t *img_header = (gui_rgb_data_head_t *)this->pixel_buffer;
-    set_img_header(img_header, (uint16_t)this->buffer_w, (uint16_t)this->buffer_h);
+    gui_geometry_data_head_set(img_header, (int16_t)this->buffer_w, (int16_t)this->buffer_h,
+                               ARGB8888);
 
     // Clear pixel data
     uint8_t *pixel_data = this->pixel_buffer + sizeof(gui_rgb_data_head_t);

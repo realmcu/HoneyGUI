@@ -35,7 +35,11 @@ typedef struct
     int buffer_h;               /**< Actual buffer height (may be optimized). */
     int buffer_off_x;           /**< Buffer left edge within the widget box. */
     int buffer_off_y;           /**< Buffer top edge within the widget box. */
-    bool buffer_valid;          /**< Buffer cache valid flag. */
+    /**
+     * Payload is up to date. Cleared by every setter that changes a pixel, so
+     * gui_arc_prepare() needs no second per-field comparison.
+     */
+    bool buffer_valid;
 
     uint8_t opacity_value;      /**< Opacity value. */
 
@@ -47,13 +51,6 @@ typedef struct
     float end_angle;            /**< End angle in degrees. */
     float line_width;           /**< Line width. */
     gui_color_t color;             /**< Arc color (stored as uint32_t internally). */
-
-    // Cache for raster payload invalidation
-    int cached_radius;
-    float cached_start_angle;
-    float cached_end_angle;
-    float cached_line_width;
-    gui_color_t cached_color;
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */

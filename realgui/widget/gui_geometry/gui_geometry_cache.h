@@ -7,8 +7,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_SHAPE_CACHE_H__
-#define __GUI_SHAPE_CACHE_H__
+#ifndef __GUI_GEOMETRY_CACHE_H__
+#define __GUI_GEOMETRY_CACHE_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -56,10 +56,10 @@ extern "C" {
  * payloads holding real pixels are worth caching: sharing a bare image header
  * costs far more than it saves.
  */
-#define GUI_SHAPE_DESC_MAX 160
+#define GUI_GEOMETRY_DESC_MAX 160
 
 /**
- * Compile-time guard that a descriptor type fits GUI_SHAPE_DESC_MAX.
+ * Compile-time guard that a descriptor type fits GUI_GEOMETRY_DESC_MAX.
  *
  * Place one per descriptor struct, at file scope.  Written as a negative array
  * bound rather than static_assert: armclang defines both __ARMCC_VERSION and
@@ -67,8 +67,8 @@ extern "C" {
  * keyed on those predefines picks the wrong branch.  This form needs no
  * predefines at all and matches the idiom already used in misc/tlsf/tlsf.c.
  */
-#define GUI_SHAPE_DESC_SIZE_CHECK(type) \
-    typedef char gui_shape_desc_fits_##type[(sizeof(type) <= GUI_SHAPE_DESC_MAX) ? 1 : -1]
+#define GUI_GEOMETRY_DESC_SIZE_CHECK(type) \
+    typedef char gui_geometry_desc_fits_##type[(sizeof(type) <= GUI_GEOMETRY_DESC_MAX) ? 1 : -1]
 
 /*============================================================================*
  *                         Functions
@@ -85,13 +85,29 @@ extern "C" {
  *                 Must not contain padding holes or uninitialised bytes -- zero
  *                 the descriptor struct before filling it, or two runs of the
  *                 same shape will miss each other.
- * @param desc_len Descriptor length in bytes, at most GUI_SHAPE_DESC_MAX.
+ * @param desc_len Descriptor length in bytes, at most GUI_GEOMETRY_DESC_MAX.
  * @param size     Payload size in bytes (image header plus pixels).
  * @param is_new   Set true when the payload needs rasterising, false on a hit.
  * @return Payload pointer, or NULL if allocation failed.
  */
-uint8_t *gui_shape_cache_acquire(const void *desc, uint16_t desc_len,
-                                 uint32_t size, bool *is_new);
+uint8_t *gui_geometry_cache_acquire(const void *desc, uint16_t desc_len,
+                                    uint32_t size, bool *is_new);
+
+/**
+ * @brief Take a reference by descriptor, allowing the payload size to be unknown.
+ *
+ * Geometry whose payload is built in one pass does not know its final compressed
+ * size until rasterisation completes. The descriptor alone still uniquely
+ * identifies its pixels, so a matching node is safe to share regardless of the
+ * logical size recorded in that node.
+ *
+ * On a miss, reserves @p capacity bytes but reports @p size as the initial
+ * logical payload size. The caller may shrink that size with
+ * gui_geometry_cache_rekey() after rendering.
+ */
+uint8_t *gui_geometry_cache_acquire_resizable(const void *desc, uint16_t desc_len,
+                                              uint32_t size, uint32_t capacity,
+                                              bool *is_new);
 
 /**
  * @brief Refresh a mutable payload with spare capacity for geometry changes.
@@ -103,14 +119,14 @@ uint8_t *gui_shape_cache_acquire(const void *desc, uint16_t desc_len,
  *
  * @param current  Payload currently owned by the caller, or NULL.
  * @param desc     Parameters that fully determine the payload's contents.
- * @param desc_len Descriptor length in bytes, at most GUI_SHAPE_DESC_MAX.
+ * @param desc_len Descriptor length in bytes, at most GUI_GEOMETRY_DESC_MAX.
  * @param size     Current logical payload size in bytes.
  * @param must_render Set true when the returned payload needs rasterising.
  * @return Payload pointer, or NULL if allocation failed.
  */
-uint8_t *gui_shape_cache_refresh_resizable(const void *current,
-                                           const void *desc, uint16_t desc_len,
-                                           uint32_t size, bool *must_render);
+uint8_t *gui_geometry_cache_refresh_resizable(const void *current,
+                                              const void *desc, uint16_t desc_len,
+                                              uint32_t size, bool *must_render);
 
 /**
  * @brief Take a reference on a matching payload, without allocating one.
@@ -119,11 +135,11 @@ uint8_t *gui_shape_cache_refresh_resizable(const void *current,
  * an existing one is better still, but only if it already exists.
  *
  * @param desc     Parameters that fully determine the payload's contents.
- * @param desc_len Descriptor length in bytes, at most GUI_SHAPE_DESC_MAX.
+ * @param desc_len Descriptor length in bytes, at most GUI_GEOMETRY_DESC_MAX.
  * @param size     Payload size in bytes.
  * @return Payload pointer with its reference count bumped, or NULL on a miss.
  */
-uint8_t *gui_shape_cache_find(const void *desc, uint16_t desc_len, uint32_t size);
+uint8_t *gui_geometry_cache_find(const void *desc, uint16_t desc_len, uint32_t size);
 
 /**
  * @brief Take an extra reference on a payload already held by the caller.
@@ -131,16 +147,16 @@ uint8_t *gui_shape_cache_find(const void *desc, uint16_t desc_len, uint32_t size
  * For the case where one widget blits the same pixels through several
  * draw_img_t structures, so that every structure can be released the same way.
  *
- * @param data Payload previously returned by gui_shape_cache_acquire().
+ * @param data Payload previously returned by gui_geometry_cache_acquire().
  */
-void gui_shape_cache_addref(const void *data);
+void gui_geometry_cache_addref(const void *data);
 
 /**
  * @brief Drop a reference, freeing the payload when the last one goes.
  *
- * @param data Payload previously returned by gui_shape_cache_acquire(), or NULL.
+ * @param data Payload previously returned by gui_geometry_cache_acquire(), or NULL.
  */
-void gui_shape_cache_release(const void *data);
+void gui_geometry_cache_release(const void *data);
 
 /**
  * @brief Re-describe a payload in place when the caller is its only user.
@@ -150,15 +166,15 @@ void gui_shape_cache_release(const void *data);
  * the payload it is re-keyed to @p desc and reused, keeping its allocation.
  * The caller must then rasterise into it, exactly as for a miss.
  *
- * @param data     Payload previously returned by gui_shape_cache_acquire().
+ * @param data     Payload previously returned by gui_geometry_cache_acquire().
  * @param desc     New descriptor.
- * @param desc_len New descriptor length, at most GUI_SHAPE_DESC_MAX.
+ * @param desc_len New descriptor length, at most GUI_GEOMETRY_DESC_MAX.
  * @param size     New payload size; must fit the existing allocation.
  * @return true if re-keyed and safe to overwrite, false if the caller must
  *         release and acquire instead.
  */
-bool gui_shape_cache_rekey(const void *data, const void *desc, uint16_t desc_len,
-                           uint32_t size);
+bool gui_geometry_cache_rekey(const void *data, const void *desc, uint16_t desc_len,
+                              uint32_t size);
 
 /**
  * @brief Report cache occupancy, for tuning and leak hunting.
@@ -168,18 +184,18 @@ bool gui_shape_cache_rekey(const void *data, const void *desc, uint16_t desc_len
  *                      without sharing, or NULL.
  * @return Number of distinct payloads held.
  */
-uint32_t gui_shape_cache_stats(uint32_t *payload_bytes, uint32_t *shared_bytes);
+uint32_t gui_geometry_cache_stats(uint32_t *payload_bytes, uint32_t *shared_bytes);
 
 /**
  * @brief Return the total payload capacity reserved by cache nodes.
  *
  * This can exceed the logical payload bytes reported by
- * gui_shape_cache_stats() when resizable nodes keep growth headroom.
+ * gui_geometry_cache_stats() when resizable nodes keep growth headroom.
  */
-uint32_t gui_shape_cache_capacity_bytes(void);
+uint32_t gui_geometry_cache_capacity_bytes(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __GUI_SHAPE_CACHE_H__ */
+#endif /* __GUI_GEOMETRY_CACHE_H__ */
