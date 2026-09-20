@@ -344,9 +344,11 @@ static void prepare_blur_param(gui_view_t *this, gui_rect_t new_rect, float blur
         param->blur_degree = blur_degree;
         param->dir = dir;
         event->type = POST_PROCESS_BLUR;
-        if (param->cache_mem == NULL)
+        struct acc_engine *acc = gui_get_acc();
+        if ((param->cache_mem == NULL) && (acc != NULL) && (acc->blur != NULL)
+            && (acc->blur->prepare != NULL))
         {
-            blur_prepare(&param->area, &param->cache_mem);
+            acc->blur->prepare(&param->cache_mem);
         }
     }
 }
@@ -455,9 +457,13 @@ void gui_view_transition(gui_view_t *_this, int16_t release) //by
     {
         gui_view_reduction(_this, release);
     }
-    else if ((_this->current_transition_style == SWITCH_OUT_STILL_USE_BLUR ||
-              _this->current_transition_style == SWITCH_IN_STILL_USE_BLUR) && blur_prepare != NULL)
+    else if (_this->current_transition_style == SWITCH_OUT_STILL_USE_BLUR ||
+             _this->current_transition_style == SWITCH_IN_STILL_USE_BLUR)
     {
-        gui_view_blur(_this, release);
+        struct acc_engine *acc = gui_get_acc();
+        if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->prepare != NULL))
+        {
+            gui_view_blur(_this, release);
+        }
     }
 }

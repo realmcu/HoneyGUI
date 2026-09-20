@@ -56,9 +56,11 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
         .x2 = image->img_target_x + (int16_t)image->img_target_w - 1,
         .y2 = image->img_target_y + (int16_t)image->img_target_h - 1,
     };
-    if (image->acc_user == NULL)
+    struct acc_engine *acc = gui_get_acc();
+    if ((image->acc_user == NULL) && (acc != NULL) && (acc->blur != NULL)
+        && (acc->blur->prepare != NULL))
     {
-        blur_prepare(&img_rect, &image->acc_user);
+        acc->blur->prepare(&image->acc_user);
     }
 
     gui_rect_t blur_rect = {0};
@@ -96,20 +98,22 @@ static void sw_acc_blur_a8(draw_img_t *image, gui_dispdev_t *dc)
                                   ? (int16_t)dc->screen_height - 1 : img_rect.y2;
         int16_t target_h        = onscreen_bottom - onscreen_top + 1;
 
-        gui_rect_t local_rect = {0, 0, blur_w - 1, target_h - 1};
+        gui_rect_t target_rect = {0, 0, blur_w - 1, target_h - 1};
+        gui_rect_t valid_rect =
+        {
+            .x1 = 0,
+            .y1 = blur_rect.y1 - onscreen_top,
+            .x2 = blur_w - 1,
+            .y2 = blur_rect.y2 - onscreen_top,
+        };
 
-        gui_dispdev_t fake_dc = {0};
-        fake_dc.frame_buf     = orig_copy;
-        fake_dc.fb_width      = (uint16_t)blur_w;
-        fake_dc.screen_width  = (uint16_t)blur_w;
-        fake_dc.screen_height = (uint16_t)target_h;
-        fake_dc.bit_depth     = dc->bit_depth;
-        fake_dc.section.x1    = 0;
-        fake_dc.section.y1    = blur_rect.y1 - onscreen_top;
-        fake_dc.section.x2    = blur_w - 1;
-        fake_dc.section.y2    = blur_rect.y2 - onscreen_top;
-
-        gui_get_acc()->blur(&fake_dc, &local_rect, GUI_A8_BLUR_DEGREE, image->acc_user);
+        gui_rect_t buffer_rect = valid_rect;
+        if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->process != NULL))
+        {
+            acc->blur->process(orig_copy, blur_w, dc->bit_depth,
+                               &buffer_rect, &valid_rect, &target_rect,
+                               GUI_A8_BLUR_DEGREE, image->acc_user);
+        }
 
         {
             int16_t x, y;

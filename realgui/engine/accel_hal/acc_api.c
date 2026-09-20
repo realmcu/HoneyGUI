@@ -21,9 +21,9 @@
 void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     struct acc_engine *acc = gui_get_acc();
-    if (acc != NULL && acc->blit != NULL)
+    if (acc != NULL && acc->blit != NULL && acc->blit->process != NULL)
     {
-        acc->blit(image, dc, rect);
+        acc->blit->process(image, dc, rect);
     }
     else
     {

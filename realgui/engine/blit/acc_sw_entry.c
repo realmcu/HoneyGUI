@@ -17,10 +17,13 @@ static void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
 
 static void sw_acc_end_cb(draw_img_t *image)
 {
-    if (image->acc_user != NULL && blur_depose != NULL)
+    struct acc_engine *acc = gui_get_acc();
+    if ((image->acc_user != NULL) && (acc != NULL) && (acc->blur != NULL)
+        && (acc->blur->release != NULL))
     {
-        blur_depose(&image->acc_user);
+        acc->blur->release(&image->acc_user);
     }
+    return;
 }
 
 void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
@@ -47,3 +50,18 @@ void sw_acc_init(void)
     draw_img_acc_prepare_cb = sw_acc_prepare_cb;
     draw_img_acc_end_cb = sw_acc_end_cb;
 }
+
+void sw_acc_deinit(void)
+{
+    extern void (* draw_img_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
+    extern void (* draw_img_acc_end_cb)(struct draw_img * image);
+    if (draw_img_acc_prepare_cb == sw_acc_prepare_cb)
+    {
+        draw_img_acc_prepare_cb = NULL;
+    }
+    if (draw_img_acc_end_cb == sw_acc_end_cb)
+    {
+        draw_img_acc_end_cb = NULL;
+    }
+}
+

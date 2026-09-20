@@ -63,7 +63,9 @@ static void prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
     matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);
 
-    if (obj->extension_process_enabled && blur_prepare != NULL)
+    struct acc_engine *acc = gui_get_acc();
+    if (obj->extension_process_enabled && acc != NULL && acc->blur != NULL
+        && acc->blur->prepare != NULL)
     {
         int16_t x1 = (int16_t)obj->matrix->m[0][2];
         int16_t y1 = (int16_t)obj->matrix->m[1][2];
@@ -87,7 +89,7 @@ static void prepare(gui_obj_t *obj)
             event->type = POST_PROCESS_BLUR;
             if (param->cache_mem == NULL)
             {
-                blur_prepare(&param->area, &param->cache_mem);
+                acc->blur->prepare(&param->cache_mem);
             }
         }
     }
@@ -117,7 +119,11 @@ static void gui_win_end(gui_obj_t *obj)
                 if (event->type == POST_PROCESS_BLUR)
                 {
                     post_process_blur_param *param = (post_process_blur_param *)event->param;
-                    blur_depose(&param->cache_mem);
+                    struct acc_engine *acc = gui_get_acc();
+                    if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->release != NULL))
+                    {
+                        acc->blur->release(&param->cache_mem);
+                    }
                 }
                 gui_free(event->param);
             }

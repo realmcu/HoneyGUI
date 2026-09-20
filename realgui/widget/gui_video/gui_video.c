@@ -130,7 +130,7 @@ static int get_jpeg_size(const unsigned char *jpeg_data, size_t jpeg_size, uint1
             uint8_t subsample = jpeg_data[i + 6];
             gui_log("w %d h %d comp %d subsample 0x%x\n", *width, *height, comp, subsample);
 
-            if (gui_get_acc()->jpeg_load)
+            if (gui_get_acc() && gui_get_acc()->jpeg && gui_get_acc()->jpeg->load)
             {
                 if (comp == 4 || ((subsample != YUV_SAMPLE_420) && (subsample != YUV_SAMPLE_422) &&
                                   (subsample != YUV_SAMPLE_444) && (subsample != YUV_SAMPLE_400)))
@@ -2186,7 +2186,7 @@ static void video_build_header(gui_video_t *this)
 
     if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
     {
-        if (gui_get_acc()->jpeg_load)
+        if (gui_get_acc()->jpeg->load)
         {
             this->header.type = 0x00; // RGB565
         }

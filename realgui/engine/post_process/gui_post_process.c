@@ -7,9 +7,7 @@
 #include "gui_post_process.h"
 #include "gui_api.h"
 #include "gui_obj.h"
-
-void (*blur_prepare)(gui_rect_t *rect, void **mem) = NULL;
-void (*blur_depose)(void **mem) = NULL;
+#include "gui_matrix.h"
 
 typedef struct post_process_item
 {
@@ -61,10 +59,11 @@ void post_process_end(void)
             {
                 if (current->event->type == POST_PROCESS_BLUR)
                 {
-                    if (blur_depose != NULL)
+                    struct acc_engine *acc = gui_get_acc();
+                    if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->release != NULL))
                     {
                         post_process_blur_param *param = (post_process_blur_param *)current->event->param;
-                        blur_depose(&param->cache_mem);
+                        acc->blur->release(&param->cache_mem);
                     }
                 }
                 gui_free(current->event->param);
@@ -79,6 +78,43 @@ void post_process_end(void)
     list_tail = NULL;
 }
 
+static void post_process_blur_buffer(post_process_blur_param *param)
+{
+    struct acc_engine *acc = gui_get_acc();
+    gui_dispdev_t *dc = gui_get_dc();
+    if ((acc == NULL) || (acc->blur == NULL) || (acc->blur->process == NULL)
+        || (dc == NULL) || (dc->frame_buf == NULL) || (param->blur_degree == 0U))
+    {
+        return;
+    }
+
+    gui_rect_t screen_rect = {0, 0, dc->screen_width - 1, dc->screen_height - 1};
+    gui_rect_t target_rect = {0};
+    gui_rect_t valid_rect = {0};
+    if (!rect_intersect(&target_rect, &screen_rect, &param->area)
+        || !rect_intersect(&valid_rect, &target_rect, &dc->section))
+    {
+        return;
+    }
+
+    uint16_t buffer_stride;
+    gui_rect_t buffer_rect;
+    if ((dc->type == DC_RAMLESS) || (dc->type == DC_PFB) || (dc->type == DC_PARTIAL_FB))
+    {
+        buffer_rect = dc->section;
+        buffer_stride = dc->section.x2 - dc->section.x1 + 1;
+    }
+    else
+    {
+        buffer_rect = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
+        buffer_stride = dc->fb_width;
+    }
+
+    acc->blur->process(dc->frame_buf, buffer_stride, dc->bit_depth,
+                       &buffer_rect, &valid_rect, &target_rect,
+                       param->blur_degree, param->cache_mem);
+}
+
 void post_process_handle(void)
 {
     T_PROCESS_ITEM *current = process_list;
@@ -90,16 +126,13 @@ void post_process_handle(void)
             {
                 struct acc_engine *acc = gui_get_acc();
                 post_process_blur_param *param = (post_process_blur_param *)current->event->param;
-                if (acc->blur != NULL)
+                if ((acc != NULL) && (acc->blur != NULL))
                 {
-                    if (blur_prepare != NULL)
+                    if (acc->blur->prepare != NULL)
                     {
-                        blur_prepare(&param->area, &param->cache_mem);
+                        acc->blur->prepare(&param->cache_mem);
                     }
-                    if (param->blur_degree != 0)
-                    {
-                        acc->blur(gui_get_dc(), &param->area, param->blur_degree, param->cache_mem);
-                    }
+                    post_process_blur_buffer(param);
                 }
                 break;
             }
@@ -118,12 +151,9 @@ void pre_process_handle(post_process_event *event)
         {
             struct acc_engine *acc = gui_get_acc();
             post_process_blur_param *param = (post_process_blur_param *)event->param;
-            if (acc->blur != NULL)
+            if ((acc != NULL) && (acc->blur != NULL))
             {
-                if (param->blur_degree != 0)
-                {
-                    acc->blur(gui_get_dc(), &param->area, param->blur_degree, param->cache_mem);
-                }
+                post_process_blur_buffer(param);
             }
             break;
         }

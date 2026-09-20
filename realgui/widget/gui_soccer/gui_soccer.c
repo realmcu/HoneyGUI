@@ -437,12 +437,13 @@ static void gui_soccer_draw_cb(gui_obj_t *obj)
                         {
                             this->decode_attempted_mask |= decode_bit;
                         }
-                        else if (acc != NULL && acc->idu_load != NULL && acc->idu_free != NULL)
+                        else if (acc != NULL && acc->idu != NULL && acc->idu->load != NULL
+                                 && acc->idu->release != NULL)
                         {
-                            this->decoded_data[i] = acc->idu_load(this->src_data[i]);
+                            this->decoded_data[i] = acc->idu->load(this->src_data[i]);
                             if (this->decoded_data[i] != NULL)
                             {
-                                this->decoded_free[i] = acc->idu_free;
+                                this->decoded_free[i] = acc->idu->release;
                             }
                             this->decode_attempted_mask |= decode_bit;
                         }

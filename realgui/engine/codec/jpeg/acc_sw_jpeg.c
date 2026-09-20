@@ -28,9 +28,9 @@
 void *gui_acc_jpeg_load(void *input, int len, int *w, int *h, int *channel)
 {
     struct acc_engine *acc = gui_get_acc();
-    if (acc != NULL && acc->jpeg_load != NULL)
+    if (acc != NULL && acc->jpeg != NULL && acc->jpeg->load != NULL)
     {
-        return acc->jpeg_load(input, len, w, h, channel);
+        return acc->jpeg->load(input, len, w, h, channel);
     }
     else
     {
@@ -57,9 +57,9 @@ void *gui_acc_jpeg_load(void *input, int len, int *w, int *h, int *channel)
 void gui_acc_jpeg_free(void *decode_image)
 {
     struct acc_engine *acc = gui_get_acc();
-    if (acc != NULL && acc->jpeg_free != NULL)
+    if (acc != NULL && acc->jpeg != NULL && acc->jpeg->release != NULL)
     {
-        acc->jpeg_free(decode_image);
+        acc->jpeg->release(decode_image);
     }
     else
     {

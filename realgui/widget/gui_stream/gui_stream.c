@@ -146,7 +146,7 @@ static bool stream_decode_frame(gui_stream_t *this, const stp_frame_t *f,
              * acc backend yields RGB565, the software fallback yields RGB888. */
             {
                 gui_rgb_data_head_t *ph = (gui_rgb_data_head_t *)out;
-                ph->type = (gui_get_acc() && gui_get_acc()->jpeg_load)
+                ph->type = (gui_get_acc() && gui_get_acc()->jpeg && gui_get_acc()->jpeg->load)
                            ? (char)RGB565 : (char)RGB888;
                 ph->jpeg = false;
             }

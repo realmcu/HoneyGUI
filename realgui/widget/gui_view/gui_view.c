@@ -636,7 +636,11 @@ static void gui_view_end(gui_obj_t *obj)
                 if (event->type == POST_PROCESS_BLUR)
                 {
                     post_process_blur_param *param = (post_process_blur_param *)event->param;
-                    blur_depose(&param->cache_mem);
+                    struct acc_engine *acc = gui_get_acc();
+                    if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->release != NULL))
+                    {
+                        acc->blur->release(&param->cache_mem);
+                    }
                 }
                 gui_free(event->param);
             }

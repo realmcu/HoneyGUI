@@ -2169,9 +2169,9 @@ void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data)
     if (head->compress && chr->buf == NULL)
     {
         struct acc_engine *acc = gui_get_acc();
-        if (acc != NULL && acc->idu_load != NULL && acc->idu_free != NULL)
+        if (acc != NULL && acc->idu != NULL && acc->idu->load != NULL && acc->idu->release != NULL)
         {
-            chr->buf = acc->idu_load(data);
+            chr->buf = acc->idu->load(data);
             if (chr->buf == NULL && dc->section_count == 0)
             {
                 gui_log("emoji U+%04X: idu_load failed, blitting compressed data\n", chr->unicode);
@@ -2197,7 +2197,7 @@ void gui_font_free_emoji_cache(gui_text_t *text)
     }
 
     struct acc_engine *acc = gui_get_acc();
-    if (acc == NULL || acc->idu_free == NULL)
+    if (acc == NULL || acc->idu == NULL || acc->idu->release == NULL)
     {
         return;
     }
@@ -2206,7 +2206,7 @@ void gui_font_free_emoji_cache(gui_text_t *text)
     {
         if (chr[i].is_emoji && chr[i].buf != NULL)
         {
-            acc->idu_free(chr[i].buf);
+            acc->idu->release(chr[i].buf);
             chr[i].buf = NULL;
         }
     }

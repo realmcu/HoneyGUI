@@ -13,9 +13,6 @@ extern "C" {
 #include "guidef.h"
 #include "gui_obj.h"
 
-extern void (*blur_prepare)(gui_rect_t *rect, void **mem);
-extern void (*blur_depose)(void **mem);
-
 typedef enum
 {
     POST_PROCESS_BLUR,

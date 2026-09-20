@@ -10,6 +10,16 @@
 #include "gui_post_process.h"
 #include "gui_matrix.h"
 
+#ifndef SW_ARM2D_BLUR_DOWNSCALE_FACTOR
+#define SW_ARM2D_BLUR_DOWNSCALE_FACTOR 2U
+#endif
+
+#if SW_ARM2D_BLUR_DOWNSCALE_FACTOR < 1 || SW_ARM2D_BLUR_DOWNSCALE_FACTOR > 16
+#error "SW_ARM2D_BLUR_DOWNSCALE_FACTOR must be in the range 1..16"
+#endif
+
+#define SW_ARM2D_ROUND_UP_8(x) (((x) + 7U) & ~7U)
+
 typedef struct
 {
     int16_t iX;
@@ -38,6 +48,16 @@ typedef struct arm2d_local_scratch_mem_t
     } tInfo;
 
     uintptr_t pBuffer;
+    uint16_t hwTargetWidth;
+    uint16_t hwTargetHeight;
+    uint8_t chStatusBytesPerPixel;
+#if SW_ARM2D_BLUR_DOWNSCALE_FACTOR > 1
+    uintptr_t pScaledBuffer;
+    uint16_t hwScaledStride;
+    uint16_t hwScaledRows;
+    uint8_t chBytesPerPixel;
+    size_t scaledBufferSize;
+#endif
 } arm2d_local_scratch_mem_t;
 
 typedef struct arm2d_local_filter_iir_blur_descriptor_t
@@ -72,8 +92,8 @@ typedef struct arm2d_color_argb8888_acc_t
     uint16_t hwR;
 } arm2d_color_argb8888_acc_t;
 
-void *arm2d_local_allocate_scratch_memory(uint32_t wSize,
-                                          uint_fast8_t nAlign)
+static void *arm2d_local_allocate_scratch_memory(uint32_t wSize,
+                                                 uint_fast8_t nAlign)
 {
     GUI_UNUSED(nAlign);
 
@@ -86,7 +106,7 @@ void *arm2d_local_allocate_scratch_memory(uint32_t wSize,
     return pBuff;
 }
 
-void arm2d_local_free_scratch_memory(void *pBuff)
+static void arm2d_local_free_scratch_memory(void *pBuff)
 {
     free(pBuff);
 }
@@ -668,81 +688,322 @@ static void arm2d_local_argb8888_filter_iir_blur(
     }
 }
 
-void sw_arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degree, void *cache_mem)
+static void sw_arm2d_run_blur(uint8_t *buffer, int16_t stride,
+                              arm2d_local_region_t *valid, arm2d_local_region_t *target,
+                              uint16_t bit_depth, uint8_t blur_degree,
+                              arm2d_local_scratch_mem_t *scratch_mem)
 {
-    gui_rect_t blur_rect = {0};
-    gui_rect_t target_rect = {.x1 = 0, .x2 = dc->screen_width - 1, .y1 = 0, .y2 = dc->screen_height - 1};
-    if (!rect_intersect(&blur_rect, rect, &dc->section))
-    {
-        return;
-    }
-    if (!rect_intersect(&target_rect, &target_rect, rect))
-    {
-        return;
-    }
-
-    uint8_t *buffer = dc->frame_buf +
-                      ((blur_rect.y1 - dc->section.y1) * dc->fb_width + blur_rect.x1) * dc->bit_depth / 8;
-
-    arm2d_local_region_t valid, target;
-    valid.tLocation.iX = blur_rect.x1;
-    valid.tLocation.iY = blur_rect.y1;
-    valid.tSize.iWidth = blur_rect.x2 - blur_rect.x1 + 1;
-    valid.tSize.iHeight = blur_rect.y2 - blur_rect.y1 + 1;
-    target.tLocation.iX = target_rect.x1;
-    target.tLocation.iY = target_rect.y1;
-    target.tSize.iWidth = target_rect.x2 - target_rect.x1 + 1;
-    target.tSize.iHeight = target_rect.y2 - target_rect.y1 + 1;
-
-    arm2d_local_scratch_mem_t local_scratch_mem = {0};
-    arm2d_local_scratch_mem_t *mem_for_blur = (arm2d_local_scratch_mem_t *)cache_mem;
-    if (cache_mem == NULL)
-    {
-        mem_for_blur = &local_scratch_mem;
-    }
-
     arm2d_local_filter_iir_blur_descriptor_t dsc = {0};
-    dsc.tScratchMemory = *mem_for_blur;
+    dsc.tScratchMemory = *scratch_mem;
     dsc.dir.bForwardHorizontal = 1;
     dsc.dir.bForwardVertical = 1;
     dsc.dir.bReverseHorizontal = 1;
     dsc.dir.bReverseVertical = 0;
 
-    if (dc->bit_depth == 32)
+    if (bit_depth == 32)
     {
-        arm2d_local_argb8888_filter_iir_blur((uint32_t *)buffer, dc->fb_width, &valid, &target,
+        arm2d_local_argb8888_filter_iir_blur((uint32_t *)buffer, stride, valid, target,
                                              blur_degree, &dsc);
     }
-    else
+    else if (bit_depth == 16)
     {
-        arm2d_local_rgb565_filter_iir_blur((uint16_t *)buffer, dc->fb_width, &valid, &target,
+        arm2d_local_rgb565_filter_iir_blur((uint16_t *)buffer, stride, valid, target,
                                            blur_degree, &dsc);
     }
 }
 
-void sw_arm_2d_create(gui_rect_t *rect, void **mem)
+static uint8_t sw_arm2d_bytes_per_pixel(uint16_t bit_depth)
 {
-    if (*mem != NULL)
+    if ((bit_depth == 16U) || (bit_depth == 32U))
+    {
+        return bit_depth / 8U;
+    }
+    return 0U;
+}
+
+static bool sw_arm2d_scratch_ensure(arm2d_local_scratch_mem_t *scratch_mem,
+                                    uint16_t target_width, uint16_t target_height,
+                                    uint8_t bytes_per_pixel)
+{
+    if ((scratch_mem->pBuffer != 0U)
+        && (scratch_mem->hwTargetWidth >= target_width)
+        && (scratch_mem->hwTargetHeight >= target_height)
+        && (scratch_mem->chStatusBytesPerPixel == bytes_per_pixel))
+    {
+        return true;
+    }
+
+#if SW_ARM2D_BLUR_DOWNSCALE_FACTOR > 1
+    uintptr_t scaled_buffer = scratch_mem->pScaledBuffer;
+    uint16_t scaled_stride = scratch_mem->hwScaledStride;
+    uint16_t scaled_rows = scratch_mem->hwScaledRows;
+    uint8_t scaled_bytes_per_pixel = scratch_mem->chBytesPerPixel;
+    size_t scaled_buffer_size = scratch_mem->scaledBufferSize;
+#endif
+    if (scratch_mem->pBuffer != 0U)
+    {
+        arm2d_local_scratch_memory_free(scratch_mem);
+    }
+    else
+    {
+        memset(&scratch_mem->tInfo, 0, sizeof(scratch_mem->tInfo));
+    }
+#if SW_ARM2D_BLUR_DOWNSCALE_FACTOR > 1
+    scratch_mem->pScaledBuffer = scaled_buffer;
+    scratch_mem->hwScaledStride = scaled_stride;
+    scratch_mem->hwScaledRows = scaled_rows;
+    scratch_mem->chBytesPerPixel = scaled_bytes_per_pixel;
+    scratch_mem->scaledBufferSize = scaled_buffer_size;
+#endif
+
+    uint16_t item_size = bytes_per_pixel == 4U
+                         ? sizeof(arm2d_color_argb8888_acc_t)
+                         : sizeof(arm2d_color_rgb565_t);
+    if (NULL == arm2d_local_scratch_memory_new(
+            scratch_mem, item_size, target_width + target_height,
+            __alignof__(uint32_t)))
+    {
+        return false;
+    }
+    scratch_mem->hwTargetWidth = target_width;
+    scratch_mem->hwTargetHeight = target_height;
+    scratch_mem->chStatusBytesPerPixel = bytes_per_pixel;
+    return true;
+}
+
+#if SW_ARM2D_BLUR_DOWNSCALE_FACTOR > 1
+static void sw_arm2d_nearest_scale(uint8_t *target_buffer,
+                                   const uint8_t *source_buffer,
+                                   uint16_t source_width,
+                                   uint16_t source_height,
+                                   uint16_t source_stride,
+                                   uint16_t target_stride,
+                                   uint8_t factor,
+                                   uint16_t target_width,
+                                   uint16_t target_height,
+                                   uint8_t bytes_per_pixel,
+                                   bool scale_up)
+{
+    struct acc_engine *acc = gui_get_acc();
+    if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->scale != NULL)
+        && acc->blur->scale(target_buffer, source_buffer, source_width, source_height,
+                            source_stride, target_stride, factor, target_width,
+                            target_height, bytes_per_pixel, scale_up))
     {
         return;
     }
-    uint16_t w = rect->x2 - rect->x1 + 1;
-    uint16_t h = rect->y2 - rect->y1 + 1;
+
+    uint8_t copy_size = (scale_up && (bytes_per_pixel == 4U)) ? 3U : bytes_per_pixel;
+    for (uint32_t y = 0; y < target_height; y++)
+    {
+        uint32_t source_y = scale_up ? y / factor : y * factor;
+        if (source_y >= source_height)
+        {
+            source_y = source_height - 1U;
+        }
+        for (uint32_t x = 0; x < target_width; x++)
+        {
+            uint32_t source_x = scale_up ? x / factor : x * factor;
+            if (source_x >= source_width)
+            {
+                source_x = source_width - 1U;
+            }
+            uint8_t *destination = target_buffer
+                                   + ((size_t)y * target_stride + x) * bytes_per_pixel;
+            const uint8_t *source = source_buffer
+                                    + ((size_t)source_y * source_stride + source_x)
+                                    * bytes_per_pixel;
+            memcpy(destination, source, copy_size);
+        }
+    }
+}
+
+static bool sw_arm2d_scaled_buffer_ensure(arm2d_local_scratch_mem_t *scratch_mem,
+                                          uint16_t scaled_width, uint16_t scaled_height,
+                                          uint8_t bytes_per_pixel)
+{
+    uint16_t stride = SW_ARM2D_ROUND_UP_8((uint32_t)scaled_width + 7U);
+    uint16_t rows = SW_ARM2D_ROUND_UP_8((uint32_t)scaled_height + 7U);
+    size_t required_size = (size_t)stride * rows * bytes_per_pixel;
+    if ((scratch_mem->pScaledBuffer != 0U)
+        && (scratch_mem->scaledBufferSize >= required_size)
+        && (scratch_mem->hwScaledStride >= stride)
+        && (scratch_mem->hwScaledRows >= rows)
+        && (scratch_mem->chBytesPerPixel == bytes_per_pixel))
+    {
+        return true;
+    }
+
+    gui_free((void *)scratch_mem->pScaledBuffer);
+    scratch_mem->pScaledBuffer = (uintptr_t)gui_malloc(required_size);
+    if (scratch_mem->pScaledBuffer == 0U)
+    {
+        return false;
+    }
+    scratch_mem->hwScaledStride = stride;
+    scratch_mem->hwScaledRows = rows;
+    scratch_mem->chBytesPerPixel = bytes_per_pixel;
+    scratch_mem->scaledBufferSize = required_size;
+    return true;
+}
+
+static bool sw_arm2d_scaled_blur(uint8_t *buffer, uint16_t buffer_stride,
+                                 uint16_t bit_depth, const gui_rect_t *buffer_rect,
+                                 const gui_rect_t *valid_rect, const gui_rect_t *target_rect,
+                                 uint8_t blur_degree, arm2d_local_scratch_mem_t *scratch_mem)
+{
+    uint8_t bytes_per_pixel = sw_arm2d_bytes_per_pixel(bit_depth);
+    uint32_t factor = SW_ARM2D_BLUR_DOWNSCALE_FACTOR;
+    uint16_t target_width = target_rect->x2 - target_rect->x1 + 1;
+    uint16_t target_height = target_rect->y2 - target_rect->y1 + 1;
+    uint16_t scaled_target_width = ((uint32_t)target_width + factor - 1U) / factor;
+    uint16_t scaled_target_height = ((uint32_t)target_height + factor - 1U) / factor;
+    if ((bytes_per_pixel == 0U) || (scratch_mem == NULL))
+    {
+        return false;
+    }
+
+    bool full_target = (valid_rect->x1 == target_rect->x1)
+                       && (valid_rect->x2 == target_rect->x2)
+                       && (valid_rect->y1 == target_rect->y1)
+                       && (valid_rect->y2 == target_rect->y2);
+    bool full_width_y_slice = (valid_rect->x1 == target_rect->x1)
+                              && (valid_rect->x2 == target_rect->x2)
+                              && (valid_rect->y1 >= target_rect->y1)
+                              && (valid_rect->y2 <= target_rect->y2);
+    if (!full_target && !full_width_y_slice)
+    {
+        return false;
+    }
+    if (!sw_arm2d_scratch_ensure(scratch_mem, scaled_target_width,
+                                 scaled_target_height, bytes_per_pixel))
+    {
+        return false;
+    }
+
+    uint16_t source_width = valid_rect->x2 - valid_rect->x1 + 1;
+    uint16_t source_height = valid_rect->y2 - valid_rect->y1 + 1;
+    uint32_t scaled_y = ((uint32_t)(valid_rect->y1 - target_rect->y1) + factor - 1U) / factor;
+    uint32_t scaled_y_end = ((uint32_t)(valid_rect->y2 - target_rect->y1 + 1)
+                             + factor - 1U) / factor;
+    uint16_t scaled_height = (uint16_t)(scaled_y_end - scaled_y);
+    if ((scaled_height == 0U) || (scaled_y + scaled_height > scaled_target_height)
+        || !sw_arm2d_scaled_buffer_ensure(scratch_mem, scaled_target_width,
+                                          scaled_height + 1U, bytes_per_pixel))
+    {
+        return false;
+    }
+
+    uint8_t *source_start = buffer
+                            + (((size_t)(valid_rect->y1 - buffer_rect->y1) * buffer_stride)
+                               + (valid_rect->x1 - buffer_rect->x1)) * bytes_per_pixel;
+    uint8_t *scaled_start = (uint8_t *)scratch_mem->pScaledBuffer;
+    sw_arm2d_nearest_scale(scaled_start, source_start, source_width, source_height,
+                           buffer_stride, scratch_mem->hwScaledStride, factor,
+                           scaled_target_width, scaled_height, bytes_per_pixel, false);
+
+    arm2d_local_region_t scaled_valid =
+    {
+        .tLocation = {.iX = 0, .iY = (int16_t)scaled_y},
+        .tSize = {.iWidth = scaled_target_width, .iHeight = scaled_height},
+    };
+    arm2d_local_region_t scaled_target =
+    {
+        .tLocation = {.iX = 0, .iY = 0},
+        .tSize = {.iWidth = scaled_target_width, .iHeight = scaled_target_height},
+    };
+    sw_arm2d_run_blur(scaled_start, scratch_mem->hwScaledStride, &scaled_valid,
+                      &scaled_target, bit_depth, blur_degree, scratch_mem);
+    memcpy(scaled_start + (size_t)scaled_height * scratch_mem->hwScaledStride * bytes_per_pixel,
+           scaled_start + (size_t)(scaled_height - 1U) * scratch_mem->hwScaledStride
+           * bytes_per_pixel,
+           (size_t)scratch_mem->hwScaledStride * bytes_per_pixel);
+
+    sw_arm2d_nearest_scale(source_start, scaled_start, scaled_target_width,
+                           scaled_height + 1U, scratch_mem->hwScaledStride,
+                           buffer_stride, factor, source_width, source_height,
+                           bytes_per_pixel, true);
+    return true;
+}
+#endif
+
+void sw_arm_2d_blur(uint8_t *buffer, uint16_t buffer_stride, uint16_t bit_depth,
+                    const gui_rect_t *buffer_rect, const gui_rect_t *valid_rect,
+                    const gui_rect_t *target_rect, uint8_t blur_degree, void *cache_mem)
+{
+    if ((buffer == NULL) || (buffer_rect == NULL) || (valid_rect == NULL)
+        || (target_rect == NULL) || (buffer_stride == 0U)
+        || (valid_rect->x1 < buffer_rect->x1) || (valid_rect->y1 < buffer_rect->y1)
+        || (valid_rect->x2 > buffer_rect->x2) || (valid_rect->y2 > buffer_rect->y2)
+        || (valid_rect->x1 < target_rect->x1) || (valid_rect->y1 < target_rect->y1)
+        || (valid_rect->x2 > target_rect->x2) || (valid_rect->y2 > target_rect->y2))
+    {
+        return;
+    }
+
+    uint8_t bytes_per_pixel = sw_arm2d_bytes_per_pixel(bit_depth);
+    if (bytes_per_pixel == 0U)
+    {
+        return;
+    }
+    uint8_t *valid_start = buffer
+                           + (((size_t)(valid_rect->y1 - buffer_rect->y1) * buffer_stride)
+                              + (valid_rect->x1 - buffer_rect->x1)) * bytes_per_pixel;
+    arm2d_local_region_t valid =
+    {
+        .tLocation = {.iX = valid_rect->x1, .iY = valid_rect->y1},
+        .tSize =
+        {
+            .iWidth = valid_rect->x2 - valid_rect->x1 + 1,
+            .iHeight = valid_rect->y2 - valid_rect->y1 + 1,
+        },
+    };
+    arm2d_local_region_t target =
+    {
+        .tLocation = {.iX = target_rect->x1, .iY = target_rect->y1},
+        .tSize =
+        {
+            .iWidth = target_rect->x2 - target_rect->x1 + 1,
+            .iHeight = target_rect->y2 - target_rect->y1 + 1,
+        },
+    };
+    arm2d_local_scratch_mem_t local_scratch_mem = {0};
+    arm2d_local_scratch_mem_t *mem_for_blur = (arm2d_local_scratch_mem_t *)cache_mem;
+    if (mem_for_blur == NULL)
+    {
+        mem_for_blur = &local_scratch_mem;
+    }
+
+#if SW_ARM2D_BLUR_DOWNSCALE_FACTOR > 1
+    if ((cache_mem != NULL)
+        && sw_arm2d_scaled_blur(buffer, buffer_stride, bit_depth, buffer_rect,
+                                valid_rect, target_rect, blur_degree, mem_for_blur))
+    {
+        return;
+    }
+#endif
+
+    if ((cache_mem != NULL)
+        && !sw_arm2d_scratch_ensure(mem_for_blur, target.tSize.iWidth,
+                                    target.tSize.iHeight, bytes_per_pixel))
+    {
+        return;
+    }
+    sw_arm2d_run_blur(valid_start, buffer_stride, &valid, &target, bit_depth,
+                      blur_degree, mem_for_blur);
+}
+
+void sw_arm_2d_create(void **mem)
+{
+    if ((mem == NULL) || (*mem != NULL))
+    {
+        return;
+    }
     arm2d_local_scratch_mem_t *scratch_mem = gui_malloc(sizeof(arm2d_local_scratch_mem_t));
     GUI_ASSERT(scratch_mem != NULL);
-
-    struct gui_dispdev *dc = gui_get_dc();
-    uint16_t item_size = (dc->bit_depth == 32) ?
-                         sizeof(arm2d_color_argb8888_acc_t) :
-                         sizeof(arm2d_color_rgb565_t);
-
-    if (NULL == arm2d_local_scratch_memory_new(
-            scratch_mem,
-            item_size,
-            (w + h),
-            __alignof__(uint32_t)))
+    if (scratch_mem != NULL)
     {
-        memset(scratch_mem, 0, sizeof(arm2d_local_scratch_mem_t));
+        memset(scratch_mem, 0, sizeof(*scratch_mem));
     }
     *mem = (void *)scratch_mem;
 }
@@ -751,14 +1012,25 @@ void sw_arm_2d_depose(void **mem)
 {
     if (*mem != NULL)
     {
-        arm2d_local_scratch_memory_free((arm2d_local_scratch_mem_t *)*mem);
+        arm2d_local_scratch_mem_t *scratch_mem = (arm2d_local_scratch_mem_t *)*mem;
+#if SW_ARM2D_BLUR_DOWNSCALE_FACTOR > 1
+        gui_free((void *)scratch_mem->pScaledBuffer);
+        scratch_mem->pScaledBuffer = 0U;
+#endif
+        if (scratch_mem->pBuffer != 0U)
+        {
+            arm2d_local_scratch_memory_free(scratch_mem);
+        }
     }
     gui_free(*mem);
     *mem = NULL;
 }
 
-void sw_arm2d_blur_init(void)
+gui_blur_ops_t sw_arm2d_blur_ops =
 {
-    blur_depose = sw_arm_2d_depose;
-    blur_prepare = sw_arm_2d_create;
-}
+    .prepare = sw_arm_2d_create,
+    .process = sw_arm_2d_blur,
+    .release = sw_arm_2d_depose,
+};
+
+
