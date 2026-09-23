@@ -338,6 +338,23 @@ int gui_font_bmp_fallback_search(uint32_t unicode, uint16_t font_size,
                                  uint8_t *skip_file, mem_char_t *out_chr,
                                  int32_t *out_line_byte);
 
+
+/**
+ * @brief Load a substitute glyph for a code point missing from every font.
+ *
+ * On success out_chr holds the substitute glyph but keeps the original unicode,
+ * so word wrap and the glyph cache still key off the character the text
+ * actually contains.
+ *
+ * @param unicode Original code point that could not be resolved.
+ * @param font_size Font size to match.
+ * @param out_chr Output character info (populated on success).
+ * @param out_line_byte Output line byte width.
+ * @return 0 on success, -1 if no candidate has a glyph.
+ */
+int gui_font_bmp_substitute_search(uint32_t unicode, uint16_t font_size,
+                                   mem_char_t *out_chr, int32_t *out_line_byte);
+
 #ifdef __cplusplus
 }
 #endif

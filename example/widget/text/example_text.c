@@ -85,7 +85,8 @@ void text_widget_example(void)
  * |14 | text_font_fallback_test()        | Mixed-language fallback: CJK+EN in one string with priority chain        |
  * |15 | text_vector_scale_test()         | V3 vector font scaling: win-issued scale + text self-scale (looping)     |
  * |16 | text_emoji_example()             | Inline color emoji drawn from .bin files, mixed with bitmap glyphs       |
- * |17 | text_ttf_emoji_example()         | Inline color emoji mixed with vector TTF glyphs                         |
+ * |17 | text_ttf_emoji_example()         | Inline color emoji mixed with vector TTF glyphs                          |
+ * |18 | text_missing_glyph_test()        | Missing glyph: skip vs substitute chain, bitmap + vector                 |
  *
  * @return 0 on success
  */
@@ -110,6 +111,7 @@ static int app_init(void)
     // text_vector_scale_test();        /* [15] Vector font scaling    */
     // text_emoji_example();            /* [16] Bitmap text + emoji    */
     // text_ttf_emoji_example();        /* [17] Vector text + emoji    */
+    // text_missing_glyph_test();       /* [18] Missing glyph modes    */
 
     return 0;
 }

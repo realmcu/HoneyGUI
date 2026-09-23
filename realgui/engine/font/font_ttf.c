@@ -1606,6 +1606,22 @@ int gui_font_ttf_fallback_search(uint32_t unicode, uint16_t font_height,
     return -1;
 }
 
+int gui_font_ttf_substitute_search(uint32_t unicode, uint16_t font_height,
+                                   uint8_t bold_weight, mem_char_t *out_chr)
+{
+    for (uint8_t i = 0; gui_text_substitute_chain[i] != 0; i++)
+    {
+        uint32_t cp = gui_text_substitute_chain[i];
+        if (cp == unicode) { continue; }   /* already tried by the caller */
+        if (gui_font_ttf_fallback_search(cp, font_height, bold_weight, NULL, out_chr) == 0)
+        {
+            out_chr->unicode = unicode;
+            return 0;
+        }
+    }
+    return -1;
+}
+
 #if ENABLE_FONT_V3_TYPO
 gui_font_typo_context_t gui_font_ttf_get_typo_context(const GUI_FONT_HEAD_TTF *header,
                                                       uint16_t font_height)
@@ -1828,6 +1844,8 @@ static void font_ttf_get_info(gui_text_t *text)
     uint32_t line_flag = 0;
     uint32_t uni_i = 0;
     uint32_t chr_i = 0;
+
+    const bool substitute_missing = gui_text_substitute_enabled(text);
 
     /* Build typography context once per text widget (not per-glyph) */
 #if ENABLE_FONT_V3_TYPO
@@ -2098,6 +2116,12 @@ static void font_ttf_get_info(gui_text_t *text)
                                                  &chr[chr_i]) == 0)
                 {
                     /* Found in TTF fallback */
+                }
+                else if (substitute_missing &&
+                         gui_font_ttf_substitute_search(unicode_buf[uni_i], text->font_height,
+                                                        text->bold_weight, &chr[chr_i]) == 0)
+                {
+                    /* Substitute glyph in place of the missing character */
                 }
                 else
                 {

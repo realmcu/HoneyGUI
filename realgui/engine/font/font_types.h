@@ -49,6 +49,17 @@ typedef enum
     BOLD_FULL       = 1,   /**< Horizontal + vertical */
 } BOLD_MODE;
 
+/**
+ * @brief Behavior for a code point missing from the primary font and every
+ *        registered fallback font (2-bit field)
+ */
+typedef enum
+{
+    GUI_MISSING_GLYPH_INHERIT    = 0,  /**< per-widget only: follow the global mode */
+    GUI_MISSING_GLYPH_SKIP       = 1,  /**< drop the character (global default) */
+    GUI_MISSING_GLYPH_SUBSTITUTE = 2,  /**< try the substitute chain; else drop */
+} gui_missing_glyph_mode_t;
+
 #ifdef __cplusplus
 }
 #endif

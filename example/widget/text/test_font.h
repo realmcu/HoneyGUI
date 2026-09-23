@@ -93,6 +93,7 @@ void text_font_fallback_test(void);
 void text_vector_scale_test(void);
 void text_emoji_example(void);
 void text_ttf_emoji_example(void);
+void text_missing_glyph_test(void);
 
 #ifdef __cplusplus
 }

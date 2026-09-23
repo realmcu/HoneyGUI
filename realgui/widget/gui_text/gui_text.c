@@ -37,6 +37,11 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+static gui_missing_glyph_mode_t font_missing_mode = GUI_MISSING_GLYPH_SKIP;
+
+/* Run-time overrideable substitute chain (default FFFD, 25A1, space).
+ * Rest of the array is zero-initialized, i.e. 0x0000-terminated. */
+uint32_t gui_text_substitute_chain[GUI_TEXT_SUBSTITUTE_CHAIN_MAX + 1] = {0xFFFD, 0x25A1, 0x0020};
 
 
 /*============================================================================*
@@ -629,6 +634,47 @@ void gui_text_set_space_width(gui_text_t *this, uint16_t space_width)
     GUI_ASSERT(this != NULL);
     this->space_width = space_width;
     this->layout_refresh = true;
+}
+
+void gui_text_set_missing_glyph_mode_global(gui_missing_glyph_mode_t mode)
+{
+    if (mode != GUI_MISSING_GLYPH_INHERIT)
+    {
+        font_missing_mode = mode;
+    }
+}
+
+void gui_text_set_missing_glyph_mode(gui_text_t *this, gui_missing_glyph_mode_t mode)
+{
+    GUI_ASSERT(this != NULL);
+    if (this->missing_glyph_mode != (uint8_t)mode)
+    {
+        /* Substitution changes which cells exist, so chr[] needs a rebuild. */
+        this->content_refresh = true;
+    }
+    this->missing_glyph_mode = (uint8_t)mode;
+}
+
+bool gui_text_substitute_enabled(const gui_text_t *text)
+{
+    gui_missing_glyph_mode_t mode = (text != NULL && text->missing_glyph_mode != 0)
+                                    ? (gui_missing_glyph_mode_t)text->missing_glyph_mode
+                                    : font_missing_mode;
+    return mode == GUI_MISSING_GLYPH_SUBSTITUTE;
+}
+
+void gui_text_substitute_chain_set(const uint32_t *cps, uint8_t n)
+{
+    if (cps == NULL || n == 0)
+    {
+        return;
+    }
+    if (n > GUI_TEXT_SUBSTITUTE_CHAIN_MAX)
+    {
+        n = GUI_TEXT_SUBSTITUTE_CHAIN_MAX;
+    }
+    memcpy(gui_text_substitute_chain, cps, n * sizeof(uint32_t));
+    gui_text_substitute_chain[n] = 0x0000;
 }
 
 void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)

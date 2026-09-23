@@ -124,9 +124,9 @@ typedef struct gui_text
     bool hebrew            : 1;
     uint8_t rendermode     : 2;
     uint8_t bold_mode      : 1;  /**< 0=BOLD_HORIZONTAL (fast), 1=BOLD_FULL */
-bool font_cache_enable :
-    1; /**< user opt-in: cross-frame glyph bitmap cache (identity/translate only) */
+    bool font_cache_enable : 1; /**< cross-frame glyph bitmap cache (identity/translate only) */
     bool font_cache_static : 1; /**< internal: chr[].buf currently holds a cross-frame static cache */
+    uint8_t missing_glyph_mode : 2; /**< gui_missing_glyph_mode_t, 0 = inherit global */
 } gui_text_t;
 
 /** @brief Text line structure. */
@@ -145,11 +145,21 @@ typedef struct gui_text_line
  *                         Macros
  *============================================================================*/
 
+/** @brief Maximum number of substitute code points in the chain. */
+#define GUI_TEXT_SUBSTITUTE_CHAIN_MAX  4
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
 
+/**
+ * @brief Substitute candidates for missing glyphs, 0x0000-terminated.
+ *
+ * Default order: U+FFFD replacement char, U+25A1 white square, U+0020 space.
+ * The space is the last resort: nearly every font has it, so a missing
+ * character degrades to a blank of the font's own width instead of vanishing.
+ */
+extern uint32_t gui_text_substitute_chain[GUI_TEXT_SUBSTITUTE_CHAIN_MAX + 1];
 
 /*============================================================================*
  *                         Functions
@@ -253,6 +263,43 @@ void gui_text_set_line_height(gui_text_t *this_widget, int16_t line_height);
  * @param space_width Space width in pixels. 0 = use the default approximation.
  */
 void gui_text_set_space_width(gui_text_t *this_widget, uint16_t space_width);
+
+/**
+ * @brief Set the global behavior for code points with no glyph anywhere.
+ *
+ * @param mode GUI_MISSING_GLYPH_SKIP or GUI_MISSING_GLYPH_SUBSTITUTE.
+ *             GUI_MISSING_GLYPH_INHERIT is ignored, it is per-widget only.
+ */
+void gui_text_set_missing_glyph_mode_global(gui_missing_glyph_mode_t mode);
+
+/**
+ * @brief Set this widget's behavior for characters missing from every font.
+ *
+ * Overrides the global mode set by gui_text_set_missing_glyph_mode_global().
+ *
+ * @param this_widget Text box widget pointer.
+ * @param mode Missing-glyph mode; INHERIT follows the global mode.
+ */
+void gui_text_set_missing_glyph_mode(gui_text_t *this_widget, gui_missing_glyph_mode_t mode);
+
+/**
+ * @brief Whether a text widget should substitute glyphs for missing characters.
+ *
+ * @param text Text widget, may be NULL to query the global mode.
+ * @return true if substitution is enabled.
+ */
+bool gui_text_substitute_enabled(const gui_text_t *text);
+
+/**
+ * @brief Override the substitute code point chain.
+ *
+ * Candidates are tried in order; the first one with a glyph wins. Takes effect
+ * when glyphs are loaded, so set it during init rather than per frame.
+ *
+ * @param cps Candidate code points; ignored when NULL.
+ * @param n Number of candidates, clamped to GUI_TEXT_SUBSTITUTE_CHAIN_MAX.
+ */
+void gui_text_substitute_chain_set(const uint32_t *cps, uint8_t n);
 
 /**
  * @brief Enable/disable matrix-based image rendering for text.

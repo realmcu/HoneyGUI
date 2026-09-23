@@ -735,6 +735,28 @@ int gui_font_bmp_fallback_search(uint32_t unicode, uint16_t font_size,
     return -1;
 }
 
+/*============================================================================*
+ *                      Missing Glyph Substitution
+ *============================================================================*/
+
+int gui_font_bmp_substitute_search(uint32_t unicode, uint16_t font_size,
+                                   mem_char_t *out_chr, int32_t *out_line_byte)
+{
+    for (uint8_t i = 0; gui_text_substitute_chain[i] != 0; i++)
+    {
+        uint32_t cp = gui_text_substitute_chain[i];
+        if (cp == unicode) { continue; }   /* already tried by the caller */
+        out_chr->unicode = cp;
+        if (gui_font_bmp_fallback_search(cp, font_size, NULL, out_chr, out_line_byte) == 0)
+        {
+            out_chr->unicode = unicode;
+            return 0;
+        }
+    }
+    out_chr->unicode = unicode;
+    return -1;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
@@ -858,6 +880,8 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint32_t uni_i = 0;
     uint32_t chr_i = 0;
 
+    const bool substitute_missing = gui_text_substitute_enabled(text);
+
     /* Build typography context once per text widget (V3 vs V1 detection) */
     int16_t emoji_baseline_px = 0;
 #if ENABLE_FONT_V3_TYPO
@@ -929,6 +953,12 @@ void gui_font_get_dot_info(gui_text_t *text)
                                                          (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
                         {
                             /* Found in BMP fallback */
+                        }
+                        else if (substitute_missing &&
+                                 gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
+                                                                &chr[chr_i], &line_byte) == 0)
+                        {
+                            /* Substitute glyph in place of the missing character */
                         }
                         else
                         {
@@ -1041,6 +1071,12 @@ void gui_font_get_dot_info(gui_text_t *text)
                                                              (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
                             {
                                 /* Found in BMP fallback */
+                            }
+                            else if (substitute_missing &&
+                                     gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
+                                                                    &chr[chr_i], &line_byte) == 0)
+                            {
+                                /* Substitute glyph in place of the missing character */
                             }
                             else
                             {
@@ -1167,6 +1203,12 @@ void gui_font_get_dot_info(gui_text_t *text)
                         {
                             /* Found in BMP fallback */
                         }
+                        else if (substitute_missing &&
+                                 gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
+                                                                &chr[chr_i], &line_byte) == 0)
+                        {
+                            /* Substitute glyph in place of the missing character */
+                        }
                         else
                         {
                             continue;
@@ -1233,6 +1275,12 @@ void gui_font_get_dot_info(gui_text_t *text)
                                                              (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
                             {
                                 /* Found in BMP fallback - skip primary font loading */
+                            }
+                            else if (substitute_missing &&
+                                     gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
+                                                                    &chr[chr_i], &line_byte) == 0)
+                            {
+                                /* Substitute glyph in place of the missing character */
                             }
                             else
                             {
