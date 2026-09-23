@@ -1,0 +1,18 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c') + Glob('*.cpp')
+
+if GetDepend(['']):
+    objs = DefineGroup('win32_sim/port/sysval', src,
+                       depend = [''], CPPPATH = [cwd])
+else:
+    objs = []
+
+Return('objs')

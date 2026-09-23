@@ -208,4 +208,3 @@ int gui_server_init(void)
                       15);
     return 0;
 }
-
