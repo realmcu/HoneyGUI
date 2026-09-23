@@ -13,48 +13,48 @@ SECTIONS
   . = ALIGN(__section_alignment__);
   .text  __image_base__ + ( __section_alignment__ < 0x1000 ? . : __section_alignment__ ) :
   {
-     KEEP(*(.init))
+    KEEP(*(.init))
     *(.text)
     *(SORT(.text$*))
-     *(.text.*)
-     *(.gnu.linkonce.t.*)
+    *(.text.*)
+    *(.gnu.linkonce.t.*)
     *(.glue_7t)
     *(.glue_7)
     . = ALIGN(8);
-       /* Note: we always define __CTOR_LIST__ and ___CTOR_LIST__ here,
-          we do not PROVIDE them.  This is because the ctors.o startup
-	  code in libgcc defines them as common symbols, with the
-          expectation that they will be overridden by the definitions
-	  here.  If we PROVIDE the symbols then they will not be
-	  overridden and global constructors will not be run.
+    /* Note: we always define __CTOR_LIST__ and ___CTOR_LIST__ here,
+       we do not PROVIDE them.  This is because the ctors.o startup
+       code in libgcc defines them as common symbols, with the
+       expectation that they will be overridden by the definitions
+       here.  If we PROVIDE the symbols then they will not be
+       overridden and global constructors will not be run.
 
-	  This does mean that it is not possible for a user to define
-	  their own __CTOR_LIST__ and __DTOR_LIST__ symbols.  If that
-	  ability is needed a custom linker script will have to be
-	  used.  (The custom script can just be a copy of this script
-	  with the PROVIDE() qualifiers added).
-	  See PR 22762 for more details.  */
-       ___CTOR_LIST__ = .;
-       __CTOR_LIST__ = .;
-       LONG (-1); LONG (-1);
-       KEEP (*(.ctors));
-       KEEP (*(.ctor));
-       KEEP (*(SORT_BY_NAME(.ctors.*)));
-       LONG (0); LONG (0);
-       /* See comment about __CTOR_LIST__ above.  The same reasoning
-    	  applies here too.  */
-       ___DTOR_LIST__ = .;
-       __DTOR_LIST__ = .;
-       LONG (-1); LONG (-1);
-       KEEP (*(.dtors));
-       KEEP (*(.dtor));
-       KEEP (*(SORT_BY_NAME(.dtors.*)));
-       LONG (0); LONG (0);
-     KEEP (*(.fini))
+       This does mean that it is not possible for a user to define
+       their own __CTOR_LIST__ and __DTOR_LIST__ symbols.  If that
+       ability is needed a custom linker script will have to be
+       used.  (The custom script can just be a copy of this script
+       with the PROVIDE() qualifiers added).
+       See PR 22762 for more details.  */
+    ___CTOR_LIST__ = .;
+    __CTOR_LIST__ = .;
+    LONG (-1); LONG (-1);
+    KEEP (*(.ctors));
+    KEEP (*(.ctor));
+    KEEP (*(SORT_BY_NAME(.ctors.*)));
+    LONG (0); LONG (0);
+    /* See comment about __CTOR_LIST__ above.  The same reasoning
+       applies here too.  */
+    ___DTOR_LIST__ = .;
+    __DTOR_LIST__ = .;
+    LONG (-1); LONG (-1);
+    KEEP (*(.dtors));
+    KEEP (*(.dtor));
+    KEEP (*(SORT_BY_NAME(.dtors.*)));
+    LONG (0); LONG (0);
+    KEEP (*(.fini))
     /* ??? Why is .gcc_exc here?  */
-     *(.gcc_exc)
+    *(.gcc_exc)
     PROVIDE (etext = .);
-     KEEP (*(.gcc_except_table))
+    KEEP (*(.gcc_except_table))
     /* section information for initial. */
     __honeygui_init_start = .;
     KEEP(*(SORT(.honeygui$init*)))
@@ -70,9 +70,9 @@ SECTIONS
     *(.rodata)
     *(SORT(.rodata$*))
     . = ALIGN(4);
-    _shell_command_start = ABSOLUTE(.); 
+    _shell_command_start = .;
     KEEP (*(shellCommand))
-    _shell_command_end = ABSOLUTE(.); 
+    _shell_command_end = .;
   }
   .data BLOCK(__section_alignment__) :
   {
@@ -87,7 +87,7 @@ SECTIONS
   .rdata BLOCK(__section_alignment__) :
   {
     *(.rdata)
-	     *(SORT(.rdata$*))
+    *(SORT(.rdata$*))
     __rt_psrelocs_start = .;
     KEEP(*(.rdata_runtime_pseudo_reloc))
     __rt_psrelocs_end = .;
@@ -126,13 +126,13 @@ SECTIONS
     *(.debug$T)
     *(.debug$F)
     *(.drectve)
-     *(.note.GNU-stack)
-     *(.gnu.lto_*)
+    *(.note.GNU-stack)
+    *(.gnu.lto_*)
   }
   .idata BLOCK(__section_alignment__) :
   {
     /* This cannot currently be handled with grouped sections.
-	See pep.em:sort_sections.  */
+       See pep.em:sort_sections.  */
     KEEP (SORT(*)(.idata$2))
     KEEP (SORT(*)(.idata$3))
     /* These zeroes mark the end of the import list.  */
@@ -181,7 +181,7 @@ SECTIONS
     /* end is deprecated, don't use it */
     PROVIDE (end = .);
     PROVIDE ( _end = .);
-     __end__ = .;
+    __end__ = .;
   }
   .rsrc BLOCK(__section_alignment__) : SUBALIGN(4)
   {
@@ -335,6 +335,30 @@ SECTIONS
   .zdebug_ranges BLOCK(__section_alignment__) (NOLOAD) :
   {
     *(.zdebug_ranges)
+  }
+  .debug_loclists BLOCK(__section_alignment__) (NOLOAD) :
+  {
+    *(.debug_loclists)
+  }
+  .zdebug_loclists BLOCK(__section_alignment__) (NOLOAD) :
+  {
+    *(.zdebug_loclists)
+  }
+  .debug_line_str BLOCK(__section_alignment__) (NOLOAD) :
+  {
+    *(.debug_line_str)
+  }
+  .zdebug_line_str BLOCK(__section_alignment__) (NOLOAD) :
+  {
+    *(.zdebug_line_str)
+  }
+  .debug_rnglists BLOCK(__section_alignment__) (NOLOAD) :
+  {
+    *(.debug_rnglists)
+  }
+  .zdebug_rnglists BLOCK(__section_alignment__) (NOLOAD) :
+  {
+    *(.zdebug_rnglists)
   }
   /* DWARF 4.  */
   .debug_types BLOCK(__section_alignment__) (NOLOAD) :
