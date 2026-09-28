@@ -1,5 +1,5 @@
-#include "gifdec.h"
 
+#include "gifdec.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,13 +7,17 @@
 #ifdef ENABLE_HONEYGUI
 #include "gui_vfs.h"
 #include "gui_api.h"
+#include "def_file.h"
 #endif
-
-
-
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
-
+#ifdef ENABLE_HONEYGUI
+#define GIF_RENDER_PREFIX_SIZE ((uint32_t)sizeof(gui_rgb_data_head_t))
+#else
+#define GIF_RENDER_PREFIX_SIZE 0U
+#endif
+static void clear_canvas_background(gd_GIF *gif, uint16_t x, uint16_t y,
+                                    uint16_t width, uint16_t height);
 static size_t mem_read(gd_GIF *gif, void *buf, size_t size)
 {
     gd_MemorySource *mem = &gif->source.mem;
@@ -21,21 +25,17 @@ static size_t mem_read(gd_GIF *gif, void *buf, size_t size)
     {
         size = mem->size - mem->pos;
     }
-
     if (size > 0)
     {
         memcpy(buf, mem->data + mem->pos, size);
         mem->pos += size;
     }
-
     return size;
 }
-
 static long mem_lseek(gd_GIF *gif, long offset, int whence)
 {
     gd_MemorySource *mem = &gif->source.mem;
     size_t new_pos = mem->pos;
-
     switch (whence)
     {
     case SEEK_SET:
@@ -48,61 +48,58 @@ static long mem_lseek(gd_GIF *gif, long offset, int whence)
         new_pos = mem->size + offset;
         break;
     }
-
     if (new_pos > mem->size)
     {
         new_pos = mem->size;
     }
-
     mem->pos = new_pos;
     return new_pos;
 }
-
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #endif
-
-static size_t port_read(int fd, void *buf, size_t len)
+static size_t port_read(intptr_t fd, void *buf, size_t len)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_vfs_read((gui_vfs_file_t *)(intptr_t)fd, buf, len);
+    return gui_vfs_read((gui_vfs_file_t *)fd, buf, len);
 #else
     return read(fd, buf, len);
 #endif
 }
-
-static int port_lseek(int fd, int offset, int whence)
+static int port_lseek(intptr_t fd, int offset, int whence)
 {
 #ifdef ENABLE_HONEYGUI
     gui_vfs_seek_t vfs_whence = (whence == SEEK_SET) ? GUI_VFS_SEEK_SET :
                                 (whence == SEEK_CUR) ? GUI_VFS_SEEK_CUR : GUI_VFS_SEEK_END;
-    return gui_vfs_seek((gui_vfs_file_t *)(intptr_t)fd, offset, vfs_whence);
+    return gui_vfs_seek((gui_vfs_file_t *)fd, offset, vfs_whence);
 #else
     return lseek(fd, offset, whence);
 #endif
 }
-static int port_open(const char *file, int flags)
+static intptr_t port_open(const char *file, int flags)
 {
 #ifdef ENABLE_HONEYGUI
     gui_vfs_file_t *f = gui_vfs_open(file, (gui_vfs_mode_t)flags);
-    return (int)(intptr_t)f;
+    if (f == NULL)
+    {
+        return -1;
+    }
+    return (intptr_t)f;
 #else
     return open(file, flags);
 #endif
 }
-
-static int port_close(int fd)
+static int port_close(intptr_t fd)
 {
 #ifdef ENABLE_HONEYGUI
-    return gui_vfs_close((gui_vfs_file_t *)(intptr_t)fd);
+    return gui_vfs_close((gui_vfs_file_t *)fd);
 #else
     return close(fd);
 #endif
 }
-
 static void *port_malloc(uint32_t n)
 {
 #ifdef ENABLE_HONEYGUI
@@ -111,7 +108,6 @@ static void *port_malloc(uint32_t n)
     return malloc(n);
 #endif
 }
-
 static void *port_realloc(void *ptr, uint32_t n)
 {
 #ifdef ENABLE_HONEYGUI
@@ -120,8 +116,6 @@ static void *port_realloc(void *ptr, uint32_t n)
     return realloc(ptr, n);
 #endif
 }
-
-
 static void port_free(void *rmem)
 {
 #ifdef ENABLE_HONEYGUI
@@ -130,29 +124,21 @@ static void port_free(void *rmem)
     free(rmem);
 #endif
 }
-
-
-
-
-
 typedef struct Entry
 {
     uint16_t length;
     uint16_t prefix;
     uint8_t  suffix;
 } Entry;
-
 typedef struct Table
 {
     int bulk;
     int nentries;
     Entry *entries;
 } Table;
-
 static uint16_t read_num(gd_GIF *gif)
 {
     uint8_t bytes[2];
-
     if (gif->is_mem)
     {
         mem_read(gif, bytes, 2);
@@ -163,8 +149,6 @@ static uint16_t read_num(gd_GIF *gif)
     }
     return bytes[0] + (((uint16_t) bytes[1]) << 8);
 }
-
-
 static gd_GIF *gd_open_gif_common(gd_GIF *gif, \
                                   uint8_t sigver[3], \
                                   uint16_t width, \
@@ -178,14 +162,10 @@ static gd_GIF *gd_open_gif_common(gd_GIF *gif, \
     (void)sigver; //Werror=unused-parameter
     (void)fdsz;
     (void)aspect;
-    int i;
-    uint8_t *bgcolor;
-
     /* Create gd_GIF Structure. */
     gif->width  = width;
     gif->height = height;
     gif->depth  = depth;
-
     /* Read GCT */
     gif->gct.size = gct_sz;
     if (gif->is_mem)
@@ -196,32 +176,20 @@ static gd_GIF *gd_open_gif_common(gd_GIF *gif, \
     {
         port_read(gif->source.fd, gif->gct.colors, 3 * gif->gct.size);
     }
-
     gif->palette = &gif->gct;
     gif->bgindex = bgidx;
-    gif->frame = port_malloc(4 * width * height);
-    memset(gif->frame, 0x00, 4 * width * height);
+    gif->frame = port_malloc(5 * width * height + GIF_RENDER_PREFIX_SIZE);
     if (!gif->frame)
     {
         port_free(gif);
         return NULL;
     }
-
-    gif->canvas = &gif->frame[width * height];
+    memset(gif->frame, 0x00, 5 * width * height + GIF_RENDER_PREFIX_SIZE);
+    gif->canvas = &gif->frame[width * height + GIF_RENDER_PREFIX_SIZE];
     if (gif->bgindex)
     {
         memset(gif->frame, gif->bgindex, gif->width * gif->height);
     }
-
-    bgcolor = &gif->palette->colors[gif->bgindex * 3];
-    if (bgcolor[0] || bgcolor[1] || bgcolor[2])
-    {
-        for (i = 0; i < gif->width * gif->height; i++)
-        {
-            memcpy(&gif->canvas[i * 3], bgcolor, 3);
-        }
-    }
-
     if (gif->is_mem)
     {
         gif->anim_start = mem_lseek(gif, 0, SEEK_CUR);
@@ -230,25 +198,21 @@ static gd_GIF *gd_open_gif_common(gd_GIF *gif, \
     {
         gif->anim_start = port_lseek(gif->source.fd, 0, SEEK_CUR);
     }
-
     return gif;
 }
-
 gd_GIF *gd_open_gif(const char *fname)
 {
-    int fd;
+    intptr_t fd;
     uint8_t sigver[3];
     uint16_t width, height, depth;
     uint8_t fdsz, bgidx, aspect;
     int gct_sz;
     gd_GIF *gif;
-
     fd = port_open(fname, 0);
     if (fd == -1) { return NULL; }
 #ifdef _WIN32
-    setmode(fd, O_BINARY);
+    setmode((int)fd, O_BINARY);
 #endif
-
     gif = port_malloc(1 * sizeof(*gif));
     if (!gif)
     {
@@ -256,10 +220,8 @@ gd_GIF *gd_open_gif(const char *fname)
         return NULL;
     }
     memset(gif, 0x00, 1 * sizeof(*gif));
-
     gif->source.fd = fd;
     gif->is_mem = 0;
-
     /* Header */
     port_read(fd, sigver, 3);
     if (memcmp(sigver, "GIF", 3) != 0)
@@ -294,20 +256,16 @@ gd_GIF *gd_open_gif(const char *fname)
     port_read(fd, &bgidx, 1);
     /* Aspect Ratio */
     port_read(fd, &aspect, 1);
-
     if (!gd_open_gif_common(gif, sigver, width, height, fdsz, bgidx, aspect, gct_sz, depth))
     {
         goto fail;
     }
-
     return gif;
-
 fail:
     port_close(fd);
     port_free(gif);
     return NULL;
 }
-
 gd_GIF *gd_open_gif_from_memory(uint8_t *data, size_t size)
 {
     uint8_t sigver[3];
@@ -315,26 +273,21 @@ gd_GIF *gd_open_gif_from_memory(uint8_t *data, size_t size)
     uint8_t fdsz, bgidx, aspect;
     int gct_sz;
     gd_GIF *gif;
-
     if (!data || size < 13)
     {
         return NULL;
     }
-
     /* Create gd_GIF Structure. */
     gif = port_malloc(1 * sizeof(*gif));
-
     if (!gif)
     {
         return NULL;
     }
     memset(gif, 0x00, 1 * sizeof(*gif));
-
     gif->source.mem.data = data;
     gif->source.mem.size = size;
     gif->source.mem.pos = 0;
     gif->is_mem = 1;
-
     /* Header */
     mem_read(gif, sigver, 3);
     if (memcmp(sigver, "GIF", 3) != 0)
@@ -369,23 +322,18 @@ gd_GIF *gd_open_gif_from_memory(uint8_t *data, size_t size)
     mem_read(gif, &bgidx, 1);
     /* Aspect Ratio */
     mem_read(gif, &aspect, 1);
-
     if (!gd_open_gif_common(gif, sigver, width, height, fdsz, bgidx, aspect, gct_sz, depth))
     {
         goto fail;
     }
-
     return gif;
-
 fail:
     port_free(gif);
     return NULL;
 }
-
 static void discard_sub_blocks(gd_GIF *gif)
 {
     uint8_t size;
-
     do
     {
         if (gif->is_mem)
@@ -401,7 +349,6 @@ static void discard_sub_blocks(gd_GIF *gif)
     }
     while (size);
 }
-
 static void read_plain_text_ext(gd_GIF *gif)
 {
     if (gif->plain_text)
@@ -409,7 +356,6 @@ static void read_plain_text_ext(gd_GIF *gif)
         uint16_t tx, ty, tw, th;
         uint8_t cw, ch, fg, bg;
         long sub_block;
-
         if (gif->is_mem)
         {
             mem_lseek(gif, 1, SEEK_CUR); /* block size = 12 */
@@ -456,11 +402,9 @@ static void read_plain_text_ext(gd_GIF *gif)
     /* Discard plain text sub-blocks. */
     discard_sub_blocks(gif);
 }
-
 static void read_graphic_control_ext(gd_GIF *gif)
 {
     uint8_t rdit;
-
     /* Discard block size (always 0x04). */
     if (gif->is_mem)
     {
@@ -487,7 +431,6 @@ static void read_graphic_control_ext(gd_GIF *gif)
         port_lseek(gif->source.fd, 1, SEEK_CUR);
     }
 }
-
 static void read_comment_ext(gd_GIF *gif)
 {
     if (gif->comment)
@@ -509,12 +452,10 @@ static void read_comment_ext(gd_GIF *gif)
     /* Discard comment sub-blocks. */
     discard_sub_blocks(gif);
 }
-
 static void read_application_ext(gd_GIF *gif)
 {
     char app_id[8];
     char app_auth_code[3];
-
     if (gif->is_mem)
     {
         /* Discard block size (always 0x0B). */
@@ -572,11 +513,9 @@ static void read_application_ext(gd_GIF *gif)
         }
     }
 }
-
 static void read_ext(gd_GIF *gif)
 {
     uint8_t label;
-
     if (gif->is_mem)
     {
         mem_read(gif, &label, 1);
@@ -585,7 +524,6 @@ static void read_ext(gd_GIF *gif)
     {
         port_read(gif->source.fd, &label, 1);
     }
-
     switch (label)
     {
     case 0x01:
@@ -604,7 +542,6 @@ static void read_ext(gd_GIF *gif)
         fprintf(stderr, "unknown extension: %02X\n", label);
     }
 }
-
 static Table *new_table(int key_size)
 {
     int key;
@@ -620,7 +557,6 @@ static Table *new_table(int key_size)
     }
     return table;
 }
-
 /* Add table entry. Return value:
  *  0 on success
  *  -1 if could not realloc table */
@@ -639,14 +575,12 @@ static int add_entry(Table **tablep, uint16_t length, uint16_t prefix, uint8_t s
     table->nentries++;
     return 0;
 }
-
 static uint16_t get_key(gd_GIF *gif, int key_size, uint8_t *sub_len, uint8_t *shift, uint8_t *byte)
 {
     int bits_read;
     int rpad;
     int frag_size;
     uint16_t key;
-
     key = 0;
     for (bits_read = 0; bits_read < key_size; bits_read += frag_size)
     {
@@ -687,13 +621,11 @@ static uint16_t get_key(gd_GIF *gif, int key_size, uint8_t *sub_len, uint8_t *sh
     *shift = (*shift + key_size) % 8;
     return key;
 }
-
 /* Compute output index of y-th input line, in frame of height h. */
 static int
 interlaced_line_index(int h, int y)
 {
     int p; /* number of lines in current pass */
-
     p = (h - 1) / 8 + 1;
     if (y < p) /* pass 1 */
     {
@@ -715,7 +647,6 @@ interlaced_line_index(int h, int y)
     /* pass 4 */
     return y * 2 + 1;
 }
-
 /* Decompress image pixels.
  * Return 0 on success or -1 on out-of-memory (w.r.t. LZW code table). */
 static int
@@ -729,7 +660,6 @@ read_image_data(gd_GIF *gif, int interlace)
     Table *table;
     Entry entry = {0};
     long start, end;
-
     if (gif->is_mem)
     {
         mem_read(gif, &byte, 1);
@@ -738,13 +668,11 @@ read_image_data(gd_GIF *gif, int interlace)
     {
         port_read(gif->source.fd, &byte, 1);
     }
-
     int min_code_size = (int) byte;
     if (min_code_size < 2 || min_code_size > 8)
     {
         return -1;
     }
-
     if (gif->is_mem)
     {
         start = mem_lseek(gif, 0, SEEK_CUR);
@@ -759,7 +687,6 @@ read_image_data(gd_GIF *gif, int interlace)
         end = port_lseek(gif->source.fd, 0, SEEK_CUR);
         port_lseek(gif->source.fd, start, SEEK_SET);
     }
-
     clear = 1 << min_code_size;
     stop = clear + 1;
     table = new_table(min_code_size);
@@ -770,12 +697,11 @@ read_image_data(gd_GIF *gif, int interlace)
     ret = 0;
     frm_size = gif->fw * gif->fh;
     table_is_full = 0;
-    prev_key = 0xFFFF; 
-
+    prev_key = 0xFFFF;
+    key = 0; /* avoid uninitialized use when the decode loop never runs */
     while (frm_off < frm_size)
     {
         key = get_key(gif, key_size, &sub_len, &shift, &byte);
-
         if (key == clear)
         {
             key_size = init_key_size;
@@ -784,12 +710,10 @@ read_image_data(gd_GIF *gif, int interlace)
             prev_key = 0xFFFF;
             continue;
         }
-
         if (key == stop || key == 0x1000)
         {
             break;
         }
-
         if (key == table->nentries)
         {
             if (prev_key == 0xFFFF)
@@ -802,7 +726,6 @@ read_image_data(gd_GIF *gif, int interlace)
                 entry = table->entries[entry.prefix];
             }
             uint8_t first_char = entry.suffix;
-
             if (!table_is_full)
             {
                 ret = add_entry(&table, table->entries[prev_key].length + 1, prev_key, first_char);
@@ -820,7 +743,6 @@ read_image_data(gd_GIF *gif, int interlace)
                     key_size++;
                 }
             }
-
             entry = table->entries[key];
             str_len = entry.length;
             for (i = 0; i < str_len; i++)
@@ -849,15 +771,12 @@ read_image_data(gd_GIF *gif, int interlace)
             prev_key = key;
             continue;
         }
-
         if (key >= table->nentries)
         {
             break;
         }
-
         entry = table->entries[key];
         str_len = entry.length;
-
         for (i = 0; i < str_len; i++)
         {
             p = frm_off + entry.length - 1;
@@ -881,7 +800,6 @@ read_image_data(gd_GIF *gif, int interlace)
             }
         }
         frm_off += str_len;
-
         if (prev_key != 0xFFFF && !table_is_full)
         {
             Entry temp = table->entries[key];
@@ -890,7 +808,6 @@ read_image_data(gd_GIF *gif, int interlace)
                 temp = table->entries[temp.prefix];
             }
             uint8_t first_char = temp.suffix;
-
             ret = add_entry(&table, table->entries[prev_key].length + 1, prev_key, first_char);
             if (ret == -1)
             {
@@ -906,10 +823,8 @@ read_image_data(gd_GIF *gif, int interlace)
                 key_size++;
             }
         }
-
         prev_key = key;
     }
-
     port_free(table);
     if (key == stop)
     {
@@ -922,7 +837,6 @@ read_image_data(gd_GIF *gif, int interlace)
             port_read(gif->source.fd, &sub_len, 1);    /* Must be zero! */
         }
     }
-
     if (gif->is_mem)
     {
         mem_lseek(gif, end, SEEK_SET);
@@ -933,7 +847,6 @@ read_image_data(gd_GIF *gif, int interlace)
     }
     return 0;
 }
-
 /* Read image.
  * Return 0 on success or -1 on out-of-memory (w.r.t. LZW code table). */
 static int
@@ -941,22 +854,18 @@ read_image(gd_GIF *gif)
 {
     uint8_t fisrz;
     int interlace;
-
+    uint16_t y;
     /* Image Descriptor. */
     gif->fx = read_num(gif);
     gif->fy = read_num(gif);
-
     if (gif->fx >= gif->width || gif->fy >= gif->height)
     {
         return -1;
     }
-
     gif->fw = read_num(gif);
     gif->fh = read_num(gif);
-
     gif->fw = MIN(gif->fw, gif->width - gif->fx);
     gif->fh = MIN(gif->fh, gif->height - gif->fy);
-
     if (gif->is_mem)
     {
         mem_read(gif, &fisrz, 1);
@@ -965,7 +874,6 @@ read_image(gd_GIF *gif)
     {
         port_read(gif->source.fd, &fisrz, 1);
     }
-
     interlace = fisrz & 0x40;
     /* Ignore Sort Flag. */
     /* Local Color Table? */
@@ -982,23 +890,36 @@ read_image(gd_GIF *gif)
             port_read(gif->source.fd, gif->lct.colors, 3 * gif->lct.size);
         }
         gif->palette = &gif->lct;
+        gif->use_argb_canvas = true;
     }
     else
     {
         gif->palette = &gif->gct;
     }
+    if (gif->gce.transparency)
+    {
+        for (y = 0; y < gif->fh; y++)
+        {
+            memset(&gif->frame[(gif->fy + y) * gif->width + gif->fx],
+                   gif->gce.tindex, gif->fw);
+        }
+        if (gif->fx == 0 && gif->fy == 0 &&
+            gif->fw == gif->width && gif->fh == gif->height)
+        {
+            clear_canvas_background(gif, 0, 0, gif->width, gif->height);
+        }
+    }
+    if (gif->fx != 0 || gif->fy != 0 ||
+        gif->fw != gif->width || gif->fh != gif->height)
+    {
+        gif->use_argb_canvas = true;
+    }
     /* Image Data. */
     return read_image_data(gif, interlace);
 }
-
 static void
 render_frame_rect(gd_GIF *gif, uint8_t *buffer)
 {
-    (void)gif;    // Werror=unused-parameter
-    (void)buffer;
-#if ENABLE_HONEYGUI // wanghao comment: this is not used in honeygui
-    return;
-#else
     int j, k;
     uint8_t index, *color;
     for (j = gif->fy; j < gif->fh + gif->fy; j++)
@@ -1009,31 +930,32 @@ render_frame_rect(gd_GIF *gif, uint8_t *buffer)
             color = &gif->palette->colors[index * 3];
             if (!(gif->gce.transparency && index == gif->gce.tindex))
             {
-                memcpy(&buffer[(j * gif->width + k) * 3], color, 3);
+                uint8_t *pixel = &buffer[(j * gif->width + k) * 4];
+                pixel[0] = color[2];
+                pixel[1] = color[1];
+                pixel[2] = color[0];
+                pixel[3] = UINT8_MAX;
             }
         }
     }
-#endif
 }
-
+static void clear_canvas_background(gd_GIF *gif, uint16_t x, uint16_t y,
+                                    uint16_t width, uint16_t height)
+{
+    uint16_t row;
+    for (row = 0; row < height; row++)
+    {
+        uint8_t *pixel = &gif->canvas[((y + row) * gif->width + x) * 4];
+        memset(pixel, 0, width * 4);
+    }
+}
 static void
 dispose(gd_GIF *gif)
 {
-    int i, j, k;
-    uint8_t *bgcolor;
     switch (gif->gce.disposal)
     {
-    case 2: /* Restore to background color. */
-        bgcolor = &gif->palette->colors[gif->bgindex * 3];
-        i = gif->fy * gif->width + gif->fx;
-        for (j = 0; j < gif->fh; j++)
-        {
-            for (k = 0; k < gif->fw; k++)
-            {
-                memcpy(&gif->canvas[(i + k) * 3], bgcolor, 3);
-            }
-            i += gif->width;
-        }
+    case 2: /* Restore to transparent background. */
+        clear_canvas_background(gif, gif->fx, gif->fy, gif->fw, gif->fh);
         break;
     case 3: /* Restore to previous, i.e., don't update canvas.*/
         break;
@@ -1042,14 +964,15 @@ dispose(gd_GIF *gif)
         render_frame_rect(gif, gif->canvas);
     }
 }
-
 /* Return 1 if got a frame; 0 if got GIF trailer; -1 if error. */
 int
 gd_get_frame(gd_GIF *gif)
 {
     char sep;
-
-    dispose(gif);
+    if (gif->use_argb_canvas && gif->frame_index != 1)
+    {
+        dispose(gif);
+    }
     if (gif->is_mem)
     {
         mem_read(gif, &sep, 1);
@@ -1058,7 +981,6 @@ gd_get_frame(gd_GIF *gif)
     {
         port_read(gif->source.fd, &sep, 1);
     }
-
     while (sep != ',')
     {
         if (sep == ';')
@@ -1070,7 +992,6 @@ gd_get_frame(gd_GIF *gif)
             read_ext(gif);
         }
         else { return -1; }
-
         if (gif->is_mem)
         {
             mem_read(gif, &sep, 1);
@@ -1084,25 +1005,36 @@ gd_get_frame(gd_GIF *gif)
     {
         return -1;
     }
+    if (gif->use_argb_canvas)
+    {
+        gd_render_frame(gif, gif->canvas);
+        gif->frame_index++;
+    }
     return 1;
 }
-
 void
 gd_render_frame(gd_GIF *gif, uint8_t *buffer)
 {
-    memcpy(buffer, gif->canvas, gif->width * gif->height * 3);
+    if (buffer != gif->canvas)
+    {
+        memcpy(buffer, gif->canvas, gif->width * gif->height * 4);
+    }
     render_frame_rect(gif, buffer);
 }
-
 int
 gd_is_bgcolor(gd_GIF *gif, uint8_t color[3])
 {
     return !memcmp(&gif->palette->colors[gif->bgindex * 3], color, 3);
 }
-
 void
 gd_rewind(gd_GIF *gif)
 {
+    size_t pixel_count = (size_t)gif->width * gif->height;
+    memset(gif->frame, 0, pixel_count);
+    clear_canvas_background(gif, 0, 0, gif->width, gif->height);
+    gif->palette = &gif->gct;
+    memset(&gif->gce, 0, sizeof(gif->gce));
+    gif->frame_index = 0;
     if (gif->is_mem)
     {
         mem_lseek(gif, gif->anim_start, SEEK_SET);
@@ -1112,7 +1044,6 @@ gd_rewind(gd_GIF *gif)
         port_lseek(gif->source.fd, gif->anim_start, SEEK_SET);
     }
 }
-
 void
 gd_close_gif(gd_GIF *gif)
 {

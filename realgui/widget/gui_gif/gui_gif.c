@@ -22,28 +22,30 @@
  *============================================================================*/
 
 /**
- * @brief Convert GIF frame to palette format for rendering
+ * @brief Convert the decoded ARGB canvas to a HoneyGUI image buffer.
  */
-static void change_gif_to_palette(gui_gif_t *_this, gui_palette_file_t *palette)
+static void change_gif_to_rgb(gui_gif_t *_this)
 {
+    gui_rgb_data_head_t *header;
+
     if (_this->gif == NULL)
     {
         return;
     }
 
-    palette->img_header.scan = 0; // no scan for palette
-    palette->img_header.align = 0;
-    palette->img_header.resize = 0; // no resize for palette
-    palette->img_header.compress = false; // no compression for palette
-    palette->img_header.rsvd = 0; // reserved field
-    palette->img_header.jpeg = false; // not a JPEG
+    header = (gui_rgb_data_head_t *)(_this->gif->canvas - sizeof(*header));
+    memset(header, 0, sizeof(*header));
+    header->type = ARGB8888;
+    header->w = _this->gif->width;
+    header->h = _this->gif->height;
+    _this->draw_img->data = header;
+}
 
+static void change_gif_to_palette(gui_gif_t *_this, gui_palette_file_t *palette)
+{
     palette->img_header.type = PALETTE;
     palette->img_header.w = _this->draw_img->img_w;
     palette->img_header.h = _this->draw_img->img_h;
-    palette->img_header.version = 0; // version number
-    palette->img_header.rsvd2 = 0; // reserved field
-
     palette->palette_data = _this->gif->palette->colors;
     palette->palette_index = _this->gif->frame;
     _this->draw_img->data = palette;
@@ -56,10 +58,20 @@ static void gif_internal_timer_cb(void *param)
 {
     gui_gif_t *_this = (gui_gif_t *)param;
     gui_obj_t *obj = (gui_obj_t *)param;
+    int status;
+
     GUI_ASSERT(_this != NULL);
-    if (gd_get_frame(_this->gif) == 0)
+    status = gd_get_frame(_this->gif);
+    if (status == 0)
     {
         gd_rewind(_this->gif);
+        status = gd_get_frame(_this->gif);
+    }
+    if (status != 1)
+    {
+        gui_log("GIF frame decode failed\n");
+        gui_obj_stop_timer(obj);
+        return;
     }
     obj->timer->interval_ms = _this->gif->gce.delay * 10; // 10ms per frame
     obj->timer->expire_time = gui_ms_get() + obj->timer->interval_ms;
@@ -172,7 +184,14 @@ static void gui_gif_draw_cb(gui_obj_t *obj)
     // cache img to buffer
     draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
     gui_palette_file_t palette = {0};
-    change_gif_to_palette(_this, &palette);
+    if (_this->gif->use_argb_canvas)
+    {
+        change_gif_to_rgb(_this);
+    }
+    else
+    {
+        change_gif_to_palette(_this, &palette);
+    }
 
     GUI_ASSERT(_this->draw_img->data != NULL);
     if (_this->need_clip)

@@ -388,10 +388,6 @@ config REALTEK_GUI_WIDGET_GLASS
     bool "gui_glass - glass / blur effect"
     default y
 
-config REALTEK_GUI_WIDGET_LOTTIE
-    bool "gui_lottie - Lottie animation"
-    default y
-
 config REALTEK_GUI_WIDGET_VIDEO
     bool "gui_video - video playback"
     default y

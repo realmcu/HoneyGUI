@@ -33,7 +33,7 @@ typedef struct gd_GIF
 {
     union
     {
-        int fd;
+        intptr_t fd;
         gd_MemorySource mem;
     } source;
     int is_mem;
@@ -53,6 +53,8 @@ typedef struct gd_GIF
     void (*application)(struct gd_GIF *gif, char id[8], char auth[3]);
     uint16_t fx, fy, fw, fh;
     uint8_t bgindex;
+    uint8_t use_argb_canvas;
+    uint16_t frame_index;
     uint8_t *canvas, *frame;
 } gd_GIF;
 
