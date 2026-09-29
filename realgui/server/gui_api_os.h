@@ -91,6 +91,18 @@ bool gui_mq_send_urgent(void *handle, void *buffer, uint32_t size, uint32_t time
 
 bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 
+/*
+ * GUI heap functions.
+ *
+ * When the port provides mq_create, mq_send and mq_recv, the heaps are
+ * guarded by a lock built on a one-slot message queue, and these functions
+ * may be called from any thread. Without a message queue they must only be
+ * called from one thread.
+ *
+ * They block while another thread holds the lock, so never call them from an
+ * interrupt. The port's mq_send, mq_recv and log functions must not call
+ * them either, since they run while the lock is held.
+ */
 void *gui_malloc(size_t n);
 void *gui_calloc(size_t num, size_t size);
 void *gui_realloc(void *ptr_old, size_t n);

@@ -29,6 +29,13 @@ static tlsf_t tlsf = NULL;
 static tlsf_t lower_tlsf = NULL;
 static uint32_t total_used_size = 0;
 
+/*
+ * Heap lock: a one-slot message queue holding a single token. Taking the
+ * token locks, putting it back unlocks. NULL when the port has no message
+ * queue, in which case the heaps are single-threaded as before.
+ */
+static void *mem_lock_mq = NULL;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -54,6 +61,56 @@ static void walker(void *ptr, size_t size, int used, void *user)
     }
 }
 
+static void mem_lock_init(void)
+{
+    uint8_t token = 0;
+
+    if (os_api->mq_create == NULL || os_api->mq_send == NULL ||
+        os_api->mq_recv == NULL)
+    {
+        return;
+    }
+
+    if (!os_api->mq_create(&mem_lock_mq, "gui_mem", sizeof(token), 1))
+    {
+        mem_lock_mq = NULL;
+        return;
+    }
+
+    if (!os_api->mq_send(mem_lock_mq, &token, sizeof(token), 0))
+    {
+        /* No token means every lock would block forever. There is no
+         * mq_delete, so the queue is leaked; this only happens at init. */
+        mem_lock_mq = NULL;
+    }
+}
+
+static void mem_lock(void)
+{
+    uint8_t token;
+    bool taken;
+
+    if (mem_lock_mq == NULL)
+    {
+        return;
+    }
+
+    taken = os_api->mq_recv(mem_lock_mq, &token, sizeof(token), 0xFFFFFFFF);
+    GUI_ASSERT(taken);
+}
+
+static void mem_unlock(void)
+{
+    uint8_t token = 0;
+
+    if (mem_lock_mq == NULL)
+    {
+        return;
+    }
+
+    os_api->mq_send(mem_lock_mq, &token, sizeof(token), 0);
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -72,6 +129,8 @@ void gui_os_api_register(gui_os_api_t *info)
         lower_tlsf = tlsf_create_with_pool(info->lower_mem_addr, info->lower_mem_size);
     }
     os_api = info;
+
+    mem_lock_init();
 }
 
 tlsf_t gui_get_tlsf(void)
@@ -165,12 +224,30 @@ bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 }
 
 
-void *gui_malloc(size_t n)
+/*
+ * The heap_* functions below do the work and never take the lock, so they
+ * can call each other freely. Each public function takes the lock once
+ * around them; the lock is not recursive.
+ */
+
+static void *heap_lower_malloc(size_t n)
+{
+    void *ptr = NULL;
+    GUI_ASSERT(lower_tlsf != NULL);
+    ptr = tlsf_malloc(lower_tlsf, n);
+    if (ptr == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
+    return ptr;
+}
+
+static void *heap_malloc(size_t n)
 {
     void *ptr = NULL;
     if ((n > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
     {
-        ptr = gui_lower_malloc(n);
+        ptr = heap_lower_malloc(n);
         return ptr;
     }
     if (tlsf != NULL)
@@ -184,59 +261,12 @@ void *gui_malloc(size_t n)
     }
     if (ptr == NULL)
     {
-        ptr = gui_lower_malloc(n);
+        ptr = heap_lower_malloc(n);
     }
-    // if (ptr == (void *)0x0000000000749D30)
-    // {
-    //     GUI_ASSERT(NULL != NULL);
-    // }
     return ptr;
 }
 
-void *gui_calloc(size_t num, size_t size)
-{
-    void *ptr = NULL;
-    size_t total_size = num * size;
-
-    if (size != 0 && total_size / size != num)
-    {
-        return NULL;
-    }
-
-    if ((total_size > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
-    {
-        ptr = gui_lower_malloc(total_size);
-        if (ptr != NULL)
-        {
-            memset(ptr, 0, total_size);
-        }
-        return ptr;
-    }
-
-    if (tlsf != NULL)
-    {
-        ptr = tlsf_malloc(tlsf, total_size);
-    }
-    else
-    {
-        GUI_ASSERT(os_api->f_malloc != NULL);
-        ptr = os_api->f_malloc(total_size);
-    }
-
-    if (ptr == NULL)
-    {
-        ptr = gui_lower_malloc(total_size);
-    }
-
-    if (ptr != NULL)
-    {
-        memset(ptr, 0, total_size);
-    }
-
-    return ptr;
-}
-
-void *gui_realloc(void *ptr_old, size_t n)
+static void *heap_realloc(void *ptr_old, size_t n)
 {
     void *ptr = NULL;
 
@@ -266,14 +296,76 @@ void *gui_realloc(void *ptr_old, size_t n)
                 memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
                 tlsf_free(tlsf, ptr_old);
             }
-            // if (ptr == (void *)0x0000000000749D30)
-            // {
-            //     GUI_ASSERT(NULL != NULL);
-            // }
             return ptr;
         }
     }
+}
 
+static void heap_lower_free(void *rmem)
+{
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_free(lower_tlsf, rmem);
+}
+
+static void heap_free(void *rmem)
+{
+    if (gui_mem_is_lower(rmem))
+    {
+        GUI_ASSERT((uintptr_t)os_api->lower_mem_addr != 0);
+        GUI_ASSERT((uintptr_t)os_api->lower_mem_size != 0);
+        heap_lower_free(rmem);
+        return;
+    }
+    if (tlsf != NULL)
+    {
+        tlsf_free(tlsf, rmem);
+    }
+    else
+    {
+        GUI_ASSERT(os_api->f_free != NULL);
+        os_api->f_free(rmem);
+    }
+}
+
+void *gui_malloc(size_t n)
+{
+    void *ptr;
+
+    mem_lock();
+    ptr = heap_malloc(n);
+    mem_unlock();
+    return ptr;
+}
+
+void *gui_calloc(size_t num, size_t size)
+{
+    void *ptr = NULL;
+    size_t total_size = num * size;
+
+    if (size != 0 && total_size / size != num)
+    {
+        return NULL;
+    }
+
+    ptr = gui_malloc(total_size);
+
+    /* Clearing needs no lock: nobody else has the pointer yet. */
+    if (ptr != NULL)
+    {
+        memset(ptr, 0, total_size);
+    }
+
+    return ptr;
+}
+
+void *gui_realloc(void *ptr_old, size_t n)
+{
+    void *ptr;
+
+    mem_lock();
+    ptr = heap_realloc(ptr_old, n);
+    mem_unlock();
+    return ptr;
 }
 
 bool gui_mem_is_lower(const void *ptr)
@@ -293,23 +385,9 @@ bool gui_mem_is_lower(const void *ptr)
 
 void gui_free(void *rmem)
 {
-
-    if (gui_mem_is_lower(rmem))
-    {
-        GUI_ASSERT((uintptr_t)os_api->lower_mem_addr != 0);
-        GUI_ASSERT((uintptr_t)os_api->lower_mem_size != 0);
-        gui_lower_free(rmem);
-        return;
-    }
-    if (tlsf != NULL)
-    {
-        tlsf_free(tlsf, rmem);
-    }
-    else
-    {
-        GUI_ASSERT(os_api->f_free != NULL);
-        os_api->f_free(rmem);
-    }
+    mem_lock();
+    heap_free(rmem);
+    mem_unlock();
 }
 
 char *gui_strdup(const char *s)
@@ -330,34 +408,40 @@ char *gui_strdup(const char *s)
     return dup;
 }
 
+/* The walkers below log while the lock is held, so the port's log function
+ * must not call gui_malloc(). */
 void gui_mem_debug(void)
 {
-    total_used_size = 0;
-    GUI_UNUSED(total_used_size);
     GUI_ASSERT(tlsf != NULL);
+    mem_lock();
+    total_used_size = 0;
     gui_log("\t\n");
     tlsf_walk_pool(tlsf_get_pool(tlsf), gui_walker, &total_used_size);
     gui_log("\t\n");
     total_used_size = 0;
+    mem_unlock();
 }
+
 uint32_t gui_mem_used(void)
 {
-    total_used_size = 0;
-    GUI_UNUSED(total_used_size);
+    uint32_t used;
+
     GUI_ASSERT(tlsf != NULL);
+    mem_lock();
+    total_used_size = 0;
     tlsf_walk_pool(tlsf_get_pool(tlsf), walker, &total_used_size);
-    return total_used_size;
+    used = total_used_size;
+    mem_unlock();
+    return used;
 }
 
 void *gui_lower_malloc(size_t n)
 {
-    void *ptr = NULL;
-    GUI_ASSERT(lower_tlsf != NULL);
-    ptr = tlsf_malloc(lower_tlsf, n);
-    if (ptr == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-    }
+    void *ptr;
+
+    mem_lock();
+    ptr = heap_lower_malloc(n);
+    mem_unlock();
     return ptr;
 }
 
@@ -365,7 +449,9 @@ void *gui_lower_realloc(void *ptr_old, size_t n)
 {
     void *ptr = NULL;
     GUI_ASSERT(lower_tlsf != NULL);
+    mem_lock();
     ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
+    mem_unlock();
     if (ptr == NULL)
     {
         GUI_ASSERT(NULL != NULL);
@@ -375,20 +461,17 @@ void *gui_lower_realloc(void *ptr_old, size_t n)
 
 void gui_lower_free(void *rmem)
 {
-    GUI_ASSERT(lower_tlsf != NULL);
-    tlsf_free(lower_tlsf, rmem);
+    mem_lock();
+    heap_lower_free(rmem);
+    mem_unlock();
 }
 
 void *gui_lower_calloc(size_t num, size_t size)
 {
     void *ptr = NULL;
     size_t total_size = num * size;
-    GUI_ASSERT(lower_tlsf != NULL);
-    ptr = tlsf_malloc(lower_tlsf, total_size);
-    if (ptr == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-    }
+
+    ptr = gui_lower_malloc(total_size);
     if (ptr != NULL)
     {
         memset(ptr, 0, total_size);
@@ -399,16 +482,24 @@ void *gui_lower_calloc(size_t num, size_t size)
 void gui_lower_mem_debug(void)
 {
     GUI_ASSERT(lower_tlsf != NULL);
+    mem_lock();
     tlsf_walk_pool(tlsf_get_pool(lower_tlsf), NULL, NULL);
+    mem_unlock();
 }
+
 uint32_t gui_low_mem_used(void)
 {
-    total_used_size = 0;
-    GUI_UNUSED(total_used_size);
+    uint32_t used;
+
     GUI_ASSERT(lower_tlsf != NULL);
+    mem_lock();
+    total_used_size = 0;
     tlsf_walk_pool(tlsf_get_pool(lower_tlsf), walker, &total_used_size);
-    return total_used_size;
+    used = total_used_size;
+    mem_unlock();
+    return used;
 }
+
 void gui_sleep_cb(void)
 {
     if (os_api->gui_sleep_cb != NULL)
