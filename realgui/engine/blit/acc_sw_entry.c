@@ -65,3 +65,9 @@ void sw_acc_deinit(void)
     }
 }
 
+gui_blit_ops_t sw_acc_blit_ops =
+{
+    .init = sw_acc_init,
+    .process = sw_acc_blit,
+    .deinit = sw_acc_deinit,
+};

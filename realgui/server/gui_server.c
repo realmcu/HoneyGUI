@@ -15,7 +15,7 @@
 #include "wheel_algo.h"
 #include <string.h>
 #include "gui_version.h"
-
+#include "gui_acc_default.h"
 
 
 extern void gui_components_init(void);
@@ -156,7 +156,7 @@ __attribute__((weak))  void gui_port_indev_init(void) {}
 __attribute__((weak))  void gui_port_fs_init(void) {}
 __attribute__((weak))  void gui_port_ftl_init(void) {}
 __attribute__((weak))  void gui_port_audio_init(void) {}
-
+__attribute__((weak))  void gui_port_acc_init(void) { gui_acc_default_init();}
 
 
 /**
