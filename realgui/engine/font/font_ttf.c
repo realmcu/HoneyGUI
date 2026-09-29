@@ -1916,6 +1916,7 @@ static void font_ttf_get_info(gui_text_t *text)
     for (uni_i = 0; uni_i < unicode_len; uni_i++)
     {
         chr[chr_i].unicode = unicode_buf[uni_i];
+        gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
         if (unicode_buf[uni_i] == 0x0A)
         {
             line_flag ++;
@@ -2044,10 +2045,24 @@ static void font_ttf_get_info(gui_text_t *text)
             chr[chr_i].char_h = (text->font_height + 3) / 4;
             // chr[chr_i].dot_addr = 0;
         }
-        else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                         unicode_buf, &uni_i, unicode_len))
+        else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                     unicode_buf, &uni_i,
+                                                     unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
         {
-            /* Emoji handled; uni_i may be advanced for a sequence. */
+            if (emoji_rc == GUI_EMOJI_LOAD_MISSING)
+            {
+                /* chr[].unicode, not unicode_buf[uni_i]: uni_i now points at the
+                 * last code point of the consumed sequence. */
+                if (gui_font_ttf_fallback_search(chr[chr_i].unicode, text->font_height,
+                                                 text->bold_weight, (uint8_t *)text->path,
+                                                 &chr[chr_i]) != 0 &&
+                    !(substitute_missing &&
+                      gui_font_ttf_substitute_search(chr[chr_i].unicode, text->font_height,
+                                                     text->bold_weight, &chr[chr_i]) == 0))
+                {
+                    continue;
+                }
+            }
         }
         else
         {

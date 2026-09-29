@@ -480,45 +480,35 @@ static bool load_emoji_resource(mem_char_t *chr, gui_text_t *text, int16_t basel
     return true;
 }
 
-/**
- * @brief Apply a Unicode emoji presentation decision to a BMP font cell.
- *
- * @return true if the caller should skip normal BMP glyph loading.
- */
-bool gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text, int16_t baseline_px,
-                             uint32_t *unicode_buf, uint32_t *p_uni_i, uint32_t unicode_len)
+gui_emoji_load_result_t gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text,
+                                                int16_t baseline_px, uint32_t *unicode_buf,
+                                                uint32_t *p_uni_i, uint32_t unicode_len)
 {
     uint32_t uni_i = *p_uni_i;
     gui_emoji_sequence_t sequence;
 
     if (!gui_unicode_resolve_emoji(&unicode_buf[uni_i], unicode_len - uni_i, &sequence))
     {
-        return false;
+        return GUI_EMOJI_LOAD_NOT_EMOJI;
     }
 
     if (sequence.presentation == GUI_EMOJI_PRESENTATION_TEXT)
     {
         *p_uni_i += sequence.selector_len;
-        return false;
+        return GUI_EMOJI_LOAD_NOT_EMOJI;
     }
+
+    /* A sequence renders as one cell either way, so the modifiers and joiners are
+     * consumed even when no color resource exists. Leaving them in the stream
+     * would resolve each one on its own and emit extra substitute glyphs. */
+    *p_uni_i += sequence.sequence_len - 1;
 
     if (load_emoji_resource(chr, text, baseline_px, &unicode_buf[uni_i], sequence.sequence_len))
     {
-        *p_uni_i += sequence.sequence_len - 1;
-        return true;
+        return GUI_EMOJI_LOAD_DONE;
     }
 
-    if (unicode_buf[uni_i] >= 0x10000)
-    {
-        /* SMP code points must not enter the font index lookup. Consume the
-         * complete sequence even when its color resource is unavailable. */
-        *p_uni_i += sequence.sequence_len - 1;
-        return true;
-    }
-
-    /* Color resource unavailable: consume a selector and fall back to text. */
-    *p_uni_i += sequence.selector_len;
-    return false;
+    return GUI_EMOJI_LOAD_MISSING;
 }
 
 /**
@@ -757,6 +747,24 @@ int gui_font_bmp_substitute_search(uint32_t unicode, uint16_t font_size,
     return -1;
 }
 
+int gui_font_bmp_resolve_missing(gui_text_t *text, mem_char_t *out_chr,
+                                 bool substitute, int32_t *out_line_byte)
+{
+    if (gui_font_bmp_fallback_search(out_chr->unicode, text->font_height,
+                                     (uint8_t *)text->path, out_chr, out_line_byte) == 0)
+    {
+        return 0;
+    }
+
+    if (substitute && gui_font_bmp_substitute_search(out_chr->unicode, text->font_height,
+                                                     out_chr, out_line_byte) == 0)
+    {
+        return 0;
+    }
+
+    return -1;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
@@ -915,6 +923,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                 chr[chr_i].w = 0;
                 chr[chr_i].h = chr_h;
                 uint32_t offset = 0;
+                gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                 if (chr[chr_i].unicode == 0x0D)
                 {
                     chr[chr_i].char_w = text->font_height / 4;
@@ -936,10 +945,16 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].char_w = 0;
                     chr[chr_i].char_h = 0;
                 }
-                else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                 unicode_buf, &uni_i, unicode_len))
+                else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                             unicode_buf, &uni_i,
+                                                             unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
                 {
-                    /* Emoji handled; uni_i may be advanced for a sequence. */
+                    if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
+                        gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                     &line_byte) != 0)
+                    {
+                        continue;
+                    }
                 }
                 else
                 {
@@ -948,19 +963,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                     offset = *offset_addr;
                     if (offset == 0xFFFFFFFF)
                     {
-                        /* Fallback: try other BMP fonts with same size */
-                        if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
-                                                         (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
-                        {
-                            /* Found in BMP fallback */
-                        }
-                        else if (substitute_missing &&
-                                 gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
-                                                                &chr[chr_i], &line_byte) == 0)
-                        {
-                            /* Substitute glyph in place of the missing character */
-                        }
-                        else
+                        if (gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                         &line_byte) != 0)
                         {
                             continue;
                         }
@@ -1035,6 +1039,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].w = 0;
                     chr[chr_i].h = chr_h;
                     uint32_t offset = 0;
+                    gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                     if (chr[chr_i].unicode == 0x0D)
                     {
                         chr[chr_i].char_w = text->font_height / 4;
@@ -1056,10 +1061,16 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_w = 0;
                         chr[chr_i].char_h = 0;
                     }
-                    else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                     unicode_buf, &uni_i, unicode_len))
+                    else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                                 unicode_buf, &uni_i,
+                                                                 unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
                     {
-                        /* Emoji handled; uni_i may be advanced for a sequence. */
+                        if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
+                            gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                         &line_byte) != 0)
+                        {
+                            continue;
+                        }
                     }
                     else
                     {
@@ -1067,18 +1078,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                         offset = font_index_bsearch_crop_offset(table_offset, index_area_size, chr[chr_i].unicode);
                         if (offset == 0xFFFFFFFF)
                         {
-                            if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
-                                                             (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
-                            {
-                                /* Found in BMP fallback */
-                            }
-                            else if (substitute_missing &&
-                                     gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
-                                                                    &chr[chr_i], &line_byte) == 0)
-                            {
-                                /* Substitute glyph in place of the missing character */
-                            }
-                            else
+                            if (gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                             &line_byte) != 0)
                             {
                                 continue;
                             }
@@ -1167,6 +1168,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                 chr[chr_i].w = aliened_font_size;
                 chr[chr_i].h = text->font_height;
                 uint16_t offset = 0;
+                gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                 if (chr[chr_i].unicode == 0x0D)
                 {
                     chr[chr_i].char_w = text->font_height / 4;
@@ -1188,28 +1190,24 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].char_w = 0;
                     chr[chr_i].char_h = 0;
                 }
-                else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                 unicode_buf, &uni_i, unicode_len))
+                else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                             unicode_buf, &uni_i,
+                                                             unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
                 {
-                    /* Emoji handled; uni_i may be advanced for a sequence. */
+                    if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
+                        gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                     &line_byte) != 0)
+                    {
+                        continue;
+                    }
                 }
                 else
                 {
                     offset = *(uint16_t *)(uintptr_t)(chr[chr_i].unicode * 2 + table_offset);
                     if (offset == 0xFFFF)
                     {
-                        if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
-                                                         (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
-                        {
-                            /* Found in BMP fallback */
-                        }
-                        else if (substitute_missing &&
-                                 gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
-                                                                &chr[chr_i], &line_byte) == 0)
-                        {
-                            /* Substitute glyph in place of the missing character */
-                        }
-                        else
+                        if (gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                         &line_byte) != 0)
                         {
                             continue;
                         }
@@ -1248,6 +1246,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].h = text->font_height;
                     chr[chr_i].char_w = text->font_height / 2;
                     chr[chr_i].char_h = text->font_height;
+                    gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                     if (chr[chr_i].unicode == 0x0A)
                     {
                         line_flag ++;
@@ -1261,30 +1260,25 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_h = text->font_height / 4;
                     }
 #endif
-                    else if (gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                     unicode_buf, &uni_i, unicode_len))
+                    else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
+                                                                 unicode_buf, &uni_i,
+                                                                 unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
                     {
-                        /* Emoji handled; uni_i may be advanced for a sequence. */
+                        if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
+                            gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                         &line_byte) != 0)
+                        {
+                            continue;
+                        }
                     }
                     else
                     {
                         int32_t index = font_index_bsearch_bmp(table_offset, index_area_size, chr[chr_i].unicode);
                         if (index < 0)
                         {
-                            if (gui_font_bmp_fallback_search(chr[chr_i].unicode, text->font_height,
-                                                             (uint8_t *)text->path, &chr[chr_i], &line_byte) == 0)
+                            if (gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
+                                                             &line_byte) != 0)
                             {
-                                /* Found in BMP fallback - skip primary font loading */
-                            }
-                            else if (substitute_missing &&
-                                     gui_font_bmp_substitute_search(chr[chr_i].unicode, text->font_height,
-                                                                    &chr[chr_i], &line_byte) == 0)
-                            {
-                                /* Substitute glyph in place of the missing character */
-                            }
-                            else
-                            {
-                                gui_log("Character %x not found in BMP-BIN file \n", chr[chr_i].unicode);
                                 continue;
                             }
                         }

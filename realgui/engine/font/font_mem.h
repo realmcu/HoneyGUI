@@ -262,7 +262,21 @@ void gui_font_mem_unload(gui_text_t *text);
 void gui_font_mem_destroy(gui_text_t *text);
 
 /**
+ * @brief Outcome of an emoji presentation decision for one character cell.
+ */
+typedef enum
+{
+    GUI_EMOJI_LOAD_NOT_EMOJI = 0,   /**< Run the normal glyph lookup. */
+    GUI_EMOJI_LOAD_DONE,            /**< Color resource loaded into the cell. */
+    GUI_EMOJI_LOAD_MISSING,         /**< No color resource: resolve as a missing glyph. */
+} gui_emoji_load_result_t;
+
+/**
  * @brief Try to load a color emoji cell using the shared Unicode rules.
+ *
+ * On GUI_EMOJI_LOAD_MISSING the whole emoji sequence has been consumed and the
+ * caller must not run the font index lookup: an SMP code point would index past
+ * the index table. Resolve chr->unicode through the missing glyph path instead.
  *
  * @param chr Output character cell.
  * @param text Text widget containing the emoji resource configuration.
@@ -270,10 +284,11 @@ void gui_font_mem_destroy(gui_text_t *text);
  * @param unicode_buf Unicode content buffer.
  * @param p_uni_i Current Unicode index, advanced when a sequence is consumed.
  * @param unicode_len Number of code points in unicode_buf.
- * @return true if normal glyph lookup should be skipped.
+ * @return How the caller should proceed with this cell.
  */
-bool gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text, int16_t baseline_px,
-                             uint32_t *unicode_buf, uint32_t *p_uni_i, uint32_t unicode_len);
+gui_emoji_load_result_t gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text,
+                                                int16_t baseline_px, uint32_t *unicode_buf,
+                                                uint32_t *p_uni_i, uint32_t unicode_len);
 
 /**
  * @brief Draw a loaded color emoji cell.
@@ -354,6 +369,20 @@ int gui_font_bmp_fallback_search(uint32_t unicode, uint16_t font_size,
  */
 int gui_font_bmp_substitute_search(uint32_t unicode, uint16_t font_size,
                                    mem_char_t *out_chr, int32_t *out_line_byte);
+
+/**
+ * @brief Resolve a code point absent from the primary BMP font.
+ *
+ * Runs the fallback font chain, then the substitute chain when enabled.
+ *
+ * @param text Text widget, supplies font size and the primary font to skip.
+ * @param out_chr Character cell holding the code point to resolve.
+ * @param substitute Whether substitution is enabled for this widget.
+ * @param out_line_byte Output line byte width.
+ * @return 0 when out_chr holds a drawable glyph, -1 when the cell must be dropped.
+ */
+int gui_font_bmp_resolve_missing(gui_text_t *text, mem_char_t *out_chr,
+                                 bool substitute, int32_t *out_line_byte);
 
 #ifdef __cplusplus
 }

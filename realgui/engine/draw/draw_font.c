@@ -509,6 +509,10 @@ bool gui_unicode_resolve_emoji(const uint32_t *unicode_buf, uint32_t len,
         return false;
     }
 
+    /* A skin tone modifier after a BMP base (U+261D, U+270A-U+270D, U+26F9) is
+     * left out of the sequence, so its resource name is never built. Folding it
+     * in needs a fallback to the unmodified base resource, else the base glyph
+     * is lost too. */
     uint32_t selector = len > 1 ? unicode_buf[1] : 0;
     if (selector == UNICODE_VARIATION_SELECTOR_TEXT)
     {
