@@ -22,15 +22,20 @@ extern "C" {
 /**
  * @brief Complete a request accepted by the platform adapter.
  *
- * HoneyGUI copies the value before this callback returns.
+ * HoneyGUI copies the value before this callback returns. A successful
+ * response must carry a value of the handler's type, otherwise it is reported
+ * to the caller as GUI_SYSVAL_STATUS_ERROR.
  */
 typedef void (*gui_sysval_complete_cb_t)(void *request_context,
                                          gui_sysval_status_t status,
-                                         const char *value);
+                                         const gui_sysval_value_t *value);
 
 typedef struct gui_sysval_handler
 {
     const char *key;
+
+    /** Type of every value read from or written to this key. */
+    gui_sysval_type_t type;
 
     /**
      * @brief Start reading a system value.
@@ -43,10 +48,12 @@ typedef struct gui_sysval_handler
     /**
      * @brief Start writing a system value.
      *
-     * The value is valid only for the duration of this call. Invoke
-     * @p complete exactly once after accepting the request.
+     * HoneyGUI has already checked that @p value has the handler's type;
+     * range checks remain the handler's job. The value is valid only for the
+     * duration of this call. Invoke @p complete exactly once after accepting
+     * the request.
      */
-    bool (*set_request)(const char *value,
+    bool (*set_request)(const gui_sysval_value_t *value,
                         gui_sysval_complete_cb_t complete,
                         void *request_context);
 

@@ -16,12 +16,41 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <stdint.h>
+#include "gui_sysval_keys.h"
 
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+
+/** Longest string value, including the terminating NUL. */
+#define GUI_SYSVAL_STR_MAX 32
+
+typedef enum
+{
+    GUI_SYSVAL_TYPE_BOOL = 0,
+    GUI_SYSVAL_TYPE_INT,
+    GUI_SYSVAL_TYPE_STR,
+} gui_sysval_type_t;
+
+/**
+ * @brief A typed system value.
+ *
+ * Every key has one fixed type, documented in gui_sysval_keys.h. The value is
+ * small and fixed-size, so it can be copied by assignment.
+ */
+typedef struct
+{
+    gui_sysval_type_t type;
+    union
+    {
+        bool b;
+        int32_t i;
+        char s[GUI_SYSVAL_STR_MAX];
+    } data;
+} gui_sysval_value_t;
 
 typedef uint32_t gui_sysval_request_id_t;
 
@@ -42,8 +71,9 @@ typedef enum
  * @brief Called when an asynchronous get or set request completes.
  *
  * For a get request, @p value contains the requested value. For a successful
- * set request, it may contain the value that actually took effect. The string
- * is valid only for the duration of the callback.
+ * set request, it may contain the value that actually took effect. When
+ * @p status is GUI_SYSVAL_STATUS_OK and @p value is not NULL, its type is the
+ * type of the key. The value is valid only for the duration of the callback.
  *
  * @param request_id Completed request.
  * @param status     Final request status.
@@ -52,13 +82,27 @@ typedef enum
  */
 typedef void (*gui_sysval_response_cb_t)(gui_sysval_request_id_t request_id,
                                          gui_sysval_status_t status,
-                                         const char *value,
+                                         const gui_sysval_value_t *value,
                                          void *user_data);
 
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+
+/** @brief Make a boolean value. */
+gui_sysval_value_t gui_sysval_value_bool(bool b);
+
+/** @brief Make an integer value. */
+gui_sysval_value_t gui_sysval_value_int(int32_t i);
+
+/**
+ * @brief Make a string value.
+ *
+ * @p s is truncated to GUI_SYSVAL_STR_MAX - 1 characters. NULL is treated as
+ * an empty string.
+ */
+gui_sysval_value_t gui_sysval_value_str(const char *s);
 
 /**
  * @brief Start an asynchronous read.
@@ -82,13 +126,14 @@ gui_sysval_request_id_t gui_sysval_get_request(const char *key,
  * adapter must copy them before returning if they are needed asynchronously.
  *
  * @param key       System value key.
- * @param value     NUL-terminated value string.
+ * @param value     New value. Its type must match the type of the key.
  * @param cb        Completion callback.
  * @param user_data Value passed to @p cb.
- * @return Request ID, or GUI_SYSVAL_REQUEST_INVALID if queuing failed.
+ * @return Request ID, or GUI_SYSVAL_REQUEST_INVALID if queuing failed or the
+ *         value type does not match the key.
  */
 gui_sysval_request_id_t gui_sysval_set_request(const char *key,
-                                               const char *value,
+                                               const gui_sysval_value_t *value,
                                                gui_sysval_response_cb_t cb,
                                                void *user_data);
 

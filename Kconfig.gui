@@ -52,8 +52,8 @@ config REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
 config REALTEK_BUILD_EXAMPLE_SYSVAL
     bool "System Value Demo"
     help
-      HoneyGUI system value demo showing the current time through the
-      asynchronous sysval request API.
+      HoneyGUI system value demo showing standard platform-independent
+      values through the asynchronous sysval request API.
 
 config REALTEK_BUILD_REAL_DOG_3D
     bool "3D Dog Demo"

@@ -120,7 +120,7 @@ example/ci_build_scripts/test_report.txt
 example/ci_build_scripts/build_errors*.log
 
 # other
-.kiro/
+build/
 .omo/
 .kiro
 /.codex-build/

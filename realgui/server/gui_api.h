@@ -29,7 +29,6 @@ extern "C" {
 #include "gui_api_os.h"
 #include "gui_listener.h"
 #include "gui_api_audio.h"
-#include "gui_sysval.h"
 
 
 /*============================================================================*

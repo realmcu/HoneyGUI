@@ -13,6 +13,7 @@
 typedef struct
 {
     gui_sysval_request_id_t id;
+    gui_sysval_type_t type;
     gui_sysval_response_cb_t callback;
     void *user_data;
 } gui_sysval_request_t;
@@ -21,7 +22,8 @@ typedef struct
 {
     gui_sysval_request_t *request;
     gui_sysval_status_t status;
-    char *value;
+    bool has_value;
+    gui_sysval_value_t value;
 } gui_sysval_response_t;
 
 static gui_sysval_handler_t *sysval_handler_head;
@@ -56,7 +58,15 @@ static gui_sysval_request_id_t sysval_request_id_allocate(void)
     return id;
 }
 
-static gui_sysval_request_t *sysval_request_create(gui_sysval_response_cb_t callback,
+static bool sysval_type_valid(gui_sysval_type_t type)
+{
+    return type == GUI_SYSVAL_TYPE_BOOL ||
+           type == GUI_SYSVAL_TYPE_INT ||
+           type == GUI_SYSVAL_TYPE_STR;
+}
+
+static gui_sysval_request_t *sysval_request_create(gui_sysval_type_t type,
+                                                   gui_sysval_response_cb_t callback,
                                                    void *user_data)
 {
     gui_sysval_request_t *request = gui_malloc(sizeof(*request));
@@ -67,6 +77,7 @@ static gui_sysval_request_t *sysval_request_create(gui_sysval_response_cb_t call
     }
 
     request->id = sysval_request_id_allocate();
+    request->type = type;
     request->callback = callback;
     request->user_data = user_data;
 
@@ -75,10 +86,6 @@ static gui_sysval_request_t *sysval_request_create(gui_sysval_response_cb_t call
 
 static void sysval_response_free(gui_sysval_response_t *response)
 {
-    if (response->value != NULL)
-    {
-        gui_free(response->value);
-    }
     gui_free(response->request);
     gui_free(response);
 }
@@ -90,19 +97,18 @@ static void sysval_response_dispatch(void *message)
     gui_sysval_request_t *request = response->request;
 
     request->callback(request->id, response->status,
-                      response->value,
+                      response->has_value ? &response->value : NULL,
                       request->user_data);
     sysval_response_free(response);
 }
 
 static void sysval_request_complete(void *request_context,
                                     gui_sysval_status_t status,
-                                    const char *value)
+                                    const gui_sysval_value_t *value)
 {
     gui_sysval_request_t *request = (gui_sysval_request_t *)request_context;
     gui_sysval_response_t *response;
     gui_msg_t msg;
-    size_t value_size;
 
     if (request == NULL)
     {
@@ -118,18 +124,25 @@ static void sysval_request_complete(void *request_context,
 
     response->request = request;
     response->status = status;
-    response->value = NULL;
+    response->has_value = false;
 
     if (value != NULL)
     {
-        value_size = strlen(value) + 1;
-        response->value = gui_malloc(value_size);
-        if (response->value == NULL)
+        /* A value of the wrong type is a provider bug. Report it rather
+         * than hand the UI a union it would read through the wrong member. */
+        if (value->type != request->type)
         {
-            sysval_response_free(response);
-            return;
+            response->status = GUI_SYSVAL_STATUS_ERROR;
         }
-        memcpy(response->value, value, value_size);
+        else
+        {
+            response->has_value = true;
+            response->value = *value;
+            if (value->type == GUI_SYSVAL_TYPE_STR)
+            {
+                response->value.data.s[GUI_SYSVAL_STR_MAX - 1] = '\0';
+            }
+        }
     }
 
     msg.event = GUI_EVENT_USER_DEFINE;
@@ -143,9 +156,43 @@ static void sysval_request_complete(void *request_context,
     }
 }
 
+gui_sysval_value_t gui_sysval_value_bool(bool b)
+{
+    gui_sysval_value_t value;
+
+    memset(&value, 0, sizeof(value));
+    value.type = GUI_SYSVAL_TYPE_BOOL;
+    value.data.b = b;
+    return value;
+}
+
+gui_sysval_value_t gui_sysval_value_int(int32_t i)
+{
+    gui_sysval_value_t value;
+
+    memset(&value, 0, sizeof(value));
+    value.type = GUI_SYSVAL_TYPE_INT;
+    value.data.i = i;
+    return value;
+}
+
+gui_sysval_value_t gui_sysval_value_str(const char *s)
+{
+    gui_sysval_value_t value;
+
+    memset(&value, 0, sizeof(value));
+    value.type = GUI_SYSVAL_TYPE_STR;
+    if (s != NULL)
+    {
+        strncpy(value.data.s, s, GUI_SYSVAL_STR_MAX - 1);
+    }
+    return value;
+}
+
 bool gui_sysval_handler_register(gui_sysval_handler_t *handler)
 {
     if (handler == NULL || handler->key == NULL || handler->key[0] == '\0' ||
+        !sysval_type_valid(handler->type) ||
         (handler->get_request == NULL && handler->set_request == NULL) ||
         sysval_handler_find(handler->key) != NULL)
     {
@@ -176,7 +223,7 @@ gui_sysval_request_id_t gui_sysval_get_request(const char *key,
         return GUI_SYSVAL_REQUEST_INVALID;
     }
 
-    request = sysval_request_create(cb, user_data);
+    request = sysval_request_create(handler->type, cb, user_data);
     if (request == NULL)
     {
         return GUI_SYSVAL_REQUEST_INVALID;
@@ -193,7 +240,7 @@ gui_sysval_request_id_t gui_sysval_get_request(const char *key,
 }
 
 gui_sysval_request_id_t gui_sysval_set_request(const char *key,
-                                               const char *value,
+                                               const gui_sysval_value_t *value,
                                                gui_sysval_response_cb_t cb,
                                                void *user_data)
 {
@@ -208,12 +255,13 @@ gui_sysval_request_id_t gui_sysval_set_request(const char *key,
     }
 
     handler = sysval_handler_find(key);
-    if (handler == NULL || handler->set_request == NULL)
+    if (handler == NULL || handler->set_request == NULL ||
+        value->type != handler->type)
     {
         return GUI_SYSVAL_REQUEST_INVALID;
     }
 
-    request = sysval_request_create(cb, user_data);
+    request = sysval_request_create(handler->type, cb, user_data);
     if (request == NULL)
     {
         return GUI_SYSVAL_REQUEST_INVALID;
