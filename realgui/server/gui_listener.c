@@ -4,6 +4,14 @@
  * SPDX-License-Identifier: MIT
  */
 
+/*
+ * Legacy topic-based listener implementation.
+ *
+ * This module is scheduled for removal in a future release. It remains
+ * available for existing users, but new code should not add dependencies on
+ * this API.
+ */
+
 #include "gui_listener.h"
 #include "gui_api.h"
 #include "gui_message.h"
