@@ -36,8 +36,7 @@ static void respond_bool(gui_sysval_request_t *request, bool b)
 static void set_percent(int32_t *target, const gui_sysval_value_t *value,
                         gui_sysval_request_t *request)
 {
-    if (value->data.i < GUI_SYSVAL_PERCENT_MIN ||
-        value->data.i > GUI_SYSVAL_PERCENT_MAX)
+    if (value->data.i < 0 || value->data.i > 100)
     {
         gui_sysval_respond(request, GUI_SYSVAL_STATUS_INVALID_VALUE, NULL);
         return;

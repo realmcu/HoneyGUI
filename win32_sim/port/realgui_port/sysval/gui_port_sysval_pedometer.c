@@ -48,8 +48,8 @@ static void port_sysval_step_target_get(gui_sysval_request_t *request)
 static void port_sysval_step_target_set(const gui_sysval_value_t *value,
                                         gui_sysval_request_t *request)
 {
-    if (value->data.i < GUI_SYSVAL_STEP_TARGET_MIN ||
-        value->data.i > GUI_SYSVAL_STEP_TARGET_MAX)
+    /* Range from gui_sysval_keys.h: health/pedometer/step_target. */
+    if (value->data.i < 1000 || value->data.i > 100000)
     {
         gui_sysval_respond(request, GUI_SYSVAL_STATUS_INVALID_VALUE, NULL);
         return;
