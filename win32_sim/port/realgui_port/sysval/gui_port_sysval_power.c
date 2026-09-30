@@ -5,132 +5,65 @@
  */
 
 /*
- * Power system values for the simulator.
- *
- * SDL_GetPowerInfo() reports the host machine's real battery, so these
- * values are genuine on a laptop. A desktop has no battery: SDL then
- * reports SDL_POWERSTATE_NO_BATTERY, and the level falls back to a fixed
- * percentage so the UI still has something plausible to draw.
+ * Battery values for the simulator. Fixed values; a device port reads the
+ * fuel gauge instead.
  */
 
-#include <SDL.h>
+#include <stddef.h>
 #include "gui_components_init.h"
-#include "gui_sysval_keys.h"
-#include "gui_sysval_provider.h"
+#include "gui_sysval_adapter.h"
 
-/** Level reported when the host has no battery, as on a desktop. */
-#define SIMULATED_BATTERY_LEVEL  76
+static int32_t battery_level = 76;
+static bool battery_charging = false;
+static int32_t battery_remaining_seconds = 5 * 3600;
 
-static bool port_sysval_battery_get(gui_sysval_complete_cb_t complete,
-                                    void *request_context)
+static void port_sysval_battery_level_get(gui_sysval_request_t *request)
 {
-    int percent = -1;
-    gui_sysval_value_t value;
+    gui_sysval_value_t value = gui_sysval_value_int(battery_level);
 
-    SDL_GetPowerInfo(NULL, &percent);
-    if (percent < 0 || percent > 100)
-    {
-        percent = SIMULATED_BATTERY_LEVEL;
-    }
-
-    value = gui_sysval_value_int(percent);
-    complete(request_context, GUI_SYSVAL_STATUS_OK, &value);
-    return true;
+    gui_sysval_respond(request, GUI_SYSVAL_STATUS_OK, &value);
 }
 
-/*
- * Charging state. SDL_POWERSTATE_CHARGED counts as charging: the cable is
- * in, which is what a charging indicator is meant to show. A host without a
- * battery reads as charging for the same reason, since it runs on mains.
- */
-static bool port_sysval_battery_charging_get(gui_sysval_complete_cb_t complete,
-                                             void *request_context)
+static void port_sysval_battery_charging_get(gui_sysval_request_t *request)
 {
-    SDL_PowerState state = SDL_GetPowerInfo(NULL, NULL);
-    gui_sysval_value_t value;
+    gui_sysval_value_t value = gui_sysval_value_bool(battery_charging);
 
-    switch (state)
-    {
-    case SDL_POWERSTATE_CHARGING:
-    case SDL_POWERSTATE_CHARGED:
-    case SDL_POWERSTATE_NO_BATTERY:
-        value = gui_sysval_value_bool(true);
-        break;
-
-    case SDL_POWERSTATE_ON_BATTERY:
-        value = gui_sysval_value_bool(false);
-        break;
-
-    default:
-        /* SDL cannot tell. Reporting a guess here would make a charging
-         * icon flicker, so fail and let the UI keep its placeholder. */
-        complete(request_context, GUI_SYSVAL_STATUS_ERROR, NULL);
-        return true;
-    }
-
-    complete(request_context, GUI_SYSVAL_STATUS_OK, &value);
-    return true;
+    gui_sysval_respond(request, GUI_SYSVAL_STATUS_OK, &value);
 }
 
-/*
- * Seconds of battery left. Only meaningful while discharging; SDL returns
- * -1 when plugged in or when it cannot estimate, which is reported as an
- * error rather than as a zero that would read as "battery empty".
- */
-static bool port_sysval_battery_time_get(gui_sysval_complete_cb_t complete,
-                                         void *request_context)
+static void port_sysval_battery_remaining_get(gui_sysval_request_t *request)
 {
-    int seconds = -1;
-    gui_sysval_value_t value;
+    gui_sysval_value_t value = gui_sysval_value_int(battery_remaining_seconds);
 
-    SDL_GetPowerInfo(&seconds, NULL);
-    if (seconds < 0)
-    {
-        complete(request_context, GUI_SYSVAL_STATUS_ERROR, NULL);
-        return true;
-    }
-
-    value = gui_sysval_value_int(seconds);
-    complete(request_context, GUI_SYSVAL_STATUS_OK, &value);
-    return true;
+    gui_sysval_respond(request, GUI_SYSVAL_STATUS_OK, &value);
 }
 
-static gui_sysval_handler_t battery_handler =
+static gui_sysval_adapter_t battery_level_adapter =
 {
     .key = GUI_SYSVAL_KEY_POWER_BATTERY_LEVEL,
     .type = GUI_SYSVAL_TYPE_INT,
-    .get_request = port_sysval_battery_get,
-    .set_request = NULL,
-    .next = NULL,
+    .get_request = port_sysval_battery_level_get,
 };
 
-static gui_sysval_handler_t battery_charging_handler =
+static gui_sysval_adapter_t battery_charging_adapter =
 {
     .key = GUI_SYSVAL_KEY_POWER_BATTERY_CHARGING,
     .type = GUI_SYSVAL_TYPE_BOOL,
     .get_request = port_sysval_battery_charging_get,
-    .set_request = NULL,
-    .next = NULL,
 };
 
-static gui_sysval_handler_t battery_time_handler =
+static gui_sysval_adapter_t battery_remaining_adapter =
 {
     .key = GUI_SYSVAL_KEY_POWER_BATTERY_REMAINING_SECONDS,
     .type = GUI_SYSVAL_TYPE_INT,
-    .get_request = port_sysval_battery_time_get,
-    .set_request = NULL,
-    .next = NULL,
+    .get_request = port_sysval_battery_remaining_get,
 };
 
 static int port_sysval_power_init(void)
 {
-    if (!gui_sysval_handler_register(&battery_handler) ||
-        !gui_sysval_handler_register(&battery_charging_handler) ||
-        !gui_sysval_handler_register(&battery_time_handler))
-    {
-        return -1;
-    }
-
+    gui_sysval_adapter_register(&battery_level_adapter);
+    gui_sysval_adapter_register(&battery_charging_adapter);
+    gui_sysval_adapter_register(&battery_remaining_adapter);
     return 0;
 }
 

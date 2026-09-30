@@ -24,7 +24,7 @@
 #define TEXT_SIZE      32
 #define FONT_SIZE      24
 #define LINE_HEIGHT    32
-#define LINE_COUNT     8
+#define LINE_COUNT     10
 
 #define REFRESH_MS     1000
 #define WRITE_DELAY_MS 1500
@@ -39,6 +39,12 @@ static char brightness_buf[TEXT_SIZE];
 static char wifi_buf[TEXT_SIZE];
 static char steps_buf[TEXT_SIZE];
 static char heart_rate_buf[TEXT_SIZE];
+static char sync_buf[TEXT_SIZE];
+static char async_buf[TEXT_SIZE];
+
+/* Simulator-only keys from gui_port_sysval_sync.c and _async.c. */
+#define SYSVAL_KEY_SYNC_VALUE  "sim/sync/value"
+#define SYSVAL_KEY_ASYNC_VALUE "sim/async/value"
 
 static void text_update(gui_text_t *text, char *buf)
 {
@@ -186,7 +192,6 @@ static void steps_done(gui_sysval_request_id_t request_id,
     text_update((gui_text_t *)user_data, steps_buf);
 }
 
-/* Fails until a measurement has finished, so "--" is expected at first. */
 static void heart_rate_done(gui_sysval_request_id_t request_id,
                             gui_sysval_status_t status,
                             const gui_sysval_value_t *value,
@@ -206,6 +211,44 @@ static void heart_rate_done(gui_sysval_request_id_t request_id,
     text_update((gui_text_t *)user_data, heart_rate_buf);
 }
 
+/* sim/sync/value is answered inside the port's get_request. */
+static void sync_done(gui_sysval_request_id_t request_id,
+                      gui_sysval_status_t status,
+                      const gui_sysval_value_t *value,
+                      void *user_data)
+{
+    GUI_UNUSED(request_id);
+
+    if (status == GUI_SYSVAL_STATUS_OK && value != NULL)
+    {
+        snprintf(sync_buf, TEXT_SIZE, "sync: %d", (int)value->data.i);
+    }
+    else
+    {
+        snprintf(sync_buf, TEXT_SIZE, "sync: --");
+    }
+    text_update((gui_text_t *)user_data, sync_buf);
+}
+
+/* sim/async/value is answered about 500 ms later, from another thread. */
+static void async_done(gui_sysval_request_id_t request_id,
+                       gui_sysval_status_t status,
+                       const gui_sysval_value_t *value,
+                       void *user_data)
+{
+    GUI_UNUSED(request_id);
+
+    if (status == GUI_SYSVAL_STATUS_OK && value != NULL)
+    {
+        snprintf(async_buf, TEXT_SIZE, "async: %d", (int)value->data.i);
+    }
+    else
+    {
+        snprintf(async_buf, TEXT_SIZE, "async: --");
+    }
+    text_update((gui_text_t *)user_data, async_buf);
+}
+
 
 /*============================================================================*
  *                         Reading
@@ -219,9 +262,11 @@ static gui_text_t *brightness_text;
 static gui_text_t *wifi_text;
 static gui_text_t *steps_text;
 static gui_text_t *heart_rate_text;
+static gui_text_t *sync_text;
+static gui_text_t *async_text;
 
-/* Timer callback: read every value once. Each result arrives later, on the
- * GUI thread, in the callback passed here. */
+/* Timer callback: read every value once. Each result arrives on the GUI
+ * thread, after this function has returned, in the callback passed here. */
 static void refresh(void *obj)
 {
     GUI_UNUSED(obj);
@@ -242,12 +287,33 @@ static void refresh(void *obj)
                            steps_done, steps_text);
     gui_sysval_get_request(GUI_SYSVAL_KEY_HEALTH_HEART_RATE,
                            heart_rate_done, heart_rate_text);
+    gui_sysval_get_request(SYSVAL_KEY_SYNC_VALUE,
+                           sync_done, sync_text);
+    gui_sysval_get_request(SYSVAL_KEY_ASYNC_VALUE,
+                           async_done, async_text);
 }
 
 
 /*============================================================================*
  *                         Writing
  *============================================================================*/
+
+static const char *status_name(gui_sysval_status_t status)
+{
+    switch (status)
+    {
+    case GUI_SYSVAL_STATUS_OK:
+        return "ok";
+    case GUI_SYSVAL_STATUS_INVALID_VALUE:
+        return "invalid value";
+    case GUI_SYSVAL_STATUS_BUSY:
+        return "busy";
+    case GUI_SYSVAL_STATUS_TIMEOUT:
+        return "timeout";
+    default:
+        return "error";
+    }
+}
 
 /* A write may complete later; log the value that actually took effect. */
 static void write_done(gui_sysval_request_id_t request_id,
@@ -261,7 +327,7 @@ static void write_done(gui_sysval_request_id_t request_id,
 
     if (status != GUI_SYSVAL_STATUS_OK || value == NULL)
     {
-        gui_log("sysval set %s -> failed, status %d\n", key, (int)status);
+        gui_log("sysval set %s -> failed, %s\n", key, status_name(status));
     }
     else if (value->type == GUI_SYSVAL_TYPE_BOOL)
     {
@@ -279,19 +345,14 @@ static void write_demo(void *obj)
     gui_sysval_value_t value;
     gui_sysval_request_id_t id;
 
-    /* Applies immediately. */
     value = gui_sysval_value_int(35);
     gui_sysval_set_request(GUI_SYSVAL_KEY_DISPLAY_BRIGHTNESS, &value,
                            write_done, GUI_SYSVAL_KEY_DISPLAY_BRIGHTNESS);
 
-    /* Completes about 400 ms later, from another thread. The callback
-     * still runs on the GUI thread. */
     value = gui_sysval_value_bool(true);
     gui_sysval_set_request(GUI_SYSVAL_KEY_CONNECTIVITY_WIFI_ENABLED, &value,
                            write_done, GUI_SYSVAL_KEY_CONNECTIVITY_WIFI_ENABLED);
 
-    /* Starts a measurement. The heart rate line fills in a few seconds
-     * later. */
     value = gui_sysval_value_bool(true);
     gui_sysval_set_request(GUI_SYSVAL_KEY_HEALTH_HEART_RATE_MEASURING, &value,
                            write_done, GUI_SYSVAL_KEY_HEALTH_HEART_RATE_MEASURING);
@@ -316,6 +377,13 @@ static void write_demo(void *obj)
         gui_log("sysval set %s -> rejected, wrong type\n",
                 GUI_SYSVAL_KEY_AUDIO_MUTED);
     }
+
+    /* Accepted, then failed: the type is right, so the request starts, but
+     * 150 is out of range. The backend reports it through the callback as
+     * GUI_SYSVAL_STATUS_INVALID_VALUE. */
+    value = gui_sysval_value_int(150);
+    gui_sysval_set_request(GUI_SYSVAL_KEY_AUDIO_VOLUME, &value,
+                           write_done, GUI_SYSVAL_KEY_AUDIO_VOLUME);
 
     gui_obj_stop_timer(GUI_BASE(obj));
 }
@@ -352,6 +420,8 @@ static int app_init(void)
     wifi_text       = text_create("wifi",       wifi_buf,       5);
     steps_text      = text_create("steps",      steps_buf,      6);
     heart_rate_text = text_create("heart rate", heart_rate_buf, 7);
+    sync_text       = text_create("sync",       sync_buf,       8);
+    async_text      = text_create("async",      async_buf,      9);
 
     /* A widget holds one timer, so each timer gets its own window. */
     win = gui_win_create(gui_obj_get_root(), "sysval_refresh", 0, 0, 0, 0);

@@ -6,7 +6,7 @@
 
 /**
  * @file gui_sysval.h
- * @brief Generic asynchronous system value request API.
+ * @brief System value request API.
  */
 
 #ifndef __GUI_SYSVAL_H__
@@ -56,15 +56,20 @@ typedef uint32_t gui_sysval_request_id_t;
 
 #define GUI_SYSVAL_REQUEST_INVALID ((gui_sysval_request_id_t)0)
 
+/**
+ * @brief Result of a request that was started.
+ *
+ * Only a started request reports a status. A request that cannot start, for
+ * example an unknown key, a read-only key or a value of the wrong type, is
+ * rejected with GUI_SYSVAL_REQUEST_INVALID instead and never calls back.
+ */
 typedef enum
 {
     GUI_SYSVAL_STATUS_OK = 0,
-    GUI_SYSVAL_STATUS_NOT_FOUND,
-    GUI_SYSVAL_STATUS_READ_ONLY,
-    GUI_SYSVAL_STATUS_INVALID_VALUE,
-    GUI_SYSVAL_STATUS_BUSY,
-    GUI_SYSVAL_STATUS_TIMEOUT,
-    GUI_SYSVAL_STATUS_ERROR,
+    GUI_SYSVAL_STATUS_INVALID_VALUE,    /**< Right type, but out of range */
+    GUI_SYSVAL_STATUS_BUSY,             /**< Backend cannot take it now */
+    GUI_SYSVAL_STATUS_TIMEOUT,          /**< Backend gave up waiting */
+    GUI_SYSVAL_STATUS_ERROR,            /**< Any other failure */
 } gui_sysval_status_t;
 
 /**
@@ -107,13 +112,16 @@ gui_sysval_value_t gui_sysval_value_str(const char *s);
 /**
  * @brief Start an asynchronous read.
  *
- * The key is defined by HoneyGUI or an extension module. The callback is
- * invoked when the platform backend completes the request.
+ * The key is defined by HoneyGUI or an extension module. If this returns a
+ * valid ID, @p cb is called exactly once, on the GUI thread, after this
+ * function has returned -- even when the backend has the value at hand. If
+ * it returns GUI_SYSVAL_REQUEST_INVALID, @p cb is never called.
  *
  * @param key       System value key.
  * @param cb        Completion callback.
  * @param user_data Value passed to @p cb.
- * @return Request ID, or GUI_SYSVAL_REQUEST_INVALID if queuing failed.
+ * @return Request ID, or GUI_SYSVAL_REQUEST_INVALID if the arguments are
+ *         invalid, the key is unknown or not readable, or out of memory.
  */
 gui_sysval_request_id_t gui_sysval_get_request(const char *key,
                                                gui_sysval_response_cb_t cb,
@@ -122,15 +130,17 @@ gui_sysval_request_id_t gui_sysval_get_request(const char *key,
 /**
  * @brief Start an asynchronous write.
  *
- * The key and value are valid only for the duration of this call. The platform
- * adapter must copy them before returning if they are needed asynchronously.
+ * Same callback rules as gui_sysval_get_request(). The key and value are only
+ * read during this call. A value of the right type but out of range is
+ * reported through @p cb as GUI_SYSVAL_STATUS_INVALID_VALUE.
  *
  * @param key       System value key.
  * @param value     New value. Its type must match the type of the key.
  * @param cb        Completion callback.
  * @param user_data Value passed to @p cb.
- * @return Request ID, or GUI_SYSVAL_REQUEST_INVALID if queuing failed or the
- *         value type does not match the key.
+ * @return Request ID, or GUI_SYSVAL_REQUEST_INVALID if the arguments are
+ *         invalid, the key is unknown or read-only, the value type does not
+ *         match the key, or out of memory.
  */
 gui_sysval_request_id_t gui_sysval_set_request(const char *key,
                                                const gui_sysval_value_t *value,

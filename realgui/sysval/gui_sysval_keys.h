@@ -45,7 +45,7 @@ extern "C" {
 /**
  * Local wall-clock time.
  *
- * Access: Read/write
+ * Access: Read/write where the platform allows it
  * Type: GUI_SYSVAL_TYPE_INT
  * Range: 0..86399
  * Unit: Seconds since local midnight
