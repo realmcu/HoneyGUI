@@ -436,7 +436,7 @@ static void render_arc_to_buffer(gui_arc_t *this)
                        this->end_angle,
                        this->color.color.argb_full);
     }
-
+    gui_get_dc()->cache_need_clean = 1;
 }
 
 /**
