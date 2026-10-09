@@ -2186,7 +2186,7 @@ static void video_build_header(gui_video_t *this)
 
     if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
     {
-        if (gui_get_acc()->jpeg->load)
+        if (gui_get_acc()->jpeg && gui_get_acc()->jpeg->load)
         {
             this->header.type = 0x00; // RGB565
         }

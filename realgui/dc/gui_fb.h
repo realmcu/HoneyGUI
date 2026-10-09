@@ -76,7 +76,7 @@ void gui_fb_skip_clear(bool skip);
 /**
  * @brief Get the theoretical FPS based on CPU render time.
  *
- * @return Theoretical render FPS.
+ * @return Theoretical render FPS, or 0 when no measurable frame is available.
  */
 uint32_t gui_fb_fps(void);
 

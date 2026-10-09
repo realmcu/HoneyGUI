@@ -609,6 +609,11 @@ static void gui_fb_draw(gui_obj_t *root)
 
 uint32_t gui_fb_fps(void)
 {
+    if (render_time_ms == 0)
+    {
+        return 0;
+    }
+
     return 1000 / render_time_ms;
 }
 
