@@ -76,6 +76,7 @@ DEMO_CONFIGS = (
      "3D Pikachu GLTF Demo", "widget"),
     ("REALTEK_BUILD_REAL_FLAG_GLTF_3D", "3D Flag GLTF Demo", "widget"),
     ("REALTEK_BUILD_REAL_ROBOT_GLTF_3D", "3D Robot GLTF Demo", "widget"),
+    ("REALTEK_BUILD_REAL_SEAWATER_3D", "3D Seawater Demo", "widget"),
     ("REALTEK_BUILD_REAL_VIEW", "View Demo", "widget"),
     ("REALTEK_BUILD_EXAMPLE_LIST_WIDGET", "List Widget Demo", "widget"),
     ("REALTEK_BUILD_EXAMPLE_CARD_LIST_WIDGET",
