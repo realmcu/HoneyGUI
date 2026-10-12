@@ -1,0 +1,8 @@
+public_api_review_config:
+  customer_visible: true   # Whether this module is customer-facing; CI does not read this field
+  rules:
+    glob_paths:   # glob patterns, same as .gitignore; supports ** globbing
+      - include/**/public_api.h
+      - include/public_api/*.h
+    required_reviewers:
+      - catherine_guo
