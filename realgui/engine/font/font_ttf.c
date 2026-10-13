@@ -600,6 +600,11 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
         .render_mode = 8,
     };
 
+    if (text->gradient != NULL)
+    {
+        render_font.gradient = text->gradient->view;
+    }
+
     switch (dc->bit_depth)
     {
     case 16:
@@ -2396,6 +2401,238 @@ void gui_font_ttf_unload(gui_text_t *text)
 }
 
 /**
+ * @brief Grow an inclusive box by another, or start it on the first call.
+ * @param found In: whether the box already holds a rect. Set to true.
+ */
+static void ttf_box_union(int *box, bool *found, int x0, int y0, int x1, int y1)
+{
+    if (!*found)
+    {
+        box[0] = x0;
+        box[1] = y0;
+        box[2] = x1;
+        box[3] = y1;
+        *found = true;
+        return;
+    }
+    box[0] = _UI_MIN(box[0], x0);
+    box[1] = _UI_MIN(box[1], y0);
+    box[2] = _UI_MAX(box[2], x1);
+    box[3] = _UI_MAX(box[3], y1);
+}
+
+static void ttf_gradient_store_box(gui_text_gradient_t *grad, const int *box)
+{
+    grad->bounds_x0 = box[0];
+    grad->bounds_y0 = box[1];
+    grad->bounds_x1 = _UI_MAX(box[2], box[0]);
+    grad->bounds_y1 = _UI_MAX(box[3], box[1]);
+}
+
+/**
+ * @brief Measure the screen-space box of every glyph's pen advance and line.
+ * @param text Text object whose chr[] holds layout positions.
+ * @param is_v3 Whether V3 typography is active.
+ * @param baseline_px Baseline offset from the line top; zero for legacy fonts.
+ * @param line_h Line box height used by the layout.
+ * @return true when at least one glyph advances the pen.
+ */
+static bool ttf_measure_layout_bounds(gui_text_t *text, bool is_v3, int16_t baseline_px,
+                                      int32_t line_h)
+{
+    const mem_char_t *chr = text->data;
+    bool found = false;
+    int box[4] = {0};
+
+    for (uint16_t i = 0; i < text->active_font_len; i++)
+    {
+        int advance = chr[i].char_w;
+#if ENABLE_FONT_V3_TYPO
+        if (is_v3)
+        {
+            /* Combining marks keep a visible char_w but advance 0; a space
+             * overflowing a line end is trimmed in char_w only. */
+            advance = _UI_MIN(chr[i].advance, chr[i].char_w);
+        }
+#endif
+        if (advance <= 0)
+        {
+            continue;
+        }
+
+        float back_x, back_y;
+        ttf_calc_bearing_backout(&chr[i], is_v3, &back_x, &back_y);
+        int pen_x = chr[i].x + (int)back_x;
+        int line_y = chr[i].y + (int)back_y - baseline_px;
+        ttf_box_union(box, &found, pen_x, line_y, pen_x + advance - 1, line_y + line_h - 1);
+    }
+
+    ttf_gradient_store_box(text->gradient, box);
+    return found;
+}
+
+/**
+ * @brief Measure the screen-space ink box of every vector glyph.
+ * @param text Text object whose chr[] holds layout positions.
+ * @param scale Font-unit to pixel scale.
+ * @param ascent Legacy ascent; zero for V3 typography.
+ * @param is_v3 Whether V3 typography is active.
+ * @return true when at least one glyph has ink.
+ */
+static bool ttf_measure_ink_bounds(gui_text_t *text, float scale, short ascent, bool is_v3)
+{
+    const mem_char_t *chr = text->data;
+    const float bold = text->bold_weight;
+    bool found = false;
+    int box[4] = {0};
+
+    for (uint16_t i = 0; i < text->active_font_len; i++)
+    {
+        const FontGlyphData *gd = (const FontGlyphData *)chr[i].dot_addr;
+        if (chr[i].is_emoji || gd == NULL || chr[i].char_w == 0 || gd->winding_count == 0)
+        {
+            continue;
+        }
+
+        float origin_x, origin_y;
+        ttf_calc_glyph_origin(gd, &chr[i], scale, ascent, is_v3, &origin_x, &origin_y);
+        float left = chr[i].x + origin_x - bold;
+        float top = chr[i].y + origin_y - bold;
+        int gx0 = (int)floorf(left);
+        int gy0 = (int)floorf(top);
+        int gx1 = (int)ceilf(left + scale * (gd->x1 - gd->x0) + bold * 2) - 1;
+        int gy1 = (int)ceilf(top + scale * (gd->y1 - gd->y0) + bold * 2) - 1;
+        ttf_box_union(box, &found, gx0, gy0, gx1, gy1);
+    }
+
+    ttf_gradient_store_box(text->gradient, box);
+    return found;
+}
+
+static bool ttf_measure_widget_bounds(gui_text_t *text)
+{
+    if (text->base.w <= 0 || text->base.h <= 0)
+    {
+        return false;
+    }
+    int box[4] = {text->offset_x, text->offset_y,
+                  text->offset_x + text->base.w - 1, text->offset_y + text->base.h - 1
+                 };
+    ttf_gradient_store_box(text->gradient, box);
+    return true;
+}
+
+/* Q16 LUT step per pixel for one axis of the handle vector. */
+static int32_t ttf_gradient_step(float full, float d, float len2, int32_t span)
+{
+    if (span <= 1)
+    {
+        return 0;
+    }
+    float step = full * d / (len2 * (span - 1));
+    /* Past one LUT sweep per pixel the edge is already hard; keeps the step
+     * representable in int32 for tiny boxes. */
+    if (step > full)
+    {
+        step = full;
+    }
+    else if (step < -full)
+    {
+        step = -full;
+    }
+    return (int32_t)step;
+}
+
+/**
+ * @brief Point the gradient view at this frame's box and handles.
+ *
+ * The box is measured once per frame: RAMLESS draws overwrite chr[].x/y with
+ * bitmap positions after the first section, so later sections reuse it.
+ * Only identity and translate transforms are supported; otherwise the view
+ * is cleared and the text draws in its flat color.
+ *
+ * @param baseline_px Baseline offset from the line top; zero for legacy fonts.
+ * @param line_h Line box height used by the layout.
+ */
+static void ttf_gradient_bind(gui_text_t *text, float scale, short ascent, bool is_v3,
+                              int16_t baseline_px, int32_t line_h, FONT_MATRIX_TYPE tm_type)
+{
+    gui_text_gradient_t *grad = text->gradient;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    memset(&grad->view, 0, sizeof(grad->view));
+    if (tm_type != FONT_IDENTITY && tm_type != FONT_TRANSFORM)
+    {
+        return;
+    }
+
+    if (!grad->bounds_valid || grad->bounds_frame != dc->frame_count)
+    {
+        bool found;
+        switch (grad->box)
+        {
+        case GUI_TEXT_GRADIENT_BOX_LAYOUT:
+            found = ttf_measure_layout_bounds(text, is_v3, baseline_px, line_h);
+            break;
+        case GUI_TEXT_GRADIENT_BOX_WIDGET:
+            found = ttf_measure_widget_bounds(text);
+            break;
+        case GUI_TEXT_GRADIENT_BOX_INK:
+        default:
+            found = ttf_measure_ink_bounds(text, scale, ascent, is_v3);
+            break;
+        }
+        if (!found)
+        {
+            return;
+        }
+        if (grad->box != GUI_TEXT_GRADIENT_BOX_WIDGET)
+        {
+            /* The first draw of the frame may be the shifted loop copy. */
+            grad->bounds_x0 -= grad->shift_x;
+            grad->bounds_x1 -= grad->shift_x;
+            grad->bounds_y0 -= grad->shift_y;
+            grad->bounds_y1 -= grad->shift_y;
+        }
+        grad->bounds_valid = true;
+        grad->bounds_frame = dc->frame_count;
+    }
+
+    /* Stop position of a pixel at normalized (u, v) in the box:
+     * t = ((u - u0) * du + (v - v0) * dv) / |d|^2, d = end - start. */
+    const float full = (float)((GUI_TEXT_GRADIENT_LUT_SIZE - 1) << 16);
+    const float du = grad->handle_x1 - grad->handle_x0;
+    const float dv = grad->handle_y1 - grad->handle_y0;
+    const float len2 = du * du + dv * dv;
+    font_gradient_t *view = &grad->view;
+
+    view->lut = grad->lut;
+    view->lut_len = GUI_TEXT_GRADIENT_LUT_SIZE;
+    view->x0 = grad->bounds_x0;
+    view->y0 = grad->bounds_y0;
+    if (grad->box != GUI_TEXT_GRADIENT_BOX_WIDGET)
+    {
+        /* Ink and layout boxes travel with the text; the widget box is fixed. */
+        view->x0 += grad->shift_x;
+        view->y0 += grad->shift_y;
+    }
+    view->origin = 0x8000;  /* round to the nearest LUT entry */
+
+    /* Handles under 1/16 of the box apart: draw the first stop's color. With
+     * handles in -1..2 the origin offset stays under 46 LUT sweeps, well
+     * inside int32 Q16. Per-pixel positions are accumulated in int64. */
+    if (len2 < 1.0f / 256.0f)
+    {
+        return;
+    }
+    view->step_x = ttf_gradient_step(full, du, len2,
+                                     grad->bounds_x1 - grad->bounds_x0 + 1);
+    view->step_y = ttf_gradient_step(full, dv, len2,
+                                     grad->bounds_y1 - grad->bounds_y0 + 1);
+    view->origin += (int32_t)(-full * (grad->handle_x0 * du + grad->handle_y0 * dv) / len2);
+}
+
+/**
  * @brief Rasterize and draw all glyphs in a text object.
  * @param text Text object containing glyphs and rendering settings.
  * @param rect Text bounds and clipping rectangle.
@@ -2523,6 +2760,22 @@ static void font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
     /* Keep cache mode stable for this pass; glyph updates must not affect the
      * dispatch of later glyphs, especially across RAMLESS sections. */
     const bool prev_static = text->font_cache_static;
+
+    if (text->gradient != NULL)
+    {
+        /* Must match the line height resolved by gui_font_mem_layout(). */
+        int16_t baseline_px = 0;
+        int32_t line_h = text->font_height + text->extra_line_spacing;
+#if ENABLE_FONT_V3_TYPO
+        if (is_v3)
+        {
+            baseline_px = typo_ctx.baseline_px;
+            line_h = (text->line_height > 0) ? text->line_height
+                     : typo_ctx.default_line_height + text->extra_line_spacing;
+        }
+#endif
+        ttf_gradient_bind(text, scale, ascent, is_v3, baseline_px, line_h, tm_type);
+    }
 
     for (uint16_t index = 0; index < text->active_font_len; index++)
     {

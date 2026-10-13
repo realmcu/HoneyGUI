@@ -208,7 +208,7 @@ bool gui_obj_point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
  * @param len Number of bytes in the array.
  * @return Calculated checksum value.
  */
-uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len);
+uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint32_t len);
 
 
 /**

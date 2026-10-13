@@ -1331,6 +1331,120 @@ static void font_render_8bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
 #endif
 }
 
+/* pos is int64: pixels far outside the box (loop copies, small boxes) must
+ * clamp to the edge stop instead of wrapping. */
+gui_inline uint32_t font_gradient_lookup(const font_gradient_t *g, int64_t pos)
+{
+    int64_t idx = pos >> 16;
+    if (idx < 0)
+    {
+        idx = 0;
+    }
+    else if (idx >= g->lut_len)
+    {
+        idx = g->lut_len - 1;
+    }
+    return g->lut[idx];
+}
+
+/* Folds the LUT color alpha and the widget alpha into the glyph coverage. */
+gui_inline uint8_t font_gradient_alpha(uint32_t argb, uint8_t font_alpha, uint8_t coverage)
+{
+    uint32_t lut_alpha = argb >> 24;
+    if (lut_alpha != 0xff)
+    {
+        coverage = _UI_UDIV255(lut_alpha * coverage);
+    }
+    if (font_alpha != 0xff)
+    {
+        coverage = _UI_UDIV255(font_alpha * coverage);
+    }
+    return coverage;
+}
+
+static void font_render_8bpp_gradient_RGB565(draw_font_t *font, font_glyph_t *glyph)
+{
+    const font_gradient_t *g = &font->gradient;
+    uint16_t *writebuf = (uint16_t *)font->target_buf;
+    uint32_t write_stride = font->target_buf_stride / 2;
+    uint8_t font_alpha = font->color.color.rgba.a;
+
+    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    {
+        int write_off = (i - font->target_rect.y1) * write_stride;
+        int dots_off = (i - glyph->pos_y) * glyph->stride;
+        int64_t pos = (int64_t)g->origin + (int64_t)g->step_y * (i - g->y0) +
+                      (int64_t)g->step_x * (font->clip_rect.x1 - g->x0);
+        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++, pos += g->step_x)
+        {
+            uint8_t coverage = glyph->data[dots_off + j - glyph->pos_x];
+            if (coverage)
+            {
+                uint32_t argb = font_gradient_lookup(g, pos);
+                uint16_t fg = ((argb >> 8) & 0xF800) | ((argb >> 5) & 0x07E0) | ((argb >> 3) & 0x1F);
+                uint16_t *dst = &writebuf[write_off + j - font->target_rect.x1];
+                *dst = alphaBlendRGB565(fg, *dst, font_gradient_alpha(argb, font_alpha, coverage));
+            }
+        }
+    }
+}
+
+static void font_render_8bpp_gradient_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
+{
+    const font_gradient_t *g = &font->gradient;
+    uint32_t *writebuf = (uint32_t *)font->target_buf;
+    uint32_t write_stride = font->target_buf_stride / 4;
+    uint8_t font_alpha = font->color.color.rgba.a;
+
+    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    {
+        int write_off = (i - font->target_rect.y1) * write_stride;
+        int dots_off = (i - glyph->pos_y) * glyph->stride;
+        int64_t pos = (int64_t)g->origin + (int64_t)g->step_y * (i - g->y0) +
+                      (int64_t)g->step_x * (font->clip_rect.x1 - g->x0);
+        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++, pos += g->step_x)
+        {
+            uint8_t coverage = glyph->data[dots_off + j - glyph->pos_x];
+            if (coverage)
+            {
+                gui_color_t fg;
+                fg.color.argb_full = font_gradient_lookup(g, pos);
+                uint32_t *dst = &writebuf[write_off + j - font->target_rect.x1];
+                *dst = fontBlendARGB(fg, *dst,
+                                     font_gradient_alpha(fg.color.argb_full, font_alpha, coverage),
+                                     font->blend_mode);
+            }
+        }
+    }
+}
+
+gui_inline bool font_gradient_enabled(const draw_font_t *font)
+{
+    return font->gradient.lut != NULL && font->gradient.lut_len != 0;
+}
+
+/* Returns false for unsupported mode/format; caller falls back to flat color. */
+static bool font_glyph_render_gradient(draw_font_t *font, font_glyph_t *glyph)
+{
+    switch (font->render_mode)
+    {
+    case 8:
+        switch (font->target_format)
+        {
+        case RGB565:
+            font_render_8bpp_gradient_RGB565(font, glyph);
+            return true;
+        case ARGB8888:
+            font_render_8bpp_gradient_ARGB8888(font, glyph);
+            return true;
+        default:
+            return false;
+        }
+    default:
+        return false;
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -1338,6 +1452,11 @@ static void font_render_8bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
 void font_glyph_render(draw_font_t *font, font_glyph_t *glyph)
 {
     if (glyph->data == NULL) { return; }
+
+    if (font_gradient_enabled(font) && font_glyph_render_gradient(font, glyph))
+    {
+        return;
+    }
 
     switch (font->render_mode)
     {

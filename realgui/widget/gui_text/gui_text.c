@@ -442,6 +442,7 @@ static void gui_text_destroy(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
 
+    gui_text_set_gradient(text, GUI_TEXT_GRADIENT_HORIZONTAL, NULL, 0);
     gui_text_font_destroy(text);
 }
 
@@ -504,6 +505,7 @@ void gui_text_ctor(gui_text_t *this,
     this->layout_refresh = false;
     this->rendermode = 2;
     this->use_img_blit = true;
+    this->gradient = NULL;
 }
 
 static TEXT_MODE transfer_to_rtl_mode(TEXT_MODE mode)
@@ -872,6 +874,153 @@ void gui_text_set_scope_absolute(gui_text_t *this, int16_t x, int16_t y, int16_t
 void gui_text_set_font_blend_mode(gui_text_t *this, BLEND_MODE_TYPE blend_mode)
 {
     this->font_blend_mode = blend_mode;
+}
+
+static uint32_t gradient_color_at(const gui_text_gradient_stop_t *stops, uint8_t count, float t)
+{
+    if (t <= stops[0].position)
+    {
+        return stops[0].color.color.argb_full;
+    }
+
+    for (uint8_t i = 0; i + 1 < count; i++)
+    {
+        if (t > stops[i + 1].position)
+        {
+            continue;
+        }
+
+        float span = stops[i + 1].position - stops[i].position;
+        float f = (span > 0.0f) ? (t - stops[i].position) / span : 1.0f;
+        uint32_t c0 = stops[i].color.color.argb_full;
+        uint32_t c1 = stops[i + 1].color.color.argb_full;
+        uint32_t out = 0;
+        for (int shift = 0; shift <= 24; shift += 8)
+        {
+            float v0 = (float)((c0 >> shift) & 0xff);
+            float v1 = (float)((c1 >> shift) & 0xff);
+            out |= (uint32_t)(v0 + (v1 - v0) * f + 0.5f) << shift;
+        }
+        return out;
+    }
+
+    return stops[count - 1].color.color.argb_full;
+}
+
+static void gradient_preset_handles(gui_text_gradient_t *grad, gui_text_gradient_dir_t dir)
+{
+    static const float presets[][4] =
+    {
+        [GUI_TEXT_GRADIENT_HORIZONTAL]     = {0.0f, 0.5f, 1.0f, 0.5f},
+        [GUI_TEXT_GRADIENT_VERTICAL]       = {0.5f, 0.0f, 0.5f, 1.0f},
+        [GUI_TEXT_GRADIENT_DIAGONAL_TL_BR] = {0.0f, 0.0f, 1.0f, 1.0f},
+        [GUI_TEXT_GRADIENT_DIAGONAL_TR_BL] = {1.0f, 0.0f, 0.0f, 1.0f},
+    };
+    const float *p = presets[(dir <= GUI_TEXT_GRADIENT_DIAGONAL_TR_BL) ? dir : 0];
+
+    grad->handle_x0 = p[0];
+    grad->handle_y0 = p[1];
+    grad->handle_x1 = p[2];
+    grad->handle_y1 = p[3];
+}
+
+static float gradient_clamp_handle(float v)
+{
+    /* Also rejects NaN, which fails both comparisons. */
+    if (!(v >= -1.0f))
+    {
+        return -1.0f;
+    }
+    return (v > 2.0f) ? 2.0f : v;
+}
+
+void gui_text_set_gradient_box(gui_text_t *this, gui_text_gradient_box_t box)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient == NULL || this->gradient->box == box)
+    {
+        return;
+    }
+    this->gradient->box = box;
+    this->gradient->bounds_valid = false;
+    gui_fb_change();
+}
+
+void gui_text_set_gradient_handles(gui_text_t *this, float x0, float y0, float x1, float y1)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (this->gradient == NULL)
+    {
+        return;
+    }
+    this->gradient->handle_x0 = gradient_clamp_handle(x0);
+    this->gradient->handle_y0 = gradient_clamp_handle(y0);
+    this->gradient->handle_x1 = gradient_clamp_handle(x1);
+    this->gradient->handle_y1 = gradient_clamp_handle(y1);
+    gui_fb_change();
+}
+
+void gui_text_set_gradient(gui_text_t *this, gui_text_gradient_dir_t dir,
+                           const gui_text_gradient_stop_t *stops, uint8_t count)
+{
+    GUI_ASSERT(this != NULL);
+
+    if (stops == NULL || count < 2)
+    {
+        if (this->gradient != NULL)
+        {
+            gui_free(this->gradient);
+            this->gradient = NULL;
+            gui_fb_change();
+        }
+        return;
+    }
+
+    if (count > GUI_TEXT_GRADIENT_MAX_STOPS)
+    {
+        count = GUI_TEXT_GRADIENT_MAX_STOPS;
+    }
+
+    gui_text_gradient_box_t box = GUI_TEXT_GRADIENT_BOX_INK;
+    if (this->gradient == NULL)
+    {
+        this->gradient = gui_malloc(sizeof(gui_text_gradient_t));
+        if (this->gradient == NULL)
+        {
+            return;
+        }
+    }
+    else
+    {
+        box = this->gradient->box;
+    }
+    memset(this->gradient, 0, sizeof(gui_text_gradient_t));
+    this->gradient->dir = dir;
+    this->gradient->box = box;
+    gradient_preset_handles(this->gradient, dir);
+
+    gui_text_gradient_stop_t sorted[GUI_TEXT_GRADIENT_MAX_STOPS];
+    memset(sorted, 0, sizeof(sorted));
+    for (uint8_t i = 0; i < count; i++)
+    {
+        uint8_t j = i;
+        while (j > 0 && sorted[j - 1].position > stops[i].position)
+        {
+            sorted[j] = sorted[j - 1];
+            j--;
+        }
+        sorted[j] = stops[i];
+    }
+
+    for (int i = 0; i < GUI_TEXT_GRADIENT_LUT_SIZE; i++)
+    {
+        this->gradient->lut[i] = gradient_color_at(sorted, count,
+                                                   (float)i / (GUI_TEXT_GRADIENT_LUT_SIZE - 1));
+    }
+
+    gui_fb_change();
 }
 
 

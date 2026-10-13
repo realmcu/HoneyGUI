@@ -477,7 +477,7 @@ static void gui_list_prepare(gui_obj_t *obj)
 
     uint8_t last = _this->checksum;
     _this->checksum = 0;
-    _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, (uint8_t)sizeof(gui_list_t));
+    _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, sizeof(gui_list_t));
     if (last != _this->checksum)
     {
         gui_fb_change();

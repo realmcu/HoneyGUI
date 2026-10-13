@@ -474,7 +474,7 @@ static void gui_card_list_prepare(gui_obj_t *obj)
 
     uint8_t last      = cl->checksum;
     cl->checksum      = 0;
-    cl->checksum      = gui_obj_checksum(0, (uint8_t *)cl, (uint8_t)sizeof(gui_card_list_t));
+    cl->checksum      = gui_obj_checksum(0, (uint8_t *)cl, sizeof(gui_card_list_t));
     if (last != cl->checksum)
     {
         gui_fb_change();

@@ -199,11 +199,11 @@ gui_obj_t *gui_obj_create(void       *parent,
     return this;
 }
 
-uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len)
+uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint32_t len)
 {
     uint8_t crc = seed;
 
-    for (uint8_t i = 0; i < len; i++)
+    for (uint32_t i = 0; i < len; i++)
     {
         crc += *(data++);
     }

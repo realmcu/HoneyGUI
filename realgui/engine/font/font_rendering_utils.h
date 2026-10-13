@@ -25,11 +25,29 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/**
+ * Per-pixel color source replacing draw_font_t.color. Only the 8bpp
+ * RGB565 / ARGB8888 targets honor it; other paths draw with the flat color.
+ * The LUT index of pixel (x, y) is
+ * (origin + step_x * (x - x0) + step_y * (y - y0)) >> 16, clamped to the LUT.
+ */
+typedef struct font_gradient
+{
+    const uint32_t *lut;    /**< ARGB8888 colors; NULL disables the gradient. */
+    uint16_t lut_len;
+    int16_t x0;             /**< Screen X of the gradient origin. */
+    int16_t y0;             /**< Screen Y of the gradient origin. */
+    int32_t origin;         /**< Q16 LUT position at (x0, y0). */
+    int32_t step_x;         /**< Q16 LUT step per pixel in X. */
+    int32_t step_y;         /**< Q16 LUT step per pixel in Y. */
+} font_gradient_t;
+
 typedef struct draw_font
 {
     uint8_t render_mode;
 
     gui_color_t color;
+    font_gradient_t gradient;
     gui_rect_t clip_rect;
 
     uint8_t *target_buf;

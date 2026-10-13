@@ -94,6 +94,7 @@ void text_vector_scale_test(void);
 void text_emoji_example(void);
 void text_ttf_emoji_example(void);
 void text_missing_glyph_test(void);
+void text_gradient_example(void);
 
 #ifdef __cplusplus
 }

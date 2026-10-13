@@ -510,10 +510,21 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     {
         mem_char_t *chr = text->base.data;
         uint16_t i, len = text->base.active_font_len;
+        gui_text_gradient_t *grad = text->base.gradient;
         for (i = 0; i < len; i++) { chr[i].x += text->loop_shift_x; chr[i].y += text->loop_shift_y; }
+        if (grad != NULL)
+        {
+            grad->shift_x = text->loop_shift_x;
+            grad->shift_y = text->loop_shift_y;
+        }
         if (gui_text_scope_rect_hit(&draw_rect, &dc->section))
         {
             gui_scroll_text_font_draw(&text->base, &draw_rect);
+        }
+        if (grad != NULL)
+        {
+            grad->shift_x = 0;
+            grad->shift_y = 0;
         }
         for (i = 0; i < len; i++) { chr[i].x -= text->loop_shift_x; chr[i].y -= text->loop_shift_y; }
     }
@@ -530,6 +541,7 @@ static void gui_scroll_text_destroy(gui_obj_t *obj)
     (void)obj;
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
     gui_scroll_text_t *st = (gui_scroll_text_t *)obj;
+    gui_text_set_gradient(&st->base, GUI_TEXT_GRADIENT_HORIZONTAL, NULL, 0);
     gui_scroll_text_font_destroy(&st->base);
 }
 
