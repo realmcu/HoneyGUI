@@ -388,6 +388,17 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
         int outer_right_solid = (int)floorf(center_x + outer_solid_x - 0.5f);
         int inner_left_solid = (int)floorf(center_x - inner_solid_x - 0.5f);
         int inner_right_solid = (int)ceilf(center_x + inner_solid_x - 0.5f);
+        int outer_left_aa = (int)ceilf(center_x - outer_aa_x - 0.5f);
+        int outer_right_aa = (int)floorf(center_x + outer_aa_x - 0.5f);
+
+        // Row lies entirely in the outer AA band: no solid span.  Without this
+        // the zero-width solid span still rounds to one opaque pixel at the
+        // centre column, leaving a spike at the top/bottom of the ring.
+        if (dy_sq >= outer_solid_sq)
+        {
+            outer_left_solid = outer_right_aa + 1;
+            outer_right_solid = outer_right_aa;
+        }
 
         if (inner_radius > 0.0f && inner_solid_x > 0.0f)
         {
@@ -399,8 +410,6 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
             fill_ring_span_argb8888(ctx, y, outer_left_solid, outer_right_solid, color);
         }
 
-        int outer_left_aa = (int)ceilf(center_x - outer_aa_x - 0.5f);
-        int outer_right_aa = (int)floorf(center_x + outer_aa_x - 0.5f);
         int outer_left_end = LG_MIN(outer_left_solid - 1, clip_x2);
         for (int x = LG_MAX(outer_left_aa, clip_x1); x <= outer_left_end; x++)
         {
@@ -594,6 +603,16 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
         int outer_right_solid = (int)floorf(center_x + outer_solid_x - 0.5f);
         int inner_left_solid = (int)floorf(center_x - inner_solid_x - 0.5f);
         int inner_right_solid = (int)ceilf(center_x + inner_solid_x - 0.5f);
+        int outer_left_aa = (int)ceilf(center_x - outer_aa_x - 0.5f);
+        int outer_right_aa = (int)floorf(center_x + outer_aa_x - 0.5f);
+
+        // Row lies entirely in the outer AA band: no solid span (see
+        // draw_arc_as_ring()), otherwise 90/270 deg get a one-pixel spike.
+        if (dy_sq >= outer_solid_sq)
+        {
+            outer_left_solid = outer_right_aa + 1;
+            outer_right_solid = outer_right_aa;
+        }
 
         if (inner_radius > 0.0f && inner_solid_x > 0.0f)
         {
@@ -611,7 +630,6 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
                                    end_cos, end_sin, wide_arc, color);
         }
 
-        int outer_left_aa = (int)ceilf(center_x - outer_aa_x - 0.5f);
         int outer_left_end = LG_MIN(outer_left_solid - 1, clip_x2);
         for (int x = LG_MAX(outer_left_aa, clip_x1); x <= outer_left_end; x++)
         {
@@ -627,7 +645,6 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
             if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
         }
 
-        int outer_right_aa = (int)floorf(center_x + outer_aa_x - 0.5f);
         int outer_right_start = LG_MAX(outer_right_solid + 1, clip_x1);
         for (int x = outer_right_start; x <= LG_MIN(outer_right_aa, clip_x2); x++)
         {
@@ -1504,16 +1521,27 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
     bool draw_end_cap = gradient_over_360 && !has_caps;
 
     float start_cap_x = 0, start_cap_y = 0, end_cap_x = 0, end_cap_y = 0;
-    PixelColor start_color = gradient->stops[0].color;
-    PixelColor end_color = gradient->stops[gradient->stop_count - 1].color;
+    // Cap colors follow the gradient at the arc's own endpoints, so an arc
+    // shorter than the gradient range does not jump to the last stop color.
+    // Same angle -> t mapping as the arc body; an end that wraps exactly onto
+    // gradient_start maps to 360 (t = 1) to match the body pixels before it.
+    float cap_start_offset = original_start_angle - gradient_start;
+    while (cap_start_offset < 0.0f) { cap_start_offset += 360.0f; }
+    while (cap_start_offset >= 360.0f) { cap_start_offset -= 360.0f; }
+    float cap_end_offset = original_end_angle - gradient_start;
+    while (cap_end_offset <= 0.0f) { cap_end_offset += 360.0f; }
+    while (cap_end_offset > 360.0f) { cap_end_offset -= 360.0f; }
+    float cap_start_t = LG_MIN(cap_start_offset / gradient_span, 1.0f);
+    float cap_end_t = LG_MIN(cap_end_offset / gradient_span, 1.0f);
+    PixelColor start_color = gradient_get_color(gradient, cap_start_t);
+    PixelColor end_color = gradient_get_color(gradient, cap_end_t);
 
-    // Pre-normalize angles for range checking
-    int norm_start_i = (int)start_angle;
-    int norm_end_i = (int)end_angle;
-    if (norm_start_i < 0) { norm_start_i += 360; }
-    if (norm_start_i >= 360) { norm_start_i -= 360; }
-    if (norm_end_i < 0) { norm_end_i += 360; }
-    if (norm_end_i >= 360) { norm_end_i -= 360; }
+    // Start/end ray directions for the exact range test, computed once
+    float range_start_cos = cosf(start_angle * M_PI / 180.0f);
+    float range_start_sin = sinf(start_angle * M_PI / 180.0f);
+    float range_end_cos = cosf(end_angle * M_PI / 180.0f);
+    float range_end_sin = sinf(end_angle * M_PI / 180.0f);
+    bool wide_arc = angle_span > 180.0f;
 
     if (has_caps || draw_end_cap)
     {
@@ -1670,17 +1698,17 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
             if (angle_i >= 360) { angle_i -= 360; }
 
             // ========== Angle range check ==========
+            // Exact half-plane test against the start/end rays.  The integer
+            // angle above is fine for color but too coarse for the boundary:
+            // at r = 200 one degree is ~3.5px, so the body edge would not meet
+            // the cap tangent cleanly.
             bool in_arc_range = true;
             if (has_caps)
             {
-                if (norm_start_i <= norm_end_i)
-                {
-                    in_arc_range = (angle_i >= norm_start_i && angle_i <= norm_end_i);
-                }
-                else
-                {
-                    in_arc_range = (angle_i >= norm_start_i || angle_i <= norm_end_i);
-                }
+                in_arc_range = is_in_angle_range_cross(dx, dy,
+                                                       range_start_cos, range_start_sin,
+                                                       range_end_cos, range_end_sin,
+                                                       wide_arc);
             }
 
             float coverage;
