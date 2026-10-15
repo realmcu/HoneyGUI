@@ -27,9 +27,15 @@
 #define O_NOFOLLOW  0400000
 #define O_CLOEXEC  02000000
 
+#ifndef SEEK_SET
 #define SEEK_SET 0
+#endif
+#ifndef SEEK_CUR
 #define SEEK_CUR 1
+#endif
+#ifndef SEEK_END
 #define SEEK_END 2
+#endif
 
 #define F_GETADDR 100  /* Custom fcntl command to get file address */
 
@@ -40,7 +46,12 @@
 #define DT_REG               0x01
 #define DT_DIR               0x02
 
+#if defined(__EMSCRIPTEN__)
+/* Emscripten's libc already defines off_t (as a 64-bit type). */
+#include <sys/types.h>
+#else
 typedef signed long off_t;
+#endif
 
 struct romfs_fd
 {

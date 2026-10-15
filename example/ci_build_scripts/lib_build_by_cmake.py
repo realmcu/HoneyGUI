@@ -13,6 +13,10 @@ ship per-SoC settings expose them as RTL*.cmake and are built once per SoC via
 Missing toolchains are reported as FAILED, same as before -- silently skipping
 them would hide a loss of CI coverage. Use --tools to narrow the run instead,
 e.g. `--tools gcc` on a developer machine without the ARM compilers.
+
+lib/emscripten is the exception: it needs the Emscripten SDK, which the CI
+nodes do not have, so the default run leaves it out. Build it on request with
+`--tools emscripten` (emcmake must be in PATH: activate emsdk).
 """
 
 import argparse
@@ -22,6 +26,9 @@ import sys
 from pathlib import Path
 
 import ci_common
+
+# Built only when named in --tools: they need a toolchain the CI nodes lack.
+OPT_IN_TOOLS = {"emscripten"}
 
 
 def discover_targets(tools=None):
@@ -34,6 +41,8 @@ def discover_targets(tools=None):
             continue
         tool = tool_dir.name
         if tools and tool not in tools:
+            continue
+        if not tools and tool in OPT_IN_TOOLS:
             continue
         socs = sorted(p.stem for p in tool_dir.glob("RTL*.cmake"))
         if socs:
@@ -55,6 +64,14 @@ def build_one(tool, soc, jobs):
                      Path(sys.executable).as_posix())]
     if soc is not None:
         configure.append("-DSOC={}".format(soc))
+    if tool == "emscripten":
+        # The wasm library needs the Emscripten toolchain file, which emcmake
+        # injects. Plain cmake would silently build a host library instead.
+        emcmake = shutil.which("emcmake")
+        if emcmake is None:
+            shutil.rmtree(str(build_dir), ignore_errors=True)
+            return (1, "emcmake not found in PATH; activate emsdk (emsdk_env)")
+        configure.insert(0, emcmake)
 
     try:
         result = ci_common.run_command(configure, ci_common.PROJECT_ROOT)
@@ -97,7 +114,8 @@ def main():
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 8,
                         help="parallel build jobs")
     parser.add_argument("--tools", nargs="+", metavar="TOOL",
-                        help="restrict to these lib/<tool> directories")
+                        help="restrict to these lib/<tool> directories; the "
+                             "only way to build opt-in tools (emscripten)")
     args = parser.parse_args()
 
     targets = discover_targets(args.tools)

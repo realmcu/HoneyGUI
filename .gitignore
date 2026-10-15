@@ -98,6 +98,10 @@ doxygen_graphviz/_build
 
 # Build output directories
 win32_sim/build/
+web_sim/build/
+web_sim/files.js
+lib/emscripten/build/
+lib/emscripten/install/
 keil_sim/ac5/build/
 keil_sim/ac6/build/
 lib/build/

@@ -1,6 +1,7 @@
 #include <agge/math.hpp>
 
 #include <math.h>
+#include <cmath>
 
 namespace agge
 {

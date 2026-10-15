@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2026, Realtek Semiconductor Corporation
+  SPDX-License-Identifier: MIT
+
+  HoneyGUI web simulator page. Build first (see CMakeLists.txt) and run
+  "python web_sim/pack_files.py", then open this file: double-clicking it
+  works. Everything it needs (gui.js with the wasm embedded, files.js) is
+  loaded with plain <script> tags, which browsers allow from disk.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HoneyGUI Web Simulator</title>
+    <style>
+        body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+               justify-content: center; gap: 12px; background: #282828; color: #ccc;
+               font: 13px system-ui, sans-serif; }
+        canvas { image-rendering: pixelated; outline: none; background: #000; }
+        #status { min-height: 1.2em; }
+    </style>
+</head>
+<body>
+    <canvas id="screen"></canvas>
+    <div id="status">Loading...</div>
+    <script src="build/gui.js"></script>
+    <script src="web_sim.js"></script>
+    <script src="files.js"></script>
+    <script>
+        (async () => {
+            const status = document.getElementById('status');
+            const canvas = document.getElementById('screen');
+            try {
+                if (typeof globalThis.createHoneyGUI !== 'function') {
+                    throw new Error('build/gui.js is missing. Build web_sim first: ' +
+                                    'emcmake cmake -S web_sim -B web_sim/build -G Ninja && cmake --build web_sim/build');
+                }
+                if (!globalThis.HONEYGUI_WEB_SIM_FILES) {
+                    throw new Error('files.js is missing. Run: python web_sim/pack_files.py');
+                }
+                const files = {};
+                for (const [path, base64] of Object.entries(globalThis.HONEYGUI_WEB_SIM_FILES)) {
+                    files[path] = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+                }
+                const sim = await startHoneyGUI({ createModule: globalThis.createHoneyGUI, canvas, files });
+                canvas.style.width = `${sim.width * 2}px`;
+                canvas.style.height = `${sim.height * 2}px`;
+                status.textContent = `${sim.width} x ${sim.height}`;
+                globalThis.honeyguiSim = sim;
+            } catch (error) {
+                status.textContent = `Failed to start: ${error}`;
+                console.error(error);
+            }
+        })();
+    </script>
+</body>
+</html>
