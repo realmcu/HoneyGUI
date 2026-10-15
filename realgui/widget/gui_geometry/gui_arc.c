@@ -143,7 +143,12 @@ static void gui_arc_prepare(gui_arc_t *this)
 /** Drawing phase processing */
 static void gui_arc_draw(gui_arc_t *this)
 {
-    if (this->draw_img != NULL && this->buffer_valid)
+    /* Do not gate on buffer_valid: object timers run after OBJ_PRE_PROCESS in
+     * the same frame, so a setter called from a timer clears buffer_valid
+     * between prepare and draw.  The payload still holds last frame's pixels,
+     * draw those and let the next prepare re-render.  Likewise when a re-render
+     * fails to get memory, keep showing the old arc instead of nothing. */
+    if (this->draw_img != NULL && this->pixel_buffer != NULL)
     {
         gui_obj_t *obj = (gui_obj_t *)this;
 

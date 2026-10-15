@@ -66,12 +66,13 @@ static uint16_t circle_desc_len(const circle_desc_t *desc)
 }
 
 /**
- * Whether this circle can be stored as an A8 coverage mask.
+ * Whether this circle fills with a gradient.
  *
- * A mask carries no RGB, so one payload serves every colour of the same shape --
+ * A solid circle without stroke can be stored as an A8 coverage mask: a mask
+ * carries no RGB, so one payload serves every colour of the same shape --
  * which is the point, since "same size, different colour" is otherwise a full
- * cache miss.  Only a gradient rules it out, since that genuinely needs per-pixel
- * RGB.
+ * cache miss.  A gradient or a stroke rules that out, since they need
+ * per-pixel RGB.
  *
  * A translucent colour is fine: its alpha is folded into the mask values, not
  * carried in fg_color_set.  That matters because the two blit paths disagree
@@ -85,72 +86,47 @@ static bool circle_has_gradient(const gui_circle_t *circle)
 }
 
 /**
- * Fill in a descriptor for one part of this circle.
+ * Fill in a descriptor for one cached payload.
  *
  * Zeroes first: gui_geometry_cache_acquire() compares descriptors byte for byte, so
  * a padding hole left uninitialised would make two identical circles miss.
  */
-static void circle_desc_init(circle_desc_t *desc, gui_circle_t *this,
-                             gui_circle_part_t part, int size_a, int size_b)
+static void circle_desc_init(circle_desc_t *desc, const gui_circle_t *this,
+                             gui_circle_part_t part, int w, int h, bool is_a8)
 {
     memset(desc, 0x00, sizeof(*desc));
 
     desc->part = (uint32_t)part;
-    desc->size_a = size_a;
-    desc->size_b = size_b;
+    desc->radius = this->radius;
+    desc->size_a = w;
+    desc->size_b = h;
     desc->gradient_type = UINT32_MAX;
-    desc->stroke_width = (part == CIRCLE_PART_FULL || part == CIRCLE_PART_STROKE) ?
-                         this->stroke_width : 0.0f;
+    desc->stroke_width = this->stroke_width;
+    if (this->stroke_width > 0.0f)
+    {
+        desc->stroke_color = this->stroke_color.color.argb_full;
+    }
 
     /* RGB is deliberately left out of an A8 key -- that is what lets circles
      * differing only in colour share one mask.  Alpha stays in, because it is
      * folded into the mask values themselves. */
-    bool is_stroke = (part == CIRCLE_PART_STROKE);
-    bool is_a8 = gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8,
-                                     circle_has_gradient(this), is_stroke);
-    gui_color_t payload_color = is_stroke ? this->stroke_color : this->color;
-
     if (is_a8)
     {
         desc->is_a8 = 1u;
-        desc->color = payload_color.color.rgba.a;
+        desc->color = this->color.color.rgba.a;
     }
     else
     {
-        desc->color = payload_color.color.argb_full;
+        desc->color = this->color.color.argb_full;
     }
 
-    /* Only the full-circle part reads the gradient; the strip and the inscribed
-     * square are always solid. */
+    /* Only the single-buffer part can carry a gradient; the split pieces are
+     * mirrored copies of one quadrant, which a gradient would not survive. */
     if (part == CIRCLE_PART_FULL && circle_has_gradient(this))
     {
         desc->gradient_type = (uint32_t)this->gradient_type;
         memcpy(&desc->gradient, this->gradient, sizeof(Gradient));
     }
-}
-
-/**
- * Free the whole arc buffer set used by multi-part rendering.
- *
- * All four hold a reference to the same strip payload, so all four release the
- * same way and the pixels go when the last one does.
- */
-static void gui_circle_release_arc_images(gui_circle_t *this)
-{
-    gui_geometry_draw_img_release(&this->arc_right);
-    gui_geometry_draw_img_release(&this->arc_top);
-    gui_geometry_draw_img_release(&this->arc_bottom);
-
-    gui_geometry_draw_img_release(&this->arc_left);
-}
-
-static void gui_circle_release_images(gui_circle_t *circle)
-{
-    gui_circle_release_arc_images(circle);
-    gui_geometry_draw_img_release(&circle->center_rect);
-    gui_geometry_draw_img_release(&circle->stroke_img);
-    gui_geometry_span_release(circle->stroke_span);
-    circle->stroke_span = NULL;
 }
 
 static void update_circle_gradient_geometry(gui_circle_t *circle)
@@ -216,923 +192,291 @@ static void gui_circle_input_process(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
 }
 
-static bool circle_row_bounds(float center, float inner_sq, float outer_sq,
-                              float dy_sq, int diameter,
-                              int *outer_left, int *outer_right,
-                              int *solid_left, int *solid_right)
+
+static void circle_geom_init(circle_geom_t *g, const gui_circle_t *this)
 {
-    if (dy_sq >= outer_sq)
+    g->radius = this->radius;
+    g->stroke = LG_CLAMP(this->stroke_width, 0.0f, (float)this->radius);
+    g->inner_radius = (float)this->radius - g->stroke;
+
+    /* The centre square's corner pixel ends at distance half * sqrt(2) from the
+     * centre; it must stay at least 0.5px inside the fill to be fully covered. */
+    float fill_r = (g->stroke > 0.0f) ? g->inner_radius : (float)this->radius;
+    g->half = (int)floorf(LG_MAX(fill_r - 0.5f, 0.0f) * (float)M_SQRT1_2);
+    g->band = this->radius - g->half;
+}
+
+/** Angular gradient table: one entry per degree, as the gradient can show. */
+#define CIRCLE_ANGULAR_LUT_SIZE 360
+
+/**
+ * Gradient sampled once per raster, so a pixel costs a table lookup instead of
+ * a walk over the colour stops: radial by whole-pixel distance from the
+ * centre, angular by whole degree.
+ */
+typedef struct
+{
+    uint32_t *lut;              /**< NULL: no gradient, or no memory for the table. */
+    int n;                      /**< Table entries. */
+} circle_lut_t;
+
+static float circle_angular_t(const gui_circle_t *this, float angle)
+{
+    float range = this->gradient->angular_end - this->gradient->angular_start;
+    if (range <= 0.0f) { range = 360.0f; }
+    float t = (angle - this->gradient->angular_start) / range;
+    if (t < 0.0f) { t += 1.0f; }
+    return LG_CLAMP(t, 0.0f, 1.0f);
+}
+
+static void circle_lut_init(circle_lut_t *l, gui_circle_t *this)
+{
+    l->lut = NULL;
+    if (!circle_has_gradient(this)) { return; }
+
+    bool angular = (this->gradient_type == CIRCLE_GRADIENT_ANGULAR);
+    int n = angular ? CIRCLE_ANGULAR_LUT_SIZE : this->radius + 1;
+    l->lut = gui_malloc((size_t)n * sizeof(uint32_t));
+    if (l->lut == NULL) { return; }
+
+    for (int i = 0; i < n; i++)
     {
-        return false;
+        float t = angular ? circle_angular_t(this, (float)i * 360.0f / (float)n) :
+                  (float)i / (float)this->radius;
+        l->lut[i] = gradient_get_color(this->gradient, LG_CLAMP(t, 0.0f, 1.0f));
+    }
+    l->n = n;
+}
+
+static void circle_lut_free(circle_lut_t *l)
+{
+    if (l->lut != NULL)
+    {
+        gui_free(l->lut);
+        l->lut = NULL;
+    }
+}
+
+/** Fill colour at an offset from the centre; @p l may be NULL. */
+static uint32_t circle_fill_color_at(gui_circle_t *this, const circle_lut_t *l,
+                                     float dx, float dy, float dist)
+{
+    if (!circle_has_gradient(this))
+    {
+        return this->color.color.argb_full;
     }
 
-    float outer_half = sqrtf(outer_sq - dy_sq);
-    int left = (int)ceilf(center - outer_half - 0.5f);
-    int right = (int)floorf(center + outer_half - 0.5f);
-
-    *outer_left = LG_MAX(left, 0);
-    *outer_right = LG_MIN(right, diameter - 1);
-    *solid_left = 1;
-    *solid_right = 0;
-
-    if (dy_sq < inner_sq)
+    bool angular = (this->gradient_type == CIRCLE_GRADIENT_ANGULAR);
+    float angle = 0.0f;
+    if (angular)
     {
-        float inner_half = sqrtf(inner_sq - dy_sq);
-
-        left = (int)ceilf(center - inner_half - 0.5f);
-        right = (int)floorf(center + inner_half - 0.5f);
-        *solid_left = LG_MAX(left, 0);
-        *solid_right = LG_MIN(right, diameter - 1);
+        angle = atan2f(dy, dx) * 180.0f / M_PI;
+        if (angle < 0.0f) { angle += 360.0f; }
     }
 
-    return *outer_left <= *outer_right;
+    if (l != NULL && l->lut != NULL)
+    {
+        int i = angular ? (int)(angle * (float)l->n / 360.0f) : (int)(dist + 0.5f);
+        return l->lut[LG_CLAMP(i, 0, l->n - 1)];
+    }
+
+    float t = angular ? circle_angular_t(this, angle) : dist / (float)this->radius;
+    return gradient_get_color(this->gradient, LG_CLAMP(t, 0.0f, 1.0f));
 }
 
 /**
- * Rasterise a circle coverage mask, one byte per pixel.
+ * One pixel of the circle, fill and stroke merged by gui_geometry_mix_fill_stroke().
  *
- * Same quadrant mirroring and same coverage maths as the ARGB8888 path, minus
- * the dithering a mask cannot carry.  The colour's alpha is folded in with the
- * same arithmetic that path uses, so the two agree byte for byte: interior
- * pixels take colour alpha unchanged, and only edge pixels scale it by coverage.
+ * Squared distances settle every pixel more than one pixel away from an edge
+ * -- fully outside, fully stroke, or fully fill -- and only the band along
+ * each edge takes a square root.  A radial gradient needs the distance
+ * anyway, so it takes the root for every pixel it fills.
  */
-static void rasterize_circle_mask_a8(gui_circle_t *this, uint8_t *buffer, uint32_t buffer_size)
+static uint32_t circle_pixel(gui_circle_t *this, const circle_geom_t *g,
+                             const circle_lut_t *l, int x, int y)
 {
-    int r = this->radius;
-    int diameter = r * 2;
-    uint8_t color_a = this->color.color.rgba.a;
-    float fill_radius = LG_MAX((float)r - this->stroke_width, 0.0f);
+    float r = (float)g->radius;
+    float dx = (float)x + 0.5f - r;
+    float dy = (float)y + 0.5f - r;
+    float d2 = dx * dx + dy * dy;
 
-    memset(buffer, 0x00, buffer_size);
-    gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)diameter,
-                               (int16_t)diameter, A8);
+    /* Coverage is r + 0.5 - dist: 1 inside r - 0.5, 0 outside r + 0.5. */
+    if (d2 >= (r + 0.5f) * (r + 0.5f)) { return 0u; }
 
-    if (fill_radius <= 0.0f) { return; }
+    bool has_stroke = g->stroke > 0.0f;
+    float ri = has_stroke ? g->inner_radius : r;
+    bool radial = circle_has_gradient(this) && this->gradient_type == CIRCLE_GRADIENT_RADIAL;
+    bool near_outer = d2 > (r - 0.5f) * (r - 0.5f);
+    bool near_inner = has_stroke && ri > 0.0f &&
+                      d2 > LG_MAX(ri - 0.5f, 0.0f) * LG_MAX(ri - 0.5f, 0.0f) &&
+                      d2 < (ri + 0.5f) * (ri + 0.5f);
+    bool in_fill = !has_stroke || (ri > 0.0f && d2 < (ri + 0.5f) * (ri + 0.5f));
 
-    uint8_t *mask = buffer + sizeof(gui_rgb_data_head_t);
-
-    float center = (float)r;
-    float r_in = LG_MAX(fill_radius - 0.5f, 0.0f);
-    float r_out = fill_radius + 0.5f;
-    float r_in_sq = r_in * r_in;
-    float r_out_sq = r_out * r_out;
-
-    /*
-     * Each row has a long, fully covered center span. Fill it at once and
-     * only evaluate the narrow anti-aliased bands on either side.
-     */
-    for (int y = 0; y < r; y++)
+    float dist = (near_outer || near_inner || (radial && in_fill)) ? sqrtf(d2) : 0.0f;
+    float c_out = near_outer ? LG_CLAMP(r + 0.5f - dist, 0.0f, 1.0f) : 1.0f;
+    float c_in;
+    if (!has_stroke)
     {
-        uint8_t *row_top = mask + y * diameter;
-        uint8_t *row_bottom = mask + (diameter - 1 - y) * diameter;
-        float dy = y + 0.5f - center;
-        float dy_sq = dy * dy;
-        int outer_left;
-        int outer_right;
-        int solid_left;
-        int solid_right;
-
-        if (!circle_row_bounds(center, r_in_sq, r_out_sq, dy_sq, diameter,
-                               &outer_left, &outer_right,
-                               &solid_left, &solid_right))
-        {
-            continue;
-        }
-
-        if (solid_left <= solid_right)
-        {
-            size_t solid_len = (size_t)(solid_right - solid_left + 1);
-
-            memset(row_top + solid_left, color_a, solid_len);
-            memset(row_bottom + solid_left, color_a, solid_len);
-        }
-
-        for (int x = outer_left; x <= outer_right; x++)
-        {
-            if (x >= solid_left && x <= solid_right)
-            {
-                continue;
-            }
-
-            float dx = x + 0.5f - center;
-            float dist_sq = dx * dx + dy_sq;
-            uint8_t edge = (uint8_t)((r_out - sqrtf(dist_sq)) * 255.0f);
-            uint8_t coverage = (uint8_t)(((uint32_t)edge * color_a) >> 8);
-
-            row_top[x] = coverage;
-            row_bottom[x] = coverage;
-        }
+        c_in = c_out;
     }
-}
-
-/** Rasterise a complete circle into a payload, with Symmetry Optimization */
-static bool rasterize_circle_payload(gui_circle_t *this, uint8_t *buffer, uint32_t buffer_size)
-{
-    int r = this->radius;
-    int diameter = r * 2; // Keep diameter even for perfect symmetry logic
-
-    memset(buffer, 0x00, buffer_size);
-
-    // Set header
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)buffer;
-    gui_geometry_data_head_set(head, (int16_t)diameter, (int16_t)diameter,
-                               ARGB8888);
-
-    uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
-    uint32_t solid_color = this->color.color.argb_full;
-    float fill_radius = LG_MAX((float)r - this->stroke_width, 0.0f);
-
-    if (fill_radius <= 0.0f) { return true; }
-
-    // --- Pre-compute Gradient LUT ---
-    uint32_t *gradient_lut = NULL;
-    int lut_size = 0;
-    bool use_radial = (this->use_gradient && this->gradient != NULL &&
-                       this->gradient->stop_count >= 2 &&
-                       this->gradient_type == CIRCLE_GRADIENT_RADIAL);
-    bool use_angular = (this->use_gradient && this->gradient != NULL &&
-                        this->gradient->stop_count >= 2 &&
-                        this->gradient_type == CIRCLE_GRADIENT_ANGULAR);
-
-    if (use_radial)
+    else if (near_inner)
     {
-        lut_size = r + 1;
-        gradient_lut = gui_malloc((size_t)lut_size * sizeof(uint32_t));
-        if (gradient_lut == NULL)
-        {
-            return false;
-        }
-        for (int i = 0; i < lut_size; i++)
-        {
-            float t = (float)i / (float)r;
-            gradient_lut[i] = gradient_get_color(this->gradient, t);
-        }
-    }
-    else if (use_angular)
-    {
-        lut_size = 360;
-        gradient_lut = gui_malloc((size_t)lut_size * sizeof(uint32_t));
-        if (gradient_lut == NULL)
-        {
-            return false;
-        }
-
-        float start_angle = this->gradient->angular_start;
-        float end_angle = this->gradient->angular_end;
-        float angle_range = end_angle - start_angle;
-        if (angle_range <= 0) { angle_range = 360.0f; }
-
-        for (int i = 0; i < lut_size; i++)
-        {
-            float angle = (float)i;
-            float t = (angle - start_angle) / angle_range;
-            if (t < 0) { t += 1.0f; } if (t > 1.0f) { t -= 1.0f; }
-            t = (t < 0) ? 0 : ((t > 1.0f) ? 1.0f : t);
-            gradient_lut[i] = gradient_get_color(this->gradient, t);
-        }
-    }
-
-    if (!use_radial && !use_angular)
-    {
-        float center = (float)r;
-        float r_in = LG_MAX(fill_radius - 0.5f, 0.0f);
-        float r_out = fill_radius + 0.5f;
-        float r_in_sq = r_in * r_in;
-        float r_out_sq = r_out * r_out;
-        uint32_t rgb = solid_color & 0x00FFFFFFu;
-        uint8_t color_alpha = (uint8_t)(solid_color >> 24);
-
-        for (int y = 0; y < diameter; y++)
-        {
-            float dy = y + 0.5f - center;
-            float dy_sq = dy * dy;
-            int outer_left;
-            int outer_right;
-            int solid_left;
-            int solid_right;
-
-            if (!circle_row_bounds(center, r_in_sq, r_out_sq, dy_sq, diameter,
-                                   &outer_left, &outer_right,
-                                   &solid_left, &solid_right))
-            {
-                continue;
-            }
-
-            uint32_t *line = pixels + y * diameter;
-            if (solid_left <= solid_right)
-            {
-                gui_memset32(line + solid_left, solid_color,
-                             (uint32_t)(solid_right - solid_left + 1));
-            }
-
-            for (int x = outer_left; x <= outer_right; x++)
-            {
-                if (x >= solid_left && x <= solid_right)
-                {
-                    continue;
-                }
-
-                float dx = x + 0.5f - center;
-                float coverage = r_out - sqrtf(dx * dx + dy_sq);
-                uint8_t alpha = (uint8_t)((coverage * color_alpha));
-
-                line[x] = rgb | ((uint32_t)alpha << 24);
-            }
-        }
-
-        return true;
-    }
-
-    // --- High Performance Quadrant Rendering ---
-    // We iterate only the Top-Left quadrant (0 to r-1)
-    // and map the results to the other 3 quadrants.
-
-    float center = (float)r;
-    bool dither = GUI_CIRCLE_ENABLE_DITHER && (use_radial || use_angular);
-
-    // Optimization: Calculate r_sq once
-    float r_in = LG_MAX(fill_radius - 0.5f, 0.0f);
-    float r_out = fill_radius + 0.5f;
-    float r_in_sq = r_in * r_in;
-    float r_out_sq = r_out * r_out;
-
-    for (int y = 0; y < r; y++)
-    {
-        // Pointers to the 4 target rows
-        uint32_t *line_tl = pixels + y * diameter;                  // Top-Left Row
-        uint32_t *line_tr = pixels + y * diameter;                  // Top-Right Row (same row)
-        uint32_t *line_bl = pixels + (diameter - 1 - y) * diameter; // Bottom-Left Row
-        uint32_t *line_br = pixels + (diameter - 1 - y) * diameter; // Bottom-Right Row (same row)
-
-        for (int x = 0; x < r; x++)
-        {
-            // Coordinate relative to center (Top-Left quadrant: dx < 0, dy < 0)
-            float dx = x + 0.5f - center;
-            float dy = y + 0.5f - center;
-            float dist_sq = dx * dx + dy * dy;
-
-            // 1. Check bounds (Clipping)
-            if (dist_sq >= r_out_sq) { continue; } // Outside circle, skip (pixels are 0 init)
-
-            uint32_t base_color = solid_color;
-            float dist = 0.0f; // Calculate only if needed
-
-            // 2. Calculate Color
-            if (use_radial && gradient_lut)
-            {
-                dist = sqrtf(dist_sq); // SQRT #1
-                int idx = (int)dist;
-                if (idx >= lut_size) { idx = lut_size - 1; }
-                base_color = gradient_lut[idx];
-            }
-            else if (use_angular && gradient_lut)
-            {
-                // Determine Angle for Top-Left
-                float angle = atan2f(dy, dx) * 180.0f / M_PI; // ATAN2 #1
-                if (angle < 0) { angle += 360.0f; }
-                // Hack: pass angle in color var to avoid struct overhead
-                base_color = (uint32_t)angle;
-            }
-
-            // 3. Calculate Alpha (Anti-aliasing)
-            uint8_t alpha_final = 255;
-            if (dist_sq > r_in_sq)
-            {
-                if (dist == 0.0f) { dist = sqrtf(dist_sq); } // SQRT #2 (Only on edge)
-                float alpha_f = r_out - dist;
-                alpha_final = (uint8_t)(alpha_f * 255.0f);
-            }
-
-            // 4. Fill 4 Quadrants (Mirroring)
-            int x_tl = x;
-            int x_tr = diameter - 1 - x;
-            int y_bottom = (diameter - 1 - y);
-
-            // Function macro to apply alpha and dither
-#define APPLY_PIXEL(target_ptr, t_x, t_y, t_color) \
-    do { \
-        uint32_t c = t_color; \
-        if(dither) c = gui_geometry_dither_argb8888(c, t_x, t_y); \
-        if(alpha_final < 255) { \
-            uint8_t base_a = (c >> 24) & 0xFF; \
-            uint8_t new_a = (uint8_t)((alpha_final * base_a) >> 8); \
-            c = (c & 0x00FFFFFF) | ((uint32_t)new_a << 24); \
-        } \
-        target_ptr[t_x] = c; \
-    } while(0)
-
-            if (use_angular && gradient_lut)
-            {
-                // Angular gradient needs special mirroring
-                float angle_tl = (float)base_color;
-
-                // TL
-                int idx = (int)angle_tl % 360;
-                APPLY_PIXEL(line_tl, x_tl, y, gradient_lut[idx]);
-
-                // TR (Mirror X -> 180 - angle + 360)
-                float angle_tr = 540.0f - angle_tl;
-                idx = (int)angle_tr % 360;
-                APPLY_PIXEL(line_tr, x_tr, y, gradient_lut[idx]);
-
-                // BL (Mirror Y -> 360 - angle)
-                float angle_bl = 360.0f - angle_tl;
-                idx = (int)angle_bl % 360;
-                APPLY_PIXEL(line_bl, x_tl, y_bottom, gradient_lut[idx]);
-
-                // BR (Mirror XY -> angle + 180)
-                float angle_br = angle_tl + 180.0f;
-                idx = (int)angle_br % 360;
-                APPLY_PIXEL(line_br, x_tr, y_bottom, gradient_lut[idx]);
-
-            }
-            else
-            {
-                // Radial: Color is identical for all 4 quadrants
-                APPLY_PIXEL(line_tl, x_tl, y, base_color);
-                APPLY_PIXEL(line_tr, x_tr, y, base_color);
-                APPLY_PIXEL(line_bl, x_tl, y_bottom, base_color);
-                APPLY_PIXEL(line_br, x_tr, y_bottom, base_color);
-            }
-#undef APPLY_PIXEL
-        }
-    }
-
-    if (gradient_lut != NULL)
-    {
-        gui_free(gradient_lut);
-    }
-    return true;
-}
-
-static void rasterize_circle_stroke(gui_circle_t *this, uint8_t *buffer,
-                                    uint32_t buffer_size, bool is_a8)
-{
-    int radius = this->radius;
-    int diameter = radius * 2;
-
-    memset(buffer, 0x00, buffer_size);
-    if (is_a8)
-    {
-        gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)diameter,
-                                   (int16_t)diameter, A8);
+        c_in = LG_CLAMP(ri + 0.5f - dist, 0.0f, c_out);
     }
     else
     {
-        gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)diameter,
-                                   (int16_t)diameter, ARGB8888);
+        c_in = (ri > 0.0f && d2 <= (ri - 0.5f) * (ri - 0.5f)) ? c_out : 0.0f;
     }
 
-    float stroke_width = LG_CLAMP(this->stroke_width, 0.0f, (float)radius);
-    if (radius <= 0 || stroke_width <= 0.0f) { return; }
-
-    uint8_t *mask = buffer + sizeof(gui_rgb_data_head_t);
-    uint32_t *pixels = (uint32_t *)mask;
-    uint32_t stroke_color = this->stroke_color.color.argb_full;
-    uint8_t stroke_alpha = this->stroke_color.color.rgba.a;
-
-    float center = (float)radius;
-    float outer_in = (float)radius - 0.5f;
-    float outer_out = (float)radius + 0.5f;
-    float outer_in_sq = outer_in * outer_in;
-    float outer_out_sq = outer_out * outer_out;
-    float inner_radius = (float)radius - stroke_width;
-    float inner_cut = LG_MAX(inner_radius - 0.5f, 0.0f);
-    float inner_cut_sq = inner_cut * inner_cut;
-
-    for (int y = 0; y < radius; y++)
+    uint32_t fill = 0u;
+    if (c_in > 0.0f)
     {
-        int y_mirror = diameter - 1 - y;
-        for (int x = 0; x < radius; x++)
+        fill = circle_fill_color_at(this, l, dx, dy, dist);
+        if (circle_has_gradient(this) && GUI_CIRCLE_ENABLE_DITHER)
         {
-            float dx = x + 0.5f - center;
-            float dy = y + 0.5f - center;
-            float dist_sq = dx * dx + dy * dy;
+            fill = gui_geometry_dither_argb8888(fill, x, y);
+        }
+    }
+    return gui_geometry_mix_fill_stroke(fill, this->stroke_color.color.argb_full, c_out, c_in);
+}
 
-            if (dist_sq >= outer_out_sq ||
-                (inner_radius > 0.0f && dist_sq < inner_cut_sq))
-            {
-                continue;
-            }
+/** Rasterise the window (ox, oy, pw x ph) of the circle into a payload body. */
+static void circle_raster(gui_circle_t *this, const circle_geom_t *g, uint8_t *body,
+                          bool is_a8, int ox, int oy, int pw, int ph)
+{
+    uint32_t *pixels = (uint32_t *)body;
+    circle_lut_t lut;
+    circle_lut_init(&lut, this);
 
-            float coverage = 1.0f;
-            if (dist_sq > outer_in_sq)
-            {
-                coverage = outer_out - sqrtf(dist_sq);
-                coverage = LG_CLAMP(coverage, 0.0f, 1.0f);
-            }
-
-            uint8_t alpha = stroke_alpha;
-            if (coverage < 0.999f)
-            {
-                alpha = (uint8_t)(coverage * (float)stroke_alpha);
-            }
-
-            int x_mirror = diameter - 1 - x;
-            int offsets[4] =
-            {
-                y *diameter + x,
-                y *diameter + x_mirror,
-                y_mirror *diameter + x,
-                y_mirror *diameter + x_mirror
-            };
+    for (int y = 0; y < ph; y++)
+    {
+        for (int x = 0; x < pw; x++)
+        {
+            uint32_t color = circle_pixel(this, g, &lut, ox + x, oy + y);
 
             if (is_a8)
             {
-                for (int i = 0; i < 4; i++) { mask[offsets[i]] = alpha; }
+                body[y * pw + x] = (uint8_t)(color >> 24);
             }
             else
             {
-                uint32_t color = (stroke_color & 0x00FFFFFFu) | ((uint32_t)alpha << 24);
-                for (int i = 0; i < 4; i++) { pixels[offsets[i]] = color; }
-            }
-        }
-    }
-}
-
-/** Create a complete circle in a single buffer, shared with identical circles */
-static draw_img_t *create_circle_buffer(gui_circle_t *this, gui_obj_t *obj, draw_img_t **old_img)
-{
-    // Free old buffer first to prevent memory leak
-    gui_geometry_draw_img_release(old_img);
-
-    int diameter = this->radius * 2;
-    uint32_t buffer_size;
-    uint32_t pixel_bytes = gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8, circle_has_gradient(this),
-                                               false) ? 1u : 4u;
-    if (this->radius <= 0 ||
-        !gui_geometry_image_buffer_size(diameter, diameter, pixel_bytes, &buffer_size))
-    {
-        return NULL;
-    }
-
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    /* Every circle of the same radius and gradient draws from one payload; only
-     * this draw_img_t and its matrix are per widget.  An opaque solid circle
-     * stores a colourless mask, so colour does not split the cache either. */
-    bool is_a8 = (pixel_bytes == 1u);
-    circle_desc_t desc;
-    bool is_new = false;
-    circle_desc_init(&desc, this, CIRCLE_PART_FULL, this->radius, 0);
-
-    uint8_t *buffer = gui_geometry_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
-    if (buffer == NULL)
-    {
-        gui_free(img);
-        return NULL;
-    }
-
-    if (is_new)
-    {
-        if (is_a8)
-        {
-            rasterize_circle_mask_a8(this, buffer, buffer_size);
-        }
-        else
-        {
-            if (!rasterize_circle_payload(this, buffer, buffer_size))
-            {
-                gui_geometry_cache_release(buffer);
-                gui_free(img);
-                return NULL;
+                pixels[y * pw + x] = color;
             }
         }
     }
 
-    gui_geometry_img_bind(img, buffer, this->opacity_value, is_a8, this->color);
-
-    // Apply transformation matrix
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-
-    return img;
+    circle_lut_free(&lut);
 }
 
-static draw_img_t *create_circle_stroke_buffer(gui_circle_t *this, gui_obj_t *obj,
-                                               draw_img_t **old_img)
+/** Rasterise (or share) the payload for the window (ox, oy, pw x ph). */
+static uint8_t *circle_payload(gui_circle_t *this, const circle_geom_t *g,
+                               gui_circle_part_t part, int ox, int oy, int pw, int ph,
+                               bool is_a8)
 {
-    gui_geometry_draw_img_release(old_img);
-
-    if (this->stroke_width <= 0.0f || this->radius <= 0) { return NULL; }
-
-    int diameter = this->radius * 2;
-    bool is_a8 = gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8, false, true);
-    uint32_t buffer_size;
-    if (!gui_geometry_image_buffer_size(diameter, diameter, is_a8 ? 1u : 4u, &buffer_size))
-    {
-        return NULL;
-    }
-
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-    memset(img, 0x00, sizeof(draw_img_t));
-
     circle_desc_t desc;
+    circle_desc_init(&desc, this, part, pw, ph, is_a8);
+
     bool is_new = false;
-    circle_desc_init(&desc, this, CIRCLE_PART_STROKE, this->radius, 0);
-
-    uint8_t *buffer = gui_geometry_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
-    if (buffer == NULL)
+    uint8_t *buffer = gui_geometry_payload_acquire(&desc, circle_desc_len(&desc),
+                                                   pw, ph, is_a8, &is_new);
+    if (buffer != NULL && is_new)
     {
-        gui_free(img);
-        return NULL;
-    }
-
-    if (is_new)
-    {
-        rasterize_circle_stroke(this, buffer, buffer_size, is_a8);
-    }
-
-    gui_geometry_img_bind(img, buffer, this->opacity_value, is_a8, this->stroke_color);
-
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-
-    return img;
-}
-
-/** Set image data header for rectangle */
-static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, gui_color_t color)
-{
-    gui_geometry_data_head_set(head, (int16_t)w, (int16_t)h, ARGB8888);
-
-    gui_rect_file_head_t *rect_head = (gui_rect_file_head_t *)head;
-    rect_head->color = color;
-}
-
-/** Create a solid color image buffer for better anti-aliasing with transformations */
-static uint8_t *create_solid_color_buffer_circle(gui_circle_t *this, uint16_t w, uint16_t h,
-                                                 gui_color_t color)
-{
-    bool is_a8 = gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8, circle_has_gradient(this), false);
-    circle_desc_t desc;
-    bool is_new = false;
-    circle_desc_init(&desc, this, CIRCLE_PART_SOLID_RECT, w, h);
-
-    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size;
-    if (!gui_geometry_image_buffer_size(w, h, pixel_bytes, &buffer_size))
-    {
-        return NULL;
-    }
-
-    uint8_t *buffer = gui_geometry_cache_acquire(&desc, circle_desc_len(&desc), buffer_size, &is_new);
-    if (buffer == NULL) { return NULL; }
-    if (!is_new) { return buffer; }
-
-    if (is_a8)
-    {
-        /* Fully covered everywhere, so the mask is just the colour's alpha and
-         * every inscribed square of this size and alpha shares it. */
-        gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)w, (int16_t)h, A8);
-        memset(buffer + sizeof(gui_rgb_data_head_t), color.color.rgba.a, (size_t)w * h);
-        return buffer;
-    }
-
-    gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)w, (int16_t)h, ARGB8888);
-
-    uint32_t *pixels = (uint32_t *)(buffer + sizeof(gui_rgb_data_head_t));
-    uint32_t argb = color.color.argb_full;
-    uint32_t pixel_count = (uint32_t)w * h;
-    for (uint32_t i = 0; i < pixel_count; i++)
-    {
-        pixels[i] = argb;
+        circle_raster(this, g, buffer + sizeof(gui_rgb_data_head_t), is_a8, ox, oy, pw, ph);
     }
     return buffer;
 }
 
-/** Create a rectangle image object */
-static void set_rect_img(gui_circle_t *this, draw_img_t **input_img, int16_t x,
-                         int16_t y, int32_t w, int32_t h)
+/**
+ * Add the strip payload four times, rotated a quarter turn each, around the
+ * centre square like a pinwheel:
+ *
+ *     +----------+---+
+ *     |   top    |   |
+ *     +---+------+ r |
+ *     |   |      | i |
+ *     | l |centre| g |
+ *     | e |      | h |
+ *     | f +------+-+-+
+ *     | t |  bottom  |
+ *     +---+----------+
+ *
+ * Each strip is band x (side + band), so together they tile the ring with no
+ * overlap and no extra corner pieces.  The circle is centred on a pixel
+ * corner, so a quarter turn maps whole pixels onto whole pixels and one
+ * payload serves all four.  Takes over the caller's reference on @p payload,
+ * including on failure.
+ */
+static bool circle_add_pinwheel(gui_circle_t *this, uint8_t *payload, bool is_a8)
 {
-    gui_obj_t *obj = (gui_obj_t *)this;
+    const gui_matrix_t *m = GUI_BASE(this)->matrix;
+    int b = this->radius * 2 - 1;
 
-    // Clean up previous image if exists (also releases its acc_user scratch data)
-    gui_geometry_draw_img_release(input_img);
-
-    if (w <= 0 || h <= 0 || w > UINT16_MAX || h > UINT16_MAX)
+    /* (x, y, xx, xy, yx, yy) per copy, see gui_geometry_part_t: the top strip
+     * as drawn, then rotated by 90, 180 and 270 degrees about the centre. */
+    const int t[4][6] =
     {
-        return;
-    }
+        {0, 0, 1, 0, 0, 1}, {b, 0, 0, -1, 1, 0}, {b, b, -1, 0, 0, -1}, {0, b, 0, 1, -1, 0},
+    };
 
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return; }
-
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    // Check if transformation is applied
-    bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f);
-
-    if (has_transform)
+    for (int i = 0; i < 4; i++)
     {
-        uint8_t *payload = create_solid_color_buffer_circle(this, (uint16_t)w, (uint16_t)h,
-                                                            this->color);
-        if (payload == NULL)
+        /* Each copy holds its own reference, so all four release the same way. */
+        if (i > 0) { gui_geometry_cache_addref(payload); }
+
+        if (!gui_geometry_parts_add_image(&this->parts, m, payload, this->opacity_value,
+                                          is_a8, this->color, t[i][0], t[i][1],
+                                          t[i][2], t[i][3], t[i][4], t[i][5]))
         {
-            gui_free(img);
-            *input_img = NULL;
-            return;
+            /* The copies not yet added still owe the caller's reference. */
+            if (i < 3) { gui_geometry_cache_release(payload); }
+            return false;
         }
-        gui_geometry_img_bind(img, payload, this->opacity_value, gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8,
-                                                                                     circle_has_gradient(this), false), this->color);
     }
-    else
-    {
-        /* Deliberately not cached: this payload is 12 bytes of header with no
-         * pixels, and its width and height make it near-unique anyway, so the
-         * per-node bookkeeping would cost several times the payload. */
-        gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
-        if (rect_data == NULL)
-        {
-            gui_free(img);
-            *input_img = NULL;
-            return;
-        }
-
-        set_rect_header((gui_rgb_data_head_t *)rect_data, (uint16_t)w, (uint16_t)h, this->color);
-
-        img->blend_mode = IMG_RECT;
-        img->data = rect_data;
-    }
-
-    img->opacity_value = this->opacity_value;
-
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-
-    matrix_translate(x, y, &img->matrix);
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-    *input_img = img;
+    return true;
 }
 
-/** Attach a strip payload to its draw_img and compute its screen area */
-static draw_img_t *finish_arc_strip(gui_circle_t *this, gui_obj_t *obj, draw_img_t *img,
-                                    uint8_t *arc_data)
+/**
+ * Build every piece of the circle, see gui_geometry_parts_t.
+ *
+ * Split: the solid centre square and one strip turned four times around it
+ * (see circle_add_pinwheel()) -- five pieces and one small payload for the
+ * whole outline.  Single: one rasterised image of the whole circle, for
+ * what the split cannot express (a gradient, a transform the pieces cannot
+ * follow, a circle too small to split).
+ */
+static bool circle_build_parts(gui_circle_t *this, const circle_geom_t *g, bool single)
 {
-    gui_geometry_img_bind(img, arc_data, this->opacity_value, gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8,
-                                                                                  circle_has_gradient(this), false), this->color);
+    int d = g->radius * 2;
+    int side = g->half * 2;
 
-    // Copy parent matrix (don't reinitialize - it may contain parent transformations)
-    if (obj->matrix != NULL)
+    if (single)
     {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+        bool is_a8 = g->stroke <= 0.0f &&
+                     gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8, circle_has_gradient(this), false);
+        uint8_t *payload = circle_payload(this, g, CIRCLE_PART_FULL, 0, 0, d, d, is_a8);
+        return payload != NULL &&
+               gui_geometry_parts_add_image(&this->parts, GUI_BASE(this)->matrix, payload,
+                                            this->opacity_value, is_a8, this->color,
+                                            0, 0, 1, 0, 0, 1);
     }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
 
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-
-    return img;
-}
-
-/** create vertical arc strip (Legacy/Fallback) */
-static draw_img_t *create_vertical_arc_strip(gui_circle_t *this, gui_obj_t *obj,
-                                             draw_img_t **old_img, int radius)
-{
-    // Free old buffer first to prevent memory leak
-    gui_geometry_draw_img_release(old_img);
-
-    if (radius <= 0) { return NULL; }
-
-    int inner_half = (int)(radius * M_SQRT1_2);
-    int inner_size = inner_half * 2;
-    int arc_width = radius - inner_half;
-    if (arc_width < 1) { arc_width = 1; }
-    int arc_height = inner_size;
-
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    bool is_a8 = gui_geometry_use_split_a8(gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8,
-                                                               circle_has_gradient(this), false), this->opacity_value, GUI_BASE(this)->parent != NULL &&
+    bool is_a8 = g->stroke <= 0.0f &&
+                 gui_geometry_use_split_a8(gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8, false, false),
+                                           this->opacity_value,
+                                           GUI_BASE(this)->parent != NULL &&
                                            GUI_BASE(this)->parent->opacity_value == UINT8_MAX);
-    circle_desc_t desc;
-    bool is_new = false;
-    circle_desc_init(&desc, this, CIRCLE_PART_ARC_STRIP, radius, 0);
 
-    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t buffer_size;
-    if (!gui_geometry_image_buffer_size(arc_width, arc_height, pixel_bytes, &buffer_size))
+    uint8_t *strip = circle_payload(this, g, CIRCLE_PART_STRIP, 0, 0,
+                                    side + g->band, g->band, is_a8);
+    if (strip == NULL || !circle_add_pinwheel(this, strip, is_a8))
     {
-        gui_free(img);
-        return NULL;
+        return false;
     }
 
-    uint8_t *arc_data = gui_geometry_cache_acquire(&desc, circle_desc_len(&desc), buffer_size,
-                                                   &is_new);
-    if (arc_data == NULL)
-    {
-        gui_free(img);
-        return NULL;
-    }
-    if (!is_new)
-    {
-        // Identical circle already built this strip
-        return finish_arc_strip(this, obj, img, arc_data);
-    }
-    memset(arc_data, 0x00, buffer_size);
-
-    if (is_a8)
-    {
-        gui_geometry_data_head_set((gui_rgb_data_head_t *)arc_data, (int16_t)arc_width,
-                                   (int16_t)arc_height, A8);
-    }
-    else
-    {
-        gui_geometry_data_head_set((gui_rgb_data_head_t *)arc_data, (int16_t)arc_width,
-                                   (int16_t)arc_height, ARGB8888);
-    }
-
-    /* One of these is used, depending on the payload format; the coverage maths
-     * below is shared. */
-    uint32_t *pixels = (uint32_t *)(arc_data + sizeof(gui_rgb_data_head_t));
-    uint8_t *mask = arc_data + sizeof(gui_rgb_data_head_t);
-    uint32_t solid_color = this->color.color.argb_full;
-
-    float center_y = (float)arc_height / 2.0f;
-    float radius_f = (float)radius;
-    float radius_sq = radius_f * radius_f;
-
-    float *exact_boundaries = gui_malloc((size_t)arc_height * sizeof(float));
-    if (exact_boundaries == NULL)
-    {
-        gui_geometry_cache_release(arc_data);
-        gui_free(img);
-        return NULL;
-    }
-
-    for (int y = 0; y < arc_height; y++)
-    {
-        float py = y + 0.5f - center_y;
-        float py_sq = py * py;
-        if (py_sq > radius_sq) { exact_boundaries[y] = -1000.0f; }
-        else
-        {
-            float dx = sqrtf(radius_sq - py_sq);
-            exact_boundaries[y] = radius_f - dx;
-        }
-    }
-
-    for (int y = 0; y < arc_height; y++)
-    {
-        float exact_boundary = exact_boundaries[y];
-        if (exact_boundary < -500.0f)
-        {
-            if (is_a8)
-            {
-                memset(mask + y * arc_width, this->color.color.rgba.a, (size_t)arc_width);
-            }
-            else
-            {
-                for (int x = 0; x < arc_width; x++) { pixels[y * arc_width + x] = solid_color; }
-            }
-            continue;
-        }
-
-        for (int x = 0; x < arc_width; x++)
-        {
-            float pixel_center_x = x + 0.5f;
-            float distance_to_boundary = pixel_center_x - exact_boundary;
-            float coverage;
-
-            if (distance_to_boundary >= 0.5f) { coverage = 1.0f; }
-            else if (distance_to_boundary <= -0.5f) { coverage = 0.0f; }
-            else
-            {
-                float t = (distance_to_boundary + 0.5f);
-                coverage = 0.5f - 0.5f * cosf(M_PI * t);
-            }
-
-            if (is_a8)
-            {
-                /* Mirror the ARGB8888 path's three bands below, so the two agree. */
-                uint8_t color_a = this->color.color.rgba.a;
-                if (coverage > 0.999f)      { mask[y * arc_width + x] = color_a; }
-                else if (coverage > 0.001f) { mask[y * arc_width + x] = (uint8_t)(coverage * (float)color_a); }
-                else                        { mask[y * arc_width + x] = 0; }
-            }
-            else if (coverage > 0.999f) { pixels[y * arc_width + x] = solid_color; }
-            else if (coverage > 0.001f)
-            {
-                gui_color_t color = this->color;
-                color.color.rgba.a = (uint8_t)(coverage * color.color.rgba.a);
-                pixels[y * arc_width + x] = color.color.argb_full;
-            }
-            else
-            {
-                pixels[y * arc_width + x] = 0;
-            }
-        }
-    }
-
-    gui_free(exact_boundaries);
-
-    return finish_arc_strip(this, obj, img, arc_data);
-}
-
-/** Create other three arc segments through transformation (Legacy/Fallback)*/
-static draw_img_t *create_transformed_arc(gui_circle_t *this, gui_obj_t *obj,
-                                          draw_img_t *base_img,
-                                          int pos_x, int pos_y,
-                                          bool mirror_x, bool mirror_y,
-                                          bool is_top_bottom,
-                                          draw_img_t **old_img)
-{
-    GUI_UNUSED(this);
-    if (base_img == NULL || base_img->data == NULL) { return NULL; }
-
-    gui_geometry_draw_img_release(old_img);
-
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-
-    memcpy(img, base_img, sizeof(draw_img_t));
-
-    /* Take our own reference on the strip: the mirrored copies and the original
-     * are then interchangeable, and the pixels live until the last one goes. */
-    img->data = base_img->data;
-    gui_geometry_cache_addref(img->data);
-
-    /* Accelerator scratch data is per draw_img and per frame, so it must not be
-     * inherited from the copy -- releasing it would double-free base_img's. */
-    img->acc_user = NULL;
-
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)base_img->data;
-    int base_width = head->w;
-    int base_height = head->h;
-
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-
-    matrix_translate((float)pos_x, (float)pos_y, &img->matrix);
-
-    if (is_top_bottom)
-    {
-        if (mirror_y) { matrix_rotate(-90.0f, &img->matrix); }
-        else { matrix_rotate(90.0f, &img->matrix); }
-    }
-    else if (mirror_x)
-    {
-        matrix_translate((float)base_width / 2.0f, (float)base_height / 2.0f, &img->matrix);
-        matrix_scale(-1.0f, 1.0f, &img->matrix);
-        matrix_translate(-(float)base_width / 2.0f, -(float)base_height / 2.0f, &img->matrix);
-    }
-
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-
-    return img;
+    return gui_geometry_parts_add_solid(&this->parts, GUI_BASE(this)->matrix,
+                                        g->band, g->band, side, side,
+                                        circle_pixel(this, g, NULL, g->radius, g->radius),
+                                        this->opacity_value);
 }
 
 static void gui_circle_prepare(gui_obj_t *obj)
@@ -1143,19 +487,31 @@ static void gui_circle_prepare(gui_obj_t *obj)
     if (this->radius <= 0 || this->radius > INT16_MAX / 2 ||
         this->base.w <= 0 || this->base.h <= 0)
     {
-        gui_circle_release_images(this);
+        gui_geometry_parts_release(&this->parts);
         return;
     }
 
     int radius = this->radius;
-    int diameter = radius * 2;
 
     // obj->matrix is already initialized by gui_obj_ctor
     // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
 
+    /* A circle turned about its own centre looks the same, so under a uniform
+     * scale the rotation stays out of the blit matrix -- rotating the bitmap
+     * would only resample the anti-aliased edge into steps.  The one thing it
+     * does change, where an angular gradient starts, is folded into the
+     * gradient below.  A non-uniform scale makes an ellipse, whose orientation
+     * does depend on the rotation, so that keeps it in the matrix. */
+    bool uniform_scale = fabsf(this->scale_x - this->scale_y) < 1e-4f;
+    float matrix_degrees = uniform_scale ? 0.0f : this->degrees;
+    float folded_degrees = uniform_scale ? this->degrees : 0.0f;
+
     // Apply transformations if needed
-    bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f ||
+    bool has_transform = (matrix_degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f ||
                           this->offset_x != 0.0f || this->offset_y != 0.0f);
+    bool parent_has_non_translate = !matrix_only_translate(obj->matrix);
+    gui_matrix_t base_matrix;
+    memcpy(&base_matrix, obj->matrix, sizeof(gui_matrix_t));
 
     if (has_transform)
     {
@@ -1165,12 +521,80 @@ static void gui_circle_prepare(gui_obj_t *obj)
         matrix_translate(this->offset_x, this->offset_y, obj->matrix);
         matrix_translate(center_x, center_y, obj->matrix);
         matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-        matrix_rotate(this->degrees, obj->matrix);
+        matrix_rotate(matrix_degrees, obj->matrix);
         matrix_translate(-center_x, -center_y, obj->matrix);
     }
 
+    /* Uniform scale without rotation: rasterise at the scaled radius and blit
+     * 1:1, as gui_rect_prepare() does.  The blit samples nearest-neighbour, so
+     * a scaled bitmap loses its anti-aliased edge, and pieces scaled separately
+     * can leave seams between them.
+     *
+     * For the rest of prepare the widget temporarily takes the scaled geometry
+     * and a translate-only matrix; everything is restored at the end, so hit
+     * testing and children keep the scaled matrix exactly as before. */
+    bool bake_scale = false;
+    gui_matrix_t scaled_matrix;
+    int16_t saved_w = this->base.w;
+    int16_t saved_h = this->base.h;
+    int saved_x = this->x;
+    int saved_y = this->y;
+    int saved_radius = this->radius;
+    float saved_stroke_width = this->stroke_width;
+
+    /* Both the baked scale and the folded rotation adjust the gradient for
+     * this prepare only; the caller's values come back at the end. */
+    Gradient saved_gradient;
+    if (this->gradient != NULL)
+    {
+        memcpy(&saved_gradient, this->gradient, sizeof(Gradient));
+    }
+
+    if (has_transform && uniform_scale && !parent_has_non_translate &&
+        this->scale_x > 0.0f && this->scale_x != 1.0f)
+    {
+        int scaled_radius = (int)roundf((float)radius * this->scale_x);
+
+        if (scaled_radius >= 1 && scaled_radius <= INT16_MAX / 2)
+        {
+            bake_scale = true;
+            memcpy(&scaled_matrix, obj->matrix, sizeof(gui_matrix_t));
+
+            /* Keep the centre the scaled matrix maps to, snapped to a whole
+             * pixel so the split pieces stay seamless. */
+            memcpy(obj->matrix, &base_matrix, sizeof(gui_matrix_t));
+            matrix_translate(roundf(this->offset_x + (float)(radius - scaled_radius)),
+                             roundf(this->offset_y + (float)(radius - scaled_radius)),
+                             obj->matrix);
+
+            this->radius = scaled_radius;
+            this->x = scaled_radius;
+            this->y = scaled_radius;
+            this->base.w = (int16_t)(scaled_radius * 2);
+            this->base.h = (int16_t)(scaled_radius * 2);
+            this->stroke_width *= this->scale_x;
+
+            // The gradient stores its centre and radius in widget pixels
+            update_circle_gradient_geometry(this);
+
+            radius = scaled_radius;
+        }
+    }
+
+    /* The rotation an angular gradient would have had from the blit matrix.
+     * Screen angles grow clockwise, as the rotation does, so the colour shown
+     * at angle a is the one the unrotated gradient had at a - degrees. */
+    if (folded_degrees != 0.0f && circle_has_gradient(this) &&
+        this->gradient_type == CIRCLE_GRADIENT_ANGULAR)
+    {
+        float range = this->gradient->angular_end - this->gradient->angular_start;
+        float start = fmodf(this->gradient->angular_start + folded_degrees, 360.0f);
+        if (start < 0.0f) { start += 360.0f; }
+        this->gradient->angular_start = start;
+        this->gradient->angular_end = start + range;
+    }
+
     // Calculate checksum only for key properties (exclude pointers)
-    // Manually calculate checksum for critical fields only
     uint32_t new_checksum = GUI_GEOMETRY_HASH_INIT;
     new_checksum = gui_geometry_hash_update(new_checksum, &this->x, sizeof(this->x));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->y, sizeof(this->y));
@@ -1182,7 +606,8 @@ static void gui_circle_prepare(gui_obj_t *obj)
                                             sizeof(this->stroke_color));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->opacity_value,
                                             sizeof(this->opacity_value));
-    new_checksum = gui_geometry_hash_update(new_checksum, &this->degrees, sizeof(this->degrees));
+    /* No degrees here: the matrix part of a rotation only re-places the pieces,
+     * and the folded part reaches the pixels through the gradient hash below. */
     new_checksum = gui_geometry_hash_update(new_checksum, &this->scale_x, sizeof(this->scale_x));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->scale_y, sizeof(this->scale_y));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->offset_x, sizeof(this->offset_x));
@@ -1201,274 +626,70 @@ static void gui_circle_prepare(gui_obj_t *obj)
         new_checksum = gui_geometry_hash_update(new_checksum, this->gradient, sizeof(Gradient));
     }
 
-    // Only regenerate buffers if properties changed
-    bool need_regenerate = (last != new_checksum);
-    uint32_t stroke_path_checksum = GUI_GEOMETRY_HASH_INIT;
-    stroke_path_checksum = gui_geometry_hash_update(stroke_path_checksum,
-                                                    &this->radius, sizeof(this->radius));
-    stroke_path_checksum = gui_geometry_hash_update(stroke_path_checksum,
-                                                    &this->stroke_width,
-                                                    sizeof(this->stroke_width));
-    bool stroke_path_dirty = (stroke_path_checksum != this->stroke_path_checksum);
+    /* Single buffer for what the split cannot express: a gradient varies across
+     * the centre, a transform would leave seams between the pieces, and a
+     * circle whose centre square vanishes has nothing to split.  The size rule
+     * is a cost trade-off -- see gui_geometry_common.h for why it is expressed
+     * in bytes. */
+    circle_geom_t geom;
+    circle_geom_init(&geom, this);
+    uint64_t circle_area = (uint64_t)(uint32_t)(radius * 2) * (uint32_t)(radius * 2);
+    bool payload_is_a8 = geom.stroke <= 0.0f && !circle_has_gradient(this) &&
+                         GUI_CIRCLE_ENABLE_A8;
+    bool single = circle_has_gradient(this) || (has_transform && !bake_scale) ||
+                  parent_has_non_translate || geom.half <= 0 ||
+                  !gui_geometry_split_pays_off(circle_area, payload_is_a8);
+    new_checksum = gui_geometry_hash_update(new_checksum, &single, sizeof(single));
 
-    /* Single buffer is the baseline representation; splitting the circle into
-     * one centre rect plus four arc pieces is the large-shape optimisation.
-     *
-     * The two groups are kept separate on purpose: must_single_buffer lists
-     * what the split representation cannot express (a gradient varies per
-     * pixel, a stroke needs the span path, a translucent colour needs a
-     * single surface), while the size rule is a cost trade-off.  Merging them
-     * into one boolean is how this table and the one in gui_rect.c drifted
-     * apart -- see gui_geometry_common.h for what the threshold means. */
-    uint64_t circle_area = (uint64_t)(uint32_t)diameter * (uint32_t)diameter;
-    bool payload_is_a8 = gui_geometry_use_a8(GUI_CIRCLE_ENABLE_A8,
-                                             circle_has_gradient(this), false);
+    /* Whether the split strips may be A8 also depends on the parent's opacity,
+     * which none of the fields above see; hashing it rebuilds the pieces when
+     * a fading parent crosses fully opaque. */
+    bool parent_opaque = obj->parent != NULL && obj->parent->opacity_value == UINT8_MAX;
+    new_checksum = gui_geometry_hash_update(new_checksum, &parent_opaque, sizeof(parent_opaque));
 
-    bool must_single_buffer = (this->color.color.rgba.a < 255) ||
-                              (this->use_gradient && this->gradient != NULL) ||
-                              (this->stroke_width > 0.0f);
-    bool need_single_buffer = must_single_buffer ||
-                              !gui_geometry_split_pays_off(circle_area, payload_is_a8);
-
-    if (need_single_buffer)
+    // All pieces are rebuilt together, so they always match each other
+    if (last != new_checksum || this->parts.count == 0)
     {
-        bool switching_from_split = this->arc_left != NULL || this->arc_right != NULL ||
-                                    this->arc_top != NULL || this->arc_bottom != NULL;
-        gui_circle_release_arc_images(this);
-        if (need_regenerate || switching_from_split || this->center_rect == NULL)
+        gui_geometry_parts_release(&this->parts);
+        if (!circle_build_parts(this, &geom, single))
         {
-            this->center_rect = create_circle_buffer(this, obj, &this->center_rect);
+            gui_geometry_parts_release(&this->parts);
         }
+        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
     }
-    else
+    else if (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0)
     {
-        // Use optimized multi-part rendering for large opaque circles
-        if (need_regenerate || this->center_rect == NULL || this->arc_left == NULL ||
-            this->arc_right == NULL || this->arc_top == NULL || this->arc_bottom == NULL)
-        {
-            gui_circle_release_images(this);
-
-            int inner_half = (int)floorf(radius * M_SQRT1_2);
-            int inner_size = inner_half * 2;
-            int arc_width = radius - inner_half;
-
-            if (inner_size < 1) { inner_size = 1; }
-            if (arc_width < 1) { arc_width = 1; }
-            if (inner_size > diameter) { inner_size = diameter; }
-
-            int inner_x = arc_width;
-            int inner_y = arc_width;
-
-            if (inner_size > 0)
-            {
-                set_rect_img(this, &this->center_rect, inner_x, inner_y, inner_size, inner_size);
-            }
-
-            this->arc_left = create_vertical_arc_strip(this, obj, &this->arc_left, radius);
-
-            if (this->arc_left != NULL)
-            {
-                int left_x = 0;
-                int left_y = arc_width;
-
-                // Apply position offset on top of parent matrix
-                matrix_translate((float)left_x, (float)left_y, &this->arc_left->matrix);
-
-                memcpy(&this->arc_left->inverse, &this->arc_left->matrix, sizeof(struct gui_matrix));
-                matrix_inverse(&this->arc_left->inverse);
-                draw_img_new_area(this->arc_left, NULL);
-
-                int right_x = arc_width + inner_size - 1;
-                int right_y = arc_width;
-                this->arc_right = create_transformed_arc(this, obj, this->arc_left,
-                                                         right_x, right_y,
-                                                         true, false, false, &this->arc_right);
-                int top_x = arc_width + inner_size;
-                int top_y = 0;
-                this->arc_top = create_transformed_arc(this, obj, this->arc_left,
-                                                       top_x, top_y,
-                                                       false, false, true, &this->arc_top);
-
-                int bottom_x = arc_width;
-                int bottom_y = arc_width * 2 + inner_size - 1;
-                this->arc_bottom = create_transformed_arc(this, obj, this->arc_left,
-                                                          bottom_x, bottom_y,
-                                                          false, true, true, &this->arc_bottom);
-            }
-
-            if (this->center_rect == NULL || this->arc_left == NULL ||
-                this->arc_right == NULL || this->arc_top == NULL || this->arc_bottom == NULL)
-            {
-                gui_circle_release_images(this);
-            }
-        }
-    }
-
-    if (this->stroke_width > 0.0f)
-    {
-        gui_dispdev_t *dc = gui_get_dc();
-        bool use_path = gui_geometry_span_can_draw(obj->matrix) &&
-                        dc != NULL && (dc->bit_depth == 16 || dc->bit_depth == 32);
-
-        if (use_path)
-        {
-            if (stroke_path_dirty || this->stroke_span == NULL)
-            {
-                gui_geometry_path_t path;
-                gui_geometry_path_init_circle(&path, radius, this->stroke_width);
-                gui_geometry_span_t *spans = gui_geometry_span_acquire(&path);
-                if (spans != NULL)
-                {
-                    gui_geometry_span_release(this->stroke_span);
-                    this->stroke_span = spans;
-                }
-                else
-                {
-                    gui_geometry_span_release(this->stroke_span);
-                    this->stroke_span = NULL;
-                }
-            }
-
-            if (this->stroke_span != NULL)
-            {
-                gui_geometry_draw_img_release(&this->stroke_img);
-            }
-            else if (need_regenerate || this->stroke_img == NULL)
-            {
-                this->stroke_img =
-                    create_circle_stroke_buffer(this, obj, &this->stroke_img);
-            }
-        }
-        else
-        {
-            gui_geometry_span_release(this->stroke_span);
-            this->stroke_span = NULL;
-            if (need_regenerate || this->stroke_img == NULL)
-            {
-                this->stroke_img =
-                    create_circle_stroke_buffer(this, obj, &this->stroke_img);
-            }
-        }
-    }
-    else
-    {
-        gui_geometry_draw_img_release(&this->stroke_img);
-        gui_geometry_span_release(this->stroke_span);
-        this->stroke_span = NULL;
+        // Moved only (e.g. list scrolling): re-place the pieces, keep the pixels
+        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
+        gui_geometry_parts_place(&this->parts, obj->matrix);
     }
 
     this->checksum = new_checksum;
-    this->stroke_path_checksum = stroke_path_checksum;
 
-    // Check if matrix changed (important for list scrolling optimization)
-    bool matrix_changed = (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0);
-
-    // Only update draw_img matrix and area when matrix actually changed
-    if (matrix_changed)
+    if (bake_scale)
     {
-        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
+        memcpy(obj->matrix, &scaled_matrix, sizeof(gui_matrix_t));
+        this->base.w = saved_w;
+        this->base.h = saved_h;
+        this->x = saved_x;
+        this->y = saved_y;
+        this->radius = saved_radius;
+        this->stroke_width = saved_stroke_width;
+    }
 
-        // Update center_rect matrix
-        if (this->center_rect != NULL)
-        {
-            // For single-buffer rendering (gradient/alpha/small circles), no offset needed
-            if (need_single_buffer)
-            {
-                // Single buffer - no offset
-                memcpy(&this->center_rect->matrix, obj->matrix, sizeof(struct gui_matrix));
-            }
-            else
-            {
-                // Multi-part rendering - need to add center rect offset
-                int inner_half = (int)floorf(radius * M_SQRT1_2);
-                int arc_width = radius - inner_half;
-                int inner_x = arc_width;
-                int inner_y = arc_width;
+    if (this->gradient != NULL)
+    {
+        memcpy(this->gradient, &saved_gradient, sizeof(Gradient));
+    }
 
-                memcpy(&this->center_rect->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate((float)inner_x, (float)inner_y, &this->center_rect->matrix);
-            }
-
-            memcpy(&this->center_rect->inverse, &this->center_rect->matrix, sizeof(struct gui_matrix));
-            matrix_inverse(&this->center_rect->inverse);
-            draw_img_new_area(this->center_rect, NULL);
-        }
-
-        if (this->stroke_img != NULL)
-        {
-            memcpy(&this->stroke_img->matrix, obj->matrix, sizeof(struct gui_matrix));
-            memcpy(&this->stroke_img->inverse, obj->matrix, sizeof(struct gui_matrix));
-            matrix_inverse(&this->stroke_img->inverse);
-            draw_img_new_area(this->stroke_img, NULL);
-        }
-
-        // Update arc matrices (for multi-part rendering)
-        if (this->arc_left != NULL)
-        {
-            int inner_half = (int)floorf(radius * M_SQRT1_2);
-            int arc_width = radius - inner_half;
-
-            // Update arc_left
-            memcpy(&this->arc_left->matrix, obj->matrix, sizeof(struct gui_matrix));
-            matrix_translate(0.0f, (float)arc_width, &this->arc_left->matrix);
-            memcpy(&this->arc_left->inverse, &this->arc_left->matrix, sizeof(struct gui_matrix));
-            matrix_inverse(&this->arc_left->inverse);
-            draw_img_new_area(this->arc_left, NULL);
-
-            // Update arc_right
-            if (this->arc_right != NULL)
-            {
-                int inner_size = inner_half * 2;
-                int right_x = arc_width + inner_size - 1;
-                int right_y = arc_width;
-
-                memcpy(&this->arc_right->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate((float)right_x, (float)right_y, &this->arc_right->matrix);
-
-                gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->arc_left->data;
-                int base_width = head->w;
-                int base_height = head->h;
-                matrix_translate((float)base_width / 2.0f, (float)base_height / 2.0f, &this->arc_right->matrix);
-                matrix_scale(-1.0f, 1.0f, &this->arc_right->matrix);
-                matrix_translate(-(float)base_width / 2.0f, -(float)base_height / 2.0f, &this->arc_right->matrix);
-
-                memcpy(&this->arc_right->inverse, &this->arc_right->matrix, sizeof(struct gui_matrix));
-                matrix_inverse(&this->arc_right->inverse);
-                draw_img_new_area(this->arc_right, NULL);
-            }
-
-            // Update arc_top
-            if (this->arc_top != NULL)
-            {
-                int inner_size = inner_half * 2;
-                int top_x = arc_width + inner_size;
-                int top_y = 0;
-
-                memcpy(&this->arc_top->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate((float)top_x, (float)top_y, &this->arc_top->matrix);
-                matrix_rotate(90.0f, &this->arc_top->matrix);
-
-                memcpy(&this->arc_top->inverse, &this->arc_top->matrix, sizeof(struct gui_matrix));
-                matrix_inverse(&this->arc_top->inverse);
-                draw_img_new_area(this->arc_top, NULL);
-            }
-
-            // Update arc_bottom
-            if (this->arc_bottom != NULL)
-            {
-                int inner_size = inner_half * 2;
-                int bottom_x = arc_width;
-                int bottom_y = arc_width * 2 + inner_size - 1;
-
-                memcpy(&this->arc_bottom->matrix, obj->matrix, sizeof(struct gui_matrix));
-                matrix_translate((float)bottom_x, (float)bottom_y, &this->arc_bottom->matrix);
-                matrix_rotate(-90.0f, &this->arc_bottom->matrix);
-
-                memcpy(&this->arc_bottom->inverse, &this->arc_bottom->matrix, sizeof(struct gui_matrix));
-                matrix_inverse(&this->arc_bottom->inverse);
-                draw_img_new_area(this->arc_bottom, NULL);
-            }
-        }
+    /* Children inherit obj->matrix, and used to inherit the rotation with it:
+     * add the folded part back for them, now that the pieces are placed. */
+    if (folded_degrees != 0.0f)
+    {
+        float c = (float)this->radius;
+        matrix_translate(c, c, obj->matrix);
+        matrix_rotate(folded_degrees, obj->matrix);
+        matrix_translate(-c, -c, obj->matrix);
     }
 
     if (last != this->checksum)
@@ -1481,66 +702,16 @@ static void gui_circle_prepare(gui_obj_t *obj)
 static void gui_circle_draw(gui_obj_t *obj)
 {
     gui_circle_t *this = (gui_circle_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
 
     // Update opacity value to consider parent's opacity (like gui_img does)
-    uint8_t final_opacity = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
-
-    if (this->stroke_span != NULL)
-    {
-        gui_geometry_span_draw(this->stroke_span, obj->matrix,
-                               this->stroke_color, final_opacity, dc);
-    }
-    if (this->stroke_img != NULL)
-    {
-        this->stroke_img->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->stroke_img, dc, NULL);
-    }
-    if (this->center_rect != NULL)
-    {
-        this->center_rect->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->center_rect, dc, NULL);
-    }
-    if (this->arc_left != NULL)
-    {
-        this->arc_left->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->arc_left, dc, NULL);
-    }
-    if (this->arc_right != NULL)
-    {
-        this->arc_right->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->arc_right, dc, NULL);
-    }
-    if (this->arc_top != NULL)
-    {
-        this->arc_top->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->arc_top, dc, NULL);
-    }
-    if (this->arc_bottom != NULL)
-    {
-        this->arc_bottom->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->arc_bottom, dc, NULL);
-    }
+    gui_geometry_parts_draw(&this->parts,
+                            obj->parent->opacity_value * this->opacity_value / UINT8_MAX);
 }
 
 /** End phase processing - Memory management */
 static void gui_circle_end(gui_circle_t *this)
 {
-    /* Pixel buffers are cached across frames and must NOT be freed here; they
-     * are released in gui_circle_destroy() or when the render mode changes.
-     * HW-acceleration user data (acc_user) is different: a hardware
-     * draw_img_acc_prepare_cb allocates it every frame inside
-     * draw_img_new_area, so it must be released now or the next frame's
-     * prepare call orphans the old pointer. */
-    if (draw_img_acc_end_cb != NULL)
-    {
-        if (this->stroke_img != NULL) { draw_img_acc_end_cb(this->stroke_img); }
-        if (this->center_rect != NULL) { draw_img_acc_end_cb(this->center_rect); }
-        if (this->arc_left   != NULL) { draw_img_acc_end_cb(this->arc_left);   }
-        if (this->arc_right  != NULL) { draw_img_acc_end_cb(this->arc_right);  }
-        if (this->arc_top    != NULL) { draw_img_acc_end_cb(this->arc_top);    }
-        if (this->arc_bottom != NULL) { draw_img_acc_end_cb(this->arc_bottom); }
-    }
+    gui_geometry_parts_end(&this->parts);
 }
 
 static void gui_circle_destroy(gui_circle_t *this)
@@ -1552,7 +723,7 @@ static void gui_circle_destroy(gui_circle_t *this)
         this->gradient = NULL;
     }
 
-    gui_circle_release_images(this);
+    gui_geometry_parts_release(&this->parts);
 }
 
 static void gui_circle_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -1712,7 +883,7 @@ void gui_circle_set_radius(gui_circle_t *circle, int radius)
 
     if (circle->radius != radius)
     {
-        gui_circle_release_images(circle);
+        gui_geometry_parts_release(&circle->parts);
         circle->base.x = center_x - radius;
         circle->base.y = center_y - radius;
         circle->base.w = radius * 2;

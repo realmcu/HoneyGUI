@@ -19,7 +19,7 @@ extern "C" {
 #include "gui_obj.h"
 #include "draw_img.h"
 #include "lite_geometry.h"
-#include "gui_geometry_span.h"
+#include "gui_geometry_image.h"
 
 /*============================================================================*
  *                         Types
@@ -38,15 +38,9 @@ typedef enum
 typedef struct
 {
     gui_obj_t base;             /**< Base widget. */
-    draw_img_t *circle_00;
-    draw_img_t *circle_01;
-    draw_img_t *circle_10;
-    draw_img_t *circle_11;
-    draw_img_t *rect_0;
-    draw_img_t *rect_1;
-    draw_img_t *rect_2;
-    draw_img_t *stroke_img;    /**< Optional inset stroke image. */
-    gui_geometry_span_t *stroke_span; /**< Cached path scanline spans. */
+    /** Non-overlapping pieces: four corners, up to three runs (stroke, stroke/fill
+     *  edge, fill) along each of the four sides, and the centre. */
+    gui_geometry_parts_t parts;
     uint8_t opacity_value;      /**< Opacity value. */
 
     int radius;                 /**< Rect radius. */
@@ -54,7 +48,6 @@ typedef struct
     float stroke_width;         /**< Inset stroke width. Zero disables stroke. */
     gui_color_t stroke_color;   /**< Stroke color. */
     uint32_t checksum;          /**< Checksum for change detection. */
-    uint32_t stroke_path_checksum; /**< Geometry-only span checksum. */
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */
@@ -78,7 +71,6 @@ typedef enum
 {
     RECT_PART_ROUNDED = 1,      /**< Whole rounded rect in one buffer. */
     RECT_PART_CORNER,           /**< One rounded corner, keyed by corner index. */
-    RECT_PART_STROKE,           /**< Whole inset stroke in one buffer. */
 } gui_rect_part_t;
 
 /**
@@ -92,15 +84,35 @@ typedef enum
 typedef struct
 {
     uint32_t part;              /**< gui_rect_part_t. */
-    int32_t size_a;             /**< Width, or radius for a corner. */
+    int32_t size_a;             /**< Width, or side length for a corner. */
     int32_t size_b;             /**< Height, or corner index for a corner. */
     int32_t radius;             /**< Corner radius. */
-    uint32_t color;             /**< ARGB baked into the pixels; 0 when A8. */
+    uint32_t color;             /**< ARGB baked into the pixels; alpha only when A8. */
     uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
     uint32_t flags;             /**< Dither on/off, and gradient direction plus 1. */
-    float stroke_width;         /**< Inset width for rounded fill or stroke payload. */
+    float stroke_width;         /**< Inset stroke width, 0 for none. */
+    uint32_t stroke_color;      /**< ARGB stroke baked into the pixels; 0 for none. */
     Gradient gradient;          /**< Only present when flags say a gradient is used. */
 } rect_desc_t;
+
+/**
+ * Geometry shared by every piece of one rect.
+ *
+ * @c straight is where the edges stop curving: past it, rows and columns are
+ * uniform along the edge, which is what lets the split draw them as solid
+ * rectangles.
+ */
+typedef struct
+{
+    int w;                      /**< Rect width. */
+    int h;                      /**< Rect height. */
+    int radius;                 /**< Effective corner radius. */
+    float stroke;               /**< Stroke width, clamped to the rect. */
+    float inner_w;              /**< Width inside the stroke. */
+    float inner_h;              /**< Height inside the stroke. */
+    float inner_radius;         /**< Corner radius inside the stroke. */
+    int straight;               /**< Corner square side: max(radius, stroke), rounded up. */
+} rect_geom_t;
 /*============================================================================*
  *                         Functions
  *============================================================================*/

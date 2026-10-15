@@ -24,7 +24,7 @@ extern "C" {
 #include "acc_api.h"
 #include "tp_algo.h"
 #include "lite_geometry.h"
-#include "gui_geometry_span.h"
+#include "gui_geometry_image.h"
 
 /*============================================================================*
  *                         Types
@@ -45,14 +45,9 @@ typedef struct
 {
     gui_obj_t base;             /**< Base widget. */
 
-    // Image parts
-    draw_img_t *center_rect;    /**< Center rectangle (inscribed square). */
-    draw_img_t *arc_left;    /**< Left arc. */
-    draw_img_t *arc_right;    /**< Right arc. */
-    draw_img_t *arc_top;    /**< Top arc. */
-    draw_img_t *arc_bottom;    /**< Bottom arc. */
-    draw_img_t *stroke_img;    /**< Optional inset stroke image. */
-    gui_geometry_span_t *stroke_span; /**< Cached path scanline spans. */
+    /** Non-overlapping pieces: the solid centre square and four strips drawn
+     *  from one payload -- or one image. */
+    gui_geometry_parts_t parts;
 
     // Circle geometry data
     int x;                      /**< Center X coordinate relative to widget. */
@@ -63,7 +58,6 @@ typedef struct
     gui_color_t stroke_color;   /**< Stroke color. */
     uint8_t opacity_value;      /**< Opacity value. */
     uint32_t checksum;          /**< Checksum for change detection. */
-    uint32_t stroke_path_checksum; /**< Geometry-only span checksum. */
 
     // Transformation parameters
     float degrees;              /**< Rotation angle in degrees. */
@@ -82,10 +76,8 @@ typedef struct
 /** Which rasterised part a cached payload holds. */
 typedef enum
 {
-    CIRCLE_PART_FULL = 1,       /**< Whole circle in one ARGB8888 buffer. */
-    CIRCLE_PART_SOLID_RECT,     /**< Solid inscribed square, used when transformed. */
-    CIRCLE_PART_ARC_STRIP,      /**< Left arc strip; the other three mirror it. */
-    CIRCLE_PART_STROKE,         /**< Whole inset stroke in one buffer. */
+    CIRCLE_PART_FULL = 1,       /**< Whole circle in one buffer. */
+    CIRCLE_PART_STRIP,          /**< Top strip; the other three are it turned. */
 } gui_circle_part_t;
 
 /**
@@ -99,14 +91,33 @@ typedef enum
 typedef struct
 {
     uint32_t part;              /**< gui_circle_part_t. */
-    int32_t size_a;             /**< Radius, or width for CIRCLE_PART_SOLID_RECT. */
-    int32_t size_b;             /**< Height for CIRCLE_PART_SOLID_RECT, else 0. */
-    uint32_t color;             /**< ARGB baked into the pixels; 0 when A8. */
+    int32_t radius;             /**< Circle radius. */
+    int32_t size_a;             /**< Payload width. */
+    int32_t size_b;             /**< Payload height. */
+    uint32_t color;             /**< ARGB baked into the pixels; alpha only when A8. */
     uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
     uint32_t gradient_type;     /**< CIRCLE_GRADIENT_*, or UINT32_MAX for none. */
-    float stroke_width;         /**< Inset width for full fill or stroke payload. */
+    float stroke_width;         /**< Inset stroke width, 0 for none. */
+    uint32_t stroke_color;      /**< ARGB stroke baked into the pixels; 0 for none. */
     Gradient gradient;          /**< Only present when gradient_type is set. */
 } circle_desc_t;
+
+/**
+ * Geometry shared by every piece of one circle, centred at (radius, radius).
+ *
+ * The split is a solid centre square of side 2 * half, and around it four
+ * strips of band x (2 * half + band) laid out like a pinwheel.  @c half is
+ * the largest value whose square still lies fully inside the fill, so the
+ * centre is one solid colour.
+ */
+typedef struct
+{
+    int radius;                 /**< Circle radius. */
+    float stroke;               /**< Stroke width, clamped to the radius. */
+    float inner_radius;         /**< Fill radius inside the stroke. */
+    int half;                   /**< Half side of the solid centre square. */
+    int band;                   /**< radius - half: depth of the edge bands. */
+} circle_geom_t;
 /*============================================================================*
  *                         Functions
  *============================================================================*/

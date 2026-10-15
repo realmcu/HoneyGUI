@@ -61,12 +61,13 @@ static uint16_t rect_desc_len(const rect_desc_t *desc)
 }
 
 /**
- * Whether this rect can be stored as an A8 coverage mask.
+ * Whether this rect fills with a gradient.
  *
- * A mask carries no RGB, so one payload serves every colour of the same shape --
+ * A solid rect without stroke can be stored as an A8 coverage mask: a mask
+ * carries no RGB, so one payload serves every colour of the same shape --
  * which is the point, since "same size, different colour" is otherwise a full
- * cache miss.  Only a gradient rules it out, since that genuinely needs per-pixel
- * RGB.
+ * cache miss.  A gradient or a stroke rules that out, since they need
+ * per-pixel RGB.
  *
  * A translucent colour is fine: its alpha is folded into the mask values, not
  * carried in fg_color_set.  That matters because the two blit paths disagree
@@ -80,74 +81,49 @@ static bool rect_has_gradient(const gui_rounded_rect_t *rect)
 }
 
 /**
- * Fill in a descriptor for one part of this rect.
+ * Fill in a descriptor for one cached payload.
  *
  * Zeroes first: gui_geometry_cache_acquire() compares descriptors byte for byte, so
  * a padding hole left uninitialised would make two identical rects miss.
  */
-static void rect_desc_init(rect_desc_t *desc, gui_rounded_rect_t *this,
-                           gui_rect_part_t part, int size_a, int size_b)
+static void rect_desc_init(rect_desc_t *desc, const gui_rounded_rect_t *this,
+                           gui_rect_part_t part, int size_a, int size_b, int radius,
+                           bool is_a8)
 {
     memset(desc, 0x00, sizeof(*desc));
 
-    bool is_stroke = (part == RECT_PART_STROKE);
     desc->part = (uint32_t)part;
     desc->size_a = size_a;
     desc->size_b = size_b;
-    desc->radius = this->radius;
-    desc->flags = (!is_stroke && this->enable_dither) ? 1u : 0u;
-    desc->stroke_width = (part == RECT_PART_ROUNDED || part == RECT_PART_STROKE) ?
-                         this->stroke_width : 0.0f;
+    desc->radius = radius;
+    desc->flags = this->enable_dither ? 1u : 0u;
+    desc->stroke_width = this->stroke_width;
+    if (this->stroke_width > 0.0f)
+    {
+        desc->stroke_color = this->stroke_color.color.argb_full;
+    }
 
     /* RGB is deliberately left out of an A8 key -- that is what lets rects
      * differing only in colour share one mask.  Alpha stays in, because it is
      * folded into the mask values themselves. */
-    bool is_a8 = gui_geometry_use_a8(GUI_RECT_ENABLE_A8,
-                                     rect_has_gradient(this), is_stroke);
-    gui_color_t payload_color = is_stroke ? this->stroke_color : this->color;
-
     if (is_a8)
     {
         desc->is_a8 = 1u;
-        desc->color = payload_color.color.rgba.a;
+        desc->color = this->color.color.rgba.a;
     }
     else
     {
-        desc->color = payload_color.color.argb_full;
+        desc->color = this->color.color.argb_full;
     }
 
-    /* Only the whole-rect part reads the gradient; sub-rectangles and corners
-     * are always solid.  The direction lives in the high half so that
-     * rect_desc_len() can tell from flags alone whether to compare it. */
+    /* Only the whole-rect part can carry a gradient; corners are always solid.
+     * The direction lives in the high half so that rect_desc_len() can tell
+     * from flags alone whether to compare it. */
     if (part == RECT_PART_ROUNDED && rect_has_gradient(this))
     {
         desc->flags |= ((uint32_t)this->gradient_dir + 1u) << 16;
         memcpy(&desc->gradient, this->gradient, sizeof(Gradient));
     }
-}
-
-static void gui_rect_release_images(gui_rounded_rect_t *rect)
-{
-    gui_geometry_draw_img_release(&rect->rect_0);
-    gui_geometry_draw_img_release(&rect->rect_1);
-    gui_geometry_draw_img_release(&rect->rect_2);
-    gui_geometry_draw_img_release(&rect->circle_00);
-    gui_geometry_draw_img_release(&rect->circle_01);
-    gui_geometry_draw_img_release(&rect->circle_10);
-    gui_geometry_draw_img_release(&rect->circle_11);
-    gui_geometry_draw_img_release(&rect->stroke_img);
-    gui_geometry_span_release(rect->stroke_span);
-    rect->stroke_span = NULL;
-}
-
-static void gui_rect_release_split_images(gui_rounded_rect_t *rect)
-{
-    gui_geometry_draw_img_release(&rect->rect_1);
-    gui_geometry_draw_img_release(&rect->rect_2);
-    gui_geometry_draw_img_release(&rect->circle_00);
-    gui_geometry_draw_img_release(&rect->circle_01);
-    gui_geometry_draw_img_release(&rect->circle_10);
-    gui_geometry_draw_img_release(&rect->circle_11);
 }
 
 static int get_effective_radius(const gui_rounded_rect_t *rect)
@@ -159,206 +135,6 @@ static int get_effective_radius(const gui_rounded_rect_t *rect)
 
     int max_radius = _UI_MIN(rect->base.w, rect->base.h) / 2;
     return _UI_MIN(rect->radius, max_radius);
-}
-
-/** Set image data header for rectangle */
-static void set_rect_header(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, gui_color_t color)
-{
-    gui_geometry_data_head_set(head, (int16_t)w, (int16_t)h, ARGB8888);
-    gui_rect_file_head_t *rect_head = (gui_rect_file_head_t *)head;
-    rect_head->color = color;
-}
-
-/**
- * Build the draw_img for a plain opaque rect.
- *
- * The payload is a bare header plus the colour -- no pixels, so there is no
- * rasterisation cost and no cached allocation.  The software rasteriser reads
- * the colour from the header and applies widget opacity itself, and a hardware
- * accelerator gets a solid rectangle primitive; neither needs a pixel buffer.
- */
-static void set_rect_img(gui_rounded_rect_t *this, draw_img_t **input_img, int16_t x,
-                         int16_t y, int32_t w, int32_t h)
-{
-    // Free old buffer first to prevent memory leak
-    gui_geometry_draw_img_release(input_img);
-
-    if (w <= 0 || h <= 0 || w > UINT16_MAX || h > UINT16_MAX)
-    {
-        return;
-    }
-
-    gui_obj_t *obj = (gui_obj_t *)this;
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL)
-    {
-        return;
-    }
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    gui_rect_file_head_t *rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
-    if (rect_data == NULL)
-    {
-        gui_free(img);
-        return;
-    }
-    set_rect_header((gui_rgb_data_head_t *)rect_data, (uint16_t)w, (uint16_t)h, this->color);
-
-    img->blend_mode = IMG_RECT;
-    img->data = rect_data;
-    img->opacity_value = this->opacity_value;
-
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-
-    matrix_translate(x, y, &img->matrix);
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-    *input_img = img;
-}
-
-// ============================================================================
-//  HIGH PERFORMANCE RENDERER (ZONE BASED + PRE-CALC)
-// ============================================================================
-
-/**
- * Allocate buffer for single-buffer rendering
- *
- * @param out_body   Receives the payload body, past the image header.  Points at
- *                   ARGB8888 pixels, or coverage bytes when the rect is A8.
- * @param out_is_new Set false when the payload was already rasterised by an
- *                   identical rect, in which case out_body must not be written.
- */
-static draw_img_t *alloc_rect_img_buffer(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                         uint8_t **out_body, bool *out_is_new, int radius)
-{
-    int w = this->base.w;
-    int h = this->base.h;
-    uint32_t buffer_size;
-
-    if (out_body == NULL || out_is_new == NULL)
-    {
-        return NULL;
-    }
-    *out_body = NULL;
-    *out_is_new = false;
-
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    /* Every rect with the same size, radius and gradient draws from one payload;
-     * only this draw_img_t and its matrix are per widget.  An opaque solid rect
-     * stores a colourless mask, so colour does not split the cache either. */
-    bool is_a8 = gui_geometry_use_a8(GUI_RECT_ENABLE_A8,
-                                     rect_has_gradient(this), false);
-    rect_desc_t desc;
-    bool is_new = false;
-    rect_desc_init(&desc, this, RECT_PART_ROUNDED, w, h);
-    desc.radius = radius;
-
-    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    if (!gui_geometry_image_buffer_size(w, h, pixel_bytes, &buffer_size))
-    {
-        gui_free(img);
-        return NULL;
-    }
-
-    uint8_t *buffer = gui_geometry_cache_acquire(&desc, rect_desc_len(&desc), buffer_size, &is_new);
-    if (buffer == NULL)
-    {
-        gui_free(img);
-        return NULL;
-    }
-
-    if (is_new)
-    {
-        memset(buffer, 0x00, buffer_size);
-
-        if (is_a8)
-        {
-            gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)w, (int16_t)h, A8);
-        }
-        else
-        {
-            gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)w, (int16_t)h, ARGB8888);
-        }
-    }
-
-    gui_geometry_img_bind(img, buffer, this->opacity_value, is_a8, this->color);
-
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-
-    *out_body = buffer + sizeof(gui_rgb_data_head_t);
-    *out_is_new = is_new;
-    return img;
-}
-
-/**
- * Pre-calculate Corner Alpha Mask
- * Returns an r*r array. 255 = solid, 0 = transparent.
- */
-static uint8_t *generate_corner_mask(int r)
-{
-    if (r <= 0) { return NULL; }
-
-    uint64_t mask_size = (uint64_t)(uint32_t)r * (uint32_t)r;
-    if (mask_size > UINT32_MAX)
-    {
-        return NULL;
-    }
-
-    uint8_t *mask = gui_malloc((uint32_t)mask_size);
-    if (!mask) { return NULL; }
-
-    float r_sq = (float)((r - 0.5f) * (r - 0.5f));
-    float r_out_sq = (float)((r + 0.5f) * (r + 0.5f));
-
-    for (int y = 0; y < r; y++)
-    {
-        for (int x = 0; x < r; x++)
-        {
-            // Logic: Calculate for Top-Left corner conceptually
-            // Distance from the circle center which is at (r, r)
-            float dist_sq = (r - x - 0.5f) * (r - x - 0.5f) + (r - y - 0.5f) * (r - y - 0.5f);
-
-            if (dist_sq <= r_sq)
-            {
-                mask[y * r + x] = 255;
-            }
-            else if (dist_sq < r_out_sq)
-            {
-                float alpha_f = r + 0.5f - sqrtf(dist_sq);
-                mask[y * r + x] = (uint8_t)(alpha_f * 255.0f);
-            }
-            else
-            {
-                mask[y * r + x] = 0;
-            }
-        }
-    }
-    return mask;
 }
 
 static float rounded_rect_distance(float px, float py,
@@ -376,839 +152,551 @@ static float rounded_rect_distance(float px, float py,
     return inside + sqrtf(outside_x * outside_x + outside_y * outside_y) - r;
 }
 
-static uint8_t rounded_rect_coverage(float distance)
+static float rect_coverage(float distance)
 {
-    float coverage = LG_CLAMP(0.5f - distance, 0.0f, 1.0f);
-    return (uint8_t)(coverage * 255.0f);
+    return LG_CLAMP(0.5f - distance, 0.0f, 1.0f);
 }
 
-static uint32_t rect_fill_color_at(gui_rounded_rect_t *this, int x, int y, int w, int h)
+/**
+ * Gradient sampled once per raster, so a pixel costs a table lookup instead of
+ * a walk over the colour stops.  The gradient position t is linear in x and y
+ * for every direction, so the table index is too: kx * x + ky * y + k0.
+ */
+typedef struct
 {
-    bool use_gradient = this->use_gradient && this->gradient != NULL &&
-                        this->gradient->stop_count >= 2;
-    if (!use_gradient)
-    {
-        return this->color.color.argb_full;
-    }
+    uint32_t *lut;              /**< NULL: no gradient, or no memory for the table. */
+    int n;                      /**< Table entries. */
+    int32_t kx;                 /**< Index step per pixel in x, 16.16 fixed point. */
+    int32_t ky;                 /**< Index step per pixel in y, 16.16 fixed point. */
+    int32_t k0;                 /**< Index at pixel (0, 0) plus rounding, 16.16. */
+} rect_lut_t;
 
-    float tx = (w > 1) ? (float)x / (float)(w - 1) : 0.0f;
-    float ty = (h > 1) ? (float)y / (float)(h - 1) : 0.0f;
-    float t;
+static void rect_lut_init(rect_lut_t *l, gui_rounded_rect_t *this, int w, int h)
+{
+    l->lut = NULL;
+    if (!rect_has_gradient(this)) { return; }
+
+    /* t per pixel step along each axis, and the t of pixel (0, 0). */
+    float sx = (w > 1) ? 1.0f / (float)(w - 1) : 0.0f;
+    float sy = (h > 1) ? 1.0f / (float)(h - 1) : 0.0f;
+    float tx, ty, t0;
+    int n;
 
     switch (this->gradient_dir)
     {
     case RECT_GRADIENT_VERTICAL:
-        t = ty;
+        tx = 0.0f; ty = sy; t0 = 0.0f; n = h;
         break;
     case RECT_GRADIENT_DIAGONAL_TL_BR:
-        t = (tx + ty) * 0.5f;
+        tx = sx * 0.5f; ty = sy * 0.5f; t0 = 0.0f; n = w + h;
         break;
     case RECT_GRADIENT_DIAGONAL_TR_BL:
-        t = ((1.0f - tx) + ty) * 0.5f;
+        tx = -sx * 0.5f; ty = sy * 0.5f; t0 = 0.5f; n = w + h;
         break;
     case RECT_GRADIENT_HORIZONTAL:
     default:
-        t = tx;
+        tx = sx; ty = 0.0f; t0 = 0.0f; n = w;
         break;
     }
 
-    uint32_t color = gradient_get_color(this->gradient, t);
-    return this->enable_dither ? gui_geometry_dither_argb8888(color, x, y) : color;
+    /* One entry per pixel step is as fine as the gradient can show. */
+    n = LG_CLAMP(n, 2, 2048);
+    l->lut = gui_malloc((size_t)n * sizeof(uint32_t));
+    if (l->lut == NULL) { return; }
+
+    for (int i = 0; i < n; i++)
+    {
+        l->lut[i] = gradient_get_color(this->gradient, (float)i / (float)(n - 1));
+    }
+    l->n = n;
+    l->kx = (int32_t)(tx * (float)(n - 1) * 65536.0f);
+    l->ky = (int32_t)(ty * (float)(n - 1) * 65536.0f);
+    l->k0 = (int32_t)((t0 * (float)(n - 1) + 0.5f) * 65536.0f);
 }
 
-static bool fill_inner_rounded_payload(gui_rounded_rect_t *this, uint8_t *body,
-                                       int w, int h, int radius, bool is_a8)
+/** Table entry for pixel (x, y), integer only. */
+static inline uint32_t rect_lut_at(const rect_lut_t *l, int x, int y)
 {
-    if (body == NULL || w <= 0 || h <= 0 || radius < 0)
+    int32_t i = (l->kx * x + l->ky * y + l->k0) >> 16;
+    return l->lut[LG_CLAMP(i, 0, l->n - 1)];
+}
+
+static void rect_lut_free(rect_lut_t *l)
+{
+    if (l->lut != NULL)
     {
-        return false;
+        gui_free(l->lut);
+        l->lut = NULL;
+    }
+}
+
+/** Fill colour at (x, y); @p l may be NULL, which samples the gradient directly. */
+static uint32_t rect_fill_color_at(gui_rounded_rect_t *this, const rect_lut_t *l,
+                                   int x, int y, int w, int h)
+{
+    if (!rect_has_gradient(this))
+    {
+        return this->color.color.argb_full;
     }
 
-    float stroke_width = LG_CLAMP(this->stroke_width, 0.0f,
-                                  LG_MIN((float)w, (float)h) * 0.5f);
-    float inner_w = (float)w - stroke_width * 2.0f;
-    float inner_h = (float)h - stroke_width * 2.0f;
-    float inner_radius = LG_MAX((float)radius - stroke_width, 0.0f);
+    uint32_t color;
+    if (l != NULL && l->lut != NULL)
+    {
+        color = rect_lut_at(l, x, y);
+    }
+    else
+    {
+        float tx = (w > 1) ? (float)x / (float)(w - 1) : 0.0f;
+        float ty = (h > 1) ? (float)y / (float)(h - 1) : 0.0f;
+        float t = (this->gradient_dir == RECT_GRADIENT_VERTICAL) ? ty :
+                  (this->gradient_dir == RECT_GRADIENT_DIAGONAL_TL_BR) ? (tx + ty) * 0.5f :
+                  (this->gradient_dir == RECT_GRADIENT_DIAGONAL_TR_BL) ? ((1.0f - tx) + ty) * 0.5f :
+                  tx;
+        color = gradient_get_color(this->gradient, t);
+    }
 
-    if (inner_w <= 0.0f || inner_h <= 0.0f) { return true; }
+    return this->enable_dither ? gui_geometry_dither_argb8888_inline(color, x, y) : color;
+}
 
-    uint8_t fill_alpha_base = this->color.color.rgba.a;
+static void rect_geom_init(rect_geom_t *g, const gui_rounded_rect_t *this, int radius)
+{
+    g->w = this->base.w;
+    g->h = this->base.h;
+    g->radius = radius;
+    g->stroke = LG_CLAMP(this->stroke_width, 0.0f, LG_MIN((float)g->w, (float)g->h) * 0.5f);
+    g->inner_w = (float)g->w - g->stroke * 2.0f;
+    g->inner_h = (float)g->h - g->stroke * 2.0f;
+    g->inner_radius = LG_MAX((float)radius - g->stroke, 0.0f);
+    g->straight = (int)ceilf(LG_MAX((float)radius, g->stroke));
+}
+
+/**
+ * Coverage of the outer edge and of the stroke's inner edge at (x, y).
+ *
+ * rounded_rect_distance() only takes a square root inside the corner arcs; on
+ * the straight parts of the edges it reduces to a subtraction.
+ */
+static void rect_coverages(const rect_geom_t *g, int x, int y, float *c_out, float *c_in)
+{
+    float px = (float)x + 0.5f;
+    float py = (float)y + 0.5f;
+
+    *c_out = rect_coverage(rounded_rect_distance(px, py, 0.0f, 0.0f,
+                                                 (float)g->w, (float)g->h, (float)g->radius));
+    *c_in = *c_out;
+
+    if (g->stroke > 0.0f && *c_out > 0.0f)
+    {
+        *c_in = 0.0f;
+        if (g->inner_w > 0.0f && g->inner_h > 0.0f)
+        {
+            *c_in = LG_MIN(rect_coverage(rounded_rect_distance(px, py, g->stroke, g->stroke,
+                                                               g->inner_w, g->inner_h,
+                                                               g->inner_radius)), *c_out);
+        }
+    }
+}
+
+/** One pixel of the rect, fill and stroke merged by gui_geometry_mix_fill_stroke(). */
+static uint32_t rect_pixel(gui_rounded_rect_t *this, const rect_geom_t *g,
+                           const rect_lut_t *l, int x, int y)
+{
+    float c_out, c_in;
+    rect_coverages(g, x, y, &c_out, &c_in);
+    if (c_out <= 0.0f) { return 0u; }
+
+    /* The stroke-only part needs no fill colour, which skips the gradient. */
+    uint32_t fill = (c_in > 0.0f) ? rect_fill_color_at(this, l, x, y, g->w, g->h) : 0u;
+    return gui_geometry_mix_fill_stroke(fill, this->stroke_color.color.argb_full, c_out, c_in);
+}
+
+/** One pixel from 0..255 coverages: integer except on the stroke/fill seam. */
+static inline uint32_t rect_mix8(uint32_t fill, uint32_t stroke, uint32_t c_out, uint32_t c_in)
+{
+    if (c_in == c_out || c_in == 0u)
+    {
+        uint32_t color = c_in ? fill : stroke;
+        if (c_out == 255u) { return color; }
+        return ((((color >> 24) * c_out + 127u) / 255u) << 24) | (color & 0x00FFFFFFu);
+    }
+    return gui_geometry_mix_fill_stroke(fill, stroke, (float)c_out / 255.0f,
+                                        (float)c_in / 255.0f);
+}
+
+/** Plain per-pixel raster, used only when a table could not be allocated. */
+static void rect_raster_slow(gui_rounded_rect_t *this, const rect_geom_t *g,
+                             const rect_lut_t *lut, uint8_t *body, bool is_a8,
+                             int ox, int oy, int pw, int ph)
+{
     uint32_t *pixels = (uint32_t *)body;
 
-    for (int y = 0; y < h; y++)
+    for (int y = 0; y < ph; y++)
     {
-        for (int x = 0; x < w; x++)
+        for (int x = 0; x < pw; x++)
         {
-            float distance = rounded_rect_distance(x + 0.5f, y + 0.5f,
-                                                   stroke_width, stroke_width,
-                                                   inner_w, inner_h, inner_radius);
-            uint8_t coverage = rounded_rect_coverage(distance);
-            if (coverage == 0) { continue; }
+            uint32_t color = rect_pixel(this, g, lut, ox + x, oy + y);
+            if (is_a8) { body[y * pw + x] = (uint8_t)(color >> 24); }
+            else { pixels[y * pw + x] = color; }
+        }
+    }
+}
 
-            if (is_a8)
+static void rect_cov_store(const rect_geom_t *g, uint8_t *dst, int x, int y)
+{
+    float c_out, c_in;
+    rect_coverages(g, x, y, &c_out, &c_in);
+    dst[0] = (uint8_t)(c_out * 255.0f + 0.5f);
+    dst[1] = (uint8_t)(c_in * 255.0f + 0.5f);
+}
+
+/**
+ * Rasterise the window (ox, oy, pw x ph) of the rect into a payload body: the
+ * whole rect for a single buffer, or one corner square for the split.
+ *
+ * The rect is symmetric about both centre lines, so every coverage it needs is
+ * precomputed once as 0..255: an s x s table shared by the four corners and a
+ * per-depth table shared by the four straight edges.  Each row is then walked
+ * as up to three spans -- left band, middle, right band -- so the middle of a
+ * row is a tight loop with no per-pixel classification: a plain fill inside
+ * the rect, one constant coverage along the top and bottom bands.  The body
+ * comes zeroed, so uncovered pixels are simply skipped.
+ */
+static void rect_raster(gui_rounded_rect_t *this, const rect_geom_t *g, uint8_t *body,
+                        bool is_a8, int ox, int oy, int pw, int ph)
+{
+    int s = g->straight;
+    int w = g->w;
+    int h = g->h;
+    uint32_t *pixels = (uint32_t *)body;
+    uint32_t stroke = this->stroke_color.color.argb_full;
+    uint32_t solid = this->color.color.argb_full;
+    bool gradient = rect_has_gradient(this);
+    bool dither = gradient && this->enable_dither;
+
+    rect_lut_t lut;
+    rect_lut_init(&lut, this, w, h);
+
+    /* [0, s*s): corner, top-left orientation; [s*s, s*s + s): straight edges
+     * by depth.  Two bytes per entry: outer coverage, then inner. */
+    uint8_t *cov = (s > 0) ? gui_malloc((size_t)(s * s + s) * 2u) : NULL;
+
+    if ((s > 0 && cov == NULL) || (gradient && lut.lut == NULL))
+    {
+        rect_raster_slow(this, g, &lut, body, is_a8, ox, oy, pw, ph);
+        if (cov != NULL) { gui_free(cov); }
+        rect_lut_free(&lut);
+        return;
+    }
+
+    uint8_t *edge = (cov != NULL) ? cov + s * s * 2 : NULL;
+    if (cov != NULL)
+    {
+        for (int y = 0; y < s; y++)
+        {
+            for (int x = 0; x < s; x++)
             {
-                body[y * w + x] = coverage == 255 ? fill_alpha_base :
-                                  (uint8_t)(((uint32_t)fill_alpha_base * coverage) >> 8);
+                rect_cov_store(g, &cov[(y * s + x) * 2], x, y);
             }
-            else
+        }
+        /* Sampled on whichever side has a straight part; every side has the
+         * same profile.  Unused when neither has one. */
+        for (int i = 0; i < s; i++)
+        {
+            rect_cov_store(g, &edge[i * 2], (h > 2 * s) ? i : w / 2, (h > 2 * s) ? h / 2 : i);
+        }
+    }
+
+    int32_t kx = gradient ? lut.kx : 0;
+    int lut_max = gradient ? lut.n - 1 : 0;
+
+    /* A full gradient without a stroke needs only the corner coverages. */
+    if (gradient && g->stroke <= 0.0f && !is_a8 &&
+        ox == 0 && oy == 0 && pw == w && ph == h &&
+        s > 0 && w > 2 * s && h > 2 * s)
+    {
+        for (int y = 0; y < h; y++)
+        {
+            uint32_t *row = pixels + y * w;
+            int dy = LG_MIN(y, h - 1 - y);
+            int32_t gi_row = lut.ky * y + lut.k0;
+            int32_t gi_left = gi_row;
+            int32_t gi_right = gi_row + kx * (w - 1);
+
+            for (int x = 0; x < s; x++, gi_left += kx, gi_right -= kx)
             {
-                uint32_t color = rect_fill_color_at(this, x, y, w, h);
-                if (coverage < 255)
+                uint8_t cover = dy < s ? cov[(dy * s + x) * 2] : edge[x * 2];
+                if (cover == 0u) { continue; }
+
+                int left = LG_CLAMP(gi_left >> 16, 0, lut_max);
+                int right_x = w - 1 - x;
+                int right = LG_CLAMP(gi_right >> 16, 0, lut_max);
+                uint32_t left_color = lut.lut[left];
+                uint32_t right_color = lut.lut[right];
+                if (dither)
                 {
-                    uint8_t alpha = (color >> 24) & 0xFF;
-                    alpha = (uint8_t)(((uint32_t)alpha * coverage) >> 8);
-                    color = (color & 0x00FFFFFFu) | ((uint32_t)alpha << 24);
+                    left_color = gui_geometry_dither_argb8888_inline(left_color, x, y);
+                    right_color = gui_geometry_dither_argb8888_inline(right_color, right_x, y);
                 }
-                pixels[y * w + x] = color;
-            }
-        }
-    }
-
-    return true;
-}
-
-static bool rasterize_rect_stroke(gui_rounded_rect_t *this, uint8_t *body,
-                                  int w, int h, int radius, bool is_a8)
-{
-    if (body == NULL || w <= 0 || h <= 0 || radius < 0)
-    {
-        return false;
-    }
-
-    float stroke_width = LG_CLAMP(this->stroke_width, 0.0f,
-                                  LG_MIN((float)w, (float)h) * 0.5f);
-    if (stroke_width <= 0.0f) { return true; }
-
-    float inner_w = (float)w - stroke_width * 2.0f;
-    float inner_h = (float)h - stroke_width * 2.0f;
-    float inner_radius = LG_MAX((float)radius - stroke_width, 0.0f);
-    uint8_t stroke_alpha = this->stroke_color.color.rgba.a;
-    uint32_t stroke_color = this->stroke_color.color.argb_full;
-    uint32_t *pixels = (uint32_t *)body;
-
-    for (int y = 0; y < h; y++)
-    {
-        for (int x = 0; x < w; x++)
-        {
-            float px = x + 0.5f;
-            float py = y + 0.5f;
-            float outer_distance = rounded_rect_distance(px, py, 0.0f, 0.0f,
-                                                         (float)w, (float)h,
-                                                         (float)radius);
-            uint8_t coverage = rounded_rect_coverage(outer_distance);
-            if (coverage == 0) { continue; }
-
-            if (inner_w > 0.0f && inner_h > 0.0f)
-            {
-                float inner_distance = rounded_rect_distance(px, py,
-                                                             stroke_width, stroke_width,
-                                                             inner_w, inner_h, inner_radius);
-                if (inner_distance <= -0.5f) { continue; }
+                if (cover != 255u)
+                {
+                    left_color = ((((left_color >> 24) * cover + 127u) / 255u) << 24) |
+                                 (left_color & 0x00FFFFFFu);
+                    right_color = ((((right_color >> 24) * cover + 127u) / 255u) << 24) |
+                                  (right_color & 0x00FFFFFFu);
+                }
+                row[x] = left_color;
+                row[right_x] = right_color;
             }
 
-            uint8_t alpha = coverage == 255 ? stroke_alpha :
-                            (uint8_t)(((uint32_t)stroke_alpha * coverage) >> 8);
-            if (is_a8)
+            uint8_t center_cover = dy < s ? edge[dy * 2] : 255u;
+            if (center_cover == 0u) { continue; }
+            int32_t gi = gi_row + kx * s;
+            if (center_cover == 255u)
             {
-                body[y * w + x] = alpha;
+                for (int x = s; x < w - s; x++, gi += kx)
+                {
+                    uint32_t color = lut.lut[LG_CLAMP(gi >> 16, 0, lut_max)];
+                    row[x] = dither ? gui_geometry_dither_argb8888_inline(color, x, y) : color;
+                }
             }
             else
             {
-                pixels[y * w + x] =
-                    (stroke_color & 0x00FFFFFFu) | ((uint32_t)alpha << 24);
+                for (int x = s; x < w - s; x++, gi += kx)
+                {
+                    uint32_t color = lut.lut[LG_CLAMP(gi >> 16, 0, lut_max)];
+                    if (dither) { color = gui_geometry_dither_argb8888_inline(color, x, y); }
+                    row[x] = ((((color >> 24) * center_cover + 127u) / 255u) << 24) |
+                             (color & 0x00FFFFFFu);
+                }
             }
         }
+        gui_free(cov);
+        rect_lut_free(&lut);
+        return;
+    }
+
+    for (int y = 0; y < ph; y++)
+    {
+        int ry = oy + y;
+        int dy = LG_MIN(ry, h - 1 - ry);                /* depth from top or bottom */
+        bool row_mid = dy >= s;
+        uint32_t *row32 = pixels + y * pw;
+        uint8_t *row8 = body + y * pw;
+        int32_t gi_row = gradient ? lut.ky * ry + lut.k0 : 0;
+        int x = 0;
+
+        while (x < pw)
+        {
+            int rx = ox + x;
+            int seg_end = (rx < s) ? s : (rx < w - s) ? w - s : w;
+            seg_end = LG_MIN(seg_end, ox + pw) - ox;    /* back to window x */
+            bool col_mid = rx >= s && rx < w - s;
+            int32_t gi = gi_row + kx * rx;
+
+            if (row_mid && col_mid)
+            {
+                /* Interior: plain fill */
+                for (; x < seg_end; x++, rx++, gi += kx)
+                {
+                    uint32_t color = solid;
+                    if (gradient)
+                    {
+                        color = lut.lut[LG_CLAMP(gi >> 16, 0, lut_max)];
+                        if (dither) { color = gui_geometry_dither_argb8888_inline(color, rx, ry); }
+                    }
+                    if (is_a8) { row8[x] = (uint8_t)(color >> 24); }
+                    else { row32[x] = color; }
+                }
+            }
+            else if (col_mid)
+            {
+                /* Top or bottom band: one coverage for the whole span */
+                uint32_t c_out = edge[dy * 2];
+                uint32_t c_in = edge[dy * 2 + 1];
+
+                if (c_out == 0u) { x = seg_end; continue; }
+
+                for (; x < seg_end; x++, rx++, gi += kx)
+                {
+                    uint32_t fill = solid;
+                    if (gradient && c_in != 0u)
+                    {
+                        fill = lut.lut[LG_CLAMP(gi >> 16, 0, lut_max)];
+                        if (dither) { fill = gui_geometry_dither_argb8888_inline(fill, rx, ry); }
+                    }
+                    uint32_t color = rect_mix8(fill, stroke, c_out, c_in);
+                    if (is_a8) { row8[x] = (uint8_t)(color >> 24); }
+                    else { row32[x] = color; }
+                }
+            }
+            else
+            {
+                /* Left or right band, or a corner: coverage per column */
+                for (; x < seg_end; x++, rx++, gi += kx)
+                {
+                    int dx = LG_MIN(rx, w - 1 - rx);
+                    const uint8_t *c = row_mid ? &edge[dx * 2] : &cov[(dy * s + dx) * 2];
+                    if (c[0] == 0u) { continue; }
+
+                    uint32_t fill = solid;
+                    if (gradient && c[1] != 0u)
+                    {
+                        fill = lut.lut[LG_CLAMP(gi >> 16, 0, lut_max)];
+                        if (dither) { fill = gui_geometry_dither_argb8888_inline(fill, rx, ry); }
+                    }
+                    uint32_t color = rect_mix8(fill, stroke, c[0], c[1]);
+                    if (is_a8) { row8[x] = (uint8_t)(color >> 24); }
+                    else { row32[x] = color; }
+                }
+            }
+        }
+    }
+
+    if (cov != NULL)
+    {
+        gui_free(cov);
+    }
+    rect_lut_free(&lut);
+}
+
+static bool rect_add_solid(gui_rounded_rect_t *this, int x, int y, int w, int h,
+                           uint32_t argb)
+{
+    return gui_geometry_parts_add_solid(&this->parts, GUI_BASE(this)->matrix,
+                                        x, y, w, h, argb, this->opacity_value);
+}
+
+/**
+ * Add a rasterised piece covering (x, y, pw x ph) of the rect, shared through
+ * the geometry cache with every rect that would draw the same pixels.
+ */
+static bool rect_add_raster(gui_rounded_rect_t *this, const rect_geom_t *g,
+                            gui_rect_part_t part, int corner_idx,
+                            int x, int y, int pw, int ph, bool is_a8)
+{
+    /* A corner is keyed by its index and side, not by the rect size: every
+     * rect with the same radius and stroke has the same corners. */
+    rect_desc_t desc;
+    rect_desc_init(&desc, this, part, pw, part == RECT_PART_CORNER ? corner_idx : ph,
+                   g->radius, is_a8);
+
+    bool is_new = false;
+    uint8_t *buffer = gui_geometry_payload_acquire(&desc, rect_desc_len(&desc),
+                                                   pw, ph, is_a8, &is_new);
+    if (buffer == NULL) { return false; }
+
+    if (is_new)
+    {
+        rect_raster(this, g, buffer + sizeof(gui_rgb_data_head_t), is_a8, x, y, pw, ph);
+    }
+
+    return gui_geometry_parts_add_image(&this->parts, GUI_BASE(this)->matrix, buffer,
+                                        this->opacity_value, is_a8, this->color,
+                                        x, y, 1, 0, 0, 1);
+}
+
+/**
+ * Add one straight band as solid runs.
+ *
+ * Past the corners every row (or column) of a band is uniform along the edge,
+ * so one sample per row gives its colour, and rows of equal colour merge into
+ * a single rectangle: at most a stroke run, the stroke/fill edge row and a
+ * fill run.
+ *
+ * @param rows  true for the top/bottom bands (runs of rows), false for the
+ *              left/right ones (runs of columns).
+ * @param first First row or column of the band.
+ * @param count Rows or columns in the band.
+ */
+static bool rect_add_band(gui_rounded_rect_t *this, const rect_geom_t *g,
+                          bool rows, int first, int count)
+{
+    int s = g->straight;
+    int run_start = first;
+    uint32_t run_color = 0u;
+
+    for (int i = first; i <= first + count; i++)
+    {
+        uint32_t color = 0u;
+        if (i < first + count)
+        {
+            color = rows ? rect_pixel(this, g, NULL, s, i) : rect_pixel(this, g, NULL, i, s);
+        }
+
+        if (i > first && (i == first + count || color != run_color))
+        {
+            bool ok = rows ?
+                      rect_add_solid(this, s, run_start, g->w - 2 * s, i - run_start, run_color) :
+                      rect_add_solid(this, run_start, s, i - run_start, g->h - 2 * s, run_color);
+            if (!ok) { return false; }
+            run_start = i;
+        }
+        run_color = color;
     }
 
     return true;
 }
 
 /**
- * Vertical Gradient Renderer (Zone Optimized)
+ * Build every piece of the rect, see gui_geometry_parts_t.
+ *
+ * Split: four rasterised corners, solid runs along the four straight bands
+ * and one solid centre -- the large areas stay rectangle fills.  Without a
+ * stroke the left and right bands are fill colour like the centre, so the
+ * three merge into one full-width strip: 4 corners + 3 strips.  Single: one
+ * rasterised image of the whole rect, for what the split cannot express (a
+ * gradient, a transform the pieces cannot follow, a rect too small to split).
  */
-static void fill_vertical_gradient_opt(uint32_t *pixels, int w, int h, int r, uint32_t *lut,
-                                       uint8_t *mask, bool use_dither)
+static bool rect_build_parts(gui_rounded_rect_t *this, const rect_geom_t *geom, bool single)
 {
-    // Zone 1: Top (0 to r-1)
-    for (int y = 0; y < r; y++)
-    {
-        uint32_t base = lut[y];
-        uint32_t *line = pixels + y * w;
-        uint8_t *mask_row = mask + y * r;
+    const rect_geom_t g = *geom;
+    int s = g.straight;
+    uint32_t fill = rect_pixel(this, &g, NULL, g.w / 2, g.h / 2);
 
-        // TL Corner
-        for (int x = 0; x < r; x++)
-        {
-            uint32_t c = use_dither ? gui_geometry_dither_argb8888(base, x, y) : base;
-            uint8_t a = mask_row[x];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
-            {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
-            }
-            else { line[x] = 0; }
-        }
-        // Top Middle
-        for (int x = r; x < w - r; x++)
-        {
-            line[x] = use_dither ? gui_geometry_dither_argb8888(base, x, y) : base;
-        }
-        // TR Corner (Mirror X of mask)
-        for (int x = w - r, mx = r - 1; x < w; x++, mx--)
-        {
-            uint32_t c = use_dither ? gui_geometry_dither_argb8888(base, x, y) : base;
-            uint8_t a = mask_row[mx];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
-            {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
-            }
-            else { line[x] = 0; }
-        }
+    if (single)
+    {
+        bool is_a8 = g.stroke <= 0.0f &&
+                     gui_geometry_use_a8(GUI_RECT_ENABLE_A8, rect_has_gradient(this), false);
+        return rect_add_raster(this, &g, RECT_PART_ROUNDED, 0, 0, 0, g.w, g.h, is_a8);
     }
 
-    // Zone 2: Middle (r to h-r) - FASTEST
-    for (int y = r; y < h - r; y++)
+    if (s > 0)
     {
-        uint32_t base = lut[y];
-        uint32_t *line = pixels + y * w;
+        bool is_a8 = g.stroke <= 0.0f &&
+                     gui_geometry_use_split_a8(gui_geometry_use_a8(GUI_RECT_ENABLE_A8, false, false),
+                                               this->opacity_value,
+                                               GUI_BASE(this)->parent != NULL &&
+                                               GUI_BASE(this)->parent->opacity_value == UINT8_MAX);
+        int corner_pos[4][2] = { {0, 0}, {g.w - s, 0}, {g.w - s, g.h - s}, {0, g.h - s} };
 
-        if (use_dither)
+        for (int i = 0; i < 4; i++)
         {
-            for (int x = 0; x < w; x++) { line[x] = gui_geometry_dither_argb8888(base, x, y); }
-        }
-        else
-        {
-            // No dither: Solid color line fill
-            for (int x = 0; x < w; x++) { line[x] = base; }
-        }
-    }
-
-    // Zone 3: Bottom (h-r to h-1)
-    for (int y = h - r, my = r - 1; y < h; y++, my--)
-    {
-        uint32_t base = lut[y];
-        uint32_t *line = pixels + y * w;
-        uint8_t *mask_row = mask + my * r; // Mirror Y of mask
-
-        // BL Corner
-        for (int x = 0; x < r; x++)
-        {
-            uint32_t c = use_dither ? gui_geometry_dither_argb8888(base, x, y) : base;
-            uint8_t a = mask_row[x];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
+            if (!rect_add_raster(this, &g, RECT_PART_CORNER, i,
+                                 corner_pos[i][0], corner_pos[i][1], s, s, is_a8))
             {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
+                return false;
             }
-            else { line[x] = 0; }
         }
-        // Bottom Middle
-        for (int x = r; x < w - r; x++)
-        {
-            line[x] = use_dither ? gui_geometry_dither_argb8888(base, x, y) : base;
-        }
-        // BR Corner
-        for (int x = w - r, mx = r - 1; x < w; x++, mx--)
-        {
-            uint32_t c = use_dither ? gui_geometry_dither_argb8888(base, x, y) : base;
-            uint8_t a = mask_row[mx];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
-            {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
-            }
-            else { line[x] = 0; }
-        }
-    }
-}
 
-/**
- * Horizontal Gradient Renderer (Zone Optimized)
- */
-static void fill_horizontal_gradient_opt(uint32_t *pixels, int w, int h, int r, uint32_t *lut,
-                                         uint8_t *mask, bool use_dither)
-{
-    // Zone 1: Top (0 to r-1)
-    for (int y = 0; y < r; y++)
-    {
-        uint32_t *line = pixels + y * w;
-        uint8_t *mask_row = mask + y * r;
-
-        // TL
-        for (int x = 0; x < r; x++)
+        if (!rect_add_band(this, &g, true, 0, s) ||
+            !rect_add_band(this, &g, true, g.h - s, s))
         {
-            uint32_t c = lut[x];
-            if (use_dither) { c = gui_geometry_dither_argb8888(c, x, y); }
-            uint8_t a = mask_row[x];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
-            {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
-            }
-            else { line[x] = 0; }
+            return false;
         }
-        // Top Middle
-        for (int x = r; x < w - r; x++)
+
+        if (g.stroke <= 0.0f)
         {
-            uint32_t c = lut[x];
-            line[x] = use_dither ? gui_geometry_dither_argb8888(c, x, y) : c;
+            return rect_add_solid(this, 0, s, g.w, g.h - 2 * s, fill);
         }
-        // TR
-        for (int x = w - r, mx = r - 1; x < w; x++, mx--)
+
+        if (!rect_add_band(this, &g, false, 0, s) ||
+            !rect_add_band(this, &g, false, g.w - s, s))
         {
-            uint32_t c = lut[x];
-            if (use_dither) { c = gui_geometry_dither_argb8888(c, x, y); }
-            uint8_t a = mask_row[mx];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
-            {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
-            }
-            else { line[x] = 0; }
-        }
-    }
-
-    // Zone 2: Middle (r to h-r)
-    for (int y = r; y < h - r; y++)
-    {
-        uint32_t *line = pixels + y * w;
-        for (int x = 0; x < w; x++)
-        {
-            uint32_t c = lut[x];
-            line[x] = use_dither ? gui_geometry_dither_argb8888(c, x, y) : c;
-        }
-    }
-
-    // Zone 3: Bottom (h-r to h-1)
-    for (int y = h - r, my = r - 1; y < h; y++, my--)
-    {
-        uint32_t *line = pixels + y * w;
-        uint8_t *mask_row = mask + my * r;
-
-        // BL
-        for (int x = 0; x < r; x++)
-        {
-            uint32_t c = lut[x];
-            if (use_dither) { c = gui_geometry_dither_argb8888(c, x, y); }
-            uint8_t a = mask_row[x];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
-            {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
-            }
-            else { line[x] = 0; }
-        }
-        // Bottom Middle
-        for (int x = r; x < w - r; x++)
-        {
-            uint32_t c = lut[x];
-            line[x] = use_dither ? gui_geometry_dither_argb8888(c, x, y) : c;
-        }
-        // BR
-        for (int x = w - r, mx = r - 1; x < w; x++, mx--)
-        {
-            uint32_t c = lut[x];
-            if (use_dither) { c = gui_geometry_dither_argb8888(c, x, y); }
-            uint8_t a = mask_row[mx];
-            if (a == 255) { line[x] = c; }
-            else if (a > 0)
-            {
-                uint8_t ca = (c >> 24) & 0xFF;
-                line[x] = (c & 0x00FFFFFF) | ((uint32_t)((ca * a) >> 8) << 24);
-            }
-            else { line[x] = 0; }
-        }
-    }
-}
-
-static bool fill_gradient_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels, int w, int h,
-                                       int r)
-{
-    if (pixels == NULL || w <= 0 || h <= 0 || r < 0)
-    {
-        return false;
-    }
-
-    int lut_size = (this->gradient_dir == RECT_GRADIENT_VERTICAL) ? h : w;
-    uint32_t *lut = gui_malloc((size_t)lut_size * sizeof(uint32_t));
-    if (!lut) { return false; }
-
-    // Generate LUT
-    float step = (lut_size > 1) ? 1.0f / (float)(lut_size - 1) : 0.0f;
-    for (int i = 0; i < lut_size; i++)
-    {
-        lut[i] = gradient_get_color(this->gradient, (float)i * step);
-    }
-
-    // Generate Corner Mask
-    uint8_t *mask = NULL;
-    if (r > 0)
-    {
-        mask = generate_corner_mask(r);
-        if (!mask)
-        {
-            gui_free(lut);
             return false;
         }
     }
 
-    bool use_dither = this->enable_dither;
-
-    // Dispatch
-    if (this->gradient_dir == RECT_GRADIENT_VERTICAL)
-    {
-        fill_vertical_gradient_opt(pixels, w, h, r, lut, mask, use_dither);
-    }
-    else
-    {
-        // Horizontal and fallback for others
-        fill_horizontal_gradient_opt(pixels, w, h, r, lut, mask, use_dither);
-    }
-
-    if (mask) { gui_free(mask); }
-    if (lut) { gui_free(lut); }
-    return true;
-}
-
-/**
- * Fill solid color with optimization
- * Reuse the mask logic to avoid sqrt loops
- */
-static bool fill_solid_rounded_rect(gui_rounded_rect_t *this, uint32_t *pixels,
-                                    int w, int h, int r)
-{
-    if (pixels == NULL || w <= 0 || h <= 0 || r < 0)
-    {
-        return false;
-    }
-
-    r = _UI_MIN(r, _UI_MIN(w, h) / 2);
-
-    const uint32_t solid_color = this->color.color.argb_full;
-    const uint32_t rgb = solid_color & 0x00FFFFFFu;
-    const uint8_t color_alpha = (uint8_t)(solid_color >> 24);
-    uint8_t *mask = NULL;
-
-    if (r == 0)
-    {
-        gui_memset32(pixels, solid_color, (uint32_t)w * h);
-        return true;
-    }
-
-    mask = generate_corner_mask(r);
-    if (mask == NULL)
-    {
-        return false;
-    }
-
-    const int middle_width = w - 2 * r;
-
-    /* Top corners and their solid center strip. */
-    for (int y = 0; y < r; y++)
-    {
-        uint32_t *line = pixels + y * w;
-        const uint8_t *corner = mask + y * r;
-
-        for (int x = 0; x < r; x++)
-        {
-            uint8_t coverage = corner[x];
-            if (coverage == UINT8_MAX)
-            {
-                line[x] = solid_color;
-            }
-            else if (coverage != 0)
-            {
-                uint8_t alpha = (uint8_t)(((uint32_t)color_alpha * coverage) >> 8);
-                line[x] = rgb | ((uint32_t)alpha << 24);
-            }
-        }
-
-        if (middle_width > 0)
-        {
-            gui_memset32(line + r, solid_color, (uint32_t)middle_width);
-        }
-
-        for (int x = 0, mx = r - 1; x < r; x++, mx--)
-        {
-            uint8_t coverage = corner[mx];
-            int dst_x = w - r + x;
-
-            if (coverage == UINT8_MAX)
-            {
-                line[dst_x] = solid_color;
-            }
-            else if (coverage != 0)
-            {
-                uint8_t alpha = (uint8_t)(((uint32_t)color_alpha * coverage) >> 8);
-                line[dst_x] = rgb | ((uint32_t)alpha << 24);
-            }
-        }
-    }
-
-    /* The center is fully covered. */
-    int middle_rows = h - 2 * r;
-    if (middle_rows > 0)
-    {
-        gui_memset32(pixels + r * w, solid_color, (uint32_t)middle_rows * w);
-    }
-
-    /* Bottom corners mirror the top rows. */
-    for (int y = 0, my = r - 1; y < r; y++, my--)
-    {
-        uint32_t *line = pixels + (h - r + y) * w;
-        const uint8_t *corner = mask + my * r;
-
-        for (int x = 0; x < r; x++)
-        {
-            uint8_t coverage = corner[x];
-            if (coverage == UINT8_MAX)
-            {
-                line[x] = solid_color;
-            }
-            else if (coverage != 0)
-            {
-                uint8_t alpha = (uint8_t)(((uint32_t)color_alpha * coverage) >> 8);
-                line[x] = rgb | ((uint32_t)alpha << 24);
-            }
-        }
-
-        if (middle_width > 0)
-        {
-            gui_memset32(line + r, solid_color, (uint32_t)middle_width);
-        }
-
-        for (int x = 0, mx = r - 1; x < r; x++, mx--)
-        {
-            uint8_t coverage = corner[mx];
-            int dst_x = w - r + x;
-
-            if (coverage == UINT8_MAX)
-            {
-                line[dst_x] = solid_color;
-            }
-            else if (coverage != 0)
-            {
-                uint8_t alpha = (uint8_t)(((uint32_t)color_alpha * coverage) >> 8);
-                line[dst_x] = rgb | ((uint32_t)alpha << 24);
-            }
-        }
-    }
-
-    gui_free(mask);
-    return true;
-}
-
-/**
- * Fill a rounded-rect coverage mask, one byte per pixel.
- *
- * Simpler than the ARGB8888 twin, since generate_corner_mask() already yields
- * the coverage and there is no colour to blend it into -- but the colour's alpha
- * is folded in with that twin's exact arithmetic so the two agree byte for byte:
- * fully covered pixels take colour alpha, corner pixels scale it by coverage.
- */
-static bool fill_solid_rounded_mask_a8(gui_rounded_rect_t *this, uint8_t *mask_out,
-                                       int w, int h, int r)
-{
-    if (mask_out == NULL || w <= 0 || h <= 0 || r < 0)
-    {
-        return false;
-    }
-
-    uint8_t color_a = this->color.color.rgba.a;
-
-    uint8_t *corner = NULL;
-    if (r > 0)
-    {
-        corner = generate_corner_mask(r);
-        if (corner == NULL) { return false; }
-    }
-
-    /* One corner row: coverage 255 keeps colour alpha, 0 stays clear (the buffer
-     * is already zeroed), anything between scales colour alpha. */
-#define MASK_CORNER_ROW(line, m)                                                    \
-    do {                                                                            \
-        for (int x = 0; x < r; x++)                                                 \
-        {                                                                           \
-            uint8_t cov = (m)[x];                                                   \
-            if (cov == 255)  { (line)[x] = color_a; }                               \
-            else if (cov > 0) { (line)[x] = (uint8_t)(((uint32_t)color_a * cov) >> 8); } \
-        }                                                                           \
-        memset((line) + r, color_a, (size_t)(w - 2 * r));                           \
-        for (int x = w - r, mx = r - 1; x < w; x++, mx--)                           \
-        {                                                                           \
-            uint8_t cov = (m)[mx];                                                  \
-            if (cov == 255)  { (line)[x] = color_a; }                               \
-            else if (cov > 0) { (line)[x] = (uint8_t)(((uint32_t)color_a * cov) >> 8); } \
-        }                                                                           \
-    } while (0)
-
-    /* Top corners plus the strip between them. */
-    for (int y = 0; y < r; y++)
-    {
-        MASK_CORNER_ROW(mask_out + y * w, corner + y * r);
-    }
-
-    /* Bottom corners, walking the corner mask back up. */
-    for (int y = h - r, my = r - 1; y < h; y++, my--)
-    {
-        MASK_CORNER_ROW(mask_out + y * w, corner + my * r);
-    }
-#undef MASK_CORNER_ROW
-
-    /* Everything between the corner bands is fully covered. */
-    for (int y = r; y < h - r; y++)
-    {
-        memset(mask_out + y * w, color_a, (size_t)w);
-    }
-
-    if (corner != NULL) { gui_free(corner); }
-    return true;
-}
-
-static draw_img_t *create_rounded_rect_buffer(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                              draw_img_t **old_img, int radius)
-{
-    // Free old buffer first to prevent memory leak
-    gui_geometry_draw_img_release(old_img);
-
-    uint8_t *body = NULL;
-    bool is_new = false;
-    draw_img_t *img = alloc_rect_img_buffer(this, obj, &body, &is_new, radius);
-    if (img == NULL) { return NULL; }
-
-    if (!is_new)
-    {
-        // An identical rect already rasterised these pixels
-        return img;
-    }
-
-    int w = this->base.w;
-    int h = this->base.h;
-
-    bool use_gradient = (this->use_gradient && this->gradient != NULL &&
-                         this->gradient->stop_count >= 2);
-
-    bool filled;
-    if (this->stroke_width > 0.0f)
-    {
-        filled = fill_inner_rounded_payload(this, body, w, h, radius,
-                                            gui_geometry_use_a8(GUI_RECT_ENABLE_A8,
-                                                                rect_has_gradient(this), false));
-    }
-    else if (gui_geometry_use_a8(GUI_RECT_ENABLE_A8, rect_has_gradient(this), false))
-    {
-        filled = fill_solid_rounded_mask_a8(this, body, w, h, radius);
-    }
-    else if (use_gradient)
-    {
-        filled = fill_gradient_rounded_rect(this, (uint32_t *)body, w, h, radius);
-    }
-    else
-    {
-        filled = fill_solid_rounded_rect(this, (uint32_t *)body, w, h, radius);
-    }
-
-    if (!filled)
-    {
-        gui_geometry_draw_img_release(&img);
-        return NULL;
-    }
-
-    return img;
-}
-
-static draw_img_t *create_rect_stroke_buffer(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                             draw_img_t **old_img, int radius)
-{
-    gui_geometry_draw_img_release(old_img);
-
-    if (this->stroke_width <= 0.0f || this->base.w <= 0 || this->base.h <= 0)
-    {
-        return NULL;
-    }
-
-    int w = this->base.w;
-    int h = this->base.h;
-    bool is_a8 = gui_geometry_use_a8(GUI_RECT_ENABLE_A8, false, true);
-    uint32_t buffer_size;
-    if (!gui_geometry_image_buffer_size(w, h, is_a8 ? 1u : 4u, &buffer_size))
-    {
-        return NULL;
-    }
-
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    rect_desc_t desc;
-    bool is_new = false;
-    rect_desc_init(&desc, this, RECT_PART_STROKE, w, h);
-    desc.radius = radius;
-
-    uint8_t *buffer = gui_geometry_cache_acquire(&desc, rect_desc_len(&desc), buffer_size, &is_new);
-    if (buffer == NULL)
-    {
-        gui_free(img);
-        return NULL;
-    }
-
-    if (is_new)
-    {
-        memset(buffer, 0x00, buffer_size);
-        if (is_a8)
-        {
-            gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)w, (int16_t)h, A8);
-        }
-        else
-        {
-            gui_geometry_data_head_set((gui_rgb_data_head_t *)buffer, (int16_t)w, (int16_t)h, ARGB8888);
-        }
-
-        if (!rasterize_rect_stroke(this, buffer + sizeof(gui_rgb_data_head_t),
-                                   w, h, radius, is_a8))
-        {
-            gui_geometry_cache_release(buffer);
-            gui_free(img);
-            return NULL;
-        }
-    }
-
-    gui_geometry_img_bind(img, buffer, this->opacity_value, is_a8, this->stroke_color);
-
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&img->inverse);
-
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-
-    return img;
-}
-
-static void prepare_corner_img(gui_rounded_rect_t *this, uint8_t *corner_data, int corner_idx,
-                               bool is_a8, int radius)
-{
-    int size = radius + 1;
-    uint32_t *pixels = (uint32_t *)(corner_data + sizeof(gui_rgb_data_head_t));
-    uint8_t *mask = corner_data + sizeof(gui_rgb_data_head_t);
-    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
-    uint32_t color = this->color.color.argb_full;
-    uint8_t color_alpha = this->color.color.rgba.a;
-    bool right = (corner_idx == 1 || corner_idx == 2);
-    bool bottom = (corner_idx == 2 || corner_idx == 3);
-
-    memset(mask, 0x00, (size_t)size * size * pixel_bytes);
-
-    for (int y = 0; y < size; y++)
-    {
-        float py = (float)(bottom ? size - 1 - y : y) + 0.5f;
-        float dy = py - radius;
-
-        for (int x = 0; x < size; x++)
-        {
-            float px = (float)(right ? size - 1 - x : x) + 0.5f;
-            float dx = px - radius;
-            float distance = sqrtf(dx * dx + dy * dy) - radius;
-            uint8_t coverage = rounded_rect_coverage(distance);
-            if (coverage == 0u) { continue; }
-
-            if (is_a8)
-            {
-                mask[y * size + x] = coverage == UINT8_MAX ? color_alpha :
-                                     (uint8_t)(((uint32_t)coverage * color_alpha) >> 8);
-            }
-            else
-            {
-                uint8_t alpha = coverage == UINT8_MAX ? color_alpha :
-                                (uint8_t)(((uint32_t)coverage * color_alpha) >> 8);
-                pixels[y * size + x] = (color & 0x00FFFFFFu) | ((uint32_t)alpha << 24);
-            }
-        }
-    }
-}
-
-static draw_img_t *create_corner_img(gui_rounded_rect_t *this, gui_obj_t *obj,
-                                     int corner_idx, int x, int y, draw_img_t **old_img,
-                                     int radius)
-{
-    gui_geometry_draw_img_release(old_img);
-
-    if (radius <= 0) { return NULL; }
-
-    int size = radius + 1;
-    bool is_a8 = gui_geometry_use_split_a8(
-                     gui_geometry_use_a8(GUI_RECT_ENABLE_A8, rect_has_gradient(this), false),
-                     this->opacity_value,
-                     GUI_BASE(this)->parent != NULL &&
-                     GUI_BASE(this)->parent->opacity_value == UINT8_MAX);
-    uint32_t buffer_size;
-    if (!gui_geometry_image_buffer_size(size, size, is_a8 ? 1u : 4u, &buffer_size))
-    {
-        return NULL;
-    }
-
-    draw_img_t *img = gui_malloc(sizeof(draw_img_t));
-    if (img == NULL) { return NULL; }
-    memset(img, 0x00, sizeof(draw_img_t));
-
-    rect_desc_t desc;
-    bool is_new = false;
-    rect_desc_init(&desc, this, RECT_PART_CORNER, radius, corner_idx);
-    desc.radius = radius;
-
-    uint8_t *corner_data = gui_geometry_cache_acquire(&desc, rect_desc_len(&desc), buffer_size,
-                                                      &is_new);
-    if (corner_data == NULL)
-    {
-        gui_free(img);
-        return NULL;
-    }
-
-    if (is_new)
-    {
-        if (is_a8)
-        {
-            gui_geometry_data_head_set((gui_rgb_data_head_t *)corner_data, (int16_t)size,
-                                       (int16_t)size, A8);
-        }
-        else
-        {
-            gui_geometry_data_head_set((gui_rgb_data_head_t *)corner_data, (int16_t)size,
-                                       (int16_t)size, ARGB8888);
-        }
-        prepare_corner_img(this, corner_data, corner_idx, is_a8, radius);
-    }
-
-    gui_geometry_img_bind(img, corner_data, this->opacity_value, is_a8, this->color);
-    if (obj->matrix != NULL)
-    {
-        memcpy(&img->matrix, obj->matrix, sizeof(gui_matrix_t));
-    }
-    else
-    {
-        matrix_identity(&img->matrix);
-    }
-    matrix_translate(x, y, &img->matrix);
-    memcpy(&img->inverse, &img->matrix, sizeof(gui_matrix_t));
-    matrix_inverse(&img->inverse);
-    draw_img_load_scale(img, IMG_SRC_MEMADDR);
-    draw_img_new_area(img, NULL);
-    return img;
+    return rect_add_solid(this, s, s, g.w - 2 * s, g.h - 2 * s, fill);
 }
 
 static void gui_rect_prepare(gui_obj_t *obj)
@@ -1218,7 +706,7 @@ static void gui_rect_prepare(gui_obj_t *obj)
 
     if (this->base.w <= 0 || this->base.h <= 0)
     {
-        gui_rect_release_images(this);
+        gui_geometry_parts_release(&this->parts);
         return;
     }
 
@@ -1233,6 +721,8 @@ static void gui_rect_prepare(gui_obj_t *obj)
     // Apply transformations if needed
     bool has_transform = (this->degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f ||
                           this->offset_x != 0.0f || this->offset_y != 0.0f);
+    gui_matrix_t base_matrix;
+    memcpy(&base_matrix, obj->matrix, sizeof(gui_matrix_t));
 
     if (has_transform)
     {
@@ -1244,6 +734,51 @@ static void gui_rect_prepare(gui_obj_t *obj)
         matrix_scale(this->scale_x, this->scale_y, obj->matrix);
         matrix_rotate(this->degrees, obj->matrix);
         matrix_translate(-center_x, -center_y, obj->matrix);
+    }
+
+    /* Uniform scale without rotation: rasterise at the scaled size and blit it
+     * 1:1, instead of letting the blit scale the bitmap.  The blit samples
+     * nearest-neighbour, which turns the anti-aliased corners into steps.
+     *
+     * Only the image matrices see this.  For the rest of prepare the widget
+     * temporarily takes the scaled size and a translate-only matrix, so the
+     * untransformed split applies as is.  obj->matrix and the geometry are
+     * restored at the end, so hit testing and children keep the scaled matrix
+     * exactly as before. */
+    bool bake_scale = false;
+    gui_matrix_t scaled_matrix;
+    int16_t saved_w = this->base.w;
+    int16_t saved_h = this->base.h;
+    int saved_radius = this->radius;
+    float saved_stroke_width = this->stroke_width;
+
+    if (has_transform && this->degrees == 0.0f && !parent_has_non_translate &&
+        this->scale_x > 0.0f && fabsf(this->scale_x - this->scale_y) < 1e-4f &&
+        this->scale_x != 1.0f)
+    {
+        float s = this->scale_x;
+        float scaled_w = roundf((float)this->base.w * s);
+        float scaled_h = roundf((float)this->base.h * s);
+
+        if (scaled_w >= 1.0f && scaled_h >= 1.0f &&
+            scaled_w <= (float)INT16_MAX && scaled_h <= (float)INT16_MAX)
+        {
+            bake_scale = true;
+            memcpy(&scaled_matrix, obj->matrix, sizeof(gui_matrix_t));
+
+            /* Same centre as the scaled matrix maps to, snapped to a whole
+             * pixel so the split pieces stay seamless. */
+            memcpy(obj->matrix, &base_matrix, sizeof(gui_matrix_t));
+            matrix_translate(roundf(this->offset_x + (this->base.w - scaled_w) / 2.0f),
+                             roundf(this->offset_y + (this->base.h - scaled_h) / 2.0f),
+                             obj->matrix);
+
+            this->base.w = (int16_t)scaled_w;
+            this->base.h = (int16_t)scaled_h;
+            this->radius = (int)roundf((float)this->radius * s);
+            this->stroke_width *= s;
+            radius = get_effective_radius(this);
+        }
     }
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
@@ -1285,199 +820,54 @@ static void gui_rect_prepare(gui_obj_t *obj)
         new_checksum = gui_geometry_hash_update(new_checksum, this->gradient, sizeof(Gradient));
     }
 
-    bool need_regenerate = (last != new_checksum);
-    uint32_t stroke_path_checksum = 2166136261u;
-    stroke_path_checksum = gui_geometry_hash_update(stroke_path_checksum,
-                                                    &this->base.w, sizeof(this->base.w));
-    stroke_path_checksum = gui_geometry_hash_update(stroke_path_checksum,
-                                                    &this->base.h, sizeof(this->base.h));
-    stroke_path_checksum = gui_geometry_hash_update(stroke_path_checksum,
-                                                    &radius, sizeof(radius));
-    stroke_path_checksum = gui_geometry_hash_update(stroke_path_checksum,
-                                                    &this->stroke_width,
-                                                    sizeof(this->stroke_width));
-    bool stroke_path_dirty = (stroke_path_checksum != this->stroke_path_checksum);
+    /* Single buffer for what the split cannot express: a gradient varies across
+     * the centre, a transform would leave seams between the pieces, and below
+     * 2 * straight per side the corners would overlap.  The size rule is a cost
+     * trade-off -- see gui_geometry_common.h for why it is expressed in bytes. */
+    rect_geom_t geom;
+    rect_geom_init(&geom, this, radius);
+    bool split_degenerate = (geom.w <= 2 * geom.straight) || (geom.h <= 2 * geom.straight);
+    uint64_t rect_area = (uint64_t)(uint16_t)geom.w * (uint16_t)geom.h;
+    bool payload_is_a8 = geom.stroke <= 0.0f && !rect_has_gradient(this) &&
+                         GUI_RECT_ENABLE_A8;
+    bool single = rect_has_gradient(this) || (has_transform && !bake_scale) ||
+                  parent_has_non_translate ||
+                  (geom.straight > 0 && (split_degenerate ||
+                                         !gui_geometry_split_pays_off(rect_area, payload_is_a8)));
+    new_checksum = gui_geometry_hash_update(new_checksum, &single, sizeof(single));
 
-    /* Same split as gui_circle.c: must_single_buffer collects what the split
-     * representation cannot express (gradient, a transform the four corner
-     * pieces cannot follow, a degenerate split, a stroke that needs the span
-     * path), while the size rule is a cost trade-off.  See
-     * gui_geometry_common.h for why the rule is expressed in bytes. */
-    int split_margin = 2 * (radius + 1);
-    bool split_degenerate = (this->base.w <= split_margin) || (this->base.h <= split_margin);
-    uint64_t rect_area = (uint64_t)(uint16_t)this->base.w * (uint16_t)this->base.h;
-    bool payload_is_a8 = gui_geometry_use_a8(GUI_RECT_ENABLE_A8,
-                                             rect_has_gradient(this), false);
+    /* Whether the split corners may be A8 also depends on the parent's
+     * opacity, which none of the fields above see; hashing it rebuilds the
+     * pieces when a fading parent crosses fully opaque. */
+    bool parent_opaque = obj->parent != NULL && obj->parent->opacity_value == UINT8_MAX;
+    new_checksum = gui_geometry_hash_update(new_checksum, &parent_opaque, sizeof(parent_opaque));
 
-    bool must_single_buffer = (this->use_gradient && this->gradient != NULL) ||
-                              has_transform || parent_has_non_translate || split_degenerate ||
-                              (this->stroke_width > 0.0f);
-    bool need_single_buffer = must_single_buffer ||
-                              !gui_geometry_split_pays_off(rect_area, payload_is_a8);
-
-    if (radius == 0 && !this->use_gradient && this->stroke_width <= 0.0f)
+    // All pieces are rebuilt together, so they always match each other
+    if (last != new_checksum || this->parts.count == 0)
     {
-        gui_rect_release_split_images(this);
-        if (need_regenerate || this->rect_0 == NULL)
+        gui_geometry_parts_release(&this->parts);
+        if (!rect_build_parts(this, &geom, single))
         {
-            set_rect_img(this, &this->rect_0, 0, 0, this->base.w, this->base.h);
+            gui_geometry_parts_release(&this->parts);
         }
+        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
     }
-    else if (need_single_buffer)
+    else if (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0)
     {
-        gui_rect_release_split_images(this);
-        if (need_regenerate || this->rect_0 == NULL)
-        {
-            this->rect_0 = create_rounded_rect_buffer(this, obj, &this->rect_0, radius);
-        }
-    }
-    else
-    {
-        /* Large opaque rounded rects do not need a w*h raster buffer.  Draw the
-         * interior as three IMG_RECTs and cache only the four antialiased corners. */
-        if (need_regenerate || this->rect_0 == NULL || this->rect_1 == NULL ||
-            this->rect_2 == NULL || this->circle_00 == NULL || this->circle_01 == NULL ||
-            this->circle_10 == NULL || this->circle_11 == NULL)
-        {
-            int corner_size = radius + 1;
-
-            set_rect_img(this, &this->rect_0, corner_size, 0,
-                         this->base.w - 2 * corner_size, corner_size);
-            set_rect_img(this, &this->rect_1, 0, corner_size,
-                         this->base.w, this->base.h - 2 * corner_size);
-            set_rect_img(this, &this->rect_2, corner_size, this->base.h - corner_size,
-                         this->base.w - 2 * corner_size, corner_size);
-
-            this->circle_00 = create_corner_img(this, obj, 0, 0, 0,
-                                                &this->circle_00, radius);
-            this->circle_01 = create_corner_img(this, obj, 1,
-                                                this->base.w - corner_size, 0,
-                                                &this->circle_01, radius);
-            this->circle_10 = create_corner_img(this, obj, 3, 0,
-                                                this->base.h - corner_size,
-                                                &this->circle_10, radius);
-            this->circle_11 = create_corner_img(this, obj, 2,
-                                                this->base.w - corner_size,
-                                                this->base.h - corner_size,
-                                                &this->circle_11, radius);
-        }
-    }
-
-    if (this->stroke_width > 0.0f)
-    {
-        gui_dispdev_t *dc = gui_get_dc();
-        bool use_path = gui_geometry_span_can_draw(obj->matrix) &&
-                        dc != NULL && (dc->bit_depth == 16 || dc->bit_depth == 32);
-
-        if (use_path)
-        {
-            if (stroke_path_dirty || this->stroke_span == NULL)
-            {
-                gui_geometry_path_t path;
-                gui_geometry_path_init_rounded_rect(&path,
-                                                    this->base.w, this->base.h,
-                                                    radius, this->stroke_width);
-                gui_geometry_span_t *spans = gui_geometry_span_acquire(&path);
-                if (spans != NULL)
-                {
-                    gui_geometry_span_release(this->stroke_span);
-                    this->stroke_span = spans;
-                }
-                else
-                {
-                    gui_geometry_span_release(this->stroke_span);
-                    this->stroke_span = NULL;
-                }
-            }
-
-            if (this->stroke_span != NULL)
-            {
-                gui_geometry_draw_img_release(&this->stroke_img);
-            }
-            else if (need_regenerate || this->stroke_img == NULL)
-            {
-                this->stroke_img =
-                    create_rect_stroke_buffer(this, obj, &this->stroke_img, radius);
-            }
-        }
-        else
-        {
-            gui_geometry_span_release(this->stroke_span);
-            this->stroke_span = NULL;
-            if (need_regenerate || this->stroke_img == NULL)
-            {
-                this->stroke_img =
-                    create_rect_stroke_buffer(this, obj, &this->stroke_img, radius);
-            }
-        }
-    }
-    else
-    {
-        gui_geometry_draw_img_release(&this->stroke_img);
-        gui_geometry_span_release(this->stroke_span);
-        this->stroke_span = NULL;
+        // Moved only (e.g. list scrolling): re-place the pieces, keep the pixels
+        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
+        gui_geometry_parts_place(&this->parts, obj->matrix);
     }
 
     this->checksum = new_checksum;
-    this->stroke_path_checksum = stroke_path_checksum;
 
-    // Check if matrix changed (important for list scrolling optimization)
-    bool matrix_changed = (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0);
-
-    // Only update draw_img matrix and area when matrix actually changed
-    if (matrix_changed)
+    if (bake_scale)
     {
-        memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
-
-        if (this->rect_0 != NULL)
-        {
-            memcpy(&this->rect_0->matrix, obj->matrix, sizeof(struct gui_matrix));
-            if (!need_single_buffer && radius > 0)
-            {
-                matrix_translate(radius + 1, 0, &this->rect_0->matrix);
-            }
-            memcpy(&this->rect_0->inverse, &this->rect_0->matrix, sizeof(struct gui_matrix));
-            matrix_inverse(&this->rect_0->inverse);
-            draw_img_new_area(this->rect_0, NULL);
-        }
-
-        if (!need_single_buffer && radius > 0)
-        {
-            int corner_size = radius + 1;
-            draw_img_t *parts[] =
-            {
-                this->rect_1, this->rect_2, this->circle_00, this->circle_01,
-                this->circle_10, this->circle_11
-            };
-            int offsets[][2] =
-            {
-                {0, corner_size},
-                {corner_size, this->base.h - corner_size},
-                {0, 0},
-                {this->base.w - corner_size, 0},
-                {0, this->base.h - corner_size},
-                {this->base.w - corner_size, this->base.h - corner_size}
-            };
-
-            for (uint32_t i = 0; i < sizeof(parts) / sizeof(parts[0]); i++)
-            {
-                if (parts[i] == NULL) { continue; }
-                memcpy(&parts[i]->matrix, obj->matrix, sizeof(gui_matrix_t));
-                matrix_translate((float)offsets[i][0], (float)offsets[i][1],
-                                 &parts[i]->matrix);
-                memcpy(&parts[i]->inverse, &parts[i]->matrix, sizeof(gui_matrix_t));
-                matrix_inverse(&parts[i]->inverse);
-                draw_img_new_area(parts[i], NULL);
-            }
-        }
-
-        if (this->stroke_img != NULL)
-        {
-            memcpy(&this->stroke_img->matrix, obj->matrix, sizeof(struct gui_matrix));
-            memcpy(&this->stroke_img->inverse, obj->matrix, sizeof(struct gui_matrix));
-            matrix_inverse(&this->stroke_img->inverse);
-            draw_img_new_area(this->stroke_img, NULL);
-        }
+        memcpy(obj->matrix, &scaled_matrix, sizeof(gui_matrix_t));
+        this->base.w = saved_w;
+        this->base.h = saved_h;
+        this->radius = saved_radius;
+        this->stroke_width = saved_stroke_width;
     }
 
     if (last != this->checksum)
@@ -1490,76 +880,15 @@ static void gui_rect_prepare(gui_obj_t *obj)
 static void gui_rect_draw(gui_obj_t *obj)
 {
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
 
     // Update opacity value to consider parent's opacity (like gui_img does)
-    uint8_t final_opacity = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
-
-    if (this->stroke_span != NULL)
-    {
-        gui_geometry_span_draw(this->stroke_span, obj->matrix,
-                               this->stroke_color, final_opacity, dc);
-    }
-    if (this->stroke_img != NULL)
-    {
-        this->stroke_img->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->stroke_img, dc, NULL);
-    }
-    if (this->rect_0 != NULL)
-    {
-        this->rect_0->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->rect_0, dc, NULL);
-    }
-    if (this->rect_1 != NULL)
-    {
-        this->rect_1->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->rect_1, dc, NULL);
-    }
-    if (this->rect_2 != NULL)
-    {
-        this->rect_2->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->rect_2, dc, NULL);
-    }
-    if (this->circle_00 != NULL)
-    {
-        this->circle_00->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->circle_00, dc, NULL);
-    }
-    if (this->circle_01 != NULL)
-    {
-        this->circle_01->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->circle_01, dc, NULL);
-    }
-    if (this->circle_10 != NULL)
-    {
-        this->circle_10->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->circle_10, dc, NULL);
-    }
-    if (this->circle_11 != NULL)
-    {
-        this->circle_11->opacity_value = final_opacity;
-        gui_acc_blit_to_dc(this->circle_11, dc, NULL);
-    }
+    gui_geometry_parts_draw(&this->parts,
+                            obj->parent->opacity_value * this->opacity_value / UINT8_MAX);
 }
+
 static void gui_rect_end(gui_obj_t *obj)
 {
-    /* Pixel buffers are cached across frames and must NOT be freed here.
-     * However HW-acceleration user data (acc_user, e.g. the boundary-line
-     * cache allocated by hw_acc_prepare_cb) is allocated every frame inside
-     * draw_img_new_area -> draw_img_acc_prepare_cb.  We must release it now
-     * so the next frame's prepare call does not orphan the old pointer. */
-    if (draw_img_acc_end_cb != NULL)
-    {
-        gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
-        if (this->stroke_img != NULL) { draw_img_acc_end_cb(this->stroke_img); }
-        if (this->rect_0   != NULL) { draw_img_acc_end_cb(this->rect_0);   }
-        if (this->rect_1   != NULL) { draw_img_acc_end_cb(this->rect_1);   }
-        if (this->rect_2   != NULL) { draw_img_acc_end_cb(this->rect_2);   }
-        if (this->circle_00 != NULL) { draw_img_acc_end_cb(this->circle_00); }
-        if (this->circle_01 != NULL) { draw_img_acc_end_cb(this->circle_01); }
-        if (this->circle_10 != NULL) { draw_img_acc_end_cb(this->circle_10); }
-        if (this->circle_11 != NULL) { draw_img_acc_end_cb(this->circle_11); }
-    }
+    gui_geometry_parts_end(&((gui_rounded_rect_t *)obj)->parts);
 }
 
 static void gui_rect_destroy(gui_obj_t *obj)
@@ -1573,7 +902,7 @@ static void gui_rect_destroy(gui_obj_t *obj)
         this->gradient = NULL;
     }
 
-    gui_rect_release_images(this);
+    gui_geometry_parts_release(&this->parts);
 }
 
 static void gui_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
