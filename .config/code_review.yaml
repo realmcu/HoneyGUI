@@ -1,0 +1,334 @@
+agent_page_id: https://wiki.realtek.com/pages/viewpage.action?pageId=157360872
+data:
+
+  win32 simulation:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - win32_sim
+    exclude_file_list: []
+    lock_status: false
+
+  Keil simulation:
+    function_owner_list:
+      - howie_wang
+    reviewer_list: []
+    file_list:
+      - keil_sim
+    exclude_file_list: []
+    lock_status: false
+
+  scons-tool:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - tool
+    exclude_file_list: []
+    lock_status: false
+
+  lib:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - lib
+    exclude_file_list: []
+    lock_status: false
+
+  3rd:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/3rd
+    exclude_file_list: []
+    lock_status: false
+
+  realgui\app:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/app
+    exclude_file_list: []
+    lock_status: false
+
+  realgui\core:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/core
+    exclude_file_list: []
+    lock_status: false
+
+  realgui\dc:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/dc
+    exclude_file_list: []
+    lock_status: false
+
+  image sw engine:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/engine/sw
+    exclude_file_list: []
+    lock_status: false
+
+  image hw engine:
+    function_owner_list:
+      - astor_zhang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/engine/acc_rtk_ppev2.c
+      - realgui/engine/acc_rtk_ppe.c
+    exclude_file_list: []
+    lock_status: false
+
+  font engine:
+    function_owner_list:
+      - luke_sun
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/engine/draw_font.c
+      - realgui/engine/draw_font.h
+    exclude_file_list: []
+    lock_status: false
+
+  realgui\input:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list: []
+    exclude_file_list: []
+    lock_status: false
+
+  realgui\misc:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/misc
+    exclude_file_list: []
+    lock_status: false
+
+  realgui\server:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/server
+    exclude_file_list: []
+    lock_status: false
+
+  realgui\test:
+    function_owner_list:
+      - luke_sun
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/test
+    exclude_file_list: []
+    lock_status: false
+
+  base object:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/widget/gui_obj
+    exclude_file_list: []
+    lock_status: false
+
+  image widget:
+    function_owner_list:
+      - howie_wang
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/widget/gui_img
+    exclude_file_list: []
+    lock_status: false
+
+  view:
+    function_owner_list:
+      - shel_deng
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/widget/gui_view
+    exclude_file_list: []
+    lock_status: false
+
+  3d widget:
+    function_owner_list:
+      - howie_wang
+      - sienna_shen
+    reviewer_list:
+      - howie_wang
+      - triton_yu
+      - shel_deng
+      - luke_sun
+      - sienna_shen
+      - astor_zhang
+      - wenjing_jiang
+      - roy_xie
+    file_list:
+      - realgui/widget/gui_3d
+    exclude_file_list: []
+    lock_status: false
+
+  scons/cmake:
+    function_owner_list:
+      - howie_wang
+    reviewer_list: []
+    file_list: []
+    exclude_file_list: []
+    lock_status: false
+repo_onwer:
+
+  - howie_wang
+coverity_onwer:
+
+  - wenjing_jiang
+path: realtek/subsys/gui
