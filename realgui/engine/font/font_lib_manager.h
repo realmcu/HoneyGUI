@@ -26,6 +26,7 @@ extern "C" {
 typedef struct FONT_LIB_NODE
 {
     uint8_t *font_file;             /**< Font file path or memory address */
+    uint8_t *alias;                 /**< Filesystem path of an XIP-mapped font, or NULL */
     uint16_t font_size;             /**< Font size in pixels (for BMP) or default size (for TTF) */
     FONT_SRC_MODE src_mode;         /**< Font source: MEM/FTL/FS */
     FONT_SRC_TYPE font_type;        /**< Font type: BMP or TTF */
@@ -61,10 +62,24 @@ void gui_font_lib_fs_close(FONT_LIB_NODE *node);
 /**
  * @brief Find font node by file path/address
  *
+ * Matches either the registered identifier or the alias path of an XIP-mapped font.
+ * Matching compares pointers, not string contents.
+ *
  * @param font_file Font file path or memory address
  * @return Pointer to font node, or NULL if not found
  */
 FONT_LIB_NODE *gui_font_lib_find(uint8_t *font_file);
+
+/**
+ * @brief Resolve a FILESYS font path to its directly addressable data.
+ *
+ * Only VFS backends with XIP support (romfs, ramfs) return an address; the
+ * file must then stay mounted and unmodified for as long as the font is used.
+ *
+ * @param font_path Font file path
+ * @return Address of the file data, or NULL if the backend has no XIP support
+ */
+uint8_t *gui_font_lib_fs_xip_addr(uint8_t *font_path);
 
 /**
  * @brief Find font node by size and type

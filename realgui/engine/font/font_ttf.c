@@ -1171,6 +1171,18 @@ uint8_t gui_font_ttf_init_fs(uint8_t *font_path)
         return 0;
     }
 
+    /* XIP-capable backend: register by address so reads skip the VFS and the heap. */
+    uint8_t *xip_addr = gui_font_lib_fs_xip_addr(font_path);
+    if (xip_addr != NULL && gui_font_ttf_init_mem(xip_addr) == 0)
+    {
+        node = gui_font_lib_find(xip_addr);
+        if (node != NULL && node->alias == NULL)
+        {
+            node->alias = font_path;
+        }
+        return 0;
+    }
+
     /* Open font file */
     gui_vfs_file_t *file = gui_vfs_open((const char *)font_path, GUI_VFS_READ);
     if (file == NULL)
@@ -1879,6 +1891,17 @@ static void font_ttf_get_info(gui_text_t *text)
     uint8_t *preloaded_index_table = NULL;
     bool need_free_index_table = false;
 
+    /* One handle serves every FILESYS read of this text. NULL means glyphs are skipped. */
+    gui_vfs_file_t *fs_file = NULL;
+    if (text->font_mode == FONT_SRC_FILESYS)
+    {
+        fs_file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+        if (fs_file == NULL)
+        {
+            gui_log("TTF fileSYS: failed to open %s\n", (const char *)text->path);
+        }
+    }
+
     /* Try to use cached index table first */
     preloaded_index_table = get_cached_ttf_index_table(text->path);
 
@@ -1895,25 +1918,16 @@ static void font_ttf_get_info(gui_text_t *text)
                 need_free_index_table = true;
             }
         }
-        else if (text->font_mode == FONT_SRC_FILESYS && ttfbin->index_method == 1 &&
+        else if (text->font_mode == FONT_SRC_FILESYS && fs_file != NULL &&
                  ttfbin->index_area_size > 0)
         {
+            /* Both index methods need the table in RAM; load it once per text. */
             preloaded_index_table = gui_malloc(ttfbin->index_area_size);
             if (preloaded_index_table != NULL)
             {
-                gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
-                if (file != NULL)
-                {
-                    gui_vfs_seek(file, ttfbin->head_length, GUI_VFS_SEEK_SET);
-                    gui_vfs_read(file, preloaded_index_table, ttfbin->index_area_size);
-                    gui_vfs_close(file);
-                    need_free_index_table = true;
-                }
-                else
-                {
-                    gui_free(preloaded_index_table);
-                    preloaded_index_table = NULL;
-                }
+                gui_vfs_seek(fs_file, ttfbin->head_length, GUI_VFS_SEEK_SET);
+                gui_vfs_read(fs_file, preloaded_index_table, ttfbin->index_area_size);
+                need_free_index_table = true;
             }
         }
     }
@@ -1952,33 +1966,10 @@ static void font_ttf_get_info(gui_text_t *text)
             {
                 /* V3 standard: look up space glyph advance from font data */
                 uint8_t *space_index_table_ptr = NULL;
-                uint8_t *space_fs_index_table = NULL;
 
                 if (text->font_mode == FONT_SRC_MEMADDR)
                 {
                     space_index_table_ptr = (uint8_t *)text->path + ttfbin->head_length;
-                }
-                else if (text->font_mode == FONT_SRC_FILESYS && ttfbin->index_method == 0 &&
-                         ttfbin->index_area_size > 0)
-                {
-                    /* FILESYS index_method=0: load index table for space lookup */
-                    space_fs_index_table = gui_malloc(ttfbin->index_area_size);
-                    if (space_fs_index_table != NULL)
-                    {
-                        gui_vfs_file_t *idx_file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
-                        if (idx_file != NULL)
-                        {
-                            gui_vfs_seek(idx_file, ttfbin->head_length, GUI_VFS_SEEK_SET);
-                            gui_vfs_read(idx_file, space_fs_index_table, ttfbin->index_area_size);
-                            gui_vfs_close(idx_file);
-                            space_index_table_ptr = space_fs_index_table;
-                        }
-                        else
-                        {
-                            gui_free(space_fs_index_table);
-                            space_fs_index_table = NULL;
-                        }
-                    }
                 }
                 else
                 {
@@ -2012,13 +2003,11 @@ static void font_ttf_get_info(gui_text_t *text)
                     }
                     else if (text->font_mode == FONT_SRC_FILESYS)
                     {
-                        gui_vfs_file_t *space_file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
-                        if (space_file != NULL)
+                        if (fs_file != NULL)
                         {
                             FontGlyphData spaceGlyphData;
-                            gui_vfs_seek(space_file, space_offset, GUI_VFS_SEEK_SET);
-                            gui_vfs_read(space_file, &spaceGlyphData, sizeof(FontGlyphData));
-                            gui_vfs_close(space_file);
+                            gui_vfs_seek(fs_file, space_offset, GUI_VFS_SEEK_SET);
+                            gui_vfs_read(fs_file, &spaceGlyphData, sizeof(FontGlyphData));
                             chr[chr_i].char_w = (uint8_t)roundf(spaceGlyphData.advance * scale);
                             chr[chr_i].advance = chr[chr_i].char_w;
                         }
@@ -2033,11 +2022,6 @@ static void font_ttf_get_info(gui_text_t *text)
                 {
                     /* Space glyph not found: fallback to legacy approximation */
                     chr[chr_i].char_w = fallback_space_width;
-                }
-
-                if (space_fs_index_table != NULL)
-                {
-                    gui_free(space_fs_index_table);
                 }
             }
             else
@@ -2072,36 +2056,10 @@ static void font_ttf_get_info(gui_text_t *text)
         else
         {
             uint8_t *index_table_ptr = NULL;
-            uint8_t *fs_index_table = NULL;  /* For FILESYS index_method=0 */
 
             if (text->font_mode == FONT_SRC_FILESYS)
             {
-                /* For FILESYS, we need to load index table from file for index_method=0 */
-                if (ttfbin->index_method == 0 && ttfbin->index_area_size > 0)
-                {
-                    fs_index_table = gui_malloc(ttfbin->index_area_size);
-                    if (fs_index_table != NULL)
-                    {
-                        gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
-                        if (file != NULL)
-                        {
-                            gui_vfs_seek(file, ttfbin->head_length, GUI_VFS_SEEK_SET);
-                            gui_vfs_read(file, fs_index_table, ttfbin->index_area_size);
-                            gui_vfs_close(file);
-                            index_table_ptr = fs_index_table;
-                        }
-                        else
-                        {
-                            gui_free(fs_index_table);
-                            fs_index_table = NULL;
-                        }
-                    }
-                }
-                else
-                {
-                    /* index_method=1 uses preloaded_index_table */
-                    index_table_ptr = preloaded_index_table;
-                }
+                index_table_ptr = preloaded_index_table;
             }
             else
             {
@@ -2111,10 +2069,6 @@ static void font_ttf_get_info(gui_text_t *text)
             /* Skip the glyph when no index table is available. */
             if (index_table_ptr == NULL)
             {
-                if (fs_index_table != NULL)
-                {
-                    gui_free(fs_index_table);
-                }
                 continue;
             }
 
@@ -2122,11 +2076,6 @@ static void font_ttf_get_info(gui_text_t *text)
                                                 index_table_ptr,
                                                 text->font_mode == FONT_SRC_FILESYS ? FONT_SRC_MEMADDR : text->font_mode,
                                                 preloaded_index_table);
-
-            if (fs_index_table != NULL)
-            {
-                gui_free(fs_index_table);
-            }
 
             if (ttfoffset == 0)
             {
@@ -2227,7 +2176,7 @@ static void font_ttf_get_info(gui_text_t *text)
                 }
                 else if (text->font_mode == FONT_SRC_FILESYS)
                 {
-                    gui_vfs_file_t *file = gui_vfs_open((const char *)text->path, GUI_VFS_READ);
+                    gui_vfs_file_t *file = fs_file;
                     if (file == NULL)
                     {
                         continue;
@@ -2257,7 +2206,6 @@ static void font_ttf_get_info(gui_text_t *text)
                                  GUI_VFS_SEEK_SET);
                     gui_vfs_read(file, dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
                                  line_count * sizeof(FontWindings));
-                    gui_vfs_close(file);
 
 #if ENABLE_FONT_V3_TYPO
                     ttf_populate_glyph_metrics(&chr[chr_i], glyphData, unicode_buf[uni_i],
@@ -2291,6 +2239,11 @@ static void font_ttf_get_info(gui_text_t *text)
     text->font_len = unicode_len;
     text->active_font_len = chr_i;
     gui_free(unicode_buf);
+
+    if (fs_file != NULL)
+    {
+        gui_vfs_close(fs_file);
+    }
 
     if (need_free_index_table && preloaded_index_table != NULL)
     {

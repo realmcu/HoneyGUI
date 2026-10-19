@@ -802,6 +802,14 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
                 gui_font_ttf_init_fs(font_source);
             }
         }
+
+        /* An XIP-mapped font is registered by address; render it as MEMADDR. */
+        FONT_LIB_NODE *node = gui_font_lib_find((uint8_t *)font_source);
+        if (node != NULL && node->src_mode == FONT_SRC_MEMADDR)
+        {
+            font_source = node->font_file;
+            font_mode = FONT_SRC_MEMADDR;
+        }
     }
     this->path = font_source;
     this->font_mode = font_mode;

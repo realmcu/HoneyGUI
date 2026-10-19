@@ -27,13 +27,22 @@ FONT_LIB_NODE *gui_font_lib_find(uint8_t *font_file)
     FONT_LIB_NODE *node = font_lib_head;
     while (node != NULL)
     {
-        if (node->font_file == font_file)
+        if (node->font_file == font_file || (node->alias != NULL && node->alias == font_file))
         {
             return node;
         }
         node = node->next;
     }
     return NULL;
+}
+
+uint8_t *gui_font_lib_fs_xip_addr(uint8_t *font_path)
+{
+    if (font_path == NULL)
+    {
+        return NULL;
+    }
+    return (uint8_t *)gui_vfs_get_file_address((const char *)font_path);
 }
 
 FONT_LIB_NODE *gui_font_lib_find_by_size(uint16_t font_size, FONT_SRC_TYPE font_type)
@@ -76,6 +85,7 @@ FONT_LIB_NODE *gui_font_lib_register(uint8_t *font_file,
     }
 
     node->font_file = font_file;
+    node->alias = NULL;
     node->font_size = font_size;
     node->src_mode = src_mode;
     node->font_type = font_type;

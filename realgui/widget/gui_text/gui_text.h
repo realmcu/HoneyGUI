@@ -414,6 +414,9 @@ void gui_text_font_mode_set(gui_text_t *this_widget, FONT_SRC_MODE font_mode);
 /**
  * @brief Set font type.
  * @note The type must match the font size.
+ * @note With FONT_SRC_FILESYS on an XIP-capable VFS backend (romfs, ramfs) the
+ *       font is read in place and the widget switches to FONT_SRC_MEMADDR. The
+ *       file must stay mounted and unmodified while any widget uses the font.
  * @param this_widget Text widget pointer.
  * @param font_source Address of .ttf or .bin.
  * @param font_mode Font source mode.

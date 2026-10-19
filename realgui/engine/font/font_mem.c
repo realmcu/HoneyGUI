@@ -2356,6 +2356,18 @@ uint8_t gui_font_mem_init_fs(uint8_t *font_path)
         return 0;
     }
 
+    /* XIP-capable backend: register by address so reads skip the VFS and the heap. */
+    uint8_t *xip_addr = gui_font_lib_fs_xip_addr(font_path);
+    if (xip_addr != NULL && gui_font_mem_init_mem(xip_addr) == 0)
+    {
+        node = gui_font_lib_find(xip_addr);
+        if (node != NULL && node->alias == NULL)
+        {
+            node->alias = font_path;
+        }
+        return 0;
+    }
+
     /* Open font file and read header */
     gui_vfs_file_t *file = gui_vfs_open((const char *)font_path, GUI_VFS_READ);
     if (file == NULL)
