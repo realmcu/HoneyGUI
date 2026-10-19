@@ -37,7 +37,7 @@ typedef struct gui_rgb_data_head
     unsigned char compress: 1;
     unsigned char jpeg: 1;
     unsigned char idu: 1;
-    unsigned char rsvd : 1;
+    unsigned char png : 1;
     char type;
     short w;
     short h;
@@ -107,6 +107,14 @@ typedef struct gui_jpeg_file_head
     uint8_t jpeg[1024];
 
 } gui_jpeg_file_head_t;
+
+/* PNG resource: GUI header, byte count, then the PNG file stream. */
+typedef struct gui_png_file_head
+{
+    gui_rgb_data_head_t img_header;
+    uint32_t size;
+    uint8_t *png;
+} gui_png_file_head_t;
 
 typedef struct gui_gif_file_head
 {

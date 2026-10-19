@@ -51,10 +51,18 @@ static void gui_acc_ops_init(struct acc_engine *info)
     {
         info->jpeg->init();
     }
+    if ((info->png != NULL) && (info->png->init != NULL))
+    {
+        info->png->init();
+    }
 }
 
 static void gui_acc_ops_deinit(struct acc_engine *info)
 {
+    if ((info->png != NULL) && (info->png->deinit != NULL))
+    {
+        info->png->deinit();
+    }
     if ((info->jpeg != NULL) && (info->jpeg->deinit != NULL))
     {
         info->jpeg->deinit();

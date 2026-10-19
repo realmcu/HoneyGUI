@@ -114,7 +114,6 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
     head->align = 0;
     head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
-    head->rsvd = 0;
     head->type = 0;
     head->version = 0;
     head->rsvd2 = 0;

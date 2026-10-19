@@ -392,7 +392,6 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
         p_data->align = 0;
         p_data->resize = 0;
         p_data->compress = 0;
-        p_data->rsvd = 0;
         p_data->type = RGB565;
         p_data->w = image_wsize;
         p_data->h = image_hsize;
@@ -419,7 +418,6 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
         p_data->align = 0;
         p_data->resize = 0;
         p_data->compress = 0;
-        p_data->rsvd = 0;
         p_data->type = RGB565;
         p_data->w = image_wsize;
         p_data->h = image_hsize;

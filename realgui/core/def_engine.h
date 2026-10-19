@@ -78,6 +78,14 @@ typedef struct gui_jpeg_ops
     void (*deinit)(void);
 } gui_jpeg_ops_t;
 
+typedef struct gui_png_ops
+{
+    void (*init)(void);
+    void *(*load)(void *input, int len, int *w, int *h, int *channel);
+    void (*release)(void *data);
+    void (*deinit)(void);
+} gui_png_ops_t;
+
 typedef struct gui_idu_ops
 {
     void (*init)(void);
@@ -94,6 +102,7 @@ typedef struct acc_engine
     void (*fb_clear)(uint8_t *addr, gui_color_t color, uint32_t len);
     gui_blur_ops_t *blur;
     const gui_jpeg_ops_t *jpeg;
+    const gui_png_ops_t *png;
     const gui_idu_ops_t *idu;
     bool enable_thread_sync;
     void *cache_mem;

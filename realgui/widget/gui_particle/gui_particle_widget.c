@@ -37,7 +37,6 @@ static void particle_set_img_header(gui_rgb_data_head_t *head, uint16_t w, uint1
     head->align = 0;
     head->resize = 0;
     head->compress = 0;
-    head->rsvd = 0;
     head->type = ARGB8888;
     head->w = w;
     head->h = h;

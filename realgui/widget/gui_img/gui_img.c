@@ -327,6 +327,10 @@ static void gui_img_ctor(gui_img_t            *_this,
     obj->h = gui_img_get_height(_this);
 
     gui_rgb_data_head_t head = gui_img_get_header(_this);
+    if (head.type == PNG)
+    {
+        _this->blend_mode = IMG_SRC_OVER_MODE;
+    }
     if (head.resize == 0)
     {
         gui_img_scale(_this, 1, 1);

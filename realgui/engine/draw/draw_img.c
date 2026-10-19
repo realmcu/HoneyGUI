@@ -8,6 +8,7 @@
 #include <string.h>
 #include <math.h>
 #include "acc_sw_jpeg.h"
+#include "acc_sw_png.h"
 #include "gui_vfs.h"
 
 void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
@@ -295,6 +296,17 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode, const char
             //gui_log("JPEG image caching is not supported.\n");
             return;
         }
+        else if (head->type == PNG)
+        {
+            gui_png_file_head_t *png = image->data;
+            int w = 0;
+            int h = 0;
+            int channel = 0;
+            image->data = gui_acc_png_load(png->png, png->size, &w, &h, &channel);
+            image->img_w = w;
+            image->img_h = h;
+            return;
+        }
         else if (head->compress)
         {
             struct acc_engine *acc = gui_get_acc();
@@ -335,8 +347,16 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *p
     }
     else if (src_mode == IMG_SRC_MEMADDR)
     {
+        if (img->data == NULL)
+        {
+            return;
+        }
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
-        if (head->jpeg)
+        if (head->png)
+        {
+            gui_acc_png_free(img->data);
+        }
+        else if (head->jpeg)
         {
             gui_acc_jpeg_free(img->data);
         }
