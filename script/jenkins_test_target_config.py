@@ -15,6 +15,9 @@ MODULE_APP_MAP = {
     },
     "HoneyGUI_Simulator":{
         'test_class_module': "honeygui_simulator_test"
+    },
+    "HoneyGUI_Zephyr":{
+        'test_class_module': "zephyr_auto_test"
     }
 }
 

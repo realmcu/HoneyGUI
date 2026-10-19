@@ -10,19 +10,21 @@ import argparse
 import git
 import subprocess
 
+west_home = os.environ.get("WestHome")
+jenkinsBuild_home = os.environ.get("jenkinsScript_abspath")
+JenkinsBuild_util_Dir = os.path.join(jenkinsBuild_home, "utils")
+JenkinsBuild_jenkins_Dir = os.path.join(jenkinsBuild_home, "jenkins")
 
-honeyRepo_env = "HoneyRepo"
-honeyRepo_uitl_dir = os.path.join(os.environ.get(honeyRepo_env), "build", "utils")
+print("west home: ", west_home)
+print("JenkinsBuild_util_Dir", JenkinsBuild_util_Dir)
+print("jenkins base", JenkinsBuild_jenkins_Dir)
 
-print("repo home: ", os.environ[honeyRepo_env])
-print("honeyRepo_uitl_dir", honeyRepo_uitl_dir)
-print("jenkins base", os.path.join(os.environ[honeyRepo_env], "build", "jenkins"))
-
-sys.path.append(honeyRepo_uitl_dir)
-sys.path.append(os.path.join(os.environ[honeyRepo_env], "build", "jenkins"))
-
+sys.path.append(JenkinsBuild_util_Dir)
+sys.path.append(JenkinsBuild_jenkins_Dir)
 from ci_check import *
-from jenkins_base import JenkinsCheckBase
+
+def doc_handler(gitobj):
+    pass
 
 class CICheck(CICheckBase):
     pass
@@ -31,4 +33,3 @@ class CICheck(CICheckBase):
 if __name__ == '__main__':
     ci_check = CICheck()
     ci_check.do_ci_check()
-

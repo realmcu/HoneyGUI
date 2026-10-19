@@ -1,9 +1,9 @@
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.types.resources.selectors.None
-
+import groovy.transform.Field
 
 properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '60', artifactNumToKeepStr: '', daysToKeepStr: '60', numToKeepStr: '')),
-           [$class: 'ScannerJobProperty', doNotScan: false], disableResume(), pipelineTriggers([cron("""H 21 * * 1-5
+           disableResume(), pipelineTriggers([cron("""H 21 * * 1-5
 
 """)])])
 
@@ -19,8 +19,8 @@ def emptyFolder(folderName){
     }
 }
 
-BRANCH_NAME = "guiEngine-master"
-def COV_VIEW_MAP = [
+@Field def BRANCH_NAME = "guiEngine-master"
+@Field def COV_VIEW_MAP = [
     "guiEngine-master":[
         "project":"HoneyGui",
         "stream":"gui-engine-master",
@@ -28,9 +28,9 @@ def COV_VIEW_MAP = [
     ]
 ]
 
-SRC_HOME = "SRC"
-HoneyRepo_Home = "${SRC_HOME}\\HoneyRepo"
-Manifest_Home = "${SRC_HOME}\\HoneyRepo\\.repo\\manifest"
+@Field def SRC_HOME = "SRC"
+@Field def HoneyRepo_Home = "${SRC_HOME}\\HoneyRepo"
+@Field def Manifest_Home = "${SRC_HOME}\\HoneyRepo\\.repo\\manifest"
 
 
 def do_code_checkout(relative_dir, url, project, branch_name, ref_spec, revision)
@@ -126,7 +126,7 @@ def get_project_info_from_manifest(manifest_path)
 
     def remote_size = manifest.remote.size()
 
-    for(i = 0; i <  remote_size; i++)
+    for(def i = 0; i <  remote_size; i++)
     {
         def r = manifest.remote[i]
         def r_name = "${r['@name']}"
@@ -136,7 +136,7 @@ def get_project_info_from_manifest(manifest_path)
 
     def default_remote_name = "${manifest.default['@remote']}"
     def project_size = manifest.project.size()
-    for(i = 0; i <  project_size; i++){
+    for(def i = 0; i <  project_size; i++){
         def p = manifest.project[i]
         def p_name = "${p['@name']}"
         def p_path = "${p['@path']}"
@@ -168,7 +168,7 @@ def get_project_info_from_manifest(manifest_path)
 
 
 def check_out_project(all_projects){
-    for(p in all_projects){
+    for(def p in all_projects){
         if(p["name"].indexOf("protected/") == 0){
             echo "${p['name']} can not check on OA"
             continue 
@@ -184,7 +184,7 @@ def check_out_project(all_projects){
 
 
 def get_single_project_info_from_all_project_list(all_projects, single_project_group_name){
-    for(p in all_projects){
+    for(def p in all_projects){
         echo "${p['groups'][0]}  ${single_project_group_name}"
         if(p["groups"][0] == single_project_group_name){
             return p
@@ -215,23 +215,22 @@ timestamps{
                         check_out_project(all_projects_in_manifest)
                         emptyFolder(iDir)
                         dir("${HoneyRepo_Home}\\${BRANCH_NAME}"){
-                            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'JIRA_ACCOUNT', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_PWD'],
-                                            [$class: 'UsernamePasswordMultiBinding', credentialsId: 'f6ab79fa-8117-4176-8adf-733f31644972', usernameVariable: 'BLACKDUCK_USER', passwordVariable: 'BLACKDUCK_PWD']]){
+                            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'JIRA_ACCOUNT', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_PWD']]){
                                 if(COV_VIEW_MAP.containsKey(BRANCH_NAME) == false){
                                     error 'Please configure Coverity first.'
                                 }
                                 env['COVERITY_UNSUPPORTED']=1
                                 env['HoneyRepo'] = "${WORKSPACE}\\${HoneyRepo_Home}"
                                 env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\master.xml"
-                                withCoverityEnv(coverityToolName: 'default', connectInstance: 'BT-Coverity'){
+                                withCoverityEnvironment(coverityInstanceUrl: 'http://172.21.15.145:8080/', credentialsId: 'coverity', projectName: COV_VIEW_MAP[BRANCH_NAME]['project'], streamName: COV_VIEW_MAP[BRANCH_NAME]['stream'], viewName: 'High Impact Outstanding') {
                                     // run cov-build capture command
                                     bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-master"
 
                                     // run cov-analyze command
-                                    bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true -tp \"!file('Keil_v5_536/.*')&&!file('AppData/Local/Arm/Packs/.*')&&!file('Keil_v5/ARM/.*')&&!file('realgui/third_party/.*')&&!file('realgui/3rd/.*')&&!file('lvgl/.*')&&!file('rt-thread/.*')&&!file('vglite/.*')&&!file('Arm2D/.*')&&!file('doc/.*')&&!file('guiEngine-master/doc/.*')&&!file('guiEngine-master/realgui/3rd/.*')\""
+                                    bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true -tp \"!file('Keil_v5_536/.*')&&!file('AppData/Local/Arm/Packs/.*')&&!file('Keil_v5/ARM/.*')&&!file('mingw64/.*')&&!file('gui_engine/third_party/.*')&&!file('gui_engine/3rd/.*')&&!file('lvgl/.*')&&!file('rt-thread/.*')&&!file('vglite/.*')&&!file('Arm2D/.*')&&!file('doc/.*')&&!file('guiEngine-master/doc/.*')&&!file('guiEngine-master/gui_engine/3rd/.*')&&!file('guiEngine-master/realgui/3rd/.*')\""
 
                                     // run cov-commit-defects command
-                                    bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --host ${COVERITY_HOST} --dataport ${COVERITY_PORT} --stream ${COV_VIEW_MAP[BRANCH_NAME]['stream']}"
+                                    bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --url http://172.21.15.145:8080 --stream ${COV_VIEW_MAP[BRANCH_NAME]['stream']}"
                                 }
                             }
                         }

@@ -19,6 +19,8 @@ import importlib
 from datetime import datetime
 from ftp.copy_image import CopyImage
 
+west_home = os.environ.get("WestHome")
+application_path = os.path.join(west_home, r"applications")
 
 def get_file_single(pathname):
     file_matches = glob.glob(pathname)
@@ -27,67 +29,109 @@ def get_file_single(pathname):
         return None
     return file_matches[0]
 
-config_path = r'simulator/win32/.config'
-def HoneyGUI_CMD_preBuild():
-    with open(os.path.join(HONEYGUI_ROOT, config_path), mode='r', newline='', errors='surrogateescape') as fd:
+# def HoneyGUI_CMD_preBuild():
+#     config_path = r'win32_sim/.config'
+#     with open(os.path.join(HONEYGUI_ROOT, config_path), mode='r', newline='', errors='surrogateescape') as fd:
+#         stream = fd.read()
+#     # Disable current demo
+#     stream = re.sub(r'^(CONFIG_REALTEK_BUILD_GUI_454_454_DEMO=y)', r'# \1 is not set', stream, count=1, flags=re.M)
+#     # Enable test demos
+#     stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_HONEYGUI_AUTO_TEST) is not set', r'\1=y', stream, count=1, flags=re.M)
+#     stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_GUI_410_502_DEMO) is not set', r'\1=y', stream, count=1, flags=re.M)
+#     stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_GUI_800_480_DEMO) is not set', r'\1=y', stream, count=1, flags=re.M)
+#     with open(os.path.join(HONEYGUI_ROOT, config_path), mode='w+', newline='', errors='surrogateescape') as fd:
+#         fd.write(stream)
+#     print(f"git diff {config_path}")
+#     subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
+
+# def HoneyGUI_CMD_afterBuild():
+#     config_path = r'win32_sim/.config'
+#     subprocess.check_call(["git", "checkout", "--", config_path], cwd=HONEYGUI_ROOT)
+#     print(f"after checkout {config_path}")
+#     subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
+
+# def build_honeyGUI_exe(build_type, module_name):
+#     if HoneyGUI_build_hook.get(module_name, {}).get("PreBuild"):
+#         HoneyGUI_build_hook.get(module_name, {}).get("PreBuild")()
+#     subprocess.check_call(['scons'], universal_newlines=True, cwd=os.path.join(HONEYGUI_ROOT, "win32_sim"))
+#     if HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild"):
+#         HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild")()
+
+#     gui_exe = get_file_single(os.path.join(HONEYGUI_ROOT, "win32_sim", r'gui.exe'))
+#     gui_bin = get_file_single(os.path.join(HONEYGUI_ROOT, "win32_sim", r'gui.bin'))
+#     if not gui_exe or not gui_bin:
+#         print("build gui.exe fail")
+#         sys.exit(1)
+#     bin_relative_dir = f"{module_name}/bin"
+#     bin_dir = os.path.join(build_dict_dir, bin_relative_dir)
+#     os.makedirs(bin_dir, exist_ok=True)
+#     shutil.copy2(gui_exe, bin_dir)
+#     shutil.copy2(gui_bin, bin_dir)
+#     shutil.copy2(os.path.join(HONEYGUI_ROOT, "win32_sim", "SDL2.dll"), bin_dir)
+#     migwin_root = os.path.dirname(shutil.which("gcc"))
+#     migwin_root = os.path.dirname(migwin_root)
+#     lib_root = os.path.join(migwin_root, "x86_64-w64-mingw32\lib")
+#     shutil.copy2(os.path.join(lib_root, "libstdc++-6.dll"), bin_dir)
+#     shutil.copy2(os.path.join(lib_root, "libgcc_s_sjlj-1.dll"), bin_dir)
+#     shutil.copy2(os.path.join(lib_root, "libwinpthread-1.dll"), bin_dir)
+
+#     CopyImage.copy_image_to_ftp(build_dict_dir, build_dict_dir, os.path.dirname(bin_relative_dir), module_name)
+
+def HoneyGUI_Zephyr_preBuild():
+    config_path = r'prj.conf'
+    with open(config_path, mode='r', newline='', errors='surrogateescape') as fd:
         stream = fd.read()
     # Disable current demo
-    stream = re.sub(r'^(CONFIG_REALTEK_BUILD_GUI_454_454_DEMO=y)', r'# \1 is not set', stream, count=1, flags=re.M)
-    # Enable test demos
-    stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_HONEYGUI_AUTO_TEST) is not set', r'\1=y', stream, count=1, flags=re.M)
-    stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_GUI_410_502_DEMO) is not set', r'\1=y', stream, count=1, flags=re.M)
-    stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_GUI_800_480_DEMO) is not set', r'\1=y', stream, count=1, flags=re.M)
-    with open(os.path.join(HONEYGUI_ROOT, config_path), mode='w+', newline='', errors='surrogateescape') as fd:
+    stream = re.sub(r'^(CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET=y)', r'CONFIG_REALTEK_BUILD_EMBEDED_TEST=y', stream, count=1, flags=re.M)
+    with open(config_path, mode='w+', newline='', errors='surrogateescape') as fd:
         fd.write(stream)
     print(f"git diff {config_path}")
     subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
 
-
-def HoneyGUI_CMD_afterBuild():
+def HoneyGUI_Zephyr_afterBuild():
+    config_path = r'prj.conf'
     subprocess.check_call(["git", "checkout", "--", config_path], cwd=HONEYGUI_ROOT)
     print(f"after checkout {config_path}")
     subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
 
-
 HoneyGUI_build_hook = {
-    "HoneyGUI_CMD": {
-        "PreBuild": HoneyGUI_CMD_preBuild,
-        "AfterBuild": HoneyGUI_CMD_afterBuild
+    # "HoneyGUI_CMD": {
+    #     "PreBuild": HoneyGUI_CMD_preBuild,
+    #     "AfterBuild": HoneyGUI_CMD_afterBuild
+    # },
+    "HoneyGUI_Zephyr": {
+        "PreBuild": HoneyGUI_Zephyr_preBuild,
+        "AfterBuild": HoneyGUI_Zephyr_afterBuild
     }
 }
 
+def build_honeyGUI_zephyr(build_type, module_name):
+    os.chdir(application_path)
+    if HoneyGUI_build_hook.get(module_name, {}).get("PreBuild"):
+        HoneyGUI_build_hook.get(module_name, {}).get("PreBuild")()
+    subprocess.check_call([r'scripts/build.bat'], universal_newlines=True)#, cwd=os.path.join(HONEYGUI_ROOT, "win32_sim")
+    if HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild"):
+        HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild")()
+    #os.chdir(os.path.join(west_home, r"zephyrproject/modules/honeygui"))
+
+    gui_bin = get_file_single(os.path.join("bin", r'app.bin'))
+    if not gui_bin:
+        print("build gui.exe fail")
+        sys.exit(1)
+    bin_relative_dir = f"{module_name}/bin"
+    bin_dir = os.path.join(build_dict_dir, bin_relative_dir)
+    os.makedirs(bin_dir, exist_ok=True)
+    shutil.copytree(r"./bin", bin_dir)
+    CopyImage.copy_image_to_ftp(build_dict_dir, build_dict_dir, os.path.dirname(bin_relative_dir), module_name)
 
 def build_honeyGUI(build_type, module_paratmeters):
-    for module_name in module_paratmeters:
-        if not module_paratmeters[module_name]:
-            continue
-
-        if HoneyGUI_build_hook.get(module_name, {}).get("PreBuild"):
-            HoneyGUI_build_hook.get(module_name, {}).get("PreBuild")()
-        subprocess.check_call(['scons'], universal_newlines=True, cwd=os.path.join(HONEYGUI_ROOT, "simulator", "win32"))
-        if HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild"):
-            HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild")()
-
-        gui_exe = get_file_single(os.path.join(HONEYGUI_ROOT, "simulator", "win32", r'gui.exe'))
-        gui_bin = get_file_single(os.path.join(HONEYGUI_ROOT, "simulator", "win32", r'gui.bin'))
-        if not gui_exe or not gui_bin:
-            print("build gui.exe fail")
-            sys.exit(1)
-        bin_relative_dir = f"{module_name}/bin"
-        bin_dir = os.path.join(build_dict_dir, bin_relative_dir)
-        os.makedirs(bin_dir, exist_ok=True)
-        shutil.copy2(gui_exe, bin_dir)
-        shutil.copy2(gui_bin, bin_dir)
-        shutil.copy2(os.path.join(HONEYGUI_ROOT, "simulator", "win32", "SDL2.dll"), bin_dir)
-        migwin_root = os.path.dirname(shutil.which("gcc"))
-        migwin_root = os.path.dirname(migwin_root)
-        lib_root = os.path.join(migwin_root, "x86_64-w64-mingw32\lib")
-        shutil.copy2(os.path.join(lib_root, "libstdc++-6.dll"), bin_dir)
-        shutil.copy2(os.path.join(lib_root, "libgcc_s_sjlj-1.dll"), bin_dir)
-        shutil.copy2(os.path.join(lib_root, "libwinpthread-1.dll"), bin_dir)
-
-        CopyImage.copy_image_to_ftp(build_dict_dir, build_dict_dir, os.path.dirname(bin_relative_dir), module_name)
-
+    for m in module_paratmeters:
+        if module_paratmeters[m]:
+            if m in ["HoneyGUI_CMD", "HoneyGUI_Simulator"]:
+                # build_honeyGUI_exe(build_type, m)
+                pass
+            else:
+                build_honeyGUI_zephyr(build_type, m)
 
 def clean_repo(repo_name):
     repo = git.Repo(search_parent_directories=True)
@@ -116,10 +160,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='master test build script')
     parser.add_argument('buildType', choices=['CI', 'Nightly', 'Release', 'FreeStyle'], help='set the build tpye')
     parser.add_argument('--triggeredBy', default='gerrit', choices=['gerrit', 'USER', 'TIMER', 'SCM','HRL_Tool_CI','HRL_Tool_Release', "HRS_Tool_CI", "HRS_Tool_Release"])
-
     parser.add_argument('--binDir', help='build output dir')
     parser.add_argument('--HoneyGUI_CMD', action = 'store_true', help = 'is need to test HoneyGUI_CMD')
     parser.add_argument('--HoneyGUI_Simulator', action = 'store_true', help='is need to test HoneyGUI_Simulator')
+    parser.add_argument('--HoneyGUI_Zephyr', action = 'store_true', help='is need to test HoneyGUI_Zephyr')
 
 
     arg_dict = parser.parse_args()
@@ -131,7 +175,7 @@ if __name__ == '__main__':
     HONEYGUI_ROOT = os.environ['HONEYGUI_ROOT']
 
     module_input_parameters = {}
-    for m in ["HoneyGUI_CMD", "HoneyGUI_Simulator"]:
+    for m in ["HoneyGUI_CMD", "HoneyGUI_Simulator", "HoneyGUI_Zephyr"]:
         module_input_parameters[m] = getattr(arg_dict, m)
 
     build_dict_dir = os.path.join(os.environ.get("WORKSPACE"), arg_dict.binDir)

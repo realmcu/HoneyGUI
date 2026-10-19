@@ -1,65 +1,72 @@
 import java.text.SimpleDateFormat
+import groovy.transform.Field
 
 // branches defined in BRANCH_CUT_MAP will be tested
-jenkins_test_build_name = ""
-jenkins_test_script_name = ""
+@Field def jenkins_test_build_name = "jenkins-test-build.py"
+@Field def jenkins_test_script_name = "jenkins-test.py"
 
+@Field def Need_Test = true
 
-SDK = 'sdk'
-SDK_PATH_RELATIVE_TO_REPO_HOME = ''
-SDK_PATH_RELATIVE_TO_WORKSPACE = ''
-SDK_BRANCH = ''
+@Field def STRING_RELATIVE_PATH_TO_WORKSPACE = "relativepath_to_workspace"
+@Field def STRING_RELATIVE_PATH_TO_WESTTOP = "relativepath_to_westtop"
+@Field def STRING_ABS_PATH = "abspath"
+@Field def STRING_REVISION = "revision" // can be branch name, revision or tag
+
+// projects name in yaml
+@Field def STRING_HONEYGUI = "honeygui"
+
+@Field def HONEYGUI_BRANCH_NAME = null
+@Field def HONEYGUI_ABSPATH = null
+@Field def HONEYGUI_RELATIVE_PATH_TO_WORKSPACE = null
+@Field def CURRENT_PROJECT_NAME = null
+//@Field def JENKINS_SCRIPT_RELAVE_PATH_TO_WORKSPACE = null
+
+HONEYGUI_BRANCH_NAME = env["${STRING_HONEYGUI}_${STRING_REVISION}"]
+HONEYGUI_ABSPATH = env["${STRING_HONEYGUI}_${STRING_ABS_PATH}"]
+HONEYGUI_RELATIVE_PATH_TO_WORKSPACE = env["${STRING_HONEYGUI}_${STRING_RELATIVE_PATH_TO_WORKSPACE}"]
+CURRENT_PROJECT_NAME = env['current_prj_name']
+echo "HONEYGUI_BRANCH_NAME: ${HONEYGUI_BRANCH_NAME}"
+echo "HONEYGUI_ABSPATH: ${HONEYGUI_ABSPATH}"
+echo "HONEYGUI_RELATIVE_PATH_TO_WORKSPACE: ${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}"
+echo "CURRENT_PROJECT_NAME: ${CURRENT_PROJECT_NAME}"
+//JENKINS_SCRIPT_RELAVE_PATH_TO_WORKSPACE = env["${STRING_JENKINS_SCRIPT}_${STRING_RELATIVE_PATH_TO_WORKSPACE}"]
+
+@Field def SDK_PATH_RELATIVE_TO_REPO_HOME = ''
+@Field def SDK_BRANCH = ''
 
 HONEYGUI_BRANCH_CUT_MAP = [
-    "-dev":[
-        "cutThrottle" : "BB2CCutTest",
+    "master":[
+        "cutThrottle" : "BB2ULTRAACutTest",
+        "slave_label_prefix":"bb2u-bcut",
+        "branchMapping":""
     ]
 ]
 
-test_module_map = [
-    "HoneyGUI_CMD": [
-        "label": "HoneyGUI",
-        "Test": 1,
-        "displayNmae": "HoneyGUI_CMD",
-        "testResult": true
-    ],
-    "HoneyGUI_Simulator": [
+@Field def test_module_map = [
+    // "HoneyGUI_CMD": [
+    //     "label": "HoneyGUI",
+    //     "Test": 1,
+    //     "displayNmae": "HoneyGUI_CMD",
+    //     "testResult": true
+    // ],
+    // "HoneyGUI_Simulator": [
+    //     "label": "HoneyGUI",
+    //     "Test": 0,
+    //     "displayNmae": "HoneyGUI_Simulator",
+    //     "testResult": true
+    // ],
+    "HoneyGUI_Zephyr": [
         "label": "HoneyGUI",
         "Test": 0,
-        "displayNmae": "HoneyGUI_Simulator",
+        "displayNmae": "HoneyGUI_Zephyr",
         "testResult": true
     ]
 ]
 
 
-Need_Test = true
+Need_Test = false
 temp_label_prefix = ""
 retryCount = 3
-
-def set_submodule_info(all_project, repo_home){
-    def sdk_info = get_prj_info_by_group_name(all_project, SDK)
-    SDK_BRANCH = sdk_info['branch']
-    SDK_PATH_RELATIVE_TO_REPO_HOME = sdk_info['path']
-    SDK_PATH_RELATIVE_TO_WORKSPACE = "${repo_home}\\${SDK_PATH_RELATIVE_TO_REPO_HOME}"
-
-    echo "submodule info"
-    echo "${SDK_BRANCH} ${SDK_PATH_RELATIVE_TO_REPO_HOME} ${SDK_PATH_RELATIVE_TO_WORKSPACE}"
-}
-
-def get_submodule_info(all_project, submodule_group_name){
-    for(p in all_projects){
-        if(p["groups"][0] == submodule_group_name){
-            return p
-        }
-    }
-    return ""
-}
-
-
-def set_test_script_name(){
-    jenkins_test_build_name = "jenkins-test-build.py"
-    jenkins_test_script_name = "jenkins-test.py"
-}
 
 
 def emptyFolder(folderName){
@@ -152,21 +159,19 @@ def is_gui_module(){
 }
 
 
-def do_ci_build(current_project_detail, all_project, manifest_len, HoneyRepo_Home, Manifest_Path, chip_type){
+def do_ci_build(current_project_detail, all_project, yaml_len, West_Home, Manifest_Path, chip_type){
     timestamps{
         stage("CIBuild"){
             echo "do ci build on ${NODE_NAME}"
-            set_test_nessary(get_prj_info_by_group_name(all_project, 'sdk')['branch'], manifest_len, chip_type)
-            withEnv(["HoneyRepo=${HoneyRepo_Home}", "manifest=${Manifest_Path}", "subGitPath=${HoneyRepo_Home}\\${current_project_detail['path']}", "subGitGroup=${current_project_detail['groups'][0]}"]){
-                dir("${HoneyRepo_Home}\\${get_prj_info_by_group_name(all_project, 'sdk')['path']}"){
-                    bat "python script/ci-build.py --chipType ${chip_type}"
-                    if(is_gui_module() == true){
-                        archiveArtifacts artifacts: "doc/output/html_out/"
-                        en_doc_url = BUILD_URL + "artifact/doc/output/html_out/en/index.html"
-                        cn_doc_url = BUILD_URL + "artifact/doc/output/html_out/cn/index.html"
-                        cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"EN Doc html: $en_doc_url CN Doc html: $cn_doc_url\" "
-                        exe_cmd(cmd_message)
-                    }
+            //def jenkinsFilePath = env["jenkins_file_path"]
+            dir(HONEYGUI_RELATIVE_PATH_TO_WORKSPACE){
+                bat "python script/ci-build.py --chipType ${chip_type}"
+                if(is_gui_module() == true){
+                    archiveArtifacts artifacts: "doc/output/html_out/"
+                    en_doc_url = BUILD_URL + "artifact/doc/output/html_out/en/index.html"
+                    cn_doc_url = BUILD_URL + "artifact/doc/output/html_out/cn/index.html"
+                    cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"EN Doc html: $en_doc_url CN Doc html: $cn_doc_url\" "
+                    exe_cmd(cmd_message)
                 }
             }
         }
@@ -176,16 +181,14 @@ def do_ci_build(current_project_detail, all_project, manifest_len, HoneyRepo_Hom
 
 def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_Home, Manifest_Path, chip_type){
     timestamps{
-        set_test_nessary(get_prj_info_by_group_name(all_project, SDK)['branch'], manifest_len, chip_type)
+        set_test_nessary(get_prj_info_by_group_name(all_project, STRING_HONEYGUI)['branch'], manifest_len, chip_type)
         if(!Need_Test){
             echo "No need to do test, return"
             return
         }
 
         stage("CITestBuild"){
-            set_submodule_info(all_project, HoneyRepo_Home)
-            set_test_script_name()
-            build_cmd = "python ${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script/${jenkins_test_build_name} CI"
+            build_cmd = "python ${WORKSPACE}/${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}/script/${jenkins_test_build_name} CI"
             for(module in test_module_map.keySet()){
                 if(test_module_map[module]["Test"] > 0){
                     build_cmd += " --${module}"
@@ -194,7 +197,7 @@ def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_H
             try{
                 emptyFolder('SRC/Dict')
                 build_cmd += ' --binDir SRC/Dict'
-                withEnv(["HONEYGUI_ROOT=${WORKSPACE}\\${SDK_PATH_RELATIVE_TO_WORKSPACE}"])
+                withEnv(["HONEYGUI_ROOT=${WORKSPACE}\\${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}"])
                 {
                     exe_cmd(build_cmd)
                 }
@@ -204,17 +207,17 @@ def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_H
             }
 
             // to check
-            withEnv(["HoneyRepo_ROOT=${WORKSPACE}\\${HoneyRepo_Home}", "HONEYGUI_ROOT=${WORKSPACE}\\${SDK_PATH_RELATIVE_TO_WORKSPACE}"]){
-                copy_script_cmd = "python ${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script/ftp/copy_script.py --testType CI --zipFolder script --localFolder test_script --workDir ${WORKSPACE}/SRC/Dict"
+            withEnv(["HoneyRepo_ROOT=${WORKSPACE}\\${HoneyRepo_Home}", "HONEYGUI_ROOT=${WORKSPACE}\\${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}"]){
+                copy_script_cmd = "python ${WORKSPACE}/${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}/script/ftp/copy_script.py --testType CI --zipFolder script --localFolder test_script --workDir ${WORKSPACE}/SRC/Dict"
                 exe_cmd(copy_script_cmd)
             }
 
 
-            dir("${SDK_PATH_RELATIVE_TO_WORKSPACE}/script"){
+            dir("${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}/script"){
                 stash includes: "ftp/download_test_files.py, ftp/ftp_helper.py", name: "Test-Script"
             }
 
-            dir("${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script"){
+            dir("${WORKSPACE}/${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}/script"){
                 stash includes: "base/parse_json.py, \
                                  ftp/ftp_helper.py, ftp/copy_script.py, \
                                 report/generate_test_report.py, report/__init__.py, \
@@ -226,13 +229,10 @@ def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_H
 
 
 def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home, chip_type){
-    echo "0"
     if(!Need_Test)
     {
         return
     }
-    echo "1"
-    set_test_script_name()
     def builders = [:]
     for(module in test_module_map.keySet()){
         def test_module = module
@@ -242,7 +242,7 @@ def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home
         def build_name = test_module_map[test_module]["displayNmae"]
         echo "2"
         builders["${build_name}"] = {
-            throttle([HONEYGUI_BRANCH_CUT_MAP[SDK_BRANCH]["cutThrottle"]]){
+            throttle([HONEYGUI_BRANCH_CUT_MAP[HONEYGUI_BRANCH_NAME]["cutThrottle"]]){
                 try{
                     echo "3"
                     def is_env_error = true

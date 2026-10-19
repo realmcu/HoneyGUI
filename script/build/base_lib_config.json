@@ -1,9 +1,10 @@
 {
-    "guiEngine-master": {
-        "mandatory": [],
-        "temporary": [
-            ["simulator/keil/ac5/HoneyGUI.uvprojx", "", "sdk"],
-            ["simulator/keil/ac6/HoneyGUI.uvprojx", "", "sdk"]
-        ]
-    }
+    "keil_mandatory": [],
+    "keil_temporary": [
+        ["simulator/keil/ac5/HoneyGUI.uvprojx", "", "honeygui"],
+        ["simulator/keil/ac6/HoneyGUI.uvprojx", "", "honeygui"]
+    ],
+    "gcc_mandatory": [],
+    "gcc_temporary": [],
+    "ignored_app": []
 }

@@ -104,9 +104,12 @@ if __name__ == '__main__':
     '''repo.git.checkout('--', '.')
     repo.git.clean('-dfx')'''
     #keil
-    keil_builder = SDKBuild(os.environ.get("manifest"), os.environ.get("HoneyRepo"), chip_type)
+    local_submodule_path={
+        "honeygui": os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    }
+    keil_builder = SDKBuild(os.environ.get("manifest"), os.environ.get("HoneyRepo"), chip_type, local_submodule_path)
     print("call build {}".format(chip_type))
-    if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path"), error_record_path=os.path.join(os.getcwd(), "error_record_{}".format(chip_type))):
+    if not keil_builder.build_all_keil_projects(title="honeygui", all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path"), error_record_path=os.path.join(os.getcwd(), "error_record_{}".format(chip_type))):
         log_file = sorted(glob.glob(os.path.join(os.path.join(os.getcwd(), "error_record_{}".format(chip_type)), '*.txt')), reverse=True)[0]
         send_mail("simulator/keil/ac6: keil build fail", log_file)
         sys.exit("build {} fail".format(chip_type))
