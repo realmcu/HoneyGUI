@@ -1,34 +1,31 @@
 /**
  * @file hml_view.c
- * @brief HML View Component (hg_view, hg_window, hg_win)
+ * @brief HML View Component (hg_view)
+ *
+ * hg_view nodes are registered as view descriptors by hml_view_instance.c and
+ * created by the view manager; this file applies their attributes when the
+ * view is switched in (same order as the designer's <view>_switch_in()).
  */
 
 #include "../hml_component.h"
 #include "../hml_utils.h"
-#include "../hml_event.h"
 #include "gui_view.h"
 #include "gui_api.h"
 #include <string.h>
 
-gui_obj_t *hml_create_view(gui_obj_t *parent, ezxml_t node)
+void hml_view_apply(gui_view_t *view, ezxml_t node)
 {
-    // Only create view with entry="true"
-    const char *entry = ezxml_attr(node, "entry");
-    if (!entry || strcmp(entry, "true") != 0)
+    // Designer default: height / 10
+    int step = hml_attr_int(node, "animateStep", hml_attr_height(node, 480) / 10);
+    if (step > 0) { gui_view_set_animate_step(view, (uint16_t)step); }
+
+    int opacity = hml_attr_int(node, "opacity", 255);
+    if (opacity < 0) { opacity = 0; }
+    if (opacity > 255) { opacity = 255; }
+    gui_view_set_opacity(view, (uint8_t)opacity);
+
+    if (ezxml_attr(node, "backgroundColor"))
     {
-        return NULL;
+        gui_view_set_bg_color(view, hml_attr_color(node, "backgroundColor", 0xFF000000));
     }
-
-    const char *id = hml_attr_str(node, "id", "view");
-    int x = hml_attr_int(node, "x", 0);
-    int y = hml_attr_int(node, "y", 0);
-    int w = hml_attr_width(node, 100);
-    int h = hml_attr_height(node, 100);
-
-    gui_view_t *view = gui_view_create(parent, id, x, y, w, h);
-
-    // Parse and bind view switch events
-    hml_bind_view_events(view, node);
-
-    return (gui_obj_t *)view;
 }

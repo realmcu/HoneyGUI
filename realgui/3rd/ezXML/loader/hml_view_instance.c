@@ -1,360 +1,435 @@
 /**
  * @file hml_view_instance.c
  * @brief HML View Instance Implementation
+ *
+ * Every hg_view of every scanned file becomes a view descriptor. Its
+ * on_switch_in creates the view's components from the resident XML tree, the
+ * same way the designer's generated <view>_switch_in() does.
  */
 
 #include "hml_view_instance.h"
+#include "hml_loader.h"
 #include "hml_component.h"
+#include "hml_runtime.h"
+#include "hml_event.h"
+#include "hml_utils.h"
 #include "ezxml.h"
 #include "gui_vfs.h"
 #include "gui_api.h"
 #include "gui_view.h"
+#include "gui_fb.h"
+#include "gui_message.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 /*============================================================================*
- *                              Forward Declarations
- *============================================================================*/
-void hml_parse_children(gui_obj_t *parent, ezxml_t node);
-
-/*============================================================================*
  *                              View Data Storage
  *============================================================================*/
 
-typedef struct
+/*
+ * One allocation per view: the view manager keeps a pointer to desc, so an
+ * instance must never move. Registered descriptors cannot be unregistered,
+ * so instances live for the whole program (see hml_cleanup).
+ */
+typedef struct hml_view_instance
 {
-    char view_name[32];  // Fixed-size buffer, no dynamic allocation needed
-    char *xml_content;   // Keep XML content alive for component strings
-    size_t xml_len;
-    bool is_entry;       // Track if this is an entry view
+    struct hml_view_instance *next;
+    gui_view_descriptor_t desc;   // registered with the view manager
+    gui_view_t *view;             // desc.pView points here
+    char *name;                   // owned copy, desc.name points here
+    ezxml_t node;                 // hg_view node inside a resident document
 } hml_view_instance_t;
 
-#define HML_MAX_VIEWS 32
-static hml_view_instance_t hml_view_instance_map[HML_MAX_VIEWS];
-static int hml_view_instance_count = 0;
-static const char *hml_entry_view_name = NULL;  // First entry view name
+/* One parsed HML file, kept resident */
+typedef struct hml_doc
+{
+    struct hml_doc *next;
+    ezxml_t root;
+    char *text;                   // parse buffer, referenced by the tree
+    char *path;                   // file it was read from
+    uint32_t hash;                // content hash, for change detection
+    bool stale;                   // replaced by a reload, kept for live objects
+} hml_doc_t;
+
+static hml_view_instance_t *hml_views = NULL;
+static hml_doc_t *hml_docs = NULL;
+static const char *hml_entry_view_name = NULL;
+static char hml_scan_dir[128];
+
+static uint32_t hml_hash(const char *s, size_t len)
+{
+    uint32_t h = 2166136261u;   // FNV-1a
+    for (size_t i = 0; i < len; i++)
+    {
+        h = (h ^ (uint8_t)s[i]) * 16777619u;
+    }
+    return h;
+}
 
 static hml_view_instance_t *hml_find_view_instance(const char *name)
 {
-    for (int i = 0; i < hml_view_instance_count; i++)
+    for (hml_view_instance_t *v = hml_views; v; v = v->next)
     {
-        if (strcmp(hml_view_instance_map[i].view_name, name) == 0)
-        {
-            return &hml_view_instance_map[i];
-        }
+        if (strcmp(v->name, name) == 0) { return v; }
     }
     return NULL;
 }
 
 /*============================================================================*
- *                              View Switch Callback
+ *                              View Switch Callbacks
  *============================================================================*/
-
-// Helper function to recursively find hg_view by id
-static ezxml_t hml_find_view_by_id(ezxml_t node, const char *target_id)
-{
-    if (!node) { return NULL; }
-
-    // Check current node
-    if (strcmp(node->name, "hg_view") == 0)
-    {
-        const char *id = ezxml_attr(node, "id");
-        if (id && strcmp(id, target_id) == 0)
-        {
-            return node;
-        }
-    }
-
-    // Search children recursively
-    for (ezxml_t child = node->child; child; child = child->ordered)
-    {
-        ezxml_t found = hml_find_view_by_id(child, target_id);
-        if (found) { return found; }
-    }
-
-    return NULL;
-}
 
 static void hml_view_on_switch_in(gui_view_t *view)
 {
-    gui_log("[HML] switch_in callback: view=%p\n", view);
+    if (!view || !view->descriptor) { return; }
 
-    if (!view || !view->descriptor)
+    hml_view_instance_t *inst = hml_find_view_instance(view->descriptor->name);
+    if (!inst || !inst->node)
     {
-        gui_log("[HML] switch_in: view or descriptor is NULL\n");
+        gui_log("[HML] switch_in: no HML for view %s\n", view->descriptor->name);
         return;
     }
 
-    gui_log("[HML] switch_in: view name=%s\n", view->descriptor->name);
+    hml_view_apply(view, inst->node);
+    // View timers, events and focus are bound before the children, as exported
+    hml_component_finish((gui_obj_t *)view, inst->node, true);
+    hml_parse_children((gui_obj_t *)view, inst->node);
+}
 
-    hml_view_instance_t *data = hml_find_view_instance(view->descriptor->name);
-    if (!data)
-    {
-        gui_log("[HML] switch_in: view data not found\n");
-        return;
-    }
-    if (!data->xml_content)
-    {
-        gui_log("[HML] switch_in: xml_content is NULL\n");
-        return;
-    }
-
-    gui_log("[HML] switch_in: parsing XML (len=%zu)\n", data->xml_len);
-
-    // Copy XML content because ezxml_parse_str modifies the string
-    char *xml_copy = gui_malloc(data->xml_len);
-    if (!xml_copy)
-    {
-        gui_log("[HML] switch_in: failed to allocate memory\n");
-        return;
-    }
-    memcpy(xml_copy, data->xml_content, data->xml_len);
-
-    // Debug: print first 100 chars
-    gui_log("[HML] switch_in: XML content start: %.100s\n", xml_copy);
-
-    // Parse XML and create children
-    ezxml_t root = ezxml_parse_str(xml_copy, data->xml_len);
-    if (!root)
-    {
-        gui_log("[HML] switch_in: failed to parse XML\n");
-        gui_free(xml_copy);
-        return;
-    }
-
-    gui_log("[HML] switch_in: root node name=%s\n", root->name ? root->name : "NULL");
-
-    // Find the view node by id - search recursively
-    // XML structure: <hml> -> <view> -> <hg_view>
-    ezxml_t view_node = hml_find_view_by_id(root, view->descriptor->name);
-
-    if (!view_node)
-    {
-        gui_log("[HML] switch_in: view node '%s' not found\n", view->descriptor->name);
-        ezxml_free(root);
-        gui_free(xml_copy);
-        return;
-    }
-
-    gui_log("[HML] switch_in: found view node id=%s\n", view->descriptor->name);
-
-    // Parse view events
-    ezxml_t events = ezxml_child(view_node, "events");
-    if (events)
-    {
-        gui_log("[HML] switch_in: parsing events\n");
-        for (ezxml_t event = ezxml_child(events, "event"); event; event = event->next)
-        {
-            const char *type = ezxml_attr(event, "type");
-            if (!type) { continue; }
-
-            ezxml_t action = ezxml_child(event, "action");
-            if (!action) { continue; }
-
-            const char *action_type = ezxml_attr(action, "type");
-            if (!action_type || strcmp(action_type, "switchView") != 0) { continue; }
-
-            const char *target = ezxml_attr(action, "target");
-            const char *switch_out_str = ezxml_attr(action, "switchOutStyle");
-            const char *switch_in_str = ezxml_attr(action, "switchInStyle");
-
-            if (!target) { continue; }
-
-            gui_log("[HML] switch_in: bind event %s -> %s\n", type, target);
-
-            // Parse event type and styles (simplified)
-            gui_event_code_t evt = GUI_EVENT_TOUCH_MOVE_LEFT;
-            if (strcmp(type, "onSwipeRight") == 0) { evt = GUI_EVENT_TOUCH_MOVE_RIGHT; }
-            else if (strcmp(type, "onSwipeUp") == 0) { evt = GUI_EVENT_TOUCH_MOVE_UP; }
-            else if (strcmp(type, "onSwipeDown") == 0) { evt = GUI_EVENT_TOUCH_MOVE_DOWN; }
-
-            VIEW_SWITCH_STYLE out_style = SWITCH_OUT_TO_LEFT_USE_TRANSLATION;
-            VIEW_SWITCH_STYLE in_style = SWITCH_IN_FROM_RIGHT_USE_TRANSLATION;
-
-            (void)switch_out_str;
-            (void)switch_in_str;
-
-            gui_view_switch_on_event(view, target, out_style, in_style, evt);
-        }
-    }
-
-    // Create children (strings point directly to xml_content)
-    gui_log("[HML] switch_in: creating children\n");
-    hml_parse_children((gui_obj_t *)view, view_node);
-    gui_log("[HML] switch_in: done\n");
-
-    ezxml_free(root);
-    gui_free(xml_copy);
+static void hml_view_on_switch_out(gui_view_t *view)
+{
+    // Component entries are released by their destroy sentinels
+    GUI_UNUSED(view);
 }
 
 /*============================================================================*
  *                              View Scanner
  *============================================================================*/
 
-static void hml_scan_node_for_views(ezxml_t node, int *count, char *xml_content, size_t xml_len)
+static bool hml_register_view(ezxml_t node)
+{
+    const char *id = ezxml_attr(node, "id");
+    if (!id || !id[0]) { return false; }
+
+    hml_view_instance_t *inst = hml_find_view_instance(id);
+    if (inst)
+    {
+        // Same id scanned again: point the existing descriptor at the new node
+        inst->node = node;
+    }
+    else
+    {
+        if (gui_view_descriptor_get(id))
+        {
+            gui_log("[HML] View %s already registered by C code, HML one ignored\n", id);
+            return false;
+        }
+        size_t len = strlen(id);
+        inst = gui_malloc(sizeof(hml_view_instance_t));
+        char *name = gui_malloc(len + 1);
+        if (!inst || !name)
+        {
+            gui_log("[HML] Out of memory, drop view %s\n", id);
+            if (inst) { gui_free(inst); }
+            if (name) { gui_free(name); }
+            return false;
+        }
+        memset(inst, 0, sizeof(hml_view_instance_t));
+        memcpy(name, id, len + 1);
+        inst->name = name;
+        inst->node = node;
+        inst->desc.name = inst->name;
+        inst->desc.pView = &inst->view;
+        inst->desc.on_switch_in = hml_view_on_switch_in;
+        inst->desc.on_switch_out = hml_view_on_switch_out;
+        inst->desc.keep = hml_attr_bool(node, "residentMemory", false);
+        gui_view_descriptor_register(&inst->desc);
+        inst->next = hml_views;
+        hml_views = inst;
+    }
+
+    bool is_entry = hml_attr_bool(node, "entry", false);
+    gui_log("[HML] Register view: %s%s\n", id, is_entry ? " (entry)" : "");
+    if (is_entry && !hml_entry_view_name)
+    {
+        hml_entry_view_name = inst->name;
+    }
+    return true;
+}
+
+static void hml_scan_node_for_views(ezxml_t node, int *count)
 {
     for (ezxml_t child = node->child; child; child = child->ordered)
     {
         if (strcmp(child->name, "hg_view") == 0)
         {
-            const char *id = ezxml_attr(child, "id");
-            const char *entry = ezxml_attr(child, "entry");
-            bool is_entry = (entry && strcmp(entry, "true") == 0);
-
-            if (id)
-            {
-                // Check view name length
-                if (strlen(id) >= sizeof(hml_view_instance_map[0].view_name))
-                {
-                    gui_log("[HML] View name too long (max %zu): %s\n",
-                            sizeof(hml_view_instance_map[0].view_name) - 1, id);
-                    continue;
-                }
-
-                gui_view_descriptor_t *desc = gui_malloc(sizeof(gui_view_descriptor_t));
-                GUI_ASSERT(desc != NULL);
-                gui_view_t **pView = gui_malloc(sizeof(gui_view_t *));
-                GUI_ASSERT(pView != NULL);
-
-                if (desc && pView && hml_view_instance_count < HML_MAX_VIEWS)
-                {
-                    *pView = NULL;
-
-                    // Copy view name to fixed-size buffer
-                    hml_view_instance_t *instance = &hml_view_instance_map[hml_view_instance_count];
-                    strncpy(instance->view_name, id, sizeof(instance->view_name) - 1);
-                    instance->view_name[sizeof(instance->view_name) - 1] = '\0';
-                    instance->xml_content = xml_content;  // Keep alive for string pointers
-                    instance->xml_len = xml_len;
-                    instance->is_entry = is_entry;
-                    hml_view_instance_count++;
-
-                    memset(desc, 0, sizeof(gui_view_descriptor_t));
-                    desc->name = instance->view_name;  // Point to fixed buffer
-                    desc->pView = pView;
-                    desc->on_switch_in = hml_view_on_switch_in;
-                    gui_view_descriptor_register(desc);
-                    gui_log("[HML] Register view: %s%s\n", id, is_entry ? " (entry)" : "");
-
-                    // Remember the first entry view
-                    if (is_entry && !hml_entry_view_name)
-                    {
-                        hml_entry_view_name = instance->view_name;
-                    }
-
-                    (*count)++;
-                }
-                else
-                {
-                    gui_free(desc);
-                    gui_free(pView);
-                }
-            }
+            if (hml_register_view(child)) { (*count)++; }
+            continue;   // views do not nest
         }
-        hml_scan_node_for_views(child, count, xml_content, xml_len);
+        hml_scan_node_for_views(child, count);
     }
+}
+
+static hml_doc_t *hml_find_doc(const char *path)
+{
+    for (hml_doc_t *d = hml_docs; d; d = d->next)
+    {
+        if (!d->stale && strcmp(d->path, path) == 0) { return d; }
+    }
+    return NULL;
+}
+
+/* Parse one file into a new resident document and register its views */
+static int hml_load_file(const char *path, char *content, size_t size, uint32_t hash, int *count)
+{
+    hml_doc_t *doc = gui_malloc(sizeof(hml_doc_t));
+    char *path_copy = doc ? gui_malloc(strlen(path) + 1) : NULL;
+    // ezxml keeps pointers into content; the document stays resident
+    ezxml_t root = path_copy ? ezxml_parse_str(content, size) : NULL;
+    if (!root)
+    {
+        gui_log("[HML] Failed to parse %s\n", path);
+        if (path_copy) { gui_free(path_copy); }
+        if (doc) { gui_free(doc); }
+        gui_free(content);
+        return -1;
+    }
+    if (ezxml_error(root)[0])
+    {
+        gui_log("[HML] %s: %s\n", path, ezxml_error(root));
+    }
+    strcpy(path_copy, path);
+    memset(doc, 0, sizeof(hml_doc_t));
+    doc->root = root;
+    doc->text = content;
+    doc->path = path_copy;
+    doc->hash = hash;
+    doc->next = hml_docs;
+    hml_docs = doc;
+    hml_scan_node_for_views(root, count);
+    return 0;
 }
 
 static int hml_scan_file(const char *path, int *count)
 {
-    gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
-    if (!f) { return -1; }
-
-    gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
-    int size = gui_vfs_tell(f);
-    gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
-
-    if (size <= 0) { gui_vfs_close(f); return -1; }
-
-    // Allocate two copies: one for parsing, one for storage
-    char *content_parse = (char *)gui_malloc(size);
-    char *content_store = (char *)gui_malloc(size);
-    if (!content_parse || !content_store)
+    size_t size = 0;
+    char *content = hml_read_file(path, &size);
+    if (!content)
     {
-        if (content_parse) { gui_free(content_parse); }
-        if (content_store) { gui_free(content_store); }
-        gui_vfs_close(f);
+        gui_log("[HML] Failed to read %s\n", path);
         return -1;
     }
-
-    gui_vfs_read(f, content_parse, size);
-    gui_vfs_close(f);
-
-    // Copy for storage
-    memcpy(content_store, content_parse, size);
-
-    ezxml_t root = ezxml_parse_str(content_parse, size);
-    if (root)
-    {
-        hml_scan_node_for_views(root, count, content_store, size);
-        ezxml_free(root);
-    }
-    else
-    {
-        gui_free(content_store);
-    }
-
-    gui_free(content_parse);
-    return 0;
+    // Hash before parsing: ezxml modifies the buffer in place
+    return hml_load_file(path, content, size, hml_hash(content, size), count);
 }
 
-int hml_scan_views(const char *dir_path)
+/*
+ * Visit every .hml / .xml file of a directory.
+ * cb returns the number of views it registered (or 0).
+ */
+static int hml_for_each_file(const char *dir_path, int (*cb)(const char *path, void *arg),
+                             void *arg)
 {
-    if (!dir_path) { return -1; }
-
-    void *dir = gui_vfs_opendir(dir_path);
+    gui_vfs_dir_t *dir = gui_vfs_opendir(dir_path);
     if (!dir)
     {
         gui_log("[HML] Failed to open dir: %s\n", dir_path);
         return -1;
     }
 
-    int count = 0;
+    int total = 0;
     gui_vfs_stat_t stat;
-    char path[512];
-
+    char path[256];
     while (gui_vfs_readdir(dir, &stat) == 0)
     {
         if (stat.name[0] == '.') { continue; }
+        if (stat.type != GUI_VFS_TYPE_FILE) { continue; }
 
-        snprintf(path, sizeof(path), "%s/%s", dir_path, stat.name);
-
-        if (stat.type == GUI_VFS_TYPE_FILE)
+        const char *ext = strrchr(stat.name, '.');
+        if (ext && (strcmp(ext, ".xml") == 0 || strcmp(ext, ".hml") == 0))
         {
-            const char *ext = strrchr(stat.name, '.');
-            if (ext && (strcmp(ext, ".xml") == 0 || strcmp(ext, ".hml") == 0))
-            {
-                gui_log("[HML] Scan file: %s\n", path);
-                hml_scan_file(path, &count);
-            }
+            snprintf(path, sizeof(path), "%s/%s", dir_path, stat.name);
+            total += cb(path, arg);
         }
     }
-
     gui_vfs_closedir(dir);
+    return total;
+}
+
+static int hml_scan_cb(const char *path, void *arg)
+{
+    GUI_UNUSED(arg);
+    int count = 0;
+    gui_log("[HML] Scan file: %s\n", path);
+    hml_scan_file(path, &count);
+    return count;
+}
+
+int hml_scan_views(const char *dir_path)
+{
+    if (!dir_path) { return -1; }
+
+    strncpy(hml_scan_dir, dir_path, sizeof(hml_scan_dir) - 1);
+    hml_scan_dir[sizeof(hml_scan_dir) - 1] = '\0';
+
+    int count = hml_for_each_file(dir_path, hml_scan_cb, NULL);
+    if (count < 0) { return -1; }
     gui_log("[HML] Total views registered: %d\n", count);
 
-    // Auto-create the first entry view to trigger on_switch_in
     if (hml_entry_view_name)
     {
         gui_log("[HML] Creating entry view: %s\n", hml_entry_view_name);
         gui_view_create(gui_obj_get_root(), hml_entry_view_name, 0, 0, 0, 0);
     }
+    else if (count > 0)
+    {
+        gui_log("[HML] No view has entry=\"true\"\n");
+    }
 
     return count;
 }
 
+const char *hml_entry_view(void)
+{
+    return hml_entry_view_name;
+}
+
+/*============================================================================*
+ *                              Hot reload
+ *============================================================================*/
+
+typedef struct
+{
+    bool force;
+    int changed;
+} hml_reload_ctx_t;
+
+/* Re-read one file; reload it when its content changed (or always if forced) */
+static int hml_reload_cb(const char *path, void *arg)
+{
+    hml_reload_ctx_t *ctx = (hml_reload_ctx_t *)arg;
+    size_t size = 0;
+    char *content = hml_read_file(path, &size);
+    if (!content) { return 0; }
+
+    uint32_t hash = hml_hash(content, size);
+    hml_doc_t *old = hml_find_doc(path);
+    if (old && old->hash == hash && !ctx->force)
+    {
+        gui_free(content);
+        return 0;
+    }
+
+    // Old tree stays allocated: hidden resident views may still use it
+    if (old) { old->stale = true; }
+    int count = 0;
+    if (hml_load_file(path, content, size, hash, &count) == 0)
+    {
+        gui_log("[HML] Reloaded %s\n", path);
+        ctx->changed++;
+    }
+    else if (old)
+    {
+        old->stale = false;   // keep the last good version
+    }
+    return count;
+}
+
+/* Runs on the GUI server, outside the frame walk */
+static void hml_rebuild_current(void *msg)
+{
+    GUI_UNUSED(msg);
+    gui_view_t *cur = gui_view_get_current();
+    if (!cur || !cur->descriptor) { return; }
+    if (gui_view_get_next())
+    {
+        // Switching: the next view is built from the new HML anyway
+        return;
+    }
+
+    // Only views that come from HML can be rebuilt
+    hml_view_instance_t *inst = hml_find_view_instance(cur->descriptor->name);
+    if (!inst || &inst->desc != cur->descriptor) { return; }
+
+    gui_obj_t *parent = GUI_BASE(cur)->parent;
+    const char *name = inst->name;
+    gui_obj_tree_free(cur);   // on_switch_out, clears the current view
+    gui_view_create(parent, name, 0, 0, 0, 0);
+    gui_fb_change();
+}
+
+int hml_reload(bool force)
+{
+    if (!hml_scan_dir[0]) { return 0; }
+
+    hml_reload_ctx_t ctx = { .force = force, .changed = 0 };
+    hml_for_each_file(hml_scan_dir, hml_reload_cb, &ctx);
+    if (ctx.changed == 0) { return 0; }
+
+    gui_msg_t msg = { .event = GUI_EVENT_USER_DEFINE, .cb = hml_rebuild_current, .payload = NULL };
+    gui_send_msg_to_server(&msg);
+    return ctx.changed;
+}
+
+/*============================================================================*
+ *                              Watch (polling)
+ *============================================================================*/
+
+static gui_obj_t *hml_watch_obj = NULL;
+
+static void hml_watch_cb(void *obj)
+{
+    GUI_UNUSED(obj);
+    hml_reload(false);
+}
+
+void hml_watch(bool enable, uint32_t interval_ms)
+{
+    if (!hml_watch_obj)
+    {
+        if (!enable) { return; }
+        // Hidden holder under the root: its timer still runs, nothing is drawn
+        hml_watch_obj = gui_obj_create(gui_obj_get_root(), "_hml_watch", 0, 0, 0, 0);
+        if (!hml_watch_obj) { return; }
+        hml_watch_obj->hidden = true;
+    }
+    if (enable)
+    {
+        gui_obj_create_timer(hml_watch_obj, interval_ms ? interval_ms : 1000, true, hml_watch_cb);
+        gui_obj_start_timer(hml_watch_obj);
+        gui_log("[HML] Watching %s every %u ms\n", hml_scan_dir,
+                (unsigned)(interval_ms ? interval_ms : 1000));
+    }
+    else if (hml_watch_obj->timer)
+    {
+        gui_obj_stop_timer(hml_watch_obj);
+        gui_log("[HML] Watch off\n");
+    }
+}
+
+bool hml_watch_enabled(void)
+{
+    return hml_watch_obj && hml_watch_obj->timer && hml_watch_obj->timer->expire_time != 0xFFFFFFFFu;
+}
+
 void hml_cleanup(void)
 {
-    for (int i = 0; i < hml_view_instance_count; i++)
+    hml_runtime_reset();
+    // Descriptors stay registered; they only lose their HML until rescanned
+    for (hml_view_instance_t *v = hml_views; v; v = v->next)
     {
-        if (hml_view_instance_map[i].xml_content)
-        {
-            gui_free(hml_view_instance_map[i].xml_content);
-            hml_view_instance_map[i].xml_content = NULL;
-        }
-        // view_name is fixed buffer, no need to free
+        v->node = NULL;
     }
-    hml_view_instance_count = 0;
+    while (hml_docs)
+    {
+        hml_doc_t *next = hml_docs->next;
+        ezxml_free(hml_docs->root);   // does not own a parse_str buffer
+        gui_free(hml_docs->text);
+        gui_free(hml_docs->path);
+        gui_free(hml_docs);
+        hml_docs = next;
+    }
     hml_entry_view_name = NULL;
+    hml_strpool_clear();
 }

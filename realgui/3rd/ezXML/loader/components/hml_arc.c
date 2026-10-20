@@ -1,79 +1,58 @@
 /**
  * @file hml_arc.c
  * @brief HML Arc Component (hg_arc)
+ *
+ * Attribute mapping follows the designer's ArcGenerator: x/y/width/height is
+ * the bounding box, gui_arc_create() takes the center.
  */
 
 #include "../hml_component.h"
 #include "../hml_utils.h"
+#include "../hml_json.h"
 #include "gui_arc.h"
 #include "gui_api.h"
 #include <string.h>
-#include <stdlib.h>
 
 gui_obj_t *hml_create_arc(gui_obj_t *parent, ezxml_t node)
 {
     const char *id = hml_attr_str(node, "id", "arc");
     int x = hml_attr_int(node, "x", 0);
     int y = hml_attr_int(node, "y", 0);
-    int radius = hml_attr_int(node, "radius", 50);
+    int w = hml_attr_width(node, 80);
+    int h = hml_attr_height(node, 80);
+    int radius = hml_attr_int(node, "radius", 40);
     float start_angle = (float)hml_attr_int(node, "startAngle", 0);
-    float end_angle = (float)hml_attr_int(node, "endAngle", 90);
-    float stroke_width = (float)hml_attr_int(node, "strokeWidth", 2);
-    gui_color_t color = hml_attr_color(node, "color", 0xFFFFFFFF);
+    float end_angle = (float)hml_attr_int(node, "endAngle", 270);
+    float stroke = (float)hml_attr_int(node, "strokeWidth", 8);
 
-    gui_arc_t *arc = gui_arc_create(parent, id, x, y, radius,
-                                    start_angle, end_angle, stroke_width, color);
-
-    // Opacity support
+    uint32_t argb = hml_parse_argb(ezxml_attr(node, "color"), 0xFFFFFFFF);
     int opacity = hml_attr_int(node, "opacity", 255);
-    if (opacity != 255)
+    if (opacity >= 0 && opacity < 255)
     {
-        gui_arc_set_opacity(arc, (uint8_t)opacity);
+        argb = (argb & 0x00FFFFFFu) | ((uint32_t)opacity << 24);
     }
+    gui_color_t color;
+    color.color.argb_full = argb;
 
-    // Gradient support
-    const char *use_grad = hml_attr_str(node, "useGradient", "false");
-    if (strcmp(use_grad, "true") == 0)
+    gui_arc_t *arc = gui_arc_create(parent, id, x + w / 2, y + h / 2, radius,
+                                    start_angle, end_angle, stroke, color);
+    if (!arc) { return NULL; }
+
+    if (hml_attr_bool(node, "useGradient", false))
     {
-        // Get gradient end angle (default to end_angle if not specified)
-        int grad_end = hml_attr_int(node, "gradientEndAngle", (int)end_angle);
-        gui_arc_set_angular_gradient(arc, start_angle, (float)grad_end);
-
-        // Parse gradient stops (simple format: [{"position":0,"color":"#FF0000"},{"position":1,"color":"#0000FF"}])
-        const char *stops = ezxml_attr(node, "gradientStops");
-        if (stops)
+        hml_json_t *stops = hml_json_parse(ezxml_attr(node, "gradientStops"));
+        if (hml_json_size(stops) >= 2)
         {
-            const char *ptr = stops;
-            while ((ptr = strstr(ptr, "\"position\":")) != NULL)
+            gui_arc_set_angular_gradient(arc, (float)hml_attr_int(node, "gradientStartAngle", (int)start_angle),
+                                         (float)hml_attr_int(node, "gradientEndAngle", 360));
+            for (const hml_json_t *s = stops->child; s; s = s->next)
             {
-                ptr += 11; // Skip "position":
-                float position = (float)atof(ptr);
-
-                // Find color field
-                const char *color_ptr = strstr(ptr, "\"color\":");
-                if (color_ptr)
-                {
-                    color_ptr += 8; // Skip "color":
-                    // Skip whitespace and quotes
-                    while (*color_ptr == ' ' || *color_ptr == '\"') { color_ptr++; }
-
-                    // Parse color (format: #RRGGBB or #AARRGGBB)
-                    if (*color_ptr == '#')
-                    {
-                        color_ptr++;
-                        uint32_t argb = (uint32_t)strtoul(color_ptr, NULL, 16);
-                        // If 6 chars (RGB), add full opacity
-                        if (strlen(color_ptr) >= 6 && (color_ptr[6] == '\"' || color_ptr[6] == ',' || color_ptr[6] == '}'))
-                        {
-                            argb = 0xFF000000 | argb;
-                        }
-                        gui_color_t color;
-                        color.color.argb_full = argb;
-                        gui_arc_add_gradient_stop(arc, position, color);
-                    }
-                }
+                gui_color_t c;
+                c.color.argb_full = hml_parse_argb(hml_json_str(s, "color", NULL), 0xFFFFFFFF);
+                gui_arc_add_gradient_stop(arc, hml_json_float(s, "position", 0.0f), c);
             }
         }
+        hml_json_free(stops);
     }
 
     return (gui_obj_t *)arc;

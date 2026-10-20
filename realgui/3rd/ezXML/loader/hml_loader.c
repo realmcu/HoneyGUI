@@ -6,19 +6,22 @@
 #include "hml_loader.h"
 #include "hml_view_instance.h"
 #include "hml_component.h"
+#include "hml_runtime.h"
+#include "hml_event.h"
 #include "hml_utils.h"
 #include "ezxml.h"
 #include "gui_vfs.h"
 #include "gui_api.h"
 #include "gui_view.h"
+#include "gui_obj_focus.h"
 #include <string.h>
 #include <stdlib.h>
 
-#define HML_MAX_CALLBACKS 64
-
+#define HML_MAX_CALLBACKS   64
+#define HML_MAX_CHILDREN    128
 
 /*============================================================================*
- *                              Callback Registry
+ *                              Legacy callback registry
  *============================================================================*/
 
 typedef struct
@@ -53,30 +56,21 @@ static hml_callback_t hml_find_callback(const char *name)
     return NULL;
 }
 
-/*============================================================================*
- *                              Event Binding
- *============================================================================*/
-
-static void hml_bind_events(gui_obj_t *obj, ezxml_t node)
+/* onClick="name" / onLongPress="name" attributes (older HML) */
+static void hml_bind_attr_events(gui_obj_t *obj, ezxml_t node)
 {
     const char *on_click = ezxml_attr(node, "onClick");
-    if (on_click)
+    hml_callback_t func = hml_find_callback(on_click);
+    if (func)
     {
-        hml_callback_t func = hml_find_callback(on_click);
-        if (func)
-        {
-            gui_obj_add_event_cb(obj, (gui_event_cb_t)func, GUI_EVENT_TOUCH_CLICKED, NULL);
-        }
+        gui_obj_add_event_cb(obj, (gui_event_cb_t)func, GUI_EVENT_TOUCH_CLICKED, NULL);
     }
 
     const char *on_long_press = ezxml_attr(node, "onLongPress");
-    if (on_long_press)
+    func = hml_find_callback(on_long_press);
+    if (func)
     {
-        hml_callback_t func = hml_find_callback(on_long_press);
-        if (func)
-        {
-            gui_obj_add_event_cb(obj, (gui_event_cb_t)func, GUI_EVENT_TOUCH_LONG, NULL);
-        }
+        gui_obj_add_event_cb(obj, (gui_event_cb_t)func, GUI_EVENT_TOUCH_LONG, NULL);
     }
 }
 
@@ -84,78 +78,129 @@ static void hml_bind_events(gui_obj_t *obj, ezxml_t node)
  *                              Parser
  *============================================================================*/
 
+typedef struct
+{
+    const char *tag;
+    hml_component_creator_t create;
+} hml_tag_entry_t;
+
+static const hml_tag_entry_t hml_tags[] =
+{
+    { "hg_window",     hml_create_window },
+    { "hg_win",        hml_create_window },
+    { "hg_image",      hml_create_image },
+    { "hg_img",        hml_create_image },
+    { "hg_text",       hml_create_text },
+    { "hg_label",      hml_create_label },
+    { "hg_canvas",     hml_create_canvas },
+    { "hg_rect",       hml_create_canvas },
+    { "hg_arc",        hml_create_arc },
+    { "hg_circle",     hml_create_circle },
+    { "hg_list",       hml_create_list },
+    { "hg_button",     hml_create_button },
+    { "hg_video",      hml_create_video },
+    { "hg_streaming",  hml_create_streaming },
+    { "hg_time_label", hml_create_time_label },
+};
+
+/* Nodes that carry data for their parent, not components */
+static bool hml_is_data_node(const char *tag)
+{
+    return !strcmp(tag, "events") || !strcmp(tag, "event") || !strcmp(tag, "action") ||
+           !strcmp(tag, "meta") || !strcmp(tag, "hg_list_item");
+}
+
+static hml_component_creator_t hml_find_creator(const char *tag)
+{
+    for (size_t i = 0; i < sizeof(hml_tags) / sizeof(hml_tags[0]); i++)
+    {
+        if (strcmp(hml_tags[i].tag, tag) == 0) { return hml_tags[i].create; }
+    }
+    return NULL;
+}
+
+/*
+ * Common steps after a component is created, in the order of the designer's
+ * exported code: properties, timers, events, focus for key events.
+ */
+void hml_component_finish(gui_obj_t *obj, ezxml_t node, bool is_view)
+{
+    hml_runtime_add(obj, node);
+
+    if (!is_view && !hml_attr_bool(node, "visible", true))
+    {
+        gui_obj_hidden(obj, true);
+    }
+
+    hml_runtime_bind_timers(obj, node, is_view);
+    hml_runtime_bind_events(obj, node, is_view);
+    hml_bind_attr_events(obj, node);
+
+    if (hml_has_key_events(node))
+    {
+        gui_obj_focus_set(obj);
+    }
+}
+
 static gui_obj_t *hml_create_component(gui_obj_t *parent, ezxml_t node)
 {
-    const char *tag = node->name;
+    hml_component_creator_t create = hml_find_creator(node->name);
+    if (!create) { return NULL; }
 
-    if (strcmp(tag, "hg_view") == 0 || strcmp(tag, "hg_window") == 0 || strcmp(tag, "hg_win") == 0)
+    gui_obj_t *obj = create(parent, node);
+    if (!obj)
     {
-        return hml_create_view(parent, node);
+        gui_log("[HML] failed to create <%s id=%s>\n", node->name, hml_attr_str(node, "id", "?"));
+        return NULL;
     }
-    else if (strcmp(tag, "hg_image") == 0)
-    {
-        return hml_create_image(parent, node);
-    }
-    else if (strcmp(tag, "hg_text") == 0)
-    {
-        return hml_create_text(parent, node);
-    }
-    else if (strcmp(tag, "hg_label") == 0)
-    {
-        return hml_create_label(parent, node);
-    }
-    else if (strcmp(tag, "hg_canvas") == 0 || strcmp(tag, "hg_rect") == 0)
-    {
-        return hml_create_canvas(parent, node);
-    }
-    else if (strcmp(tag, "hg_arc") == 0)
-    {
-        return hml_create_arc(parent, node);
-    }
-    else if (strcmp(tag, "hg_circle") == 0)
-    {
-        return hml_create_circle(parent, node);
-    }
-    else if (strcmp(tag, "hg_list") == 0)
-    {
-        return hml_create_list(parent, node);
-    }
-    else if (strcmp(tag, "hg_list_item") == 0)
-    {
-        return hml_create_list_item(parent, node);
-    }
-    else if (strcmp(tag, "hg_button") == 0)
-    {
-        return hml_create_button(parent, node);
-    }
-    else if (strcmp(tag, "hg_video") == 0)
-    {
-        return hml_create_video(parent, node);
-    }
-
-    else if (strcmp(tag, "hg_time_label") == 0)
-    {
-        return hml_create_time_label(parent, node);
-    }
-
-    return NULL;
+    hml_component_finish(obj, node, false);
+    return obj;
 }
 
 void hml_parse_children(gui_obj_t *parent, ezxml_t node)
 {
+    // Children are created in ascending zIndex, stable for equal values,
+    // so later (higher) ones are drawn on top, as in the exported code
+    ezxml_t kids[HML_MAX_CHILDREN];
+    int n = 0;
     for (ezxml_t child = node->child; child; child = child->ordered)
     {
+        if (hml_is_data_node(child->name)) { continue; }
+        if (n >= HML_MAX_CHILDREN)
+        {
+            gui_log("[HML] too many children under %s\n", hml_attr_str(node, "id", node->name));
+            break;
+        }
+        kids[n++] = child;
+    }
+    for (int i = 1; i < n; i++)
+    {
+        ezxml_t k = kids[i];
+        int z = hml_attr_int(k, "zIndex", 0);
+        int j = i - 1;
+        while (j >= 0 && hml_attr_int(kids[j], "zIndex", 0) > z)
+        {
+            kids[j + 1] = kids[j];
+            j--;
+        }
+        kids[j + 1] = k;
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        ezxml_t child = kids[i];
         gui_obj_t *obj = hml_create_component(parent, child);
         if (obj)
         {
-            gui_log("[HML] Create <%s>\n", child->name);
-            hml_bind_events(obj, child);
-            hml_parse_children(obj, child);
+            // A list builds its items lazily through its note_design callback
+            if (strcmp(child->name, "hg_list") != 0)
+            {
+                hml_parse_children(obj, child);
+            }
         }
-        else
+        else if (!hml_find_creator(child->name))
         {
             gui_log("[HML] Skip <%s>\n", child->name);
-            hml_parse_children(parent, child);
         }
     }
 }
@@ -164,40 +209,55 @@ void hml_parse_children(gui_obj_t *parent, ezxml_t node)
  *                              Public API
  *============================================================================*/
 
-gui_obj_t *hml_load(gui_obj_t *parent, const char *path)
+char *hml_read_file(const char *path, size_t *len)
 {
     if (!path) { return NULL; }
 
     gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
-    if (!f)
-    {
-        gui_log("hml_load: failed to load '%s'\n", path);
-        return NULL;
-    }
+    if (!f) { return NULL; }
 
     gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
     int size = gui_vfs_tell(f);
     gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
+    if (size <= 0)
+    {
+        gui_vfs_close(f);
+        return NULL;
+    }
 
-    if (size <= 0) { gui_vfs_close(f); return NULL; }
-
-    char *content = (char *)gui_malloc(size);
-    if (!content) { gui_vfs_close(f); return NULL; }
-
-    gui_vfs_read(f, content, size);
+    char *buf = gui_malloc((size_t)size + 1);
+    if (buf)
+    {
+        int got = gui_vfs_read(f, buf, (size_t)size);
+        buf[got > 0 ? got : 0] = '\0';
+        if (len) { *len = got > 0 ? (size_t)got : 0; }
+    }
     gui_vfs_close(f);
+    return buf;
+}
 
-    // Parse XML
+gui_obj_t *hml_load(gui_obj_t *parent, const char *path)
+{
+    size_t size = 0;
+    char *content = hml_read_file(path, &size);
+    if (!content)
+    {
+        gui_log("hml_load: failed to load '%s'\n", path ? path : "(null)");
+        return NULL;
+    }
+
+    // The parsed tree is kept for the lifetime of the program: widgets keep
+    // pointers to attribute strings (text, ids) and events read it lazily
     ezxml_t root = ezxml_parse_str(content, size);
-    gui_free(content);
+    if (!root)
+    {
+        gui_free(content);
+        return NULL;
+    }
 
-    if (!root) { return NULL; }
-
-    // Create root component
     gui_obj_t *result = hml_create_component(parent, root);
     if (result)
     {
-        hml_bind_events(result, root);
         hml_parse_children(result, root);
     }
     else
@@ -205,8 +265,6 @@ gui_obj_t *hml_load(gui_obj_t *parent, const char *path)
         hml_parse_children(parent, root);
         result = parent;
     }
-
-    ezxml_free(root);
     return result;
 }
 
