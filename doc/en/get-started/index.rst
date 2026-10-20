@@ -98,12 +98,12 @@ Before compiling, you can use the ``menuconfig`` graphical configuration tool to
 Using Menuconfig for Configuration
 """""""""""""""""""""""""""""""""""
 
-Execute the following commands in the ``win32_sim`` directory:
+Execute the following commands in the ``HoneyGUI`` folder:
 
 .. code-block:: shell
 
-   > cd win32_sim
-   > menuconfig ../Kconfig.gui
+   > cd simulator\win32
+   > menuconfig ../../Kconfig.gui
 
 After executing the command, a graphical configuration interface will open:
 
@@ -138,7 +138,7 @@ Operation Instructions
 Configuration File Description
 """"""""""""""""""""""""""""""
 
-After configuration, the ``.config`` file will be automatically generated in the ``HoneyGUI\win32_sim`` directory. The build system (SCons or CMake) will automatically read this configuration file and compile the corresponding application based on the configuration.
+After configuration, the ``.config`` file will be automatically generated in the ``HoneyGUI\simulator\win32`` directory. The build system (SCons or CMake) will automatically read this configuration file and compile the corresponding application based on the configuration.
 
 .. note::
 
@@ -152,10 +152,10 @@ Open a CMD window in the ``HoneyGUI`` folder, and then run the following command
 
 .. code-block:: shell
 
-   > cd win32_sim
+   > cd simulator\win32
    > scons
-   > cd ..
-   > .\win32_sim\gui.exe
+   > cd ..\..
+   > .\simulator\win32\gui.exe
 
 The ``scons`` command to perform the build process and then execute ``gui.exe`` to run it.
 
@@ -184,7 +184,7 @@ In the ``HoneyGUI`` folder, execute:
 
 .. code-block:: shell
 
-   > cd win32_sim
+   > cd simulator\win32
    > mkdir build
    > cd build
    > cmake -G "MinGW Makefiles" ..
@@ -192,12 +192,12 @@ In the ``HoneyGUI`` folder, execute:
 Configuring the Application
 """"""""""""""""""""""""""""
 
-If you need to change the application configuration, refer to the previous :ref:`Configure Application (Menuconfig)` section and execute the ``menuconfig ../Kconfig.gui`` command in the ``win32_sim`` directory.
+If you need to change the application configuration, refer to the previous :ref:`Configure Application (Menuconfig)` section and execute the ``menuconfig ../../Kconfig.gui`` command in the ``simulator\win32`` directory.
 
 Compiling the Project
 """""""""""""""""""""
 
-In the ``HoneyGUI\win32_sim\build`` folder, execute:
+In the ``HoneyGUI\simulator\win32\build`` folder, execute:
 
 .. code-block:: shell
       
@@ -218,7 +218,7 @@ In the ``HoneyGUI`` folder, execute:
 
 .. code-block:: shell
    
-   > .\win32_sim\build\gui.exe
+   > .\simulator\win32\build\gui.exe
 
 
 

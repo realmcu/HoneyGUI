@@ -5,7 +5,7 @@
             "name": "g++.exe build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/win32_sim/gui${command:pickPlatform}",
+            "program": "${workspaceFolder}/simulator/win32/gui${command:pickPlatform}",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -18,12 +18,12 @@
             "externalConsole": false,
             "MIMode": "gdb",
             "windows": {
-                "program": "${workspaceFolder}\\win32_sim\\gui.exe",
+                "program": "${workspaceFolder}\\simulator\\win32\\gui.exe",
                 "miDebuggerPath": "gdb.exe"
             },
             "linux": {
-                "program": "${workspaceFolder}/win32_sim/gui",
-                "cwd": "${workspaceFolder}/win32_sim",
+                "program": "${workspaceFolder}/simulator/win32/gui",
+                "cwd": "${workspaceFolder}/simulator/win32",
                 "miDebuggerPath": "/usr/bin/gdb",
                 "miDebuggerArgs": "-iex 'set debuginfod enabled off' -iex 'set debuginfod urls \"\"' -iex 'set auto-solib-add off'"
             },

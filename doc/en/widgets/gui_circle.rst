@@ -144,10 +144,10 @@ Enable the Kconfig option via ``menuconfig``:
 
 .. code-block:: shell
 
-   cd win32_sim
-   menuconfig ../Kconfig.gui
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui
 
-Select ``Geometry CIRCLE Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE`` ), then save to ``win32_sim/.config``.
+Select ``Geometry CIRCLE Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE`` ), then save to ``simulator/win32/.config``.
 
 .. code-block:: c
 

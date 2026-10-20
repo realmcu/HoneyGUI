@@ -4,7 +4,7 @@
   SPDX-License-Identifier: MIT
 
   HoneyGUI web simulator page. Build first (see CMakeLists.txt) and run
-  "python web_sim/pack_files.py", then open this file: double-clicking it
+  "python simulator/web/pack_files.py", then open this file: double-clicking it
   works. Everything it needs (gui.js with the wasm embedded, files.js) is
   loaded with plain <script> tags, which browsers allow from disk.
 -->
@@ -32,11 +32,12 @@
             const canvas = document.getElementById('screen');
             try {
                 if (typeof globalThis.createHoneyGUI !== 'function') {
-                    throw new Error('build/gui.js is missing. Build web_sim first: ' +
-                                    'emcmake cmake -S web_sim -B web_sim/build -G Ninja && cmake --build web_sim/build');
+                    throw new Error('build/gui.js is missing. Build simulator/web first: ' +
+                                    'emcmake cmake -S simulator/web -B simulator/web/build -G Ninja && ' +
+                                    'cmake --build simulator/web/build');
                 }
                 if (!globalThis.HONEYGUI_WEB_SIM_FILES) {
-                    throw new Error('files.js is missing. Run: python web_sim/pack_files.py');
+                    throw new Error('files.js is missing. Run: python simulator/web/pack_files.py');
                 }
                 const files = {};
                 for (const [path, base64] of Object.entries(globalThis.HONEYGUI_WEB_SIM_FILES)) {

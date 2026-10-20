@@ -67,39 +67,39 @@ if __name__ == '__main__':
     repo = git.Repo(search_parent_directories=True)
     repo.git.clean('-dfx')
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
-    #win32_sim scons
-    os.chdir('./win32_sim')
+    #simulator/win32 scons
+    os.chdir('./simulator/win32')
     try:
         subprocess.check_call(["scons.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
-        os.chdir('./..')
-        send_mail("win32_sim: 'scons' fail.", None)
-        sys.exit("win32_sim: 'scons' fail, {}".format(e))
-    os.chdir('./..')
+        os.chdir('./../..')
+        send_mail("simulator/win32: 'scons' fail.", None)
+        sys.exit("simulator/win32: 'scons' fail, {}".format(e))
+    os.chdir('./../..')
     #reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
-    #keil_sim/ac5 scons --target=mdk5
-    os.chdir('./keil_sim/ac5')
+    #simulator/keil/ac5 scons --target=mdk5
+    os.chdir('./simulator/keil/ac5')
     try:
         subprocess.check_call(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
-        os.chdir('./../..')
-        send_mail("keil_sim/ac5: 'keil_sim/ac5: 'scons --target=mdk5' fail.", None)
-        sys.exit("keil_sim/ac5: 'keil_sim/ac5: 'scons --target=mdk5' fail, {}".format(e))
-    os.chdir('./../..')
+        os.chdir('./../../..')
+        send_mail("simulator/keil/ac5: 'simulator/keil/ac5: 'scons --target=mdk5' fail.", None)
+        sys.exit("simulator/keil/ac5: 'simulator/keil/ac5: 'scons --target=mdk5' fail, {}".format(e))
+    os.chdir('./../../..')
     #reset
     '''repo.git.checkout('--', '.')
     repo.git.clean('-dfx')'''
-    #keil_sim/ac6 scons --target=mdk5
-    os.chdir('./keil_sim/ac6')
+    #simulator/keil/ac6 scons --target=mdk5
+    os.chdir('./simulator/keil/ac6')
     try:
         subprocess.check_call(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
-        os.chdir('./../..')
-        send_mail("keil_sim/ac6: 'keil_sim/ac6: 'scons --target=mdk5' fail.", None)
-        sys.exit("keil_sim/ac6: 'keil_sim/ac6: 'scons --target=mdk5' fail, {}".format(e))
-    os.chdir('./../..')
+        os.chdir('./../../..')
+        send_mail("simulator/keil/ac6: 'simulator/keil/ac6: 'scons --target=mdk5' fail.", None)
+        sys.exit("simulator/keil/ac6: 'simulator/keil/ac6: 'scons --target=mdk5' fail, {}".format(e))
+    os.chdir('./../../..')
     #reset
     '''repo.git.checkout('--', '.')
     repo.git.clean('-dfx')'''
@@ -108,5 +108,5 @@ if __name__ == '__main__':
     print("call build {}".format(chip_type))
     if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path"), error_record_path=os.path.join(os.getcwd(), "error_record_{}".format(chip_type))):
         log_file = sorted(glob.glob(os.path.join(os.path.join(os.getcwd(), "error_record_{}".format(chip_type)), '*.txt')), reverse=True)[0]
-        send_mail("keil_sim/ac6: keil build fail", log_file)
+        send_mail("simulator/keil/ac6: keil build fail", log_file)
         sys.exit("build {} fail".format(chip_type))

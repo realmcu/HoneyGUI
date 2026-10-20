@@ -3,7 +3,7 @@ import sys
 import menu_config
 from SCons.Script import *
 
-TOOL_ROOT="../../tool/scons-tool"
+TOOL_ROOT="../../../tool/scons-tool"
 
 sys.path = sys.path + [os.path.join(TOOL_ROOT, '')]
 try:
@@ -24,8 +24,8 @@ env = Environment(tools = ['mingw'],
 
 
 
-RTK_GUI_ENGINE = os.path.abspath('./../../realgui/')
-GUI_EXAMPLE = os.path.abspath('./../../example/')
+RTK_GUI_ENGINE = os.path.abspath('./../../../realgui/')
+GUI_EXAMPLE = os.path.abspath('./../../../example/')
 PLATFORM = menu_config.PLATFORM
 
 Export('PLATFORM')

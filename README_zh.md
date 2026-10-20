@@ -127,11 +127,11 @@ HoneyGUI 遵循四段式版本号命名规范：
 
 #### 使用 Menuconfig 进行配置
 
-在 `win32_sim` 目录下执行以下命令：
+在 `HoneyGUI` 文件夹中执行以下命令：
 
 ```shell
-> cd win32_sim
-> menuconfig ../Kconfig.gui
+> cd simulator\win32
+> menuconfig ../../Kconfig.gui
 ```
 
 执行命令后，将打开图形化配置界面：
@@ -163,7 +163,7 @@ HoneyGUI 遵循四段式版本号命名规范：
 
 #### 配置文件说明
 
-配置完成后，会在 `HoneyGUI\win32_sim` 目录下自动生成 `.config` 文件。构建系统（SCons 或 CMake）会自动读取此配置文件，并根据配置编译相应的应用程序。
+配置完成后，会在 `HoneyGUI\simulator\win32` 目录下自动生成 `.config` 文件。构建系统（SCons 或 CMake）会自动读取此配置文件，并根据配置编译相应的应用程序。
 
 > **注意：** 如果不使用 menuconfig 进行配置，构建系统将使用默认配置或已存在的 `.config` 文件。
 
@@ -173,10 +173,10 @@ HoneyGUI 遵循四段式版本号命名规范：
 在 `HoneyGUI` 文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
 
 ```shell
-> cd win32_sim
+> cd simulator\win32
 > scons
-> cd ..
-> .\win32_sim\gui.exe
+> cd ..\..
+> .\simulator\win32\gui.exe
 ```
 
 `scons` 命令执行构建过程，然后执行 `gui.exe` 来运行应用程序。
@@ -200,7 +200,7 @@ HoneyGUI 遵循四段式版本号命名规范：
 在 `HoneyGUI` 文件夹中执行：
 
 ```shell
-> cd win32_sim
+> cd simulator\win32
 > mkdir build
 > cd build
 > cmake -G "MinGW Makefiles" ..
@@ -208,11 +208,11 @@ HoneyGUI 遵循四段式版本号命名规范：
 
 #### 配置应用程序
 
-如需更改应用程序配置，请参考前面的 **配置应用程序（Menuconfig）** 部分，在 `win32_sim` 目录下执行 `menuconfig ../Kconfig.gui` 命令。
+如需更改应用程序配置，请参考前面的 **配置应用程序（Menuconfig）** 部分，在 `simulator\win32` 目录下执行 `menuconfig ../../Kconfig.gui` 命令。
 
 #### 编译项目
 
-在 `HoneyGUI\win32_sim\build` 文件夹中执行：
+在 `HoneyGUI\simulator\win32\build` 文件夹中执行：
 
 ```shell
 > cmake -G "MinGW Makefiles" ..
@@ -231,7 +231,7 @@ HoneyGUI 遵循四段式版本号命名规范：
 在 `HoneyGUI` 文件夹中执行：
 
 ```shell
-> .\win32_sim\build\gui.exe
+> .\simulator\win32\build\gui.exe
 ```
 
 

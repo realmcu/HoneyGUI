@@ -8,11 +8,8 @@ cwd = GetCurrentDir()
 inc = [cwd]
 src = Glob('*.c') + Glob('*.cpp')
 
-if not GetDepend(['CONFIG_REALTEK_BUILD_AUDIO']):
-    SrcRemove(src, ['gui_port_audio.c'])
-
 if GetDepend(['']):
-    objs = DefineGroup('win32_sim/port', src, depend = [''], CPPPATH = inc)
+    objs = DefineGroup('simulator/win32/port', src, depend = [''], CPPPATH = inc)
     list = os.listdir(cwd)
     for d in list:
         path = os.path.join(cwd, d)

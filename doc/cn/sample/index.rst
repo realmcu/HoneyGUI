@@ -6,10 +6,10 @@
 
 .. code-block:: shell
 
-   cd win32_sim
-   menuconfig ../Kconfig.gui
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui
 
-保存后，配置写入 ``win32_sim/.config``，构建系统会根据选择编译对应示例。
+保存后，配置写入 ``simulator/win32/.config``，构建系统会根据选择编译对应示例。
 
 
 .. figure:: https://foruda.gitee.com/images/1718765392647198639/ac4aa231_13408154.png

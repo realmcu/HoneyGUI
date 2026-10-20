@@ -9,7 +9,7 @@ ignore_declaration_check = [
 ]
 
 ignore_illgeal_check = [
-    "script/illegal_check_config.py",
+    "script",
     "doc/cn/_templates",
     "doc/en/_templates",
     "example/application/screen_410_502/root_image"

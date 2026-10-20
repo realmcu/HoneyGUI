@@ -10,7 +10,7 @@ cwd = GetCurrentDir()
 src = Glob('*.c') + Glob('*.cpp')
 
 if GetDepend(['']):
-    objs = DefineGroup('win32_sim/port/sysval', src,
+    objs = DefineGroup('simulator/win32/port/sysval', src,
                        depend = [''], CPPPATH = [cwd])
 else:
     objs = []

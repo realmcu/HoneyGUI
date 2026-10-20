@@ -68,10 +68,10 @@ Enable the Kconfig option via ``menuconfig`` to run this example:
 
 .. code-block:: shell
 
-   cd win32_sim
-   menuconfig ../Kconfig.gui
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui
 
-Select canvas demo (``CONFIG_REALTEK_BUILD_REAL_CANVAS``), then save to ``win32_sim/.config``.
+Select canvas demo (``CONFIG_REALTEK_BUILD_REAL_CANVAS``), then save to ``simulator/win32/.config``.
 
 .. literalinclude:: ../../../example/widget/canvas/example_canvas.c
    :language: c

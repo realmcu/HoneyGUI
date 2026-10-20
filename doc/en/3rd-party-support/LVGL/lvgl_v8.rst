@@ -41,7 +41,7 @@ Run LVGL in HoneyGUI Simulator
 --------------------------------
 HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be run and debugged in VScode. For specific environment setup and running instructions, please refer to the :ref:`Get Started` section.
 
-After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path :file:`your HoneyGUI dir\\win32_sim\\` and open the file :file:`menu_config.h`, which is the configuration file for the simulator. Under the section **HoneyGUI Demo Select**, comment out all the demos. Under the section **HoneyGUI Enable LVGL**, enable ``CONFIG_REALTEK_BUILD_LVGL_GUI``. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
+After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path :file:`your HoneyGUI dir\\simulator\\win32\\` and open the file :file:`menu_config.h`, which is the configuration file for the simulator. Under the section **HoneyGUI Demo Select**, comment out all the demos. Under the section **HoneyGUI Enable LVGL**, enable ``CONFIG_REALTEK_BUILD_LVGL_GUI``. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
 
 .. figure:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
    :align: center
@@ -92,7 +92,6 @@ The directories and files related to LVGL in HoneyGUI are as follows:
     |        |-- resource.h                   // resource files packed address
     |        |__ root(0x4600000).bin          // packed User Data
     |
-    |-- keil_sim
     |-- lib
     |-- lvgl_v8                               // LVGL v8.3
     |  |-- demos                              // LVGL demo source files
@@ -130,20 +129,22 @@ The directories and files related to LVGL in HoneyGUI are as follows:
     |-- lvgl_v9                               // LVGL v9
     :
     :
-    |__ win32_sim
-        :
-        |__ port                              // Simulator porting
-            |-- realgui_port                  // Simulator HoneyGUI porting
-            |-- lvgl_port                     // Simulator LVGLv8 porting
-            |    |-- lv_conf.h                // Simulator LVGL configuration
-            |    |-- lv_port_disp.c
-            |    |-- lv_port_disp.h
-            |    |-- lv_port_fs.c
-            |    |-- lv_port_fs.h
-            |    |-- lv_port_indev.c
-            |    |__ lv_port_indev.h
-            |
-            |__ lvglv9_port                    // Simulator LVGLv9 porting
+    |__ simulator
+        |-- keil
+        |__ win32
+            :
+            |__ port                          // Simulator porting
+                |-- realgui_port              // Simulator HoneyGUI porting
+                |-- lvgl_port                 // Simulator LVGLv8 porting
+                |    |-- lv_conf.h            // Simulator LVGL configuration
+                |    |-- lv_port_disp.c
+                |    |-- lv_port_disp.h
+                |    |-- lv_port_fs.c
+                |    |-- lv_port_fs.h
+                |    |-- lv_port_indev.c
+                |    |__ lv_port_indev.h
+                |
+                |__ lvglv9_port               // Simulator LVGLv9 porting
 
 
 

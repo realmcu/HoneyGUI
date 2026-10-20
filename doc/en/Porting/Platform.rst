@@ -53,7 +53,7 @@ Display Device
 
 - A typical ``gui_dispdev`` structure initialization example:
 
-  .. literalinclude:: ../../../win32_sim/port/realgui_port/gui_port_dc.c
+  .. literalinclude:: ../../../simulator/win32/port/realgui_port/gui_port_dc.c
      :language: c
      :start-after: /* gui_dispdev example define start */
      :end-before: /* gui_dispdev example define end */

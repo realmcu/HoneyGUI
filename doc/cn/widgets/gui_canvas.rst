@@ -68,10 +68,10 @@
 
 .. code-block:: shell
 
-   cd win32_sim
-   menuconfig ../Kconfig.gui
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui
 
-选择画布示例（ ``CONFIG_REALTEK_BUILD_REAL_CANVAS``），保存到 ``win32_sim/.config``。
+选择画布示例（ ``CONFIG_REALTEK_BUILD_REAL_CANVAS``），保存到 ``simulator/win32/.config``。
 
 .. literalinclude:: ../../../example/widget/canvas/example_canvas.c
    :language: c

@@ -130,11 +130,11 @@ Before compiling, you can use the `menuconfig` graphical configuration tool to s
 
 #### Using Menuconfig for Configuration
 
-Execute the following commands in the `win32_sim` directory:
+Execute the following commands in the `HoneyGUI` folder:
 
 ```shell
-> cd win32_sim
-> menuconfig ../Kconfig.gui
+> cd simulator\win32
+> menuconfig ../../Kconfig.gui
 ```
 
 After executing the command, the graphical configuration interface will open:
@@ -166,7 +166,7 @@ After executing the command, the graphical configuration interface will open:
 
 #### Configuration File Description
 
-After configuration is complete, a `.config` file will be automatically generated in the `HoneyGUI\win32_sim` directory. The build system (SCons or CMake) will automatically read this configuration file and compile the corresponding application according to the configuration.
+After configuration is complete, a `.config` file will be automatically generated in the `HoneyGUI\simulator\win32` directory. The build system (SCons or CMake) will automatically read this configuration file and compile the corresponding application according to the configuration.
 
 > **Note:** If you do not use menuconfig for configuration, the build system will use the default configuration or an existing `.config` file.
 
@@ -177,10 +177,10 @@ After installing the `MinGW-w64` toolchain and `scons` library, you can launch t
 Open a CMD window in the `HoneyGUI` folder, then run the following commands to start the application.
 
 ```shell
-> cd win32_sim
+> cd simulator\win32
 > scons
-> cd ..
-> .\win32_sim\gui.exe
+> cd ..\..
+> .\simulator\win32\gui.exe
 ```
 
 The `scons` command performs the build process, then execute `gui.exe` to run the application.
@@ -203,7 +203,7 @@ The `scons` command performs the build process, then execute `gui.exe` to run th
 Execute in the `HoneyGUI` folder:
 
 ```shell
-> cd win32_sim
+> cd simulator\win32
 > mkdir build
 > cd build
 > cmake -G "MinGW Makefiles" ..
@@ -211,11 +211,11 @@ Execute in the `HoneyGUI` folder:
 
 #### Configure Application
 
-To change the application configuration, refer to the **Configure Application (Menuconfig)** section above, and execute the `menuconfig ../Kconfig.gui` command in the `win32_sim` directory.
+To change the application configuration, refer to the **Configure Application (Menuconfig)** section above, and execute the `menuconfig ../../Kconfig.gui` command in the `simulator\win32` directory.
 
 #### Compile Project
 
-Execute in the `HoneyGUI\win32_sim\build` folder:
+Execute in the `HoneyGUI\simulator\win32\build` folder:
 
 ```shell
 > cmake -G "MinGW Makefiles" ..
@@ -234,7 +234,7 @@ During compilation, CMake will automatically:
 Execute in the `HoneyGUI` folder:
 
 ```shell
-> .\win32_sim\build\gui.exe
+> .\simulator\win32\build\gui.exe
 ```
 
 ### Startup by VSCode

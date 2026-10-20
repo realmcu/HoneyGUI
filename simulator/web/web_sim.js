@@ -25,7 +25,7 @@
  *
  * Files are written relative to the module's working directory, which is
  * what the POSIX VFS mount "/pc" -> "." resolves against (same layout as
- * running win32_sim from the repository root).
+ * running simulator/win32 from the repository root).
  */
 
 /* Touch event codes from realgui/input/tp_algo.h */

@@ -55,20 +55,20 @@ Mkfile.old
 dkms.conf
 *.pyc
 .gitignore
-keil_sim/ac5/RTE/*
-keil_sim/ac5/build/*
-keil_sim/ac5/HoneyGUI.uvguix.*
-keil_sim/ac6/RTE/*
-keil_sim/ac6/build/*
-keil_sim/ac6/HoneyGUI.uvguix.*
+simulator/keil/ac5/RTE/*
+simulator/keil/ac5/build/*
+simulator/keil/ac5/HoneyGUI.uvguix.*
+simulator/keil/ac6/RTE/*
+simulator/keil/ac6/build/*
+simulator/keil/ac6/HoneyGUI.uvguix.*
 lib/RTE/*
 lib/build/*
 lib/gui_engine.uvguix.*
 *.dblite
 
 # Generated config headers
-win32_sim/hgconfig.h
-win32_sim/cconfig.h
+simulator/win32/hgconfig.h
+simulator/win32/cconfig.h
 hgconfig.h
 
 # Build artifacts
@@ -97,22 +97,22 @@ doxygen_graphviz/_build
 .vscode/
 
 # Build output directories
-win32_sim/build/
-web_sim/build/
-web_sim/files.js
+simulator/win32/build/
+simulator/web/build/
+simulator/web/files.js
 lib/emscripten/build/
 lib/emscripten/install/
-keil_sim/ac5/build/
-keil_sim/ac6/build/
+simulator/keil/ac5/build/
+simulator/keil/ac6/build/
 lib/build/
 doc/build/
 doc/_build/
 doxygen_graphviz/_build/
 
 # Executables and binaries
-win32_sim/gui.bin
-win32_sim/gui
-win32_sim/gui.exe
+simulator/win32/gui.bin
+simulator/win32/gui
+simulator/win32/gui.exe
 
 # tool
 tool/D2XML/MasterGo_plugin/node_modules/

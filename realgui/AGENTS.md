@@ -25,7 +25,7 @@
 ## Build Integration
 
 - Included via CMakeLists.txt or SConscript in parent
-- Linked into: win32_sim, keil_sim, lib/*, zephyr
+- Linked into: simulator/win32, simulator/web, simulator/keil, lib/*, zephyr
 - Kconfig options in Kconfig.gui for feature selection
 
 ## Anti-Patterns

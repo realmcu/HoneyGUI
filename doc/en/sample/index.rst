@@ -6,10 +6,10 @@ We have provided some example applications to help everyone become familiar with
 
 .. code-block:: shell
 
-   cd win32_sim
-   menuconfig ../Kconfig.gui
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui
 
-After saving, the configuration is written to ``win32_sim/.config`` and the build system will compile the selected sample.
+After saving, the configuration is written to ``simulator/win32/.config`` and the build system will compile the selected sample.
 
 .. figure:: https://foruda.gitee.com/images/1718765392647198639/ac4aa231_13408154.png
    :align: center

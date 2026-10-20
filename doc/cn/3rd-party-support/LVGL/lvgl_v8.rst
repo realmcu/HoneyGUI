@@ -44,7 +44,7 @@ HoneyGUI 模拟器
 -----------------------------
 HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南` 章节。
 
-完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 :file:`your HoneyGUI dir\\win32_sim\\` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，在 **HoneyGUI Demo Select** 下注释掉所有的 Demo，在 **HoneyGUI Enable LVGL** 下使能 ``CONFIG_REALTEK_BUILD_LVGL_GUI``。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
+完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 :file:`your HoneyGUI dir\\simulator\\win32\\` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，在 **HoneyGUI Demo Select** 下注释掉所有的 Demo，在 **HoneyGUI Enable LVGL** 下使能 ``CONFIG_REALTEK_BUILD_LVGL_GUI``。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
 
 
 .. figure:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
@@ -101,7 +101,6 @@ HoneyGUI LVGL
     |        |-- resource.h                   // 打包的文件资源地址映射
     |        |__ root(0x4600000).bin          // 打包的 User Data
     |
-    |-- keil_sim
     |-- lib
     |-- lvgl_v8                               // LVGL v8.3
     |  |-- demos                              // LVGL demo 源文件
@@ -140,20 +139,22 @@ HoneyGUI LVGL
     |
     :
     :
-    |__ win32_sim
-        :
-        |__ port                              // 模拟器 porting
-            |-- realgui_port                  // 模拟器 HoneyGUI porting
-            |-- lvgl_port                     // 模拟器 LVGLv8 porting
-            |    |-- lv_conf.h                // 模拟器 LVGL 配置定义
-            |    |-- lv_port_disp.c
-            |    |-- lv_port_disp.h
-            |    |-- lv_port_fs.c
-            |    |-- lv_port_fs.h
-            |    |-- lv_port_indev.c
-            |    |__ lv_port_indev.h
-            |
-            |__ lvglv9_port                    // 模拟器 LVGLv9 porting
+    |__ simulator
+        |-- keil
+        |__ win32
+            :
+            |__ port                          // 模拟器 porting
+                |-- realgui_port              // 模拟器 HoneyGUI porting
+                |-- lvgl_port                 // 模拟器 LVGLv8 porting
+                |    |-- lv_conf.h            // 模拟器 LVGL 配置定义
+                |    |-- lv_port_disp.c
+                |    |-- lv_port_disp.h
+                |    |-- lv_port_fs.c
+                |    |-- lv_port_fs.h
+                |    |-- lv_port_indev.c
+                |    |__ lv_port_indev.h
+                |
+                |__ lvglv9_port               // 模拟器 LVGLv9 porting
 
 
 

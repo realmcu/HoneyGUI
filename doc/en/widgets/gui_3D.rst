@@ -323,7 +323,7 @@ This model consists of 1454 triangular faces and is filled with a default materi
 3D Dog
 ~~~~~~~~
 
-To run this example, enable the Kconfig option via ``menuconfig`` and save to ``win32_sim/.config``. The model consists of 774 triangular surfaces and supports filling with a custom material base color.
+To run this example, enable the Kconfig option via ``menuconfig`` and save to ``simulator/win32/.config``. The model consists of 774 triangular surfaces and supports filling with a custom material base color.
 
 .. literalinclude:: ../../../example/widget/3d/example_3d_dog.c
    :language: c

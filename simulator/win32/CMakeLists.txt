@@ -21,7 +21,7 @@ find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 execute_process(
     COMMAND ${Python3_EXECUTABLE}
-            ${CMAKE_SOURCE_DIR}/../tool/convert_dot_config_to.py
+            ${CMAKE_SOURCE_DIR}/../../tool/convert_dot_config_to.py
             ${CMAKE_SOURCE_DIR}/.config
             ${CMAKE_SOURCE_DIR}/config.cmake
     RESULT_VARIABLE result
@@ -65,7 +65,7 @@ add_executable(${GUI_TARGET_NAME} main.c)
 target_compile_definitions(${GUI_TARGET_NAME} PRIVATE _HONEYGUI_SIMULATOR_)
 
 if(WIN32)
-    set(SDL2_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../lib/sim/SDL2-2.26.0-STATIC")
+    set(SDL2_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../lib/sim/SDL2-2.26.0-STATIC")
     target_include_directories(${GUI_TARGET_NAME} PRIVATE
         ${SDL2_ROOT}/include
         ${SDL2_ROOT}/include/SDL2
@@ -100,9 +100,9 @@ else()
     )
 endif()
 
-add_subdirectory(../realgui realgui)
-add_subdirectory(../example example)
-add_subdirectory(../lib/sim sim)
+add_subdirectory(../../realgui realgui)
+add_subdirectory(../../example example)
+add_subdirectory(../../lib/sim sim)
 add_subdirectory(port port)
 
 get_property(GUI_BINARY_RESOURCES GLOBAL PROPERTY GUI_BINARY_RESOURCES)

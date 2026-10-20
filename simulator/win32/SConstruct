@@ -6,8 +6,8 @@ import uuid
 import menu_config
 from SCons.Script import *
 
-# Get project root directory (parent of win32_sim)
-PROJECT_ROOT = os.path.dirname(os.getcwd())
+# Get project root directory (two levels above simulator/win32)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.getcwd()))
 TOOL_ROOT = os.path.join(PROJECT_ROOT, 'tool/scons-tool')
 EXAMPLE_ROOT = os.path.join(PROJECT_ROOT, 'example')
 

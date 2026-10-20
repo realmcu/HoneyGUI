@@ -7,7 +7,7 @@
             "command": "scons",
             "windows": {
                 "options": {
-                    "cwd": "${workspaceFolder}\\win32_sim",
+                    "cwd": "${workspaceFolder}\\simulator\\win32",
                     "env": {
                         "DEBUG_MODE": "1"
                     }
@@ -15,7 +15,7 @@
             },
             "linux": {
                 "options": {
-                    "cwd": "${workspaceFolder}/win32_sim",
+                    "cwd": "${workspaceFolder}/simulator/win32",
                     "env": {
                         "DEBUG_MODE": "1"
                     }

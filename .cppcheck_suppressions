@@ -1,5 +1,5 @@
 
-*:win32_sim\RTE\*
+*:simulator\win32\RTE\*
 *:realgui\3rd\*
 
 

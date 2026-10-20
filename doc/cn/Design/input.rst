@@ -106,7 +106,7 @@
 ~~~~~~~~~~~~
 键盘输入通过 ``gui_kb_create`` 注册。每个物理按键调用一次 ``gui_kb_create`` ，传入按键名称，以及按键状态、按下时间戳和释放时间戳的变量指针：
 
-.. literalinclude:: ../../../win32_sim/port/realgui_port/gui_port_indev.c
+.. literalinclude:: ../../../simulator/win32/port/realgui_port/gui_port_indev.c
    :language: c
    :dedent:
    :start-after: /* keyboard register start */

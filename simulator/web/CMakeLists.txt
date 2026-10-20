@@ -6,20 +6,23 @@
 
 # Browser (WebAssembly) simulator. Build with the Emscripten toolchain:
 #
-#   emcmake cmake -S web_sim -B web_sim/build -G Ninja
-#   cmake --build web_sim/build
+#   emcmake cmake -S simulator/web -B simulator/web/build -G Ninja
+#   cmake --build simulator/web/build
 #
-# Produces gui.js (with the wasm embedded). Run "python web_sim/pack_files.py"
-# once, then open web_sim/index.html by double-clicking it.
+# Produces gui.js (with the wasm embedded). Run
+# "python simulator/web/pack_files.py" once, then open
+# simulator/web/index.html by double-clicking it.
 #
-# The demo is selected the same way as win32_sim, through web_sim/.config.
-# web_sim/files.json lists the runtime files the demo reads (its romfs image);
-# update it and re-run pack_files.py after selecting a different demo.
+# The demo is selected the same way as simulator/win32, through
+# simulator/web/.config. simulator/web/files.json lists the runtime files the
+# demo reads (its romfs image); update it and re-run pack_files.py after
+# selecting a different demo.
 #
 # Options:
-#   WEB_SIM_CONFIG       .config to use instead of web_sim/.config, for example
-#                        web_sim/.config_engine (all widgets, no demo app, no
-#                        letter_shell which needs a GNU linker script)
+#   WEB_SIM_CONFIG       .config to use instead of simulator/web/.config, for
+#                        example simulator/web/.config_engine (all widgets, no
+#                        demo app, no letter_shell which needs a GNU linker
+#                        script)
 #   WEB_SIM_MAIN_MODULE  build the engine as a main module that can load a
 #                        project compiled separately as a side module at run
 #                        time (-sSIDE_MODULE). Implies position independent
@@ -35,12 +38,12 @@ set(CMAKE_C_EXTENSIONS ON)
 project(HoneyGUI_web_sim)
 
 if(NOT EMSCRIPTEN)
-    message(FATAL_ERROR "web_sim must be configured with the Emscripten toolchain (emcmake cmake ...)")
+    message(FATAL_ERROR "simulator/web must be configured with the Emscripten toolchain (emcmake cmake ...)")
 endif()
 
 # An unoptimized Asyncify build is much larger and slower, so optimize when no
 # build type is given. Not the Release type: its NDEBUG would turn off assert(),
-# unlike win32_sim. Pass -DCMAKE_BUILD_TYPE=Debug for debugging.
+# unlike simulator/win32. Pass -DCMAKE_BUILD_TYPE=Debug for debugging.
 if(NOT CMAKE_BUILD_TYPE)
     add_compile_options(-O2)
     add_link_options(-O2)
@@ -56,7 +59,7 @@ set(WEB_SIM_CONFIG_CMAKE ${CMAKE_BINARY_DIR}/config.cmake)
 
 execute_process(
     COMMAND ${Python3_EXECUTABLE}
-            ${CMAKE_SOURCE_DIR}/../tool/convert_dot_config_to.py
+            ${CMAKE_SOURCE_DIR}/../../tool/convert_dot_config_to.py
             ${WEB_SIM_CONFIG}
             ${WEB_SIM_CONFIG_CMAKE}
     RESULT_VARIABLE result
@@ -83,8 +86,8 @@ add_executable(${GUI_TARGET_NAME} main.c)
 
 target_compile_definitions(${GUI_TARGET_NAME} PRIVATE _HONEYGUI_SIMULATOR_)
 
-add_subdirectory(../realgui realgui)
-add_subdirectory(../example example)
+add_subdirectory(../../realgui realgui)
+add_subdirectory(../../example example)
 add_subdirectory(port port)
 
 get_property(GUI_BINARY_RESOURCES GLOBAL PROPERTY GUI_BINARY_RESOURCES)

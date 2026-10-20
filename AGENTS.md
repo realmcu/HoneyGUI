@@ -18,20 +18,23 @@ Embedded GUI framework for Realtek microcontrollers (RTL8762, RTL8773). C librar
     +-- server/        # GUI server components
 
     example/          # Demo applications by screen resolution
-    win32_sim/        # Windows PC simulator
+    simulator/        # Simulators
+    +-- win32/        # Windows/Linux PC simulator (SDL)
+    +-- web/          # Browser simulator (Emscripten)
+    +-- keil/         # Keil MDK simulator projects (ac5/, ac6/)
     lib/              # Prebuilt toolchain libraries
     tool/             # Development tools (image/video converters)
 
 ## Build
 
     # SCons (primary)
-    cd win32_sim && scons
+    cd simulator/win32 && scons
 
     # CMake (alternative)
-    cd win32_sim && mkdir build && cmake -G "MinGW Makefiles" .. && mingw32-make
+    cd simulator/win32 && mkdir build && cd build && cmake -G "MinGW Makefiles" .. && mingw32-make
 
     # Configure app
-    cd win32_sim && menuconfig ../Kconfig.gui
+    cd simulator/win32 && menuconfig ../../Kconfig.gui
 
 ## Key Conventions
 
@@ -77,7 +80,8 @@ the application and widget demo configs with SCons and CMake.
 
 ## Platform Ports
 
-- win32_sim/: MinGW-w64, SDL2, Windows
-- keil_sim/ac5/ac6/: Keil ARM MDK
+- simulator/win32/: MinGW-w64 or Linux GCC, SDL2
+- simulator/web/: Emscripten, browser
+- simulator/keil/ac5/ac6/: Keil ARM MDK
 - zephyr/: Zephyr RTOS integration
 - lib/: Prebuilt for gcc, armcc, armclang, arm-none-eabi-gcc

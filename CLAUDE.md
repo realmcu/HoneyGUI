@@ -32,12 +32,12 @@ HoneyGUI supports two build systems:
 ### SCons Build (Primary)
 
 ```shell
-cd win32_sim
-scons                    # Build the project
-scons -c                 # Clean build artifacts
-cd ..
-./win32_sim/gui.exe      # Run on Windows
-./win32_sim/gui          # Run on Linux/WSL
+cd simulator/win32
+scons                      # Build the project
+scons -c                   # Clean build artifacts
+cd ../..
+./simulator/win32/gui.exe  # Run on Windows
+./simulator/win32/gui      # Run on Linux/WSL
 ```
 
 **Build Configuration:**
@@ -49,12 +49,12 @@ cd ..
 ### CMake Build (Alternative)
 
 ```shell
-cd win32_sim
+cd simulator/win32
 mkdir build && cd build
 cmake -G "MinGW Makefiles" ..
 mingw32-make -j 32       # Or use 'make' on Linux
-cd ../..
-./win32_sim/build/gui.exe
+cd ../../..
+./simulator/win32/build/gui.exe
 ```
 
 ### Application Configuration (Menuconfig)
@@ -62,8 +62,8 @@ cd ../..
 Before building, configure which application to run:
 
 ```shell
-cd win32_sim
-menuconfig ../Kconfig.gui
+cd simulator/win32
+menuconfig ../../Kconfig.gui
 ```
 
 This generates a `.config` file that both build systems read. Available applications include:
@@ -103,8 +103,10 @@ This generates a `.config` file that both build systems read. Available applicat
   - `mkromfs/` - ROM filesystem creation
   - `scons-tool/` - SCons build utilities
 
-- **`win32_sim/`** - Windows/Linux simulation environment
-- **`keil_sim/`** - Keil simulator environment
+- **`simulator/`** - Simulation environments
+  - `win32/` - Windows/Linux SDL simulator (SCons and CMake)
+  - `web/` - Browser simulator built with Emscripten
+  - `keil/` - Keil MDK simulator projects (`ac5/` and `ac6/`)
 
 ### Widget System
 
@@ -236,9 +238,9 @@ into `application/` and `widget/` to match the source layout. The default
 
 ### Command Line Workflow
 
-1. Configure application: `cd win32_sim && menuconfig ../Kconfig.gui`
+1. Configure application: `cd simulator/win32 && menuconfig ../../Kconfig.gui`
 2. Build: `scons` (or use CMake)
-3. Run: `../win32_sim/gui.exe` (or `gui` on Linux)
+3. Run from the repository root: `cd ../.. && ./simulator/win32/gui.exe` (or `gui` on Linux)
 4. Interact with the GUI window using mouse for touch simulation
 
 ### VSCode Workflow

@@ -28,16 +28,16 @@ jobs:
           pip install scons
 
       - name: Build with SCons
-        run: cd win32_sim && scons -j$(nproc)
+        run: cd simulator/win32 && scons -j$(nproc)
 
       - name: Verify binary
-        run: ls -lh win32_sim/gui
+        run: ls -lh simulator/win32/gui
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: gui-binary
-          path: win32_sim/gui
+          path: simulator/win32/gui
           retention-days: 30
 
   lint:
@@ -79,7 +79,7 @@ jobs:
           pip install scons
 
       - name: Build
-        run: cd win32_sim && scons -j$(nproc)
+        run: cd simulator/win32 && scons -j$(nproc)
 
       - name: Run widget tests
         run: |

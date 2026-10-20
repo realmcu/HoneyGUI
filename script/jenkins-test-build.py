@@ -27,7 +27,7 @@ def get_file_single(pathname):
         return None
     return file_matches[0]
 
-config_path = r'win32_sim/.config'
+config_path = r'simulator/win32/.config'
 def HoneyGUI_CMD_preBuild():
     with open(os.path.join(HONEYGUI_ROOT, config_path), mode='r', newline='', errors='surrogateescape') as fd:
         stream = fd.read()
@@ -64,12 +64,12 @@ def build_honeyGUI(build_type, module_paratmeters):
 
         if HoneyGUI_build_hook.get(module_name, {}).get("PreBuild"):
             HoneyGUI_build_hook.get(module_name, {}).get("PreBuild")()
-        subprocess.check_call(['scons'], universal_newlines=True, cwd=os.path.join(HONEYGUI_ROOT, "win32_sim"))
+        subprocess.check_call(['scons'], universal_newlines=True, cwd=os.path.join(HONEYGUI_ROOT, "simulator", "win32"))
         if HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild"):
             HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild")()
 
-        gui_exe = get_file_single(os.path.join(HONEYGUI_ROOT, "win32_sim", r'gui.exe'))
-        gui_bin = get_file_single(os.path.join(HONEYGUI_ROOT, "win32_sim", r'gui.bin'))
+        gui_exe = get_file_single(os.path.join(HONEYGUI_ROOT, "simulator", "win32", r'gui.exe'))
+        gui_bin = get_file_single(os.path.join(HONEYGUI_ROOT, "simulator", "win32", r'gui.bin'))
         if not gui_exe or not gui_bin:
             print("build gui.exe fail")
             sys.exit(1)
@@ -78,7 +78,7 @@ def build_honeyGUI(build_type, module_paratmeters):
         os.makedirs(bin_dir, exist_ok=True)
         shutil.copy2(gui_exe, bin_dir)
         shutil.copy2(gui_bin, bin_dir)
-        shutil.copy2(os.path.join(HONEYGUI_ROOT, "win32_sim", "SDL2.dll"), bin_dir)
+        shutil.copy2(os.path.join(HONEYGUI_ROOT, "simulator", "win32", "SDL2.dll"), bin_dir)
         migwin_root = os.path.dirname(shutil.which("gcc"))
         migwin_root = os.path.dirname(migwin_root)
         lib_root = os.path.join(migwin_root, "x86_64-w64-mingw32\lib")
@@ -113,7 +113,7 @@ def check_repo(repo_name):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='bb2-sdk-v1 test build script')
+    parser = argparse.ArgumentParser(description='master test build script')
     parser.add_argument('buildType', choices=['CI', 'Nightly', 'Release', 'FreeStyle'], help='set the build tpye')
     parser.add_argument('--triggeredBy', default='gerrit', choices=['gerrit', 'USER', 'TIMER', 'SCM','HRL_Tool_CI','HRL_Tool_Release', "HRS_Tool_CI", "HRS_Tool_Release"])
 

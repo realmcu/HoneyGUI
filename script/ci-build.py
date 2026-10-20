@@ -45,21 +45,21 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     global Keil_path
     repo = git.Repo(search_parent_directories=True)
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
-    #win32_sim scons
-    os.chdir('./win32_sim')
+    #simulator/win32 scons
+    os.chdir('./simulator/win32')
     try:
         result_lines = subprocess.check_output(["scons.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
-        print("./win32_sim > scons.exe\r\n{}".format(result_lines))
+        print("./simulator/win32 > scons.exe\r\n{}".format(result_lines))
         if 'warning:' in result_lines:
-            os.chdir('./..')
+            os.chdir('./../..')
             print(result_lines)
-            print("win32_sim: 'scons' fail: has warning")
+            print("simulator/win32: 'scons' fail: has warning")
             return False
     except Exception as e:
-        os.chdir('./..')
-        print("win32_sim: 'scons' fail: {}".format(e.output))
+        os.chdir('./../..')
+        print("simulator/win32: 'scons' fail: {}".format(e.output))
         return False
-    os.chdir('./..')
+    os.chdir('./../..')
     #reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
@@ -81,39 +81,39 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     #reset
     '''repo.git.checkout('--', '.')
     repo.git.clean('-dfx')'''
-    #keil_sim/ac5 scons --target=mdk5
-    os.chdir('./keil_sim/ac5')
+    #simulator/keil/ac5 scons --target=mdk5
+    os.chdir('./simulator/keil/ac5')
     try:
         result_lines = subprocess.check_output(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
-        print("./keil_sim/ac5 > scons.exe\r\n{}".format(result_lines))
+        print("./simulator/keil/ac5 > scons.exe\r\n{}".format(result_lines))
         if 'warning:' in result_lines:
-            os.chdir('./../..')
+            os.chdir('./../../..')
             print(result_lines)
-            print("keil_sim/ac5: 'scons --target=mdk5' fail: has warning")
+            print("simulator/keil/ac5: 'scons --target=mdk5' fail: has warning")
             return False
     except Exception as e:
-        os.chdir('./../..')
-        print("keil_sim/ac5: 'scons --target=mdk5' fail: {}".format(e.output))
+        os.chdir('./../../..')
+        print("simulator/keil/ac5: 'scons --target=mdk5' fail: {}".format(e.output))
         return False
-    os.chdir('./../..')
+    os.chdir('./../../..')
     #reset
     '''repo.git.checkout('--', '.')
     repo.git.clean('-dfx')'''
-    #keil_sim/ac6 scons --target=mdk5
-    os.chdir('./keil_sim/ac6')
+    #simulator/keil/ac6 scons --target=mdk5
+    os.chdir('./simulator/keil/ac6')
     try:
         result_lines = subprocess.check_output(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
-        print("./keil_sim/ac6 > scons.exe\r\n{}".format(result_lines))
+        print("./simulator/keil/ac6 > scons.exe\r\n{}".format(result_lines))
         if 'warning:' in result_lines:
-            os.chdir('./../..')
+            os.chdir('./../../..')
             print(result_lines)
-            print("keil_sim/ac6: 'scons --target=mdk5' fail: has warning")
+            print("simulator/keil/ac6: 'scons --target=mdk5' fail: has warning")
             return False
     except Exception as e:
-        os.chdir('./../..')
-        print("keil_sim/ac6: 'scons --target=mdk5' fail: {}".format(e.output))
+        os.chdir('./../../..')
+        print("simulator/keil/ac6: 'scons --target=mdk5' fail: {}".format(e.output))
         return False
-    os.chdir('./../..')
+    os.chdir('./../../..')
     #reset
     '''repo.git.checkout('--', '.')
     repo.git.clean('-dfx')'''

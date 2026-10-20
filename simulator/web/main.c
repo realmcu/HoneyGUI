@@ -8,7 +8,7 @@
  * @file main.c
  * @brief Entry point of the browser (WebAssembly) simulator
  *
- * Counterpart of win32_sim/main.c. The desktop simulator starts the GUI
+ * Counterpart of simulator/win32/main.c. The desktop simulator starts the GUI
  * server thread and parks the main thread; in the browser the server loop
  * runs on the main thread itself and yields to the page every frame.
  */

@@ -290,7 +290,7 @@ class HoneyGUIRelease(WindowsToolRelease):
         WindowsToolRelease.__init__(self)
         self.owner = "mengfei_gao"
         self.platform_separate = False
-        self.bin_dir = os.path.join(self.cwd, r'win32_sim')
+        self.bin_dir = os.path.join(self.cwd, r'simulator', r'win32')
         self.mingw64_path = os.environ.get("MINGW64")
         if not self.mingw64_path:
             sys.exit(f"Can not find env MINGW64")
@@ -299,15 +299,15 @@ class HoneyGUIRelease(WindowsToolRelease):
     def before_build(self):
 
         self.enable_config_option(option_name=r'CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP',
-                                 file_path=os.path.join(os.getcwd(), r"win32_sim/.config"))
+                                 file_path=os.path.join(os.getcwd(), r"simulator/win32/.config"))
         self.disable_config_option(option_name=r'CONFIG_REALTEK_BUILD_GUI_454_454_DEMO',
-                                 file_path=os.path.join(os.getcwd(), r"win32_sim/.config"))
+                                 file_path=os.path.join(os.getcwd(), r"simulator/win32/.config"))
         self.print_git_diff()
 
     def jenkins_build_tool(self):
         self.before_build()
         try:
-            subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT, cwd=os.path.join(self.cwd, r'win32_sim'))
+            subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT, cwd=os.path.join(self.cwd, r'simulator', r'win32'))
         except subprocess.CalledProcessError as e:
             sys.exit('scons: compiling error code ->\n{}'.format(e.returncode))
 

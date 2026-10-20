@@ -107,7 +107,7 @@ Get Keyboard Data
 ~~~~~~~~~~~~~~~~~
 Keyboard input is registered through ``gui_kb_create``. Call ``gui_kb_create`` once for each physical key, passing the key name along with pointers to the key state, press timestamp, and release timestamp variables:
 
-.. literalinclude:: ../../../win32_sim/port/realgui_port/gui_port_indev.c
+.. literalinclude:: ../../../simulator/win32/port/realgui_port/gui_port_indev.c
    :language: c
    :dedent:
    :start-after: /* keyboard register start */
