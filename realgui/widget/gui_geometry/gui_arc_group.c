@@ -246,6 +246,12 @@ static void gui_arc_group_prepare(gui_arc_group_t *this)
     this->draw_ctx.clip_rect.y = 0;
     this->draw_ctx.clip_rect.w = this->buffer_w;
     this->draw_ctx.clip_rect.h = this->buffer_h;
+    /* This buffer collects several arcs, so one arc's pixels are background for
+     * the next: overlap_keeps_max_alpha stays clear and they composite, even
+     * when two arcs happen to share a colour.  It also means a single arc's
+     * span/edge seam is composited rather than deduplicated here, which is what
+     * this widget has always done -- only a buffer dedicated to one arc (see
+     * gui_arc.c) can tell the two cases apart. */
 
     // Render all arcs to buffer
     for (int i = 0; i < this->arc_count; i++)

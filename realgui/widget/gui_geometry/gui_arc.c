@@ -29,6 +29,33 @@
 #define GUI_ARC_ENABLE_INK_BOUNDS 1
 #endif
 
+/**
+ * 1 = store solid arcs as A8 coverage masks, 0 = always ARGB8888.
+ *
+ * An arc is a stroke with one colour, so what the mask holds is exactly the
+ * anti-aliased coverage the rasteriser already computes.  A8 costs a quarter of
+ * the memory, drops colour from the cache key so arcs differing only in colour
+ * share one payload, and reaches acc_sw's dedicated A8 blit instead of the
+ * generic rasteriser -- the same trade gui_circle and gui_rect make.
+ *
+ * A gradient arc keeps ARGB8888: the colour varies across the stroke, so there
+ * is no single mask to share.
+ *
+ * Set to 0 when bringing up a hardware accelerator whose blit may not handle A8.
+ * An unsupported source format usually shows up as a garbled or missing shape
+ * rather than a clean fallback, so flipping this is the quickest way to rule it
+ * out.
+ *
+ * There is no `scons GUI_ARC_ENABLE_A8=0`: the SConstruct does not forward
+ * command-line assignments to the compiler, so the value has to be changed
+ * here.  The arc example prints the payload size of each arc it allocates, read
+ * back from the buffer header, so a before/after comparison needs only this one
+ * line.
+ */
+#ifndef GUI_ARC_ENABLE_A8
+#define GUI_ARC_ENABLE_A8 1
+#endif
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -52,10 +79,16 @@ typedef struct
     float line_width;           /**< Stroke width. */
     float start_angle;          /**< Sweep start, degrees. */
     float end_angle;            /**< Sweep end, degrees. */
-    uint32_t color;             /**< ARGB, baked into the pixels. */
+    uint32_t color;             /**< ARGB baked into the pixels; alpha only when A8. */
+    uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
     uint32_t use_gradient;      /**< Non-zero when the gradient below applies. */
     Gradient gradient;          /**< Only present when use_gradient is set. */
 } arc_desc_t;
+
+/* Exactly at the limit today (160 bytes), so any new field must come out of
+ * Gradient or raise GUI_GEOMETRY_DESC_MAX -- this turns the overflow into a
+ * build error instead of a runtime assert in the cache. */
+GUI_GEOMETRY_DESC_SIZE_CHECK(arc_desc_t);
 
 /*============================================================================*
  *                            Macros
@@ -297,6 +330,21 @@ static void gui_arc_ink_box(gui_arc_t *this, int *off_x, int *off_y, int *w, int
     *h = (y1 > y0) ? (y1 - y0) : 1;
 }
 
+/**
+ * Whether this arc's payload can be a coverage mask.
+ *
+ * Only a gradient rules it out, and only because a mask carries no colour:
+ * the stroke is a single colour by construction, and its alpha is folded into
+ * the mask values rather than carried beside them.  Folding it in matters for
+ * the same reason it does for gui_circle -- the two blit paths disagree about
+ * the fixed foreground's alpha, so it is pinned at 255 and the mask holds the
+ * whole answer.
+ */
+static bool arc_can_use_a8(const gui_arc_t *this)
+{
+    return GUI_ARC_ENABLE_A8 && !(this->use_gradient && this->gradient != NULL);
+}
+
 /** Descriptor bytes to compare: solid arcs stop before the gradient. */
 static uint16_t arc_desc_len(const arc_desc_t *desc)
 {
@@ -317,7 +365,8 @@ static uint16_t arc_desc_len(const arc_desc_t *desc)
  * a padding hole left uninitialised would make two identical arcs miss.
  */
 static void arc_desc_init(arc_desc_t *desc, gui_arc_t *this,
-                          int buffer_w, int buffer_h, int off_x, int off_y)
+                          int buffer_w, int buffer_h, int off_x, int off_y,
+                          bool is_a8)
 {
     memset(desc, 0x00, sizeof(*desc));
 
@@ -329,7 +378,19 @@ static void arc_desc_init(arc_desc_t *desc, gui_arc_t *this,
     desc->line_width = this->line_width;
     desc->start_angle = this->start_angle;
     desc->end_angle = this->end_angle;
-    desc->color = this->color.color.argb_full;
+
+    /* RGB is deliberately left out of an A8 key -- that is what lets arcs
+     * differing only in colour share one mask.  Alpha stays in, because it is
+     * folded into the mask values themselves. */
+    if (is_a8)
+    {
+        desc->is_a8 = 1u;
+        desc->color = this->color.color.rgba.a;
+    }
+    else
+    {
+        desc->color = this->color.color.argb_full;
+    }
 
     if (this->use_gradient && this->gradient != NULL)
     {
@@ -349,16 +410,37 @@ static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render)
     int buffer_w, buffer_h, off_x, off_y;
     gui_arc_ink_box(this, &off_x, &off_y, &buffer_w, &buffer_h);
 
-    uint32_t required_size = (uint32_t)(buffer_w * buffer_h * 4 + sizeof(gui_rgb_data_head_t));
+    bool is_a8 = arc_can_use_a8(this);
+    uint32_t required_size;
+    if (!gui_geometry_image_buffer_size(buffer_w, buffer_h, is_a8 ? 1u : 4u, &required_size))
+    {
+        return false;
+    }
 
     arc_desc_t desc;
-    arc_desc_init(&desc, this, buffer_w, buffer_h, off_x, off_y);
+    arc_desc_init(&desc, this, buffer_w, buffer_h, off_x, off_y, is_a8);
     uint16_t desc_len = arc_desc_len(&desc);
 
+    /* Crossing between A8 and ARGB8888 (a gradient set or cleared) must not
+     * re-key the old payload in place: going to A8 it would keep the 4x
+     * allocation for good, and the saving would never reach the heap.  Acquire
+     * a right-sized payload first and drop the old one after, so a failed
+     * allocation still leaves the previous arc to draw. */
+    const uint8_t *reuse = this->pixel_buffer;
+    if (reuse != NULL &&
+        (((const gui_rgb_data_head_t *)reuse)->type == (char)A8) != is_a8)
+    {
+        reuse = NULL;
+    }
+
     uint8_t *buffer =
-        gui_geometry_cache_refresh_resizable(this->pixel_buffer, &desc, desc_len,
+        gui_geometry_cache_refresh_resizable(reuse, &desc, desc_len,
                                              required_size, out_need_render);
     if (buffer == NULL) { return false; }
+    if (reuse == NULL && this->pixel_buffer != NULL)
+    {
+        gui_geometry_cache_release(this->pixel_buffer);
+    }
     this->pixel_buffer = buffer;
 
     // Save buffer dimensions
@@ -379,9 +461,12 @@ static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render)
     }
 
     // Setup draw_img
-    this->draw_img->data = this->pixel_buffer;
-    this->draw_img->blend_mode = IMG_SRC_OVER_MODE;
-    this->draw_img->opacity_value = this->opacity_value;
+    gui_geometry_img_bind(this->draw_img, this->pixel_buffer, this->opacity_value,
+                          is_a8, this->color);
+    /* The bind turns filtered sampling on, as rect/circle want.  Arc has always
+     * drawn unfiltered; keep it so, so that switching the storage format is the
+     * only thing this change does.  Filtering is a separate decision, to be
+     * weighed on its own for rotated and scaled arcs. */
     this->draw_img->high_quality = 0;
 
     return true;
@@ -394,22 +479,36 @@ static void render_arc_to_buffer(gui_arc_t *this)
     int buffer_w = this->buffer_w;
     int buffer_h = this->buffer_h;
 
+    /* Same predicate init_arc_buffer() sized the allocation with: this runs
+     * right after it, with no setter in between, so the two always agree.  A
+     * fresh render would overwrite the header anyway. */
+    bool is_a8 = arc_can_use_a8(this);
+    uint32_t pixel_bytes = is_a8 ? 1u : 4u;
+
     // Setup image header
     gui_rgb_data_head_t *img_header = (gui_rgb_data_head_t *)this->pixel_buffer;
-    gui_geometry_data_head_set(img_header, (int16_t)buffer_w, (int16_t)buffer_h, ARGB8888);
+    gui_geometry_data_head_set(img_header, (int16_t)buffer_w, (int16_t)buffer_h,
+                               is_a8 ? A8 : ARGB8888);
 
     // Clear pixel data
     uint8_t *pixel_data = this->pixel_buffer + sizeof(gui_rgb_data_head_t);
-    memset(pixel_data, 0x00, (size_t)(buffer_w * buffer_h * 4));
+    memset(pixel_data, 0x00, (size_t)((uint32_t)(buffer_w * buffer_h) * pixel_bytes));
 
     DrawContext draw_ctx;
-    init_draw_context(&draw_ctx, pixel_data, buffer_w, buffer_h, PIXEL_FORMAT_ARGB8888);
+    init_draw_context(&draw_ctx, pixel_data, buffer_w, buffer_h,
+                      is_a8 ? PIXEL_FORMAT_A8 : PIXEL_FORMAT_ARGB8888);
     draw_ctx.enable_aa = true;
     draw_ctx.clip_rect.x = 0;
     draw_ctx.clip_rect.y = 0;
     draw_ctx.clip_rect.w = buffer_w;
     draw_ctx.clip_rect.h = buffer_h;
     draw_ctx.gradient = this->gradient;
+    /* This buffer is this arc's own, so a pixel its spans, AA edges and caps
+     * cover more than once is one shape's overlap and takes the larger alpha.
+     * That is also what the A8 mask does, keeping the two formats identical.
+     * gui_arc_group draws several arcs into one buffer and leaves the flag
+     * clear, so separate arcs still composite. */
+    draw_ctx.overlap_keeps_max_alpha = true;
 
     // The buffer covers only the inked sub-rect of the widget box, so the arc
     // centre sits at the widget-local centre minus that sub-rect's origin.

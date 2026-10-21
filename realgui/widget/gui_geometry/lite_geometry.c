@@ -16,7 +16,29 @@
 
 static inline int get_pixel_size(PixelFormat format)
 {
+    if (format == PIXEL_FORMAT_A8)
+    {
+        return 1;
+    }
     return (format == PIXEL_FORMAT_RGB565) ? 2 : 4;
+}
+
+/**
+ * Accumulate one sample of @p color into an A8 mask byte.
+ *
+ * A mask pixel holds coverage only, and all samples of one raster carry the
+ * same colour, so overlapping writes take the maximum instead of compositing:
+ * two AA passes over the same byte must not add up past full coverage.  There
+ * is no alternative -- a mask has no background colour to blend against.  The
+ * ARGB8888 path matches this through overlap_keeps_max_alpha; without it the
+ * two storage formats disagree wherever the raster covers a pixel twice.
+ */
+static inline void a8_accumulate(uint8_t *pixel, uint8_t value)
+{
+    if (value > *pixel)
+    {
+        *pixel = value;
+    }
 }
 static inline float smoothstep(float edge0, float edge1, float x)
 {
@@ -81,6 +103,7 @@ void init_draw_context(DrawContext *ctx, uint8_t *buffer, int width, int height,
     ctx->height = height;
     ctx->format = format;
     ctx->stride = width * get_pixel_size(format);
+    ctx->overlap_keeps_max_alpha = false;
 }
 
 static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
@@ -88,6 +111,16 @@ static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
 {
     int pixel_size = get_pixel_size(ctx->format);
     int offset = (y * ctx->width + x) * pixel_size;
+
+    if (ctx->format == PIXEL_FORMAT_A8)
+    {
+        uint8_t source_alpha = (color >> 24) & 0xFF;
+        if (source_alpha == 0) { return; }
+
+        uint8_t alpha = (uint8_t)(source_alpha * coverage);
+        a8_accumulate(ctx->buffer + offset, alpha);
+        return;
+    }
 
     if (ctx->format == PIXEL_FORMAT_RGB565)
     {
@@ -117,7 +150,26 @@ static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
     }
     else
     {
-        *pixel = blend_colors_argb8888(*pixel, color, alpha);
+        /* In a buffer dedicated to one shape, a pixel the raster covers twice is
+         * one shape's overlap: keep the larger alpha rather than compositing the
+         * colour into itself.  See overlap_keeps_max_alpha -- the caller decides,
+         * because only it knows whether the buffer collects several shapes.
+         * blend_colors_argb8888() is left alone: the rect/circle span path shares
+         * it. */
+        uint32_t bg = *pixel;
+        uint8_t bg_alpha = (bg >> 24) & 0xFF;
+        if (ctx->overlap_keeps_max_alpha && bg_alpha != 0 &&
+            (bg & 0x00FFFFFFu) == (color & 0x00FFFFFFu))
+        {
+            if (alpha > bg_alpha)
+            {
+                *pixel = ((uint32_t)alpha << 24) | (color & 0x00FFFFFFu);
+            }
+        }
+        else
+        {
+            *pixel = blend_colors_argb8888(bg, color, alpha);
+        }
     }
 }
 
@@ -314,6 +366,17 @@ static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int en
     if (start_x > end_x) { return; }
 
     uint8_t alpha = (uint8_t)(color >> 24);
+
+    /* An A8 span is one byte per pixel and every sample here is fully covered,
+     * so it is a memset of the colour alpha -- translucent or not.  That equals
+     * the per-pixel max a8_accumulate() would take: anything already in the
+     * span came from this same colour at coverage <= 1, so it is <= alpha. */
+    if (ctx->format == PIXEL_FORMAT_A8)
+    {
+        memset(ctx->buffer + y * ctx->stride + start_x, alpha, (size_t)(end_x - start_x + 1));
+        return;
+    }
+
     if (alpha != UINT8_MAX)
     {
         for (int x = start_x; x <= end_x; x++)
@@ -343,7 +406,10 @@ static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int en
 static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
                              float arc_radius, float line_width, PixelColor color)
 {
-    if (ctx->format != PIXEL_FORMAT_ARGB8888)
+    /* RGB565 keeps the 8-way symmetric filler: it writes 16-bit pixels a pair
+     * at a time.  ARGB8888 and A8 share the span filler below, which knows
+     * both layouts. */
+    if (ctx->format == PIXEL_FORMAT_RGB565)
     {
         draw_arc_as_ring_symmetric(ctx, center_x, center_y, arc_radius, line_width, color);
         return;
@@ -535,7 +601,9 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
                                        float start_angle, float end_angle,
                                        PixelColor color)
 {
-    if (ctx->format != PIXEL_FORMAT_ARGB8888 || (uint8_t)(color >> 24) != UINT8_MAX)
+    /* An opaque colour under ARGB8888 or A8: the spans and the AA edges below
+     * both go through the layout-aware writers.  RGB565 has its own filler. */
+    if (ctx->format == PIXEL_FORMAT_RGB565 || (uint8_t)(color >> 24) != UINT8_MAX)
     {
         return false;
     }
@@ -1018,7 +1086,7 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
     if (color_a == 0) { return; }
 
     // Direct pixel access
-    int pixel_size = (ctx->format == PIXEL_FORMAT_RGB565) ? 2 : 4;
+    int pixel_size = get_pixel_size(ctx->format);
     int stride = ctx->width * pixel_size;
 
     // Process each quadrant with strict non-overlapping boundaries
@@ -1182,7 +1250,11 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 // Write pixel
                 int byte_offset = px * pixel_size;
 
-                if (ctx->format == PIXEL_FORMAT_ARGB8888)
+                if (ctx->format == PIXEL_FORMAT_A8)
+                {
+                    a8_accumulate(row + byte_offset, final_alpha);
+                }
+                else if (ctx->format == PIXEL_FORMAT_ARGB8888)
                 {
                     uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
 
@@ -1258,6 +1330,7 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
             }
         }
     }
+
 }
 
 // ==================== Gradient Functions ====================
@@ -1444,6 +1517,11 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
 {
     if (radius <= 0 || line_width <= 0 || gradient == NULL) { return; }
 
+    /* A gradient varies across the shape, so it needs per-pixel colour and
+     * cannot be expressed as a coverage mask.  A caller that asked for one
+     * anyway gets nothing rather than a silently wrong colour. */
+    if (ctx->format == PIXEL_FORMAT_A8) { return; }
+
     // Read gradient angles from struct using union to handle potential alignment issues
     volatile unsigned char *bytes = (volatile unsigned char *)gradient;
     union { unsigned char b[4]; float f; } start_union, end_union;
@@ -1497,7 +1575,7 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
     if (min_x >= max_x || min_y >= max_y) { return; }
 
     // Direct pixel access
-    int pixel_size = (ctx->format == PIXEL_FORMAT_RGB565) ? 2 : 4;
+    int pixel_size = get_pixel_size(ctx->format);
     uint8_t *buffer = ctx->buffer;
     int stride = ctx->width * pixel_size;
 

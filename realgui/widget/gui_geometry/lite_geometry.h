@@ -33,7 +33,16 @@ typedef struct
 typedef enum
 {
     PIXEL_FORMAT_RGB565,
-    PIXEL_FORMAT_ARGB8888
+    PIXEL_FORMAT_ARGB8888,
+    /**
+     * One byte of coverage per pixel, no colour.
+     *
+     * A solid shape of a single colour needs only its coverage rasterised: the
+     * colour travels beside the mask (the blit's fixed foreground), so one mask
+     * serves every colour of the same geometry.  Coverage of a translucent
+     * colour is folded into the mask, as gui_circle and gui_rect already do.
+     */
+    PIXEL_FORMAT_A8
 } PixelFormat;
 
 typedef enum
@@ -79,6 +88,21 @@ typedef struct
     Rect clip_rect;
     bool enable_stroke_cap;
     Gradient *gradient;
+    /**
+     * Declares that this buffer holds one shape at a time.
+     *
+     * An arc's spans, AA edges and caps are one shape of one colour, so a pixel
+     * that two of them cover is a raster overlap, not two objects stacking:
+     * keeping the larger alpha deduplicates the passes, and it is what an A8
+     * mask does regardless.  With the flag clear, overlapping writes composite
+     * instead, which is right when the buffer collects several shapes -- the
+     * particle widget's independent circles, or gui_arc_group's arcs.
+     *
+     * Set by the caller, because only the caller knows whether the buffer is
+     * dedicated to one shape.  The rasterisers read it and never write it, so a
+     * caller's setting survives every return path.  Defaults to false.
+     */
+    bool overlap_keeps_max_alpha;
 } DrawContext;
 
 PixelColor create_color_by_format(PixelFormat format, uint8_t r, uint8_t g,
