@@ -240,7 +240,6 @@ static int hml_for_each_file(const char *dir_path, int (*cb)(const char *path, v
 
     int total = 0;
     gui_vfs_stat_t stat;
-    char path[256];
     while (gui_vfs_readdir(dir, &stat) == 0)
     {
         if (stat.name[0] == '.') { continue; }
@@ -249,8 +248,24 @@ static int hml_for_each_file(const char *dir_path, int (*cb)(const char *path, v
         const char *ext = strrchr(stat.name, '.');
         if (ext && (strcmp(ext, ".xml") == 0 || strcmp(ext, ".hml") == 0))
         {
-            snprintf(path, sizeof(path), "%s/%s", dir_path, stat.name);
+            size_t dir_len = strlen(dir_path);
+            size_t name_len = strlen(stat.name);
+            if (dir_len > SIZE_MAX - name_len - 2)
+            {
+                gui_log("[HML] Path too long: %s/%s\n", dir_path, stat.name);
+                continue;
+            }
+            char *path = gui_malloc(dir_len + name_len + 2);
+            if (!path)
+            {
+                gui_log("[HML] Out of memory, skip file %s\n", stat.name);
+                continue;
+            }
+            memcpy(path, dir_path, dir_len);
+            path[dir_len] = '/';
+            memcpy(path + dir_len + 1, stat.name, name_len + 1);
             total += cb(path, arg);
+            gui_free(path);
         }
     }
     gui_vfs_closedir(dir);
