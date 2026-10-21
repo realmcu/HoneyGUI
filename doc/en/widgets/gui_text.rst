@@ -124,17 +124,21 @@ Developers can use the function :cpp:any:`gui_text_emoji_set` to set the path an
 
 Text Modes
 ^^^^^^^^^^^
-The text control currently supports 30 types of layout modes, including the following categories:
+The text control currently supports 36 types of layout modes, including the following categories:
 
  + Single-line layout modes (3 types): Suitable for scenarios displaying only one line of text, such as single-line centered, left-aligned, right-aligned, etc.
  + Multi-line layout modes (3 types): Used for displaying multiple lines of text, supporting various arrangements like multi-line centered, multi-line left-aligned, multi-line right-aligned, etc.
  + Single-line middle layout modes (3 types): Single-line text vertically centered, supporting left-aligned, centered, and right-aligned.
  + Multi-line middle layout modes (3 types): Multi-line text vertically centered, supporting left-aligned, centered, and right-aligned.
+ + Single-line bottom layout modes (3 types): Single-line text anchored to the bottom edge, supporting left-aligned, centered, and right-aligned.
+ + Multi-line bottom layout modes (3 types): Multi-line text anchored to the bottom edge, supporting left-aligned, centered, and right-aligned.
  + Scrolling layout modes (6 types): Ideal for displaying content that exceeds the display area by scrolling, including horizontal scrolling (top and middle) and vertical scrolling.
  + Vertical layout modes (6 types): Supports vertical text display from top to bottom, and can also be used as a general layout method for rotated text, including top alignment, middle alignment, and bottom alignment.
  + RTL (right-to-left) layout modes (6 types): Designed for languages written from right to left, such as Arabic and Hebrew, supporting corresponding layout modes.
 
 Each layout mode can be selected based on the actual application scenario to meet diverse text display needs. Use :cpp:any:`gui_text_mode_set` to set the text layout mode.
+
+Top and middle modes truncate the text at the widget's bottom edge. Bottom modes instead anchor the last line to that edge, so when the content is taller than the widget the top of the text is clipped rather than the end.
 
 All type setting modes are as follows.
 
@@ -169,6 +173,18 @@ All type setting modes are as follows.
    | `MULTI_MID_CENTER`     | Multi-line    | Center           | Mid                           | Text widget              |
    +------------------------+---------------+------------------+-------------------------------+--------------------------+
    | `MULTI_MID_RIGHT`      | Multi-line    | Right            | Mid                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `BOT_LEFT`             | Single-line   | Left             | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `BOT_CENTER`           | Single-line   | Center           | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `BOT_RIGHT`            | Single-line   | Right            | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_BOT_LEFT`       | Multi-line    | Left             | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_BOT_CENTER`     | Multi-line    | Center           | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_BOT_RIGHT`      | Multi-line    | Right            | Bottom                        | Text widget              |
    +------------------------+---------------+------------------+-------------------------------+--------------------------+
    | `SCROLL_X`             | Single-line   | Right to Left    | Top                           | Scroll text widget       |
    +------------------------+---------------+------------------+-------------------------------+--------------------------+

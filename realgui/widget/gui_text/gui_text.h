@@ -94,6 +94,13 @@ typedef enum
     MULTI_MID_LEFT       = 0x13,
     MULTI_MID_CENTER     = 0x14,
     MULTI_MID_RIGHT      = 0x15,
+    /* BOT */
+    BOT_LEFT             = 0x20,
+    BOT_CENTER           = 0x21,
+    BOT_RIGHT            = 0x22,
+    MULTI_BOT_LEFT       = 0x23,
+    MULTI_BOT_CENTER     = 0x24,
+    MULTI_BOT_RIGHT      = 0x25,
     /* SCROLL */
     SCROLL_X             = 0x30,
     SCROLL_X_REVERSE     = 0x31,
@@ -255,7 +262,8 @@ void gui_text_set(gui_text_t    *this_widget,
  * @brief Set text mode of this_widget text widget.
  * @note If text line count was more than one, it will display on the left even if it was set left or right.
  * @param this_widget Text widget pointer.
- * @param mode Text layout mode (e.g., LEFT, CENTER, RIGHT, MULTI_LEFT, SCROLL_X, VERTICAL_LEFT_TOP, RTL_RIGHT, etc.).
+ * @param mode Text layout mode (e.g., LEFT, CENTER, RIGHT, MULTI_LEFT, BOT_LEFT, MULTI_BOT_CENTER,
+ *             SCROLL_X, VERTICAL_LEFT_TOP, RTL_RIGHT, etc.).
  */
 void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
 

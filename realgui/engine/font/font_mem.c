@@ -1373,6 +1373,61 @@ static void layout_position_bearing(mem_char_t *chr, int16_t *cursor_x, int16_t 
 }
 #endif /* ENABLE_FONT_V3_TYPO */
 
+/**
+ * @brief Horizontal alignment index of a layout mode: 0 left, 1 center, 2 right.
+ */
+static int32_t text_mode_align_x(TEXT_MODE mode)
+{
+    switch (mode)
+    {
+    case CENTER:
+    case MULTI_CENTER:
+    case MID_CENTER:
+    case MULTI_MID_CENTER:
+    case BOT_CENTER:
+    case MULTI_BOT_CENTER:
+        return 1;
+    case RIGHT:
+    case MULTI_RIGHT:
+    case MID_RIGHT:
+    case MULTI_MID_RIGHT:
+    case BOT_RIGHT:
+    case MULTI_BOT_RIGHT:
+        return 2;
+    default:
+        return 0;
+    }
+}
+
+/**
+ * @brief Vertical alignment index of a layout mode: 0 top, 1 mid, 2 bottom.
+ *
+ * Multiplied by (rect_h - content_h) and halved, this yields the vertical
+ * offset for every alignment: 0, half the slack, or the full slack.
+ */
+static int32_t text_mode_align_y(TEXT_MODE mode)
+{
+    switch (mode)
+    {
+    case MID_LEFT:
+    case MID_CENTER:
+    case MID_RIGHT:
+    case MULTI_MID_LEFT:
+    case MULTI_MID_CENTER:
+    case MULTI_MID_RIGHT:
+        return 1;
+    case BOT_LEFT:
+    case BOT_CENTER:
+    case BOT_RIGHT:
+    case MULTI_BOT_LEFT:
+    case MULTI_BOT_CENTER:
+    case MULTI_BOT_RIGHT:
+        return 2;
+    default:
+        return 0;
+    }
+}
+
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
     if (text == NULL || text->data == NULL)
@@ -1467,12 +1522,16 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     case MID_LEFT:
     case MID_CENTER:
     case MID_RIGHT:
+    case BOT_LEFT:
+    case BOT_CENTER:
+    case BOT_RIGHT:
         {
             char_line_sum = 1;
-            int32_t align_factor = (text_mode <= RIGHT) ? (text_mode - LEFT) : (text_mode - MID_LEFT);
-            /* MID centers the line box (line_height), matching MULTI_MID_* and the CSS/Figma model. */
-            int16_t offset_y = (text_mode >= MID_LEFT && text_mode <= MID_RIGHT) ?
-                               (rect_h - line_height) / 2 : 0;
+            int32_t align_factor = text_mode_align_x(text_mode);
+            /* MID/BOT align the line box (line_height), matching MULTI_MID_* /
+             * MULTI_BOT_* and the CSS/Figma model. */
+            int16_t offset_y = (int16_t)(((int32_t)(rect_h - line_height) *
+                                          text_mode_align_y(text_mode)) / 2);
             int16_t offset_x = _UI_MAX((int32_t)((rect_w - char_width_sum) / 2), 0) * align_factor;
 
 #if ENABLE_FONT_V3_TYPO
@@ -1523,16 +1582,22 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     case MULTI_MID_LEFT:
     case MULTI_MID_CENTER:
     case MULTI_MID_RIGHT:
+    case MULTI_BOT_LEFT:
+    case MULTI_BOT_CENTER:
+    case MULTI_BOT_RIGHT:
         {
             gui_text_line_t *line_buf;
             int32_t line = 0;
             int32_t last_space_index = 0;
             int32_t line_start_index = 0;
-            int32_t align_factor = (text_mode <= MULTI_RIGHT) ?
-                                   (text_mode - MULTI_LEFT) : (text_mode - MULTI_MID_LEFT);
-            bool vertical_center = (text_mode >= MULTI_MID_LEFT);
+            int32_t align_factor = text_mode_align_x(text_mode);
+            int32_t align_y = text_mode_align_y(text_mode);
+            /* BOT anchors the bottom instead of truncating at it, so all
+             * characters are laid out and the buffer no longer fits rect_h;
+             * at most one line per character is produced. */
+            bool anchor_bottom = (align_y == 2);
 
-            int32_t line_count = rect_h / line_height + 1;
+            int32_t line_count = anchor_bottom ? (int32_t)font_len + 1 : rect_h / line_height + 1;
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
             GUI_ASSERT(line_buf != NULL);
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
@@ -1597,7 +1662,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 
                     layout_position_bearing(&chr[i], &cursor_x, rect->y1 + line * line_height,
                                             typo_ctx.baseline_px, letter_spacing);
-                    if ((rect->y1 + (line + 1) * line_height - 1) > rect->y2)
+                    if (!anchor_bottom && (rect->y1 + (line + 1) * line_height - 1) > rect->y2)
                     {
                         active_font_len = i;
                         break;
@@ -1662,7 +1727,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     }
 
                     chr[i].y = rect->y1 + line * line_height;
-                    if (chr[i].y + chr[i].h - 1 > rect->y2)
+                    if (!anchor_bottom && chr[i].y + chr[i].h - 1 > rect->y2)
                     {
                         active_font_len = i;
                         break;
@@ -1692,7 +1757,9 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                                          chr[active_font_len - 1].char_w) / 2 * align_factor;
             }
             char_height_sum = (line + 1) * line_height;
-            int32_t offset_y = vertical_center ? (rect_h - char_height_sum) / 2 : 0;
+            /* Negative for BOT when the content overflows: the layout is then
+             * shifted up and the top is clipped by the draw bounds. */
+            int32_t offset_y = (int32_t)(rect_h - (int32_t)char_height_sum) * align_y / 2;
             line = 0;
             for (uint16_t i = 0; i < active_font_len; i++)
             {

@@ -72,7 +72,6 @@ void gui_font_scale_destroy(gui_text_t *text)
 void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *img_x,
                        int16_t *img_y)
 {
-    (void)img_y;
     int16_t buf_width = 0;
     int16_t buf_height = 0;
     uint8_t font_img_pixel_bytes;
@@ -83,6 +82,9 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     rect.x2 = rect.x1 + text->base.w - 1;
     rect.y2 = rect.y1 + text->base.h - 1;
     TEXT_MODE mode = text->mode;
+    /* Single-line horizontal alignment is applied by moving the image, so those
+     * modes lay out left-aligned here. Modes that bake their offsets into the
+     * layout keep their own mode; the buffer below covers their full extent. */
     if (text->mode == CENTER || text->mode == RIGHT)
     {
         text->mode = LEFT;
@@ -95,6 +97,8 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     {
         return NULL;
     }
+    *img_x = 0;
+    *img_y = 0;
     switch (text->mode)
     {
     case LEFT:
@@ -107,12 +111,32 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
             *img_x = offset * text->mode;
             break;
         }
+    case BOT_LEFT:
+    case BOT_CENTER:
+    case BOT_RIGHT:
+        {
+            /* Glyph rows already carry the bottom offset, so the buffer has to
+             * cover the widget box rather than one line box. */
+            buf_width = text->base.w;
+            buf_height = text->base.h;
+            break;
+        }
     case MULTI_LEFT:
     case MULTI_CENTER:
     case MULTI_RIGHT:
         {
             buf_width = text->base.w;
             buf_height = text->font_height * text->char_line_sum;
+            break;
+        }
+    case MULTI_BOT_LEFT:
+    case MULTI_BOT_CENTER:
+    case MULTI_BOT_RIGHT:
+        {
+            /* BOT is not truncated at the widget edge, so clip into the box
+             * the same way the draw path does. */
+            buf_width = text->base.w;
+            buf_height = text->base.h;
             break;
         }
     // case SCROLL_X:
