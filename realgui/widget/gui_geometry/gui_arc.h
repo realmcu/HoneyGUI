@@ -23,23 +23,51 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/**
+ * How an arc's pixels are stored.
+ *
+ * A solid full ring is empty over most of its bounding box, so the two
+ * contiguous layouts spend most of their payload on zeros.  ARC_STORE_SPARSE is
+ * the same coverage kept as horizontal runs instead -- see gui_geometry_raster.h
+ * for the layout.  It is a layout difference only: the bytes a pixel ends up
+ * with are the ones ARC_STORE_A8 would have given it.
+ */
+typedef enum
+{
+    ARC_STORE_NONE = 0,         /**< No payload yet. */
+    ARC_STORE_A8,               /**< Contiguous coverage mask. */
+    ARC_STORE_ARGB8888,         /**< Contiguous colour, for gradients. */
+    ARC_STORE_SPARSE,           /**< Coverage runs. */
+} arc_store_t;
+
 /** Arc widget structure. */
 typedef struct
 {
     gui_obj_t base;             /**< Base widget. */
 
     // Drawing resources
-    draw_img_t *draw_img;       /**< Drawing image object. */
-    uint8_t *pixel_buffer;      /**< Cached pixel buffer. */
+    draw_img_t *draw_img;       /**< Drawing image object, contiguous layouts. */
+    uint8_t *pixel_buffer;      /**< Cached payload, in the layout below. */
     int buffer_w;               /**< Actual buffer width (may be optimized). */
     int buffer_h;               /**< Actual buffer height (may be optimized). */
     int buffer_off_x;           /**< Buffer left edge within the widget box. */
     int buffer_off_y;           /**< Buffer top edge within the widget box. */
     /**
+     * Layout of pixel_buffer.
+     *
+     * Kept explicitly rather than read back from the payload's header: a sparse
+     * payload has no image header, so the type cannot be sniffed out of it.
+     */
+    arc_store_t store;
+    uint32_t buffer_runs;       /**< Runs the sparse payload was acquired for. */
+    /**
      * Payload is up to date. Cleared by every setter that changes a pixel, so
      * gui_arc_prepare() needs no second per-field comparison.
      */
     bool buffer_valid;
+
+    bool end_angle_dirty;       /**< Only end_angle changed since the last render. */
+    float rendered_end_angle;
 
     uint8_t opacity_value;      /**< Opacity value. */
 

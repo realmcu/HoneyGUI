@@ -50,13 +50,18 @@ extern "C" {
 /**
  * Descriptor ceiling: a geometry key plus a full Gradient (116 bytes).
  *
- * Only a sanity bound -- a node stores the descriptor length it was given, so a
- * solid shape does not pay for the space a gradient would need.  Per-node
- * bookkeeping is 24 bytes plus the descriptor, which is still enough that only
- * payloads holding real pixels are worth caching: sharing a bare image header
- * costs far more than it saves.
+ * Only a sanity bound.  A node reserves its descriptor to the length it was
+ * given, so a solid shape does not pay for the space a gradient would need; the
+ * only caller that reserves to this maximum is the resizable acquire path
+ * (gui_geometry_cache_acquire_resizable()), whose nodes may be rekeyed later.
+ * Per-node bookkeeping is 24 bytes plus the descriptor, which is still enough
+ * that only payloads holding real pixels are worth caching: sharing a bare
+ * image header costs far more than it saves.
+ *
+ * arc_desc_t is the largest descriptor at 160 bytes, so this leaves 32 bytes of
+ * headroom before GUI_GEOMETRY_DESC_SIZE_CHECK() starts rejecting structs.
  */
-#define GUI_GEOMETRY_DESC_MAX 160
+#define GUI_GEOMETRY_DESC_MAX 192
 
 /**
  * Compile-time guard that a descriptor type fits GUI_GEOMETRY_DESC_MAX.

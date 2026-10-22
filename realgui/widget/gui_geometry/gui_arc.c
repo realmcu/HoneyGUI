@@ -16,6 +16,7 @@
 #include "acc_api.h"
 #include "lite_geometry.h"
 #include "gui_geometry_image.h"
+#include "gui_geometry_span.h"
 #include "gui_arc.h"
 #include "gui_geometry_cache.h"
 
@@ -32,28 +33,33 @@
 /**
  * 1 = store solid arcs as A8 coverage masks, 0 = always ARGB8888.
  *
- * An arc is a stroke with one colour, so what the mask holds is exactly the
- * anti-aliased coverage the rasteriser already computes.  A8 costs a quarter of
- * the memory, drops colour from the cache key so arcs differing only in colour
- * share one payload, and reaches acc_sw's dedicated A8 blit instead of the
- * generic rasteriser -- the same trade gui_circle and gui_rect make.
+ * A solid arc is one colour, so the mask holds exactly the coverage the
+ * rasteriser computes: a quarter of the memory, no colour in the cache key, and
+ * acc_sw's A8 blit instead of the generic rasteriser.  A gradient arc keeps
+ * ARGB8888 because its colour varies across the stroke.
  *
- * A gradient arc keeps ARGB8888: the colour varies across the stroke, so there
- * is no single mask to share.
- *
- * Set to 0 when bringing up a hardware accelerator whose blit may not handle A8.
- * An unsupported source format usually shows up as a garbled or missing shape
- * rather than a clean fallback, so flipping this is the quickest way to rule it
- * out.
- *
- * There is no `scons GUI_ARC_ENABLE_A8=0`: the SConstruct does not forward
- * command-line assignments to the compiler, so the value has to be changed
- * here.  The arc example prints the payload size of each arc it allocates, read
- * back from the buffer header, so a before/after comparison needs only this one
- * line.
+ * Set to 0 when bringing up an accelerator whose blit may not handle A8; the
+ * failure mode is a garbled shape, not a clean fallback.  There is no scons
+ * option for this -- the SConstruct does not forward command-line assignments.
  */
 #ifndef GUI_ARC_ENABLE_A8
 #define GUI_ARC_ENABLE_A8 1
+#endif
+
+/**
+ * Store solid full rings as runs rather than as a byte per pixel.
+ *
+ * A ring inks a band around its rim, so the mask is mostly zeros.  Only arcs
+ * arc_can_use_sparse() accepts qualify; the rest keep the contiguous mask, and
+ * the pixels are the same either way.  Set to 0 to force the contiguous layout
+ * for an A/B of memory against draw cost.
+ */
+#ifndef GUI_ARC_ENABLE_SPARSE
+#define GUI_ARC_ENABLE_SPARSE 1
+#endif
+
+#ifndef GUI_ARC_ENABLE_INCREMENTAL
+#define GUI_ARC_ENABLE_INCREMENTAL 1
 #endif
 
 /*============================================================================*
@@ -79,15 +85,14 @@ typedef struct
     float line_width;           /**< Stroke width. */
     float start_angle;          /**< Sweep start, degrees. */
     float end_angle;            /**< Sweep end, degrees. */
-    uint32_t color;             /**< ARGB baked into the pixels; alpha only when A8. */
-    uint32_t is_a8;             /**< Non-zero when the payload is a coverage mask. */
+    uint32_t color;             /**< ARGB baked into the pixels; alpha only for masks. */
+    uint32_t store;             /**< arc_store_t the payload is encoded as. */
     uint32_t use_gradient;      /**< Non-zero when the gradient below applies. */
     Gradient gradient;          /**< Only present when use_gradient is set. */
 } arc_desc_t;
 
-/* Exactly at the limit today (160 bytes), so any new field must come out of
- * Gradient or raise GUI_GEOMETRY_DESC_MAX -- this turns the overflow into a
- * build error instead of a runtime assert in the cache. */
+/* 160 bytes of a 192-byte ceiling, most of it the 116-byte Gradient.  When the
+ * check fires, take the bytes out of Gradient or raise GUI_GEOMETRY_DESC_MAX. */
 GUI_GEOMETRY_DESC_SIZE_CHECK(arc_desc_t);
 
 /*============================================================================*
@@ -101,8 +106,15 @@ GUI_GEOMETRY_DESC_SIZE_CHECK(arc_desc_t);
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render);
-static void render_arc_to_buffer(gui_arc_t *this);
+static bool init_arc_buffer(gui_arc_t *this, arc_store_t store, bool *out_need_render);
+static bool render_arc_to_buffer(gui_arc_t *this);
+static void gui_arc_release_payload(gui_arc_t *this);
+static bool arc_can_use_a8(const gui_arc_t *this);
+static bool arc_can_use_sparse(const gui_arc_t *this, const gui_matrix_t *matrix);
+static uint16_t arc_desc_len(const arc_desc_t *desc);
+static void arc_desc_init(arc_desc_t *desc, gui_arc_t *this,
+                          int buffer_w, int buffer_h, int off_x, int off_y,
+                          arc_store_t store);
 
 /** Touch input preparation - simplified version like round_rect */
 static void gui_arc_input_process(gui_obj_t *obj)
@@ -133,7 +145,9 @@ static void gui_arc_prepare(gui_arc_t *this)
         matrix_identity(obj->matrix);
     }
 
-    // Apply transformations (like gui_img_prepare does)
+    // Append this arc's own transform.  The render tree rebuilds obj->matrix
+    // from the parent plus position each frame before OBJ_PRE_PROCESS, so these
+    // are not idempotent and must not be.  Same contract as gui_img_prepare().
     float center_x = obj->w / 2.0f;
     float center_y = obj->h / 2.0f;
 
@@ -153,22 +167,34 @@ static void gui_arc_prepare(gui_arc_t *this)
     gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_RELEASED, "touch");
     gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_LONG, "touch");
     gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
+    arc_store_t store = arc_can_use_sparse(this, obj->matrix) ? ARC_STORE_SPARSE
+                        : (arc_can_use_a8(this) ? ARC_STORE_A8 : ARC_STORE_ARGB8888);
+    bool store_changed = (store != this->store);
+
     /* Every setter that changes a pixel clears buffer_valid, so this flag alone
-     * decides whether the payload has to be re-acquired and redrawn. */
-    if (!this->buffer_valid)
+     * decides whether the payload has to be re-acquired and redrawn -- except
+     * for the storage mode, which depends on the matrix and can therefore flip
+     * without any setter running. */
+    if (!this->buffer_valid || store_changed)
     {
         bool need_render = false;
 
-        if (!init_arc_buffer(this, &need_render))
+        if (!init_arc_buffer(this, store, &need_render))
         {
             gui_log("[GUI MODULE]Arc prepare: init_arc_buffer failed!\n");
             return;
         }
         if (need_render)
         {
-            render_arc_to_buffer(this);
+            if (!render_arc_to_buffer(this))
+            {
+                gui_arc_release_payload(this);
+                return;
+            }
         }
         this->buffer_valid = true;
+        this->end_angle_dirty = false;
+        this->rendered_end_angle = this->end_angle;
         gui_fb_change();
     }
 }
@@ -181,32 +207,52 @@ static void gui_arc_draw(gui_arc_t *this)
      * between prepare and draw.  The payload still holds last frame's pixels,
      * draw those and let the next prepare re-render.  Likewise when a re-render
      * fails to get memory, keep showing the old arc instead of nothing. */
-    if (this->draw_img != NULL && this->pixel_buffer != NULL)
+    if (this->pixel_buffer == NULL)
     {
-        gui_obj_t *obj = (gui_obj_t *)this;
+        return;
+    }
 
-        // The arc is rendered at the center of the buffer
-        // We just need to position the buffer at the widget's location
-        // No offset needed since arc->x, arc->y are already relative to the bounding box
+    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_matrix_t matrix;
 
+    // Initialize with identity matrix or copy user's matrix
+    if (obj->matrix != NULL)
+    {
+        memcpy(&matrix, obj->matrix, sizeof(matrix));
+    }
+    else
+    {
+        matrix_identity(&matrix);
+    }
+
+    // Place the (possibly clipped) buffer back at its origin inside the box.
+    matrix_translate((float)this->buffer_off_x, (float)this->buffer_off_y, &matrix);
+
+    if (this->store == ARC_STORE_SPARSE)
+    {
+        gui_dispdev_t *dc = gui_get_dc();
+        uint8_t opacity = (uint8_t)((uint32_t)obj->parent->opacity_value *
+                                    this->opacity_value / UINT8_MAX);
+
+        gui_color_t tint = this->color;
+        tint.color.rgba.a = 0xFFu;
+
+        if (gui_geometry_span_draw((const gui_geometry_span_t *)this->pixel_buffer,
+                                   &matrix, tint, opacity, dc))
+        {
+            return;
+        }
+        this->buffer_valid = false;
+        return;
+    }
+
+    if (this->draw_img != NULL)
+    {
         // Update opacity value to consider parent's opacity (like gui_img does)
         this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
 
-        // Initialize with identity matrix or copy user's matrix
-        if (obj->matrix != NULL)
-        {
-            memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
-        }
-        else
-        {
-            matrix_identity(&this->draw_img->matrix);
-        }
-
-        // Place the (possibly clipped) buffer back at its origin inside the box.
-        matrix_translate((float)this->buffer_off_x, (float)this->buffer_off_y,
-                         &this->draw_img->matrix);
-
-        memcpy(&this->draw_img->inverse, &this->draw_img->matrix, sizeof(struct gui_matrix));
+        memcpy(&this->draw_img->matrix, &matrix, sizeof(struct gui_matrix));
+        memcpy(&this->draw_img->inverse, &matrix, sizeof(struct gui_matrix));
         matrix_inverse(&this->draw_img->inverse);
 
         // Prepare for rendering with updated matrix
@@ -228,10 +274,14 @@ static void gui_arc_end(gui_arc_t *this)
     }
 }
 
-static void gui_arc_destroy(gui_arc_t *this)
+/**
+ * Release the payload, whatever its layout.
+ *
+ * All three layouts come from the geometry cache, so one release covers them;
+ * the draw_img only exists for the contiguous ones.
+ */
+static void gui_arc_release_payload(gui_arc_t *this)
 {
-    /* The payload is shared, so drop a reference rather than freeing it; other
-     * arcs with the same geometry may still be drawing from it. */
     if (this->pixel_buffer != NULL)
     {
         gui_geometry_cache_release(this->pixel_buffer);
@@ -245,13 +295,20 @@ static void gui_arc_destroy(gui_arc_t *this)
         this->draw_img = NULL;
     }
 
+    this->store = ARC_STORE_NONE;
+    this->buffer_valid = false;
+    this->end_angle_dirty = false;
+}
+
+static void gui_arc_destroy(gui_arc_t *this)
+{
+    gui_arc_release_payload(this);
+
     if (this->gradient != NULL)
     {
         gui_free(this->gradient);
         this->gradient = NULL;
     }
-
-    this->buffer_valid = false;
 }
 
 static void gui_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -345,6 +402,52 @@ static bool arc_can_use_a8(const gui_arc_t *this)
     return GUI_ARC_ENABLE_A8 && !(this->use_gradient && this->gradient != NULL);
 }
 
+/** Whether the sweep covers a whole turn, so the shape is a ring. */
+static bool arc_is_full_ring(const gui_arc_t *this)
+{
+    float start = fmodf(this->start_angle, 360.0f);
+    float end = fmodf(this->end_angle, 360.0f);
+
+    if (start < 0.0f) { start += 360.0f; }
+    if (end < 0.0f) { end += 360.0f; }
+
+    float span = end - start;
+    if (span <= 0.0f) { span += 360.0f; }
+
+    /* draw_arc_df_aa() treats a span this close to 360 as a full circle, and the
+     * sparse builder only exists for that path; anything else goes through the
+     * cap and angular-clip code, which has no run sink. */
+    return fabsf(span - 360.0f) < 0.001f;
+}
+
+/**
+ * Whether this arc's payload should be run-encoded instead of contiguous.
+ *
+ * All four are hard limits:
+ *  - a full ring, because only draw_arc_as_ring() has the run sink wired in;
+ *  - a mask, since runs carry coverage and a gradient needs a colour per pixel;
+ *  - a whole-pixel translation of the final draw matrix.  Runs are written
+ *    straight to their columns with no resampling, so a fraction of a pixel
+ *    cannot be carried and the arc would snap frame to frame instead of
+ *    sliding.  Judged on @p matrix because a rotated parent bends the arc just
+ *    as its own rotation does;
+ *  - 16 or 32 bit output, the only depths gui_geometry_span_draw() can blend.
+ *
+ * Opacity and clipping are absent on purpose -- both act on the coverage at
+ * draw time, so neither changes what is stored.
+ */
+static bool arc_can_use_sparse(const gui_arc_t *this, const gui_matrix_t *matrix)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+
+    return GUI_ARC_ENABLE_SPARSE &&
+           arc_can_use_a8(this) &&
+           arc_is_full_ring(this) &&
+           matrix != NULL &&
+           dc != NULL && (dc->bit_depth == 16 || dc->bit_depth == 32) &&
+           gui_geometry_span_can_draw(matrix);
+}
+
 /** Descriptor bytes to compare: solid arcs stop before the gradient. */
 static uint16_t arc_desc_len(const arc_desc_t *desc)
 {
@@ -366,7 +469,7 @@ static uint16_t arc_desc_len(const arc_desc_t *desc)
  */
 static void arc_desc_init(arc_desc_t *desc, gui_arc_t *this,
                           int buffer_w, int buffer_h, int off_x, int off_y,
-                          bool is_a8)
+                          arc_store_t store)
 {
     memset(desc, 0x00, sizeof(*desc));
 
@@ -379,12 +482,13 @@ static void arc_desc_init(arc_desc_t *desc, gui_arc_t *this,
     desc->start_angle = this->start_angle;
     desc->end_angle = this->end_angle;
 
-    /* RGB is deliberately left out of an A8 key -- that is what lets arcs
+    /* RGB is deliberately left out of a mask key -- that is what lets arcs
      * differing only in colour share one mask.  Alpha stays in, because it is
-     * folded into the mask values themselves. */
-    if (is_a8)
+     * folded into the mask values themselves.  Sparse payloads are masks too,
+     * so they key the same way and a contiguous mask maps to the same runs. */
+    desc->store = (uint32_t)store;
+    if (store == ARC_STORE_A8 || store == ARC_STORE_SPARSE)
     {
-        desc->is_a8 = 1u;
         desc->color = this->color.color.rgba.a;
     }
     else
@@ -400,37 +504,154 @@ static void arc_desc_init(arc_desc_t *desc, gui_arc_t *this,
 }
 
 /**
+ * Rasterise this arc's ring into @p sink.
+ *
+ * The one place the ring's coverage is produced.  Both storage layouts go
+ * through it, so they cannot drift apart: they differ only in which sink they
+ * hand it.  A NULL @p sink means "count the runs, keep nothing", which is how
+ * the payload is sized before it exists.
+ */
+static void arc_raster_ring(gui_arc_t *this, gui_geometry_run_sink_t *sink,
+                            int buffer_h, int off_x, int off_y)
+{
+    DrawContext draw_ctx;
+    init_draw_context(&draw_ctx, NULL, sink->width, buffer_h, PIXEL_FORMAT_A8);
+    draw_ctx.enable_aa = true;
+    draw_ctx.clip_rect.x = 0;
+    draw_ctx.clip_rect.y = 0;
+    draw_ctx.clip_rect.w = sink->width;
+    draw_ctx.clip_rect.h = buffer_h;
+    draw_ctx.gradient = NULL;
+    /* Only one shape ever writes here, so the sink's max-on-overlap is the
+     * whole story and this flag has nothing to arbitrate. */
+    draw_ctx.overlap_keeps_max_alpha = true;
+    draw_ctx.run_sink = sink;
+
+    gui_obj_t *obj = GUI_BASE(this);
+    float center_x = obj->w / 2.0f - (float)off_x;
+    float center_y = obj->h / 2.0f - (float)off_y;
+
+    draw_arc_df_aa(&draw_ctx,
+                   center_x,
+                   center_y,
+                   this->radius,
+                   this->line_width,
+                   this->start_angle,
+                   this->end_angle,
+                   this->color.color.argb_full);
+}
+
+/**
+ * Runs this arc's ring rasterises to, without writing any.
+ *
+ * Shares arc_raster_ring() with the real render, so the count and the fill
+ * agree and the payload cannot overflow.  The count sets the requested size;
+ * the cache may still round it up to its next capacity class.
+ *
+ * @return false if the scratch row could not be allocated.
+ */
+static bool arc_sparse_run_count(gui_arc_t *this, int buffer_w, int buffer_h,
+                                 int off_x, int off_y, uint32_t *out_runs)
+{
+    uint8_t *scratch = gui_malloc((size_t)buffer_w);
+    if (scratch == NULL)
+    {
+        return false;
+    }
+
+    /* No row table and no run store: the sink only counts. */
+    gui_geometry_run_sink_t sink;
+    gui_geometry_run_sink_init(&sink, scratch, (uint16_t)buffer_w, (uint16_t)buffer_h,
+                               NULL, NULL, 0u);
+
+    arc_raster_ring(this, &sink, buffer_h, off_x, off_y);
+    gui_geometry_run_sink_flush(&sink);
+    gui_free(scratch);
+
+    *out_runs = sink.run_count;
+    return true;
+}
+
+/**
  * Point pixel_buffer at a payload matching the current parameters.
  *
+ * @param store           Layout chosen by the caller for this arc.
  * @param out_need_render Set true when the payload still has to be rasterised.
  */
-static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render)
+static bool init_arc_buffer(gui_arc_t *this, arc_store_t store, bool *out_need_render)
 {
     // Calculate required buffer size
     int buffer_w, buffer_h, off_x, off_y;
     gui_arc_ink_box(this, &off_x, &off_y, &buffer_w, &buffer_h);
 
-    bool is_a8 = arc_can_use_a8(this);
+    bool is_a8 = (store != ARC_STORE_ARGB8888);
     uint32_t required_size;
-    if (!gui_geometry_image_buffer_size(buffer_w, buffer_h, is_a8 ? 1u : 4u, &required_size))
+    uint32_t runs = 0u;
+
+    if (store == ARC_STORE_SPARSE)
+    {
+        if (!arc_sparse_run_count(this, buffer_w, buffer_h, off_x, off_y, &runs))
+        {
+            return false;
+        }
+
+        uint64_t bytes = gui_geometry_span_bytes(runs, (uint16_t)buffer_h);
+        if (bytes == 0u || bytes > UINT32_MAX)
+        {
+            return false;
+        }
+        required_size = (uint32_t)bytes;
+    }
+    else if (!gui_geometry_image_buffer_size(buffer_w, buffer_h, is_a8 ? 1u : 4u,
+                                             &required_size))
     {
         return false;
     }
 
     arc_desc_t desc;
-    arc_desc_init(&desc, this, buffer_w, buffer_h, off_x, off_y, is_a8);
+    arc_desc_init(&desc, this, buffer_w, buffer_h, off_x, off_y, store);
     uint16_t desc_len = arc_desc_len(&desc);
 
-    /* Crossing between A8 and ARGB8888 (a gradient set or cleared) must not
-     * re-key the old payload in place: going to A8 it would keep the 4x
-     * allocation for good, and the saving would never reach the heap.  Acquire
-     * a right-sized payload first and drop the old one after, so a failed
-     * allocation still leaves the previous arc to draw. */
-    const uint8_t *reuse = this->pixel_buffer;
-    if (reuse != NULL &&
-        (((const gui_rgb_data_head_t *)reuse)->type == (char)A8) != is_a8)
+    const uint8_t *reuse = (this->store == store) ? this->pixel_buffer : NULL;
+
+    if (GUI_ARC_ENABLE_INCREMENTAL && this->end_angle_dirty &&
+        store == ARC_STORE_A8 && this->store == ARC_STORE_A8 &&
+        reuse != NULL && this->draw_img != NULL &&
+        buffer_w == this->buffer_w && buffer_h == this->buffer_h &&
+        off_x == this->buffer_off_x && off_y == this->buffer_off_y)
     {
-        reuse = NULL;
+        uint8_t *hit = gui_geometry_cache_find(&desc, desc_len, required_size);
+        bool updated = false;
+        if (hit != NULL)
+        {
+            gui_geometry_cache_release(reuse);
+            this->pixel_buffer = hit;
+            *out_need_render = false;
+            updated = true;
+        }
+        else if (gui_geometry_cache_rekey(reuse, &desc, desc_len, required_size))
+        {
+            DrawContext ctx;
+            init_draw_context(&ctx, this->pixel_buffer + sizeof(gui_rgb_data_head_t),
+                              buffer_w, buffer_h, PIXEL_FORMAT_A8);
+            ctx.clip_rect = (Rect) {0, 0, (int16_t)buffer_w, (int16_t)buffer_h};
+            ctx.overlap_keeps_max_alpha = true;
+            *out_need_render = !lg_arc_update_a8(&ctx,
+                                                 GUI_BASE(this)->w / 2.0f - off_x,
+                                                 GUI_BASE(this)->h / 2.0f - off_y,
+                                                 this->radius, this->line_width,
+                                                 this->start_angle, this->rendered_end_angle,
+                                                 this->end_angle, this->color.color.argb_full);
+            gui_get_dc()->cache_need_clean = 1;
+            updated = true;
+        }
+        if (updated)
+        {
+            gui_geometry_img_bind(this->draw_img, this->pixel_buffer, this->opacity_value,
+                                  true, this->color);
+            this->draw_img->high_quality = 0;
+            return true;
+        }
     }
 
     uint8_t *buffer =
@@ -442,12 +663,28 @@ static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render)
         gui_geometry_cache_release(this->pixel_buffer);
     }
     this->pixel_buffer = buffer;
+    this->store = store;
+    this->buffer_runs = runs;
 
     // Save buffer dimensions
     this->buffer_w = buffer_w;
     this->buffer_h = buffer_h;
     this->buffer_off_x = off_x;
     this->buffer_off_y = off_y;
+
+    /* A sparse payload is drawn straight to the frame buffer by
+     * gui_geometry_span_draw(), which positions it from the matrix rather than
+     * from a draw_img, so there is nothing to bind. */
+    if (store == ARC_STORE_SPARSE)
+    {
+        if (this->draw_img != NULL)
+        {
+            /* data aliases pixel_buffer, released above or replaced below. */
+            gui_free(this->draw_img);
+            this->draw_img = NULL;
+        }
+        return true;
+    }
 
     // Allocate draw_img if needed
     if (this->draw_img == NULL)
@@ -472,17 +709,84 @@ static bool init_arc_buffer(gui_arc_t *this, bool *out_need_render)
     return true;
 }
 
-/** Render arc to buffer - called only when parameters change */
-static void render_arc_to_buffer(gui_arc_t *this)
+/**
+ * Rasterise the ring straight into the run-encoded payload.
+ *
+ * The coverage comes from arc_raster_ring(), the same function the contiguous
+ * mask uses, so the two layouts cannot drift apart.  What differs is only the
+ * destination: a covered run is written once, and the zeros that make up most
+ * of a ring's bounding box are not written at all.
+ *
+ * @return false if the scratch row could not be had.  The payload is discarded
+ *         rather than left half-written -- see the failure paths below.
+ */
+static bool render_arc_sparse(gui_arc_t *this)
+{
+    gui_geometry_span_t *spans = (gui_geometry_span_t *)this->pixel_buffer;
+
+    /* Take the scratch before touching the payload.  A payload from the cache
+     * carries whatever header the node last used, and that header is what says
+     * where the row table ends: overwriting it and then failing would leave the
+     * node describing a shape nobody wrote. */
+    uint8_t *scratch = gui_malloc((size_t)this->buffer_w);
+    if (scratch == NULL)
+    {
+        return false;
+    }
+
+    /* From here the payload is this arc's.  The row table is addressed through
+     * spans->height, so the header has to be in place before either pointer is
+     * derived -- and the runs follow the rows, so the two cannot be carved out
+     * of a stale height. */
+    spans->width = (uint16_t)this->buffer_w;
+    spans->height = (uint16_t)this->buffer_h;
+    spans->run_count = 0u;
+
+    gui_geometry_span_row_t *rows = gui_geometry_span_rows(spans);
+    gui_geometry_span_run_t *runs = gui_geometry_span_runs(spans);
+
+    /* The payload was acquired for exactly this many runs, since the count and
+     * this pass share the rasteriser. */
+    gui_geometry_run_sink_t sink;
+    gui_geometry_run_sink_init(&sink, scratch, (uint16_t)this->buffer_w,
+                               (uint16_t)this->buffer_h, rows, runs, this->buffer_runs);
+
+    arc_raster_ring(this, &sink, this->buffer_h, this->buffer_off_x, this->buffer_off_y);
+    gui_geometry_run_sink_flush(&sink);
+    gui_free(scratch);
+
+    /* Count and raster are one function, so these agree by construction; an
+     * overflow would mean a truncated run store. */
+    if (sink.overflow || sink.run_count > this->buffer_runs)
+    {
+        return false;
+    }
+
+    spans->run_count = sink.run_count;
+
+    return true;
+}
+
+/**
+ * Render arc to buffer - called only when parameters change.
+ *
+ * @return true if the payload holds this arc's coverage.
+ */
+static bool render_arc_to_buffer(gui_arc_t *this)
 {
     // Use the saved buffer dimensions
     int buffer_w = this->buffer_w;
     int buffer_h = this->buffer_h;
 
+    if (this->store == ARC_STORE_SPARSE)
+    {
+        return render_arc_sparse(this);
+    }
+
     /* Same predicate init_arc_buffer() sized the allocation with: this runs
      * right after it, with no setter in between, so the two always agree.  A
      * fresh render would overwrite the header anyway. */
-    bool is_a8 = arc_can_use_a8(this);
+    bool is_a8 = (this->store == ARC_STORE_A8);
     uint32_t pixel_bytes = is_a8 ? 1u : 4u;
 
     // Setup image header
@@ -541,6 +845,7 @@ static void render_arc_to_buffer(gui_arc_t *this)
                        this->color.color.argb_full);
     }
     gui_get_dc()->cache_need_clean = 1;
+    return true;
 }
 
 /**
@@ -655,6 +960,7 @@ void gui_arc_set_radius(gui_arc_t *arc, int radius)
     arc->radius = radius;
     gui_arc_refit_box(arc);
     arc->buffer_valid = false;
+    arc->end_angle_dirty = false;
 }
 void gui_arc_set_opacity(gui_arc_t *arc, uint8_t opacity)
 {
@@ -666,6 +972,7 @@ void gui_arc_set_color(gui_arc_t *arc, gui_color_t color)
     GUI_ASSERT(arc != NULL);
     arc->color = color;
     arc->buffer_valid = false;
+    arc->end_angle_dirty = false;
 }
 
 void gui_arc_set_start_angle(gui_arc_t *arc, float start_angle)
@@ -673,11 +980,17 @@ void gui_arc_set_start_angle(gui_arc_t *arc, float start_angle)
     GUI_ASSERT(arc != NULL);
     arc->start_angle = start_angle;
     arc->buffer_valid = false;
+    arc->end_angle_dirty = false;
 }
 
 void gui_arc_set_end_angle(gui_arc_t *arc, float end_angle)
 {
     GUI_ASSERT(arc != NULL);
+    if (arc->end_angle == end_angle) { return; }
+    if (arc->buffer_valid)
+    {
+        arc->end_angle_dirty = true;
+    }
     arc->end_angle = end_angle;
     arc->buffer_valid = false;
 }
@@ -688,6 +1001,7 @@ void gui_arc_set_line_width(gui_arc_t *arc, float line_width)
     arc->line_width = line_width;
     gui_arc_refit_box(arc);
     arc->buffer_valid = false;
+    arc->end_angle_dirty = false;
 }
 
 void gui_arc_on_click(gui_arc_t *arc, void *callback, void *parameter)
@@ -740,6 +1054,7 @@ void gui_arc_set_angular_gradient(gui_arc_t *arc, float start_angle, float end_a
 
     arc->use_gradient = true;
     arc->buffer_valid = false;
+    arc->end_angle_dirty = false;
 }
 
 void gui_arc_add_gradient_stop(gui_arc_t *arc, float position, gui_color_t color)
@@ -754,6 +1069,7 @@ void gui_arc_add_gradient_stop(gui_arc_t *arc, float position, gui_color_t color
 
     gradient_add_stop(arc->gradient, position, color.color.argb_full);
     arc->buffer_valid = false;
+    arc->end_angle_dirty = false;
 }
 
 void gui_arc_clear_gradient(gui_arc_t *arc)
@@ -768,4 +1084,5 @@ void gui_arc_clear_gradient(gui_arc_t *arc)
 
     arc->use_gradient = false;
     arc->buffer_valid = false;
+    arc->end_angle_dirty = false;
 }

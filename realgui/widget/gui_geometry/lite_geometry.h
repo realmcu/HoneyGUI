@@ -11,6 +11,10 @@
 #include <stdint.h>
 #include <math.h>
 
+/* The collector type, for the run_sink field below.  This stays a plain
+ * data-only header so the rasteriser can be exercised on a host. */
+#include "gui_geometry_raster.h"
+
 #ifdef M_PI
 #undef M_PI
 #endif
@@ -19,6 +23,14 @@
 #define LG_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define LG_MAX(a, b) ((a) > (b) ? (a) : (b))
 #define LG_CLAMP(x, min_val, max_val) LG_MIN(LG_MAX(x, min_val), max_val)
+
+/**
+ * Feather width of one stroke edge, in pixels.  Half a pixel: an edge inside a
+ * pixel ramps it across 0..1 and no further.  Strokes narrower than
+ * @c 2 * LG_ARC_AA_WIDTH have overlapping edges and take the thin profile
+ * instead (see arc_is_thin()).
+ */
+#define LG_ARC_AA_WIDTH 0.5f
 
 typedef uint32_t PixelColor;
 
@@ -103,6 +115,22 @@ typedef struct
      * caller's setting survives every return path.  Defaults to false.
      */
     bool overlap_keeps_max_alpha;
+    /**
+     * Sparse destination, used instead of @c buffer when set.
+     *
+     * A shape that is empty nearly everywhere does not need a byte per pixel.
+     * Pointing this at a collector makes the raster record only the covered
+     * runs, which for a ring is a small fraction of its bounding box.  Every
+     * sample then lands through gui_geometry_run_sink_put() and the bytes
+     * written are the same ones @c buffer would have received, so the two
+     * destinations stay interchangeable: the sparse one only leaves out the
+     * zeros.
+     *
+     * Requires the raster to be the shape's sole output -- a collector holds
+     * coverage and nothing else, so it cannot blend into what was there before.
+     * NULL means write to @c buffer.  Defaults to NULL.
+     */
+    gui_geometry_run_sink_t *run_sink;
 } DrawContext;
 
 PixelColor create_color_by_format(PixelFormat format, uint8_t r, uint8_t g,
@@ -121,6 +149,11 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                     float radius, float line_width,
                     float start_angle, float end_angle,
                     PixelColor stroke_color);
+
+/* Update an opaque A8 arc in place. False leaves the buffer unchanged. */
+bool lg_arc_update_a8(DrawContext *ctx, float center_x, float center_y,
+                      float radius, float line_width, float start_angle,
+                      float old_end_angle, float end_angle, PixelColor color);
 void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
                              float radius, float line_width,
                              float start_angle, float end_angle,

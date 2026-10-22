@@ -35,8 +35,9 @@ static void calculate_arc_bbox(float cx, float cy, float radius, float line_widt
     float angle_span = end_angle - start_angle;
     if (angle_span < 0) { angle_span += 360.0f; }
 
-    // Check if this is a full circle (including 0->360 case)
-    if (angle_span >= 359.0f || angle_span <= 1.0f)
+    bool degenerate_full = (angle_span < 0.001f);
+
+    if (angle_span >= 359.0f || degenerate_full)
     {
         // Full circle - use entire bounding box
         *min_x = cx - outer_r;
@@ -131,15 +132,7 @@ static void gui_arc_group_prepare(gui_arc_group_t *this)
         return;  // Already rendered
     }
 
-    gui_obj_t *obj = (gui_obj_t *)this;
-
-    // Initialize matrix
-    if (obj->matrix == NULL)
-    {
-        obj->matrix = gui_malloc(sizeof(gui_matrix_t));
-        GUI_ASSERT(obj->matrix != NULL);
-        matrix_identity(obj->matrix);
-    }
+    // obj->matrix is owned by the base object; do not allocate or free it here.
 
     // Optimize buffer size on first allocation based on actual arcs
     if (this->pixel_buffer == NULL && this->arc_count > 0)
@@ -223,11 +216,11 @@ static void gui_arc_group_prepare(gui_arc_group_t *this)
         memset(this->draw_img, 0x00, sizeof(draw_img_t));
     }
 
-    // Setup draw_img
     this->draw_img->data = this->pixel_buffer;
     this->draw_img->blend_mode = IMG_SRC_OVER_MODE;
     this->draw_img->opacity_value = this->opacity_value;
-    this->draw_img->high_quality = 0;
+    this->draw_img->high_quality = 1;
+    this->draw_img->fg_color_set = 0xFFFFFFFFu;
 
     // Setup image header
     gui_rgb_data_head_t *img_header = (gui_rgb_data_head_t *)this->pixel_buffer;

@@ -165,6 +165,13 @@ void gui_geometry_span_release(const gui_geometry_span_t *spans)
     gui_geometry_cache_release(spans);
 }
 
+/**
+ * Whether a run payload can be placed through @p matrix at all.
+ *
+ * Runs are written straight to the columns they name, with no pixel grid to
+ * resample, so the matrix must be an exact whole-pixel translation.  A caller
+ * that gets false has to keep the contiguous mask instead.
+ */
 bool gui_geometry_span_can_draw(const gui_matrix_t *matrix)
 {
     if (!matrix_only_translate((gui_matrix_t *)matrix))
@@ -178,12 +185,31 @@ bool gui_geometry_span_can_draw(const gui_matrix_t *matrix)
            fabsf(ty - roundf(ty)) < 0.001f;
 }
 
+/**
+ * Fold the two draw-time alphas into a run's coverage.
+ *
+ * Each factor of 255 is skipped rather than multiplied through: x * 255 / 255
+ * is x only if the division rounds, and the smallest rounding nudge is enough
+ * to move a 5-bit channel.  Skipping keeps the common cases -- opaque colour,
+ * opaque widget -- byte-identical to the A8 blit, which does not touch the
+ * coverage in those cases either.  The 8-bit step itself matches that blit's
+ * @c a * opacity >> 8, truncation included, so the residual gap is nil there
+ * and at most one level everywhere else.
+ */
 static uint8_t combined_alpha(uint8_t coverage, uint8_t color_alpha, uint8_t opacity)
 {
-    uint32_t alpha = (uint32_t)coverage * color_alpha;
-    alpha = (alpha + 127u) / 255u;
-    alpha = alpha * opacity;
-    return (uint8_t)((alpha + 127u) / 255u);
+    uint32_t alpha = coverage;
+
+    if (color_alpha != 255u)
+    {
+        alpha = (alpha * color_alpha + 127u) / 255u;
+    }
+    if (opacity != 255u)
+    {
+        alpha = (alpha * opacity) >> 8;
+    }
+
+    return (uint8_t)alpha;
 }
 
 bool gui_geometry_span_draw(const gui_geometry_span_t *spans,
@@ -193,6 +219,14 @@ bool gui_geometry_span_draw(const gui_geometry_span_t *spans,
 {
     if (spans == NULL || matrix == NULL || dc == NULL || dc->frame_buf == NULL ||
         !gui_geometry_span_can_draw(matrix))
+    {
+        return false;
+    }
+
+    /* An inverted section would make section_width negative and fold every run
+     * onto the wrong columns.  Other blits read the section from the display
+     * controller, which keeps it valid; this one takes dc by value. */
+    if (dc->section.x2 < dc->section.x1 || dc->section.y2 < dc->section.y1)
     {
         return false;
     }

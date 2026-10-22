@@ -748,6 +748,106 @@ uint64_t gui_geometry_span_bytes(uint32_t run_count, uint16_t height)
            (uint64_t)run_count * sizeof(gui_geometry_span_run_t);
 }
 
+void gui_geometry_run_sink_init(gui_geometry_run_sink_t *sink, uint8_t *row,
+                                uint16_t width, uint16_t height,
+                                gui_geometry_span_row_t *rows,
+                                gui_geometry_span_run_t *runs,
+                                uint32_t capacity)
+{
+    memset(sink, 0x00, sizeof(*sink));
+
+    sink->rows = rows;
+    sink->runs = runs;
+    sink->run_capacity = (runs != NULL) ? capacity : 0u;
+    sink->row = row;
+    sink->width = width;
+    sink->height = height;
+    sink->open_row = -1;
+
+    if (row != NULL && width > 0u)
+    {
+        memset(row, 0x00, width);
+    }
+
+    /* A counting sink has no row table to hang run indices off, but a caller
+     * filling a payload needs every row present even where it inks nothing. */
+    if (rows != NULL && height > 0u)
+    {
+        memset(rows, 0x00, (size_t)height * sizeof(*rows));
+    }
+}
+
+void gui_geometry_run_sink_flush(gui_geometry_run_sink_t *sink)
+{
+    if (sink->open_row < 0)
+    {
+        return;
+    }
+
+    gui_geometry_span_row_t *row = NULL;
+    if (sink->rows != NULL)
+    {
+        row = &sink->rows[sink->open_row];
+        row->first_run = sink->run_count;
+        row->run_count = 0u;
+        row->reserved = 0u;
+    }
+
+    int32_t x = 0;
+    while (x < (int32_t)sink->width)
+    {
+        uint8_t alpha = sink->row[x];
+
+        if (alpha == 0u)
+        {
+            x++;
+            continue;
+        }
+
+        int32_t start = x;
+        while (x < (int32_t)sink->width && sink->row[x] == alpha)
+        {
+            x++;
+        }
+
+        if (sink->runs != NULL)
+        {
+            if (sink->run_count < sink->run_capacity)
+            {
+                gui_geometry_span_run_t *run = &sink->runs[sink->run_count];
+                run->x = (uint16_t)start;
+                run->length = (uint16_t)(x - start);
+                run->alpha = alpha;
+                run->reserved = 0u;
+                if (row != NULL)
+                {
+                    row->run_count++;
+                }
+            }
+            else
+            {
+                sink->overflow = true;
+            }
+        }
+
+        sink->run_count++;
+    }
+
+    memset(sink->row, 0x00, sink->width);
+    sink->open_row = -1;
+}
+
+void gui_geometry_run_sink_row(gui_geometry_run_sink_t *sink, int32_t y)
+{
+    if (y < 0 || y >= (int32_t)sink->height || (int32_t)y == sink->open_row)
+    {
+        return;
+    }
+
+    gui_geometry_run_sink_flush(sink);
+    sink->open_row = y;
+}
+
 uint32_t gui_geometry_raster_run_count(const gui_geometry_path_t *path)
 {
     uint32_t runs = 0u;

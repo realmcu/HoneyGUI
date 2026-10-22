@@ -104,6 +104,7 @@ void init_draw_context(DrawContext *ctx, uint8_t *buffer, int width, int height,
     ctx->format = format;
     ctx->stride = width * get_pixel_size(format);
     ctx->overlap_keeps_max_alpha = false;
+    ctx->run_sink = NULL;
 }
 
 static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
@@ -111,6 +112,18 @@ static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
 {
     int pixel_size = get_pixel_size(ctx->format);
     int offset = (y * ctx->width + x) * pixel_size;
+
+    /* A sparse destination holds coverage only, so it can be fed before any of
+     * the per-format work below -- and the value stored is the byte the A8
+     * branch would have written, keeping the two layouts equivalent. */
+    if (ctx->run_sink != NULL)
+    {
+        uint8_t source_alpha = (color >> 24) & 0xFF;
+        if (source_alpha == 0) { return; }
+
+        gui_geometry_run_sink_put(ctx->run_sink, x, y, (uint8_t)(source_alpha * coverage));
+        return;
+    }
 
     if (ctx->format == PIXEL_FORMAT_A8)
     {
@@ -202,7 +215,33 @@ void fill_circle(DrawContext *ctx, float center_x, float center_y, float radius,
         }
     }
 }
-// ==================== Arc Helper Functions ====================
+// ==================== Arc helpers ====================
+
+/**
+ * @brief Whether a stroke is too thin for the two-band coverage model.
+ *
+ * Below @c 2 * LG_ARC_AA_WIDTH the outer and inner bands overlap: no distance
+ * is solid and none is empty between them, so the branch order decides the
+ * result and the coverage becomes a step rather than a ramp.  Such strokes take
+ * the distance profile below instead.
+ */
+static inline bool arc_is_thin(float line_width)
+{
+    return line_width < 2.0f * LG_ARC_AA_WIDTH;
+}
+
+/**
+ * @brief Coverage of a stroke of half-width @p half at distance @p d from its
+ *        centreline.
+ *
+ * Both edges of the stroke are box filtered together, which is what keeps a
+ * stroke narrower than the feather visible.  Assumes the stroke is locally
+ * parallel to the centreline; callers must not use it near a cap.
+ */
+static inline float arc_stroke_coverage(float d, float half)
+{
+    return LG_CLAMP(half + 0.5f - fabsf(d), 0.0f, 1.0f);
+}
 
 // Compute coverage for anti-aliasing using squared distances (avoids sqrt)
 // Uses smoothstep-like falloff for consistency with arc_sdf
@@ -238,6 +277,9 @@ static inline float compute_coverage_fast(float dist_sq, float outer_sq, float i
     return 0.0f;
 }
 
+static void draw_arc_as_ring_thin(DrawContext *ctx, float center_x, float center_y,
+                                  float arc_radius, float line_width, PixelColor color);
+
 /**
  * Draw a complete ring (360 degree arc) - optimized for full circles
  * Uses unified AA width and smoothstep for consistency
@@ -247,9 +289,19 @@ static void draw_arc_as_ring_symmetric(DrawContext *ctx, float center_x, float c
 {
     if (line_width <= 0) { return; }
 
+    /* See draw_arc_as_ring_thin(): the band model needs a solid core, and a
+     * stroke this narrow has none.  RGB565 gets the same distance profile as
+     * the other layouts, so format does not change what a thin arc looks like;
+     * an arc this small has no pixels to spare for the paired filler. */
+    if (arc_is_thin(line_width))
+    {
+        draw_arc_as_ring_thin(ctx, center_x, center_y, arc_radius, line_width, color);
+        return;
+    }
+
     float outer_radius = arc_radius + line_width / 2;
     float inner_radius = fmaxf(arc_radius - line_width / 2, 0);
-    float aa_width = 1.5f;  // Unified AA width
+    float aa_width = LG_ARC_AA_WIDTH;  // Unified AA width
 
     float outer_sq = outer_radius * outer_radius;
     float inner_sq = inner_radius * inner_radius;
@@ -367,6 +419,22 @@ static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int en
 
     uint8_t alpha = (uint8_t)(color >> 24);
 
+    /* A sparse destination wants the same fully-covered byte the A8 memset
+     * below writes, for the same reason: nothing already in this run can exceed
+     * it.  With alpha at 255 this is also where the ARGB fast fill goes, so the
+     * three destinations agree span for span.  A zero alpha records nothing --
+     * the collector drops those samples -- so the run is skipped outright. */
+    if (ctx->run_sink != NULL)
+    {
+        if (alpha == 0) { return; }
+
+        for (int x = start_x; x <= end_x; x++)
+        {
+            gui_geometry_run_sink_put(ctx->run_sink, x, y, alpha);
+        }
+        return;
+    }
+
     /* An A8 span is one byte per pixel and every sample here is fully covered,
      * so it is a memset of the colour alpha -- translucent or not.  That equals
      * the per-pixel max a8_accumulate() would take: anything already in the
@@ -403,6 +471,76 @@ static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int en
     }
 }
 
+/**
+ * @brief Whole ring of a stroke too thin for the two-band model.
+ *
+ * Walks the distance profile instead of the two bands, so the ring ramps over
+ * one pixel whatever the line width.
+ */
+static void draw_arc_as_ring_thin(DrawContext *ctx, float center_x, float center_y,
+                                  float arc_radius, float line_width, PixelColor color)
+{
+    float half = line_width * 0.5f;
+    float reach = half + 0.5f;
+
+    int clip_x1 = ctx->clip_rect.x;
+    int clip_x2 = ctx->clip_rect.x + ctx->clip_rect.w - 1;
+    int min_y = LG_MAX((int)floorf(center_y - arc_radius - reach), ctx->clip_rect.y);
+    int max_y = LG_MIN((int)ceilf(center_y + arc_radius + reach),
+                       ctx->clip_rect.y + ctx->clip_rect.h - 1);
+
+    for (int y = min_y; y <= max_y; y++)
+    {
+        float dy = (float)y + 0.5f - center_y;
+        float dy_sq = dy * dy;
+
+        /* Row extent of the band: the feather reaches @c reach past the
+         * centreline, so a row further out than that inks nothing. */
+        float band_sq = (arc_radius + reach) * (arc_radius + reach);
+
+        if (dy_sq > band_sq) { continue; }
+
+        float outer_x = sqrtf(band_sq - dy_sq);
+
+        /* A row that crosses the centreline has an inner limit: the feather on
+         * the near side, which is the same circle one radius in. */
+        float inner_reach = arc_radius - reach;
+        float inner_x = (inner_reach > 0.0f && dy_sq < inner_reach * inner_reach) ?
+                        sqrtf(inner_reach * inner_reach - dy_sq) : 0.0f;
+
+        int left_from = LG_MAX((int)ceilf(center_x - outer_x - 0.5f), clip_x1);
+        int left_to = LG_MIN((int)floorf(center_x - inner_x - 0.5f), clip_x2);
+        int right_from = LG_MAX((int)ceilf(center_x + inner_x - 0.5f), clip_x1);
+        int right_to = LG_MIN((int)floorf(center_x + outer_x - 0.5f), clip_x2);
+
+        /* Rows fully inside the ring's radius band, and rows that straddle the
+         * centre column, end up with one span covering the whole width. */
+        if (inner_reach <= 0.0f)
+        {
+            left_to = LG_MIN((int)floorf(center_x - 0.5f), clip_x2);
+            right_from = LG_MAX((int)ceilf(center_x - 0.5f), clip_x1);
+        }
+
+        for (int pass = 0; pass < 2; pass++)
+        {
+            int from = (pass == 0) ? left_from : right_from;
+            int to = (pass == 0) ? left_to : right_to;
+
+            for (int x = from; x <= to; x++)
+            {
+                float dx = (float)x + 0.5f - center_x;
+                float dist = sqrtf(dx * dx + dy_sq);
+                float coverage = arc_stroke_coverage(dist - arc_radius, half);
+
+                if (coverage > 0.001f)
+                {
+                    add_pixel_aa(ctx, x, y, color, coverage);
+                }
+            }
+        }
+    }
+}
+
 static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
                              float arc_radius, float line_width, PixelColor color)
 {
@@ -417,9 +555,19 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
 
     if (line_width <= 0.0f) { return; }
 
+    /* No solid core to protect, so skip the band arithmetic and walk the
+     * feather directly.  The solid spans below are built from
+     * @c outer_solid_radius and @c inner_solid_radius, which cross over once
+     * the bands overlap; the distance profile has no such state. */
+    if (arc_is_thin(line_width))
+    {
+        draw_arc_as_ring_thin(ctx, center_x, center_y, arc_radius, line_width, color);
+        return;
+    }
+
     float outer_radius = arc_radius + line_width / 2.0f;
     float inner_radius = fmaxf(arc_radius - line_width / 2.0f, 0.0f);
-    float aa_width = 1.5f;
+    float aa_width = LG_ARC_AA_WIDTH;
     float outer_aa_radius = outer_radius + aa_width;
     float outer_solid_radius = fmaxf(outer_radius - aa_width, 0.0f);
     float inner_aa_radius = fmaxf(inner_radius - aa_width, 0.0f);
@@ -621,7 +769,15 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
         return false;
     }
 
-    float aa_width = 1.5f;
+    /* A thin stroke has no solid core for the spans below to fill, and the
+     * band edges they leave over would overlap.  Hand it back to the caller,
+     * which has the distance-profile path for exactly this case. */
+    if (arc_is_thin(line_width))
+    {
+        return false;
+    }
+
+    float aa_width = LG_ARC_AA_WIDTH;
     float outer_radius = radius + cap_radius;
     float inner_radius = fmaxf(radius - cap_radius, 0.0f);
     float outer_aa_radius = outer_radius + aa_width;
@@ -774,7 +930,7 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
 
     return true;
 }
-// ==================== Optimized Arc Drawing ====================
+// ==================== Arc drawing ====================
 
 // Normalize angle to [0, 360)
 static inline float normalize_angle_arc(float angle)
@@ -832,7 +988,9 @@ static inline float arc_sdf(float px, float py, float cx, float cy,
     }
     else
     {
-        ring_dist = -fminf(dist - inner_r, outer_r - dist); // Inside ring (negative)
+        /* Half the line width from the centreline: a signed distance, so the
+         * outline can be scaled per angle without the sign flipping. */
+        ring_dist = fabsf(dist - radius) - line_width / 2.0f;
     }
 
     // Check angle constraint
@@ -863,7 +1021,56 @@ static inline float arc_sdf(float px, float py, float cx, float cy,
     return ring_dist;
 }
 
-// ==================== Optimized Arc Drawing with Quadrant-based approach ====================
+/**
+ * @brief Partial arc of a stroke too thin for the two-band model.
+ *
+ * The band model cannot express a stroke narrower than its own feather, and the
+ * quadrant walk underneath leaves a one-pixel seam where the quadrants meet.
+ * Neither matters here: an arc this thin is a few hundred pixels, so the whole
+ * box is walked against a single distance field.  The outline and the round
+ * caps come from the same field, which is what keeps the caps tangent to the
+ * body instead of pasted onto it.
+ */
+static void arc_draw_thin_outline(DrawContext *ctx, float center_x, float center_y,
+                                  float radius, float line_width,
+                                  float start_angle, float end_angle,
+                                  PixelColor color)
+{
+    float half = line_width * 0.5f;
+    float reach = half + 0.5f;
+    float outer = radius + reach;
+
+    int min_x = LG_MAX((int)floorf(center_x - outer), ctx->clip_rect.x);
+    int max_x = LG_MIN((int)ceilf(center_x + outer), ctx->clip_rect.x + ctx->clip_rect.w - 1);
+    int min_y = LG_MAX((int)floorf(center_y - outer), ctx->clip_rect.y);
+    int max_y = LG_MIN((int)ceilf(center_y + outer), ctx->clip_rect.y + ctx->clip_rect.h - 1);
+
+    for (int y = min_y; y <= max_y; y++)
+    {
+        float dy = (float)y + 0.5f - center_y;
+
+        for (int x = min_x; x <= max_x; x++)
+        {
+            float dx = (float)x + 0.5f - center_x;
+
+            /* Outside the outline and outside both caps, nothing here can ink.
+             * The cap centres sit on the centreline, so they are inside the
+             * circle of radius @c outer and this bound covers them too. */
+            if (dx * dx + dy * dy > outer * outer) { continue; }
+
+            float sdf = arc_sdf((float)x + 0.5f, (float)y + 0.5f, center_x, center_y,
+                                radius, line_width, start_angle, end_angle);
+            float coverage = 1.0f - smoothstep(-LG_ARC_AA_WIDTH, LG_ARC_AA_WIDTH, sdf);
+
+            if (coverage > 0.001f)
+            {
+                add_pixel_aa(ctx, x, y, color, coverage);
+            }
+        }
+    }
+}
+
+// ==================== Arc drawing, quadrants ====================
 
 static inline bool is_in_angle_range_cross(float dx, float dy,
                                            float start_cos, float start_sin,
@@ -1007,10 +1214,19 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
         return;
     }
 
+    /* Too narrow for the solid-core model, so the outline and the caps are
+     * both taken from one distance field below. */
+    if (arc_is_thin(line_width))
+    {
+        arc_draw_thin_outline(ctx, center_x, center_y, radius, line_width,
+                              start_angle, end_angle, stroke_color);
+        return;
+    }
+
     // Pre-calculate radii and squared values
     float outer_radius = radius + line_width / 2.0f;
     float inner_radius = fmaxf(radius - line_width / 2.0f, 0);
-    float aa_width = 1.5f;  // Unified AA width for both arc body and caps
+    float aa_width = LG_ARC_AA_WIDTH;  // Unified AA width for both arc body and caps
 
     float outer_sq = outer_radius * outer_radius;
     float inner_sq = inner_radius * inner_radius;
@@ -1333,6 +1549,74 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
 
 }
 
+bool lg_arc_update_a8(DrawContext *ctx, float center_x, float center_y,
+                      float radius, float line_width, float start_angle,
+                      float old_end_angle, float end_angle, PixelColor color)
+{
+    if (ctx == NULL || ctx->buffer == NULL || ctx->format != PIXEL_FORMAT_A8 ||
+        ctx->run_sink != NULL || (uint8_t)(color >> 24) != UINT8_MAX ||
+        !isfinite(radius) || !isfinite(line_width) || radius <= 0.0f ||
+        line_width < 2.0f * LG_ARC_AA_WIDTH ||
+        !isfinite(start_angle) || !isfinite(old_end_angle) || !isfinite(end_angle) ||
+        start_angle < 0.0f || start_angle >= 360.0f ||
+        old_end_angle < 0.0f || old_end_angle > 720.0f ||
+        end_angle < 0.0f || end_angle > 720.0f ||
+        ctx->width <= 0 || ctx->height <= 0 || ctx->width > INT16_MAX ||
+        ctx->height > INT16_MAX || !isfinite(center_x) || !isfinite(center_y))
+    {
+        return false;
+    }
+
+    float old_span = fmodf(old_end_angle - start_angle, 360.0f);
+    float span = fmodf(end_angle - start_angle, 360.0f);
+    if (old_span <= 0.0f) { old_span += 360.0f; }
+    if (span <= 0.0f) { span += 360.0f; }
+
+    /* Stay on the same scanline path; short arcs and full rings use other profiles. */
+    float min_span = LG_MIN(old_span, span);
+    float max_span = LG_MAX(old_span, span);
+    if (max_span >= 359.9f || max_span - min_span > 90.0f ||
+        (min_span <= 180.0f && max_span >= 180.0f) ||
+        radius * min_span * M_PI / 180.0f <= line_width * 1.5f)
+    {
+        return false;
+    }
+    if (old_span == span) { return true; }
+
+    float min_x, min_y, max_x, max_y;
+    lg_arc_ink_bounds(radius, line_width, start_angle + min_span, start_angle + max_span,
+                      &min_x, &min_y, &max_x, &max_y);
+    int x0 = LG_MAX(0, ctx->clip_rect.x);
+    int y0 = LG_MAX(0, ctx->clip_rect.y);
+    int x1 = LG_MIN(ctx->width, ctx->clip_rect.x + ctx->clip_rect.w);
+    int y1 = LG_MIN(ctx->height, ctx->clip_rect.y + ctx->clip_rect.h);
+    x0 = LG_MAX(x0, (int)floorf(center_x + min_x));
+    y0 = LG_MAX(y0, (int)floorf(center_y + min_y));
+    x1 = LG_MIN(x1, (int)ceilf(center_x + max_x));
+    y1 = LG_MIN(y1, (int)ceilf(center_y + max_y));
+    if (x0 >= x1 || y0 >= y1) { return true; }
+    if ((int64_t)(x1 - x0) * (y1 - y0) * 2 >= (int64_t)ctx->width * ctx->height)
+    {
+        return false;
+    }
+
+    Rect saved_clip = ctx->clip_rect;
+    ctx->clip_rect = (Rect)
+    {
+        (int16_t)x0, (int16_t)y0,
+        (int16_t)(x1 - x0), (int16_t)(y1 - y0)
+    };
+    /* Remove the old end cap as well as the changed arc body. */
+    for (int y = y0; y < y1; y++)
+    {
+        memset(ctx->buffer + (size_t)y * ctx->width + x0, 0, (size_t)(x1 - x0));
+    }
+    draw_arc_df_aa(ctx, center_x, center_y, radius, line_width,
+                   start_angle, end_angle, color);
+    ctx->clip_rect = saved_clip;
+    return true;
+}
+
 // ==================== Gradient Functions ====================
 
 /**
@@ -1579,7 +1863,7 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
     uint8_t *buffer = ctx->buffer;
     int stride = ctx->width * pixel_size;
 
-    // ========== OPTIMIZATION 1: Pre-compute color LUT ==========
+    // Angle -> colour lookup, built once per call
     // Build 360-entry lookup table for angle-to-color mapping
     PixelColor color_lut[360];
     for (int i = 0; i < 360; i++)
@@ -1587,7 +1871,7 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
         color_lut[i] = gradient_get_color_at_angle(gradient, (float)i);
     }
 
-    // ========== OPTIMIZATION 2: Pre-calculate constants ==========
+    // Per-call constants
     // Check if gradient angle span exceeds 360 degrees
     float gradient_span = gradient_end - gradient_start;
     if (gradient_span <= 0.0f) { gradient_span += 360.0f; }
@@ -1631,16 +1915,25 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
         end_cap_y = center_y + radius * sinf(end_rad);
     }
 
-    // ========== OPTIMIZATION 3: Pre-calculate ring parameters ==========
+    // Ring parameters
     float inner_r = radius - line_width / 2.0f;
     float outer_radius = radius + line_width / 2.0f;
-    float aa_width = 1.5f;  // Unified AA width for both arc body and caps
+    float aa_width = LG_ARC_AA_WIDTH;  // Unified AA width for both arc body and caps
+    /* Distance from the centreline past which the stroke inks nothing.  Never
+     * larger than the radius, so a stroke wide enough to reach the centre
+     * fills the disc instead of turning the inner bound negative and making
+     * the quick rejection below drop every pixel. */
+    float reach = LG_MIN(line_width / 2.0f + 0.5f, radius);
 
     // Pre-calculate squared distances for fast comparison
     float outer_sq = outer_radius * outer_radius;
     float inner_sq = inner_r * inner_r;
     float outer_aa_sq = (outer_radius + aa_width) * (outer_radius + aa_width);
-    float inner_aa_sq = fmaxf((inner_r - aa_width) * (inner_r - aa_width), 0);
+    /* The inner edge is the centreline one @c reach in, not @c inner_r plus
+     * the feather: for a stroke wider than twice the feather those differ, and
+     * only this form stays right when the stroke fills the disc. */
+    float inner_aa_radius = radius - reach;
+    float inner_aa_sq = (inner_aa_radius > 0.0f) ? inner_aa_radius * inner_aa_radius : 0.0f;
 
     // Solid region boundaries (no AA needed)
     float outer_solid = outer_radius - aa_width;
@@ -1648,7 +1941,7 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
     float outer_solid_sq = outer_solid * outer_solid;
     float inner_solid_sq = inner_solid * inner_solid;
 
-    // ========== OPTIMIZED PATH FOR FULL CIRCLE ==========
+    // Full circle: no angle range test, same covering rule
     if (is_full_circle && !draw_end_cap)
     {
         // Full circle gradient - simplified loop without angle range check
@@ -1750,7 +2043,7 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
         return;
     }
 
-    // ========== Main rendering loop for partial arcs ==========
+    // Partial arcs
     // Use hybrid approach: fast path for arc body, arc_sdf only for cap regions
     float cap_r = line_width / 2.0f;
     float cap_check_sq = (cap_r + aa_width + 2.0f) * (cap_r + aa_width + 2.0f);
@@ -1770,12 +2063,12 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
             if (dist_sq > outer_aa_sq) { continue; }
             if (dist_sq < inner_aa_sq && inner_r > 2.0f) { continue; }
 
-            // ========== Fast angle calculation for color lookup ==========
+            // Colour lookup
             int angle_i = lg_atan2((int)dy, (int)dx);
             if (angle_i < 0) { angle_i += 360; }
             if (angle_i >= 360) { angle_i -= 360; }
 
-            // ========== Angle range check ==========
+            // Sweep test
             // Exact half-plane test against the start/end rays.  The integer
             // angle above is fine for color but too coarse for the boundary:
             // at r = 200 one degree is ~3.5px, so the body edge would not meet
@@ -1919,7 +2212,7 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
         }
     }
 
-    // ========== SPECIAL: Draw end cap for gradient > 360? on full circle ==========
+    // A gradient range past a full turn leaves a cap outside the ring
     // When arc is full circle (0-360) but gradient exceeds 360? (e.g., 0-361),
     // we need to draw the end cap separately since arc_sdf doesn't handle it
     // The end cap should protrude OUTWARD from the arc at the end angle position

@@ -217,8 +217,14 @@ bool gui_geometry_parts_add(gui_geometry_parts_t *parts, const gui_matrix_t *mat
 }
 
 /**
- * Append a piece drawing a cached payload.  Takes over the caller's reference
- * on @p payload, including on failure.
+ * Append a piece drawing a cached payload.
+ *
+ * Takes over the caller's reference on @p payload on every path, success
+ * included: the piece owns it from here and drops it when the widget rebuilds
+ * or is destroyed.  On failure it has been dropped already, so a caller that
+ * cleaned up after a false return would release it a second time.  Adding a
+ * reference first is the only way to keep one, and that is what the pinwheel
+ * caller does for the copies it has not handed over yet.
  */
 bool gui_geometry_parts_add_image(gui_geometry_parts_t *parts, const gui_matrix_t *matrix,
                                   uint8_t *payload, uint8_t opacity, bool is_a8,
@@ -228,11 +234,15 @@ bool gui_geometry_parts_add_image(gui_geometry_parts_t *parts, const gui_matrix_
     draw_img_t *img = gui_malloc(sizeof(draw_img_t));
     if (img == NULL)
     {
+        /* Still the caller's reference turning into ours and then gone: the
+         * contract is unconditional, so the caller must not also release. */
         gui_geometry_cache_release(payload);
         return false;
     }
     memset(img, 0x00, sizeof(draw_img_t));
     gui_geometry_img_bind(img, payload, opacity, is_a8, color);
+    /* parts_add() releases the draw_img -- and with it the payload -- when it
+     * cannot take the piece either, so nothing is left dangling down there. */
     return gui_geometry_parts_add(parts, matrix, img, x, y, xx, xy, yx, yy);
 }
 

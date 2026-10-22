@@ -153,6 +153,38 @@ typedef struct
     uint8_t alpha;          /**< Coverage shared by those columns. */
 } raster_run_builder_t;
 
+/**
+ * @brief Collector that turns a raster's coverage into horizontal runs.
+ *
+ * A ring is empty almost everywhere.  Even where it inks, a row collapses to a
+ * couple of runs -- the rest of the row is either hole or outside the shape.  A
+ * byte per pixel therefore spends most of a payload on nothing, which is what
+ * this collector exists to avoid: the same coverage, as runs, is a fraction of
+ * the size.
+ *
+ * One row of coverage is held in scratch so that a pixel reached by two passes
+ * -- an AA band meeting a solid span, say -- keeps the larger alpha and is
+ * emitted once, whatever order the raster visits it in.  Compressing per row
+ * rather than per pixel is what keeps the rasteriser's innermost loop free of
+ * callbacks: a pixel costs a compare and a store into scratch.
+ *
+ * The collector is a sink for a raster whose *only* output is coverage.  A shape
+ * that has to blend into existing pixels cannot use it, because runs carry no
+ * background to blend against.
+ */
+typedef struct gui_geometry_run_sink
+{
+    gui_geometry_span_row_t *rows;  /**< height entries; NULL counts runs only. */
+    gui_geometry_span_run_t *runs;  /**< Run store; NULL counts runs only. */
+    uint32_t run_capacity;          /**< Entries available in runs. */
+    uint32_t run_count;             /**< Runs emitted so far, or counted. */
+    uint8_t *row;                   /**< Scratch, width bytes. */
+    uint16_t width;                 /**< Payload width. */
+    uint16_t height;                /**< Payload height. */
+    int32_t open_row;               /**< Row held in scratch; -1 when none. */
+    bool overflow;                  /**< Runs ran past run_capacity. */
+} gui_geometry_run_sink_t;
+
 /*============================================================================*
  *                         Functions
  *============================================================================*/
@@ -195,6 +227,76 @@ bool gui_geometry_raster_build(const gui_geometry_path_t *path,
  * @return Size in bytes, excluding any enclosing cache node.
  */
 uint64_t gui_geometry_span_bytes(uint32_t run_count, uint16_t height);
+
+/**
+ * @brief Start a row, flushing the one before it.
+ *
+ * Called for you by gui_geometry_run_sink_put() when the row changes; call it
+ * directly only to close the last row before gui_geometry_run_sink_flush().
+ *
+ * @param sink Collector from gui_geometry_run_sink_init().
+ * @param y    Row to open.
+ */
+void gui_geometry_run_sink_row(gui_geometry_run_sink_t *sink, int32_t y);
+
+/**
+ * @brief Insert one coverage sample into a run sink's current row.
+ *
+ * Overlapping samples keep the larger alpha, so the run store holds each pixel
+ * exactly once no matter how many raster passes reach it.  Moving to a new row
+ * finalises the previous one, so the caller only has to visit rows in ascending
+ * order -- every pass over one row must finish before the next row starts.
+ *
+ * @param sink Collector from gui_geometry_run_sink_init().
+ * @param x    Column, within the payload width.
+ * @param y    Row, within the payload height.
+ * @param alpha Coverage, 1..255.  Samples of 0 are not stored.
+ */
+static inline void gui_geometry_run_sink_put(gui_geometry_run_sink_t *sink,
+                                             int32_t x, int32_t y, uint8_t alpha)
+{
+    if (alpha == 0u || x < 0 || x >= (int32_t)sink->width ||
+        y < 0 || y >= (int32_t)sink->height)
+    {
+        return;
+    }
+
+    if ((int32_t)y != sink->open_row)
+    {
+        gui_geometry_run_sink_row(sink, y);
+    }
+
+    uint8_t *cell = &sink->row[x];
+    if (alpha > *cell)
+    {
+        *cell = alpha;
+    }
+}
+
+/**
+ * @brief Close the open row and write it out, or count it.
+ *
+ * @param sink Collector from gui_geometry_run_sink_init().
+ */
+void gui_geometry_run_sink_flush(gui_geometry_run_sink_t *sink);
+
+/**
+ * @brief Prepare a collector over a @p width x @p height payload.
+ *
+ * @param sink      Collector to prepare.
+ * @param row       Scratch of @p width bytes, zeroed by this call.
+ * @param width     Payload width in pixels.
+ * @param height    Payload height in pixels.
+ * @param rows      Row table to fill, or NULL to only count runs.
+ * @param runs      Run store to fill, or NULL to only count runs.
+ * @param capacity  Entries available in @p runs.
+ */
+void gui_geometry_run_sink_init(gui_geometry_run_sink_t *sink, uint8_t *row,
+                                uint16_t width, uint16_t height,
+                                gui_geometry_span_row_t *rows,
+                                gui_geometry_span_run_t *runs,
+                                uint32_t capacity);
+
 
 /**
  * @brief The row table of a rasterised shape.

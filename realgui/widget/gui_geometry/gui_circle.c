@@ -427,8 +427,6 @@ static bool circle_add_pinwheel(gui_circle_t *this, uint8_t *payload, bool is_a8
                                           is_a8, this->color, t[i][0], t[i][1],
                                           t[i][2], t[i][3], t[i][4], t[i][5]))
         {
-            /* The copies not yet added still owe the caller's reference. */
-            if (i < 3) { gui_geometry_cache_release(payload); }
             return false;
         }
     }
