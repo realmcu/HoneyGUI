@@ -17,10 +17,16 @@
  *       createModule: createHoneyGUI,   // factory from gui.js
  *       canvas: document.querySelector('canvas'),
  *       files: { 'example/foo.bin': uint8Array },  // written to MEMFS before start
- *       // Only for an engine built with WEB_SIM_MAIN_MODULE=ON:
  *       screen: { width: 480, height: 320, pixelBits: 32, cornerRadius: 40 },
+ *       // Only for an engine built with WEB_SIM_MAIN_MODULE=ON:
  *       project: uint8Array,   // a project compiled as -sSIDE_MODULE
+ *       // Or, for an engine built with the HML runtime, run designer HML
+ *       // with no compiled project. dir is relative to the working
+ *       // directory and holds the converted assets with the HML in ui/;
+ *       // startView (optional) is shown instead of the entry view:
+ *       hml: { dir: 'assets', startView: '' },
  *   });
+ *   sim.reloadHml();   // after rewriting files under hml.dir
  *   sim.stop();
  *
  * Files are written relative to the module's working directory, which is
@@ -48,7 +54,7 @@ function mkdirp(FS, dir) {
     }
 }
 
-async function startHoneyGUI({ createModule, canvas, files = {}, screen, project, print, printErr }) {
+async function startHoneyGUI({ createModule, canvas, files = {}, screen, project, hml, print, printErr }) {
     const module = await createModule({
         print: print || (text => console.log(text)),
         printErr: printErr || (text => console.error(text)),
@@ -72,6 +78,11 @@ async function startHoneyGUI({ createModule, canvas, files = {}, screen, project
          * must be loaded before main() runs the engine. */
         FS.writeFile('/project.wasm', project);
         await module.loadDynamicLibrary('/project.wasm', { loadAsync: true, global: true, nodelete: true });
+    } else if (hml) {
+        if (typeof module._web_sim_load_hml !== 'function') {
+            throw new Error('This engine was built without the HML runtime (CONFIG_REALTEK_BUILD_XML_LOADER)');
+        }
+        module.ccall('web_sim_load_hml', null, ['string', 'string'], [hml.dir, hml.startView || '']);
     }
 
     const width = module._web_sim_screen_width();
@@ -162,6 +173,13 @@ async function startHoneyGUI({ createModule, canvas, files = {}, screen, project
         module,
         width,
         height,
+        /* HML runs only: rebuild the current view from the files on the next frame. */
+        reloadHml() {
+            module._web_sim_reload_hml?.();
+        },
+        currentView() {
+            return module._web_sim_current_view ? module.UTF8ToString(module._web_sim_current_view()) : '';
+        },
         stop() {
             running = false;
             canvas.removeEventListener('pointerdown', onPointerDown);

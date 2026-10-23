@@ -20,13 +20,20 @@
 #
 # Options:
 #   WEB_SIM_CONFIG       .config to use instead of simulator/web/.config, for
-#                        example simulator/web/.config_engine (all widgets, no
-#                        demo app, no letter_shell which needs a GNU linker
-#                        script)
+#                        example simulator/web/.config_engine (all widgets and
+#                        the HML runtime, no demo app, no letter_shell which
+#                        needs a GNU linker script). With the HML runtime the
+#                        engine can also run designer HML directly, without a
+#                        compiled project (web_sim_load_hml(), see web_sim.h).
 #   WEB_SIM_MAIN_MODULE  build the engine as a main module that can load a
 #                        project compiled separately as a side module at run
 #                        time (-sSIDE_MODULE). Implies position independent
 #                        code and a separate gui.wasm.
+#   WEB_SIM_SOURCE_PREFIX_MAP
+#                        directory to strip from __FILE__ and macro paths, so
+#                        the same source builds the same engine wherever the
+#                        checkout is (main module only; see
+#                        scripts/build-web-engine.js).
 
 cmake_minimum_required(VERSION 3.13)
 
@@ -80,6 +87,14 @@ if(WEB_SIM_MAIN_MODULE)
     # Side modules are position independent, so the engine they link against
     # at run time must be too.
     add_compile_options(-fPIC)
+    # __FILE__ and asserted paths name the build tree. Strip it, so an engine
+    # built from a checkout in another directory is identical (web_sim.js and
+    # the designer ship the built engine in their repositories).
+    if(DEFINED WEB_SIM_SOURCE_PREFIX_MAP)
+        add_compile_options(
+            "-ffile-prefix-map=${WEB_SIM_SOURCE_PREFIX_MAP}="
+            "-fmacro-prefix-map=${WEB_SIM_SOURCE_PREFIX_MAP}=")
+    endif()
 endif()
 
 add_executable(${GUI_TARGET_NAME} main.c)
@@ -105,7 +120,7 @@ target_link_options(${GUI_TARGET_NAME} PRIVATE
     -sSTACK_SIZE=1MB
     -sMODULARIZE=1
     -sEXPORT_NAME=createHoneyGUI
-    -sEXPORTED_RUNTIME_METHODS=FS,HEAPU8,callMain
+    -sEXPORTED_RUNTIME_METHODS=FS,HEAPU8,callMain,ccall,UTF8ToString
     -sINVOKE_RUN=0
     -sFORCE_FILESYSTEM=1
     -sENVIRONMENT=web,worker,node
@@ -116,7 +131,23 @@ if(WEB_SIM_MAIN_MODULE)
     # them at load time, and the linker cannot know which it will use.
     target_link_options(${GUI_TARGET_NAME} PRIVATE
         -sMAIN_MODULE=1
-        -sEXPORTED_RUNTIME_METHODS=FS,HEAPU8,callMain,loadDynamicLibrary)
+        -sEXPORTED_RUNTIME_METHODS=FS,HEAPU8,callMain,ccall,UTF8ToString,loadDynamicLibrary)
+
+    # "cmake --install" collects what a host page needs: the module and
+    # web_sim.js in engine/, and in include/ the headers a project is compiled
+    # against to run as a side module.
+    include(${CMAKE_CURRENT_SOURCE_DIR}/../../lib/install_headers.cmake)
+    # Projects written for the desktop simulator export shell commands, so
+    # they include shell.h. The engine has no letter_shell (it needs a GNU
+    # linker script), but such a project must still compile.
+    file(GLOB WEB_SIM_SHELL_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/../../realgui/3rd/letter_shell/*.h)
+    install(FILES ${WEB_SIM_SHELL_HEADERS} DESTINATION include)
+    # A project compiled against the engine can also call the API web_sim.js
+    # uses, so web_sim.h ships with the headers.
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/port/web_sim.h DESTINATION include)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gui.js ${CMAKE_CURRENT_BINARY_DIR}/gui.wasm
+                  ${CMAKE_CURRENT_SOURCE_DIR}/web_sim.js
+            DESTINATION engine)
 else()
     # SINGLE_FILE embeds the .wasm in gui.js. Browsers refuse to fetch a
     # separate .wasm file for pages opened from disk (file://), and embedding

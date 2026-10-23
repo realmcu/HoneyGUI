@@ -8,6 +8,10 @@ cmake_minimum_required(VERSION 3.10)
 
 # Browser-specific port: os, display, input, filesystem, flash.
 file(GLOB SOURCES "*.c")
+# Running designer HML without compiling the project needs the HML runtime.
+if(NOT CONFIG_REALTEK_BUILD_XML_LOADER)
+    list(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/web_sim_hml.c)
+endif()
 target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
 target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
