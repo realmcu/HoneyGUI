@@ -75,6 +75,12 @@ if(DEFINED CONFIG_REALTEK_BUILD_LETTER_SHELL AND CONFIG_REALTEK_BUILD_LETTER_SHE
     list(APPEND HEADER_FILES ${TMP_HEADERS})
 endif()
 
+# Lite3D vendors its own gui_version.h, which lands on the same
+# include/gui_version.h as realgui/gui_version.h: the copy that won depended on
+# the install order, so two builds of the same source shipped different version
+# headers. The engine compiles with realgui/gui_version.h, so drop the other.
+list(FILTER HEADER_FILES EXCLUDE REGEX "/3rd/Lite3D/widget/gui_version[.]h$")
+
 install(FILES ${HEADER_FILES} DESTINATION include)
 
 # Box2D directory installation - conditionally included
