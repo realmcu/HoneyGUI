@@ -19,6 +19,9 @@
 #define PROJECT_NAME                   "HoneyGUI Simulator"
 #define COMPANY_NAME                   "Realtek Semiconductor Corporation"
 
+/* Assets directory given on the command line ("gui <dir>"), NULL if none */
+const char *asset_dir = NULL;
+
 
 int main(int argc, char **argv)
 {
@@ -31,8 +34,10 @@ int main(int argc, char **argv)
         printf("current working directory: %s\n", cwd);
     }
 
-    (void)argc;
-    (void)argv;
+    if (argc > 1)
+    {
+        asset_dir = argv[1];
+    }
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", \
            COMPANY_NAME, \
            PROJECT_NAME, \
