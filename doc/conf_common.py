@@ -26,6 +26,7 @@ JenkinsBuild_doc_Dir = os.path.join(jenkinsBuild_home, "release/doc")
 sys.path.append(JenkinsBuild_doc_Dir)
 
 ROOT_BASE = os.path.abspath(os.path.dirname(__file__))
+is_github_pages = os.getenv("HONEYGUI_GITHUB_PAGES") == "true"
  
 html_context = {
     'current_year': datetime.now().year, # Set the Copyright year of footer
@@ -151,6 +152,13 @@ html_js_files = [
     'js/real-kapa.js',
 ]
 
+if is_github_pages:
+    # These widgets depend on Realtek documentation services or generated
+    # assets that are not available in the GitHub Pages deployment.
+    html_js_files.remove('js/versions.js')
+    html_js_files.remove('js/real-kapa.js')
+    html_js_files.remove('js/aisummary.js')
+
 html_css_files = [
     'css/fontawesome.min.css',
     'css/auto.number.title.css',
@@ -167,9 +175,13 @@ html_theme_options = {
     'collapse_navigation' : False,
     'logo_only': True,
     # 在侧边栏显示版本
-    'display_version': True,
+    'display_version': not is_github_pages,
     'navigation_depth': 10,
 }
+
+if is_github_pages:
+    language_path = os.getenv("current_language", "en")
+    html_baseurl = f"https://realmcu.github.io/HoneyGUI/{language_path}/"
 
 
 # -- Options for LaTeX output ---------------------------------------------

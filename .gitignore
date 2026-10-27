@@ -91,6 +91,7 @@ doc/output
 doc/build
 doc/_build
 doc/**/word_dict.txt
+doc/**/_static/js/ga_config.js
 doxygen_graphviz/_build
 
 # editor config

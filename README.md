@@ -2,7 +2,7 @@
 
 [EN](README.md)   |  [中文](README_zh.md)
 
-For detailed information, please refer to [HoneyGUI Online Documentation](https://docs.realmcu.com/gui/en/latest/index.html).
+For detailed information, please refer to [HoneyGUI Online Documentation](https://realmcu.github.io/HoneyGUI/).
 
 ## Examples
 <table>
