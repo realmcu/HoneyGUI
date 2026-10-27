@@ -145,6 +145,14 @@ config REALTEK_BUILD_REAL_LITE_ARC
     help
       HoneyGUI Geometry ARC Demo
 
+config REALTEK_BUILD_GEOMETRY_BENCH
+    bool "Geometry Benchmark"
+    select REALTEK_GUI_WIDGET_GEOMETRY
+    help
+      Measures rect, circle and arc raster and blit cost, payload size and
+      cache sharing, then prints the result at init and returns. No UI: this
+      exists to record numbers, not to be looked at.
+
 config REALTEK_BUILD_REAL_LITE_RECT
     bool "Geometry RECT Demo"
     select REALTEK_GUI_WIDGET_GEOMETRY
