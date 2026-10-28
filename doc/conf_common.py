@@ -36,6 +36,7 @@ html_context = {
     "is_multitarget": False,
     # 如果是多语言文档，is_multilingual设置为 True
     "is_multilingual": True,
+    "is_github_pages": is_github_pages,
     "logo_link": os.getenv("Docs_Home_URL", None),
     "proj_link": os.getenv("Proj_Home_URL", None),
     # 左侧目录栏的拖拽宽度，不同的文档项目使用不同的名称，如：
@@ -182,6 +183,17 @@ html_theme_options = {
 if is_github_pages:
     language_path = os.getenv("current_language", "en")
     html_baseurl = f"https://realmcu.github.io/HoneyGUI/{language_path}/"
+    html_title = "HoneyGUI Documentation"
+    html_short_title = "HoneyGUI"
+    html_context.update({
+        "social_description": (
+            "Lightweight embedded GUI framework for resource-constrained "
+            "microcontrollers and smart devices."
+        ),
+        "social_baseurl": html_baseurl,
+        "social_locale": "zh_CN" if language_path == "cn" else "en_US",
+        "social_locale_alternate": "en_US" if language_path == "cn" else "zh_CN",
+    })
 
 
 # -- Options for LaTeX output ---------------------------------------------

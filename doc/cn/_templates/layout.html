@@ -1,8 +1,34 @@
 {% extends "!layout.html" %}
 
+{% if is_github_pages and pagename == master_doc %}
+{% set docstitle = "" %}
+{% endif %}
+
 
 {% block extrahead %}
 {{ super() }}
+
+{% if is_github_pages %}
+<meta name="description" content="{{ social_description | e }}">
+<meta name="theme-color" content="#07182b">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HoneyGUI">
+<meta property="og:title" content="HoneyGUI Documentation">
+<meta property="og:description" content="{{ social_description | e }}">
+<meta property="og:url" content="{{ pageurl }}">
+<meta property="og:image" content="{{ social_baseurl }}_static/image/honeygui-social.png">
+<meta property="og:image:secure_url" content="{{ social_baseurl }}_static/image/honeygui-social.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HoneyGUI embedded GUI framework documentation">
+<meta property="og:locale" content="{{ social_locale }}">
+<meta property="og:locale:alternate" content="{{ social_locale_alternate }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HoneyGUI Documentation">
+<meta name="twitter:description" content="{{ social_description | e }}">
+<meta name="twitter:image" content="{{ social_baseurl }}_static/image/honeygui-social.png">
+{% endif %}
 
 <!-- <script type="text/javascript">
     window.sdktype = "{{ SDK | e }}";
