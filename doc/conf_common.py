@@ -105,7 +105,6 @@ intersphinx_mapping = {
 exclude_patterns = [
     'widgets/gui_window.rst',
     'widgets/gui_soccer.rst',
-    'sample/86box/86box.rst',
     'sample/Calculator/Demo.rst',
     'sample/Status-bar/Status bar.rst',
     'sample/Timer/Timer.rst',

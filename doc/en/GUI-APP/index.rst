@@ -21,5 +21,4 @@ HoneyGUI framework diagram is shown in the figure below:
     :maxdepth: 2
 
     C-APP Application<Native/Native>
-    Use RVD Tool Design An Application <SaaA/index>
     Using VSCode Plugin to Develop Applications <VSCode/index>

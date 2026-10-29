@@ -37,7 +37,7 @@ def download_tools(language_path):
   tool_jira_id = "BTSOCGUI-213"
   print("Release build, need downd tools from {}".format(tool_jira_id))
   download_tool_list = list()
-  for file_name in ["ImageConverter", "Font Convert Tool", "RVisualDesigner", "GlassTool"]:
+  for file_name in ["ImageConverter", "Font Convert Tool", "GlassTool"]:
     tool_list = Jira().find_packages_from_jira(tool_jira_id, file_name)
     if not tool_list:
       sys.exit("Cannot find {} in {}".format(file_name, tool_jira_id))
@@ -46,7 +46,7 @@ def download_tools(language_path):
   return download_tool_list
 
 def add_download_link(download_tool_list, language_path):
-  if len(download_tool_list) != 4:
+  if len(download_tool_list) != 3:
     sys.exit("Invalid tool list: {}".format(download_tool_list))
   print("Start add download link")
   
@@ -62,9 +62,7 @@ Image Convert Tool: :download:`Image Convert Tool <../{}>`
 
 Font Convert Tool: :download:`Font Convert Tool <../{}>`
 
-RVisualDesigner Tool: :download:`RVisualDesigner Tool <../{}>`
-
-'''.format(download_tool_list[0], download_tool_list[1], download_tool_list[2])
+'''.format(download_tool_list[0], download_tool_list[1])
     stream = re.sub(r'(.. Add tool downlod link here)', lambda objs: objs.group(1) + "\r\n" + download_link, stream, count=0, flags=re.M)
   with open(index_file, mode='w+', newline='', errors='surrogateescape') as fd:
     fd.write(stream)
@@ -75,7 +73,7 @@ RVisualDesigner Tool: :download:`RVisualDesigner Tool <../{}>`
     with open(glass_file, mode='r', newline='', errors='surrogateescape') as fd:
       stream = fd.read()
       # Replace the placeholder download link with actual file
-      stream = stream.replace('GlassTool.zip', download_tool_list[3])
+      stream = stream.replace('GlassTool.zip', download_tool_list[2])
     with open(glass_file, mode='w+', newline='', errors='surrogateescape') as fd:
       fd.write(stream)
 

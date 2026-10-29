@@ -15,7 +15,7 @@ Description
 
 HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (:term:`GUI`) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
 
-HoneyGUI provides a :term:`PC`-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, :term:`RVD`, to achieve visual programming.
+HoneyGUI provides a :term:`PC`-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms.
 
 HoneyGUI currently primarily supports the following two efficient :term:`APP` development methods:
 
@@ -24,11 +24,11 @@ HoneyGUI currently primarily supports the following two efficient :term:`APP` de
    - Developers can directly utilize the C/C++ API based on the RealGUI display engine to construct applications.
    - This approach offers the highest level of flexibility and system performance control, suitable for complex applications with high performance requirements.
 
-2. Front-end low-code development
+2. VSCode plugin development
 
-   - Develop front-end applications using JavaScript and XML.
-   - It is recommended to use ``RVisualDesigner`` to quickly build beautiful :term:`UI` interfaces through dragging and dropping components and visual configuration, enabling low-code development and significantly improving development efficiency.
-   - The low-code development approach for the front end offers advantages in rapid development and iteration, making it particularly suitable for rapid prototyping and small-scale application development.
+   - Use the :doc:`HoneyGUI Visual Designer VSCode plugin <../GUI-APP/VSCode/index>` to build :term:`UI` interfaces through drag-and-drop components and visual configuration.
+   - Describe interfaces using XML-based HML files, automatically generate C code that calls the HoneyGUI API, and build and simulate applications in VSCode.
+   - The plugin integrates design, coding, building, and simulation with code protection to improve development and iteration efficiency.
 
 The HoneyGUI framework has good portability, which can run on a variety of chips and :term:`OS`. PC Windows version is provided.
 
