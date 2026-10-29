@@ -336,10 +336,15 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     text->loop_shift_x = 0;
     text->loop_shift_y = 0;
 
+    /* Leading/trailing padding is travel beyond the content, so it decides
+     * whether short text still scrolls. Loop mode uses the seam gap instead. */
+    int32_t scroll_pad = text->loop ? (int32_t)text->loop_gap
+                         : (int32_t)text->start_value + (int32_t)text->end_value;
+
     if (is_scroll_x)
     {
         offset = _this->char_width_sum;
-        if (offset > obj->w)
+        if (offset + scroll_pad > obj->w)
         {
             int16_t new_x1;
             if (text->loop)
@@ -399,7 +404,7 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     {
         offset = _this->char_line_sum * _this->font_height;
         offset += (_this->char_line_sum - 1) * _this->extra_line_spacing;
-        if (offset > obj->h || offset == 0)
+        if (offset + scroll_pad > obj->h || offset == 0)
         {
             int16_t new_y1;
             if (text->loop)
@@ -427,7 +432,7 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     else if (_this->mode == SCROLL_Y_REVERSE)
     {
         offset = _this->char_height_sum;
-        if (offset > obj->h || offset == 0)
+        if (offset + scroll_pad > obj->h || offset == 0)
         {
             int16_t new_y2;
             if (text->loop)

@@ -35,6 +35,7 @@ gui_scroll_text_t *scroll_y_reverse;
 gui_scroll_text_t *test_left;
 gui_scroll_text_t *test_center;
 gui_scroll_text_t *test_right;
+gui_scroll_text_t *test_padded_x;
 
 static bool toggle_state[3] = {false, false, false}; // false = short text, true = long text
 static char *long_text =
@@ -197,8 +198,13 @@ void text_font_scroll_function_test(void)
     gui_scroll_text_non_scroll_align_set(test_right, RIGHT);
     gui_obj_add_event_cb(test_right, (gui_event_cb_t)toggle_text_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-
-
+    /* Short text stays narrower than the box even with start/end padding,
+     * but the padding itself must still trigger the scroll. */
+    test_padded_x = gui_scroll_text_create(gui_obj_get_root(), "test_padded_x", 40, 330, 200, 32);
+    gui_scroll_text_set(test_padded_x, short_text, GUI_FONT_SRC_BMP, APP_COLOR_YELLOW,
+                        strlen(short_text), 32);
+    gui_scroll_text_scroll_set(test_padded_x, SCROLL_X, 150, 150, 6000, 0);
+    gui_scroll_text_type_set(test_padded_x, font32b2, FONT_SRC_MEMADDR);
 
     gui_text_t *stop = gui_text_create(gui_obj_get_root(), "stop", 100, 400, 0, 0);
     gui_text_set(stop, "STOP", GUI_FONT_SRC_BMP, APP_COLOR_TOMATO, 4, 32);

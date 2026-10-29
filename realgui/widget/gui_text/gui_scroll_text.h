@@ -70,7 +70,9 @@ typedef struct gui_scroll_text
 /**
  * @brief Creat a scroll text widget.
  * @note Scroll text widget can show horizontal and vertical scroll text.
- * @note If the width of the text is less than the width of the text box, the text will stand still.
+ * @note Text scrolls when the text width plus its start/end padding exceeds
+ *       the text box width; otherwise it stands still and is aligned by
+ *       gui_scroll_text_non_scroll_align_set.
  * @note Scroll and text properties need to be set by gui_scroll_text_scroll_set and gui_scroll_text_set.
  * @param parent The father widget which the scroll text nested in.
  * @param name The widget's name.
@@ -93,7 +95,9 @@ gui_scroll_text_t *gui_scroll_text_create(void       *parent,
  *
  * @param this the scroll text widget pointer.
  * @param mode the mode of this scroll text widget, SCROLL_X or SCROLL_Y.
- * @param start_value the number of pixels to the left of the text in the first frame
+ * @param start_value the number of pixels to the left of the text in the first frame.
+ *                    Also counts toward the scroll threshold, so short text can
+ *                    be made to scroll by padding it with blank space.
  * @param end_value the number of pixels to the right of the text at the last frame.
  * @param interval_time_ms the time for one loop.
  * @param duration_time_ms the total time that text scrolling lasts.
