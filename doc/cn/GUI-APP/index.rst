@@ -22,4 +22,5 @@ HoneyGUI 框架的结构图如下所示：
 
     C 应用程序 <Native/Native>
     使用 VSCode 插件开发应用程序 <VSCode/index>
+    浏览器仿真 <Web/index>
 

@@ -60,9 +60,6 @@ Glossary
     RLE
         Run-Length Encoding
 
-    RVD
-        Realtek Visual Designer
-
     TP
         Touch Pad
         

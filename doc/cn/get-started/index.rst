@@ -15,9 +15,9 @@
 
 HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为资源受限的微控制器和嵌入式系统设计的开源嵌入式图形用户界面（:term:`GUI`）库。HoneyGUI 具备轻量级、功能丰富和高度可定制性的特点，广泛应用于消费电子、家电、医疗设备和智能手表等领域。
 
-HoneyGUI 提供基于 :term:`PC` 的仿真环境，使开发者能够快速进行应用开发和调试，而无需依赖嵌入式硬件平台。
+HoneyGUI 提供基于 :term:`PC` 的仿真环境，使开发者能够快速进行应用开发和调试，而无需依赖嵌入式硬件平台；同时提供浏览器仿真，引擎以 WebAssembly 形式运行在网页中，无需安装本地工具链。HoneyGUI 还可以与 Realtek 自研的前端设计工具配合使用，实现可视化编程。
 
-HoneyGUI 目前主要支持以下两种高效的 :term:`APP` 开发方式：
+HoneyGUI 目前主要支持以下三种高效的 :term:`APP` 开发方式：
 
 1. C/C++ :term:`API` 开发
 
@@ -29,6 +29,11 @@ HoneyGUI 目前主要支持以下两种高效的 :term:`APP` 开发方式：
    - 使用 :doc:`HoneyGUI Visual Designer VSCode 插件 <../GUI-APP/VSCode/index>`，通过拖拽组件和可视化配置构建 :term:`UI` 界面。
    - 使用基于 XML 的 HML 文件描述界面，自动生成调用 HoneyGUI API 的 C 代码，并支持在 VSCode 中编译和仿真。
    - 插件集成设计、编码、编译和仿真流程，支持代码保护机制，提高开发和迭代效率。
+
+3. 浏览器仿真
+
+   - 使用 :doc:`浏览器仿真 <../GUI-APP/Web/index>` 将引擎编译为 WebAssembly，直接在浏览器中运行并查看界面，无需安装本地工具链或连接硬件设备。
+   - 引擎自带 HML 运行时，可解析设计器导出的界面文件并渲染，适合快速预览、演示和分发。
 
 HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS` 上运行。此次提供了 PC Windows 版本。
 

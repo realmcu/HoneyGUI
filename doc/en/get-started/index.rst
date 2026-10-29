@@ -15,9 +15,9 @@ Description
 
 HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (:term:`GUI`) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
 
-HoneyGUI provides a :term:`PC`-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms.
+HoneyGUI provides a :term:`PC`-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. It also provides a browser simulator, where the engine runs as WebAssembly in a web page, so no local toolchain is needed. HoneyGUI can further be used in conjunction with Realtek's proprietary front-end design tool to achieve visual programming.
 
-HoneyGUI currently primarily supports the following two efficient :term:`APP` development methods:
+HoneyGUI currently primarily supports the following three efficient :term:`APP` development methods:
 
 1. C/C++ :term:`API` development
 
@@ -29,6 +29,11 @@ HoneyGUI currently primarily supports the following two efficient :term:`APP` de
    - Use the :doc:`HoneyGUI Visual Designer VSCode plugin <../GUI-APP/VSCode/index>` to build :term:`UI` interfaces through drag-and-drop components and visual configuration.
    - Describe interfaces using XML-based HML files, automatically generate C code that calls the HoneyGUI API, and build and simulate applications in VSCode.
    - The plugin integrates design, coding, building, and simulation with code protection to improve development and iteration efficiency.
+
+3. Browser simulation
+
+   - Use :doc:`Browser Simulation <../GUI-APP/Web/index>` to compile the engine to WebAssembly and run it directly in a browser, with no local toolchain and no hardware device.
+   - The engine has the HML runtime built in, so it parses and renders the interface files exported by the designer, which suits quick preview, demos and distribution.
 
 The HoneyGUI framework has good portability, which can run on a variety of chips and :term:`OS`. PC Windows version is provided.
 

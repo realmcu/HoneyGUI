@@ -22,3 +22,4 @@ HoneyGUI framework diagram is shown in the figure below:
 
     C-APP Application<Native/Native>
     Using VSCode Plugin to Develop Applications <VSCode/index>
+    Browser Simulation <Web/index>
