@@ -212,6 +212,22 @@ static uint8_t combined_alpha(uint8_t coverage, uint8_t color_alpha, uint8_t opa
     return (uint8_t)alpha;
 }
 
+/**
+ * Blend onto an RGB565 framebuffer pixel with 5-bit alpha.
+ *
+ * Same packed multiply as rgb565_fast_blending() in the software blit, so a
+ * span and an A8 mask of the same shape land on identical pixels.  Kept local
+ * rather than including acc_sw_define.h, which is blit-internal.
+ */
+static uint16_t blend_rgb565(uint16_t bg, uint16_t fg, uint8_t alpha)
+{
+    uint32_t a5 = ((uint32_t)alpha + 4u) >> 3;
+    uint32_t b = (bg | ((uint32_t)bg << 16)) & 0x07E0F81Fu;
+    uint32_t f = (fg | ((uint32_t)fg << 16)) & 0x07E0F81Fu;
+    uint32_t result = ((((f - b) * a5) >> 5) + b) & 0x07E0F81Fu;
+    return (uint16_t)((result >> 16) | result);
+}
+
 bool gui_geometry_span_draw(const gui_geometry_span_t *spans,
                             const gui_matrix_t *matrix,
                             gui_color_t color, uint8_t opacity,
@@ -237,10 +253,9 @@ bool gui_geometry_span_draw(const gui_geometry_span_t *spans,
     const gui_geometry_span_row_t *rows = gui_geometry_span_rows_const(spans);
     const gui_geometry_span_run_t *runs = gui_geometry_span_runs_const(spans);
 
-    uint16_t fg565 = (uint16_t)create_color_by_format(PIXEL_FORMAT_RGB565,
-                                                      color.color.rgba.r,
-                                                      color.color.rgba.g,
-                                                      color.color.rgba.b, 255u);
+    uint16_t fg565 = (uint16_t)(((color.color.rgba.r & 0xF8u) << 8) |
+                                ((color.color.rgba.g & 0xFCu) << 3) |
+                                (color.color.rgba.b >> 3));
     uint32_t fg8888 = 0xFF000000u | (color.color.argb_full & 0x00FFFFFFu);
 
     for (uint16_t local_y = 0; local_y < spans->height; local_y++)
@@ -271,8 +286,7 @@ bool gui_geometry_span_draw(const gui_geometry_span_t *spans,
                 uint16_t *dst = (uint16_t *)dc->frame_buf + offset;
                 for (int x = x1; x <= x2; x++, dst++)
                 {
-                    *dst = alpha == 255u ? fg565 :
-                           (uint16_t)blend_colors_rgb565(*dst, fg565, alpha);
+                    *dst = alpha == 255u ? fg565 : blend_rgb565(*dst, fg565, alpha);
                 }
             }
             else if (dc->bit_depth == 32)

@@ -10,28 +10,9 @@
 #include "lite_geometry.h"
 #include "lite_geometry_math.h"
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846f
-#endif
-
-static inline int get_pixel_size(PixelFormat format)
-{
-    if (format == PIXEL_FORMAT_A8)
-    {
-        return 1;
-    }
-    return (format == PIXEL_FORMAT_RGB565) ? 2 : 4;
-}
-
 /**
- * Accumulate one sample of @p color into an A8 mask byte.
- *
- * A mask pixel holds coverage only, and all samples of one raster carry the
- * same colour, so overlapping writes take the maximum instead of compositing:
- * two AA passes over the same byte must not add up past full coverage.  There
- * is no alternative -- a mask has no background colour to blend against.  The
- * ARGB8888 path matches this through overlap_keeps_max_alpha; without it the
- * two storage formats disagree wherever the raster covers a pixel twice.
+ * Accumulate into an A8 mask.
+ * Overlapping writes take max coverage, matching ARGB behavior (overlap_keeps_max_alpha).
  */
 static inline void a8_accumulate(uint8_t *pixel, uint8_t value)
 {
@@ -40,33 +21,57 @@ static inline void a8_accumulate(uint8_t *pixel, uint8_t value)
         *pixel = value;
     }
 }
-static inline float smoothstep(float edge0, float edge1, float x)
+
+/** Hermite ramp 3t^2 - 2t^3 over t in [0, 1]. */
+static inline float smooth01(float t)
 {
-    float t = LG_CLAMP((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
     return t * t * (3.0f - 2.0f * t);
 }
 
-PixelColor create_color_by_format(PixelFormat format, uint8_t r, uint8_t g,
-                                  uint8_t b, uint8_t a)
+/** Coverage of a signed distance (negative inside), feathered over +-aa. */
+static inline float sdf_coverage(float d, float aa)
 {
-    if (format == PIXEL_FORMAT_RGB565)
-    {
-        return ((r & 0xF8u) << 8) | ((g & 0xFCu) << 3) | (b >> 3);
-    }
-    return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
+    return 1.0f - smooth01(LG_CLAMP((d + aa) / (aa + aa), 0.0f, 1.0f));
 }
 
-PixelColor blend_colors_rgb565(PixelColor bg_color, PixelColor fg_color,
-                               uint8_t alpha)
+/**
+ * Source-over of one ARGB8888 pixel, as the arc rasterisers do it.
+ *
+ * This is the 8-bit-shift blend, not blend_colors_argb8888(): the two round
+ * differently by up to one level, and the arc output is kept as it was.
+ * @p keep_max_on_same_rgb takes the larger alpha when the destination already
+ * holds the same colour, so a pixel two raster passes cover does not darken.
+ */
+static inline void arc_blend_argb8888(uint32_t *pixel, PixelColor color, uint8_t alpha,
+                                      bool keep_max_on_same_rgb)
 {
-    if (alpha == 0) { return bg_color; }
-    if (alpha == 255) { return fg_color; }
+    if (alpha == 255)
+    {
+        *pixel = color;
+        return;
+    }
 
-    alpha = (alpha + 4) >> 3;
-    bg_color = (bg_color | (bg_color << 16)) & 0x07E0F81F;
-    fg_color = (fg_color | (fg_color << 16)) & 0x07E0F81F;
-    uint32_t result = ((((fg_color - bg_color) * alpha) >> 5) + bg_color) & 0x07E0F81F;
-    return (uint16_t)((result >> 16) | result);
+    uint32_t bg = *pixel;
+    uint32_t bg_a = bg >> 24;
+    uint32_t rgb = color & 0x00FFFFFFu;
+    if (bg_a == 0)
+    {
+        *pixel = ((uint32_t)alpha << 24) | rgb;
+        return;
+    }
+    if (keep_max_on_same_rgb && (bg & 0x00FFFFFFu) == rgb)
+    {
+        *pixel = ((uint32_t)LG_MAX(alpha, bg_a) << 24) | rgb;
+        return;
+    }
+
+    uint32_t inv_alpha = 256u - alpha;
+    uint32_t out_r = ((((bg >> 16) & 0xFFu) * inv_alpha + ((color >> 16) & 0xFFu) * alpha) >> 8) &
+                     0xFFu;
+    uint32_t out_g = ((((bg >> 8) & 0xFFu) * inv_alpha + ((color >> 8) & 0xFFu) * alpha) >> 8) & 0xFFu;
+    uint32_t out_b = (((bg & 0xFFu) * inv_alpha + (color & 0xFFu) * alpha) >> 8) & 0xFFu;
+    uint32_t out_a = bg_a + (((255u - bg_a) * alpha) >> 8);
+    *pixel = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
 }
 
 PixelColor blend_colors_argb8888(PixelColor bg_color, PixelColor fg_color,
@@ -102,7 +107,7 @@ void init_draw_context(DrawContext *ctx, uint8_t *buffer, int width, int height,
     ctx->width = width;
     ctx->height = height;
     ctx->format = format;
-    ctx->stride = width * get_pixel_size(format);
+    ctx->stride = width * (format == PIXEL_FORMAT_A8 ? 1 : 4);
     ctx->overlap_keeps_max_alpha = false;
     ctx->run_sink = NULL;
 }
@@ -110,12 +115,7 @@ void init_draw_context(DrawContext *ctx, uint8_t *buffer, int width, int height,
 static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
                          float coverage)
 {
-    int pixel_size = get_pixel_size(ctx->format);
-    int offset = (y * ctx->width + x) * pixel_size;
-
-    /* A sparse destination holds coverage only, so it can be fed before any of
-     * the per-format work below -- and the value stored is the byte the A8
-     * branch would have written, keeping the two layouts equivalent. */
+    /* Sparse destination: store coverage only. */
     if (ctx->run_sink != NULL)
     {
         uint8_t source_alpha = (color >> 24) & 0xFF;
@@ -131,22 +131,7 @@ static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
         if (source_alpha == 0) { return; }
 
         uint8_t alpha = (uint8_t)(source_alpha * coverage);
-        a8_accumulate(ctx->buffer + offset, alpha);
-        return;
-    }
-
-    if (ctx->format == PIXEL_FORMAT_RGB565)
-    {
-        uint16_t *pixel = (uint16_t *)(ctx->buffer + offset);
-        if (coverage > 0.999f)
-        {
-            *pixel = (uint16_t)color;
-        }
-        else
-        {
-            *pixel = (uint16_t)blend_colors_rgb565(*pixel, color,
-                                                   (uint8_t)(coverage * 255.0f));
-        }
+        a8_accumulate(ctx->buffer + y * ctx->stride + x, alpha);
         return;
     }
 
@@ -156,19 +141,14 @@ static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
     uint8_t alpha = (uint8_t)(source_alpha * coverage);
     if (alpha == 0) { return; }
 
-    uint32_t *pixel = (uint32_t *)(ctx->buffer + offset);
+    uint32_t *pixel = (uint32_t *)(ctx->buffer + y * ctx->stride) + x;
     if (alpha == 255)
     {
         *pixel = color;
     }
     else
     {
-        /* In a buffer dedicated to one shape, a pixel the raster covers twice is
-         * one shape's overlap: keep the larger alpha rather than compositing the
-         * colour into itself.  See overlap_keeps_max_alpha -- the caller decides,
-         * because only it knows whether the buffer collects several shapes.
-         * blend_colors_argb8888() is left alone: the rect/circle span path shares
-         * it. */
+        /* Keep max alpha for same-color overlaps if buffer is dedicated to one shape. */
         uint32_t bg = *pixel;
         uint8_t bg_alpha = (bg >> 24) & 0xFF;
         if (ctx->overlap_keeps_max_alpha && bg_alpha != 0 &&
@@ -185,11 +165,6 @@ static void add_pixel_aa(DrawContext *ctx, int x, int y, PixelColor color,
         }
     }
 }
-
-static inline bool is_in_angle_range_cross(float dx, float dy,
-                                           float start_cos, float start_sin,
-                                           float end_cos, float end_sin,
-                                           bool wide_arc);
 
 void fill_circle(DrawContext *ctx, float center_x, float center_y, float radius,
                  PixelColor fill_color)
@@ -215,195 +190,53 @@ void fill_circle(DrawContext *ctx, float center_x, float center_y, float radius,
         }
     }
 }
+
 // ==================== Arc helpers ====================
 
-/**
- * @brief Whether a stroke is too thin for the two-band coverage model.
- *
- * Below @c 2 * LG_ARC_AA_WIDTH the outer and inner bands overlap: no distance
- * is solid and none is empty between them, so the branch order decides the
- * result and the coverage becomes a step rather than a ramp.  Such strokes take
- * the distance profile below instead.
- */
+/** Stroke too thin for the two-band coverage model (outer and inner bands overlap). */
 static inline bool arc_is_thin(float line_width)
 {
     return line_width < 2.0f * LG_ARC_AA_WIDTH;
 }
 
-/**
- * @brief Coverage of a stroke of half-width @p half at distance @p d from its
- *        centreline.
- *
- * Both edges of the stroke are box filtered together, which is what keeps a
- * stroke narrower than the feather visible.  Assumes the stroke is locally
- * parallel to the centreline; callers must not use it near a cap.
- */
+static inline bool is_in_angle_range_cross(float dx, float dy,
+                                           float start_cos, float start_sin,
+                                           float end_cos, float end_sin,
+                                           bool wide_arc)
+{
+    float from_start = start_cos * dy - start_sin * dx;
+    float to_end = dx * end_sin - dy * end_cos;
+    return wide_arc ? (from_start >= 0.0f || to_end >= 0.0f) :
+           (from_start >= 0.0f && to_end >= 0.0f);
+}
+
+/** Box-filtered coverage for thin strokes. Callers must avoid caps. */
 static inline float arc_stroke_coverage(float d, float half)
 {
     return LG_CLAMP(half + 0.5f - fabsf(d), 0.0f, 1.0f);
 }
 
-// Compute coverage for anti-aliasing using squared distances (avoids sqrt)
-// Uses smoothstep-like falloff for consistency with arc_sdf
-static inline float compute_coverage_fast(float dist_sq, float outer_sq, float inner_sq,
+/** Coverage using squared distances (avoids sqrt) with smoothstep falloff. */
+static inline float compute_coverage_fast(float dist_sq, float inner_sq,
                                           float outer_aa_sq, float inner_aa_sq,
                                           float outer_solid_sq, float inner_solid_sq)
 {
-    (void)outer_sq;
-    // Solid region - full coverage
     if (dist_sq <= outer_solid_sq && dist_sq >= inner_solid_sq)
     {
         return 1.0f;
     }
 
-    // Outer edge anti-aliasing - use smoothstep for consistency
     if (dist_sq > outer_solid_sq && dist_sq <= outer_aa_sq)
     {
-        float t = (dist_sq - outer_solid_sq) / (outer_aa_sq - outer_solid_sq);
-        // Smoothstep: 3t^2 - 2t^3
-        t = t * t * (3.0f - 2.0f * t);
-        return 1.0f - t;
+        return 1.0f - smooth01((dist_sq - outer_solid_sq) / (outer_aa_sq - outer_solid_sq));
     }
 
-    // Inner edge anti-aliasing - use smoothstep for consistency
     if (inner_sq > 0 && dist_sq >= inner_aa_sq && dist_sq < inner_solid_sq)
     {
-        float t = (inner_solid_sq - dist_sq) / (inner_solid_sq - inner_aa_sq);
-        // Smoothstep: 3t^2 - 2t^3
-        t = t * t * (3.0f - 2.0f * t);
-        return 1.0f - t;
+        return 1.0f - smooth01((inner_solid_sq - dist_sq) / (inner_solid_sq - inner_aa_sq));
     }
 
     return 0.0f;
-}
-
-static void draw_arc_as_ring_thin(DrawContext *ctx, float center_x, float center_y,
-                                  float arc_radius, float line_width, PixelColor color);
-
-/**
- * Draw a complete ring (360 degree arc) - optimized for full circles
- * Uses unified AA width and smoothstep for consistency
- */
-static void draw_arc_as_ring_symmetric(DrawContext *ctx, float center_x, float center_y,
-                                       float arc_radius, float line_width, PixelColor color)
-{
-    if (line_width <= 0) { return; }
-
-    /* See draw_arc_as_ring_thin(): the band model needs a solid core, and a
-     * stroke this narrow has none.  RGB565 gets the same distance profile as
-     * the other layouts, so format does not change what a thin arc looks like;
-     * an arc this small has no pixels to spare for the paired filler. */
-    if (arc_is_thin(line_width))
-    {
-        draw_arc_as_ring_thin(ctx, center_x, center_y, arc_radius, line_width, color);
-        return;
-    }
-
-    float outer_radius = arc_radius + line_width / 2;
-    float inner_radius = fmaxf(arc_radius - line_width / 2, 0);
-    float aa_width = LG_ARC_AA_WIDTH;  // Unified AA width
-
-    float outer_sq = outer_radius * outer_radius;
-    float inner_sq = inner_radius * inner_radius;
-    float outer_aa_sq = (outer_radius + aa_width) * (outer_radius + aa_width);
-    float inner_aa_sq = fmaxf((inner_radius - aa_width) * (inner_radius - aa_width), 0);
-
-    float outer_solid_sq = (outer_radius - aa_width) * (outer_radius - aa_width);
-    float inner_solid_sq = (inner_radius + aa_width) * (inner_radius + aa_width);
-
-    int max_y = (int)ceilf(outer_radius + aa_width);
-
-    for (int y = 0; y <= max_y; y++)
-    {
-        float y_sq = y * y;
-
-        int x_start = y;
-        int x_end = (int)ceilf(sqrtf(outer_aa_sq - y_sq));
-
-        if (x_start > x_end) { continue; }
-
-        int inner_x_start = 0;
-        if (y <= inner_radius + aa_width)
-        {
-            inner_x_start = (int)ceilf(sqrtf(fmaxf(inner_aa_sq - y_sq, 0)));
-            if (inner_x_start > x_start && inner_x_start <= x_end)
-            {
-                x_start = inner_x_start;
-            }
-        }
-
-        for (int x = x_start; x <= x_end; x++)
-        {
-            float dist_sq = x * x + y_sq;
-
-            // Compute coverage using smoothstep for consistency
-            float coverage = compute_coverage_fast(dist_sq, outer_sq, inner_sq,
-                                                   outer_aa_sq, inner_aa_sq,
-                                                   outer_solid_sq, inner_solid_sq);
-            if (coverage < 0.001f) { continue; }
-
-            // Draw 8-way symmetric pixels
-            int coords[8][2];
-            int point_count = 0;
-
-            if (x == 0 && y == 0)
-            {
-                coords[point_count][0] = (int)(center_x + 0); coords[point_count][1] = (int)(center_y + 0);
-                point_count++;
-            }
-            else if (y == 0)
-            {
-                coords[point_count][0] = (int)(center_x + x); coords[point_count][1] = (int)(center_y + 0);
-                point_count++;
-                coords[point_count][0] = (int)(center_x - x); coords[point_count][1] = (int)(center_y + 0);
-                point_count++;
-                coords[point_count][0] = (int)(center_x + 0); coords[point_count][1] = (int)(center_y + x);
-                point_count++;
-                coords[point_count][0] = (int)(center_x + 0); coords[point_count][1] = (int)(center_y - x);
-                point_count++;
-            }
-            else if (x == y)
-            {
-                coords[point_count][0] = (int)(center_x + x); coords[point_count][1] = (int)(center_y + y);
-                point_count++;
-                coords[point_count][0] = (int)(center_x - x); coords[point_count][1] = (int)(center_y + y);
-                point_count++;
-                coords[point_count][0] = (int)(center_x + x); coords[point_count][1] = (int)(center_y - y);
-                point_count++;
-                coords[point_count][0] = (int)(center_x - x); coords[point_count][1] = (int)(center_y - y);
-                point_count++;
-            }
-            else
-            {
-                coords[point_count][0] = (int)(center_x + x); coords[point_count][1] = (int)(center_y + y);
-                point_count++;
-                coords[point_count][0] = (int)(center_x - x); coords[point_count][1] = (int)(center_y + y);
-                point_count++;
-                coords[point_count][0] = (int)(center_x + x); coords[point_count][1] = (int)(center_y - y);
-                point_count++;
-                coords[point_count][0] = (int)(center_x - x); coords[point_count][1] = (int)(center_y - y);
-                point_count++;
-                coords[point_count][0] = (int)(center_x + y); coords[point_count][1] = (int)(center_y + x);
-                point_count++;
-                coords[point_count][0] = (int)(center_x - y); coords[point_count][1] = (int)(center_y + x);
-                point_count++;
-                coords[point_count][0] = (int)(center_x + y); coords[point_count][1] = (int)(center_y - x);
-                point_count++;
-                coords[point_count][0] = (int)(center_x - y); coords[point_count][1] = (int)(center_y - x);
-                point_count++;
-            }
-
-            for (int i = 0; i < point_count; i++)
-            {
-                int px = coords[i][0];
-                int py = coords[i][1];
-                if (px >= 0 && px < ctx->width && py >= 0 && py < ctx->height)
-                {
-                    add_pixel_aa(ctx, px, py, color, coverage);
-                }
-            }
-        }
-    }
 }
 
 static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int end_x,
@@ -419,11 +252,6 @@ static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int en
 
     uint8_t alpha = (uint8_t)(color >> 24);
 
-    /* A sparse destination wants the same fully-covered byte the A8 memset
-     * below writes, for the same reason: nothing already in this run can exceed
-     * it.  With alpha at 255 this is also where the ARGB fast fill goes, so the
-     * three destinations agree span for span.  A zero alpha records nothing --
-     * the collector drops those samples -- so the run is skipped outright. */
     if (ctx->run_sink != NULL)
     {
         if (alpha == 0) { return; }
@@ -435,10 +263,7 @@ static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int en
         return;
     }
 
-    /* An A8 span is one byte per pixel and every sample here is fully covered,
-     * so it is a memset of the colour alpha -- translucent or not.  That equals
-     * the per-pixel max a8_accumulate() would take: anything already in the
-     * span came from this same colour at coverage <= 1, so it is <= alpha. */
+    /* Fully covered A8 span is simply a memset of alpha. */
     if (ctx->format == PIXEL_FORMAT_A8)
     {
         memset(ctx->buffer + y * ctx->stride + start_x, alpha, (size_t)(end_x - start_x + 1));
@@ -471,12 +296,7 @@ static void fill_ring_span_argb8888(DrawContext *ctx, int y, int start_x, int en
     }
 }
 
-/**
- * @brief Whole ring of a stroke too thin for the two-band model.
- *
- * Walks the distance profile instead of the two bands, so the ring ramps over
- * one pixel whatever the line width.
- */
+/** Draw a complete thin ring via distance profile. */
 static void draw_arc_as_ring_thin(DrawContext *ctx, float center_x, float center_y,
                                   float arc_radius, float line_width, PixelColor color)
 {
@@ -494,16 +314,11 @@ static void draw_arc_as_ring_thin(DrawContext *ctx, float center_x, float center
         float dy = (float)y + 0.5f - center_y;
         float dy_sq = dy * dy;
 
-        /* Row extent of the band: the feather reaches @c reach past the
-         * centreline, so a row further out than that inks nothing. */
         float band_sq = (arc_radius + reach) * (arc_radius + reach);
-
         if (dy_sq > band_sq) { continue; }
 
         float outer_x = sqrtf(band_sq - dy_sq);
 
-        /* A row that crosses the centreline has an inner limit: the feather on
-         * the near side, which is the same circle one radius in. */
         float inner_reach = arc_radius - reach;
         float inner_x = (inner_reach > 0.0f && dy_sq < inner_reach * inner_reach) ?
                         sqrtf(inner_reach * inner_reach - dy_sq) : 0.0f;
@@ -513,8 +328,6 @@ static void draw_arc_as_ring_thin(DrawContext *ctx, float center_x, float center
         int right_from = LG_MAX((int)ceilf(center_x + inner_x - 0.5f), clip_x1);
         int right_to = LG_MIN((int)floorf(center_x + outer_x - 0.5f), clip_x2);
 
-        /* Rows fully inside the ring's radius band, and rows that straddle the
-         * centre column, end up with one span covering the whole width. */
         if (inner_reach <= 0.0f)
         {
             left_to = LG_MIN((int)floorf(center_x - 0.5f), clip_x2);
@@ -544,21 +357,8 @@ static void draw_arc_as_ring_thin(DrawContext *ctx, float center_x, float center
 static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
                              float arc_radius, float line_width, PixelColor color)
 {
-    /* RGB565 keeps the 8-way symmetric filler: it writes 16-bit pixels a pair
-     * at a time.  ARGB8888 and A8 share the span filler below, which knows
-     * both layouts. */
-    if (ctx->format == PIXEL_FORMAT_RGB565)
-    {
-        draw_arc_as_ring_symmetric(ctx, center_x, center_y, arc_radius, line_width, color);
-        return;
-    }
-
     if (line_width <= 0.0f) { return; }
 
-    /* No solid core to protect, so skip the band arithmetic and walk the
-     * feather directly.  The solid spans below are built from
-     * @c outer_solid_radius and @c inner_solid_radius, which cross over once
-     * the bands overlap; the distance profile has no such state. */
     if (arc_is_thin(line_width))
     {
         draw_arc_as_ring_thin(ctx, center_x, center_y, arc_radius, line_width, color);
@@ -573,7 +373,6 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
     float inner_aa_radius = fmaxf(inner_radius - aa_width, 0.0f);
     float inner_solid_radius = inner_radius + aa_width;
 
-    float outer_sq = outer_radius * outer_radius;
     float inner_sq = inner_radius * inner_radius;
     float outer_aa_sq = outer_aa_radius * outer_aa_radius;
     float inner_aa_sq = inner_aa_radius * inner_aa_radius;
@@ -605,9 +404,7 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
         int outer_left_aa = (int)ceilf(center_x - outer_aa_x - 0.5f);
         int outer_right_aa = (int)floorf(center_x + outer_aa_x - 0.5f);
 
-        // Row lies entirely in the outer AA band: no solid span.  Without this
-        // the zero-width solid span still rounds to one opaque pixel at the
-        // centre column, leaving a spike at the top/bottom of the ring.
+        // Row entirely in outer AA band: no solid span, prevents center spike.
         if (dy_sq >= outer_solid_sq)
         {
             outer_left_solid = outer_right_aa + 1;
@@ -628,7 +425,7 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
         for (int x = LG_MAX(outer_left_aa, clip_x1); x <= outer_left_end; x++)
         {
             float dx = (float)x + 0.5f - center_x;
-            float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+            float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                    outer_aa_sq, inner_aa_sq,
                                                    outer_solid_sq, inner_solid_sq);
             if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -637,7 +434,7 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
         for (int x = outer_right_start; x <= LG_MIN(outer_right_aa, clip_x2); x++)
         {
             float dx = (float)x + 0.5f - center_x;
-            float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+            float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                    outer_aa_sq, inner_aa_sq,
                                                    outer_solid_sq, inner_solid_sq);
             if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -653,7 +450,7 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
             for (int x = inner_left_start; x <= LG_MIN(inner_left_aa, clip_x2); x++)
             {
                 float dx = (float)x + 0.5f - center_x;
-                float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+                float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                        outer_aa_sq, inner_aa_sq,
                                                        outer_solid_sq, inner_solid_sq);
                 if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -662,7 +459,7 @@ static void draw_arc_as_ring(DrawContext *ctx, float center_x, float center_y,
             for (int x = LG_MAX(inner_right_aa, clip_x1); x <= inner_right_end; x++)
             {
                 float dx = (float)x + 0.5f - center_x;
-                float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+                float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                        outer_aa_sq, inner_aa_sq,
                                                        outer_solid_sq, inner_solid_sq);
                 if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -735,7 +532,7 @@ static void draw_arc_cap_argb8888(DrawContext *ctx, float cap_x, float cap_y,
             float cap_dx = (float)x + 0.5f - cap_x;
             float cap_dy = (float)y + 0.5f - cap_y;
             float distance = sqrtf(cap_dx * cap_dx + cap_dy * cap_dy) - cap_radius;
-            float coverage = 1.0f - smoothstep(-aa_width, aa_width, distance);
+            float coverage = sdf_coverage(distance, aa_width);
             if (coverage > 0.001f)
             {
                 add_pixel_aa(ctx, x, y, color, coverage);
@@ -749,9 +546,7 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
                                        float start_angle, float end_angle,
                                        PixelColor color)
 {
-    /* An opaque colour under ARGB8888 or A8: the spans and the AA edges below
-     * both go through the layout-aware writers.  RGB565 has its own filler. */
-    if (ctx->format == PIXEL_FORMAT_RGB565 || (uint8_t)(color >> 24) != UINT8_MAX)
+    if ((uint8_t)(color >> 24) != UINT8_MAX)
     {
         return false;
     }
@@ -769,9 +564,6 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
         return false;
     }
 
-    /* A thin stroke has no solid core for the spans below to fill, and the
-     * band edges they leave over would overlap.  Hand it back to the caller,
-     * which has the distance-profile path for exactly this case. */
     if (arc_is_thin(line_width))
     {
         return false;
@@ -785,7 +577,6 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
     float inner_aa_radius = fmaxf(inner_radius - aa_width, 0.0f);
     float inner_solid_radius = inner_radius + aa_width;
 
-    float outer_sq = outer_radius * outer_radius;
     float inner_sq = inner_radius * inner_radius;
     float outer_aa_sq = outer_aa_radius * outer_aa_radius;
     float inner_aa_sq = inner_aa_radius * inner_aa_radius;
@@ -830,8 +621,7 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
         int outer_left_aa = (int)ceilf(center_x - outer_aa_x - 0.5f);
         int outer_right_aa = (int)floorf(center_x + outer_aa_x - 0.5f);
 
-        // Row lies entirely in the outer AA band: no solid span (see
-        // draw_arc_as_ring()), otherwise 90/270 deg get a one-pixel spike.
+        // Row entirely in outer AA band: no solid span (prevents 90/270 spike).
         if (dy_sq >= outer_solid_sq)
         {
             outer_left_solid = outer_right_aa + 1;
@@ -863,7 +653,7 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
             {
                 continue;
             }
-            float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+            float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                    outer_aa_sq, inner_aa_sq,
                                                    outer_solid_sq, inner_solid_sq);
             if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -878,7 +668,7 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
             {
                 continue;
             }
-            float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+            float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                    outer_aa_sq, inner_aa_sq,
                                                    outer_solid_sq, inner_solid_sq);
             if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -897,7 +687,7 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
                 {
                     continue;
                 }
-                float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+                float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                        outer_aa_sq, inner_aa_sq,
                                                        outer_solid_sq, inner_solid_sq);
                 if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -913,7 +703,7 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
                 {
                     continue;
                 }
-                float coverage = compute_coverage_fast(dx * dx + dy_sq, outer_sq, inner_sq,
+                float coverage = compute_coverage_fast(dx * dx + dy_sq, inner_sq,
                                                        outer_aa_sq, inner_aa_sq,
                                                        outer_solid_sq, inner_solid_sq);
                 if (coverage > 0.001f) { add_pixel_aa(ctx, x, y, color, coverage); }
@@ -930,9 +720,9 @@ static bool draw_arc_scanline_argb8888(DrawContext *ctx, float center_x, float c
 
     return true;
 }
+
 // ==================== Arc drawing ====================
 
-// Normalize angle to [0, 360)
 static inline float normalize_angle_arc(float angle)
 {
     while (angle < 0) { angle += 360.0f; }
@@ -940,7 +730,6 @@ static inline float normalize_angle_arc(float angle)
     return angle;
 }
 
-// Check if angle is in arc range (handles cross-zero correctly)
 static inline bool is_angle_in_arc_range(float angle, float start, float end)
 {
     angle = normalize_angle_arc(angle);
@@ -949,7 +738,7 @@ static inline bool is_angle_in_arc_range(float angle, float start, float end)
 
     if (fabsf(end - start) >= 359.9f)
     {
-        return true; // Full circle
+        return true;
     }
 
     if (start <= end)
@@ -958,13 +747,11 @@ static inline bool is_angle_in_arc_range(float angle, float start, float end)
     }
     else
     {
-        // Cross zero: e.g., start=350, end=10
         return (angle >= start || angle <= end);
     }
 }
 
-// Compute signed distance from point to arc (negative = inside)
-// This provides seamless cap-to-arc transition
+/** Signed distance to arc. Negative = inside. */
 static inline float arc_sdf(float px, float py, float cx, float cy,
                             float radius, float line_width,
                             float start_angle, float end_angle)
@@ -973,33 +760,29 @@ static inline float arc_sdf(float px, float py, float cx, float cy,
     float dy = py - cy;
     float dist = sqrtf(dx * dx + dy * dy);
 
-    // Distance to ring
     float inner_r = radius - line_width / 2.0f;
     float outer_r = radius + line_width / 2.0f;
     float ring_dist;
 
     if (dist < inner_r)
     {
-        ring_dist = inner_r - dist; // Inside inner circle
+        ring_dist = inner_r - dist;
     }
     else if (dist > outer_r)
     {
-        ring_dist = dist - outer_r; // Outside outer circle
+        ring_dist = dist - outer_r;
     }
     else
     {
-        /* Half the line width from the centreline: a signed distance, so the
-         * outline can be scaled per angle without the sign flipping. */
+        /* Signed distance to centreline, prevents sign flip. */
         ring_dist = fabsf(dist - radius) - line_width / 2.0f;
     }
 
-    // Check angle constraint
     if (fabsf(end_angle - start_angle) < 359.9f)
     {
         float angle = atan2f(dy, dx) * 180.0f / M_PI;
         if (!is_angle_in_arc_range(angle, start_angle, end_angle))
         {
-            // Outside angle range - compute distance to arc endpoints (caps)
             float start_rad = start_angle * M_PI / 180.0f;
             float end_rad = end_angle * M_PI / 180.0f;
 
@@ -1011,9 +794,7 @@ static inline float arc_sdf(float px, float py, float cx, float cy,
             float dist_to_start = sqrtf((px - start_x) * (px - start_x) + (py - start_y) * (py - start_y));
             float dist_to_end = sqrtf((px - end_x) * (px - end_x) + (py - end_y) * (py - end_y));
 
-            // Cap SDF: distance to nearest cap center minus cap radius
             float cap_dist = fminf(dist_to_start, dist_to_end) - line_width / 2.0f;
-            // Return the maximum of ring_dist and cap_dist for seamless blending
             return fmaxf(ring_dist, cap_dist);
         }
     }
@@ -1021,16 +802,7 @@ static inline float arc_sdf(float px, float py, float cx, float cy,
     return ring_dist;
 }
 
-/**
- * @brief Partial arc of a stroke too thin for the two-band model.
- *
- * The band model cannot express a stroke narrower than its own feather, and the
- * quadrant walk underneath leaves a one-pixel seam where the quadrants meet.
- * Neither matters here: an arc this thin is a few hundred pixels, so the whole
- * box is walked against a single distance field.  The outline and the round
- * caps come from the same field, which is what keeps the caps tangent to the
- * body instead of pasted onto it.
- */
+/** Draw a partial thin arc using a single distance field walk. */
 static void arc_draw_thin_outline(DrawContext *ctx, float center_x, float center_y,
                                   float radius, float line_width,
                                   float start_angle, float end_angle,
@@ -1053,14 +825,11 @@ static void arc_draw_thin_outline(DrawContext *ctx, float center_x, float center
         {
             float dx = (float)x + 0.5f - center_x;
 
-            /* Outside the outline and outside both caps, nothing here can ink.
-             * The cap centres sit on the centreline, so they are inside the
-             * circle of radius @c outer and this bound covers them too. */
             if (dx * dx + dy * dy > outer * outer) { continue; }
 
             float sdf = arc_sdf((float)x + 0.5f, (float)y + 0.5f, center_x, center_y,
                                 radius, line_width, start_angle, end_angle);
-            float coverage = 1.0f - smoothstep(-LG_ARC_AA_WIDTH, LG_ARC_AA_WIDTH, sdf);
+            float coverage = sdf_coverage(sdf, LG_ARC_AA_WIDTH);
 
             if (coverage > 0.001f)
             {
@@ -1072,45 +841,11 @@ static void arc_draw_thin_outline(DrawContext *ctx, float center_x, float center
 
 // ==================== Arc drawing, quadrants ====================
 
-static inline bool is_in_angle_range_cross(float dx, float dy,
-                                           float start_cos, float start_sin,
-                                           float end_cos, float end_sin,
-                                           bool wide_arc)
-{
-    float from_start = start_cos * dy - start_sin * dx;
-    float to_end = dx * end_sin - dy * end_cos;
-    return wide_arc ? (from_start >= 0.0f || to_end >= 0.0f) :
-           (from_start >= 0.0f && to_end >= 0.0f);
-}
-
-/** Ink margin beyond the outer radius: the 1.5px AA band plus rounding slack. */
 #define LG_ARC_AA_MARGIN 3.0f
-
-/** Sweep tolerance for treating an arc as a complete ring. */
 #define LG_ARC_FULL_EPS 0.01f
-
-/**
- * Angular slack the rasterisers can ink past the requested end angle.
- *
- * draw_arc_df_aa() and draw_arc_df_aa_gradient() classify a pixel as inside or
- * outside the sweep from the precomputed start/end rays.  Pad the sweep by
- * that much so the allocation covers anti-aliased endpoint pixels.
- */
 #define LG_ARC_ANGLE_GUARD 2.0f
 
-/**
- * Axis-aligned bounds of the ink an arc lays down, relative to its centre.
- *
- * A 30-degree arc only inks a small sliver of its bounding square, so callers
- * that size a pixel buffer per arc want the sweep bounded, not the whole
- * circle.  The centreline arc is bounded first -- its two endpoints, plus
- * whichever of the four axis extremes the sweep actually crosses -- and then
- * inflated by half the line width.  That inflation also covers the round caps,
- * since they are centred on the centreline, and by the anti-aliasing margin the
- * draw_arc_* rasterisers feather over.
- *
- * Y grows downward, matching the rasterisers' screen-space convention.
- */
+/** Compute axis-aligned ink bounds for an arc, including AA margin and caps. */
 void lg_arc_ink_bounds(float radius, float line_width,
                        float start_angle, float end_angle,
                        float *min_x, float *min_y, float *max_x, float *max_y)
@@ -1119,10 +854,6 @@ void lg_arc_ink_bounds(float radius, float line_width,
     float grow = line_width / 2.0f + LG_ARC_AA_MARGIN;
     float raw_span = end_angle - start_angle;
 
-    /* Match draw_arc_df_aa()'s full-circle test: a 360-degree sweep normalizes
-     * to a zero span, which it then treats as the complete ring.  The gradient
-     * rasteriser also accepts near-zero and near-360 spans as a full circle, so
-     * keep the allocation conservative for either renderer. */
     float sweep = fmodf(raw_span, 360.0f);
     if (sweep <= 0.0f) { sweep += 360.0f; }
 
@@ -1144,7 +875,7 @@ void lg_arc_ink_bounds(float radius, float line_width,
     if (a0 < 0.0f) { a0 += 360.0f; }
     a0 -= LG_ARC_ANGLE_GUARD;
     sweep += 2.0f * LG_ARC_ANGLE_GUARD;
-    float a1 = a0 + sweep;                  /* left unwrapped, may exceed 360 */
+    float a1 = a0 + sweep;
 
     float c0 = cosf(a0 * M_PI / 180.0f);
     float s0 = sinf(a0 * M_PI / 180.0f);
@@ -1154,7 +885,6 @@ void lg_arc_ink_bounds(float radius, float line_width,
     float lo_x = LG_MIN(c0, c1) * r, hi_x = LG_MAX(c0, c1) * r;
     float lo_y = LG_MIN(s0, s1) * r, hi_y = LG_MAX(s0, s1) * r;
 
-    /* An axis extreme only counts when the sweep actually passes over it. */
     for (int k = 0; k < 4; k++)
     {
         float ak = 90.0f * (float)k;
@@ -1164,10 +894,10 @@ void lg_arc_ink_bounds(float radius, float line_width,
         }
         switch (k)
         {
-        case 0: hi_x =  r; break;           /* 0 deg   -> rightmost */
-        case 1: hi_y =  r; break;           /* 90 deg  -> bottommost */
-        case 2: lo_x = -r; break;           /* 180 deg -> leftmost */
-        default: lo_y = -r; break;          /* 270 deg -> topmost */
+        case 0: hi_x =  r; break;
+        case 1: hi_y =  r; break;
+        case 2: lo_x = -r; break;
+        default: lo_y = -r; break;
         }
     }
 
@@ -1175,13 +905,7 @@ void lg_arc_ink_bounds(float radius, float line_width,
     *min_y = lo_y - grow; *max_y = hi_y + grow;
 }
 
-/**
- * Draw arc with anti-aliasing - hybrid approach for performance + quality
- * Key features:
- * 1. Fast path for arc body using squared distance
- * 2. arc_sdf only for cap regions (seamless transition)
- * 3. Smooth anti-aliasing using smoothstep
- */
+/** Hybrid arc drawer: fast raster for body, arc_sdf for caps. */
 void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                     float radius, float line_width,
                     float start_angle, float end_angle,
@@ -1189,19 +913,15 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
 {
     if (radius <= 0 || line_width <= 0) { return; }
 
-    // Normalize angles
     start_angle = normalize_angle_arc(start_angle);
     end_angle = normalize_angle_arc(end_angle);
 
-    // Calculate angle span
     float angle_span = end_angle - start_angle;
     if (angle_span <= 0) { angle_span += 360.0f; }
 
-    // Check for full circle
     const float EPSILON = 0.001f;
     bool is_full_circle = (fabsf(angle_span - 360.0f) < EPSILON);
 
-    // Use optimized ring drawing for full circles
     if (is_full_circle)
     {
         draw_arc_as_ring(ctx, center_x, center_y, radius, line_width, stroke_color);
@@ -1214,8 +934,6 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
         return;
     }
 
-    /* Too narrow for the solid-core model, so the outline and the caps are
-     * both taken from one distance field below. */
     if (arc_is_thin(line_width))
     {
         arc_draw_thin_outline(ctx, center_x, center_y, radius, line_width,
@@ -1223,29 +941,24 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
         return;
     }
 
-    // Pre-calculate radii and squared values
     float outer_radius = radius + line_width / 2.0f;
     float inner_radius = fmaxf(radius - line_width / 2.0f, 0);
-    float aa_width = LG_ARC_AA_WIDTH;  // Unified AA width for both arc body and caps
+    float aa_width = LG_ARC_AA_WIDTH;
 
-    float outer_sq = outer_radius * outer_radius;
     float inner_sq = inner_radius * inner_radius;
     float outer_aa_sq = (outer_radius + aa_width) * (outer_radius + aa_width);
     float inner_aa_sq = fmaxf((inner_radius - aa_width) * (inner_radius - aa_width), 0);
 
-    // Solid region boundaries (no AA needed)
     float outer_solid = outer_radius - aa_width;
     float inner_solid = inner_radius + aa_width;
     float outer_solid_sq = outer_solid * outer_solid;
     float inner_solid_sq = inner_solid * inner_solid;
 
-    // Convert angles to integer degrees for fast comparison
     uint16_t start_angle_deg = (uint16_t)start_angle;
     uint16_t end_angle_deg = (uint16_t)end_angle;
     while (start_angle_deg >= 360) { start_angle_deg -= 360; }
     while (end_angle_deg >= 360) { end_angle_deg -= 360; }
 
-    // Pre-calculate cap positions
     float start_rad = start_angle * M_PI / 180.0f;
     float end_rad = end_angle * M_PI / 180.0f;
     float start_cos = cosf(start_rad);
@@ -1261,7 +974,6 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
     float cap_r = line_width / 2.0f;
     float cap_check_sq = (cap_r + aa_width + 2.0f) * (cap_r + aa_width + 2.0f);
 
-    // Determine which quadrants contain the arc
     bool quadrants[4] = {false, false, false, false};
     uint16_t start_quadrant = start_angle_deg / 90;
     uint16_t end_quadrant = end_angle_deg / 90;
@@ -1275,7 +987,6 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
     }
     else
     {
-        // Cross zero
         for (int q = start_quadrant; q < 4; q++)
         {
             quadrants[q] = true;
@@ -1286,49 +997,31 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
         }
     }
 
-    // Determine which quadrant should draw each cap (to avoid double-drawing)
-    // Start cap quadrant - based on start angle
     int start_cap_quad = start_angle_deg / 90;
-
-    // End cap quadrant - based on end angle
     int end_cap_quad = end_angle_deg / 90;
 
-    // Extract color components
     uint8_t color_a = (stroke_color >> 24) & 0xFF;
-    uint8_t color_r = (stroke_color >> 16) & 0xFF;
-    uint8_t color_g = (stroke_color >> 8) & 0xFF;
-    uint8_t color_b = stroke_color & 0xFF;
-
     if (color_a == 0) { return; }
 
-    // Direct pixel access
-    int pixel_size = get_pixel_size(ctx->format);
-    int stride = ctx->width * pixel_size;
-
-    // Process each quadrant with strict non-overlapping boundaries
     for (int quad = 0; quad < 4; quad++)
     {
         if (!quadrants[quad]) { continue; }
 
-        // Calculate quadrant bounds with strict boundaries to avoid overlap
-        // Use center_x/center_y as exclusive boundaries between quadrants
         int qx_start, qx_end, qy_start, qy_end;
         float cap_expand = cap_r + aa_width + 1.0f;
         int center_x_int = (int)center_x;
         int center_y_int = (int)center_y;
 
-        // Check if start/end cap is in this quadrant and needs boundary extension
         bool has_start_cap = (start_cap_quad == quad);
         bool has_end_cap = (end_cap_quad == quad);
 
         switch (quad)
         {
-        case 0: // Q0: x >= center, y >= center (angles 0-90)
+        case 0:
             qx_start = center_x_int;
             qx_end = (int)(center_x + outer_radius + aa_width + cap_expand);
             qy_start = center_y_int;
             qy_end = (int)(center_y + outer_radius + aa_width + cap_expand);
-            // Extend boundaries only if cap belongs to this quadrant (by angle, not position)
             if (has_start_cap)
             {
                 qx_start = LG_MIN(qx_start, (int)(start_cap_x - cap_expand));
@@ -1340,12 +1033,11 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 qy_start = LG_MIN(qy_start, (int)(end_cap_y - cap_expand));
             }
             break;
-        case 1: // Q1: x < center, y >= center (angles 90-180)
+        case 1:
             qx_start = (int)(center_x - outer_radius - aa_width - cap_expand);
             qx_end = center_x_int - 1;
             qy_start = center_y_int;
             qy_end = (int)(center_y + outer_radius + aa_width + cap_expand);
-            // Extend boundaries only if cap belongs to this quadrant
             if (has_start_cap)
             {
                 qx_end = LG_MAX(qx_end, (int)(start_cap_x + cap_expand));
@@ -1357,12 +1049,11 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 qy_start = LG_MIN(qy_start, (int)(end_cap_y - cap_expand));
             }
             break;
-        case 2: // Q2: x < center, y < center (angles 180-270)
+        case 2:
             qx_start = (int)(center_x - outer_radius - aa_width - cap_expand);
             qx_end = center_x_int - 1;
             qy_start = (int)(center_y - outer_radius - aa_width - cap_expand);
             qy_end = center_y_int - 1;
-            // Extend boundaries only if cap belongs to this quadrant
             if (has_start_cap)
             {
                 qx_end = LG_MAX(qx_end, (int)(start_cap_x + cap_expand));
@@ -1374,12 +1065,11 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                 qy_end = LG_MAX(qy_end, (int)(end_cap_y + cap_expand));
             }
             break;
-        case 3: // Q3: x >= center, y < center (angles 270-360)
+        case 3:
             qx_start = center_x_int;
             qx_end = (int)(center_x + outer_radius + aa_width + cap_expand);
             qy_start = (int)(center_y - outer_radius - aa_width - cap_expand);
             qy_end = center_y_int - 1;
-            // Extend boundaries only if cap belongs to this quadrant
             if (has_start_cap)
             {
                 qx_start = LG_MIN(qx_start, (int)(start_cap_x - cap_expand));
@@ -1393,7 +1083,6 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
             break;
         }
 
-        // Clip to context bounds
         qx_start = LG_MAX(qx_start, ctx->clip_rect.x);
         qx_end = LG_MIN(qx_end, ctx->clip_rect.x + ctx->clip_rect.w - 1);
         qy_start = LG_MAX(qy_start, ctx->clip_rect.y);
@@ -1401,25 +1090,22 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
 
         if (qx_start > qx_end || qy_start > qy_end) { continue; }
 
-        // Process rows in this quadrant
         for (int py = qy_start; py <= qy_end; py++)
         {
             float dy = (py + 0.5f) - center_y;
             float dy_sq = dy * dy;
-            uint8_t *row = ctx->buffer + py * stride;
+            uint8_t *row = ctx->buffer + py * ctx->stride;
 
             for (int px = qx_start; px <= qx_end; px++)
             {
                 float dx = (px + 0.5f) - center_x;
                 float dist_sq = dx * dx + dy_sq;
 
-                // Quick rejection: outside AA region
                 if (dist_sq > outer_aa_sq) { continue; }
                 if (inner_sq > 0 && dist_sq < inner_aa_sq) { continue; }
 
                 float coverage;
 
-                // Check if in angle range
                 bool in_angle = is_in_angle_range_cross(dx, dy,
                                                         start_cos, start_sin,
                                                         end_cos, end_sin,
@@ -1427,7 +1113,6 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
 
                 if (!in_angle)
                 {
-                    // Outside angle range - check if in cap region
                     float sample_x = px + 0.5f;
                     float sample_y = py + 0.5f;
                     float dx_start = sample_x - start_cap_x;
@@ -1438,115 +1123,38 @@ void draw_arc_df_aa(DrawContext *ctx, float center_x, float center_y,
                     float dist_start_sq = dx_start * dx_start + dy_start * dy_start;
                     float dist_end_sq = dx_end * dx_end + dy_end * dy_end;
 
-                    // Quick rejection for cap region
                     if (dist_start_sq > cap_check_sq && dist_end_sq > cap_check_sq)
                     {
                         continue;
                     }
 
-                    // Use arc_sdf for seamless cap transition
                     float sdf = arc_sdf(sample_x, sample_y, center_x, center_y,
                                         radius, line_width, start_angle, end_angle);
-                    coverage = 1.0f - smoothstep(-aa_width, aa_width, sdf);
+                    coverage = sdf_coverage(sdf, aa_width);
                 }
                 else
                 {
-                    // In angle range - use fast coverage calculation
-                    coverage = compute_coverage_fast(dist_sq, outer_sq, inner_sq,
+                    coverage = compute_coverage_fast(dist_sq, inner_sq,
                                                      outer_aa_sq, inner_aa_sq,
                                                      outer_solid_sq, inner_solid_sq);
                 }
 
                 if (coverage < 0.001f) { continue; }
 
-                // Compute final alpha
                 uint8_t final_alpha = (uint8_t)(color_a * coverage);
                 if (final_alpha == 0) { continue; }
 
-                // Write pixel
-                int byte_offset = px * pixel_size;
-
                 if (ctx->format == PIXEL_FORMAT_A8)
                 {
-                    a8_accumulate(row + byte_offset, final_alpha);
+                    a8_accumulate(row + px, final_alpha);
                 }
-                else if (ctx->format == PIXEL_FORMAT_ARGB8888)
+                else
                 {
-                    uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
-
-                    if (final_alpha == 255)
-                    {
-                        *pixel_ptr = stroke_color;
-                    }
-                    else
-                    {
-                        uint32_t bg = *pixel_ptr;
-                        uint8_t bg_a = (bg >> 24) & 0xFF;
-
-                        if (bg_a == 0)
-                        {
-                            *pixel_ptr = (final_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
-                        }
-                        else
-                        {
-                            // Check if background is same color (to avoid double-draw artifacts)
-                            uint8_t bg_r = (bg >> 16) & 0xFF;
-                            uint8_t bg_g = (bg >> 8) & 0xFF;
-                            uint8_t bg_b = bg & 0xFF;
-
-                            // If same color, use MAX alpha instead of ADD to prevent transparency stacking
-                            if (bg_r == color_r && bg_g == color_g && bg_b == color_b)
-                            {
-                                uint8_t max_alpha = (final_alpha > bg_a) ? final_alpha : bg_a;
-                                *pixel_ptr = (max_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
-                            }
-                            else
-                            {
-                                // Different color, use standard alpha blending
-                                uint16_t inv_alpha = 256 - final_alpha;
-
-                                uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
-                                uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
-                                uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
-                                uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
-
-                                *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
-                            }
-                        }
-                    }
-                }
-                else if (ctx->format == PIXEL_FORMAT_RGB565)
-                {
-                    uint16_t *pixel_ptr = (uint16_t *)(row + byte_offset);
-
-                    if (final_alpha == 255)
-                    {
-                        *pixel_ptr = (uint16_t)stroke_color;
-                    }
-                    else
-                    {
-                        uint16_t bg = *pixel_ptr;
-                        uint16_t inv_alpha = 256 - final_alpha;
-
-                        uint8_t bg_r = (bg >> 11) & 0x1F;
-                        uint8_t bg_g = (bg >> 5) & 0x3F;
-                        uint8_t bg_b = bg & 0x1F;
-
-                        uint8_t fg_r = (color_r >> 3) & 0x1F;
-                        uint8_t fg_g = (color_g >> 2) & 0x3F;
-                        uint8_t fg_b = (color_b >> 3) & 0x1F;
-
-                        uint8_t out_r = ((bg_r * inv_alpha + fg_r * final_alpha) >> 8) & 0x1F;
-                        uint8_t out_g = ((bg_g * inv_alpha + fg_g * final_alpha) >> 8) & 0x3F;
-                        uint8_t out_b = ((bg_b * inv_alpha + fg_b * final_alpha) >> 8) & 0x1F;
-
-                        *pixel_ptr = (out_r << 11) | (out_g << 5) | out_b;
-                    }
+                    arc_blend_argb8888((uint32_t *)row + px, stroke_color, final_alpha, true);
                 }
             }
         }
     }
-
 }
 
 bool lg_arc_update_a8(DrawContext *ctx, float center_x, float center_y,
@@ -1572,7 +1180,6 @@ bool lg_arc_update_a8(DrawContext *ctx, float center_x, float center_y,
     if (old_span <= 0.0f) { old_span += 360.0f; }
     if (span <= 0.0f) { span += 360.0f; }
 
-    /* Stay on the same scanline path; short arcs and full rings use other profiles. */
     float min_span = LG_MIN(old_span, span);
     float max_span = LG_MAX(old_span, span);
     if (max_span >= 359.9f || max_span - min_span > 90.0f ||
@@ -1606,7 +1213,6 @@ bool lg_arc_update_a8(DrawContext *ctx, float center_x, float center_y,
         (int16_t)x0, (int16_t)y0,
         (int16_t)(x1 - x0), (int16_t)(y1 - y0)
     };
-    /* Remove the old end cap as well as the changed arc body. */
     for (int y = y0; y < y1; y++)
     {
         memset(ctx->buffer + (size_t)y * ctx->width + x0, 0, (size_t)(x1 - x0));
@@ -1619,31 +1225,22 @@ bool lg_arc_update_a8(DrawContext *ctx, float center_x, float center_y,
 
 // ==================== Gradient Functions ====================
 
-/**
- * Initialize a gradient structure
- */
+/** Initialize gradient. Zeroes memory for cache byte-comparison. */
 void gradient_init(Gradient *grad, GradientType type)
 {
     if (grad == NULL) { return; }
 
-    /* Descriptors compare the complete Gradient byte-for-byte.  Clear inactive
-     * stops as well as active fields so equivalent gradients share cache data. */
     memset(grad, 0x00, sizeof(*grad));
     grad->type = type;
     grad->angular_end = 360;
 }
 
-/**
- * Add a color stop to gradient
- */
 void gradient_add_stop(Gradient *grad, float position, PixelColor color)
 {
     if (grad == NULL || grad->stop_count >= 8) { return; }
 
-    // Clamp position to [0, 1]
     position = LG_CLAMP(position, 0.0f, 1.0f);
 
-    // Insert stop in sorted order
     int insert_idx = grad->stop_count;
     for (int i = 0; i < grad->stop_count; i++)
     {
@@ -1654,21 +1251,16 @@ void gradient_add_stop(Gradient *grad, float position, PixelColor color)
         }
     }
 
-    // Shift existing stops
     for (int i = grad->stop_count; i > insert_idx; i--)
     {
         grad->stops[i] = grad->stops[i - 1];
     }
 
-    // Insert new stop
     grad->stops[insert_idx].position = position;
     grad->stops[insert_idx].color = color;
     grad->stop_count++;
 }
 
-/**
- * Interpolate color between two stops
- */
 static PixelColor interpolate_color(PixelColor c1, PixelColor c2, float t)
 {
     int a1 = (c1 >> 24) & 0xFF;
@@ -1681,13 +1273,11 @@ static PixelColor interpolate_color(PixelColor c1, PixelColor c2, float t)
     int g2 = (c2 >> 8) & 0xFF;
     int b2 = c2 & 0xFF;
 
-    // Use int for interpolation to avoid overflow
     int a = (int)(a1 + (a2 - a1) * t);
     int r = (int)(r1 + (r2 - r1) * t);
     int g = (int)(g1 + (g2 - g1) * t);
     int b = (int)(b1 + (b2 - b1) * t);
 
-    // Clamp to [0, 255]
     a = (a < 0) ? 0 : ((a > 255) ? 255 : a);
     r = (r < 0) ? 0 : ((r > 255) ? 255 : r);
     g = (g < 0) ? 0 : ((g > 255) ? 255 : g);
@@ -1696,14 +1286,11 @@ static PixelColor interpolate_color(PixelColor c1, PixelColor c2, float t)
     return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
 }
 
-/**
- * Get color from gradient at position t (0.0 to 1.0)
- */
 PixelColor gradient_get_color(Gradient *grad, float t)
 {
     if (grad == NULL || grad->stop_count == 0)
     {
-        return 0xFF000000; // Black
+        return 0xFF000000;
     }
 
     if (grad->stop_count == 1)
@@ -1711,10 +1298,8 @@ PixelColor gradient_get_color(Gradient *grad, float t)
         return grad->stops[0].color;
     }
 
-    // Clamp t to [0, 1]
     t = LG_CLAMP(t, 0.0f, 1.0f);
 
-    // Find the two stops to interpolate between
     if (t <= grad->stops[0].position)
     {
         return grad->stops[0].color;
@@ -1740,10 +1325,6 @@ PixelColor gradient_get_color(Gradient *grad, float t)
     return grad->stops[grad->stop_count - 1].color;
 }
 
-/**
- * Get color from gradient at specific angle (for angular gradients)
- * Improved version with correct angle handling for full circles
- */
 PixelColor gradient_get_color_at_angle(Gradient *grad, float angle)
 {
     if (grad == NULL || grad->type != GRADIENT_ANGULAR)
@@ -1761,25 +1342,19 @@ PixelColor gradient_get_color_at_angle(Gradient *grad, float angle)
         return grad->stops[0].color;
     }
 
-    // Get gradient angle range (use original values, don't normalize)
     float start = grad->angular_start;
     float end = grad->angular_end;
 
-    // Calculate angle span
     float span = end - start;
     if (span <= 0.0f) { span += 360.0f; }
 
-    // Normalize input angle to be relative to start
     float angle_offset = angle - start;
 
-    // Handle wrap-around
     while (angle_offset < 0.0f) { angle_offset += 360.0f; }
     while (angle_offset >= 360.0f) { angle_offset -= 360.0f; }
 
-    // Calculate t (0.0 to 1.0)
     float t = angle_offset / span;
 
-    // Clamp t to [0, 1] range
     if (t < 0.0f) { t = 0.0f; }
     if (t > 1.0f) { t = 1.0f; }
 
@@ -1787,12 +1362,8 @@ PixelColor gradient_get_color_at_angle(Gradient *grad, float angle)
 }
 
 /**
- * Draw arc with gradient - optimized version using LUT
- * Performance optimizations:
- * 1. Pre-computed angle-to-color lookup table (LUT)
- * 2. Fast integer angle calculation using atan2 approximation
- * 3. Squared distance comparison (no sqrt)
- * 4. Minimized branching in hot loop
+ * Draw a gradient arc.
+ * Uses 360-entry LUT for angle-to-color mapping.
  */
 void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
                              float radius, float line_width,
@@ -1801,12 +1372,9 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
 {
     if (radius <= 0 || line_width <= 0 || gradient == NULL) { return; }
 
-    /* A gradient varies across the shape, so it needs per-pixel colour and
-     * cannot be expressed as a coverage mask.  A caller that asked for one
-     * anyway gets nothing rather than a silently wrong colour. */
+    /* Gradients cannot be expressed as A8 coverage masks. */
     if (ctx->format == PIXEL_FORMAT_A8) { return; }
 
-    // Read gradient angles from struct using union to handle potential alignment issues
     volatile unsigned char *bytes = (volatile unsigned char *)gradient;
     union { unsigned char b[4]; float f; } start_union, end_union;
     start_union.b[0] = bytes[108]; start_union.b[1] = bytes[109];
@@ -1816,17 +1384,13 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
     float gradient_start = start_union.f;
     float gradient_end = end_union.f;
 
-    // Save original angles for cap calculation
     float original_start_angle = start_angle;
     float original_end_angle = end_angle;
 
-    // CRITICAL: Calculate original angle span BEFORE normalization
-    // This preserves the intent of full circle (e.g., 270-630 = 360? span)
     float original_span = original_end_angle - original_start_angle;
     bool is_full_circle = (original_span >= 359.9f || original_span <= -359.9f ||
-                           fabsf(original_span) < 0.1f);  // 270-270 case
+                           fabsf(original_span) < 0.1f);
 
-    // For full circle, treat as 0-360 internally
     if (is_full_circle)
     {
         start_angle = 0.0f;
@@ -1834,23 +1398,19 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
     }
     else
     {
-        // Normalize angles
         start_angle = normalize_angle_arc(start_angle);
         end_angle = normalize_angle_arc(end_angle);
     }
 
-    // Calculate angle span
     float angle_span = end_angle - start_angle;
     if (angle_span <= 0) { angle_span += 360.0f; }
 
-    // Calculate bounding box
     float outer_r = radius + line_width / 2.0f + 2.0f;
     int min_x = (int)(center_x - outer_r);
     int max_x = (int)(center_x + outer_r) + 1;
     int min_y = (int)(center_y - outer_r);
     int max_y = (int)(center_y + outer_r) + 1;
 
-    // Clip to context bounds
     min_x = LG_MAX(min_x, ctx->clip_rect.x);
     max_x = LG_MIN(max_x, ctx->clip_rect.x + ctx->clip_rect.w);
     min_y = LG_MAX(min_y, ctx->clip_rect.y);
@@ -1858,35 +1418,26 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
 
     if (min_x >= max_x || min_y >= max_y) { return; }
 
-    // Direct pixel access
-    int pixel_size = get_pixel_size(ctx->format);
     uint8_t *buffer = ctx->buffer;
-    int stride = ctx->width * pixel_size;
+    int stride = ctx->stride;
 
-    // Angle -> colour lookup, built once per call
-    // Build 360-entry lookup table for angle-to-color mapping
     PixelColor color_lut[360];
     for (int i = 0; i < 360; i++)
     {
         color_lut[i] = gradient_get_color_at_angle(gradient, (float)i);
     }
 
-    // Per-call constants
-    // Check if gradient angle span exceeds 360 degrees
     float gradient_span = gradient_end - gradient_start;
     if (gradient_span <= 0.0f) { gradient_span += 360.0f; }
     bool gradient_over_360 = (gradient_span > 360.0f);
 
     bool has_caps = (angle_span < 359.9f);
 
-    // CRITICAL: When gradient > 360?, we need to draw end cap even for full circle
     bool draw_end_cap = gradient_over_360 && !has_caps;
 
     float start_cap_x = 0, start_cap_y = 0, end_cap_x = 0, end_cap_y = 0;
-    // Cap colors follow the gradient at the arc's own endpoints, so an arc
-    // shorter than the gradient range does not jump to the last stop color.
-    // Same angle -> t mapping as the arc body; an end that wraps exactly onto
-    // gradient_start maps to 360 (t = 1) to match the body pixels before it.
+
+    /* Cap colors follow the gradient at the arc's endpoints. */
     float cap_start_offset = original_start_angle - gradient_start;
     while (cap_start_offset < 0.0f) { cap_start_offset += 360.0f; }
     while (cap_start_offset >= 360.0f) { cap_start_offset -= 360.0f; }
@@ -1898,7 +1449,6 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
     PixelColor start_color = gradient_get_color(gradient, cap_start_t);
     PixelColor end_color = gradient_get_color(gradient, cap_end_t);
 
-    // Start/end ray directions for the exact range test, computed once
     float range_start_cos = cosf(start_angle * M_PI / 180.0f);
     float range_start_sin = sinf(start_angle * M_PI / 180.0f);
     float range_end_cos = cosf(end_angle * M_PI / 180.0f);
@@ -1915,36 +1465,25 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
         end_cap_y = center_y + radius * sinf(end_rad);
     }
 
-    // Ring parameters
     float inner_r = radius - line_width / 2.0f;
     float outer_radius = radius + line_width / 2.0f;
-    float aa_width = LG_ARC_AA_WIDTH;  // Unified AA width for both arc body and caps
-    /* Distance from the centreline past which the stroke inks nothing.  Never
-     * larger than the radius, so a stroke wide enough to reach the centre
-     * fills the disc instead of turning the inner bound negative and making
-     * the quick rejection below drop every pixel. */
+    float aa_width = LG_ARC_AA_WIDTH;
+
+    /* Max distance from centerline that inks. Prevents negative inner bound for thick strokes. */
     float reach = LG_MIN(line_width / 2.0f + 0.5f, radius);
 
-    // Pre-calculate squared distances for fast comparison
-    float outer_sq = outer_radius * outer_radius;
     float inner_sq = inner_r * inner_r;
     float outer_aa_sq = (outer_radius + aa_width) * (outer_radius + aa_width);
-    /* The inner edge is the centreline one @c reach in, not @c inner_r plus
-     * the feather: for a stroke wider than twice the feather those differ, and
-     * only this form stays right when the stroke fills the disc. */
     float inner_aa_radius = radius - reach;
     float inner_aa_sq = (inner_aa_radius > 0.0f) ? inner_aa_radius * inner_aa_radius : 0.0f;
 
-    // Solid region boundaries (no AA needed)
     float outer_solid = outer_radius - aa_width;
     float inner_solid = inner_r + aa_width;
     float outer_solid_sq = outer_solid * outer_solid;
     float inner_solid_sq = inner_solid * inner_solid;
 
-    // Full circle: no angle range test, same covering rule
     if (is_full_circle && !draw_end_cap)
     {
-        // Full circle gradient - simplified loop without angle range check
         for (int py = min_y; py < max_y; py++)
         {
             float dy = py + 0.5f - center_y;
@@ -1956,95 +1495,32 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
                 float dx = px + 0.5f - center_x;
                 float dist_sq = dx * dx + dy_sq;
 
-                // Quick rejection
                 if (dist_sq > outer_aa_sq) { continue; }
                 if (dist_sq < inner_aa_sq && inner_r > 2.0f) { continue; }
 
-                // Compute coverage
-                float coverage = compute_coverage_fast(dist_sq, outer_sq, inner_sq,
+                float coverage = compute_coverage_fast(dist_sq, inner_sq,
                                                        outer_aa_sq, inner_aa_sq,
                                                        outer_solid_sq, inner_solid_sq);
                 if (coverage < 0.001f) { continue; }
 
-                // Fast angle calculation
                 int angle_i = lg_atan2((int)dy, (int)dx);
                 if (angle_i < 0) { angle_i += 360; }
                 if (angle_i >= 360) { angle_i -= 360; }
 
-                // Direct LUT lookup for full circle
                 PixelColor stroke_color = color_lut[angle_i];
 
                 uint8_t color_a = (stroke_color >> 24) & 0xFF;
                 if (color_a == 0) { continue; }
 
-                uint8_t color_r = (stroke_color >> 16) & 0xFF;
-                uint8_t color_g = (stroke_color >> 8) & 0xFF;
-                uint8_t color_b = stroke_color & 0xFF;
-
                 uint8_t final_alpha = (uint8_t)(color_a * coverage);
                 if (final_alpha == 0) { continue; }
 
-                int byte_offset = px * pixel_size;
-
-                if (ctx->format == PIXEL_FORMAT_ARGB8888)
-                {
-                    uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
-                    if (final_alpha == 255)
-                    {
-                        *pixel_ptr = stroke_color;
-                    }
-                    else
-                    {
-                        uint32_t bg = *pixel_ptr;
-                        uint8_t bg_a = (bg >> 24) & 0xFF;
-                        if (bg_a == 0)
-                        {
-                            *pixel_ptr = (final_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
-                        }
-                        else
-                        {
-                            uint16_t inv_alpha = 256 - final_alpha;
-                            uint8_t bg_r = (bg >> 16) & 0xFF;
-                            uint8_t bg_g = (bg >> 8) & 0xFF;
-                            uint8_t bg_b = bg & 0xFF;
-                            uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
-                            *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
-                        }
-                    }
-                }
-                else if (ctx->format == PIXEL_FORMAT_RGB565)
-                {
-                    uint16_t *pixel_ptr = (uint16_t *)(row + byte_offset);
-                    if (final_alpha == 255)
-                    {
-                        *pixel_ptr = (uint16_t)stroke_color;
-                    }
-                    else
-                    {
-                        uint16_t bg = *pixel_ptr;
-                        uint16_t inv_alpha = 256 - final_alpha;
-                        uint8_t bg_r = (bg >> 11) & 0x1F;
-                        uint8_t bg_g = (bg >> 5) & 0x3F;
-                        uint8_t bg_b = bg & 0x1F;
-                        uint8_t fg_r = (color_r >> 3) & 0x1F;
-                        uint8_t fg_g = (color_g >> 2) & 0x3F;
-                        uint8_t fg_b = (color_b >> 3) & 0x1F;
-                        uint8_t out_r = ((bg_r * inv_alpha + fg_r * final_alpha) >> 8) & 0x1F;
-                        uint8_t out_g = ((bg_g * inv_alpha + fg_g * final_alpha) >> 8) & 0x3F;
-                        uint8_t out_b = ((bg_b * inv_alpha + fg_b * final_alpha) >> 8) & 0x1F;
-                        *pixel_ptr = (out_r << 11) | (out_g << 5) | out_b;
-                    }
-                }
+                arc_blend_argb8888((uint32_t *)row + px, stroke_color, final_alpha, false);
             }
         }
         return;
     }
 
-    // Partial arcs
-    // Use hybrid approach: fast path for arc body, arc_sdf only for cap regions
     float cap_r = line_width / 2.0f;
     float cap_check_sq = (cap_r + aa_width + 2.0f) * (cap_r + aa_width + 2.0f);
 
@@ -2059,20 +1535,13 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
             float dx = px + 0.5f - center_x;
             float dist_sq = dx * dx + dy_sq;
 
-            // Quick rejection: outside outer circle or inside inner circle
             if (dist_sq > outer_aa_sq) { continue; }
             if (dist_sq < inner_aa_sq && inner_r > 2.0f) { continue; }
 
-            // Colour lookup
             int angle_i = lg_atan2((int)dy, (int)dx);
             if (angle_i < 0) { angle_i += 360; }
             if (angle_i >= 360) { angle_i -= 360; }
 
-            // Sweep test
-            // Exact half-plane test against the start/end rays.  The integer
-            // angle above is fine for color but too coarse for the boundary:
-            // at r = 200 one degree is ~3.5px, so the body edge would not meet
-            // the cap tangent cleanly.
             bool in_arc_range = true;
             if (has_caps)
             {
@@ -2089,7 +1558,6 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
 
             if (has_caps && !in_arc_range)
             {
-                // In cap region - check distance to caps
                 float dx_start = sample_x - start_cap_x;
                 float dy_start = sample_y - start_cap_y;
                 float dx_end = sample_x - end_cap_x;
@@ -2098,20 +1566,17 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
                 float dist_start_sq = dx_start * dx_start + dy_start * dy_start;
                 float dist_end_sq = dx_end * dx_end + dy_end * dy_end;
 
-                // Quick rejection for cap region
                 if (dist_start_sq > cap_check_sq && dist_end_sq > cap_check_sq)
                 {
                     continue;
                 }
 
-                // Use arc_sdf only for cap region pixels (seamless transition)
                 float sdf = arc_sdf(sample_x, sample_y, center_x, center_y,
                                     radius, line_width, start_angle, end_angle);
-                coverage = 1.0f - smoothstep(-aa_width, aa_width, sdf);
+                coverage = sdf_coverage(sdf, aa_width);
 
                 if (coverage < 0.001f) { continue; }
 
-                // Determine cap color
                 if (gradient_over_360 && dist_end_sq < dist_start_sq)
                 {
                     stroke_color = gradient_get_color_at_angle(gradient, (float)angle_i);
@@ -2123,107 +1588,28 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
             }
             else
             {
-                // In arc range - use fast coverage calculation
-                coverage = compute_coverage_fast(dist_sq, outer_sq, inner_sq,
+                coverage = compute_coverage_fast(dist_sq, inner_sq,
                                                  outer_aa_sq, inner_aa_sq,
                                                  outer_solid_sq, inner_solid_sq);
                 if (coverage < 0.001f) { continue; }
 
-                // Use LUT for color lookup
                 stroke_color = color_lut[angle_i];
             }
 
-            // Extract color components
             uint8_t color_a = (stroke_color >> 24) & 0xFF;
             if (color_a == 0) { continue; }
 
-            uint8_t color_r = (stroke_color >> 16) & 0xFF;
-            uint8_t color_g = (stroke_color >> 8) & 0xFF;
-            uint8_t color_b = stroke_color & 0xFF;
-
-            // Compute final alpha
             uint8_t final_alpha = (uint8_t)(color_a * coverage);
             if (final_alpha == 0) { continue; }
 
-            // Write pixel
-            int byte_offset = px * pixel_size;
-
-            if (ctx->format == PIXEL_FORMAT_ARGB8888)
-            {
-                uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
-
-                if (final_alpha == 255)
-                {
-                    *pixel_ptr = stroke_color;
-                }
-                else
-                {
-                    uint32_t bg = *pixel_ptr;
-                    uint8_t bg_a = (bg >> 24) & 0xFF;
-
-                    if (bg_a == 0)
-                    {
-                        *pixel_ptr = (final_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
-                    }
-                    else
-                    {
-                        uint16_t inv_alpha = 256 - final_alpha;
-                        uint8_t bg_r = (bg >> 16) & 0xFF;
-                        uint8_t bg_g = (bg >> 8) & 0xFF;
-                        uint8_t bg_b = bg & 0xFF;
-
-                        uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
-                        uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
-                        uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
-                        uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
-
-                        *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
-                    }
-                }
-            }
-            else if (ctx->format == PIXEL_FORMAT_RGB565)
-            {
-                uint16_t *pixel_ptr = (uint16_t *)(row + byte_offset);
-
-                if (final_alpha == 255)
-                {
-                    *pixel_ptr = (uint16_t)stroke_color;
-                }
-                else
-                {
-                    uint16_t bg = *pixel_ptr;
-                    uint16_t inv_alpha = 256 - final_alpha;
-
-                    uint8_t bg_r = (bg >> 11) & 0x1F;
-                    uint8_t bg_g = (bg >> 5) & 0x3F;
-                    uint8_t bg_b = bg & 0x1F;
-
-                    uint8_t fg_r = (color_r >> 3) & 0x1F;
-                    uint8_t fg_g = (color_g >> 2) & 0x3F;
-                    uint8_t fg_b = (color_b >> 3) & 0x1F;
-
-                    uint8_t out_r = ((bg_r * inv_alpha + fg_r * final_alpha) >> 8) & 0x1F;
-                    uint8_t out_g = ((bg_g * inv_alpha + fg_g * final_alpha) >> 8) & 0x3F;
-                    uint8_t out_b = ((bg_b * inv_alpha + fg_b * final_alpha) >> 8) & 0x1F;
-
-                    *pixel_ptr = (out_r << 11) | (out_g << 5) | out_b;
-                }
-            }
+            arc_blend_argb8888((uint32_t *)row + px, stroke_color, final_alpha, false);
         }
     }
 
-    // A gradient range past a full turn leaves a cap outside the ring
-    // When arc is full circle (0-360) but gradient exceeds 360? (e.g., 0-361),
-    // we need to draw the end cap separately since arc_sdf doesn't handle it
-    // The end cap should protrude OUTWARD from the arc at the end angle position
     if (draw_end_cap)
     {
         float cap_radius = line_width / 2.0f;
 
-        // Calculate end cap center position
-        // The cap center should be on the arc's center line (at radius distance from center)
-        // at the gradient end angle position
-        // Use gradient_end from gradient struct (already read at function start)
         float end_angle_rad = gradient_end * M_PI / 180.0f;
         float cap_center_x = center_x + radius * cosf(end_angle_rad);
         float cap_center_y = center_y + radius * sinf(end_angle_rad);
@@ -2233,7 +1619,6 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
         int cap_min_y = (int)(cap_center_y - cap_radius - 2);
         int cap_max_y = (int)(cap_center_y + cap_radius + 2);
 
-        // Clip to context bounds
         cap_min_x = LG_MAX(cap_min_x, ctx->clip_rect.x);
         cap_max_x = LG_MIN(cap_max_x, ctx->clip_rect.x + ctx->clip_rect.w);
         cap_min_y = LG_MAX(cap_min_y, ctx->clip_rect.y);
@@ -2248,81 +1633,21 @@ void draw_arc_df_aa_gradient(DrawContext *ctx, float center_x, float center_y,
             {
                 float dx_cap = px + 0.5f - cap_center_x;
 
-                // Distance from cap center
                 float dist_cap = sqrtf(dx_cap * dx_cap + dy_cap * dy_cap);
 
-                // SDF for circle cap
                 float sdf = dist_cap - cap_radius;
-                float coverage = 1.0f - smoothstep(-aa_width, aa_width, sdf);
+                float coverage = sdf_coverage(sdf, aa_width);
                 if (coverage < 0.001f) { continue; }
 
-                // Use the end color of the gradient for the cap
                 PixelColor stroke_color = end_color;
 
                 uint8_t color_a = (stroke_color >> 24) & 0xFF;
                 if (color_a == 0) { continue; }
 
-                uint8_t color_r = (stroke_color >> 16) & 0xFF;
-                uint8_t color_g = (stroke_color >> 8) & 0xFF;
-                uint8_t color_b = stroke_color & 0xFF;
-
                 uint8_t final_alpha = (uint8_t)(color_a * coverage);
                 if (final_alpha == 0) { continue; }
 
-                int byte_offset = px * pixel_size;
-
-                if (ctx->format == PIXEL_FORMAT_ARGB8888)
-                {
-                    uint32_t *pixel_ptr = (uint32_t *)(row + byte_offset);
-                    if (final_alpha == 255)
-                    {
-                        *pixel_ptr = stroke_color;
-                    }
-                    else
-                    {
-                        uint32_t bg = *pixel_ptr;
-                        uint8_t bg_a = (bg >> 24) & 0xFF;
-                        if (bg_a == 0)
-                        {
-                            *pixel_ptr = (final_alpha << 24) | (color_r << 16) | (color_g << 8) | color_b;
-                        }
-                        else
-                        {
-                            uint16_t inv_alpha = 256 - final_alpha;
-                            uint8_t bg_r = (bg >> 16) & 0xFF;
-                            uint8_t bg_g = (bg >> 8) & 0xFF;
-                            uint8_t bg_b = bg & 0xFF;
-                            uint8_t out_r = ((bg_r * inv_alpha + color_r * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_g = ((bg_g * inv_alpha + color_g * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_b = ((bg_b * inv_alpha + color_b * final_alpha) >> 8) & 0xFF;
-                            uint8_t out_a = bg_a + (((255 - bg_a) * final_alpha) >> 8);
-                            *pixel_ptr = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
-                        }
-                    }
-                }
-                else if (ctx->format == PIXEL_FORMAT_RGB565)
-                {
-                    uint16_t *pixel_ptr = (uint16_t *)(row + byte_offset);
-                    if (final_alpha == 255)
-                    {
-                        *pixel_ptr = (uint16_t)stroke_color;
-                    }
-                    else
-                    {
-                        uint16_t bg = *pixel_ptr;
-                        uint16_t inv_alpha = 256 - final_alpha;
-                        uint8_t bg_r = (bg >> 11) & 0x1F;
-                        uint8_t bg_g = (bg >> 5) & 0x3F;
-                        uint8_t bg_b = bg & 0x1F;
-                        uint8_t fg_r = (color_r >> 3) & 0x1F;
-                        uint8_t fg_g = (color_g >> 2) & 0x3F;
-                        uint8_t fg_b = (color_b >> 3) & 0x1F;
-                        uint8_t out_r = ((bg_r * inv_alpha + fg_r * final_alpha) >> 8) & 0x1F;
-                        uint8_t out_g = ((bg_g * inv_alpha + fg_g * final_alpha) >> 8) & 0x3F;
-                        uint8_t out_b = ((bg_b * inv_alpha + fg_b * final_alpha) >> 8) & 0x1F;
-                        *pixel_ptr = (out_r << 11) | (out_g << 5) | out_b;
-                    }
-                }
+                arc_blend_argb8888((uint32_t *)row + px, stroke_color, final_alpha, false);
             }
         }
     }

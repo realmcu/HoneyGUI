@@ -36,6 +36,10 @@ Core Features
      - :cpp:any:`gui_rect_set_stroke`
    * - Clear Stroke
      - :cpp:any:`gui_rect_clear_stroke`
+   * - Set Glow
+     - :cpp:any:`gui_rect_set_glow`
+   * - Clear Glow
+     - :cpp:any:`gui_rect_clear_glow`
    * - Set Opacity
      - :cpp:any:`gui_rect_set_opacity`
    * - Register Click Event Callback
@@ -61,6 +65,49 @@ The rounded rectangle supports the same corner radius for all four corners:
 - **radius = 0**: Draw a rectangle with sharp corners
 - **radius > 0**: Draw a rounded rectangle, with the radius determining the arc of the corners
 - **Inset Stroke**: Draws the stroke inside the rectangle without changing widget size
+
+Outer Glow
+----------
+
+An optional outer glow can be drawn around the widget. It is a separate layer
+painted under the body: the body's own fill, stroke and gradient are untouched,
+and changing the glow does not rebuild them.
+
+.. code-block:: c
+
+   gui_color_t glow = gui_rgba(255, 200, 80, 160);
+   gui_rect_set_glow(rect, glow, 12);   /* 12 px blur radius */
+   gui_rect_clear_glow(rect);
+
+**Parameters**
+
+- The colour's **alpha is the strength**: alpha 0 switches the glow off.
+- ``blur_radius`` is in pixels, clamped to 1..32. 0 switches the glow off.
+- Changing colour or strength re-paints without rebuilding the mask; changing
+  size, corner radius or blur radius rebuilds it.
+
+**How It Works**
+
+The glow mask is an A8 signed-distance field sampled from the same rounded
+rectangle distance the body's anti-aliasing uses, so the two edges line up
+exactly. The stored value is ``F(d) * (1 - c) / (1 - c * a)``, which composes
+with the body's own SRC_OVER instead of multiplying the edge coverage in twice.
+Without that compensation the seam between body and glow shows as a dark ring
+about one pixel wide.
+
+The mask is stored **split**, not as one bounding box: one corner block drawn
+four times through mirroring, plus one horizontal and one vertical band. Only
+the ring around the outline is non-zero, so a body's interior costs nothing and
+the memory depends on the corner radius and blur radius rather than on the
+widget's area. Blocks are shared through the geometry cache, so two rects with
+the same corner and blur radius share one set of pixels regardless of colour.
+
+**Limitations**
+
+- The glow may extend past a parent container: it is clipped to the display
+  section only, never to the parent's bounds. Hit testing still uses the body.
+- When the body leaves the screen, the part of the glow still on screen is not
+  erased until something else redraws that area.
 
 Gradient Fill
 -------------

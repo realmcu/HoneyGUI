@@ -18,6 +18,7 @@
 #include "gui_geometry_cache.h"
 #include "gui_geometry_common.h"
 #include "gui_geometry_image.h"
+#include "gui_geometry_glow.h"
 
 /*============================================================================*
  *                           Configuration
@@ -26,20 +27,9 @@
 #define GUI_CIRCLE_ENABLE_DITHER 1
 
 /**
- * 1 = store solid circles as A8 coverage masks, 0 = always ARGB8888.
- *
- * A8 costs a quarter of the memory, drops colour from the cache key so circles
- * differing only in colour share one payload, and reaches acc_sw's dedicated A8
- * blit instead of the generic rasteriser.
- *
- * Set to 0 when bringing up a hardware accelerator whose blit may not handle A8.
- * An unsupported source format usually shows up as a garbled or missing shape
- * rather than a clean fallback, so flipping this is the quickest way to rule it
- * out.  The same switch isolates what A8 alone contributes to frame time -- the
- * shape cache stays active either way.
- *
- * Overridable from the build, so a bring-up run needs no source edit:
- *   scons GUI_CIRCLE_ENABLE_A8=0
+ * 1 = Store solid circles as A8 masks (saves 75% memory, allows color sharing).
+ * 0 = Always ARGB8888 (use for hardware accelerators that don't support A8).
+ * Override via: scons GUI_CIRCLE_ENABLE_A8=0
  */
 #ifndef GUI_CIRCLE_ENABLE_A8
 #define GUI_CIRCLE_ENABLE_A8 1
@@ -65,20 +55,6 @@ static uint16_t circle_desc_len(const circle_desc_t *desc)
     return (uint16_t)sizeof(circle_desc_t);
 }
 
-/**
- * Whether this circle fills with a gradient.
- *
- * A solid circle without stroke can be stored as an A8 coverage mask: a mask
- * carries no RGB, so one payload serves every colour of the same shape --
- * which is the point, since "same size, different colour" is otherwise a full
- * cache miss.  A gradient or a stroke rules that out, since they need
- * per-pixel RGB.
- *
- * A translucent colour is fine: its alpha is folded into the mask values, not
- * carried in fg_color_set.  That matters because the two blit paths disagree
- * about fg_color_set's alpha -- acc_sw_generic multiplies it in, a8_2_rgb565
- * discards it -- so it is pinned at 255 and the mask carries everything.
- */
 static bool circle_has_gradient(const gui_circle_t *circle)
 {
     return circle->use_gradient && circle->gradient != NULL &&
@@ -87,9 +63,7 @@ static bool circle_has_gradient(const gui_circle_t *circle)
 
 /**
  * Fill in a descriptor for one cached payload.
- *
- * Zeroes first: gui_geometry_cache_acquire() compares descriptors byte for byte, so
- * a padding hole left uninitialised would make two identical circles miss.
+ * Zeroes first to prevent padding holes from breaking byte-for-byte cache comparison.
  */
 static void circle_desc_init(circle_desc_t *desc, const gui_circle_t *this,
                              gui_circle_part_t part, int w, int h, bool is_a8)
@@ -107,9 +81,7 @@ static void circle_desc_init(circle_desc_t *desc, const gui_circle_t *this,
         desc->stroke_color = this->stroke_color.color.argb_full;
     }
 
-    /* RGB is deliberately left out of an A8 key -- that is what lets circles
-     * differing only in colour share one mask.  Alpha stays in, because it is
-     * folded into the mask values themselves. */
+    /* A8 ignores RGB to allow mask sharing; alpha stays in as it's baked into mask values. */
     if (is_a8)
     {
         desc->is_a8 = 1u;
@@ -120,8 +92,7 @@ static void circle_desc_init(circle_desc_t *desc, const gui_circle_t *this,
         desc->color = this->color.color.argb_full;
     }
 
-    /* Only the single-buffer part can carry a gradient; the split pieces are
-     * mirrored copies of one quadrant, which a gradient would not survive. */
+    /* Only full-buffer carries gradient; split quadrants cannot survive gradient mirroring. */
     if (part == CIRCLE_PART_FULL && circle_has_gradient(this))
     {
         desc->gradient_type = (uint32_t)this->gradient_type;
@@ -167,8 +138,7 @@ static void gui_circle_input_process(gui_obj_t *obj)
     int absolute_x = 0;
     int absolute_y = 0;
 
-    /* Touch coordinates are absolute while obj->x/y are parent relative, so the
-     * widget origin has to be accumulated up the tree. */
+    /* Accumulate widget origin to convert absolute touch coords to local. */
     gui_obj_absolute_xy(obj, &absolute_x, &absolute_y);
 
     if (!is_point_in_circle(this, tp->x - absolute_x, tp->y - absolute_y))
@@ -176,22 +146,13 @@ static void gui_circle_input_process(gui_obj_t *obj)
         return;
     }
 
-    /* No extra touch-state condition here: gui_obj_enable_event() checks the
-     * state that belongs to each event code (TOUCH_SHORT for CLICKED,
-     * tp->pressed for PRESSED, tp->released for RELEASED, ...). Gating all of
-     * them on TOUCH_SHORT made everything except CLICKED unreachable, because
-     * at press time the type is still TOUCH_INIT/TOUCH_HOLD_* and TOUCH_SHORT
-     * only appears once a short tap is released. */
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
-    /* PRESSING repeats every frame while the touch is held, which is what a
-     * drag needs. tp->x/tp->y stay at the press origin for the whole press, so
-     * the hit test above means "the press started on the circle". */
+    /* PRESSING repeats every frame for drag; tp->x/tp->y remain at press origin. */
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
 }
-
 
 static void circle_geom_init(circle_geom_t *g, const gui_circle_t *this)
 {
@@ -199,21 +160,16 @@ static void circle_geom_init(circle_geom_t *g, const gui_circle_t *this)
     g->stroke = LG_CLAMP(this->stroke_width, 0.0f, (float)this->radius);
     g->inner_radius = (float)this->radius - g->stroke;
 
-    /* The centre square's corner pixel ends at distance half * sqrt(2) from the
-     * centre; it must stay at least 0.5px inside the fill to be fully covered. */
+    /* Center square side: keep corner pixel at least 0.5px inside the fill. */
     float fill_r = (g->stroke > 0.0f) ? g->inner_radius : (float)this->radius;
     g->half = (int)floorf(LG_MAX(fill_r - 0.5f, 0.0f) * (float)M_SQRT1_2);
     g->band = this->radius - g->half;
 }
 
-/** Angular gradient table: one entry per degree, as the gradient can show. */
+/** Angular gradient table: one entry per degree. */
 #define CIRCLE_ANGULAR_LUT_SIZE 360
 
-/**
- * Gradient sampled once per raster, so a pixel costs a table lookup instead of
- * a walk over the colour stops: radial by whole-pixel distance from the
- * centre, angular by whole degree.
- */
+/** Gradient LUT: lookups by whole-pixel distance (radial) or whole degree (angular). */
 typedef struct
 {
     uint32_t *lut;              /**< NULL: no gradient, or no memory for the table. */
@@ -285,12 +241,8 @@ static uint32_t circle_fill_color_at(gui_circle_t *this, const circle_lut_t *l,
 }
 
 /**
- * One pixel of the circle, fill and stroke merged by gui_geometry_mix_fill_stroke().
- *
- * Squared distances settle every pixel more than one pixel away from an edge
- * -- fully outside, fully stroke, or fully fill -- and only the band along
- * each edge takes a square root.  A radial gradient needs the distance
- * anyway, so it takes the root for every pixel it fills.
+ * Blend fill and stroke for one pixel.
+ * Uses squared distances to skip sqrt for pixels fully inside/outside.
  */
 static uint32_t circle_pixel(gui_circle_t *this, const circle_geom_t *g,
                              const circle_lut_t *l, int x, int y)
@@ -300,7 +252,7 @@ static uint32_t circle_pixel(gui_circle_t *this, const circle_geom_t *g,
     float dy = (float)y + 0.5f - r;
     float d2 = dx * dx + dy * dy;
 
-    /* Coverage is r + 0.5 - dist: 1 inside r - 0.5, 0 outside r + 0.5. */
+    /* Coverage = r + 0.5 - dist */
     if (d2 >= (r + 0.5f) * (r + 0.5f)) { return 0u; }
 
     bool has_stroke = g->stroke > 0.0f;
@@ -386,33 +338,12 @@ static uint8_t *circle_payload(gui_circle_t *this, const circle_geom_t *g,
     return buffer;
 }
 
-/**
- * Add the strip payload four times, rotated a quarter turn each, around the
- * centre square like a pinwheel:
- *
- *     +----------+---+
- *     |   top    |   |
- *     +---+------+ r |
- *     |   |      | i |
- *     | l |centre| g |
- *     | e |      | h |
- *     | f +------+-+-+
- *     | t |  bottom  |
- *     +---+----------+
- *
- * Each strip is band x (side + band), so together they tile the ring with no
- * overlap and no extra corner pieces.  The circle is centred on a pixel
- * corner, so a quarter turn maps whole pixels onto whole pixels and one
- * payload serves all four.  Takes over the caller's reference on @p payload,
- * including on failure.
- */
 static bool circle_add_pinwheel(gui_circle_t *this, uint8_t *payload, bool is_a8)
 {
     const gui_matrix_t *m = GUI_BASE(this)->matrix;
     int b = this->radius * 2 - 1;
 
-    /* (x, y, xx, xy, yx, yy) per copy, see gui_geometry_part_t: the top strip
-     * as drawn, then rotated by 90, 180 and 270 degrees about the centre. */
+    /* (x, y, xx, xy, yx, yy): top strip, then rotated 90, 180, 270 deg. */
     const int t[4][6] =
     {
         {0, 0, 1, 0, 0, 1}, {b, 0, 0, -1, 1, 0}, {b, b, -1, 0, 0, -1}, {0, b, 0, 1, -1, 0},
@@ -420,7 +351,7 @@ static bool circle_add_pinwheel(gui_circle_t *this, uint8_t *payload, bool is_a8
 
     for (int i = 0; i < 4; i++)
     {
-        /* Each copy holds its own reference, so all four release the same way. */
+        /* Each copy holds its own reference. */
         if (i > 0) { gui_geometry_cache_addref(payload); }
 
         if (!gui_geometry_parts_add_image(&this->parts, m, payload, this->opacity_value,
@@ -434,13 +365,9 @@ static bool circle_add_pinwheel(gui_circle_t *this, uint8_t *payload, bool is_a8
 }
 
 /**
- * Build every piece of the circle, see gui_geometry_parts_t.
- *
- * Split: the solid centre square and one strip turned four times around it
- * (see circle_add_pinwheel()) -- five pieces and one small payload for the
- * whole outline.  Single: one rasterised image of the whole circle, for
- * what the split cannot express (a gradient, a transform the pieces cannot
- * follow, a circle too small to split).
+ * Build every piece of the circle.
+ * Split: center square + one strip turned 4 times.
+ * Single: one full image (for gradients, unsupported transforms, or tiny circles).
  */
 static bool circle_build_parts(gui_circle_t *this, const circle_geom_t *g, bool single)
 {
@@ -491,20 +418,10 @@ static void gui_circle_prepare(gui_obj_t *obj)
 
     int radius = this->radius;
 
-    // obj->matrix is already initialized by gui_obj_ctor
-    // Don't reinitialize it - it may contain parent transformations (e.g., list scrolling)
-
-    /* A circle turned about its own centre looks the same, so under a uniform
-     * scale the rotation stays out of the blit matrix -- rotating the bitmap
-     * would only resample the anti-aliased edge into steps.  The one thing it
-     * does change, where an angular gradient starts, is folded into the
-     * gradient below.  A non-uniform scale makes an ellipse, whose orientation
-     * does depend on the rotation, so that keeps it in the matrix. */
     bool uniform_scale = fabsf(this->scale_x - this->scale_y) < 1e-4f;
     float matrix_degrees = uniform_scale ? 0.0f : this->degrees;
     float folded_degrees = uniform_scale ? this->degrees : 0.0f;
 
-    // Apply transformations if needed
     bool has_transform = (matrix_degrees != 0.0f || this->scale_x != 1.0f || this->scale_y != 1.0f ||
                           this->offset_x != 0.0f || this->offset_y != 0.0f);
     bool parent_has_non_translate = !matrix_only_translate(obj->matrix);
@@ -523,14 +440,6 @@ static void gui_circle_prepare(gui_obj_t *obj)
         matrix_translate(-center_x, -center_y, obj->matrix);
     }
 
-    /* Uniform scale without rotation: rasterise at the scaled radius and blit
-     * 1:1, as gui_rect_prepare() does.  The blit samples nearest-neighbour, so
-     * a scaled bitmap loses its anti-aliased edge, and pieces scaled separately
-     * can leave seams between them.
-     *
-     * For the rest of prepare the widget temporarily takes the scaled geometry
-     * and a translate-only matrix; everything is restored at the end, so hit
-     * testing and children keep the scaled matrix exactly as before. */
     bool bake_scale = false;
     gui_matrix_t scaled_matrix;
     int16_t saved_w = this->base.w;
@@ -540,8 +449,8 @@ static void gui_circle_prepare(gui_obj_t *obj)
     int saved_radius = this->radius;
     float saved_stroke_width = this->stroke_width;
 
-    /* Both the baked scale and the folded rotation adjust the gradient for
-     * this prepare only; the caller's values come back at the end. */
+    float scale_factor = 1.0f;
+
     Gradient saved_gradient;
     if (this->gradient != NULL)
     {
@@ -556,10 +465,10 @@ static void gui_circle_prepare(gui_obj_t *obj)
         if (scaled_radius >= 1 && scaled_radius <= INT16_MAX / 2)
         {
             bake_scale = true;
+            scale_factor = this->scale_x;
             memcpy(&scaled_matrix, obj->matrix, sizeof(gui_matrix_t));
 
-            /* Keep the centre the scaled matrix maps to, snapped to a whole
-             * pixel so the split pieces stay seamless. */
+            /* Keep center snapped to whole pixel for seamless split pieces. */
             memcpy(obj->matrix, &base_matrix, sizeof(gui_matrix_t));
             matrix_translate(roundf(this->offset_x + (float)(radius - scaled_radius)),
                              roundf(this->offset_y + (float)(radius - scaled_radius)),
@@ -572,16 +481,12 @@ static void gui_circle_prepare(gui_obj_t *obj)
             this->base.h = (int16_t)(scaled_radius * 2);
             this->stroke_width *= this->scale_x;
 
-            // The gradient stores its centre and radius in widget pixels
             update_circle_gradient_geometry(this);
 
             radius = scaled_radius;
         }
     }
 
-    /* The rotation an angular gradient would have had from the blit matrix.
-     * Screen angles grow clockwise, as the rotation does, so the colour shown
-     * at angle a is the one the unrotated gradient had at a - degrees. */
     if (folded_degrees != 0.0f && circle_has_gradient(this) &&
         this->gradient_type == CIRCLE_GRADIENT_ANGULAR)
     {
@@ -592,7 +497,7 @@ static void gui_circle_prepare(gui_obj_t *obj)
         this->gradient->angular_end = start + range;
     }
 
-    // Calculate checksum only for key properties (exclude pointers)
+    // Checksum (exclude pointers)
     uint32_t new_checksum = GUI_GEOMETRY_HASH_INIT;
     new_checksum = gui_geometry_hash_update(new_checksum, &this->x, sizeof(this->x));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->y, sizeof(this->y));
@@ -604,8 +509,7 @@ static void gui_circle_prepare(gui_obj_t *obj)
                                             sizeof(this->stroke_color));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->opacity_value,
                                             sizeof(this->opacity_value));
-    /* No degrees here: the matrix part of a rotation only re-places the pieces,
-     * and the folded part reaches the pixels through the gradient hash below. */
+    /* degrees omitted: matrix part re-places pieces, folded part affects gradient hash. */
     new_checksum = gui_geometry_hash_update(new_checksum, &this->scale_x, sizeof(this->scale_x));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->scale_y, sizeof(this->scale_y));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->offset_x, sizeof(this->offset_x));
@@ -614,21 +518,15 @@ static void gui_circle_prepare(gui_obj_t *obj)
                                             sizeof(this->use_gradient));
     new_checksum = gui_geometry_hash_update(new_checksum, &this->gradient_type,
                                             sizeof(this->gradient_type));
-    // Handle bit-field hidden with temporary variable
+
     uint32_t hidden_val = obj->hidden;
     new_checksum = gui_geometry_hash_update(new_checksum, &hidden_val, sizeof(hidden_val));
 
-    // Include gradient data if present
     if (this->gradient != NULL)
     {
         new_checksum = gui_geometry_hash_update(new_checksum, this->gradient, sizeof(Gradient));
     }
 
-    /* Single buffer for what the split cannot express: a gradient varies across
-     * the centre, a transform would leave seams between the pieces, and a
-     * circle whose centre square vanishes has nothing to split.  The size rule
-     * is a cost trade-off -- see gui_geometry_common.h for why it is expressed
-     * in bytes. */
     circle_geom_t geom;
     circle_geom_init(&geom, this);
     uint64_t circle_area = (uint64_t)(uint32_t)(radius * 2) * (uint32_t)(radius * 2);
@@ -639,13 +537,14 @@ static void gui_circle_prepare(gui_obj_t *obj)
                   !gui_geometry_split_pays_off(circle_area, payload_is_a8);
     new_checksum = gui_geometry_hash_update(new_checksum, &single, sizeof(single));
 
-    /* Whether the split strips may be A8 also depends on the parent's opacity,
-     * which none of the fields above see; hashing it rebuilds the pieces when
-     * a fading parent crosses fully opaque. */
+    /* Split strips A8 depends on parent opacity (rebuild when crossing fully opaque). */
     bool parent_opaque = obj->parent != NULL && obj->parent->opacity_value == UINT8_MAX;
     new_checksum = gui_geometry_hash_update(new_checksum, &parent_opaque, sizeof(parent_opaque));
 
-    // All pieces are rebuilt together, so they always match each other
+    bool moved = this->parts.count > 0 &&
+                 memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0;
+
+    // All pieces are rebuilt together
     if (last != new_checksum || this->parts.count == 0)
     {
         gui_geometry_parts_release(&this->parts);
@@ -655,14 +554,34 @@ static void gui_circle_prepare(gui_obj_t *obj)
         }
         memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
     }
-    else if (memcmp(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t)) != 0)
+    else if (moved)
     {
-        // Moved only (e.g. list scrolling): re-place the pieces, keep the pixels
+        // Moved only: re-place, keep pixels.
         memcpy(&this->last_matrix, obj->matrix, sizeof(gui_matrix_t));
         gui_geometry_parts_place(&this->parts, obj->matrix);
     }
 
     this->checksum = new_checksum;
+
+    if (this->glow_blur > 0 && this->glow_color.color.rgba.a > 0)
+    {
+        gui_geometry_glow_input_t in;
+        memset(&in, 0x00, sizeof(in));
+        in.shape = GUI_GEOMETRY_GLOW_SHAPE_CIRCLE;
+        in.single = (has_transform && !bake_scale) || parent_has_non_translate;
+        in.w = this->radius * 2;
+        in.h = this->radius * 2;
+        in.radius = this->radius;
+        in.blur_q = gui_geometry_glow_blur_q(bake_scale ? (float)this->glow_blur * scale_factor
+                                             : (float)this->glow_blur);
+        in.edge_alpha = this->stroke_width > 0.0f ? this->stroke_color.color.rgba.a
+                        : this->color.color.rgba.a;
+        gui_geometry_glow_prepare(&this->glow, &in, obj->matrix, moved, this->glow_color);
+    }
+    else if (this->glow != NULL)
+    {
+        gui_geometry_glow_prepare(&this->glow, NULL, obj->matrix, moved, this->glow_color);
+    }
 
     if (bake_scale)
     {
@@ -680,8 +599,7 @@ static void gui_circle_prepare(gui_obj_t *obj)
         memcpy(this->gradient, &saved_gradient, sizeof(Gradient));
     }
 
-    /* Children inherit obj->matrix, and used to inherit the rotation with it:
-     * add the folded part back for them, now that the pieces are placed. */
+    /* Children inherit obj->matrix; add folded rotation back for them. */
     if (folded_degrees != 0.0f)
     {
         float c = (float)this->radius;
@@ -701,7 +619,8 @@ static void gui_circle_draw(gui_obj_t *obj)
 {
     gui_circle_t *this = (gui_circle_t *)obj;
 
-    // Update opacity value to consider parent's opacity (like gui_img does)
+    gui_geometry_glow_draw(this->glow, obj->parent->opacity_value, this->opacity_value);
+
     gui_geometry_parts_draw(&this->parts,
                             obj->parent->opacity_value * this->opacity_value / UINT8_MAX);
 }
@@ -710,17 +629,22 @@ static void gui_circle_draw(gui_obj_t *obj)
 static void gui_circle_end(gui_circle_t *this)
 {
     gui_geometry_parts_end(&this->parts);
+
+    if (this->glow != NULL)
+    {
+        gui_geometry_parts_end(&this->glow->parts);
+    }
 }
 
 static void gui_circle_destroy(gui_circle_t *this)
 {
-    // Free gradient data
     if (this->gradient != NULL)
     {
         gui_free(this->gradient);
         this->gradient = NULL;
     }
 
+    gui_geometry_glow_free(&this->glow);
     gui_geometry_parts_release(&this->parts);
 }
 
@@ -773,8 +697,7 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
 
     memset(circle, 0x00, sizeof(gui_circle_t));
 
-    /* Colour alpha is stored in the raster payload.  Widget opacity is an
-     * independent multiplier and therefore starts fully opaque. */
+    /* Color alpha is rasterized into payload; widget opacity starts opaque. */
     circle->opacity_value = UINT8_MAX;
     gui_obj_ctor((gui_obj_t *)circle, parent, name, x - radius, y - radius, radius * 2, radius * 2);
     GET_BASE(circle)->obj_cb = gui_circle_cb;
@@ -807,7 +730,6 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->use_gradient = false;
     circle->gradient_type = CIRCLE_GRADIENT_RADIAL;
 
-    // Initialize last_matrix to identity
     matrix_identity(&circle->last_matrix);
 
     return circle;
@@ -821,18 +743,15 @@ void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_co
         return;
     }
 
-    // Calculate new widget bounding box
     int new_base_x = x - radius;
     int new_base_y = y - radius;
     int new_size = radius * 2;
 
-    // Update widget position and size
     circle->base.x = new_base_x;
     circle->base.y = new_base_y;
     circle->base.w = new_size;
     circle->base.h = new_size;
 
-    // Circle center is always at the center of the bounding box
     circle->x = radius;
     circle->y = radius;
     circle->radius = radius;
@@ -848,17 +767,14 @@ void gui_circle_set_position(gui_circle_t *circle, int x, int y)
         return;
     }
 
-    // Calculate new widget bounding box position
     int new_base_x = x - circle->radius;
     int new_base_y = y - circle->radius;
 
-    // Update widget position if changed
     if (circle->base.x != new_base_x || circle->base.y != new_base_y)
     {
         circle->base.x = new_base_x;
         circle->base.y = new_base_y;
 
-        // Circle center is always at the center of the bounding box
         circle->x = circle->radius;
         circle->y = circle->radius;
     }
@@ -892,11 +808,13 @@ void gui_circle_set_radius(gui_circle_t *circle, int radius)
         update_circle_gradient_geometry(circle);
     }
 }
+
 void gui_circle_set_opacity(gui_circle_t *circle, uint8_t opacity)
 {
     GUI_ASSERT(circle != NULL);
     circle->opacity_value = opacity;
 }
+
 void gui_circle_set_color(gui_circle_t *circle, gui_color_t color)
 {
     GUI_ASSERT(circle != NULL);
@@ -932,6 +850,36 @@ void gui_circle_clear_stroke(gui_circle_t *circle)
     }
 
     circle->stroke_width = 0.0f;
+}
+
+void gui_circle_set_glow(gui_circle_t *circle, gui_color_t color, uint8_t blur_radius)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+    if (blur_radius == 0u || color.color.rgba.a == 0u)
+    {
+        gui_circle_clear_glow(circle);
+        return;
+    }
+
+    circle->glow_color = color;
+    circle->glow_blur = (blur_radius > GUI_GEOMETRY_GLOW_MAX_BLUR) ?
+                        GUI_GEOMETRY_GLOW_MAX_BLUR : blur_radius;
+}
+
+void gui_circle_clear_glow(gui_circle_t *circle)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    circle->glow_blur = 0u;
+    gui_geometry_glow_free(&circle->glow);
 }
 
 void gui_circle_on_click(gui_circle_t *circle, void *callback, void *parameter)

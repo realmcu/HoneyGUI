@@ -44,8 +44,8 @@ typedef struct
 
 typedef enum
 {
-    PIXEL_FORMAT_RGB565,
-    PIXEL_FORMAT_ARGB8888,
+    /* 0 was RGB565, which no caller ever used; values stay put for prebuilt libs. */
+    PIXEL_FORMAT_ARGB8888 = 1,
     /**
      * One byte of coverage per pixel, no colour.
      *
@@ -54,7 +54,7 @@ typedef enum
      * serves every colour of the same geometry.  Coverage of a translucent
      * colour is folded into the mask, as gui_circle and gui_rect already do.
      */
-    PIXEL_FORMAT_A8
+    PIXEL_FORMAT_A8 = 2
 } PixelFormat;
 
 typedef enum
@@ -133,12 +133,8 @@ typedef struct
     gui_geometry_run_sink_t *run_sink;
 } DrawContext;
 
-PixelColor create_color_by_format(PixelFormat format, uint8_t r, uint8_t g,
-                                  uint8_t b, uint8_t a);
 PixelColor blend_colors_argb8888(PixelColor bg_color, PixelColor fg_color,
                                  uint8_t alpha);
-PixelColor blend_colors_rgb565(PixelColor bg_color, PixelColor fg_color,
-                               uint8_t alpha);
 
 void init_draw_context(DrawContext *ctx, uint8_t *buffer, int width, int height,
                        PixelFormat format);

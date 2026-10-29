@@ -36,6 +36,10 @@ Core Features
      - :cpp:any:`gui_circle_set_stroke`
    * - Clear Stroke
      - :cpp:any:`gui_circle_clear_stroke`
+   * - Set Glow
+     - :cpp:any:`gui_circle_set_glow`
+   * - Clear Glow
+     - :cpp:any:`gui_circle_clear_glow`
    * - Set Opacity
      - :cpp:any:`gui_circle_set_opacity`
    * - Register Click Event Callback
@@ -65,6 +69,30 @@ The circle widget has the following geometric characteristics:
 - **Perfect Circle**: Ensure perfect geometric circular rendering
 - **Boundary Handling**: Automatically handle clipping with boundaries
 - **Inset Stroke**: Draws the stroke inside the circle without changing widget size
+
+Outer Glow
+----------
+
+An optional outer glow can be drawn around the circle. It is a separate layer
+painted under the body, so the body's fill and stroke are untouched.
+
+.. code-block:: c
+
+   gui_color_t glow = gui_rgba(80, 200, 255, 160);
+   gui_circle_set_glow(circle, glow, 12);   /* 12 px blur radius */
+   gui_circle_clear_glow(circle);
+
+The colour's alpha is the strength; ``blur_radius`` is in pixels, clamped to
+1..32, and 0 switches the glow off. Changing colour or strength re-paints
+without rebuilding the mask.
+
+The mask is stored as one radial strip turned four times around the centre, so
+its size depends on the radius and blur radius together, not on the circle's
+area. The centre is empty and is not stored at all.
+
+The same limitations as the rounded rectangle apply: the glow may overflow a
+parent container, and a glow left on screen after the body scrolls away is only
+cleared by the next redraw of that area.
 
 Gradient Fill
 -------------

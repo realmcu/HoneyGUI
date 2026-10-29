@@ -71,6 +71,10 @@ typedef struct
     bool use_gradient;          /**< Flag to enable gradient rendering. */
     gui_circle_gradient_type_t gradient_type; /**< Gradient type. */
     gui_matrix_t last_matrix;
+
+    gui_color_t glow_color;     /**< Glow colour; its alpha is the strength. */
+    uint8_t glow_blur;          /**< Glow blur radius; 0 disables the glow. */
+    struct gui_geometry_glow *glow;      /**< Glow state, allocated on first use. */
 } gui_circle_t;
 
 /** Which rasterised part a cached payload holds. */
@@ -193,6 +197,30 @@ void gui_circle_set_stroke(gui_circle_t *circle, float width, gui_color_t color)
  * @param circle Circle widget pointer.
  */
 void gui_circle_clear_stroke(gui_circle_t *circle);
+
+/**
+ * @brief Draw an outer glow around the circle.
+ *
+ * The glow is a separate layer drawn under the body: the body's own fill and
+ * stroke are untouched, and changing the glow does not rebuild them.
+ *
+ * Its colour's alpha is the strength, so a dimmer glow is a lower alpha rather
+ * than a different blur.  Changing colour or strength repaints without
+ * rebuilding the mask; changing the radius or blur radius rebuilds it.
+ *
+ * @param circle Circle widget pointer.
+ * @param color Glow colour; alpha 0 switches the glow off.
+ * @param blur_radius Blur radius in pixels, clamped to 1..32.  0 switches the
+ *                    glow off.
+ */
+void gui_circle_set_glow(gui_circle_t *circle, gui_color_t color, uint8_t blur_radius);
+
+/**
+ * @brief Remove the circle's outer glow.
+ *
+ * @param circle Circle widget pointer.
+ */
+void gui_circle_clear_glow(gui_circle_t *circle);
 
 /**
  * @brief Set click callback for the circle.

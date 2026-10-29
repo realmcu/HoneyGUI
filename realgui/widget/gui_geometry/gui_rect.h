@@ -64,6 +64,10 @@ typedef struct
 
     // Matrix cache for change detection
     gui_matrix_t last_matrix;   /**< Cached matrix for change detection. */
+
+    gui_color_t glow_color;     /**< Glow colour; its alpha is the strength. */
+    uint8_t glow_blur;          /**< Glow blur radius; 0 disables the glow. */
+    struct gui_geometry_glow *glow;      /**< Glow state, allocated on first use. */
 } gui_rounded_rect_t;
 
 /** Which rasterised part a cached payload holds. */
@@ -196,6 +200,30 @@ void gui_rect_set_stroke(gui_rounded_rect_t *rect, float width, gui_color_t colo
  * @param rect Pointer to the rect widget.
  */
 void gui_rect_clear_stroke(gui_rounded_rect_t *rect);
+
+/**
+ * @brief Draw an outer glow around the rect.
+ *
+ * The glow is a separate layer drawn under the body: the body's own fill and
+ * stroke are untouched, and changing the glow does not rebuild them.
+ *
+ * Its colour's alpha is the strength, so a dimmer glow is a lower alpha rather
+ * than a different blur.  Changing colour or strength repaints without
+ * rebuilding the mask; changing size, radius or blur radius rebuilds it.
+ *
+ * @param rect Pointer to the rect widget.
+ * @param color Glow colour; alpha 0 switches the glow off.
+ * @param blur_radius Blur radius in pixels, clamped to 1..32.  0 switches the
+ *                    glow off.
+ */
+void gui_rect_set_glow(gui_rounded_rect_t *rect, gui_color_t color, uint8_t blur_radius);
+
+/**
+ * @brief Remove the rect's outer glow.
+ *
+ * @param rect Pointer to the rect widget.
+ */
+void gui_rect_clear_glow(gui_rounded_rect_t *rect);
 
 /**
  * @brief Register a click event callback for the rect widget.

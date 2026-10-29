@@ -18,6 +18,7 @@
 #include "gui_api_os.h"
 #include "gui_message.h"
 #include "gui_geometry_cache.h"
+#include "gui_geometry_glow.h"
 #include "gui_components_init.h"
 
 #ifndef GEOMETRY_BENCH_FRAMES
@@ -44,18 +45,16 @@ typedef enum
     SCENE_CIRCLE_SOLID,
     SCENE_CIRCLE_ALPHA,
     SCENE_CIRCLE_GRADIENT,
-
-    /* A progress ring advanced by end_angle only: the one shape the engine can
-     * extend in place instead of rebuilding.  Paired with a full rebuild of
-     * the same ring so the saving is measured rather than assumed. */
     SCENE_PROGRESS_STEP,
     SCENE_PROGRESS_REBUILD,
+    SCENE_RECT_GLOW,
+    SCENE_CIRCLE_GLOW,
     SCENE_TOTAL
 } bench_scene_t;
 
 typedef enum
 {
-    WIDGET_ARC, WIDGET_RECT, WIDGET_CIRCLE, WIDGET_PROGRESS, WIDGET_TOTAL
+    WIDGET_ARC, WIDGET_RECT, WIDGET_CIRCLE, WIDGET_PROGRESS, WIDGET_GLOW, WIDGET_TOTAL
 } bench_widget_t;
 typedef enum { STYLE_NONE = -1, STYLE_SOLID, STYLE_ALPHA, STYLE_GRADIENT, STYLE_TOTAL } bench_style_t;
 
@@ -97,11 +96,12 @@ static const char *const scene_names[SCENE_TOTAL] =
     "Arc/solid", "Arc/opacity", "Arc/gradient",
     "Rect/solid", "Rect/opacity", "Rect/gradient",
     "Circle/solid", "Circle/opacity", "Circle/gradient",
-    "Progress/step", "Progress/rebuild"
+    "Progress/step", "Progress/rebuild",
+    "Rect/glow", "Circle/glow"
 };
 static const char *const widget_names[WIDGET_TOTAL] =
 {
-    "Arc", "Rect", "Circle", "Progress"
+    "Arc", "Rect", "Circle", "Progress", "Glow"
 };
 static gui_obj_t *page;
 static gui_obj_t *layer;
@@ -138,22 +138,44 @@ static bool is_progress_scene(void)
     return scene == SCENE_PROGRESS_STEP || scene == SCENE_PROGRESS_REBUILD;
 }
 
-static bench_widget_t widget_kind(void)
+/** The glow pair also has no style axis; both use a solid body. */
+static bool is_glow_scene(void)
 {
-    return is_progress_scene() ? WIDGET_PROGRESS
-           : (bench_widget_t)(scene / STYLE_TOTAL);
+    return scene == SCENE_RECT_GLOW || scene == SCENE_CIRCLE_GLOW;
 }
 
-/** STYLE_NONE for the progress pair, which has no style axis. */
+static bench_widget_t widget_kind(void)
+{
+    if (is_progress_scene()) { return WIDGET_PROGRESS; }
+    if (is_glow_scene()) { return WIDGET_GLOW; }
+    return (bench_widget_t)(scene / STYLE_TOTAL);
+}
+
+/** STYLE_NONE for the pairs with no style axis. */
 static bench_style_t style_kind(void)
 {
-    return is_progress_scene() ? STYLE_NONE : (bench_style_t)(scene % STYLE_TOTAL);
+    return (is_progress_scene() || is_glow_scene()) ?
+           STYLE_NONE : (bench_style_t)(scene % STYLE_TOTAL);
+}
+
+/**
+ * Whether the current scene is the last one its widget scores on.
+ *
+ * The HUD holds the finished scene for a second so the combined score can be
+ * read, and it takes the score once every scene of the widget has run.  For the
+ * 3x3 widgets that means the gradient style; the progress and glow pairs have
+ * no style axis, so each names its own final scene.  A style test cannot stand
+ * in for them -- style_kind() is STYLE_NONE for every one of their scenes.
+ */
+static bool is_widget_final_scene(void)
+{
+    if (is_progress_scene()) { return scene == SCENE_PROGRESS_REBUILD; }
+    if (is_glow_scene())     { return scene == SCENE_CIRCLE_GLOW; }
+    return style_kind() == STYLE_GRADIENT;
 }
 
 static uint32_t bench_us(void)
 {
-    /* The port supplies a microsecond clock on every target, so one call covers
-     * the simulator and the boards alike. */
     return gui_us_get();
 }
 
@@ -252,7 +274,7 @@ static void layer_callback(gui_obj_t *obj, T_OBJ_CB_TYPE type)
                           (float)i;
             int dx = (int)(sinf(angle) * 8.0f);
             int dy = (int)(cosf(angle) * 8.0f);
-            if (widget_kind() == WIDGET_RECT)
+            if (widget_kind() == WIDGET_RECT || scene == SCENE_RECT_GLOW)
             {
                 gui_rect_set_position((gui_rounded_rect_t *)shapes[i].obj,
                                       shapes[i].x + dx, shapes[i].y + dy);
@@ -315,9 +337,7 @@ static void end_callback(gui_obj_t *obj, T_OBJ_CB_TYPE type)
     if (complete)
     {
         completed_ms = now;
-        bool widget_scored = is_progress_scene() ? (scene == SCENE_PROGRESS_REBUILD)
-                             : (style_kind() == STYLE_GRADIENT);
-        if (GEOMETRY_BENCH_ONLY_SCENE < 0 && widget_scored)
+        if (GEOMETRY_BENCH_ONLY_SCENE < 0 && is_widget_final_scene())
         {
             bench_score_t *score = &scores[widget_kind()];
             uint32_t combined = fps10(score->frames + result.frames,
@@ -341,6 +361,29 @@ static gui_obj_t *make_shape(unsigned int i, int x, int y, int size)
         gui_arc_t *a = gui_arc_create(layer, "progress", x, y, radius, 270.0f,
                                       270.0f + 40.0f, (float)width, color(i));
         obj = (gui_obj_t *)a;
+    }
+    else if (is_glow_scene())
+    {
+        uint8_t glow_blur = (uint8_t)_UI_MAX(4, _UI_MIN(GUI_GEOMETRY_GLOW_MAX_BLUR,
+                                                        size / 8));
+        gui_color_t glow = color(i + 1u);
+
+        if (scene == SCENE_RECT_GLOW)
+        {
+            x -= size / 2;
+            y -= size / 2;
+            gui_rounded_rect_t *r = gui_rect_create(layer, "rect_glow", x, y, size, size,
+                                                    _UI_MAX(1, size / 5), color(i));
+            gui_rect_set_glow(r, glow, glow_blur);
+            obj = (gui_obj_t *)r;
+        }
+        else
+        {
+            gui_circle_t *c = gui_circle_create(layer, "circle_glow", x, y, size / 2,
+                                                color(i));
+            gui_circle_set_glow(c, glow, glow_blur);
+            obj = (gui_obj_t *)c;
+        }
     }
     else if (widget_kind() == WIDGET_ARC)
     {
@@ -490,9 +533,10 @@ static void finish_scene(void)
     score->peak_bytes = _UI_MAX(score->peak_bytes, peak);
     score->memory_valid = score->memory_valid && memory_supported && memory_stats.consistent;
     score->timing_valid = score->timing_valid && result.clock_excess_us == 0u;
-    /* The 3x3 widgets score across their three styles; the progress pair has
-     * two scenes, so it scores when both have run. */
-    if (score->scenes == (is_progress_scene() ? 2u : (uint32_t)STYLE_TOTAL))
+
+    uint32_t expected_scenes = (is_progress_scene() || is_glow_scene()) ?
+                               2u : (uint32_t)STYLE_TOTAL;
+    if (score->scenes == expected_scenes)
     {
         fps = fps10(score->frames, score->period_us);
         gui_log("WIDGET_SCORE,%u,%s,%u,%u.%u,%u,%u,%u\n",
@@ -522,11 +566,8 @@ static void next_scene(void *obj)
 {
     GUI_UNUSED(obj);
     if (!complete) { return; }
-    /* Hold the finished scene for a second so the combined score can be read;
-     * the same test as the HUD, see end_callback(). */
-    bool widget_scored = is_progress_scene() ? (scene == SCENE_PROGRESS_REBUILD)
-                         : (style_kind() == STYLE_GRADIENT);
-    if (GEOMETRY_BENCH_ONLY_SCENE < 0 && widget_scored &&
+
+    if (GEOMETRY_BENCH_ONLY_SCENE < 0 && is_widget_final_scene() &&
         gui_ms_get() - completed_ms < 1000u)
     {
         return;

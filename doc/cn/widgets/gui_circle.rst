@@ -36,6 +36,10 @@
      - :cpp:any:`gui_circle_set_stroke`
    * - 清除描边
      - :cpp:any:`gui_circle_clear_stroke`
+   * - 设置外发光
+     - :cpp:any:`gui_circle_set_glow`
+   * - 清除外发光
+     - :cpp:any:`gui_circle_clear_glow`
    * - 设置不透明度
      - :cpp:any:`gui_circle_set_opacity`
    * - 注册点击事件回调
@@ -65,6 +69,27 @@
 - **完美圆形**: 确保绘制完美的几何圆形
 - **边界处理**: 自动处理圆形与边界的裁剪
 - **内部描边**: 描边向圆形内部扩展，不改变控件尺寸
+
+外发光
+------
+
+控件可选地绘制一圈外发光。它是独立的一层，画在本体下方，本体的填充和描边
+都不受影响。
+
+.. code-block:: c
+
+   gui_color_t glow = gui_rgba(80, 200, 255, 160);
+   gui_circle_set_glow(circle, glow, 12);   /* 12 像素模糊半径 */
+   gui_circle_clear_glow(circle);
+
+颜色的 alpha 即发光强度；``blur_radius`` 单位为像素，钳到 1..32，传 0 等同
+关闭。改颜色或强度只重绘，不重建掩膜。
+
+掩膜按一条径向条块绕中心旋转四次存储，所以大小取决于半径和模糊半径，
+而不是圆的面积。中心区域为空，完全不存储。
+
+限制与圆角矩形相同：发光可以溢出父容器；本体滚出屏幕后留在屏内的发光，
+要等该区域下一次重绘才会清掉。
 
 渐变色填充
 ----------
