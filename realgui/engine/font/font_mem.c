@@ -1716,7 +1716,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         line_start_index = i;
                         chr[i].x = rect->x1;
                     }
-                    else if (chr[i - 1].unicode == 0x0A)
+                    else if (i > 0 && chr[i - 1].unicode == 0x0A)
                     {
                         line_buf[line].index = i - 1;
                         line_buf[line].offset = (rect_w - chr[i].x + rect->x1 + letter_spacing * 2) / 2 *
@@ -1919,7 +1919,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         line_start_index = i;
                         chr[i].x = rect->x1;
                     }
-                    else if (chr[i - 1].unicode == 0x0A)
+                    else if (i > 0 && chr[i - 1].unicode == 0x0A)
                     {
                         line++;
                         line_start_index = i;
