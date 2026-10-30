@@ -42,12 +42,45 @@ static void gui_win_input_process(gui_obj_t *obj)
     (void)obj;
 }
 
+static void gui_win_apply_rotation(gui_obj_t *obj, gui_win_t *this)
+{
+    if (this->degrees == 0.0f)
+    {
+        return;
+    }
+
+    float cx = obj->w / 2.0f;
+    float cy = obj->h / 2.0f;
+
+    matrix_translate(cx, cy, obj->matrix);
+    matrix_rotate(this->degrees, obj->matrix);
+    matrix_translate(-cx, -cy, obj->matrix);
+}
+
+static void gui_win_apply_scale(gui_obj_t *obj, gui_win_t *this)
+{
+    if (this->scale == 1.0f && this->scale_y == 1.0f)
+    {
+        return;
+    }
+
+    float cx = obj->w / 2.0f;
+    float cy = obj->h / 2.0f;
+
+    matrix_translate(cx, cy, obj->matrix);
+    matrix_scale(this->scale, this->scale_y, obj->matrix);
+    matrix_translate(-cx, -cy, obj->matrix);
+}
+
 static void prepare(gui_obj_t *obj)
 {
     // touch_info_t *tp = tp_get_info();
     // kb_info_t *kb = kb_get_info();
     gui_win_t *this = (void *)obj;
     GUI_UNUSED(this);
+
+    gui_win_apply_rotation(obj, this);
+    gui_win_apply_scale(obj, this);
 
     matrix_translate(-this->compensate_x, -this->compensate_y, obj->matrix);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
@@ -180,6 +213,8 @@ void gui_win_ctor(gui_win_t  *this,
     GET_BASE(this)->has_post_process_cb = true;
     GET_BASE(this)->type = WINDOW;
     this->blur_degree = 225;
+    this->scale = 1.0f;
+    this->scale_y = 1.0f;
 }
 
 /*============================================================================*
@@ -281,6 +316,16 @@ void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float s
     }
     win->scale = scale_rate_horizontal;
     win->scale_y = scale_rate_vertical;
+}
+void gui_win_set_rotation(gui_win_t *win, float degrees)
+{
+    if (win == NULL)
+    {
+        // Handle error: window structure is NULL
+        gui_log("Cannot set rotation: win is NULL\n");
+        return;
+    }
+    win->degrees = degrees;
 }
 void gui_win_set_scope(gui_win_t *win, bool enable)
 {

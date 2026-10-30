@@ -31,6 +31,7 @@ typedef struct gui_win
     float compensate_y;              /* Compensate in Y direction for tp event judgment. */
     float scale;
     float scale_y;
+    float degrees;                   /* Clockwise rotation about the win centre. */
     bool press_flag;
     bool long_flag;
     bool release_flag;
@@ -157,13 +158,64 @@ void gui_win_click(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 void gui_win_hold_tp(gui_win_t *_this, bool hold_tp);
 
 /**
- * @brief Set the scale rate for the window both horizontally and vertically.
+ * @brief Scale the window, and with it everything inside it, about the window's
+ *        own centre.
+ *
+ * THE PIVOT IS THE WIN'S CENTRE, NOT EACH CHILD'S.  Same model as
+ * gui_win_set_rotation(): the win contributes one matrix to the whole subtree,
+ * so the children scale as a single rigid body.  A child sitting off-centre
+ * therefore travels away from (w/2, h/2) rather than growing in place.  A
+ * child's own transform still composes with this one.
+ *
+ * Rotation and scale are applied together as T(+c) * R * S * T(-c), i.e. scale
+ * first, then rotate.  The order only matters when the win is non-square and the
+ * two scale rates differ.
  *
  * @param win Pointer to the window structure.
- * @param scale_rate_horizontal Horizontal scale rate.
- * @param scale_rate_vertical Vertical scale rate.
+ * @param scale_rate_horizontal Horizontal scale rate; 1.0 is the identity.
+ * @param scale_rate_vertical Vertical scale rate; 1.0 is the identity.
+ *
+ * @note A zero rate collapses the subtree to a line or a point.  The ctor seeds
+ *       both rates to 1.0f, so a win never scales until this is called.
+ * @note Unlike gui_win_set_rotation(), this composes with blur: the blur rect is
+ *       derived from the scale terms, so a scale-only win keeps an accurate blur
+ *       area.  Off-screen culling keeps working too, because it accepts a matrix
+ *       with scale and translation as long as the rotation terms are zero
+ *       (gui_obj_out_screen()).  Touch hit-testing still has the rotation
+ *       caveat, however: gui_obj_point_in_obj_rect() tests the axis-aligned
+ *       bounding box of the transformed rectangle, so the empty corners around a
+ *       shrunk win count as hits.  Combined with a rotation, culling stops as
+ *       well.
  */
 void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical);
+
+/**
+ * @brief Rotate the window, and with it everything inside it, about the window's
+ *        own centre.
+ *
+ * THE PIVOT IS THE WIN'S CENTRE, NOT EACH CHILD'S.  The win contributes one
+ * matrix to the whole subtree below it, so the children turn as a single rigid
+ * body: each keeps its position and orientation RELATIVE to the win, and the
+ * point that stays still is (w/2, h/2) in win-local coordinates. A child sitting
+ * off-centre therefore travels along an arc rather than spinning in place.
+ *
+ * A child's own transform still composes with this one -- an image with its own
+ * gui_img_rotation() ends up at the sum of the two angles, spinning about its own
+ * focus while orbiting the win centre.
+ *
+ * @param win Pointer to the window structure.
+ * @param degrees Clockwise absolute angle, in degrees; 0 disables the rotation.
+ *                Clockwise because screen Y grows downward.
+ *
+ * @note w and h are the win's OWN size, so a win created with w=h=0 (a
+ *       full-screen container, say) has its centre at (0,0) and turns about its
+ *       top-left corner. Give the win the size of the area it should turn about.
+ * @note Two framework behaviours change once this is non-zero, neither of them
+ *       specific to this function -- see the notes in gui_win.c at
+ *       gui_win_apply_rotation(): touch hit-testing widens to the bounding box of
+ *       the rotated rectangle, and off-screen culling stops happening at all.
+ */
+void gui_win_set_rotation(gui_win_t *win, float degrees);
 
 /**
  * @brief Enable or disable the scope for the window.
