@@ -2,7 +2,7 @@ public_api_review_config:
   release_scope: sdk   # sdk or module， module: only used by other modules; sdk: publish in sdk release package
   rules:
     - glob_paths:   # glob patterns, same as .gitignore; supports ** globbing
-        - include/**/public_api.h
-        - include/public_api/*.h
+        - 'include/**/public_api.h'
+        - 'include/public_api/*.h'
       required_reviewers:
         - catherine_guo
