@@ -198,7 +198,7 @@ uint8_t *gui_rle_solid_color_create(uint16_t width, uint16_t height, gui_color_t
     p += 4;
 
     /* ---- 4. RLE compressed data ---- */
-    uint8_t pix[3];
+    uint8_t pix[3] = {0};
     uint8_t r = color.color.rgba.r;
     uint8_t g = color.color.rgba.g;
     uint8_t b = color.color.rgba.b;

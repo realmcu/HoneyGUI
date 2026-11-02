@@ -82,6 +82,8 @@ static void prepare(gui_obj_t *obj)
     gui_win_apply_rotation(obj, this);
     gui_win_apply_scale(obj, this);
 
+    obj->opacity_value = obj->opacity_value * this->opacity_value / UINT8_MAX;
+
     matrix_translate(-this->compensate_x, -this->compensate_y, obj->matrix);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
@@ -213,6 +215,7 @@ void gui_win_ctor(gui_win_t  *this,
     GET_BASE(this)->has_post_process_cb = true;
     GET_BASE(this)->type = WINDOW;
     this->blur_degree = 225;
+    this->opacity_value = UINT8_MAX;
     this->scale = 1.0f;
     this->scale_y = 1.0f;
 }
@@ -354,15 +357,10 @@ int gui_win_get_y(gui_win_t *win)
     GUI_ASSERT(GUI_BASE(win)->type == WINDOW);
     return GUI_BASE(win)->y;
 }
-void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)
+void gui_win_set_opacity(gui_win_t *win, uint8_t opacity_value)
 {
-    if (win == NULL)
-    {
-        // Handle error: window structure is NULL
-        gui_log("Cannot set opacity: win is NULL\n");
-        return;
-    }
-    GUI_BASE(win)->opacity_value = opacity_value;
+    GUI_ASSERT(GUI_BASE(win)->type == WINDOW);
+    win->opacity_value = opacity_value;
 }
 
 void gui_win_prepare_global(gui_obj_t *obj)

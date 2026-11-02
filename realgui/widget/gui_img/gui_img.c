@@ -770,19 +770,28 @@ void gui_img_skew_y(gui_img_t *_this, float degrees)
 
 void gui_img_a8_recolor(gui_img_t *_this, uint32_t fg_color_set)
 {
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     gui_img_set_mode(_this, IMG_2D_SW_FIX_A8_FG);
     _this->fg_color_set = fg_color_set;
 }
 
 void gui_img_a8_fix_bg(gui_img_t *_this, uint32_t bg_color_fix)
 {
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     _this->bg_color_fix = bg_color_fix;
     gui_img_set_mode(_this, IMG_2D_SW_FIX_A8_BGFG);
 }
 
-void gui_img_a8_mix_alpha(gui_img_t *_this, uint32_t alpha_mix)
+void gui_img_a8_mix_alpha(gui_img_t *_this, uint8_t alpha_mix)
 {
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     _this->opacity_value = alpha_mix;
+}
+
+void gui_img_a8_blur_degree(gui_img_t *_this, uint8_t blur_degree)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    _this->opacity_value = blur_degree;
 }
 
 void gui_img_clip(gui_img_t *_this, bool clip)

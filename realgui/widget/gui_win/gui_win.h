@@ -41,6 +41,7 @@ typedef struct gui_win
     bool hold_tp;
     void *blur_param;
     uint8_t blur_degree;
+    uint8_t opacity_value;
 } gui_win_t;
 
 /*============================================================================*
@@ -231,7 +232,7 @@ void gui_win_set_scope(gui_win_t *win, bool enable);
  * @param win Pointer to the window structure.
  * @param opacity_value Desired opacity value to set.
  */
-void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value);
+void gui_win_set_opacity(gui_win_t *win, uint8_t opacity_value);
 
 /**
  * @brief Window widget prepare.

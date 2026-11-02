@@ -379,7 +379,12 @@ void gui_img_a8_fix_bg(gui_img_t *_this, uint32_t bg_color_mix);
 /**
  * @brief Sets the alpha mixing value for the A8 image widget.
  */
-void gui_img_a8_mix_alpha(gui_img_t *_this, uint32_t alpha_mix);
+void gui_img_a8_mix_alpha(gui_img_t *_this, uint8_t alpha_mix);
+
+/**
+ * @brief Sets the blur degree for the A8 image widget. Blend mode should be set to `IMG_A8_BLUR`.
+ */
+void gui_img_a8_blur_degree(gui_img_t *_this, uint8_t blur_degree);
 
 /**
  * @brief Creates a solid-color RLE image buffer.
