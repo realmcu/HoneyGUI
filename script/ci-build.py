@@ -14,7 +14,6 @@ import time
 import argparse
 import shutil
 import importlib
-from helper.keil_helper import *
 from project_update import *
 from build.sdk_build import *
 

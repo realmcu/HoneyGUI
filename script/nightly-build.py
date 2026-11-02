@@ -15,21 +15,26 @@ import glob
 import argparse
 import shutil
 import importlib
+
 from project_update import *
 from build.sdk_build import *
 
-honeyRepo_env = "HoneyRepo"
-manifest_path_env = "manifest"
+west_home = os.environ.get("WestHome")
+jenkinsBuild_home = os.environ.get("jenkinsScript_abspath")
+JenkinsBuild_util_Dir = os.path.join(jenkinsBuild_home, "utils")
+JenkinsBuild_jenkins_Dir = os.path.join(jenkinsBuild_home, "jenkins")
+current_prj_path = os.environ.get("current_prj_abspath")
+current_prj_name = os.environ.get("current_prj_name")
+honeygui_path = os.path.join(west_home, r"zephyrproject/modules/honeygui")
+yaml_path = os.environ.get("yaml_abs_path")
 
-honeyRepo_uitl_dir = os.path.join(os.environ.get(honeyRepo_env), "build", "utils")
+print("west_home: ", west_home)
+print("JenkinsBuild_util_Dir", JenkinsBuild_util_Dir)
+print("jenkins base", JenkinsBuild_jenkins_Dir)
+print("subGitPath", current_prj_path)
 
-print("repo home: ", os.environ[honeyRepo_env])
-print("honeyRepo_uitl_dir", honeyRepo_uitl_dir)
-print("jenkins base", os.path.join(os.environ[honeyRepo_env], "build", "jenkins"))
-print(os.path.join(os.environ[honeyRepo_env], "build", "jenkins"))
-
-sys.path.append(os.path.join(os.environ[honeyRepo_env], "build", "jenkins"))
-sys.path.append(honeyRepo_uitl_dir)
+sys.path.append(JenkinsBuild_util_Dir)
+sys.path.append(JenkinsBuild_jenkins_Dir)
 
 from repo_helper import *
 from jenkins_base import JenkinsCheckBase
@@ -59,7 +64,7 @@ def send_mail(err_msg = None, attachment_file = None):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='HoneyPatch CI build script')
+    parser = argparse.ArgumentParser(description='HoneyGUI nightly build script')
     parser.add_argument('-c', '--chipType', help='Set the chip type')
     arg_dict = parser.parse_args()
     chip_type = arg_dict.chipType
@@ -104,10 +109,7 @@ if __name__ == '__main__':
     '''repo.git.checkout('--', '.')
     repo.git.clean('-dfx')'''
     #keil
-    local_submodule_path={
-        "honeygui": os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    }
-    keil_builder = SDKBuild(os.environ.get("manifest"), os.environ.get("HoneyRepo"), chip_type, local_submodule_path)
+    keil_builder = SDKBuild(yaml_path, west_home, chip_type)
     print("call build {}".format(chip_type))
     if not keil_builder.build_all_keil_projects(title="honeygui", all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path"), error_record_path=os.path.join(os.getcwd(), "error_record_{}".format(chip_type))):
         log_file = sorted(glob.glob(os.path.join(os.path.join(os.getcwd(), "error_record_{}".format(chip_type)), '*.txt')), reverse=True)[0]

@@ -14,6 +14,7 @@ import groovy.transform.Field
 
 // projects name in yaml
 @Field def STRING_HONEYGUI = "honeygui"
+@Field def STRING_HMI = "hmi"
 
 @Field def HONEYGUI_BRANCH_NAME = null
 @Field def HONEYGUI_ABSPATH = null
@@ -24,6 +25,7 @@ import groovy.transform.Field
 HONEYGUI_BRANCH_NAME = env["${STRING_HONEYGUI}_${STRING_REVISION}"]
 HONEYGUI_ABSPATH = env["${STRING_HONEYGUI}_${STRING_ABS_PATH}"]
 HONEYGUI_RELATIVE_PATH_TO_WORKSPACE = env["${STRING_HONEYGUI}_${STRING_RELATIVE_PATH_TO_WORKSPACE}"]
+HMI_RELATIVE_PATH_TO_WORKSPACE = env["${STRING_HMI}_${STRING_RELATIVE_PATH_TO_WORKSPACE}"]
 CURRENT_PROJECT_NAME = env['current_prj_name']
 echo "HONEYGUI_BRANCH_NAME: ${HONEYGUI_BRANCH_NAME}"
 echo "HONEYGUI_ABSPATH: ${HONEYGUI_ABSPATH}"
@@ -31,8 +33,7 @@ echo "HONEYGUI_RELATIVE_PATH_TO_WORKSPACE: ${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE
 echo "CURRENT_PROJECT_NAME: ${CURRENT_PROJECT_NAME}"
 //JENKINS_SCRIPT_RELAVE_PATH_TO_WORKSPACE = env["${STRING_JENKINS_SCRIPT}_${STRING_RELATIVE_PATH_TO_WORKSPACE}"]
 
-@Field def SDK_PATH_RELATIVE_TO_REPO_HOME = ''
-@Field def SDK_BRANCH = ''
+@Field def retryCount = 3
 
 HONEYGUI_BRANCH_CUT_MAP = [
     "master":[
@@ -43,30 +44,25 @@ HONEYGUI_BRANCH_CUT_MAP = [
 ]
 
 @Field def test_module_map = [
-    // "HoneyGUI_CMD": [
-    //     "label": "HoneyGUI",
-    //     "Test": 1,
-    //     "displayNmae": "HoneyGUI_CMD",
-    //     "testResult": true
-    // ],
-    // "HoneyGUI_Simulator": [
-    //     "label": "HoneyGUI",
-    //     "Test": 0,
-    //     "displayNmae": "HoneyGUI_Simulator",
-    //     "testResult": true
-    // ],
-    "HoneyGUI_Zephyr": [
+    "HoneyGUI_CMD": [
         "label": "HoneyGUI",
         "Test": 0,
+        "displayNmae": "HoneyGUI_CMD",
+        "testResult": true
+    ],
+    "HoneyGUI_Simulator": [
+        "label": "HoneyGUI",
+        "Test": 0,
+        "displayNmae": "HoneyGUI_Simulator",
+        "testResult": true
+    ],
+    "HoneyGUI_Zephyr": [
+        "label": "bb2u-bcut-honeygui-RTL8783GBF",
+        "Test": 1,
         "displayNmae": "HoneyGUI_Zephyr",
         "testResult": true
     ]
 ]
-
-
-Need_Test = false
-temp_label_prefix = ""
-retryCount = 3
 
 
 def emptyFolder(folderName){
@@ -107,7 +103,7 @@ def check_test_necessary_by_commit_msg()
     if(['spec', 'debug', 'doc'].contains(module)){
         echo "${subject} no need to test"
         return false
-    }else if(module == 'script' && sub_module !="ci"){
+    }else if(module == 'script' && sub_module != "ci"){
         echo "${subject} change will not change ci, skip"
         return false
     }else{
@@ -125,7 +121,6 @@ def set_test_nessary(sdk_branch, manifest_len, chip_type){
         Need_Test = false
         cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"Test for ${sdk_branch} ${chip_type} is not supported\" "
     }
-
     if(!check_test_necessary_by_commit_msg()){
         cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"Skip test for ${params.GERRIT_CHANGE_SUBJECT} ${chip_type}\" "
         Need_Test = false
@@ -138,12 +133,12 @@ def set_test_nessary(sdk_branch, manifest_len, chip_type){
 
 
 def get_prj_info_by_group_name(all_project, proj_group_name){
-    for(p in all_project){
-        if(p["groups"][0] == proj_group_name){
-            return p
-        }
+    def p = all_project[proj_group_name]
+    if(p == null){
+        echo "can not find project ${proj_group_name}"
+        return [:]
     }
-    return [:]
+    return p
 }
 
 
@@ -181,7 +176,7 @@ def do_ci_build(current_project_detail, all_project, yaml_len, West_Home, Manife
 
 def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_Home, Manifest_Path, chip_type){
     timestamps{
-        set_test_nessary(get_prj_info_by_group_name(all_project, STRING_HONEYGUI)['branch'], manifest_len, chip_type)
+        set_test_nessary(get_prj_info_by_group_name(all_project, STRING_HONEYGUI)['revision'], manifest_len, chip_type)
         if(!Need_Test){
             echo "No need to do test, return"
             return
@@ -214,9 +209,12 @@ def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_H
 
 
             dir("${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}/script"){
-                stash includes: "ftp/download_test_files.py, ftp/ftp_helper.py", name: "Test-Script"
+                stash includes: "ftp/download_test_files.py, ftp/ftp_helper.py, peripheral/, test/, base/", name: "Test-Script"
             }
-
+            dir("${HMI_RELATIVE_PATH_TO_WORKSPACE}"){
+                stash includes: "scripts/flash-win32-app.bat, scripts/tool/mpcli/mpcli.exe, scripts/tool/mpcli/config/**, scripts/tool/mpcli/fw/RTL87X3G/**, bin/",
+                    name: "Download-Tool"
+            }
             dir("${WORKSPACE}/${HONEYGUI_RELATIVE_PATH_TO_WORKSPACE}/script"){
                 stash includes: "base/parse_json.py, \
                                  ftp/ftp_helper.py, ftp/copy_script.py, \
@@ -240,11 +238,9 @@ def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home
             continue
         }
         def build_name = test_module_map[test_module]["displayNmae"]
-        echo "2"
         builders["${build_name}"] = {
             throttle([HONEYGUI_BRANCH_CUT_MAP[HONEYGUI_BRANCH_NAME]["cutThrottle"]]){
                 try{
-                    echo "3"
                     def is_env_error = true
                     def test_result = false
                     retry(retryCount){
@@ -260,9 +256,13 @@ def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home
                                         echo "execute ${build_name} test on node ${NODE_NAME}"
                                         emptyFolder("SRC")
                                         emptyFolder("script")
+                                        emptyFolder("applications")
                                         emptyFolder("log")
                                         dir("script"){
                                             unstash "Test-Script"
+                                        }
+                                        dir("applications"){
+                                            unstash "Download-Tool"
                                         }
                                         try{
                                             exe_cmd("python script/ftp/download_test_files.py --module ${test_module}")

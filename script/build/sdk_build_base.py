@@ -5,7 +5,7 @@ import itertools
 import subprocess
 import json
 
-default_yml_name = r"rtl87x3g-sdk-zephyr_ci.yml"
+default_yml_name = r"rtl8783gbf-evb-honeygui.yml"
 chip_type = 'rtl87x3g'
 westHome_env = "WestHome"
 yaml_path_env = "yaml_abs_path"

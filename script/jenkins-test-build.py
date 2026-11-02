@@ -78,6 +78,7 @@ def get_file_single(pathname):
 #     CopyImage.copy_image_to_ftp(build_dict_dir, build_dict_dir, os.path.dirname(bin_relative_dir), module_name)
 
 def HoneyGUI_Zephyr_preBuild():
+    repo = git.Repo(search_parent_directories=True)
     config_path = r'prj.conf'
     with open(config_path, mode='r', newline='', errors='surrogateescape') as fd:
         stream = fd.read()
@@ -85,14 +86,14 @@ def HoneyGUI_Zephyr_preBuild():
     stream = re.sub(r'^(CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET=y)', r'CONFIG_REALTEK_BUILD_EMBEDED_TEST=y', stream, count=1, flags=re.M)
     with open(config_path, mode='w+', newline='', errors='surrogateescape') as fd:
         fd.write(stream)
-    print(f"git diff {config_path}")
-    subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
+    print(repo.git.diff(config_path))
 
 def HoneyGUI_Zephyr_afterBuild():
+    repo = git.Repo(search_parent_directories=True)
     config_path = r'prj.conf'
-    subprocess.check_call(["git", "checkout", "--", config_path], cwd=HONEYGUI_ROOT)
+    repo.git.checkout("--", config_path)
     print(f"after checkout {config_path}")
-    subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
+    print(repo.git.diff(config_path))
 
 HoneyGUI_build_hook = {
     # "HoneyGUI_CMD": {
@@ -109,7 +110,7 @@ def build_honeyGUI_zephyr(build_type, module_name):
     os.chdir(application_path)
     if HoneyGUI_build_hook.get(module_name, {}).get("PreBuild"):
         HoneyGUI_build_hook.get(module_name, {}).get("PreBuild")()
-    subprocess.check_call([r'scripts/build.bat'], universal_newlines=True)#, cwd=os.path.join(HONEYGUI_ROOT, "win32_sim")
+    subprocess.check_call([r'.\scripts\build.bat'], universal_newlines=True)
     if HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild"):
         HoneyGUI_build_hook.get(module_name, {}).get("AfterBuild")()
     #os.chdir(os.path.join(west_home, r"zephyrproject/modules/honeygui"))

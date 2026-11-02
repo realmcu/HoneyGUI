@@ -1,14 +1,42 @@
 import groovy.json.JsonSlurper
-import org.apache.tools.ant.types.resources.selectors.None
 import groovy.transform.Field
 
-properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '60', artifactNumToKeepStr: '', daysToKeepStr: '60', numToKeepStr: '')),
-           disableResume(), pipelineTriggers([cron("""H 21 * * 1-5
+@Field def SRC_HOME = "SRC"
+@Field def HoneyRepo_Home = "${SRC_HOME}\\HoneyRepo"
+env.MANIFEST_PROJECT = "HoneyRepo/manifest"
+env.MANIFEST_BRNACH = "west"
+@Field def STRING_WEST_HOME = "WestHome"
 
-""")])])
+//STRING_SDK = "sdk"
+@Field def STRING_HONEYGUI = "honeygui"
+@Field def STRING_RELATIVE_PATH_TO_WORKSPACE = "relativepath_to_workspace"
+@Field def STRING_RELATIVE_PATH_TO_WESTTOP = "relativepath_to_westtop"
+@Field def STRING_ABS_PATH = "abspath"
+@Field def STRING_REVISION = "revision" // can be branch name, revision or tag
 
-// Skip test for bypassed or deprecated branches
-// Each item contains Branch name, Status and Reason
+@Field def BuildScript_Home = "${SRC_HOME}\\build"
+@Field def BuildScript_Project = "HoneyRepo/build"
+@Field def BuildScript_Branch = "v2"
+env["BUILD_SCRIPT_PATH"] = BuildScript_Home
+@Field def is_SD = false
+@Field def Temp_Dir = "temp"
+
+// assigned in set_west_project_env(), used at top level
+@Field def HONEYGUI_BRANCH_NAME = null
+@Field def HONEYGUI_ABSPATH = null
+@Field def HONEYGUI_RELAVE_PATH_TO_WORKSPACE = null
+
+@Field def branch_name_list = [
+    "master": [
+        "manifest": "bb2ultra\\rtl87x3g\\rtl8783gbf-evb-honeygui.yml",
+        "repo": "HoneyGUI",
+        "script_path": "zephyrproject\\modules\\honeygui\\script",
+        "project":"HoneyGui",
+        "stream":"gui-engine-master",
+        "view_id":"-1"
+    ]
+]
+
 
 def emptyFolder(folderName){
     if (fileExists("${folderName}")){
@@ -19,224 +47,234 @@ def emptyFolder(folderName){
     }
 }
 
-@Field def BRANCH_NAME = "guiEngine-master"
-@Field def COV_VIEW_MAP = [
-    "guiEngine-master":[
-        "project":"HoneyGui",
-        "stream":"gui-engine-master",
-        "view_id":"-1"
-    ]
-]
 
-@Field def SRC_HOME = "SRC"
-@Field def HoneyRepo_Home = "${SRC_HOME}\\HoneyRepo"
-@Field def Manifest_Home = "${SRC_HOME}\\HoneyRepo\\.repo\\manifest"
-
-
-def do_code_checkout(relative_dir, url, project, branch_name, ref_spec, revision)
-{
-    echo "do_code_checkout: ${relative_dir} ${url} ${project} ${branch_name} ${ref_spec} ${revision}"
-    if (fileExists("${relative_dir}/.git/index.lock")){
-        bat "del ${WORKSPACE}\\${relative_dir}\\.git\\index.lock /f /q"
-    }
-     def is_commit_id = false
-     def p2 = ~/[0-9a-zA-Z]{12}/
-     def matcher = (revision =~ p2)
-     if(matcher.getCount() > 0){
-        echo "${revision}'s version is commitID"
-        is_commit_id = true
-    }else{
-        is_commit_id = false
-    }
-
-    if(ref_spec.size() > 0)
-    {
-        timestamps{
-            try_time = 0
-            retry(3) {
-                try_time += 1
-                if(try_time > 1){
-                    sleep time: 2, unit: 'MINUTES'
-                }
-                echo "checkout ${project} ${branch_name} ${ref_spec}"
-                honeyComb_src_check_res = checkout([$class: 'GitSCM', 
-                                            branches: [[name: "${branch_name}"]], 
-                                            doGenerateSubmoduleConfigurations: false, 
-                                            extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${relative_dir}"], [$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: true, reference: '', shallow: false, timeout: 50], [$class: 'BuildChooserSetting', buildChooser: [$class: 'GerritTriggerBuildChooser']]],
-                                            submoduleCfg: [],
-                                            userRemoteConfigs: [[credentialsId: 'a47475ae-3cc6-4172-9baf-8b472d834b9f', refspec: "${ref_spec}", url: "${url}/${project}"]]])
-            }
-        }
-    }else if(is_commit_id == true)
-    {
-        timestamps {
-            try_time = 0
-            retry(3) {
-                try_time += 1
-                if (try_time > 1) {
-                    sleep time: 2, unit: 'MINUTES'
-                }
-                echo "checkout ${project} ${branch_name}  by commitID ${revision}"
-                checkout_res = checkout([$class: 'GitSCM',
-                                         branches: [[name: "${revision}"]],
-                                         doGenerateSubmoduleConfigurations: false,
-                                         extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${relative_dir}"], [$class: 'CloneOption', noTags: true, reference: '', shallow: false, timeout: 50], [$class: 'CleanBeforeCheckout']],
-                                         submoduleCfg: [],
-                                         userRemoteConfigs: [[credentialsId: 'a47475ae-3cc6-4172-9baf-8b472d834b9f', name: 'origin', refspec: "+refs/heads/${branch_name}:refs/remotes/origin/${branch_name}", url: "${url}/${project}"]]])
-            }
-        }
-    }else{
-        timestamps{
-            try_time = 0
-            retry(3) {
-                try_time += 1
-                if(try_time > 1){
-                    sleep time: 2, unit: 'MINUTES'
-                }
-                echo "checkout ${project} ${branch_name} ${revision} by branch name"
-                checkout_res = checkout([$class: 'GitSCM',
-                                        branches: [[name: "refs/heads/${revision}"]],
-                                        doGenerateSubmoduleConfigurations: false,
-                                        extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${relative_dir}"],[$class: 'CloneOption', noTags: true, reference: '', shallow: false, timeout: 50], [$class: 'CleanBeforeCheckout']],
-                                        submoduleCfg: [],
-                                        userRemoteConfigs: [[credentialsId: 'a47475ae-3cc6-4172-9baf-8b472d834b9f', name: 'origin', refspec: "+refs/heads/${revision}:refs/remotes/origin/${revision}", url: "${url}/${project}"]]])
-            }
-        }
-    }
-    dir("${relative_dir}"){
-        bat(label: '', returnStdout: true, script: """
-git fetch""")
-        
-        git_log = bat(label: '', returnStdout: true, script: """@echo off
-
-
-git log -1 HEAD --pretty=oneline""")
-        echo "${project}-${branch_name}: ${git_log}"
-    }
-}
-
-
-def get_project_info_from_manifest(manifest_path)
-{
-    def input = readFile(manifest_path)
-    def all_projects = []
-    def current_project = ""
-    def all_remotes =  [:]
-    def manifest = new XmlSlurper().parseText(input)
-
-    def remote_size = manifest.remote.size()
-
-    for(def i = 0; i <  remote_size; i++)
-    {
-        def r = manifest.remote[i]
-        def r_name = "${r['@name']}"
-        def r_url = "${r['@fetch']}"
-        all_remotes[r_name] = ["url": r_url]
-    }
-
-    def default_remote_name = "${manifest.default['@remote']}"
-    def project_size = manifest.project.size()
-    for(def i = 0; i <  project_size; i++){
-        def p = manifest.project[i]
-        def p_name = "${p['@name']}"
-        def p_path = "${p['@path']}"
-        def p_revision = "${p["@revision"]}"
-        def p_branch = "${p["@dest-branch"]}"
-        def p_groups = "${p["@groups"]}".split()
-
-        def p_remote = "${p['@remote']}"
-        if(p_remote.size() > 0){
-            p_remote = all_remotes[p_remote]["url"]
+def exe_cmd(cmd, return_res=false){
+    if(isUnix()){
+        if(return_res){
+            return sh(returnStdout: true, encoding: 'utf-8', script: """#!/usr/bin/bash -l\n"""+cmd)
         }else{
-            p_remote = all_remotes[default_remote_name]["url"]
+            sh(encoding: 'utf-8', script: """#!/usr/bin/bash -l\n"""+cmd)
         }
-        def t_project = [
-                "name": p_name,
-                "path": p_path,
-                "revision": p_revision,
-                "branch": p_branch,
-                "url": p_remote,
-                "groups": p_groups,
-                "ref_spec": ""]
-        if((p_name == params["GERRIT_PROJECT"]) && (p_branch == params["GERRIT_BRANCH"])){
-            t_project["ref_spec"] = params["GERRIT_REFSPEC"]
+    }else{
+        if(return_res){
+            return bat(label: '', returnStdout: true, encoding: 'utf-8', script: """@echo off \n"""+cmd)
+        }else{
+            bat(label: '', encoding: 'utf-8', script: cmd)
         }
-        all_projects = all_projects + [t_project]
-    }
-    return all_projects
-}
-
-
-def check_out_project(all_projects){
-    for(def p in all_projects){
-        if(p["name"].indexOf("protected/") == 0){
-            echo "${p['name']} can not check on OA"
-            continue 
-        }
-        do_code_checkout("${HoneyRepo_Home}\\${p['path']}",
-            "${p['url']}",
-            "${p['name']}",
-            "${p['branch']}",
-            "${p['ref_spec']}",
-            "${p['revision']}")
+        
     }
 }
 
+def group_filter_decoration(t_group_filter=""){
+    if(is_SD == false){
+        t_group_filter += ",-protected"
+    }
 
-def get_single_project_info_from_all_project_list(all_projects, single_project_group_name){
-    for(def p in all_projects){
-        echo "${p['groups'][0]}  ${single_project_group_name}"
-        if(p["groups"][0] == single_project_group_name){
-            return p
-        }
+    if(t_group_filter.length() == 0){
+        return ""
+    }
+
+    t_group_filter = t_group_filter.replaceFirst("^,","")
+    t_group_filter = "-- ${t_group_filter}"
+    return t_group_filter
+}
+
+def get_module_version_info(module_dir){
+    dir(module_dir){
+        def res = exe_cmd("""git log -1 HEAD --pretty=%%H""",true).trim()
+        return res
     }
 }
 
 
-def copy_depend_script(rom_path, rom_branch){
-    echo "${rom_path}"
-    echo "${rom_branch}"
-    bat "copy \"D:\\local_depend_script\\${rom_branch}\\nightly-build.py\" ${rom_path}\\script"
+def do_manifest_init(jenkinsCommonlibManagement, jenkinsGitManagement, jenkinsWestManagement, yaml_file_path){
+    // return [git_log, manifest_path]
+    def branch_changeID_list = [:]
+    jenkinsWestManagement.do_west_init("${HoneyRepo_Home}", "${GIT_URL}/${MANIFEST_PROJECT}", "${MANIFEST_BRNACH}", "default.yaml")
+    // to do call west config -D twice to check if error happens
+
+    def manifest_path = ""
+    dir("${HoneyRepo_Home}"){
+        jenkinsWestManagement.set_west_config("manifest", "group-filter", group_filter_decoration())
+        manifest_path = jenkinsWestManagement.get_west_config("manifest", "path")
+    }
+
+    manifest_path = "${HoneyRepo_Home}\\${manifest_path}"
+    echo "manifest_path -> ${manifest_path}"
+
+    def git_log = ""
+
+    dir("${manifest_path}"){
+        jenkinsGitManagement.do_git_clean()
+    }
+    jenkinsGitManagement.do_code_clone("${manifest_path}", "${GIT_URL}", "HoneyRepo/manifest", "west", "","west", true)
+
+    dir("${HoneyRepo_Home}"){
+        jenkinsWestManagement.set_west_config("manifest", "file", yaml_file_path)
+    }
+
+    return ["manifest_path": manifest_path, "git_log": git_log]
 }
 
+
+def set_west_update_parameter(jenkinsWestManagement){
+    jenkinsWestManagement.set_west_config("manifest", "group-filter", group_filter_decoration("-syspatch,-lowerpatch"))
+}
+
+
+def check_out_project(jenkinsWestManagement, jenkinsGitManagement, yaml_path, manifest_path){
+    /*is OA, disable protected*/
+    def yaml_json_file = "yaml_json_file.json"
+    def top_yaml_json = ""
+    def west_projects = [:]
+    dir(BuildScript_Home){
+        def python_script = "python ${WORKSPACE}\\${BuildScript_Home}\\utils\\west_helper.py -s convert_yaml_to_json"
+        python_script += " -y ${WORKSPACE}\\${manifest_path}\\${yaml_path}"
+        python_script += " -o ${WORKSPACE}\\${Temp_Dir}\\${yaml_json_file}"
+        def res = exe_cmd(python_script)
+        def jsonSlurper = new JsonSlurper()
+        top_yaml_json = readFile encoding: 'utf-8', file: "${WORKSPACE}\\${Temp_Dir}\\${yaml_json_file}"
+        top_yaml_json = jsonSlurper.parseText(top_yaml_json)
+        echo "${yaml_path} content -> \n ${top_yaml_json}"
+    }
+
+    def update_parameter = [:]
+    dir("${HoneyRepo_Home}"){
+        set_west_update_parameter(jenkinsWestManagement)
+        jenkinsWestManagement.do_west_update() // first update exclude the isolate module
+        //1.0 check gerrit project , branch in yaml
+        //2.0 if yes, update project according to MAP, if rom, then checkout all the project
+        //3.0 checkout the gerrit project, branch file as refspec
+        west_projects = jenkinsWestManagement.get_west_projects()
+        echo "west_projects: ${west_projects}"
+    }
+
+    return ["all_projects": west_projects]
+}
+
+
+def set_west_project_env(t_all_west_projects,  manifest_path, yaml_name){
+    env["WestHome"] = "${WORKSPACE}\\${HoneyRepo_Home}"
+    for(def t_p in t_all_west_projects.keySet()){
+        def p = t_all_west_projects[t_p]
+        env[p['name']] = p['name']
+        env[p['name'] + "_relativepath_to_westtop"] = "${p['path']}"
+        env[p['name'] + "_relativepath_to_workspace"] = "${HoneyRepo_Home}\\${p['path']}"
+        env[p['name'] + "_abspath"] = "${WORKSPACE}\\${HoneyRepo_Home}\\${p['path']}"
+        env[p['name'] + '_revision'] = p['revision']
+
+        
+    }
+    HONEYGUI_BRANCH_NAME = env["${STRING_HONEYGUI}_${STRING_REVISION}"]
+    HONEYGUI_ABSPATH = env["${STRING_HONEYGUI}_${STRING_ABS_PATH}"]
+    HONEYGUI_RELAVE_PATH_TO_WORKSPACE = env["${STRING_HONEYGUI}_${STRING_RELATIVE_PATH_TO_WORKSPACE}"]
+    env["TEST_SCRIPT_LOCATION"] = "${HONEYGUI_ABSPATH}/script"
+    env["HONEYGUI_BRANCH_NAME"] = HONEYGUI_BRANCH_NAME
+    echo "TEST_SCRIPT_LOCATION: ${TEST_SCRIPT_LOCATION}"
+
+    echo "HONEYGUI_BRANCH_NAME ${HONEYGUI_BRANCH_NAME}"
+    echo "HONEYGUI_ABSPATH ${HONEYGUI_ABSPATH}"
+    echo "HONEYGUI_RELAVE_PATH_TO_WORKSPACE ${HONEYGUI_RELAVE_PATH_TO_WORKSPACE}"
+
+    env['yaml_abs_path'] = "${WORKSPACE}\\${manifest_path}\\${yaml_name}"
+}
+
+
+def write_commit_info_to_yaml(jenkinsWestManagement, yaml_file_path){
+    def manifest_path = ""
+    def temp_yaml_name = ""
+    def temp_yaml_file = ""
+    dir("${HoneyRepo_Home}"){
+        manifest_path = jenkinsWestManagement.get_west_config("manifest", "path")
+    }
+    manifest_path = "${HoneyRepo_Home}/${manifest_path}"
+    dir("${HoneyRepo_Home}"){
+        temp_yaml_name = "${BUILD_NUMBER}.yml"
+        temp_yaml_file = "${WORKSPACE}\\${Temp_Dir}\\${temp_yaml_name}"
+        exe_cmd("""cp ${WORKSPACE}/${manifest_path}/${yaml_file_path} ${temp_yaml_file}""")
+        def python_script = "python ${WORKSPACE}/${BuildScript_Home}/utils/west_helper.py -s update_project_revision"
+        python_script += " -y ${temp_yaml_file}"
+        exe_cmd(python_script)
+        env["yaml_file"] = temp_yaml_file
+    }
+    dir(Temp_Dir){
+        // stash includes: "${temp_yaml_file}", name: "Commit-File"
+        archiveArtifacts allowEmptyArchive: true, artifacts: "${temp_yaml_name}"
+    }
+}
 
 timestamps{
     catchError{
-        def iDir = 'cov-idir';
-        throttle(['KeilBuild']){
-            node('keilBuildServer'){
-            //node('windows-build-server8'){
-                stage("NightlyBuild"){
-                    timeout(180){
-                        do_code_checkout("${Manifest_Home}", env['GIT_URL'], "HoneyRepo/manifest", "master", "","master")
+        def iDir = "cov-idir";
+        def builders = [:]
+        for(def b in branch_name_list.keySet()){
+            def branch_name = b
+            def yaml_file_path = branch_name_list[b]["manifest"]
+            def repo = branch_name_list[b]["repo"]
+            def script_root = branch_name_list[b]["script_path"]
+            def builder_name = "${branch_name}-NightlyBuild"
+            builders["${builder_name}"] = {
+                throttle(["KeilBuild"]){
+                    node("keilBuildServer"){
+                        stage(builder_name){
+                            println("branch_name: $branch_name")
+                            timeout(time: 2, unit: "HOURS"){
+                                def build_project = checkout([$class: 'GitSCM',
+                                        branches: [[name: "refs/heads/${BuildScript_Branch}"]],
+                                        doGenerateSubmoduleConfigurations: false,
+                                        extensions: [[$class: 'SubmoduleOption', disableSubmodules: true, parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: false],[$class: 'RelativeTargetDirectory', relativeTargetDir: "${BuildScript_Home}"],[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 50], [$class: 'CleanBeforeCheckout']],
+                                        submoduleCfg: [],
+                                        userRemoteConfigs: [[credentialsId: 'a47475ae-3cc6-4172-9baf-8b472d834b9f', name: 'origin', refspec: "+refs/heads/${BuildScript_Branch}:refs/remotes/origin/${BuildScript_Branch}", url: "${GIT_URL}/${BuildScript_Project}"]]])
+                                def jenkinsCommonlibManagement = load "${WORKSPACE}\\${BuildScript_Home}\\jenkins\\jenkins-common-library.groovy"
+                                def jenkinsGitManagement = load "${WORKSPACE}\\${BuildScript_Home}\\jenkins\\jenkins-git-management.groovy"
+                                def jenkinsWestManagement = load "${WORKSPACE}\\${BuildScript_Home}\\jenkins\\jenkins-west-management.groovy"
 
-                        // to do, nightly need to update manifest according RD's requirement
-                        all_projects_in_manifest = get_project_info_from_manifest("${Manifest_Home}\\guiEngine\\master.xml")
-                        check_out_project(all_projects_in_manifest)
-                        emptyFolder(iDir)
-                        dir("${HoneyRepo_Home}\\${BRANCH_NAME}"){
-                            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'JIRA_ACCOUNT', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_PWD']]){
-                                if(COV_VIEW_MAP.containsKey(BRANCH_NAME) == false){
-                                    error 'Please configure Coverity first.'
-                                }
-                                env['COVERITY_UNSUPPORTED']=1
-                                env['HoneyRepo'] = "${WORKSPACE}\\${HoneyRepo_Home}"
-                                env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\master.xml"
-                                withCoverityEnvironment(coverityInstanceUrl: 'http://172.21.15.145:8080/', credentialsId: 'coverity', projectName: COV_VIEW_MAP[BRANCH_NAME]['project'], streamName: COV_VIEW_MAP[BRANCH_NAME]['stream'], viewName: 'High Impact Outstanding') {
-                                    // run cov-build capture command
-                                    bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-master"
+                                echo "clean all the project dir "
+                                def python_script = "python ${WORKSPACE}\\${BuildScript_Home}\\utils\\west_helper.py -s clean_git_dir_in_west -a"
+                                python_script += " -w ${WORKSPACE}\\${HoneyRepo_Home}"
+                                def res = exe_cmd(python_script)
 
-                                    // run cov-analyze command
-                                    bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true -tp \"!file('Keil_v5_536/.*')&&!file('AppData/Local/Arm/Packs/.*')&&!file('Keil_v5/ARM/.*')&&!file('mingw64/.*')&&!file('gui_engine/third_party/.*')&&!file('gui_engine/3rd/.*')&&!file('lvgl/.*')&&!file('rt-thread/.*')&&!file('vglite/.*')&&!file('Arm2D/.*')&&!file('doc/.*')&&!file('guiEngine-master/doc/.*')&&!file('guiEngine-master/gui_engine/3rd/.*')&&!file('guiEngine-master/realgui/3rd/.*')\""
+                                def manifest_init_res = do_manifest_init(jenkinsCommonlibManagement, jenkinsGitManagement, jenkinsWestManagement, yaml_file_path)
+                                def manifest_path = manifest_init_res["manifest_path"]
+                                def git_log = manifest_init_res["git_log"]
 
-                                    // run cov-commit-defects command
-                                    bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --url http://172.21.15.145:8080 --stream ${COV_VIEW_MAP[BRANCH_NAME]['stream']}"
+                                def check_out_project_res = check_out_project(jenkinsWestManagement, jenkinsGitManagement, yaml_file_path, manifest_path)
+                                def all_west_projects = check_out_project_res["all_projects"]
+                                set_west_project_env(all_west_projects, manifest_path, yaml_file_path)
+                                write_commit_info_to_yaml(jenkinsWestManagement, yaml_file_path)
+
+                                //jenkinsGitManagement.do_code_clone("${HoneyRepo_Home}/zephyrproject/realtek-app", "${GIT_URL}", "HoneyRepo/realtek-zephyr-project", "master", "refs/changes/15/302515/13","master", true)
+                                // jenkinsGitManagement.do_code_clone("${HoneyRepo_Home}/script", "${GIT_URL}", "HoneyRepo/build", "v2", "refs/changes/98/223198/1","v2", true)
+                                // jenkinsGitManagement.do_code_clone("${BuildScript_Home}", "${GIT_URL}", "HoneyRepo/build", "v2", "refs/changes/98/223198/1","v2", true)
+                            }
+                            timeout(time: 12, unit: "HOURS"){
+                                emptyFolder(iDir)
+                                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'JIRA_ACCOUNT', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_PWD']]){
+                                    dir(HONEYGUI_RELAVE_PATH_TO_WORKSPACE){
+                                        if(branch_name_list.containsKey(HONEYGUI_BRANCH_NAME) == false){
+                                            error 'Please configure Coverity first.'
+                                        }
+                                        env['COVERITY_UNSUPPORTED']=1
+                                        withCoverityEnvironment(coverityInstanceUrl: 'http://172.21.15.145:8080/', credentialsId: 'coverity', projectName: branch_name_list[HONEYGUI_BRANCH_NAME]['project'], streamName: branch_name_list[HONEYGUI_BRANCH_NAME]['stream'], viewName: 'High Impact Outstanding') {
+                                            // run cov-build capture command
+                                            bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${HONEYGUI_ABSPATH} python script/nightly-build.py --chipType rtl87x3g"
+
+                                            // run cov-analyze command
+                                            bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${HONEYGUI_ABSPATH} -co OVERRUN:check_nonsymbolic_dynamic:true -tp \"!file('Keil_v5_536/.*')&&!file('AppData/Local/Arm/Packs/.*')&&!file('Keil_v5/ARM/.*')&&!file('keil_v5/arm/.*')&&!file('mingw64/.*')&&!file('gui_engine/third_party/.*')&&!file('gui_engine/3rd/.*')&&!file('lvgl/.*')&&!file('rt-thread/.*')&&!file('vglite/.*')&&!file('Arm2D/.*')&&!file('doc/.*')&&!file('realgui/3rd/.*')\""
+
+                                            // run cov-commit-defects command
+                                            bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --url http://172.21.15.145:8080 --stream ${branch_name_list[HONEYGUI_BRANCH_NAME]['stream']}"
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+        stage("NightlyBuild"){
+            parallel builders
         }
     }
 }
