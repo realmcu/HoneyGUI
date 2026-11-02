@@ -20,6 +20,7 @@
 #include "gui_geometry_image.h"
 #include "gui_geometry_distance.h"
 #include "gui_geometry_glow.h"
+#include "gui_geometry_shadow.h"
 
 /*============================================================================*
  *                           Configuration
@@ -767,25 +768,82 @@ static void gui_rect_prepare(gui_obj_t *obj)
 
     this->checksum = new_checksum;
 
+    if (obj->hidden)
+    {
+        gui_geometry_glow_prepare(&this->glow, NULL, obj->matrix, this->glow_color);
+        gui_geometry_shadow_prepare(&this->shadow_layer, NULL, obj->matrix, 0, 0,
+                                    this->shadow.color);
+        goto hidden_done;
+    }
+
     if (this->glow_blur > 0 && this->glow_color.color.rgba.a > 0)
     {
-        gui_geometry_glow_input_t in;
+        gui_geometry_effect_input_t in;
         memset(&in, 0x00, sizeof(in));
-        in.shape = GUI_GEOMETRY_GLOW_SHAPE_RECT;
+        in.shape = GUI_GEOMETRY_EFFECT_SHAPE_RECT;
         in.single = (has_transform && !bake_scale) || parent_has_non_translate;
         in.w = this->base.w;
         in.h = this->base.h;
         in.radius = radius;
-        in.blur_q = gui_geometry_glow_blur_q(bake_scale ? (float)this->glow_blur * scale_factor
-                                             : (float)this->glow_blur);
+        in.blur_q = gui_geometry_effect_blur_q(bake_scale ? (float)this->glow_blur * scale_factor
+                                               : (float)this->glow_blur);
         in.edge_alpha = this->stroke_width > 0.0f ? this->stroke_color.color.rgba.a
                         : this->color.color.rgba.a;
-        gui_geometry_glow_prepare(&this->glow, &in, obj->matrix, moved, this->glow_color);
+        in.mode = GUI_GEOMETRY_EFFECT_MODE_GLOW;
+        gui_geometry_glow_prepare(&this->glow, &in, obj->matrix, this->glow_color);
     }
     else if (this->glow != NULL)
     {
-        gui_geometry_glow_prepare(&this->glow, NULL, obj->matrix, moved, this->glow_color);
+        gui_geometry_glow_prepare(&this->glow, NULL, obj->matrix, this->glow_color);
     }
+
+    if (this->shadow_enabled && this->shadow.blur > 0 &&
+        this->shadow.color.color.rgba.a > 0)
+    {
+        gui_geometry_effect_input_t in;
+        int spread = this->shadow.spread;
+        int32_t dx = this->shadow.dx;
+        int32_t dy = this->shadow.dy;
+
+        if (bake_scale)
+        {
+            spread = (int)lroundf((float)spread * scale_factor);
+            dx = (int32_t)lroundf((float)dx * scale_factor);
+            dy = (int32_t)lroundf((float)dy * scale_factor);
+        }
+
+        int body_w = this->base.w + 2 * spread;
+        int body_h = this->base.h + 2 * spread;
+        int body_radius = radius + spread;
+
+        if (body_radius * 2 > _UI_MIN(body_w, body_h))
+        {
+            body_radius = _UI_MIN(body_w, body_h) / 2;
+        }
+
+        memset(&in, 0x00, sizeof(in));
+        in.shape = GUI_GEOMETRY_EFFECT_SHAPE_RECT;
+        in.single = (has_transform && !bake_scale) || parent_has_non_translate;
+        in.w = body_w;
+        in.h = body_h;
+        in.radius = body_radius;
+        in.blur_q = gui_geometry_effect_blur_q(bake_scale ?
+                                               (float)this->shadow.blur *scale_factor :
+                                               (float)this->shadow.blur);
+        /* A shadow is the outline's own projection; a transparent fill or a
+         * stroke does not change what casts it, and nothing is compensated. */
+        in.edge_alpha = 0u;
+        in.mode = GUI_GEOMETRY_EFFECT_MODE_SHADOW;
+        gui_geometry_shadow_prepare(&this->shadow_layer, &in, obj->matrix,
+                                    dx - spread, dy - spread, this->shadow.color);
+    }
+    else if (this->shadow_layer != NULL)
+    {
+        gui_geometry_shadow_prepare(&this->shadow_layer, NULL, obj->matrix, 0, 0,
+                                    this->shadow.color);
+    }
+
+hidden_done:
 
     if (bake_scale)
     {
@@ -806,7 +864,8 @@ static void gui_rect_prepare(gui_obj_t *obj)
 static void gui_rect_draw(gui_obj_t *obj)
 {
     gui_rounded_rect_t *this = (gui_rounded_rect_t *)obj;
-    gui_geometry_glow_draw(this->glow, obj->parent->opacity_value, this->opacity_value);
+    gui_geometry_effect_draw(this->shadow_layer, obj->parent->opacity_value, this->opacity_value);
+    gui_geometry_effect_draw(this->glow, obj->parent->opacity_value, this->opacity_value);
 
     gui_geometry_parts_draw(&this->parts,
                             obj->parent->opacity_value * this->opacity_value / UINT8_MAX);
@@ -822,6 +881,11 @@ static void gui_rect_end(gui_obj_t *obj)
     {
         gui_geometry_parts_end(&this->glow->parts);
     }
+
+    if (this->shadow_layer != NULL)
+    {
+        gui_geometry_parts_end(&this->shadow_layer->parts);
+    }
 }
 
 static void gui_rect_destroy(gui_obj_t *obj)
@@ -834,7 +898,8 @@ static void gui_rect_destroy(gui_obj_t *obj)
         this->gradient = NULL;
     }
 
-    gui_geometry_glow_free(&this->glow);
+    gui_geometry_effect_free(&this->glow);
+    gui_geometry_effect_free(&this->shadow_layer);
     gui_geometry_parts_release(&this->parts);
 }
 
@@ -903,6 +968,8 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
                                &(GET_BASE(round_rect)->brother_list));
     }
     GET_BASE(round_rect)->create_done = true;
+
+    GET_BASE(round_rect)->type = MACRO_ROUNDED_RECT;
     round_rect->radius = _UI_MAX(radius, 0);
     round_rect->color = color;
     round_rect->stroke_width = 0.0f;
@@ -916,6 +983,8 @@ gui_rounded_rect_t *gui_rect_create(void *parent, const char *name, int x, int y
     round_rect->use_gradient = false;
     round_rect->enable_dither = (GUI_RECT_ENABLE_DITHER != 0);
     round_rect->gradient_dir = RECT_GRADIENT_HORIZONTAL;
+    round_rect->shadow = gui_shadow_default();
+    round_rect->shadow_enabled = false;
 
     return round_rect;
 }
@@ -951,7 +1020,10 @@ void gui_rect_set_opacity(gui_rounded_rect_t *rect, uint8_t opacity)
 void gui_rect_set_position(gui_rounded_rect_t *rect, int x, int y)
 {
     GUI_ASSERT(rect != NULL);
-    if (rect == NULL || !gui_geometry_i16_position_valid(x) || !gui_geometry_i16_position_valid(y))
+
+    GUI_ASSERT(rect == NULL || GET_BASE(rect)->type == MACRO_ROUNDED_RECT);
+    if (rect == NULL || GET_BASE(rect)->type != MACRO_ROUNDED_RECT ||
+        !gui_geometry_i16_position_valid(x) || !gui_geometry_i16_position_valid(y))
     {
         return;
     }
@@ -1046,7 +1118,91 @@ void gui_rect_clear_glow(gui_rounded_rect_t *rect)
     }
 
     rect->glow_blur = 0u;
-    gui_geometry_glow_free(&rect->glow);
+    gui_geometry_effect_free(&rect->glow);
+}
+
+void gui_rect_set_shadow(gui_rounded_rect_t *rect)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    rect->shadow_enabled = true;
+}
+
+void gui_rect_clear_shadow(gui_rounded_rect_t *rect)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    rect->shadow_enabled = false;
+    gui_geometry_effect_free(&rect->shadow_layer);
+}
+
+void gui_rect_set_shadow_color(gui_rounded_rect_t *rect, gui_color_t color)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    rect->shadow.color = color;
+}
+
+void gui_rect_set_shadow_blur(gui_rounded_rect_t *rect, int32_t blur_radius)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    int32_t blur = blur_radius < 0 ? 0 : blur_radius;
+    if (blur > GUI_GEOMETRY_GLOW_MAX_BLUR)
+    {
+        blur = GUI_GEOMETRY_GLOW_MAX_BLUR;
+    }
+    rect->shadow.blur = (uint8_t)blur;
+}
+
+void gui_rect_set_shadow_spread(gui_rounded_rect_t *rect, int32_t spread)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    int32_t value = spread < 0 ? 0 : spread;
+    if (value > GUI_GEOMETRY_SHADOW_MAX_SPREAD)
+    {
+        value = GUI_GEOMETRY_SHADOW_MAX_SPREAD;
+    }
+    rect->shadow.spread = (uint8_t)value;
+}
+
+void gui_rect_set_shadow_direction(gui_rounded_rect_t *rect,
+                                   gui_shadow_dir_t direction, int32_t distance)
+{
+    GUI_ASSERT(rect != NULL);
+    if (rect == NULL)
+    {
+        return;
+    }
+
+    int32_t length = distance < 0 ? 0 : distance;
+    if (length > GUI_GEOMETRY_SHADOW_MAX_DISTANCE)
+    {
+        length = GUI_GEOMETRY_SHADOW_MAX_DISTANCE;
+    }
+
+    gui_shadow_set_direction(&rect->shadow, direction, (uint8_t)length);
 }
 
 void gui_rect_on_click(gui_rounded_rect_t *rect, void *callback, void *parameter)

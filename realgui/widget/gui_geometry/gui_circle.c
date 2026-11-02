@@ -19,6 +19,7 @@
 #include "gui_geometry_common.h"
 #include "gui_geometry_image.h"
 #include "gui_geometry_glow.h"
+#include "gui_geometry_shadow.h"
 
 /*============================================================================*
  *                           Configuration
@@ -563,25 +564,86 @@ static void gui_circle_prepare(gui_obj_t *obj)
 
     this->checksum = new_checksum;
 
+    if (obj->hidden)
+    {
+        gui_geometry_glow_prepare(&this->glow, NULL, obj->matrix, this->glow_color);
+        gui_geometry_shadow_prepare(&this->shadow_layer, NULL, obj->matrix, 0, 0,
+                                    this->shadow.color);
+        goto hidden_done;
+    }
+
     if (this->glow_blur > 0 && this->glow_color.color.rgba.a > 0)
     {
-        gui_geometry_glow_input_t in;
+        gui_geometry_effect_input_t in;
         memset(&in, 0x00, sizeof(in));
-        in.shape = GUI_GEOMETRY_GLOW_SHAPE_CIRCLE;
+        in.shape = GUI_GEOMETRY_EFFECT_SHAPE_CIRCLE;
         in.single = (has_transform && !bake_scale) || parent_has_non_translate;
         in.w = this->radius * 2;
         in.h = this->radius * 2;
         in.radius = this->radius;
-        in.blur_q = gui_geometry_glow_blur_q(bake_scale ? (float)this->glow_blur * scale_factor
-                                             : (float)this->glow_blur);
+        in.blur_q = gui_geometry_effect_blur_q(bake_scale ? (float)this->glow_blur * scale_factor
+                                               : (float)this->glow_blur);
         in.edge_alpha = this->stroke_width > 0.0f ? this->stroke_color.color.rgba.a
                         : this->color.color.rgba.a;
-        gui_geometry_glow_prepare(&this->glow, &in, obj->matrix, moved, this->glow_color);
+        in.mode = GUI_GEOMETRY_EFFECT_MODE_GLOW;
+        gui_geometry_glow_prepare(&this->glow, &in, obj->matrix, this->glow_color);
     }
     else if (this->glow != NULL)
     {
-        gui_geometry_glow_prepare(&this->glow, NULL, obj->matrix, moved, this->glow_color);
+        gui_geometry_glow_prepare(&this->glow, NULL, obj->matrix, this->glow_color);
     }
+
+    if (this->shadow_enabled && this->shadow.blur > 0 && this->shadow.color.color.rgba.a > 0)
+    {
+        gui_geometry_effect_input_t in;
+        int spread = this->shadow.spread;
+        float fx = (float)this->shadow.dx;
+        float fy = (float)this->shadow.dy;
+
+        if (bake_scale)
+        {
+            spread = (int)lroundf((float)spread * scale_factor);
+            fx *= scale_factor;
+            fy *= scale_factor;
+        }
+
+        if (folded_degrees != 0.0f)
+        {
+            float theta = folded_degrees / 180.0f * 3.1415926f;
+            float c = cosf(theta);
+            float s = sinf(theta);
+            float rot_x = fx * c - fy * s;
+            float rot_y = fx * s + fy * c;
+
+            fx = rot_x;
+            fy = rot_y;
+        }
+
+        int32_t dx = (int32_t)lroundf(fx);
+        int32_t dy = (int32_t)lroundf(fy);
+        int body_radius = this->radius + spread;
+
+        memset(&in, 0x00, sizeof(in));
+        in.shape = GUI_GEOMETRY_EFFECT_SHAPE_CIRCLE;
+        in.single = (has_transform && !bake_scale) || parent_has_non_translate;
+        in.w = body_radius * 2;
+        in.h = body_radius * 2;
+        in.radius = body_radius;
+        in.blur_q = gui_geometry_effect_blur_q(bake_scale ?
+                                               (float)this->shadow.blur *scale_factor :
+                                               (float)this->shadow.blur);
+        in.edge_alpha = 0u;
+        in.mode = GUI_GEOMETRY_EFFECT_MODE_SHADOW;
+        gui_geometry_shadow_prepare(&this->shadow_layer, &in, obj->matrix,
+                                    dx - spread, dy - spread, this->shadow.color);
+    }
+    else if (this->shadow_layer != NULL)
+    {
+        gui_geometry_shadow_prepare(&this->shadow_layer, NULL, obj->matrix, 0, 0,
+                                    this->shadow.color);
+    }
+
+hidden_done:
 
     if (bake_scale)
     {
@@ -619,7 +681,8 @@ static void gui_circle_draw(gui_obj_t *obj)
 {
     gui_circle_t *this = (gui_circle_t *)obj;
 
-    gui_geometry_glow_draw(this->glow, obj->parent->opacity_value, this->opacity_value);
+    gui_geometry_effect_draw(this->shadow_layer, obj->parent->opacity_value, this->opacity_value);
+    gui_geometry_effect_draw(this->glow, obj->parent->opacity_value, this->opacity_value);
 
     gui_geometry_parts_draw(&this->parts,
                             obj->parent->opacity_value * this->opacity_value / UINT8_MAX);
@@ -634,6 +697,11 @@ static void gui_circle_end(gui_circle_t *this)
     {
         gui_geometry_parts_end(&this->glow->parts);
     }
+
+    if (this->shadow_layer != NULL)
+    {
+        gui_geometry_parts_end(&this->shadow_layer->parts);
+    }
 }
 
 static void gui_circle_destroy(gui_circle_t *this)
@@ -644,7 +712,8 @@ static void gui_circle_destroy(gui_circle_t *this)
         this->gradient = NULL;
     }
 
-    gui_geometry_glow_free(&this->glow);
+    gui_geometry_effect_free(&this->glow);
+    gui_geometry_effect_free(&this->shadow_layer);
     gui_geometry_parts_release(&this->parts);
 }
 
@@ -714,6 +783,9 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
                                &(GET_BASE(circle)->brother_list));
     }
     GET_BASE(circle)->create_done = true;
+    /* Tag the object so a caller that casts through the wrong widget type can
+     * be caught instead of scribbling over unrelated fields. */
+    GET_BASE(circle)->type = MACRO_CIRCLE;
     circle->x = radius;
     circle->y = radius;
     circle->radius = radius;
@@ -729,6 +801,8 @@ gui_circle_t *gui_circle_create(void *parent, const char *name, int x, int y,
     circle->gradient = NULL;
     circle->use_gradient = false;
     circle->gradient_type = CIRCLE_GRADIENT_RADIAL;
+    circle->shadow = gui_shadow_default();
+    circle->shadow_enabled = false;
 
     matrix_identity(&circle->last_matrix);
 
@@ -762,7 +836,13 @@ void gui_circle_set_style(gui_circle_t *circle, int x, int y, int radius, gui_co
 void gui_circle_set_position(gui_circle_t *circle, int x, int y)
 {
     GUI_ASSERT(circle != NULL);
-    if (circle == NULL || !gui_geometry_circle_bounds_valid(x, y, circle->radius, true))
+    /* Reading circle->radius through a gui_rounded_rect_t yields the rect's
+     * first parts entry, and writing base.x/y below lands on its payload
+     * pointers -- a corrupt pointer that surfaces a frame later inside the
+     * geometry code.  Catching the mix-up here names the real culprit. */
+    GUI_ASSERT(circle == NULL || GET_BASE(circle)->type == MACRO_CIRCLE);
+    if (circle == NULL || GET_BASE(circle)->type != MACRO_CIRCLE ||
+        !gui_geometry_circle_bounds_valid(x, y, circle->radius, true))
     {
         return;
     }
@@ -879,7 +959,91 @@ void gui_circle_clear_glow(gui_circle_t *circle)
     }
 
     circle->glow_blur = 0u;
-    gui_geometry_glow_free(&circle->glow);
+    gui_geometry_effect_free(&circle->glow);
+}
+
+void gui_circle_set_shadow(gui_circle_t *circle)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    circle->shadow_enabled = true;
+}
+
+void gui_circle_clear_shadow(gui_circle_t *circle)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    circle->shadow_enabled = false;
+    gui_geometry_effect_free(&circle->shadow_layer);
+}
+
+void gui_circle_set_shadow_color(gui_circle_t *circle, gui_color_t color)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    circle->shadow.color = color;
+}
+
+void gui_circle_set_shadow_blur(gui_circle_t *circle, int32_t blur_radius)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    int32_t blur = blur_radius < 0 ? 0 : blur_radius;
+    if (blur > GUI_GEOMETRY_GLOW_MAX_BLUR)
+    {
+        blur = GUI_GEOMETRY_GLOW_MAX_BLUR;
+    }
+    circle->shadow.blur = (uint8_t)blur;
+}
+
+void gui_circle_set_shadow_spread(gui_circle_t *circle, int32_t spread)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    int32_t value = spread < 0 ? 0 : spread;
+    if (value > GUI_GEOMETRY_SHADOW_MAX_SPREAD)
+    {
+        value = GUI_GEOMETRY_SHADOW_MAX_SPREAD;
+    }
+    circle->shadow.spread = (uint8_t)value;
+}
+
+void gui_circle_set_shadow_direction(gui_circle_t *circle,
+                                     gui_shadow_dir_t direction, int32_t distance)
+{
+    GUI_ASSERT(circle != NULL);
+    if (circle == NULL)
+    {
+        return;
+    }
+
+    int32_t length = distance < 0 ? 0 : distance;
+    if (length > GUI_GEOMETRY_SHADOW_MAX_DISTANCE)
+    {
+        length = GUI_GEOMETRY_SHADOW_MAX_DISTANCE;
+    }
+
+    gui_shadow_set_direction(&circle->shadow, direction, (uint8_t)length);
 }
 
 void gui_circle_on_click(gui_circle_t *circle, void *callback, void *parameter)

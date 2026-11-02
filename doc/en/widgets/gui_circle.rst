@@ -40,6 +40,18 @@ Core Features
      - :cpp:any:`gui_circle_set_glow`
    * - Clear Glow
      - :cpp:any:`gui_circle_clear_glow`
+   * - Enable Shadow
+     - :cpp:any:`gui_circle_set_shadow`
+   * - Set Shadow Colour
+     - :cpp:any:`gui_circle_set_shadow_color`
+   * - Set Shadow Blur Radius
+     - :cpp:any:`gui_circle_set_shadow_blur`
+   * - Set Shadow Spread
+     - :cpp:any:`gui_circle_set_shadow_spread`
+   * - Set Shadow Direction
+     - :cpp:any:`gui_circle_set_shadow_direction`
+   * - Clear Shadow
+     - :cpp:any:`gui_circle_clear_shadow`
    * - Set Opacity
      - :cpp:any:`gui_circle_set_opacity`
    * - Register Click Event Callback
@@ -93,6 +105,37 @@ area. The centre is empty and is not stored at all.
 The same limitations as the rounded rectangle apply: the glow may overflow a
 parent container, and a glow left on screen after the body scrolls away is only
 cleared by the next redraw of that area.
+
+Drop Shadow
+-----------
+
+An optional drop shadow can be drawn behind the circle. It is its own layer,
+painted below the glow if there is one and below the body in any case.
+
+.. code-block:: c
+
+   gui_circle_set_shadow(circle);                                 /* defaults */
+   gui_circle_set_shadow_color(circle, gui_rgba(0, 0, 0, 128));
+   gui_circle_set_shadow_blur(circle, 12);
+   gui_circle_set_shadow_spread(circle, 2);
+   gui_circle_set_shadow_direction(circle, GUI_SHADOW_DIR_BOTTOM_RIGHT, 8);
+   gui_circle_clear_shadow(circle);
+
+The parameters, defaults and rebuild rules are the same as for the rounded
+rectangle: the colour's alpha is the strength, ``blur`` is clamped to 0..32,
+``spread`` to 0..32, and ``distance`` to 0..64. Direction and distance never
+reach the mask, so they cost no rasterisation.
+
+One difference is worth knowing: the circle folds a uniform rotation into its
+own matrix instead of the cached mask, because a circle's mask is
+rotation-symmetric. The shadow's direction is not, so the offset is rotated by
+the same angle separately. The shadow therefore follows the body's rotation,
+and the folded angle never enters the mask key.
+
+The same limitations as the rounded rectangle apply: the shadow may overflow a
+parent container, and it disappears early once the body leaves the screen --
+the renderer decides visibility from the body's rectangle only, so the outer
+``blur + |offset|`` pixels stop being drawn while they are still on screen.
 
 Gradient Fill
 -------------

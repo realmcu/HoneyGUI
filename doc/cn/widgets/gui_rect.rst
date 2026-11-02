@@ -40,6 +40,18 @@
      - :cpp:any:`gui_rect_set_glow`
    * - 清除外发光
      - :cpp:any:`gui_rect_clear_glow`
+   * - 开启阴影
+     - :cpp:any:`gui_rect_set_shadow`
+   * - 设置阴影颜色
+     - :cpp:any:`gui_rect_set_shadow_color`
+   * - 设置阴影模糊半径
+     - :cpp:any:`gui_rect_set_shadow_blur`
+   * - 设置阴影膨胀量
+     - :cpp:any:`gui_rect_set_shadow_spread`
+   * - 设置阴影方向
+     - :cpp:any:`gui_rect_set_shadow_direction`
+   * - 清除阴影
+     - :cpp:any:`gui_rect_clear_shadow`
    * - 设置不透明度
      - :cpp:any:`gui_rect_set_opacity`
    * - 注册点击事件回调
@@ -102,6 +114,64 @@
   仍只算本体。
 - 本体移出屏幕时，仍留在屏幕内的那部分发光不会被擦除，要等该区域下一次
   重绘。
+
+阴影
+----
+
+控件可选地绘制一层投影。它同样是独立的一层，画在发光之下、本体之下，
+所以半透明本体能透出阴影，而不是把阴影挖空。
+
+.. code-block:: c
+
+   gui_rect_set_shadow(rect);                                     /* 默认配置 */
+   gui_rect_set_shadow_color(rect, gui_rgba(0, 0, 0, 128));
+   gui_rect_set_shadow_blur(rect, 12);
+   gui_rect_set_shadow_spread(rect, 2);
+   gui_rect_set_shadow_direction(rect, GUI_SHADOW_DIR_BOTTOM_RIGHT, 8);
+   gui_rect_clear_shadow(rect);
+
+**参数**
+
+- 颜色的 **alpha 即阴影强度**，alpha 为 0 只停止绘制，不解除开启状态。
+- ``blur`` 单位为像素，钳到 0..32；传 0 停止绘制，调大后阴影恢复。
+  要彻底关闭请调用 ``gui_rect_clear_shadow``。
+- ``spread`` 让轮廓向四周各外扩指定像素，钳到 0..32。
+- ``direction`` 是九个预设方向之一，``distance`` 是偏移长度，钳到 0..64。
+  ``GUI_SHADOW_DIR_CENTER`` 表示四周均匀投影，不是关闭。
+
+**默认值**
+
+只调用 ``gui_rect_set_shadow`` 而不设置任何属性，得到的是黑色、alpha 100、
+偏移 ``(4, 4)``、模糊 4 像素、spread 0。``gui_rect_clear_shadow`` 只关闭
+绘制并释放资源，配置保留，再次开启时沿用上次的设置。
+
+**实现说明**
+
+掩膜就是本体自身轮廓的模糊：内部实心，外部衰减。与发光不同，它不做边缘
+补偿——本体是后来叠加在它上面的，这正是投影需要的层次关系。
+
+内部必须实心，这是偏移能成立的前提。整张掩膜被平移，本体边缘外那一小段
+"内部"会露到外面；如果内部是空的，那一段就会缺失，阴影看起来像是飘在控件
+旁边的独立色块，而不是由控件投下的。
+
+**方向和距离不产生生成成本。** 偏移不进掩膜，只改掩膜被绘制到的那块 piece
+的坐标。所以九个方向和任意距离共用同一份掩膜，动画改变它们也只是重新摆放，
+不重新光栅化。
+
+**重建时机**
+
+- 改颜色或强度只重绘，不重建掩膜。
+- 改方向或距离只重新摆放，不重建掩膜。
+- 改尺寸、圆角半径、模糊或 spread 才重建。spread 在生成前就折进几何，
+  所以 spread 阴影与轮廓相同的更大本体可以共享同一份掩膜。
+
+**已知限制**
+
+- 阴影可以溢出父容器，与发光相同。
+- 本体移出屏幕时阴影会提前消失：渲染层只按本体矩形判断可见性，最外侧
+  ``blur + |偏移|`` 像素仍应在屏内时就已经停止绘制。
+- 支持发光与阴影同时开启，但两者是逐层合成而不是先组合再整体处理，
+  控件做不透明度淡出时边缘可能与单独一层略有差异。
 
 渐变色填充
 ----------

@@ -25,6 +25,8 @@ extern "C" {
 #include "tp_algo.h"
 #include "lite_geometry.h"
 #include "gui_geometry_image.h"
+#include "gui_geometry_effect.h"
+#include "gui_geometry_shadow.h"
 
 /*============================================================================*
  *                         Types
@@ -74,7 +76,11 @@ typedef struct
 
     gui_color_t glow_color;     /**< Glow colour; its alpha is the strength. */
     uint8_t glow_blur;          /**< Glow blur radius; 0 disables the glow. */
-    struct gui_geometry_glow *glow;      /**< Glow state, allocated on first use. */
+    struct gui_geometry_effect *glow;      /**< Glow state, allocated on first use. */
+
+    gui_shadow_t shadow;        /**< Shadow configuration, kept across off/on. */
+    struct gui_geometry_effect *shadow_layer; /**< Shadow state, allocated on first use. */
+    bool shadow_enabled;        /**< Configured on; blur/alpha 0 still stops drawing. */
 } gui_circle_t;
 
 /** Which rasterised part a cached payload holds. */
@@ -221,6 +227,62 @@ void gui_circle_set_glow(gui_circle_t *circle, gui_color_t color, uint8_t blur_r
  * @param circle Circle widget pointer.
  */
 void gui_circle_clear_glow(gui_circle_t *circle);
+
+/**
+ * @brief Draw a drop shadow behind the circle.
+ *
+ * The shadow is its own layer, drawn first, then the glow if there is one, then
+ * the body.  The offset is a local vector and follows the body's rotation, even
+ * though the body folds that rotation into its own matrix instead of the cached
+ * mask -- a circle's mask is rotation-symmetric, the shadow's direction is not.
+ *
+ * @param circle Circle widget pointer.
+ */
+void gui_circle_set_shadow(gui_circle_t *circle);
+
+/**
+ * @brief Remove the circle's drop shadow.
+ *
+ * Stops drawing and frees the layer; the configuration is kept, so enabling it
+ * again resumes with whatever was last set rather than the defaults.
+ *
+ * @param circle Circle widget pointer.
+ */
+void gui_circle_clear_shadow(gui_circle_t *circle);
+
+/**
+ * @brief Set the circle shadow colour; its alpha is the strength.
+ * @param circle Circle widget pointer.
+ * @param color Shadow colour.
+ */
+void gui_circle_set_shadow_color(gui_circle_t *circle, gui_color_t color);
+
+/**
+ * @brief Set the circle shadow blur radius, clamped to 1..32 px.
+ *
+ * 0 stops the shadow being drawn without disabling it: raising the value again
+ * brings it back.  Use gui_circle_clear_shadow() to turn it off.
+ *
+ * @param circle Circle widget pointer.
+ * @param blur_radius Blur radius in pixels.
+ */
+void gui_circle_set_shadow_blur(gui_circle_t *circle, int32_t blur_radius);
+
+/**
+ * @brief Set how far the circle shadow inflates beyond the body, 0..32 px per side.
+ * @param circle Circle widget pointer.
+ * @param spread Pixels to add on every side.
+ */
+void gui_circle_set_shadow_spread(gui_circle_t *circle, int32_t spread);
+
+/**
+ * @brief Point the circle shadow in one of the nine presets.
+ * @param circle Circle widget pointer.
+ * @param direction Which way the shadow falls.
+ * @param distance Offset length in pixels, clamped to 0..64.
+ */
+void gui_circle_set_shadow_direction(gui_circle_t *circle,
+                                     gui_shadow_dir_t direction, int32_t distance);
 
 /**
  * @brief Set click callback for the circle.

@@ -40,6 +40,18 @@
      - :cpp:any:`gui_circle_set_glow`
    * - 清除外发光
      - :cpp:any:`gui_circle_clear_glow`
+   * - 开启阴影
+     - :cpp:any:`gui_circle_set_shadow`
+   * - 设置阴影颜色
+     - :cpp:any:`gui_circle_set_shadow_color`
+   * - 设置阴影模糊半径
+     - :cpp:any:`gui_circle_set_shadow_blur`
+   * - 设置阴影膨胀量
+     - :cpp:any:`gui_circle_set_shadow_spread`
+   * - 设置阴影方向
+     - :cpp:any:`gui_circle_set_shadow_direction`
+   * - 清除阴影
+     - :cpp:any:`gui_circle_clear_shadow`
    * - 设置不透明度
      - :cpp:any:`gui_circle_set_opacity`
    * - 注册点击事件回调
@@ -90,6 +102,32 @@
 
 限制与圆角矩形相同：发光可以溢出父容器；本体滚出屏幕后留在屏内的发光，
 要等该区域下一次重绘才会清掉。
+
+阴影
+----
+
+控件可选地绘制一层投影。它同样是独立的一层，画在发光之下、本体之下。
+
+.. code-block:: c
+
+   gui_circle_set_shadow(circle);                                 /* 默认配置 */
+   gui_circle_set_shadow_color(circle, gui_rgba(0, 0, 0, 128));
+   gui_circle_set_shadow_blur(circle, 12);
+   gui_circle_set_shadow_spread(circle, 2);
+   gui_circle_set_shadow_direction(circle, GUI_SHADOW_DIR_BOTTOM_RIGHT, 8);
+   gui_circle_clear_shadow(circle);
+
+参数、默认值和重建时机与圆角矩形一致：颜色的 alpha 即强度，``blur`` 钳到
+0..32，``spread`` 钳到 0..32，``distance`` 钳到 0..64。方向和距离都不进
+掩膜，因此不产生光栅化成本。
+
+有一处差别需要注意：圆的等比旋转被折进本体自己的矩阵，而不是缓存掩膜，
+因为圆的掩膜是旋转对称的。阴影的方向不是对称的，所以要按同一角度单独旋转
+偏移量。这样阴影会跟随本体旋转，而折叠角度不会进入掩膜缓存键。
+
+限制与圆角矩形相同：阴影可以溢出父容器；本体移出屏幕后阴影会提前消失——
+渲染层只按本体矩形判断可见性，最外侧 ``blur + |偏移|`` 像素仍应在屏内时
+就已经停止绘制。
 
 渐变色填充
 ----------

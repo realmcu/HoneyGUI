@@ -24,8 +24,8 @@
  *
  * Last full run: 324 cases, 0 differences (410x502, 16 bpp simulator).
  *
- * To run it, add this file (and gui_geometry_glow.c) to a host build that can
- * reach the geometry headers, then call gui_geometry_glow_regional_test().
+ * To run it, add this file (and gui_geometry_effect.c) to a host build that can
+ * reach the geometry headers, then call gui_geometry_effect_regional_test().
  */
 
 #include <string.h>
@@ -34,7 +34,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "gui_geometry_distance.h"
-#include "gui_geometry_glow_internal.h"
+#include "gui_geometry_effect_internal.h"
 
 /*============================================================================*
  *                         Reference generator
@@ -46,7 +46,8 @@
  * correct by inspection.
  */
 static void ref_fill_rect(uint8_t *body, int w, int h, int body_w, int body_h,
-                          int radius, int m, uint32_t blur_q, uint32_t edge_alpha)
+                          int radius, int m, uint32_t blur_q, uint32_t edge_alpha,
+                          uint32_t mode)
 {
     float blur_px = (float)blur_q / 8.0f;
 
@@ -61,13 +62,13 @@ static void ref_fill_rect(uint8_t *body, int w, int h, int body_w, int body_h,
                                                          0.0f, 0.0f,
                                                          (float)body_w, (float)body_h,
                                                          (float)radius);
-            row[x] = gui_geometry_glow_mask_value(d, blur_px, edge_alpha);
+            row[x] = gui_geometry_effect_value(mode, d, blur_px, edge_alpha);
         }
     }
 }
 
 static void ref_fill_circle(uint8_t *body, int w, int h, int radius, int m,
-                            uint32_t blur_q, uint32_t edge_alpha)
+                            uint32_t blur_q, uint32_t edge_alpha, uint32_t mode)
 {
     float blur_px = (float)blur_q / 8.0f;
     float c = (float)(radius + m);
@@ -81,8 +82,9 @@ static void ref_fill_circle(uint8_t *body, int w, int h, int radius, int m,
             float dx = (float)x + 0.5f - c;
             float dy = (float)y + 0.5f - c;
 
-            row[x] = gui_geometry_glow_mask_value(sqrtf(dx * dx + dy * dy) - (float)radius,
-                                                  blur_px, edge_alpha);
+            row[x] = gui_geometry_effect_value(mode,
+                                               sqrtf(dx * dx + dy * dy) - (float)radius,
+                                               blur_px, edge_alpha);
         }
     }
 }
@@ -97,10 +99,10 @@ typedef struct
     uint32_t failures;
 } test_tally_t;
 
-static void check_one(test_tally_t *tally, const gui_geometry_glow_input_t *in,
-                      uint32_t s, uint32_t r, uint32_t b)
+static void check_one(test_tally_t *tally, const gui_geometry_effect_input_t *in,
+                      uint32_t s, uint32_t r, uint32_t b, uint32_t mode)
 {
-    int m = (int)gui_geometry_glow_margin(in->blur_q);
+    int m = (int)gui_geometry_effect_margin(in->blur_q);
     int w = in->w + 2 * m;
     int h = in->h + 2 * m;
     int first_x = -1;
@@ -125,19 +127,19 @@ static void check_one(test_tally_t *tally, const gui_geometry_glow_input_t *in,
 
     bool filled;
 
-    if (in->shape == GUI_GEOMETRY_GLOW_SHAPE_CIRCLE)
+    if (in->shape == GUI_GEOMETRY_EFFECT_SHAPE_CIRCLE)
     {
-        filled = gui_geometry_glow_build_circle_regional(regional, w, h, in->radius, m,
-                                                         in->blur_q, in->edge_alpha);
-        ref_fill_circle(reference, w, h, in->radius, m, in->blur_q, in->edge_alpha);
+        filled = gui_geometry_effect_build_circle_regional(regional, w, h, in->radius, m,
+                                                           in->blur_q, in->edge_alpha, in->mode);
+        ref_fill_circle(reference, w, h, in->radius, m, in->blur_q, in->edge_alpha, in->mode);
     }
     else
     {
-        filled = gui_geometry_glow_build_rect_regional(regional, w, h, in->w, in->h,
-                                                       in->radius, m, in->blur_q,
-                                                       in->edge_alpha);
+        filled = gui_geometry_effect_build_rect_regional(regional, w, h, in->w, in->h,
+                                                         in->radius, m, in->blur_q,
+                                                         in->edge_alpha, in->mode);
         ref_fill_rect(reference, w, h, in->w, in->h, in->radius, m, in->blur_q,
-                      in->edge_alpha);
+                      in->edge_alpha, in->mode);
     }
 
     if (!filled)
@@ -146,8 +148,8 @@ static void check_one(test_tally_t *tally, const gui_geometry_glow_input_t *in,
          * case to skip silently. */
         tally->cases++;
         tally->failures++;
-        gui_log("GLOW_REGIONAL REFUSED s=%u r=%u b=%u shape=%u w=%d h=%d R=%d blur_q=%u\n",
-                (unsigned)s, (unsigned)r, (unsigned)b, (unsigned)in->shape,
+        gui_log("EFFECT_REGIONAL REFUSED s=%u r=%u b=%u shape=%u mode=%u w=%d h=%d R=%d blur_q=%u\n",
+                (unsigned)s, (unsigned)r, (unsigned)b, (unsigned)in->shape, (unsigned)mode,
                 in->w, in->h, in->radius, (unsigned)in->blur_q);
         gui_free(regional);
         gui_free(reference);
@@ -184,9 +186,9 @@ static void check_one(test_tally_t *tally, const gui_geometry_glow_input_t *in,
     if (diff != 0u)
     {
         tally->failures++;
-        gui_log("GLOW_REGIONAL FAIL s=%u r=%u b=%u shape=%u w=%d h=%d R=%d blur_q=%u "
+        gui_log("EFFECT_REGIONAL FAIL s=%u r=%u b=%u shape=%u mode=%u w=%d h=%d R=%d blur_q=%u "
                 "alpha=%u diff_px=%u max_delta=%d first=%d,%d\n",
-                (unsigned)s, (unsigned)r, (unsigned)b, (unsigned)in->shape,
+                (unsigned)s, (unsigned)r, (unsigned)b, (unsigned)in->shape, (unsigned)mode,
                 in->w, in->h, in->radius, (unsigned)in->blur_q,
                 (unsigned)in->edge_alpha, (unsigned)diff, max_delta, first_x, first_y);
     }
@@ -205,7 +207,7 @@ static void check_one(test_tally_t *tally, const gui_geometry_glow_input_t *in,
  *
  * @return Number of failing cases; 0 means every case matched.
  */
-uint32_t gui_geometry_glow_regional_test(void)
+uint32_t gui_geometry_effect_regional_test(void)
 {
     /* uint32_t, not uint8_t: 256 is the 32 px ceiling and does not fit a byte.
      * A byte table truncates it to 0, which is not a valid blur at all. */
@@ -224,49 +226,60 @@ uint32_t gui_geometry_glow_regional_test(void)
                 {
                     for (uint32_t alpha = 0; alpha < 2; alpha++)
                     {
-                        gui_geometry_glow_input_t in;
+                        /* A glow's mask divides out the body's edge alpha; a
+                         * shadow's does not look at it, so running both alpha
+                         * values there only repeats the same mask. */
+                        uint32_t modes = (alpha == 0u) ? 2u : 1u;
 
-                        memset(&in, 0x00, sizeof(in));
-                        in.shape = shape ? GUI_GEOMETRY_GLOW_SHAPE_CIRCLE
-                                   : GUI_GEOMETRY_GLOW_SHAPE_RECT;
-                        in.radius = radii[r];
-                        in.blur_q = blurs[b];
-                        in.edge_alpha = alpha ? 128u : 255u;
-
-                        if (in.shape == GUI_GEOMETRY_GLOW_SHAPE_CIRCLE)
+                        for (uint32_t mode = 0; mode < modes; mode++)
                         {
-                            /* Same relation gui_circle.c establishes: the body
-                             * is 2r across, and the buffer adds a margin on
-                             * each side.  Anything else puts the centre off the
-                             * mirror axis and tests a shape the widget never
-                             * produces. */
-                            in.w = 2 * in.radius;
-                            in.h = in.w;
+                            gui_geometry_effect_input_t in;
 
-                            if (in.w <= 0)
+                            memset(&in, 0x00, sizeof(in));
+                            in.shape = shape ? GUI_GEOMETRY_EFFECT_SHAPE_CIRCLE
+                                       : GUI_GEOMETRY_EFFECT_SHAPE_RECT;
+                            in.radius = radii[r];
+                            in.blur_q = blurs[b];
+                            in.edge_alpha = (mode == GUI_GEOMETRY_EFFECT_MODE_SHADOW) ? 0u :
+                                            (alpha ? 128u : 255u);
+                            in.mode = mode ? GUI_GEOMETRY_EFFECT_MODE_SHADOW
+                                      : GUI_GEOMETRY_EFFECT_MODE_GLOW;
+
+                            if (in.shape == GUI_GEOMETRY_EFFECT_SHAPE_CIRCLE)
                             {
-                                continue;   /* rejected before either runs */
-                            }
-                        }
-                        else
-                        {
-                            in.w = sizes[s][0];
-                            in.h = sizes[s][1];
+                                /* Same relation gui_circle.c establishes: the
+                                 * body is 2r across, and the buffer adds a
+                                 * margin on each side.  Anything else puts the
+                                 * centre off the mirror axis and tests a shape
+                                 * the widget never produces. */
+                                in.w = 2 * in.radius;
+                                in.h = in.w;
 
-                            if (in.radius * 2 > _UI_MIN(in.w, in.h))
+                                if (in.w <= 0)
+                                {
+                                    continue;   /* rejected before either runs */
+                                }
+                            }
+                            else
                             {
-                                in.radius = _UI_MIN(in.w, in.h) / 2;
-                            }
-                        }
+                                in.w = sizes[s][0];
+                                in.h = sizes[s][1];
 
-                        check_one(&tally, &in, s, r, b);
+                                if (in.radius * 2 > _UI_MIN(in.w, in.h))
+                                {
+                                    in.radius = _UI_MIN(in.w, in.h) / 2;
+                                }
+                            }
+
+                            check_one(&tally, &in, s, r, b, mode);
+                        }
                     }
                 }
             }
         }
     }
 
-    gui_log("GLOW_REGIONAL done, %u of %u cases failed\n",
+    gui_log("EFFECT_REGIONAL done, %u of %u cases failed\n",
             (unsigned)tally.failures, (unsigned)tally.cases);
 
     return tally.failures;

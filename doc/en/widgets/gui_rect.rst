@@ -40,6 +40,18 @@ Core Features
      - :cpp:any:`gui_rect_set_glow`
    * - Clear Glow
      - :cpp:any:`gui_rect_clear_glow`
+   * - Enable Shadow
+     - :cpp:any:`gui_rect_set_shadow`
+   * - Set Shadow Colour
+     - :cpp:any:`gui_rect_set_shadow_color`
+   * - Set Shadow Blur Radius
+     - :cpp:any:`gui_rect_set_shadow_blur`
+   * - Set Shadow Spread
+     - :cpp:any:`gui_rect_set_shadow_spread`
+   * - Set Shadow Direction
+     - :cpp:any:`gui_rect_set_shadow_direction`
+   * - Clear Shadow
+     - :cpp:any:`gui_rect_clear_shadow`
    * - Set Opacity
      - :cpp:any:`gui_rect_set_opacity`
    * - Register Click Event Callback
@@ -108,6 +120,74 @@ the same corner and blur radius share one set of pixels regardless of colour.
   section only, never to the parent's bounds. Hit testing still uses the body.
 - When the body leaves the screen, the part of the glow still on screen is not
   erased until something else redraws that area.
+
+Drop Shadow
+-----------
+
+An optional drop shadow can be drawn behind the widget. It is its own layer,
+painted below the glow if there is one and below the body in any case, so a
+half-transparent body lets the shadow show through instead of cutting a hole
+in it.
+
+.. code-block:: c
+
+   gui_rect_set_shadow(rect);                                     /* defaults */
+   gui_rect_set_shadow_color(rect, gui_rgba(0, 0, 0, 128));
+   gui_rect_set_shadow_blur(rect, 12);
+   gui_rect_set_shadow_spread(rect, 2);
+   gui_rect_set_shadow_direction(rect, GUI_SHADOW_DIR_BOTTOM_RIGHT, 8);
+   gui_rect_clear_shadow(rect);
+
+**Parameters**
+
+- The colour's **alpha is the strength**: alpha 0 stops the shadow being drawn
+  without disabling it.
+- ``blur`` is in pixels, clamped to 0..32. 0 stops drawing; raising it again
+  brings the shadow back. Use ``gui_rect_clear_shadow`` to turn it off.
+- ``spread`` inflates the outline by that many pixels on every side, clamped to
+  0..32.
+- ``direction`` picks one of nine presets; ``distance`` is the offset length,
+  clamped to 0..64. ``GUI_SHADOW_DIR_CENTER`` is a uniform halo, not "off".
+
+**Defaults**
+
+Enabling the shadow without setting anything gives a black shadow at alpha 100,
+offset ``(4, 4)``, blur 4 px, spread 0. ``gui_rect_clear_shadow`` keeps the
+configuration, so enabling it again resumes with whatever was last set.
+
+**How It Works**
+
+The mask is the body's own outline blurred: solid inside, falling off outside.
+Unlike the glow it needs no edge compensation -- the body is composited over it
+afterwards, which is exactly the layering a drop shadow wants.
+
+The solid interior is what makes an offset shadow possible. Sliding the whole
+mask sideways exposes the strip of interior just past the body's edge; with an
+empty interior that strip would be missing and the shadow would look detached
+from the widget instead of cast by it.
+
+**Direction and distance are free.** The offset never reaches the mask: it only
+moves the piece the mask is drawn through. So one mask serves all nine
+directions and every distance, and animating either of them re-places the piece
+instead of rasterising anything.
+
+**Parameters**
+
+- Changing colour or strength re-paints without rebuilding the mask.
+- Changing direction or distance re-places without rebuilding the mask.
+- Changing size, corner radius, blur or spread rebuilds it. ``spread`` is
+  folded into the geometry before generation, so a spread shadow and a larger
+  plain body share a mask when their outlines agree.
+
+**Limitations**
+
+- The shadow may extend past a parent container, the same as the glow.
+- When the body leaves the screen, the shadow disappears early: the renderer
+  decides visibility from the body's rectangle only, so the outer
+  ``blur + |offset|`` pixels stop being drawn while they are still on screen.
+- Enabling both glow and shadow is supported, but the layers composite one after
+  another rather than as a group, so a widget opaciting to zero may show a
+  slightly different edge than either layer alone.
 
 Gradient Fill
 -------------

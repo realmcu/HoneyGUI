@@ -19,6 +19,7 @@
 #include "gui_message.h"
 #include "gui_geometry_cache.h"
 #include "gui_geometry_glow.h"
+#include "gui_geometry_shadow.h"
 #include "gui_components_init.h"
 
 #ifndef GEOMETRY_BENCH_FRAMES
@@ -49,12 +50,16 @@ typedef enum
     SCENE_PROGRESS_REBUILD,
     SCENE_RECT_GLOW,
     SCENE_CIRCLE_GLOW,
+    SCENE_RECT_SHADOW,
+    SCENE_CIRCLE_SHADOW,
+    SCENE_SHADOW_DIRECTION,
     SCENE_TOTAL
 } bench_scene_t;
 
 typedef enum
 {
-    WIDGET_ARC, WIDGET_RECT, WIDGET_CIRCLE, WIDGET_PROGRESS, WIDGET_GLOW, WIDGET_TOTAL
+    WIDGET_ARC, WIDGET_RECT, WIDGET_CIRCLE, WIDGET_PROGRESS, WIDGET_GLOW, WIDGET_SHADOW,
+    WIDGET_TOTAL
 } bench_widget_t;
 typedef enum { STYLE_NONE = -1, STYLE_SOLID, STYLE_ALPHA, STYLE_GRADIENT, STYLE_TOTAL } bench_style_t;
 
@@ -64,6 +69,14 @@ typedef struct
     void (*callback)(gui_obj_t *, T_OBJ_CB_TYPE);
     int x;
     int y;
+    bool is_rect;               /**< Which widget was created here.  The
+                                 *   animation code casts through this rather
+                                 *   than re-deriving the type from the scene:
+                                 *   the two answers disagreed once, and a
+                                 *   gui_rounded_rect_t handed to
+                                 *   gui_circle_set_position() scribbles over
+                                 *   the rect's fields. */
+    uint8_t distance;           /**< Shadow offset length, for direction animation. */
 } bench_shape_t;
 
 typedef struct
@@ -97,11 +110,12 @@ static const char *const scene_names[SCENE_TOTAL] =
     "Rect/solid", "Rect/opacity", "Rect/gradient",
     "Circle/solid", "Circle/opacity", "Circle/gradient",
     "Progress/step", "Progress/rebuild",
-    "Rect/glow", "Circle/glow"
+    "Rect/glow", "Circle/glow",
+    "Rect/shadow", "Circle/shadow", "Shadow/dir"
 };
 static const char *const widget_names[WIDGET_TOTAL] =
 {
-    "Arc", "Rect", "Circle", "Progress", "Glow"
+    "Arc", "Rect", "Circle", "Progress", "Glow", "Shadow"
 };
 static gui_obj_t *page;
 static gui_obj_t *layer;
@@ -144,17 +158,25 @@ static bool is_glow_scene(void)
     return scene == SCENE_RECT_GLOW || scene == SCENE_CIRCLE_GLOW;
 }
 
+/** The shadow scenes: two solid bodies plus the direction animation. */
+static bool is_shadow_scene(void)
+{
+    return scene == SCENE_RECT_SHADOW || scene == SCENE_CIRCLE_SHADOW ||
+           scene == SCENE_SHADOW_DIRECTION;
+}
+
 static bench_widget_t widget_kind(void)
 {
     if (is_progress_scene()) { return WIDGET_PROGRESS; }
     if (is_glow_scene()) { return WIDGET_GLOW; }
+    if (is_shadow_scene()) { return WIDGET_SHADOW; }
     return (bench_widget_t)(scene / STYLE_TOTAL);
 }
 
 /** STYLE_NONE for the pairs with no style axis. */
 static bench_style_t style_kind(void)
 {
-    return (is_progress_scene() || is_glow_scene()) ?
+    return (is_progress_scene() || is_glow_scene() || is_shadow_scene()) ?
            STYLE_NONE : (bench_style_t)(scene % STYLE_TOTAL);
 }
 
@@ -163,14 +185,16 @@ static bench_style_t style_kind(void)
  *
  * The HUD holds the finished scene for a second so the combined score can be
  * read, and it takes the score once every scene of the widget has run.  For the
- * 3x3 widgets that means the gradient style; the progress and glow pairs have
- * no style axis, so each names its own final scene.  A style test cannot stand
- * in for them -- style_kind() is STYLE_NONE for every one of their scenes.
+ * 3x3 widgets that means the gradient style; the progress, glow and shadow
+ * groups have no style axis, so each names its own final scene.  A style test
+ * cannot stand in for them -- style_kind() is STYLE_NONE for every one of
+ * their scenes.
  */
 static bool is_widget_final_scene(void)
 {
     if (is_progress_scene()) { return scene == SCENE_PROGRESS_REBUILD; }
     if (is_glow_scene())     { return scene == SCENE_CIRCLE_GLOW; }
+    if (is_shadow_scene())   { return scene == SCENE_SHADOW_DIRECTION; }
     return style_kind() == STYLE_GRADIENT;
 }
 
@@ -206,7 +230,7 @@ static gui_text_t *label(const char *name, const char *text, int y, int height)
     int width = (int)gui_get_dc()->screen_width;
     int inset = _UI_MIN(BENCH_SAFE_MARGIN, width / 8);
     gui_text_t *t = gui_text_create(page, name, inset, y, width - inset * 2, height);
-    gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, gui_rgba(240, 243, 245, 255),
+    gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, gui_rgba(32, 36, 42, 255),
                  (uint16_t)strlen(text), 24);
     gui_text_mode_set(t, LEFT);
     return t;
@@ -274,7 +298,12 @@ static void layer_callback(gui_obj_t *obj, T_OBJ_CB_TYPE type)
                           (float)i;
             int dx = (int)(sinf(angle) * 8.0f);
             int dy = (int)(cosf(angle) * 8.0f);
-            if (widget_kind() == WIDGET_RECT || scene == SCENE_RECT_GLOW)
+            /* The type this slot actually holds, not a re-derivation from the
+             * scene: the two disagreed for SCENE_SHADOW_DIRECTION and the
+             * mismatch wrote through the wrong struct. */
+            bool is_rect = shapes[i].is_rect;
+
+            if (is_rect)
             {
                 gui_rect_set_position((gui_rounded_rect_t *)shapes[i].obj,
                                       shapes[i].x + dx, shapes[i].y + dy);
@@ -283,6 +312,32 @@ static void layer_callback(gui_obj_t *obj, T_OBJ_CB_TYPE type)
             {
                 gui_circle_set_position((gui_circle_t *)shapes[i].obj,
                                         shapes[i].x + dx, shapes[i].y + dy);
+            }
+
+            if (scene == SCENE_SHADOW_DIRECTION)
+            {
+                /* Walk the nine presets so the cache can be checked for
+                 * direction sharing: the mask must not be rebuilt at all. */
+                static const gui_shadow_dir_t dirs[] =
+                {
+                    GUI_SHADOW_DIR_BOTTOM_RIGHT, GUI_SHADOW_DIR_BOTTOM,
+                    GUI_SHADOW_DIR_BOTTOM_LEFT,  GUI_SHADOW_DIR_LEFT,
+                    GUI_SHADOW_DIR_CENTER,       GUI_SHADOW_DIR_RIGHT,
+                    GUI_SHADOW_DIR_TOP_LEFT,     GUI_SHADOW_DIR_TOP,
+                    GUI_SHADOW_DIR_TOP_RIGHT,
+                };
+                uint32_t step = (f / 24u + i) % (uint32_t)(sizeof(dirs) / sizeof(dirs[0]));
+
+                if (is_rect)
+                {
+                    gui_rect_set_shadow_direction((gui_rounded_rect_t *)shapes[i].obj,
+                                                  dirs[step], shapes[i].distance);
+                }
+                else
+                {
+                    gui_circle_set_shadow_direction((gui_circle_t *)shapes[i].obj,
+                                                    dirs[step], shapes[i].distance);
+                }
             }
         }
     }
@@ -337,7 +392,8 @@ static void end_callback(gui_obj_t *obj, T_OBJ_CB_TYPE type)
     if (complete)
     {
         completed_ms = now;
-        if (GEOMETRY_BENCH_ONLY_SCENE < 0 && is_widget_final_scene())
+        bool widget_scored = is_widget_final_scene();
+        if (GEOMETRY_BENCH_ONLY_SCENE < 0 && widget_scored)
         {
             bench_score_t *score = &scores[widget_kind()];
             uint32_t combined = fps10(score->frames + result.frames,
@@ -354,6 +410,7 @@ static void end_callback(gui_obj_t *obj, T_OBJ_CB_TYPE type)
 static gui_obj_t *make_shape(unsigned int i, int x, int y, int size)
 {
     gui_obj_t *obj;
+    bool is_rect = false;
     if (is_progress_scene())
     {
         int radius = _UI_MAX(2, size / 2 - size / 10 - 3);
@@ -361,6 +418,42 @@ static gui_obj_t *make_shape(unsigned int i, int x, int y, int size)
         gui_arc_t *a = gui_arc_create(layer, "progress", x, y, radius, 270.0f,
                                       270.0f + 40.0f, (float)width, color(i));
         obj = (gui_obj_t *)a;
+    }
+    else if (is_shadow_scene())
+    {
+        /* Blur relative to the shape, so every size gets a visible falloff;
+         * spread is left at 0 so the mask stays the body's own outline and the
+         * direction scene can prove the offset alone never rebuilds it. */
+        int32_t shadow_blur = _UI_MIN(GUI_GEOMETRY_GLOW_MAX_BLUR, size / 8);
+        uint8_t distance = (uint8_t)_UI_MAX(2, _UI_MIN(GUI_GEOMETRY_SHADOW_MAX_DISTANCE,
+                                                       size / 12));
+
+        if (scene == SCENE_CIRCLE_SHADOW ||
+            (scene == SCENE_SHADOW_DIRECTION && (i % 2u) != 0u))
+        {
+            gui_circle_t *c = gui_circle_create(layer, "circle_shadow", x, y, size / 2,
+                                                color(i));
+            gui_circle_set_shadow_color(c, gui_rgba(0, 0, 0, 140));
+            gui_circle_set_shadow_blur(c, shadow_blur);
+            gui_circle_set_shadow_direction(c, GUI_SHADOW_DIR_BOTTOM_RIGHT, distance);
+            gui_circle_set_shadow(c);
+            obj = (gui_obj_t *)c;
+        }
+        else
+        {
+            x -= size / 2;
+            y -= size / 2;
+            gui_rounded_rect_t *r = gui_rect_create(layer, "rect_shadow", x, y, size, size,
+                                                    _UI_MAX(1, size / 5), color(i));
+            gui_rect_set_shadow_color(r, gui_rgba(0, 0, 0, 140));
+            gui_rect_set_shadow_blur(r, shadow_blur);
+            gui_rect_set_shadow_direction(r, GUI_SHADOW_DIR_BOTTOM_RIGHT, distance);
+            gui_rect_set_shadow(r);
+            obj = (gui_obj_t *)r;
+            is_rect = true;
+        }
+
+        shapes[i].distance = distance;
     }
     else if (is_glow_scene())
     {
@@ -376,6 +469,7 @@ static gui_obj_t *make_shape(unsigned int i, int x, int y, int size)
                                                     _UI_MAX(1, size / 5), color(i));
             gui_rect_set_glow(r, glow, glow_blur);
             obj = (gui_obj_t *)r;
+            is_rect = true;
         }
         else
         {
@@ -417,6 +511,7 @@ static gui_obj_t *make_shape(unsigned int i, int x, int y, int size)
             gui_rect_add_gradient_stop(r, 1.0f, color(i + 1u));
         }
         obj = (gui_obj_t *)r;
+        is_rect = true;
     }
     else
     {
@@ -435,6 +530,7 @@ static gui_obj_t *make_shape(unsigned int i, int x, int y, int size)
     GUI_ASSERT(obj != NULL);
     shapes[i].obj = obj;
     shapes[i].callback = obj->obj_cb;
+    shapes[i].is_rect = is_rect;
     shapes[i].x = x;
     shapes[i].y = y;
     obj->user_data = &shapes[i];
@@ -456,14 +552,13 @@ static void build_scene(void)
     page = (gui_obj_t *)gui_win_create(gui_obj_get_root(), "geometry_bench", 0, 0,
                                        w, (int)dc->screen_height);
     gui_rect_create(page, "background", 0, 0, w, (int)dc->screen_height, 0,
-                    gui_rgba(18, 20, 24, 255));
-    /* Three cheap bands provide the same visible background for all styles. */
+                    gui_rgba(244, 246, 248, 255));
     for (int i = 0; i < 3; i++)
     {
         gui_rect_create(page, "band", 0, BENCH_HEADER_H + i * h / 3, w,
                         (i + 1) * h / 3 - i * h / 3, 0,
-                        gui_rgba((uint8_t)(24 + i * 10), (uint8_t)(32 + i * 8),
-                                 (uint8_t)(40 + i * 5), 255));
+                        gui_rgba((uint8_t)(250 - i * 8), (uint8_t)(250 - i * 7),
+                                 (uint8_t)(249 - i * 6), 255));
     }
     layer = gui_obj_create(page, "workload", 0, BENCH_HEADER_H, w, h);
     layer->obj_cb = layer_callback;
@@ -534,8 +629,10 @@ static void finish_scene(void)
     score->memory_valid = score->memory_valid && memory_supported && memory_stats.consistent;
     score->timing_valid = score->timing_valid && result.clock_excess_us == 0u;
 
-    uint32_t expected_scenes = (is_progress_scene() || is_glow_scene()) ?
-                               2u : (uint32_t)STYLE_TOTAL;
+    uint32_t expected_scenes;
+    if (is_progress_scene() || is_glow_scene()) { expected_scenes = 2u; }
+    else if (is_shadow_scene())                 { expected_scenes = 3u; }
+    else                                        { expected_scenes = (uint32_t)STYLE_TOTAL; }
     if (score->scenes == expected_scenes)
     {
         fps = fps10(score->frames, score->period_us);
@@ -567,7 +664,8 @@ static void next_scene(void *obj)
     GUI_UNUSED(obj);
     if (!complete) { return; }
 
-    if (GEOMETRY_BENCH_ONLY_SCENE < 0 && is_widget_final_scene() &&
+    bool widget_scored = is_widget_final_scene();
+    if (GEOMETRY_BENCH_ONLY_SCENE < 0 && widget_scored &&
         gui_ms_get() - completed_ms < 1000u)
     {
         return;

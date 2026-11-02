@@ -20,6 +20,8 @@ extern "C" {
 #include "draw_img.h"
 #include "lite_geometry.h"
 #include "gui_geometry_image.h"
+#include "gui_geometry_effect.h"
+#include "gui_geometry_shadow.h"
 
 /*============================================================================*
  *                         Types
@@ -67,7 +69,11 @@ typedef struct
 
     gui_color_t glow_color;     /**< Glow colour; its alpha is the strength. */
     uint8_t glow_blur;          /**< Glow blur radius; 0 disables the glow. */
-    struct gui_geometry_glow *glow;      /**< Glow state, allocated on first use. */
+    struct gui_geometry_effect *glow;      /**< Glow state, allocated on first use. */
+
+    gui_shadow_t shadow;        /**< Shadow configuration, kept across off/on. */
+    struct gui_geometry_effect *shadow_layer; /**< Shadow state, allocated on first use. */
+    bool shadow_enabled;        /**< Configured on; blur/alpha 0 still stops drawing. */
 } gui_rounded_rect_t;
 
 /** Which rasterised part a cached payload holds. */
@@ -224,6 +230,67 @@ void gui_rect_set_glow(gui_rounded_rect_t *rect, gui_color_t color, uint8_t blur
  * @param rect Pointer to the rect widget.
  */
 void gui_rect_clear_glow(gui_rounded_rect_t *rect);
+
+/**
+ * @brief Draw a drop shadow behind the rect.
+ *
+ * The shadow is its own layer, drawn first, then the glow if there is one, then
+ * the body -- so a half-transparent body lets the shadow show through instead of
+ * cutting a hole in it.  Its colour's alpha is the strength, and the offset is a
+ * local vector: the shadow turns with the rect unless the rect's own transform
+ * leaves it upright.
+ *
+ * Changing the direction, the distance or the colour repaints without
+ * rebuilding the mask; only the size, the corner radius, the blur and the
+ * spread change what the mask holds.
+ *
+ * @param rect Pointer to the rect widget.
+ */
+void gui_rect_set_shadow(gui_rounded_rect_t *rect);
+
+/**
+ * @brief Remove the rect's drop shadow.
+ *
+ * Stops drawing and frees the layer; the configuration is kept, so enabling it
+ * again resumes with whatever was last set rather than the defaults.
+ *
+ * @param rect Pointer to the rect widget.
+ */
+void gui_rect_clear_shadow(gui_rounded_rect_t *rect);
+
+/**
+ * @brief Set the rect shadow colour; its alpha is the strength.
+ * @param rect Pointer to the rect widget.
+ * @param color Shadow colour.
+ */
+void gui_rect_set_shadow_color(gui_rounded_rect_t *rect, gui_color_t color);
+
+/**
+ * @brief Set the rect shadow blur radius, clamped to 1..32 px.
+ *
+ * 0 stops the shadow being drawn without disabling it: raising the value again
+ * brings it back.  Use gui_rect_clear_shadow() to turn it off.
+ *
+ * @param rect Pointer to the rect widget.
+ * @param blur_radius Blur radius in pixels.
+ */
+void gui_rect_set_shadow_blur(gui_rounded_rect_t *rect, int32_t blur_radius);
+
+/**
+ * @brief Set how far the rect shadow inflates beyond the body, 0..32 px per side.
+ * @param rect Pointer to the rect widget.
+ * @param spread Pixels to add on every side.
+ */
+void gui_rect_set_shadow_spread(gui_rounded_rect_t *rect, int32_t spread);
+
+/**
+ * @brief Point the rect shadow in one of the nine presets.
+ * @param rect Pointer to the rect widget.
+ * @param direction Which way the shadow falls.
+ * @param distance Offset length in pixels, clamped to 0..64.
+ */
+void gui_rect_set_shadow_direction(gui_rounded_rect_t *rect,
+                                   gui_shadow_dir_t direction, int32_t distance);
 
 /**
  * @brief Register a click event callback for the rect widget.
