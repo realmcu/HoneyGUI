@@ -556,6 +556,36 @@ extern "C" {
     "health/temperature/measuring"
 
 /**
+ * Latest valid stress level.
+ *
+ * Access: Read-only
+ * Type: GUI_SYSVAL_TYPE_INT
+ * Range: 0..100
+ * Unit: Stress level index, where 0 is relaxed and 100 is highest stress
+ */
+#define GUI_SYSVAL_KEY_HEALTH_STRESS "health/stress"
+
+/**
+ * Lowest valid stress level today.
+ *
+ * Access: Read-only
+ * Type: GUI_SYSVAL_TYPE_INT
+ * Range: 0..100
+ * Unit: Stress level index, where 0 is relaxed and 100 is highest stress
+ */
+#define GUI_SYSVAL_KEY_HEALTH_STRESS_DAILY_MIN "health/stress/daily_min"
+
+/**
+ * Highest valid stress level today.
+ *
+ * Access: Read-only
+ * Type: GUI_SYSVAL_TYPE_INT
+ * Range: 0..100
+ * Unit: Stress level index, where 0 is relaxed and 100 is highest stress
+ */
+#define GUI_SYSVAL_KEY_HEALTH_STRESS_DAILY_MAX "health/stress/daily_max"
+
+/**
  * Deep sleep accumulated today.
  *
  * Access: Read-only

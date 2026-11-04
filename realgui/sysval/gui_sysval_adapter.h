@@ -6,13 +6,17 @@
 
 /**
  * @file gui_sysval_adapter.h
- * @brief Adapter contract for system value requests.
+ * @brief Adapter contract for system values.
  *
  * An adapter receives a request and answers it with gui_sysval_respond(),
  * exactly once. It may answer inside get_request (see
  * gui_port_sysval_sync.c) or keep the request pointer and answer later from
  * any thread (see gui_port_sysval_async.c). HoneyGUI always delivers the
  * answer to the UI on the GUI thread.
+ *
+ * An adapter only serves reads and writes. To report a value that changed on
+ * its own, a producer calls gui_sysval_publish(), declared in gui_sysval.h
+ * together with the rest of the consumer API.
  */
 
 #ifndef __GUI_SYSVAL_ADAPTER_H__

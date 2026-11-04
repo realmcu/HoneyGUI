@@ -6,6 +6,7 @@ a complete minimal build input. CI copies one `.config_*` file to
 
 - `application/` contains the configs for `example/application/`.
 - `widget/` contains the configs for `example/widget/`.
+- `sysval/` contains the configs for `example/sysval/`.
 
 When a build option changes, update the affected files explicitly so the
 configuration diff is visible in review.

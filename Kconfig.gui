@@ -49,11 +49,17 @@ config REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
     help
       HoneyGUI Base Demo - Text Widget
 
-config REALTEK_BUILD_EXAMPLE_SYSVAL
-    bool "System Value Demo"
+config REALTEK_BUILD_EXAMPLE_SYSVAL_REQUEST
+    bool "System Value Request Demo"
     help
-      HoneyGUI system value demo showing standard platform-independent
-      values through the asynchronous sysval request API.
+      HoneyGUI system value request demo showing standard
+      platform-independent values through the asynchronous sysval API.
+
+config REALTEK_BUILD_EXAMPLE_SYSVAL_SUBSCRIBE
+    bool "System Value Subscription Demo"
+    help
+      HoneyGUI system value subscription demo showing how a screen consumes
+      values published by the platform.
 
 config REALTEK_BUILD_REAL_DOG_3D
     bool "3D Dog Demo"

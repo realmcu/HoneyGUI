@@ -205,6 +205,8 @@ python all_build.py                    # Every stage, writes test_report.txt
 # Individual stages
 python widget_build_by_scons.py         # example/widget demos, SCons
 python widget_build_by_cmake.py         # example/widget demos, CMake
+python sysval_build_by_scons.py         # example/sysval demos, SCons
+python sysval_build_by_cmake.py         # example/sysval demos, CMake
 python application_build_by_scons.py    # example/application demos, SCons
 python application_build_by_cmake.py    # example/application demos, CMake
 python lib_build_by_cmake.py            # lib/ prebuilt libraries, CMake

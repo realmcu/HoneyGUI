@@ -29,6 +29,8 @@ STAGES = [
     ("Library build (CMake)", "lib_build_by_cmake.py", []),
     ("Widget demos (SCons)", "widget_build_by_scons.py", []),
     ("Widget demos (CMake)", "widget_build_by_cmake.py", []),
+    ("System Value demos (SCons)", "sysval_build_by_scons.py", []),
+    ("System Value demos (CMake)", "sysval_build_by_cmake.py", []),
     ("Application demos (SCons)", "application_build_by_scons.py", []),
     ("Application demos (CMake)", "application_build_by_cmake.py", []),
 ]
