@@ -12,6 +12,7 @@ HoneyGUI
   GUI Application <GUI-APP/index>
   Widgets <widgets/index>
   Porting <Porting/index>
+  System Value <System-Value/index>
   Samples <sample/index>
   Tool <tool/index>
   Design Spec <Design/index>

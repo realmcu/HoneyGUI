@@ -16,6 +16,7 @@ HoneyGUI
    GUI 应用程序 <GUI-APP/index>
    控件 <widgets/index>
    移植 <Porting/index>
+   系统值 <System-Value/index>
    示例 <sample/index>
    工具 <tool/index>
    设计说明 <Design/index>
