@@ -358,7 +358,7 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *p
         }
         else if (head->jpeg)
         {
-            gui_acc_jpeg_free(img->data);
+            gui_acc_jpeg_release(img->data);
         }
         else if (head->idu)
         {

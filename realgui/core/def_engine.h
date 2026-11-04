@@ -75,6 +75,9 @@ typedef struct gui_jpeg_ops
     void (*init)(void);
     void *(*load)(void *input, int len, int *w, int *h, int *channel);
     void (*release)(void *data);
+    void *(*compress)(void *input, int w, int h, int bpp,
+                      int quality, int buf_len, int *out_len);
+    void (*free)(void *data);
     void (*deinit)(void);
 } gui_jpeg_ops_t;
 

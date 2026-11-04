@@ -304,7 +304,7 @@ static void gui_video_draw(gui_obj_t *obj)
         {
             if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
             {
-                gui_acc_jpeg_free(this->frame_buff_raw);
+                gui_acc_jpeg_release(this->frame_buff_raw);
             }
             else if (this->img_type == VIDEO_TYPE_H264)
             {
@@ -810,7 +810,7 @@ static void video_release_frame(gui_video_t *this, uint8_t img_type)
     {
         if (img_type == VIDEO_TYPE_MJPEG || img_type == VIDEO_TYPE_AVI)
         {
-            gui_acc_jpeg_free(this->frame_buff_raw);
+            gui_acc_jpeg_release(this->frame_buff_raw);
         }
         else if (img_type == VIDEO_TYPE_H264)
         {
@@ -2083,6 +2083,16 @@ static int gui_video_src_init(gui_video_t  *this)
     uint8_t header[16];
 
     memset(header, 0, sizeof(header));
+    if (this->storage_type == IMG_SRC_FILESYS)
+    {
+        char *file = this->data;
+        const void *data = gui_vfs_get_file_address(file);
+        if (data)
+        {
+            this->storage_type == IMG_SRC_MEMADDR;
+        }
+    }
+
     if (this->storage_type == IMG_SRC_FILESYS)
     {
         char *file = this->data;
