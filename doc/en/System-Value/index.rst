@@ -48,8 +48,9 @@ adapter so the application can read the level on demand, and publishes every
 time the level actually changes. Keeping both in one place is what makes a
 read and a subscription give the same answer.
 
-The type, access, unit and range of each key are fixed per entry by the
-catalog in :doc:`keys`. Two rules make one catalog usable across products.
+The type, access, unit and range of each key are fixed per entry by the key
+catalog in the architecture chapter. Two rules make one catalog usable across
+products.
 Declaring a key does not register it: an adapter registers only what its
 platform supports and every other key answers
 ``GUI_SYSVAL_REQUEST_INVALID``, so a screen can probe for an optional
@@ -57,17 +58,14 @@ capability without a build-time flag. And missing data is not a value: a key
 with no current reading answers ``GUI_SYSVAL_STATUS_ERROR`` with no value, so
 zero always means a real zero.
 
-The sections below take these in turn: the full key catalog, how a change
-travels from a driver thread to a callback, how a port implements a key, how
-an application reads and subscribes, and working example code.
+The sections below take these in turn: the key catalog, how a change travels
+from a driver thread to a callback, how an application reads and subscribes,
+and how a port implements a key through an adapter.
 
 
 .. toctree::
     :maxdepth: 2
 
-    Key Catalog <keys>
     Architecture <architecture>
-    Adapters <adapter>
-    Consumers <consumer>
-    Porting <porting>
-    Examples <example>
+    Usage and Examples <consumer>
+    Porting and Adapters <porting>

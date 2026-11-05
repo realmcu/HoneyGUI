@@ -1,33 +1,43 @@
 .. _System-Value-Consumer_CN:
 
 ==========================
-使用方
+使用方法与示例
 ==========================
 
-这一章是应用开发者需要的部分。涵盖读一次、写一次，以及跟随一个值的
-变化。
+这一章面向应用开发者，结合 HoneyGUI 附带的请求示例和订阅示例，说明如何
+读取、写入并跟随一个系统值的变化。两个示例刻意写得窄：每个只演示一种
+使用方式，代码可以直接作为参考。
+
+用 ``menuconfig`` 选择其中一个：
+
+.. code-block:: none
+
+   System Value Request Demo
+   System Value Subscription Demo
+
+这两个选项互斥，构建时只会编译被选中的源文件。
 
 
-读一次
+请求示例
 ----------------------
+
+``example/sysval/example_sysval_request.c`` 演示请求/应答路径。一个每秒
+触发的定时器读取十个 key，并把每个结果放进各自的文本控件：
 
 .. literalinclude:: ../../../example/sysval/example_sysval_request.c
    :language: c
-   :start-at: static void battery_done
-   :end-before: static void charging_done
+   :start-at: static void refresh(void *obj)
+   :end-before: /*====================
 
 如果调用返回了有效的 ID，回调会恰好执行一次，在 GUI 线程上，且在调用
 返回之后。如果返回 ``GUI_SYSVAL_REQUEST_INVALID``，回调永远不会执行：
 这发生在参数无效、key 未知或不可读，或者内存不足时。
 
 传给回调的值是一个快照，仅在回调执行期间有效：需要什么就复制出来，不
-要保留指针。
+要保留指针。这个调用点同时覆盖了平台立即应答、需要半秒才应答、平台上
+不存在，以及从工作线程应答的 key。
 
-
-写入
-----------------------
-
-下面这段取自请求示例，写入亮度并用 ``write_done`` 记录结果：
+第二个一次性定时器写入几个值并记录结果，写入亮度并记录完成状态：
 
 .. literalinclude:: ../../../example/sysval/example_sysval_request.c
    :language: c
@@ -47,10 +57,11 @@
   ``GUI_SYSVAL_STATUS_INVALID_VALUE`` 之类的状态回调。
 
 
-跟随变化
+订阅示例
 ----------------------
 
-取订阅示例中的回调和订阅调用：
+``example/sysval/example_sysval_subscribe.c`` 演示变化路径。它订阅电量
+和充电状态，把收到的内容画出来：
 
 .. literalinclude:: ../../../example/sysval/example_sysval_subscribe.c
    :language: c
@@ -62,6 +73,9 @@
    :start-at: if (gui_sysval_subscribe(GUI_SYSVAL_KEY_POWER_BATTERY_LEVEL,
    :end-before: gui_log("sysval subscribe failed
    :dedent: 4
+
+这个示例既不发布也不读取。两行都会保持 ``--``，直到平台上报变化。这正
+是订阅者所提供内容的真实写照：一条变化流，而不是一个值缓存。
 
 订阅者能得到以下保证：
 
@@ -117,3 +131,19 @@
 
 如果界面的控件在整个运行期间都存活，例如顶层表盘，则不需要取消任何
 订阅。
+
+
+运行示例
+----------------------
+
+.. code-block:: shell
+
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui      # 选择两个示例之一
+   scons
+   cd ../..
+   ./simulator/win32/gui             # Windows 上是 gui.exe
+
+模拟器移植层用合理的固定值应答标准 key，因此示例无需任何硬件即可运行。
+这些移植层位于 ``simulator/win32/port/realgui_port/sysval/``，同时也是
+最易读的适配器示例。

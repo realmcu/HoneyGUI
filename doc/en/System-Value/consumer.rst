@@ -1,20 +1,36 @@
 .. _System-Value-Consumer_EN:
 
 ==========================
-Consumers
+Usage and Examples
 ==========================
 
-This is the part an application author needs. It covers reading a value
-once, writing one, and following one as it changes.
+This chapter is for application authors. It uses the request and subscription
+demos shipped with HoneyGUI to show how to read, write, and follow a system
+value. Both demos are deliberately narrow: each shows one usage pattern, so
+the code can be read as a reference.
+
+Select one with ``menuconfig``:
+
+.. code-block:: none
+
+   System Value Request Demo
+   System Value Subscription Demo
+
+The two options are mutually exclusive, and the build compiles only the
+selected source file.
 
 
-Reading Once
-------------
+Request Example
+---------------
+
+``example/sysval/example_sysval_request.c`` shows the request/response path.
+A one second timer reads ten keys and puts each answer in its own text
+widget:
 
 .. literalinclude:: ../../../example/sysval/example_sysval_request.c
    :language: c
-   :start-at: static void battery_done
-   :end-before: static void charging_done
+   :start-at: static void refresh(void *obj)
+   :end-before: /*====================
 
 If the call returns a valid ID, the callback runs exactly once, on the GUI
 thread, after the call has returned. If it returns
@@ -23,11 +39,13 @@ the arguments are invalid, the key is unknown or not readable, or memory is
 unavailable.
 
 The value passed to the callback is a snapshot. It is valid only for the
-duration of the callback: copy what you need, do not keep the pointer.
+duration of the callback: copy what you need, do not keep the pointer. This
+call site covers keys answered immediately, keys that take half a second,
+keys that are absent from the platform, and keys answered from a worker
+thread.
 
-
-Writing
--------
+A second, one-shot timer writes a few values and logs what happened. This
+snippet writes brightness and records the completion status:
 
 .. literalinclude:: ../../../example/sysval/example_sysval_request.c
    :language: c
@@ -49,8 +67,12 @@ Two failure styles are worth telling apart:
   ``GUI_SYSVAL_STATUS_INVALID_VALUE``.
 
 
-Following Changes
------------------
+Subscription Example
+--------------------
+
+``example/sysval/example_sysval_subscribe.c`` shows the change path. It
+subscribes to the battery level and the charging state, and draws whatever
+arrives:
 
 .. literalinclude:: ../../../example/sysval/example_sysval_subscribe.c
    :language: c
@@ -62,6 +84,10 @@ Following Changes
    :start-at: if (gui_sysval_subscribe(GUI_SYSVAL_KEY_POWER_BATTERY_LEVEL,
    :end-before: gui_log("sysval subscribe failed
    :dedent: 4
+
+The demo does not publish and does not read. Both lines stay as ``--`` until
+the platform reports a change, which is the honest picture of what a
+subscriber provides: a change stream, not a value cache.
 
 What the subscriber is promised:
 
@@ -121,3 +147,20 @@ normal way to make a subscription one-shot.
 
 A screen whose widgets live for the whole run, such as a top level watch
 face, does not have to cancel anything.
+
+
+Running the Examples
+--------------------
+
+.. code-block:: shell
+
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui      # pick one of the two demos
+   scons
+   cd ../..
+   ./simulator/win32/gui             # gui.exe on Windows
+
+The simulator port answers the standard keys with plausible fixed values, so
+the demos run without any hardware. The ports live in
+``simulator/win32/port/realgui_port/sysval/`` and are also the smallest
+readable example of an adapter.
