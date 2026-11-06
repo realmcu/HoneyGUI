@@ -16,7 +16,6 @@
 #include "tp_algo.h"
 #include "gui_list.h"
 #include "gui_view.h"
-#include "gui_canvas.h"
 
 
 /*============================================================================*
@@ -37,6 +36,9 @@ static bool quick_slide = false;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+static uint16_t gui_list_argb_to_rgb565(gui_color_t color);
+static void gui_list_fill_bar(gui_list_t *_this);
+
 static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index);
 
 static void gui_list_note_animate_timer_cb(void *obj)
@@ -76,14 +78,45 @@ static void gui_list_update_speed(gui_list_t *_this, int16_t tp_delta)
     }
 }
 
-static void gui_list_update_bar_data_cb(NVGcontext *vg)
+static uint16_t gui_list_argb_to_rgb565(gui_color_t color)
 {
-    nvgRoundedRect(vg, 0, 0, g_Bar_Width, g_Bar_Height, 2);
-    nvgFillColor(vg, nvgRGBA(g_Bar_Color.color.rgba.r,
-                             g_Bar_Color.color.rgba.g,
-                             g_Bar_Color.color.rgba.b,
-                             g_Bar_Color.color.rgba.a));
-    nvgFill(vg);
+    uint16_t r5 = (uint16_t)(color.color.rgba.r >> 3);
+    uint16_t g6 = (uint16_t)(color.color.rgba.g >> 2);
+    uint16_t b5 = (uint16_t)(color.color.rgba.b >> 3);
+    return (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+}
+
+/* Redraw the scrollbar image in place. The bar is 5px wide and at most one
+ * screen edge long, so filling it a pixel at a time costs less than allocating
+ * an anti-aliased rasteriser for it. */
+static void gui_list_fill_bar(gui_list_t *_this)
+{
+    uint16_t *buf = (uint16_t *)((uint8_t *)_this->bar_data + sizeof(gui_rgb_data_head_t));
+    int16_t bar_w = _this->bar->base.w;
+    int16_t bar_h = _this->bar->base.h;
+    int16_t rw = (g_Bar_Width < bar_w) ? g_Bar_Width : bar_w;
+    int16_t rh = (g_Bar_Height < bar_h) ? g_Bar_Height : bar_h;
+    uint16_t color = gui_list_argb_to_rgb565(g_Bar_Color);
+    const int16_t radius = 2;
+
+    memset(buf, 0, (size_t)bar_w * bar_h * sizeof(uint16_t));
+
+    for (int16_t y = 0; y < rh; y++)
+    {
+        for (int16_t x = 0; x < rw; x++)
+        {
+            /* Skip the four corner squares that fall outside the arc. */
+            int16_t cx = -1, cy = -1;
+            if (x < radius) { cx = radius - x; }
+            else if (x >= rw - radius) { cx = x - (rw - radius - 1); }
+            if (y < radius) { cy = radius - y; }
+            else if (y >= rh - radius) { cy = y - (rh - radius - 1); }
+
+            if (cx > 0 && cy > 0 && (cx * cx + cy * cy) > radius * radius) { continue; }
+
+            buf[y * bar_w + x] = color;
+        }
+    }
 }
 
 static void gui_list_update_bar(gui_obj_t *obj)
@@ -109,10 +142,7 @@ static void gui_list_update_bar(gui_obj_t *obj)
             gui_obj_hidden(GUI_BASE(_this->bar), total_length == h);
         }
         g_Bar_Color = _this->bar_color;
-        memset(_this->bar_data, 0, _this->bar->base.w * _this->bar->base.h * 4);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, _this->bar->base.w, _this->bar->base.h,
-                                          gui_list_update_bar_data_cb,
-                                          _this->bar_data);
+        gui_list_fill_bar(_this);
     }
 
     float t_x = 0;
@@ -1085,11 +1115,13 @@ static void gui_list_create_bar(gui_list_t *_this,
         bar_w = LIST_BAR_WIDTH;
         bar_h = _this->area_display ? h : dc->screen_height;
     }
-    int pixel_bytes = 4;
-    size_t buffer_size = bar_h * bar_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    size_t buffer_size = (size_t)bar_w * bar_h * sizeof(uint16_t) + sizeof(gui_rgb_data_head_t);
     _this->bar_data = gui_malloc(buffer_size);
     GUI_ASSERT(_this->bar_data != NULL);
     memset(_this->bar_data, 0, buffer_size);
+    ((gui_rgb_data_head_t *)_this->bar_data)->type = RGB565;
+    ((gui_rgb_data_head_t *)_this->bar_data)->w = bar_w;
+    ((gui_rgb_data_head_t *)_this->bar_data)->h = bar_h;
     _this->bar = gui_img_create_from_mem(_this->base.parent, "list_bar", _this->bar_data, bar_x, bar_y,
                                          bar_w, bar_h);
     gui_img_set_mode(_this->bar, IMG_SRC_OVER_MODE);

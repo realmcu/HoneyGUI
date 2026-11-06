@@ -217,10 +217,6 @@ config REALTEK_GUI_WIDGET_VIEW
     bool "gui_view - view container, button, transitions"
     default y
 
-config REALTEK_GUI_WIDGET_CANVAS
-    bool "gui_canvas - custom drawing canvas"
-    default y
-
 config REALTEK_GUI_WIDGET_GEOMETRY
     bool "gui_geometry - arc, circle, rect"
     default y
@@ -228,67 +224,15 @@ config REALTEK_GUI_WIDGET_GEOMETRY
 config REALTEK_GUI_WIDGET_LIST
     bool "gui_list - scrollable list"
     default y
-    select REALTEK_GUI_WIDGET_CANVAS
     select REALTEK_GUI_WIDGET_VIEW
-
-config REALTEK_GUI_WIDGET_SVG
-    bool "gui_svg - SVG vector graphics"
-    default y
 
 config REALTEK_GUI_WIDGET_GIF
     bool "gui_gif - animated GIF"
     default y
 
-config REALTEK_GUI_WIDGET_GLASS
-    bool "gui_glass - glass / blur effect"
-    default y
-
-config REALTEK_GUI_WIDGET_VIDEO
-    bool "gui_video - video playback"
-    default y
-
-config REALTEK_GUI_WIDGET_LITE_VIDEO
-    bool "gui_lite_video - MSV1 + Cinepak unified video"
-    default y
-    select REALTEK_GUI_WIDGET_VIDEO
-
-config REALTEK_GUI_WIDGET_STREAM
-    bool "gui_stream - live RAW video stream"
-    default y
-    select REALTEK_GUI_WIDGET_LITE_VIDEO
-
 config REALTEK_GUI_WIDGET_QBCODE
     bool "gui_qbcode - barcode / QR code"
     default y
-
-config REALTEK_GUI_WIDGET_SOCCER
-    bool "gui_soccer - 2.5D soccer"
-    default y
-
-config REALTEK_GUI_WIDGET_CARD_LIST
-    bool "gui_card_list - 3D perspective carousel"
-    default y
-
-config REALTEK_GUI_WIDGET_MENU_CELLULAR
-    bool "gui_menu_cellular - cellular menu"
-    default y
-
-config REALTEK_GUI_WIDGET_LITE3D
-    bool "gui_lite3d - 3D rendering widget"
-    depends on REALTEK_BUILD_LITE3D
-    default y
-    help
-      Widget adapter for the Lite3D library. Kept separate from
-      REALTEK_BUILD_LITE3D so the library can be used without the widget.
-
-config REALTEK_GUI_WIDGET_PARTICLE
-    bool "gui_particle - particle effect widget"
-    depends on REALTEK_BUILD_PARTICLE_SYSTEM
-    default y
-    select REALTEK_GUI_WIDGET_GEOMETRY
-    help
-      Widget adapter for the particle system core. The core in 3rd/particle
-      is independent and can be used without HoneyGUI.
 
 endmenu
 
