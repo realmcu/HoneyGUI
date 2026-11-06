@@ -155,7 +155,6 @@ static void gui_server_entry(void *parameter)
 __attribute__((weak))  void gui_port_indev_init(void) {}
 __attribute__((weak))  void gui_port_fs_init(void) {}
 __attribute__((weak))  void gui_port_ftl_init(void) {}
-__attribute__((weak))  void gui_port_audio_init(void) {}
 __attribute__((weak))  void gui_port_acc_init(void) { gui_acc_default_init();}
 
 
@@ -182,14 +181,12 @@ int gui_server_init(void)
     extern void gui_port_fs_init(void);
     extern void gui_port_ftl_init(void);
     extern void gui_port_acc_init(void);
-    extern void gui_port_audio_init(void);
     gui_port_acc_init();
     gui_port_os_init();
     gui_port_dc_init();
     gui_port_indev_init();
     gui_port_fs_init();
     gui_port_ftl_init();
-    gui_port_audio_init();
 
     /* Engine */
     extern int gui_default_font_init(void);

@@ -128,62 +128,6 @@ config REALTEK_BUILD_MONKEY_TEST
     help
       HoneyGUI Enable Monkey Test Log
 
-config REALTEK_H264_DECODER
-            bool "Enable REALTEK_H264_DECODER support"
-            default n
-
-        if REALTEK_H264_DECODER
-
-            config REALTEK_H264BSD
-                bool "Enable REALTEK H264BSD"
-
-        endif
-
-config REALTEK_BUILD_GUI_BOX2D
-    bool "Enable Box2D"
-    default n
-    help
-      HoneyGUI Box2D physics engine
-
-config REALTEK_BUILD_LITE3D
-    bool "Enable Lite3D library"
-    default n
-    help
-      HoneyGUI Enable Lite3D library
-
-config REALTEK_BUILD_XML_LOADER
-    bool "Enable XML Loader"
-    default n
-    select REALTEK_BUILD_LITE3D
-    select REALTEK_H264_DECODER
-    select REALTEK_GUI_WIDGET_VIEW
-    select REALTEK_GUI_WIDGET_LIST
-    select REALTEK_GUI_WIDGET_GEOMETRY
-    select REALTEK_GUI_WIDGET_VIDEO
-    help
-      HoneyGUI Enable XML Loader (ezXML)
-
-config REALTEK_BUILD_PARTICLE_SYSTEM
-    bool "Enable Particle System"
-    default n
-    help
-      HoneyGUI Enable lightweight particle system for visual effects
-      including firework, trail, touch, snow and bubble effects.
-      The particle system core is independent and can be used
-      without HoneyGUI.
-
-config REALTEK_MINIMP3
-    bool "Enable Minimp3"
-    default n
-    help
-      HoneyGUI Enable Minimp3 decoder
-
-config REALTEK_BUILD_AUDIO
-    bool "Enable Audio"
-    default n
-    help
-      HoneyGUI Enable Audio, depending on "Minimp3" for simulator
-
 endmenu
 
 menu "HoneyGUI Widget Configuration"
