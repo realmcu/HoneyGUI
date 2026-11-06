@@ -39,8 +39,6 @@ typedef struct gui_win
     uint8_t checksum;
     bool scope;
     bool hold_tp;
-    void *blur_param;
-    uint8_t blur_degree;
     uint8_t opacity_value;
 } gui_win_t;
 
@@ -178,11 +176,9 @@ void gui_win_hold_tp(gui_win_t *_this, bool hold_tp);
  *
  * @note A zero rate collapses the subtree to a line or a point.  The ctor seeds
  *       both rates to 1.0f, so a win never scales until this is called.
- * @note Unlike gui_win_set_rotation(), this composes with blur: the blur rect is
- *       derived from the scale terms, so a scale-only win keeps an accurate blur
- *       area.  Off-screen culling keeps working too, because it accepts a matrix
- *       with scale and translation as long as the rotation terms are zero
- *       (gui_obj_out_screen()).  Touch hit-testing still has the rotation
+ * @note Unlike gui_win_set_rotation(), a scale-only win keeps off-screen culling:
+ *       gui_obj_out_screen() accepts a matrix with scale and translation as long
+ *       as the rotation terms are zero.  Touch hit-testing still has the rotation
  *       caveat, however: gui_obj_point_in_obj_rect() tests the axis-aligned
  *       bounding box of the transformed rectangle, so the empty corners around a
  *       shrunk win count as hits.  Combined with a rotation, culling stops as
@@ -279,20 +275,6 @@ int gui_win_get_y(gui_win_t *win);
  * @param y Y-coordinate to compensate.
  */
 void gui_win_compensate(gui_win_t *win, int x, int y);
-
-/**
- * @brief Enable GUI window's blur effect.
- * @param win Pointer to the GUI window.
- * @param enable True to enable blur effect, false to disable.
- */
-void gui_win_enable_blur(gui_win_t *win, bool enable);
-
-/**
- * @brief Set the blur degree for the GUI window.
- * @param win Pointer to the GUI window.
- * @param degree Blur degree value (0-255) and default value is 225.
- */
-void gui_win_set_blur_degree(gui_win_t *win, uint8_t degree);
 
 #ifdef __cplusplus
 }

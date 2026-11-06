@@ -788,12 +788,6 @@ void gui_img_a8_mix_alpha(gui_img_t *_this, uint8_t alpha_mix)
     _this->opacity_value = alpha_mix;
 }
 
-void gui_img_a8_blur_degree(gui_img_t *_this, uint8_t blur_degree)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    _this->opacity_value = blur_degree;
-}
-
 void gui_img_clip(gui_img_t *_this, bool clip)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);

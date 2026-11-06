@@ -43,35 +43,10 @@ void text_measure_test(void)
             bmp_multi->char_width_sum, bmp_multi->char_height_sum,
             bmp_multi->char_line_sum, bmp_multi->active_font_len, bmp_multi->font_len);
 
-    /* [3] TTF single-line */
-    gui_text_t *ttf_single = gui_text_create(root, "ttf_single", 0, 260, 300, 50);
-    char *str3 = "TTF Single";
-    gui_text_set(ttf_single, str3, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(str3), 32);
-    gui_text_type_set(ttf_single, font32vb4, FONT_SRC_MEMADDR);
-    gui_text_mode_set(ttf_single, LEFT);
-
-    gui_text_layout_measure(ttf_single);
-    gui_log("[TTF single] w=%d h=%d lines=%d visible=%d/%d\n",
-            ttf_single->char_width_sum, ttf_single->char_height_sum,
-            ttf_single->char_line_sum, ttf_single->active_font_len, ttf_single->font_len);
-
-    /* [4] TTF multi-line with wordwrap */
-    gui_text_t *ttf_multi = gui_text_create(root, "ttf_multi", 0, 320, 120, 200);
-    char *str4 = "TTF Multi Line Word Wrap Test Example";
-    gui_text_set(ttf_multi, str4, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(str4), 32);
-    gui_text_type_set(ttf_multi, font32vb4, FONT_SRC_MEMADDR);
-    gui_text_mode_set(ttf_multi, MULTI_LEFT);
-    gui_text_wordwrap_set(ttf_multi, true);
-
-    gui_text_layout_measure(ttf_multi);
-    gui_log("[TTF multi]  w=%d h=%d lines=%d visible=%d/%d\n",
-            ttf_multi->char_width_sum, ttf_multi->char_height_sum,
-            ttf_multi->char_line_sum, ttf_multi->active_font_len, ttf_multi->font_len);
-
-    /* [5] BMP horizontal scroll */
+    /* [3] BMP horizontal scroll */
     gui_scroll_text_t *scroll_x = gui_scroll_text_create(root, "scroll_x", 320, 0, 160, 50);
-    char *str5 = "HoneyGUI Horizontal Scroll Text Layout Measure";
-    gui_scroll_text_set(scroll_x, str5, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(str5), 32);
+    char *str3 = "HoneyGUI Horizontal Scroll Text Layout Measure";
+    gui_scroll_text_set(scroll_x, str3, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(str3), 32);
     gui_scroll_text_type_set(scroll_x, font32b4, FONT_SRC_MEMADDR);
     gui_scroll_text_scroll_set(scroll_x, SCROLL_X, 0, 0, 8000, 0);
 

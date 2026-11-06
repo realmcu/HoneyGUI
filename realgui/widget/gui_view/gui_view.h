@@ -30,8 +30,6 @@ extern "C" {
 typedef enum
 {
     SWITCH_INIT_STATE = 0x0000, ///< Default status.
-    SWITCH_IN_STILL_USE_BLUR,   ///< Switch in still with gauss blur.
-    SWITCH_OUT_STILL_USE_BLUR,  ///< Switch out still with gauss blur.
 
     SWITCH_OUT_TO_LEFT_USE_TRANSLATION = 0x0100, ///< Switch out to left with transition effect.
     SWITCH_OUT_TO_RIGHT_USE_TRANSLATION, ///< Switch out to right with transition effect.
@@ -114,7 +112,6 @@ typedef struct gui_view
     VIEW_SWITCH_STYLE current_transition_style;
     gui_event_code_t current_event_code;
     const struct gui_view_descriptor *descriptor;
-    void *blur_param;
     struct gui_view_on_event **on_event;
 
     draw_img_t *bg_img;

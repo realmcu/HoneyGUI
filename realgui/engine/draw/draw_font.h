@@ -56,7 +56,6 @@ typedef struct
     uint16_t char_h;            /**< glyph height (pixels); 16-bit to match uint16 font_size */
     uint8_t *dot_addr;
     uint8_t *buf;
-    uint8_t is_emoji;           /**< 1 = color emoji bitmap (dot_addr is ARGB source) */
 
 #if ENABLE_FONT_V3_TYPO
     /* V3 bearing-based fields (zero-initialized for V1 glyphs) */
@@ -83,20 +82,6 @@ typedef enum
 
     UTF_32BE             = 4,
 } TEXT_CHARSET;
-
-typedef enum
-{
-    GUI_EMOJI_PRESENTATION_NONE = 0,
-    GUI_EMOJI_PRESENTATION_TEXT,
-    GUI_EMOJI_PRESENTATION_COLOR,
-} gui_emoji_presentation_t;
-
-typedef struct
-{
-    gui_emoji_presentation_t presentation;
-    uint16_t sequence_len;
-    uint8_t selector_len;
-} gui_emoji_sequence_t;
 
 typedef struct
 {
@@ -167,27 +152,6 @@ uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content,
  * @return Length of the UTF8 string in bytes.
  */
 uint32_t get_len_by_char_num(uint8_t *utf8, uint32_t char_num);
-
-/**
- * @brief Resolve the Unicode presentation and length of an emoji sequence.
- *
- * @param unicode_buf Unicode sequence starting at the candidate code point.
- * @param len Remaining number of Unicode code points.
- * @param result Resolved presentation, sequence length and selector length.
- * @return true if the first code point is handled by emoji presentation rules.
- */
-bool gui_unicode_resolve_emoji(const uint32_t *unicode_buf, uint32_t len,
-                               gui_emoji_sequence_t *result);
-
-/**
- * @brief Append an emoji resource name to an existing path prefix.
- *
- * @param unicode_buf Unicode buffer to generate the name from.
- * @param sequence_len Number of code points in the resolved sequence.
- * @param file_path Output path containing an existing prefix.
- */
-void gui_unicode_append_emoji_file_name(const uint32_t *unicode_buf, uint32_t sequence_len,
-                                        char *file_path);
 
 /**
  * @brief Check if the content has any Arabic or Persian Unicode characters.

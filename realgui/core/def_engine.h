@@ -54,22 +54,6 @@ typedef struct gui_blit_ops
     void (*deinit)(void);
 } gui_blit_ops_t;
 
-typedef struct gui_blur_ops
-{
-    void (*init)(void);
-    void (*prepare)(void **cache_mem);
-    void (*process)(uint8_t *buffer, uint16_t buffer_stride, uint16_t bit_depth,
-                    const gui_rect_t *buffer_rect, const gui_rect_t *valid_rect,
-                    const gui_rect_t *target_rect, uint8_t blur_degree, void *cache_mem);
-    void (*release)(void **cache_mem);
-    bool (*scale)(uint8_t *target_buffer, const uint8_t *source_buffer,
-                  uint16_t source_width, uint16_t source_height,
-                  uint16_t source_stride, uint16_t target_stride,
-                  uint8_t factor, uint16_t target_width, uint16_t target_height,
-                  uint8_t bytes_per_pixel, bool scale_up);
-    void (*deinit)(void);
-} gui_blur_ops_t;
-
 typedef struct gui_jpeg_ops
 {
     void (*init)(void);
@@ -103,7 +87,6 @@ typedef struct acc_engine
 {
     const gui_blit_ops_t *blit;
     void (*fb_clear)(uint8_t *addr, gui_color_t color, uint32_t len);
-    gui_blur_ops_t *blur;
     const gui_jpeg_ops_t *jpeg;
     const gui_png_ops_t *png;
     const gui_idu_ops_t *idu;

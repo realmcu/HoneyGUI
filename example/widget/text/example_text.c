@@ -71,23 +71,17 @@ void text_widget_example(void)
  * |---|----------------------------------|--------------------------------------------------------------------------|
  * | 1 | text_widget_example()            | Basic text widget with click event and periodic timer callback           |
  * | 2 | scroll_text_widget_example()     | Horizontal (SCROLL_X) and vertical (SCROLL_Y) auto-scrolling text        |
- * | 3 | custom_font_rendering_demo()     | Custom font engine with user-defined load/draw/unload/destroy            |
- * | 4 | text_font_rendering_test()       | Swipeable views: bitmap(1/2/4/8-bit), vector, bold, matrix, img, bench   |
- * | 5 | text_font_layout_test()          | Swipeable views: single-line, multi-line, scroll, vertical, RTL          |
- * | 6 | text_multi_language_test()       | Language list with per-language rendering (AR, EN, ZH, TH, HE)           |
- * | 7 | text_font_scroll_function_test() | Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes      |
- * | 8 | text_font_scroll_loop_test()     | Scroll loop (marquee) for X/Y forward and reverse directions             |
- * | 9 | text_font_source_mode_test()     | 3x4 grid: source(MEMADDR/FTL/FILESYS) x type(BMP/IMG/MAT/TTF)            |
- * |10 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
- * |11 | text_measure_test()              | Layout measure: BMP/TTF, single-line/multi-line metrics                  |
- * |12 | text_clip_test()                 | Partial text display using win clip (top/bottom/right/center)            |
- * |13 | text_font_typo_rendering_test()  | Typography rendering: bitmap + vector baseline/line-height (swipeable)   |
- * |14 | text_font_fallback_test()        | Mixed-language fallback: CJK+EN in one string with priority chain        |
- * |15 | text_vector_scale_test()         | V3 vector font scaling: win-issued scale + text self-scale (looping)     |
- * |16 | text_emoji_example()             | Inline color emoji drawn from .bin files, mixed with bitmap glyphs       |
- * |17 | text_ttf_emoji_example()         | Inline color emoji mixed with vector TTF glyphs                          |
- * |18 | text_missing_glyph_test()        | Missing glyph: skip vs substitute chain, bitmap + vector                 |
- * |19 | text_gradient_example()          | Vector text with horizontal / vertical / diagonal gradient fill          |
+ * | 3 | text_font_rendering_test()       | Swipeable views: bitmap 1/2/4/8-bit, typography, benchmark               |
+ * | 4 | text_font_layout_test()          | Swipeable views: single-line, multi-line, scroll, vertical, RTL          |
+ * | 5 | text_multi_language_test()       | Language list with per-language rendering (AR, EN, ZH, TH, HE)           |
+ * | 6 | text_font_scroll_function_test() | Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes      |
+ * | 7 | text_font_scroll_loop_test()     | Scroll loop (marquee) for X/Y forward and reverse directions             |
+ * | 8 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
+ * | 9 | text_measure_test()              | Layout measure: single-line and multi-line metrics                       |
+ * |10 | text_clip_test()                 | Partial text display using win clip (top/bottom/right/center)            |
+ * |11 | text_font_typo_rendering_test()  | Typography rendering: bitmap baseline and line height                    |
+ * |12 | text_font_fallback_test()        | Mixed-language fallback: CJK+EN in one string with priority chain        |
+ * |13 | text_missing_glyph_test()        | Missing glyph: skip vs substitute chain                                  |
  *
  * @return 0 on success
  */
@@ -97,23 +91,17 @@ static int app_init(void)
 
     text_widget_example();              /* [1] Basic text widget       */
     // scroll_text_widget_example();    /* [2] Scroll text             */
-    // custom_font_rendering_demo();    /* [3] Custom font rendering   */
-    // text_font_rendering_test();      /* [4] Font rendering styles   */
-    // text_font_layout_test();         /* [5] Text layout modes       */
-    // text_multi_language_test();      /* [6] Multi-language support  */
-    // text_font_scroll_function_test();/* [7] Scroll function control */
-    // text_font_scroll_loop_test();    /* [8] Scroll loop (marquee)   */
-    // text_font_source_mode_test();    /* [9] Font source modes       */
-    // text_wordwrap_test();            /* [10] Word-wrap & break test */
-    // text_measure_test();             /* [11] Layout measure test    */
-    // text_clip_test();                /* [12] Text clip/partial show */
-    // text_font_typo_rendering_test(); /* [13] Typography bitmap+vec  */
-    // text_font_fallback_test();       /* [14] Mixed-lang fallback    */
-    // text_vector_scale_test();        /* [15] Vector font scaling    */
-    // text_emoji_example();            /* [16] Bitmap text + emoji    */
-    // text_ttf_emoji_example();        /* [17] Vector text + emoji    */
-    // text_missing_glyph_test();       /* [18] Missing glyph modes    */
-    // text_gradient_example();         /* [19] Gradient text fill     */
+    // text_font_rendering_test();      /* [3] Font rendering styles   */
+    // text_font_layout_test();         /* [4] Text layout modes       */
+    // text_multi_language_test();      /* [5] Multi-language support  */
+    // text_font_scroll_function_test();/* [6] Scroll function control */
+    // text_font_scroll_loop_test();    /* [7] Scroll loop (marquee)   */
+    // text_wordwrap_test();            /* [8] Word-wrap & break test  */
+    // text_measure_test();             /* [9] Layout measure test     */
+    // text_clip_test();                /* [10] Text clip/partial show */
+    // text_font_typo_rendering_test(); /* [11] Typography bitmap      */
+    // text_font_fallback_test();       /* [12] Mixed-lang fallback    */
+    // text_missing_glyph_test();       /* [13] Missing glyph modes    */
 
     return 0;
 }

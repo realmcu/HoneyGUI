@@ -13,13 +13,8 @@
  *                           Configuration
  *============================================================================*/
 
-#if LAYOUT_USE_VECTOR_FONT
-#define TEST_FONT           font32vb4           // Vector font
-#define TEST_FONT_TYPE      GUI_FONT_SRC_TTF    // Vector font uses TTF source
-#else
-#define TEST_FONT           font32b8            // Bitmap font
-#define TEST_FONT_TYPE      GUI_FONT_SRC_BMP    // Bitmap font uses BMP source
-#endif
+#define TEST_FONT           font32b8
+#define TEST_FONT_TYPE      GUI_FONT_SRC_BMP
 
 /*============================================================================*
  *                           Types

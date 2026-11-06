@@ -39,10 +39,6 @@ static void gui_acc_ops_init(struct acc_engine *info)
     {
         info->blit->init();
     }
-    if ((info->blur != NULL) && (info->blur->init != NULL))
-    {
-        info->blur->init();
-    }
     if ((info->idu != NULL) && (info->idu->init != NULL))
     {
         info->idu->init();
@@ -70,10 +66,6 @@ static void gui_acc_ops_deinit(struct acc_engine *info)
     if ((info->idu != NULL) && (info->idu->deinit != NULL))
     {
         info->idu->deinit();
-    }
-    if ((info->blur != NULL) && (info->blur->deinit != NULL))
-    {
-        info->blur->deinit();
     }
     if ((info->blit != NULL) && (info->blit->deinit != NULL))
     {

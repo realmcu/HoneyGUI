@@ -135,8 +135,8 @@ void text_clip_test(void)
     draw_indicator(gui_obj_get_root(), "sc4", crop, y + th / 4, sw - crop * 2, half_th,
                    APP_COLOR_YELLOW, sc_opa);
     gui_text_t *t4 = gui_text_create(gui_obj_get_root(), "clip_ctr", 0, y, sw, th);
-    gui_text_set(t4, str, GUI_FONT_SRC_TTF, APP_COLOR_YELLOW, len, fh);
-    gui_text_type_set(t4, font32vb4, FONT_SRC_MEMADDR);
+    gui_text_set(t4, str, GUI_FONT_SRC_BMP, APP_COLOR_YELLOW, len, fh);
+    gui_text_type_set(t4, font32b4, FONT_SRC_MEMADDR);
     gui_text_mode_set(t4, MULTI_LEFT);
     gui_text_wordwrap_set(t4, true);
     gui_text_set_scope(t4, crop, th / 4, sw - crop * 2, half_th);

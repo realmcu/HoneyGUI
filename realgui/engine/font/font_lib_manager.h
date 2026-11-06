@@ -27,9 +27,9 @@ typedef struct FONT_LIB_NODE
 {
     uint8_t *font_file;             /**< Font file path or memory address */
     uint8_t *alias;                 /**< Filesystem path of an XIP-mapped font, or NULL */
-    uint16_t font_size;             /**< Font size in pixels (for BMP) or default size (for TTF) */
+    uint16_t font_size;             /**< Font size in pixels */
     FONT_SRC_MODE src_mode;         /**< Font source: MEM/FTL/FS */
-    FONT_SRC_TYPE font_type;        /**< Font type: BMP or TTF */
+    FONT_SRC_TYPE font_type;        /**< Font source type */
     uint8_t *cached_data;           /**< Cached header + index data */
     uint32_t cached_size;           /**< Size of cached data */
     uint32_t ref_count;             /**< Reference count for memory management */

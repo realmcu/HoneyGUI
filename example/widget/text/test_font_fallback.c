@@ -13,7 +13,6 @@
 
 #include "gui_text.h"
 #include "font_mem.h"
-#include "font_ttf.h"
 #include "font_lib_manager.h"
 #include "test_font.h"
 
@@ -30,10 +29,9 @@
 /**
  * @brief Test 14: Mixed-language font fallback
  *
- * Demonstrates BMP font fallback with priority chain.
- * A single text widget displays a string containing Chinese, Japanese,
- * Korean and English characters. The primary font is Chinese (HarmonyOS),
- * with NotoSansJP, NotoSansKR and NotoSans registered as fallbacks.
+ * Demonstrates BMP font fallback with a priority chain. A single text widget
+ * displays Chinese, Japanese, Korean, Thai and English, with the Noto fonts
+ * registered as fallbacks behind HarmonyOS.
  */
 void text_font_fallback_test(void)
 {
@@ -61,24 +59,4 @@ void text_font_fallback_test(void)
                  strlen(mixed_text), FONT_SIZE);
     gui_text_type_set(text, fontnoto, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MULTI_LEFT);
-
-    /* --- Vector (TTF) fallback --- */
-    gui_font_ttf_init_mem(fontnotovec);
-    gui_font_ttf_init_mem(fontnotoscvec);
-    gui_font_ttf_init_mem(fontnotojpvec);
-    gui_font_ttf_init_mem(fontnotokrvec);
-
-    gui_font_set_priority((uint8_t *)fontnotovec, 0);
-    gui_font_set_priority((uint8_t *)fontnotoscvec, 1);
-    gui_font_set_priority((uint8_t *)fontnotojpvec, 2);
-    gui_font_set_priority((uint8_t *)fontnotokrvec, 3);
-
-    char *mixed_text_ttf = "你好世界 こんにちは 한국어 Hello";
-
-    gui_text_t *text_ttf = gui_text_create(gui_obj_get_root(), "fallback_ttf",
-                                           10, 220, 460, 200);
-    gui_text_set(text_ttf, mixed_text_ttf, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
-                 strlen(mixed_text_ttf), FONT_SIZE);
-    gui_text_type_set(text_ttf, fontnotovec, FONT_SRC_MEMADDR);
-    gui_text_mode_set(text_ttf, MULTI_LEFT);
 }

@@ -262,51 +262,6 @@ void gui_font_mem_unload(gui_text_t *text);
 void gui_font_mem_destroy(gui_text_t *text);
 
 /**
- * @brief Outcome of an emoji presentation decision for one character cell.
- */
-typedef enum
-{
-    GUI_EMOJI_LOAD_NOT_EMOJI = 0,   /**< Run the normal glyph lookup. */
-    GUI_EMOJI_LOAD_DONE,            /**< Color resource loaded into the cell. */
-    GUI_EMOJI_LOAD_MISSING,         /**< No color resource: resolve as a missing glyph. */
-} gui_emoji_load_result_t;
-
-/**
- * @brief Try to load a color emoji cell using the shared Unicode rules.
- *
- * On GUI_EMOJI_LOAD_MISSING the whole emoji sequence has been consumed and the
- * caller must not run the font index lookup: an SMP code point would index past
- * the index table. Resolve chr->unicode through the missing glyph path instead.
- *
- * @param chr Output character cell.
- * @param text Text widget containing the emoji resource configuration.
- * @param baseline_px Font baseline offset in pixels.
- * @param unicode_buf Unicode content buffer.
- * @param p_uni_i Current Unicode index, advanced when a sequence is consumed.
- * @param unicode_len Number of code points in unicode_buf.
- * @return How the caller should proceed with this cell.
- */
-gui_emoji_load_result_t gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text,
-                                                int16_t baseline_px, uint32_t *unicode_buf,
-                                                uint32_t *p_uni_i, uint32_t unicode_len);
-
-/**
- * @brief Draw a loaded color emoji cell.
- *
- * @param text Text widget.
- * @param chr Emoji character cell.
- * @param data Emoji image data.
- */
-void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data);
-
-/**
- * @brief Release decoded emoji cells cached in mem_char_t::buf.
- *
- * @param text Text widget.
- */
-void gui_font_free_emoji_cache(gui_text_t *text);
-
-/**
  * @brief Get the font library node by size.
  *
  * @param font_size Font size.

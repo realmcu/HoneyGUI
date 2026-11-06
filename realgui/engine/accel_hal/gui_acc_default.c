@@ -16,8 +16,6 @@
 #include "acc_sw_entry.h"
 #include "acc_sw_idu.h"
 
-extern gui_blur_ops_t sw_arm2d_blur_ops;
-
 static const gui_blit_ops_t sw_blit_ops =
 {
     .init = sw_acc_init,
@@ -35,7 +33,6 @@ static const gui_idu_ops_t sw_idu_ops =
 static acc_engine_t sw_acc =
 {
     .blit = &sw_blit_ops,
-    .blur = &sw_arm2d_blur_ops,
     .idu = &sw_idu_ops,
 };
 #endif

@@ -15,7 +15,6 @@
 #include "tp_algo.h"
 #include "gui_view.h"
 #include "gui_view_api.h"
-#include "gui_post_process.h"
 
 
 /*============================================================================*
@@ -311,7 +310,7 @@ static void gui_view_on_event_prepare(gui_obj_t *obj, gui_event_t *e)
     g_NextView->current_event_code = e->code;
     g_CurrentView->current_event_code = e->code;
 
-    if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR) // cover CurrentView
+    if (on_event->switch_in_style == SWITCH_INIT_STATE) // cover CurrentView
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
     }
@@ -545,16 +544,6 @@ static void gui_view_draw(gui_obj_t *obj)
     }
 }
 
-static void gui_view_preprocess(gui_obj_t *obj)
-{
-    gui_view_t *_this = (gui_view_t *)obj;
-    post_process_event *blur_param = (post_process_event *)_this->blur_param;
-    if (blur_param != NULL)
-    {
-        pre_process_handle(blur_param);
-    }
-}
-
 static void gui_view_destroy(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
@@ -625,30 +614,6 @@ static void gui_view_end(gui_obj_t *obj)
     {
         g_SurpressEvent = false;
     }
-    if (obj->extension_process_enabled)
-    {
-        post_process_event *blur_param = (post_process_event *)_this->blur_param;
-        if (blur_param != NULL)
-        {
-            post_process_event *event = blur_param;
-            if (event->param != NULL)
-            {
-                if (event->type == POST_PROCESS_BLUR)
-                {
-                    post_process_blur_param *param = (post_process_blur_param *)event->param;
-                    struct acc_engine *acc = gui_get_acc();
-                    if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->release != NULL))
-                    {
-                        acc->blur->release(&param->cache_mem);
-                    }
-                }
-                gui_free(event->param);
-            }
-            gui_free(blur_param);
-            _this->blur_param = NULL;
-        }
-    }
-    obj->extension_process_enabled = false;
 }
 
 static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -665,11 +630,6 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         case OBJ_PROCESS:
             {
                 gui_view_draw(obj);
-            }
-            break;
-        case OBJ_EXTENSION_PROCESS:
-            {
-                gui_view_preprocess(obj);
             }
             break;
         case OBJ_POST_PROCESS:

@@ -44,7 +44,7 @@ static void app_ui_view_lime_design(gui_view_t *view)
 
     gui_view_switch_on_event(view, "blue_view",
                              SWITCH_OUT_TO_TOP_USE_TRANSLATION,
-                             SWITCH_IN_STILL_USE_BLUR,
+                             SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_view_set_opacity(view, 150);

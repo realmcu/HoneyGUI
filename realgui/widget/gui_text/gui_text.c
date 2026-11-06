@@ -10,11 +10,6 @@
 #include "gui_text.h"
 #include "gui_matrix.h"
 #include "font_mem.h"
-#include "font_ttf.h"
-#include "font_stb.h"
-#include "font_mem_img.h"
-#include "font_mem_matrix.h"
-#include "font_custom.h"
 #include "tp_algo.h"
 #include "gui_fb.h"
 #include "gui_vfs.h"
@@ -48,31 +43,6 @@ uint32_t gui_text_substitute_chain[GUI_TEXT_SUBSTITUTE_CHAIN_MAX + 1] = {0xFFFD,
  *                           Private Functions
  *============================================================================*/
 
-static bool gui_text_matrix_is_identity(gui_matrix_t *matrix)
-{
-    if (matrix == NULL)
-    {
-        return false;
-    }
-    if (
-        matrix->m[0][0] == 1.0f && \
-        matrix->m[0][1] == 0.0f && \
-        // matrix->m[0][2] == 0.0f &&
-        matrix->m[1][0] == 0.0f && \
-        matrix->m[1][1] == 1.0f && \
-        // matrix->m[1][2] == 0.0f &&
-        matrix->m[2][0] == 0.0f && \
-        matrix->m[2][1] == 0.0f && \
-        matrix->m[2][2] == 1.0f
-    )
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
@@ -83,44 +53,8 @@ static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-    case GUI_FONT_SRC_STB:
-        {
-            gui_font_stb_load(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_IMG:
-        {
-
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            if (gui_text_matrix_is_identity(text->base.matrix))
-            {
-                gui_font_mem_load(text, rect);
-            }
-            else
-            {
-                gui_font_mat_load(text, rect);
-            }
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-            gui_font_ttf_load(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_CUS:
-        {
-            gui_font_custom_load(text, rect);
-        }
-        break;
-
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -135,44 +69,8 @@ static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-    case GUI_FONT_SRC_STB:
-        {
-            gui_font_stb_draw(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_IMG:
-        {
-
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            if (gui_text_matrix_is_identity(text->base.matrix))
-            {
-                gui_font_mem_draw(text, rect);
-            }
-            else
-            {
-                gui_font_mat_draw(text, rect);
-            }
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-            gui_font_ttf_draw(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_CUS:
-        {
-            gui_font_custom_draw(text, rect);
-        }
-        break;
-
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -184,44 +82,11 @@ static void gui_text_font_unload(gui_text_t *text)
     case GUI_FONT_SRC_BMP:
         {
             // gui_font_mem_unload(text);
-            gui_font_free_emoji_cache(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_STB:
-        {
-            gui_font_stb_unload(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_IMG:
-        {
-
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            gui_font_mat_unload(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-            /* Before ttf_unload(), which returns early for a static or
-             * non-RAMLESS cache and would leave the emoji cells allocated. */
-            gui_font_free_emoji_cache(text);
-            gui_font_ttf_unload(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_CUS:
-        {
-            gui_font_custom_unload(text);
         }
         break;
 
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -241,37 +106,8 @@ static void gui_text_font_destroy(gui_text_t *text)
         }
         break;
 
-    case GUI_FONT_SRC_STB:
-        {
-
-        }
-        break;
-
-    case GUI_FONT_SRC_IMG:
-        {
-            gui_font_scale_destroy(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            gui_font_mat_destroy(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-            gui_font_ttf_destroy(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_CUS:
-        {
-            gui_font_custom_destroy(text);
-        }
-        break;
-
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -298,11 +134,6 @@ static void gui_text_prepare(gui_obj_t *obj)
     gui_text_t *this = (void *)obj;
     gui_point3f_t point = {0, 0, 1};
     uint8_t last;
-
-    if (this->font_type == GUI_FONT_SRC_IMG)
-    {
-        return;
-    }
 
     /* --- Lightweight section: always runs (even when hidden) --- */
     if (this->matrix)
@@ -407,12 +238,6 @@ static void gui_text_draw(gui_obj_t *obj)
 
     gui_text_resize_rect(text, &draw_rect);
 
-    if (text->font_type == GUI_FONT_SRC_TTF ||
-        (text->font_type == GUI_FONT_SRC_MAT && text->use_img_blit))
-    {
-        gui_font_ttf_adapt_rect(text, &draw_rect);
-    }
-
     gui_text_read_scope(text, &draw_rect);
     if (text->scope_self)
     {
@@ -442,7 +267,6 @@ static void gui_text_destroy(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
 
-    gui_text_set_gradient(text, GUI_TEXT_GRADIENT_HORIZONTAL, NULL, 0);
     gui_text_font_destroy(text);
 }
 
@@ -504,8 +328,6 @@ void gui_text_ctor(gui_text_t *this,
     this->content_refresh = false;
     this->layout_refresh = false;
     this->rendermode = 2;
-    this->use_img_blit = true;
-    this->gradient = NULL;
 }
 
 static TEXT_MODE transfer_to_rtl_mode(TEXT_MODE mode)
@@ -679,11 +501,6 @@ void gui_text_substitute_chain_set(const uint32_t *cps, uint8_t n)
     gui_text_substitute_chain[n] = 0x0000;
 }
 
-void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)
-{
-    this->use_img_blit = use_img_blit;
-}
-
 void gui_text_rendermode_set(gui_text_t *this, uint8_t rendermode)
 {
     uint8_t mode = this->rendermode;
@@ -730,11 +547,6 @@ void gui_text_bold_set(gui_text_t *this, uint8_t bold_weight, BOLD_MODE bold_mod
     this->layout_refresh = true;
 }
 
-void gui_text_set_min_scale(gui_text_t *this, float min_scale)
-{
-    this->min_scale = min_scale;
-}
-
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
 {
     this->base.x = x;
@@ -764,9 +576,9 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
         {
             gui_font_mem_init_mem(font_source);
         }
-        else if (flag == FONT_FILE_TTF_FLAG)
+        else
         {
-            gui_font_ttf_init_mem(font_source);
+            gui_log("Unsupported font file type: %d\n", flag);
         }
     }
     else if (font_mode == FONT_SRC_FTL)
@@ -777,15 +589,14 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
         {
             gui_font_mem_init_ftl(font_source);
         }
-        else if (flag == FONT_FILE_TTF_FLAG)
+        else
         {
-            gui_font_ttf_init_ftl(font_source);
+            gui_log("Unsupported font file type: %d\n", flag);
         }
     }
     else if (font_mode == FONT_SRC_FILESYS)
     {
         /* Auto-initialize FS font (lazy loading with ref counting) */
-        /* Try BMP first, then TTF */
         gui_vfs_file_t *file = gui_vfs_open((const char *)font_source, GUI_VFS_READ);
         if (file != NULL)
         {
@@ -797,9 +608,9 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
             {
                 gui_font_mem_init_fs(font_source);
             }
-            else if (header[1] == FONT_FILE_TTF_FLAG)
+            else
             {
-                gui_font_ttf_init_fs(font_source);
+                gui_log("Unsupported font file type: %d\n", header[1]);
             }
         }
 
@@ -813,12 +624,6 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
     }
     this->path = font_source;
     this->font_mode = font_mode;
-}
-
-void gui_text_emoji_set(gui_text_t *this, uint8_t *path, uint8_t size)
-{
-    this->emoji_path = path;
-    this->emoji_size = size;
 }
 
 void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
@@ -839,9 +644,9 @@ void gui_text_set_matrix(gui_text_t *this, gui_matrix_t *matrix)
 void gui_text_set_cache(gui_text_t *this, bool enable)
 {
     this->font_cache_enable = enable;
-    /* Force a full rebuild (-> gui_font_ttf_destroy) so the policy applies next
-     * frame; it frees any resident static cache and nulls chr[].buf, so
-     * font_cache_static self-heals (NULL buf short-circuits the hit path). */
+    /* Force a full rebuild so the policy applies next frame; the rebuild frees
+     * any resident static cache and nulls chr[].buf, so font_cache_static
+     * self-heals (NULL buf short-circuits the hit path). */
     this->content_refresh = true;
 }
 
@@ -882,205 +687,6 @@ void gui_text_set_scope_absolute(gui_text_t *this, int16_t x, int16_t y, int16_t
 void gui_text_set_font_blend_mode(gui_text_t *this, BLEND_MODE_TYPE blend_mode)
 {
     this->font_blend_mode = blend_mode;
-}
-
-static uint32_t gradient_color_at(const gui_text_gradient_stop_t *stops, uint8_t count, float t)
-{
-    if (t <= stops[0].position)
-    {
-        return stops[0].color.color.argb_full;
-    }
-
-    for (uint8_t i = 0; i + 1 < count; i++)
-    {
-        if (t > stops[i + 1].position)
-        {
-            continue;
-        }
-
-        float span = stops[i + 1].position - stops[i].position;
-        float f = (span > 0.0f) ? (t - stops[i].position) / span : 1.0f;
-        uint32_t c0 = stops[i].color.color.argb_full;
-        uint32_t c1 = stops[i + 1].color.color.argb_full;
-        uint32_t out = 0;
-        for (int shift = 0; shift <= 24; shift += 8)
-        {
-            float v0 = (float)((c0 >> shift) & 0xff);
-            float v1 = (float)((c1 >> shift) & 0xff);
-            out |= (uint32_t)(v0 + (v1 - v0) * f + 0.5f) << shift;
-        }
-        return out;
-    }
-
-    return stops[count - 1].color.color.argb_full;
-}
-
-static void gradient_preset_handles(gui_text_gradient_t *grad, gui_text_gradient_dir_t dir)
-{
-    static const float presets[][4] =
-    {
-        [GUI_TEXT_GRADIENT_HORIZONTAL]     = {0.0f, 0.5f, 1.0f, 0.5f},
-        [GUI_TEXT_GRADIENT_VERTICAL]       = {0.5f, 0.0f, 0.5f, 1.0f},
-        [GUI_TEXT_GRADIENT_DIAGONAL_TL_BR] = {0.0f, 0.0f, 1.0f, 1.0f},
-        [GUI_TEXT_GRADIENT_DIAGONAL_TR_BL] = {1.0f, 0.0f, 0.0f, 1.0f},
-    };
-    const float *p = presets[(dir <= GUI_TEXT_GRADIENT_DIAGONAL_TR_BL) ? dir : 0];
-
-    grad->handle_x0 = p[0];
-    grad->handle_y0 = p[1];
-    grad->handle_x1 = p[2];
-    grad->handle_y1 = p[3];
-}
-
-static float gradient_clamp_handle(float v)
-{
-    /* Also rejects NaN, which fails both comparisons. */
-    if (!(v >= -1.0f))
-    {
-        return -1.0f;
-    }
-    return (v > 2.0f) ? 2.0f : v;
-}
-
-void gui_text_set_gradient_box(gui_text_t *this, gui_text_gradient_box_t box)
-{
-    GUI_ASSERT(this != NULL);
-
-    if (this->gradient == NULL || this->gradient->box == box)
-    {
-        return;
-    }
-    this->gradient->box = box;
-    this->gradient->bounds_valid = false;
-    gui_fb_change();
-}
-
-void gui_text_set_gradient_handles(gui_text_t *this, float x0, float y0, float x1, float y1)
-{
-    GUI_ASSERT(this != NULL);
-
-    if (this->gradient == NULL)
-    {
-        return;
-    }
-    this->gradient->handle_x0 = gradient_clamp_handle(x0);
-    this->gradient->handle_y0 = gradient_clamp_handle(y0);
-    this->gradient->handle_x1 = gradient_clamp_handle(x1);
-    this->gradient->handle_y1 = gradient_clamp_handle(y1);
-    gui_fb_change();
-}
-
-void gui_text_set_gradient(gui_text_t *this, gui_text_gradient_dir_t dir,
-                           const gui_text_gradient_stop_t *stops, uint8_t count)
-{
-    GUI_ASSERT(this != NULL);
-
-    if (stops == NULL || count < 2)
-    {
-        if (this->gradient != NULL)
-        {
-            gui_free(this->gradient);
-            this->gradient = NULL;
-            gui_fb_change();
-        }
-        return;
-    }
-
-    if (count > GUI_TEXT_GRADIENT_MAX_STOPS)
-    {
-        count = GUI_TEXT_GRADIENT_MAX_STOPS;
-    }
-
-    gui_text_gradient_box_t box = GUI_TEXT_GRADIENT_BOX_INK;
-    if (this->gradient == NULL)
-    {
-        this->gradient = gui_malloc(sizeof(gui_text_gradient_t));
-        if (this->gradient == NULL)
-        {
-            return;
-        }
-    }
-    else
-    {
-        box = this->gradient->box;
-    }
-    memset(this->gradient, 0, sizeof(gui_text_gradient_t));
-    this->gradient->dir = dir;
-    this->gradient->box = box;
-    gradient_preset_handles(this->gradient, dir);
-
-    gui_text_gradient_stop_t sorted[GUI_TEXT_GRADIENT_MAX_STOPS];
-    memset(sorted, 0, sizeof(sorted));
-    for (uint8_t i = 0; i < count; i++)
-    {
-        uint8_t j = i;
-        while (j > 0 && sorted[j - 1].position > stops[i].position)
-        {
-            sorted[j] = sorted[j - 1];
-            j--;
-        }
-        sorted[j] = stops[i];
-    }
-
-    for (int i = 0; i < GUI_TEXT_GRADIENT_LUT_SIZE; i++)
-    {
-        this->gradient->lut[i] = gradient_color_at(sorted, count,
-                                                   (float)i / (GUI_TEXT_GRADIENT_LUT_SIZE - 1));
-    }
-
-    gui_fb_change();
-}
-
-
-void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
-{
-    if (this->len == 0 || this->font_height == 0)
-    {
-        return;
-    }
-    void *img;
-    gui_img_t *text_img;
-    int16_t img_x = 0, img_y = 0;
-
-    gui_font_scale_destroy(this);
-    img = gui_text_bmp2img(this, font_img_type, &img_x, &img_y);
-
-    if (this->scale_img == NULL)
-    {
-        text_img = gui_img_create_from_mem(this, "text_img", img, img_x, img_y, 0, 0);
-    }
-    else
-    {
-        text_img = this->scale_img;
-        gui_img_set_pos(text_img, img_x, img_y);
-        gui_img_set_src(text_img, img, text_img->storage_type);
-        text_img->base.w = gui_img_get_width(text_img);
-        text_img->base.h = gui_img_get_height(text_img);
-        gui_fb_change();
-    }
-
-    switch (font_img_type)
-    {
-    case RGB565:
-    case RGB888:
-        {
-            text_img->blend_mode = IMG_FILTER_BLACK;
-        }
-        break;
-
-    case ARGB8565:
-    case ARGB8888:
-        {
-            text_img->blend_mode = IMG_SRC_OVER_MODE;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    this->scale_img = text_img;
-    this->font_type = GUI_FONT_SRC_IMG;
 }
 
 void gui_text_layout_measure(gui_text_t *this_widget)

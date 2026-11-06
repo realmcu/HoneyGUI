@@ -7,7 +7,6 @@
 #include "acc_sw_entry.h"
 #include "acc_sw_compressed.h"
 #include "acc_sw_uncompressed.h"
-#include "gui_post_process.h"
 
 static void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
 {
@@ -17,13 +16,7 @@ static void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
 
 static void sw_acc_end_cb(draw_img_t *image)
 {
-    struct acc_engine *acc = gui_get_acc();
-    if ((image->acc_user != NULL) && (acc != NULL) && (acc->blur != NULL)
-        && (acc->blur->release != NULL))
-    {
-        acc->blur->release(&image->acc_user);
-    }
-    return;
+    (void)image;
 }
 
 void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)

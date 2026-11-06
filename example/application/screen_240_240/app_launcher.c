@@ -19,7 +19,6 @@
 #include "gui_server.h"
 #include <math.h>
 #include "font_mem.h"
-#include "font_stb.h"
 #include "gui_components_init.h"
 #include "app_launcher.h"
 #ifndef _HONEYGUI_SIMULATOR_

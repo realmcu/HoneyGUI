@@ -260,8 +260,8 @@ static void note_design(gui_obj_t *obj, void *p)
 static void create_return_text(void)
 {
     return_text = gui_text_create(gui_obj_get_root(), "text", 0, 430, 0, 48);
-    gui_text_set(return_text, "RETURN", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 6, 48);
-    gui_text_type_set(return_text, font32vb4, FONT_SRC_MEMADDR);
+    gui_text_set(return_text, "RETURN", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 6, 48);
+    gui_text_type_set(return_text, font32b8, FONT_SRC_MEMADDR);
     gui_text_mode_set(return_text, RIGHT);
     gui_obj_add_event_cb(return_text, return_language_list, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_hidden((gui_obj_t *)return_text, true);

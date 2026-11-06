@@ -9,7 +9,6 @@
 #include "gui_matrix.h"
 #include "gui_fb.h"
 #include "gui_obj.h"
-#include "gui_post_process.h"
 
 
 static bool fb_change = false;
@@ -242,10 +241,6 @@ static void obj_draw_scan(gui_obj_t *obj)
         {
             continue;
         }
-        if (obj->extension_process_enabled)
-        {
-            obj->obj_cb(obj, OBJ_EXTENSION_PROCESS);
-        }
         obj_draw_scan(obj);
     }
 }
@@ -473,8 +468,7 @@ static void gui_pfb_draw(gui_obj_t *root)
         }
         obj_draw_scan(root);
 
-        /* --- 5. Post-processing and debug borders --- */
-        post_process_handle();
+        /* --- 5. Debug borders --- */
         draw_section_borders(dc, mgr, real_dirty_count);
 
         /* --- 6. Tear effect sync and LCD update --- */
@@ -541,8 +535,6 @@ static void gui_fb_draw(gui_obj_t *root)
             }
         }
 
-        post_process_handle();
-
         if (gui_dirty_border_is_enabled())
         {
             if (mgr->full_refresh || mgr->count == 0)
@@ -588,14 +580,12 @@ static void gui_fb_draw(gui_obj_t *root)
         }
         dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
         obj_draw_scan(root);
-        post_process_handle();
         if (dc->lcd_draw_sync != NULL)
         {
             dc->lcd_draw_sync();
         }
         dc->lcd_update(dc);
     }
-    post_process_end();
     draw_fb_measure_end_time = gui_ms_get();
 
     render_time_ms = (draw_fb_measure_end_time - draw_fb_measure_start_time) +

@@ -9,9 +9,6 @@
  *============================================================================*/
 #include "gui_scroll_text.h"
 #include "font_mem.h"
-#include "font_stb.h"
-#include "font_ttf.h"
-#include "font_mem_matrix.h"
 #include "gui_fb.h"
 
 
@@ -66,25 +63,8 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-    case GUI_FONT_SRC_STB:
-        {
-            gui_font_stb_load(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            gui_font_mat_load(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-            gui_font_ttf_load(text, rect);
-        }
-        break;
-
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -99,25 +79,8 @@ static void gui_scroll_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-    case GUI_FONT_SRC_STB:
-        {
-            gui_font_stb_draw(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            gui_font_mat_draw(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-            gui_font_ttf_draw(text, rect);
-        }
-        break;
-
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -129,32 +92,11 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
     case GUI_FONT_SRC_BMP:
         {
             // gui_font_mem_unload(text);
-            gui_font_free_emoji_cache(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_STB:
-        {
-            gui_font_stb_unload(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            gui_font_mat_unload(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-            /* Before ttf_unload(), which returns early for a static or
-             * non-RAMLESS cache and would leave the emoji cells allocated. */
-            gui_font_free_emoji_cache(text);
-            gui_font_ttf_unload(text);
         }
         break;
 
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -174,25 +116,8 @@ static void gui_scroll_text_font_destroy(gui_text_t *text)
         }
         break;
 
-    case GUI_FONT_SRC_STB:
-        {
-
-        }
-        break;
-
-    case GUI_FONT_SRC_MAT:
-        {
-            gui_font_mat_destroy(text);
-        }
-        break;
-
-    case GUI_FONT_SRC_TTF:
-        {
-
-        }
-        break;
-
     default:
+        gui_log("Unsupported font source type: %d\n", text->font_type);
         break;
     }
 }
@@ -465,14 +390,6 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     dr->yboundtop = _this->offset_y;
     dr->yboundbottom = _this->offset_y + obj->h - 1;
 
-    if (_this->font_type == GUI_FONT_SRC_TTF)
-    {
-        gui_font_ttf_adapt_rect(_this, dr);
-        dr->xboundleft = dr->x1;
-        dr->xboundright = dr->x2;
-        dr->yboundtop = dr->y1;
-        dr->yboundbottom = dr->y2;
-    }
 }
 
 static void gui_scroll_text_draw(gui_obj_t *obj)
@@ -515,21 +432,10 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     {
         mem_char_t *chr = text->base.data;
         uint16_t i, len = text->base.active_font_len;
-        gui_text_gradient_t *grad = text->base.gradient;
         for (i = 0; i < len; i++) { chr[i].x += text->loop_shift_x; chr[i].y += text->loop_shift_y; }
-        if (grad != NULL)
-        {
-            grad->shift_x = text->loop_shift_x;
-            grad->shift_y = text->loop_shift_y;
-        }
         if (gui_text_scope_rect_hit(&draw_rect, &dc->section))
         {
             gui_scroll_text_font_draw(&text->base, &draw_rect);
-        }
-        if (grad != NULL)
-        {
-            grad->shift_x = 0;
-            grad->shift_y = 0;
         }
         for (i = 0; i < len; i++) { chr[i].x -= text->loop_shift_x; chr[i].y -= text->loop_shift_y; }
     }
@@ -546,7 +452,6 @@ static void gui_scroll_text_destroy(gui_obj_t *obj)
     (void)obj;
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
     gui_scroll_text_t *st = (gui_scroll_text_t *)obj;
-    gui_text_set_gradient(&st->base, GUI_TEXT_GRADIENT_HORIZONTAL, NULL, 0);
     gui_scroll_text_font_destroy(&st->base);
 }
 

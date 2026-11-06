@@ -75,9 +75,9 @@ static void ui_text_font(gui_view_t *view)
     gui_scroll_text_scroll_set(scroll_text4, SCROLL_X, 100, 100, 3000, 0);
 
     gui_scroll_text_t *scroll_text5 = gui_scroll_text_create(view, "scroll_text5", 50, 200, 200, 32);
-    gui_scroll_text_set(scroll_text5, (void *)CURRENT_VIEW_NAME, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+    gui_scroll_text_set(scroll_text5, (void *)CURRENT_VIEW_NAME, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                         strlen(CURRENT_VIEW_NAME), font_size);
-    gui_scroll_text_type_set(scroll_text5, font32vb4, FONT_SRC_MEMADDR);
+    gui_scroll_text_type_set(scroll_text5, font32b8, FONT_SRC_MEMADDR);
     gui_scroll_text_scroll_set(scroll_text5, SCROLL_X, 100, 100, 3000, 0);
 
 

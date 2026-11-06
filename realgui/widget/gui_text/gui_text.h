@@ -29,54 +29,6 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-#define GUI_TEXT_GRADIENT_MAX_STOPS  8
-#define GUI_TEXT_GRADIENT_LUT_SIZE   256
-
-/** @brief Gradient direction, matching the rect widget's directions. */
-typedef enum
-{
-    GUI_TEXT_GRADIENT_HORIZONTAL = 0,   /**< Left to right. */
-    GUI_TEXT_GRADIENT_VERTICAL,         /**< Top to bottom. */
-    GUI_TEXT_GRADIENT_DIAGONAL_TL_BR,   /**< Top-left to bottom-right. */
-    GUI_TEXT_GRADIENT_DIAGONAL_TR_BL,   /**< Top-right to bottom-left. */
-} gui_text_gradient_dir_t;
-
-/** @brief Box the gradient handles are normalized against. */
-typedef enum
-{
-    GUI_TEXT_GRADIENT_BOX_INK = 0,  /**< Union of the glyph outlines. */
-    GUI_TEXT_GRADIENT_BOX_LAYOUT,   /**< Pen advances x line boxes, like a Figma auto-size text. */
-    GUI_TEXT_GRADIENT_BOX_WIDGET,   /**< Widget rectangle, like a Figma fixed-size text. */
-} gui_text_gradient_box_t;
-
-/** @brief Gradient color stop. */
-typedef struct
-{
-    float position;         /**< Position from the start handle (0.0) to the end handle (1.0). */
-    gui_color_t color;      /**< Color at this position, alpha included. */
-} gui_text_gradient_stop_t;
-
-/** @brief Text gradient state, allocated by gui_text_set_gradient(). */
-typedef struct gui_text_gradient
-{
-    gui_text_gradient_dir_t dir;
-    gui_text_gradient_box_t box;
-    float handle_x0;                /**< Start handle, normalized to the box. */
-    float handle_y0;
-    float handle_x1;                /**< End handle, normalized to the box. */
-    float handle_y1;
-    font_gradient_t view;           /**< Rebound by the font draw each time. */
-    bool bounds_valid;
-    uint32_t bounds_frame;          /**< Frame the box was measured in. */
-    int16_t bounds_x0;              /**< Box in screen coordinates, inclusive. */
-    int16_t bounds_y0;
-    int16_t bounds_x1;
-    int16_t bounds_y1;
-    int16_t shift_x;                /**< Offset of the copy being drawn from the measured box. */
-    int16_t shift_y;                /**< Set by scroll text for its loop copy; 0 otherwise. */
-    uint32_t lut[GUI_TEXT_GRADIENT_LUT_SIZE];   /**< ARGB8888 colors. */
-} gui_text_gradient_t;
-
 /* TEXT_MODE start */
 typedef enum
 {
@@ -134,14 +86,10 @@ typedef struct gui_text
 {
     gui_obj_t base;
     gui_color_t color;
-    gui_img_t *scale_img;
-    uint8_t *emoji_path;
-    float min_scale;
     void *content;
     void *data;
     void *path;
     gui_matrix_t *matrix;
-    gui_text_gradient_t *gradient;  /**< Optional gradient fill, NULL = flat color. */
 
     uint16_t len;
     uint16_t font_len;
@@ -159,7 +107,6 @@ typedef struct gui_text
     FONT_SRC_TYPE font_type;
     FONT_SRC_MODE font_mode;
     BLEND_MODE_TYPE font_blend_mode;    /**< blend mode for font rendering */
-    uint8_t emoji_size;
     uint8_t checksum;
     int8_t extra_letter_spacing;
     int8_t extra_line_spacing;
@@ -169,7 +116,6 @@ typedef struct gui_text
 
     bool layout_refresh    : 1;
     bool content_refresh   : 1;
-    bool use_img_blit      : 1;
     bool inputable         : 1;
     bool ispasswd          : 1;
     bool wordwrap          : 1;
@@ -316,7 +262,7 @@ void gui_text_extra_line_spacing_set(gui_text_t *this_widget, int8_t extra_line_
 void gui_text_set_line_height(gui_text_t *this_widget, int16_t line_height);
 
 /**
- * @brief Set the fallback space width for legacy TTF fonts.
+ * @brief Set the fallback space width for fonts without a space glyph.
  *
  * @param this_widget Text box widget pointer.
  * @param space_width Space width in pixels. 0 = use the default approximation.
@@ -361,15 +307,7 @@ bool gui_text_substitute_enabled(const gui_text_t *text);
 void gui_text_substitute_chain_set(const uint32_t *cps, uint8_t n);
 
 /**
- * @brief Enable/disable matrix-based image rendering for text.
- * @param this_widget Pointer to the text widget.
- * @param use_img_blit True = Use image matrix blitting (for complex transformations),
- *                     False = Use standard rendering.
- */
-void gui_text_use_matrix_by_img(gui_text_t *this_widget, bool use_img_blit);
-
-/**
- * @brief Set TTF raster render mode.
+ * @brief Set glyph raster bits per pixel.
  *
  * @param this_widget Text box widget pointer.
  * @param rendermode Render mode. 1/2/4/8.
@@ -377,21 +315,13 @@ void gui_text_use_matrix_by_img(gui_text_t *this_widget, bool use_img_blit);
 void gui_text_rendermode_set(gui_text_t *this_widget, uint8_t rendermode);
 
 /**
- * @brief Set text bold weight and mode (only effective for vector fonts).
+ * @brief Set text bold weight and mode.
  *
  * @param this_widget Text box widget pointer.
  * @param bold_weight Bold weight. 0 = normal, 1-8 = bold levels.
  * @param bold_mode Bold mode: BOLD_HORIZONTAL (fast) or BOLD_FULL.
  */
 void gui_text_bold_set(gui_text_t *this_widget, uint8_t bold_weight, BOLD_MODE bold_mode);
-
-/**
- * @brief Set text minimum scale.
- *
- * @param this_widget Text box widget pointer.
- * @param min_scale Minimum scale.
- */
-void gui_text_set_min_scale(gui_text_t *this_widget, float min_scale);
 
 /**
  * @brief Move the text widget.
@@ -432,18 +362,6 @@ void gui_text_font_mode_set(gui_text_t *this_widget, FONT_SRC_MODE font_mode);
 void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE font_mode);
 
 /**
- * @brief Set emoji file path and emoji size.
- * @note Requires ROMFS.
- * @note Example of a full emoji image file path: 'font/emoji/emoji_u1f30d.bin'.
- * @param this_widget Text widget pointer.
- * @param path Path containing folder path and file name prefix. Path example: 'font/emoji/emoji_u'.
- * Folder path is the emoji image file folder path, e.g., 'font/emoji/'.
- * File name prefix is the prefix before the filename for Unicode sorting, e.g., 'emoji_u'.
- * @param size Emoji image file size, e.g., 32.
- */
-void gui_text_emoji_set(gui_text_t *this_widget, uint8_t *path, uint8_t size);
-
-/**
  * @brief Set font encoding.
  * @note UTF-8 or Unicode.
  * @param this_widget Text widget pointer.
@@ -460,13 +378,11 @@ void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
 void gui_text_set_matrix(gui_text_t *this_widget, gui_matrix_t *matrix);
 
 /**
- * @brief Enable cross-frame glyph bitmap cache for TTF text.
+ * @brief Enable the cross-frame glyph bitmap cache.
  *
- * When enabled, rasterized glyph bitmaps are kept alive across frames instead
- * of being freed each frame, eliminating re-rasterization for static or purely
- * translating/scrolling text. Only effective for identity / pure-translate
- * transforms; scale/rotate always re-rasterizes per frame. Trades memory
- * (resident glyph bitmaps until content change or destroy) for CPU.
+ * Keeps rasterized glyph bitmaps alive across frames instead of freeing them
+ * each frame, trading resident memory for CPU. Only effective for identity or
+ * pure-translate transforms.
  *
  * @param this_widget Text widget pointer.
  * @param enable true to keep glyph bitmaps across frames, false (default) to
@@ -482,14 +398,6 @@ void gui_text_set_cache(gui_text_t *this_widget, bool enable);
  * @param length Text string's length.
  */
 void gui_text_content_set(gui_text_t *this_widget, void *text, uint16_t length);
-
-/**
- * @brief Draw text by image so that text can be scaled.
- *
- * @param this_widget Text widget pointer.
- * @param font_img_type Color format.
- */
-void gui_text_convert_to_img(gui_text_t *this_widget, GUI_FormatType font_img_type);
 
 /**
  * @brief Create a text box widget.
@@ -556,50 +464,6 @@ void gui_text_set_scope_absolute(gui_text_t *this_widget, int16_t x, int16_t y, 
  * @param blend_mode Blend mode (e.g., IMG_PLUS_DARKER for darken blend).
  */
 void gui_text_set_font_blend_mode(gui_text_t *this_widget, BLEND_MODE_TYPE blend_mode);
-
-/**
- * @brief Fill the text with a linear gradient.
- *
- * Replaces the text color's RGB; its alpha and the widget opacity still apply.
- * Only vector (TTF) text drawn without scale or rotation on an RGB565 or
- * ARGB8888 display shows the gradient; other cases keep the flat color.
- * Resets the handles to the preset of dir; the box mode is kept.
- *
- * @param this_widget Text widget pointer.
- * @param dir Gradient direction preset.
- * @param stops Color stops, positions in 0.0 to 1.0; at most
- *              GUI_TEXT_GRADIENT_MAX_STOPS are used.
- * @param count Number of stops. NULL stops or count < 2 clears the gradient.
- */
-void gui_text_set_gradient(gui_text_t *this_widget, gui_text_gradient_dir_t dir,
-                           const gui_text_gradient_stop_t *stops, uint8_t count);
-
-/**
- * @brief Select the box the gradient handles are normalized against.
- *
- * Default is GUI_TEXT_GRADIENT_BOX_INK. No effect before gui_text_set_gradient().
- *
- * @param this_widget Text widget pointer.
- * @param box Box mode.
- */
-void gui_text_set_gradient_box(gui_text_t *this_widget, gui_text_gradient_box_t box);
-
-/**
- * @brief Place the gradient start and end handles, overriding the dir preset.
- *
- * Coordinates are normalized to the box: (0, 0) top-left, (1, 1) bottom-right,
- * matching Figma's gradientHandlePositions. Each value is clamped to -1.0..2.0.
- * Handles closer than 1/16 of the box draw the first stop's color.
- * No effect before gui_text_set_gradient().
- *
- * @param this_widget Text widget pointer.
- * @param x0 Start handle X, stop position 0.0.
- * @param y0 Start handle Y.
- * @param x1 End handle X, stop position 1.0.
- * @param y1 End handle Y.
- */
-void gui_text_set_gradient_handles(gui_text_t *this_widget, float x0, float y0,
-                                   float x1, float y1);
 
 gui_inline bool gui_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
 {

@@ -44,9 +44,6 @@ extern "C" {
  *                            Macros
  *============================================================================*/
 
-/*For layout test*/
-#define LAYOUT_USE_VECTOR_FONT  0
-
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -54,7 +51,6 @@ extern void *font32b1;
 extern void *font32b2;
 extern void *font32b4;
 extern void *font32b8;
-extern void *font32vb4;
 
 extern void *fontnoto;
 extern void *fontnotoarabic;
@@ -63,10 +59,6 @@ extern void *fontnotokr;
 extern void *fontnotothai;
 extern void *fontnotohebrew;
 
-extern void *fontnotovec;
-extern void *fontnotoscvec;
-extern void *fontnotojpvec;
-extern void *fontnotokrvec;
 
 extern void *fontharmonysc;
 /*============================================================================*
@@ -77,24 +69,18 @@ void font_file_init(void);
 
 void text_widget_example(void);
 void scroll_text_widget_example(void);
-void custom_font_rendering_demo(void);
 
 void text_font_rendering_test(void);
 void text_font_layout_test(void);
 void text_multi_language_test(void);
 void text_font_scroll_function_test(void);
 void text_font_scroll_loop_test(void);
-void text_font_source_mode_test(void);
 void text_wordwrap_test(void);
 void text_measure_test(void);
 void text_clip_test(void);
 void text_font_typo_rendering_test(void);
 void text_font_fallback_test(void);
-void text_vector_scale_test(void);
-void text_emoji_example(void);
-void text_ttf_emoji_example(void);
 void text_missing_glyph_test(void);
-void text_gradient_example(void);
 
 #ifdef __cplusplus
 }

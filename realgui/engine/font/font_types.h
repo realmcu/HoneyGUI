@@ -30,14 +30,7 @@ typedef enum
  */
 typedef enum
 {
-    GUI_FONT_SRC_BMP = 0x00,    /**< Bitmap font */
-    GUI_FONT_SRC_IMG = 0x01,    /**< Image font */
-    GUI_FONT_SRC_MAT = 0x02,    /**< Matrix font */
-
-    GUI_FONT_SRC_TTF = 0x10,    /**< TTF font */
-    GUI_FONT_SRC_STB = 0x11,    /**< STB font */
-
-    GUI_FONT_SRC_CUS = 0x20,    /**< Custom font */
+    GUI_FONT_SRC_BMP = 0x00,    /**< Bitmap font. The only source type nano keeps. */
 } FONT_SRC_TYPE;
 
 /**

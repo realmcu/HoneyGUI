@@ -10,7 +10,6 @@
 
 #include "guidef.h"
 #include "draw_font.h"
-#include "emoji_unicode_property.h"
 #include <string.h>
 
 /*============================================================================*
@@ -402,144 +401,6 @@ static uint16_t utf32be_to_unicode(uint8_t *utf32be, uint16_t len, uint32_t *uni
     return unicode_index;
 }
 
-/*emoji function*/
-
-// Helper function to check if a code point is a zero-width joiner (ZWJ)
-static int is_zwj(uint32_t code)
-{
-    return code == 0x200D;
-}
-
-// Helper function to check if a code point is a skin tone modifier
-static int is_skin_tone_modifier(uint32_t code)
-{
-    return (code >= 0x1F3FB && code <= 0x1F3FF);
-}
-
-// Helper function to check if a code point is a combining diacritical mark
-static int is_combining_diacritical_mark(uint32_t code)
-{
-    return (code >= 0x0300 && code <= 0x036F) ||
-           (code >= 0x1AB0 && code <= 0x1AFF) ||
-           (code >= 0x1DC0 && code <= 0x1DFF) ||
-           (code >= 0x20D0 && code <= 0x20FF) ||
-           (code >= 0xFE20 && code <= 0xFE2F);
-}
-
-// Helper function to check if a code point is a regional indicator
-static int is_regional_indicator(uint32_t code)
-{
-    return (code >= 0x1F1E6 && code <= 0x1F1FF);
-}
-
-// Helper function to check if a code point is a variation selector
-static int is_variation_selector(uint32_t code)
-{
-    return (code >= 0xFE00 && code <= 0xFE0F) ||
-           (code >= 0xE0100 && code <= 0xE01EF);
-}
-
-// Helper function to check if a code point is a tag character
-static int is_tag_character(uint32_t code)
-{
-    return (code >= 0xE0000 && code <= 0xE007F);
-}
-
-// Check if a code point should be combined based on emoji composition rules
-static int is_combination_rule(uint32_t code)
-{
-    return is_skin_tone_modifier(code) ||
-           is_combining_diacritical_mark(code) ||
-           is_regional_indicator(code) ||
-           is_variation_selector(code) ||
-           is_tag_character(code);
-}
-
-static uint32_t find_first_emoji(const uint32_t *unicode_buf, uint32_t len)
-{
-    if (len == 0)
-    {
-        return 0;
-    }
-    uint32_t i = 0;
-
-    for (i = 1; i < len; i++)
-    {
-        if (is_zwj(unicode_buf[i]))
-        {
-            if (i + 1 >= len)
-            {
-                break;
-            }
-            i++;
-            continue;
-        }
-        if (!is_combination_rule(unicode_buf[i]))
-        {
-            break;
-        }
-    }
-
-    return i;
-}
-
-#define UNICODE_VARIATION_SELECTOR_TEXT  0xFE0E
-#define UNICODE_VARIATION_SELECTOR_EMOJI 0xFE0F
-
-bool gui_unicode_resolve_emoji(const uint32_t *unicode_buf, uint32_t len,
-                               gui_emoji_sequence_t *result)
-{
-    if (unicode_buf == NULL || len == 0 || result == NULL)
-    {
-        return false;
-    }
-
-    memset(result, 0, sizeof(*result));
-    uint32_t unicode = unicode_buf[0];
-
-    if (unicode >= 0x10000)
-    {
-        result->presentation = GUI_EMOJI_PRESENTATION_COLOR;
-        result->sequence_len = (uint16_t)find_first_emoji(unicode_buf, len);
-        return true;
-    }
-
-    if (!gui_emoji_unicode_has_property(unicode))
-    {
-        return false;
-    }
-
-    /* A skin tone modifier after a BMP base (U+261D, U+270A-U+270D, U+26F9) is
-     * left out of the sequence, so its resource name is never built. Folding it
-     * in needs a fallback to the unmodified base resource, else the base glyph
-     * is lost too. */
-    uint32_t selector = len > 1 ? unicode_buf[1] : 0;
-    if (selector == UNICODE_VARIATION_SELECTOR_TEXT)
-    {
-        result->presentation = GUI_EMOJI_PRESENTATION_TEXT;
-        result->sequence_len = 1;
-        result->selector_len = 1;
-        return true;
-    }
-
-    if (selector == UNICODE_VARIATION_SELECTOR_EMOJI)
-    {
-        result->presentation = GUI_EMOJI_PRESENTATION_COLOR;
-        result->sequence_len = (uint16_t)find_first_emoji(unicode_buf, len);
-        result->selector_len = 1;
-        return true;
-    }
-
-    result->sequence_len = 1;
-    result->presentation = gui_emoji_unicode_has_default_presentation(unicode) ?
-                           GUI_EMOJI_PRESENTATION_COLOR : GUI_EMOJI_PRESENTATION_TEXT;
-    if (result->presentation == GUI_EMOJI_PRESENTATION_COLOR)
-    {
-        result->sequence_len = (uint16_t)find_first_emoji(unicode_buf, len);
-    }
-    return true;
-}
-
 /*Arabic/Persian function*/
 
 static bool is_ap_unicode(uint32_t c)
@@ -805,32 +666,6 @@ uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content,
     unicode_buf[unicode_len] = 0;
     *unicode_buf_ptr = unicode_buf;
     return unicode_len;
-}
-
-void gui_unicode_append_emoji_file_name(const uint32_t *unicode_buf, uint32_t sequence_len,
-                                        char *file_path)
-{
-    for (uint32_t i = 0; i < sequence_len; ++i)
-    {
-        char buffer[12];
-        if (unicode_buf[i] == UNICODE_VARIATION_SELECTOR_EMOJI)
-        {
-            continue;
-        }
-        snprintf(buffer, sizeof(buffer), "%04x", (unsigned int)unicode_buf[i]);
-        strcat(file_path, buffer);
-        if (i < sequence_len - 1)
-        {
-            strcat(file_path, "_");
-        }
-    }
-
-    uint32_t path_len = strlen(file_path);
-    if (file_path[path_len - 1] == '_')
-    {
-        file_path[path_len - 1] = '\0';
-    }
-    strcat(file_path, ".bin");
 }
 
 bool content_has_ap_unicode(uint32_t *unicode_buf, uint32_t len)

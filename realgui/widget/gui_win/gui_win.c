@@ -12,7 +12,6 @@
 #include "gui_matrix.h"
 #include "gui_obj.h"
 #include "gui_win.h"
-#include "gui_post_process.h"
 
 /*============================================================================*
  *                           Types
@@ -97,75 +96,11 @@ static void prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_UP_SLIDE_QUICK, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
     matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);
-
-    struct acc_engine *acc = gui_get_acc();
-    if (obj->extension_process_enabled && acc != NULL && acc->blur != NULL
-        && acc->blur->prepare != NULL)
-    {
-        int16_t x1 = (int16_t)obj->matrix->m[0][2];
-        int16_t y1 = (int16_t)obj->matrix->m[1][2];
-        int16_t x2 = x1 + (int16_t)(obj->w * obj->matrix->m[0][0]);
-        int16_t y2 = y1 + (int16_t)(obj->h * obj->matrix->m[1][1]);
-        gui_rect_t new_rect = {.x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2};
-        uint8_t *blur_param = this->blur_param;
-        if (blur_param == NULL)
-        {
-            blur_param = gui_malloc(sizeof(post_process_event));
-            GUI_ASSERT(blur_param != NULL);
-            this->blur_param = blur_param;
-            memset(blur_param, 0, sizeof(post_process_event));
-            post_process_event *event = (post_process_event *)blur_param;
-            event->param = gui_malloc(sizeof(post_process_blur_param));
-            GUI_ASSERT(event->param != NULL);
-            memset(event->param, 0, sizeof(post_process_blur_param));
-            post_process_blur_param *param = (post_process_blur_param *)event->param;
-            param->area = new_rect;
-            param->blur_degree = this->blur_degree;
-            event->type = POST_PROCESS_BLUR;
-            if (param->cache_mem == NULL)
-            {
-                acc->blur->prepare(&param->cache_mem);
-            }
-        }
-    }
-}
-
-static void gui_win_preprocess(gui_obj_t *obj)
-{
-    gui_win_t *this = (gui_win_t *)obj;
-    post_process_event *blur_param = (post_process_event *)this->blur_param;
-    if (blur_param != NULL)
-    {
-        pre_process_handle(blur_param);
-    }
 }
 
 static void gui_win_end(gui_obj_t *obj)
 {
-    if (obj->extension_process_enabled)
-    {
-        gui_win_t *this = (gui_win_t *)obj;
-        post_process_event *blur_param = (post_process_event *)this->blur_param;
-        if (blur_param != NULL)
-        {
-            post_process_event *event = blur_param;
-            if (event->param != NULL)
-            {
-                if (event->type == POST_PROCESS_BLUR)
-                {
-                    post_process_blur_param *param = (post_process_blur_param *)event->param;
-                    struct acc_engine *acc = gui_get_acc();
-                    if ((acc != NULL) && (acc->blur != NULL) && (acc->blur->release != NULL))
-                    {
-                        acc->blur->release(&param->cache_mem);
-                    }
-                }
-                gui_free(event->param);
-            }
-            gui_free(blur_param);
-            this->blur_param = NULL;
-        }
-    }
+    (void)obj;
 }
 
 static void gui_win_destroy(gui_obj_t *obj)
@@ -184,9 +119,6 @@ static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             break;
         case OBJ_PRE_PROCESS:
             gui_win_prepare(obj);
-            break;
-        case OBJ_EXTENSION_PROCESS:
-            gui_win_preprocess(obj);
             break;
         case OBJ_POST_PROCESS:
             gui_win_end(obj);
@@ -214,7 +146,6 @@ void gui_win_ctor(gui_win_t  *this,
     GET_BASE(this)->has_pre_process_cb = true;
     GET_BASE(this)->has_post_process_cb = true;
     GET_BASE(this)->type = WINDOW;
-    this->blur_degree = 225;
     this->opacity_value = UINT8_MAX;
     this->scale = 1.0f;
     this->scale_y = 1.0f;
@@ -382,26 +313,4 @@ void gui_win_compensate(gui_win_t *win, int x, int y)
     }
     win->compensate_x = x;
     win->compensate_y = y;
-}
-
-void gui_win_enable_blur(gui_win_t *win, bool enable)
-{
-    if (win == NULL)
-    {
-        // Handle error: window structure is NULL
-        gui_log("Cannot use_blur: win is NULL\n");
-        return;
-    }
-    win->base.extension_process_enabled = enable;
-}
-
-void gui_win_set_blur_degree(gui_win_t *win, uint8_t degree)
-{
-    if (win == NULL)
-    {
-        // Handle error: window structure is NULL
-        gui_log("Cannot use_blur: win is NULL\n");
-        return;
-    }
-    win->blur_degree = degree;
 }

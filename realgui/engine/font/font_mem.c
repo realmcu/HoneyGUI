@@ -7,14 +7,11 @@
 #include <string.h>
 #include "draw_font.h"
 #include "font_mem.h"
-#include "font_ttf.h"
 #include "font_lib_manager.h"
 #include "font_rendering_utils.h"
 #include "gui_vfs.h"
 #include "font_glyph_cache.h"
 #include "draw_img.h"
-#include "gui_matrix.h"
-#include "acc_api.h"
 
 /*============================================================================*
  *                      Font Library Access Functions
@@ -445,73 +442,6 @@ static int gui_font_bmp_load_glyph(mem_char_t *chr, uint8_t *font_path, FONT_LIB
 #endif /* ENABLE_FONT_V3_TYPO */
 
 /**
- * @brief Load a resolved color emoji sequence from the configured resource path.
- *
- * @return true if the emoji resource was found and loaded.
- */
-static bool load_emoji_resource(mem_char_t *chr, gui_text_t *text, int16_t baseline_px,
-                                const uint32_t *unicode_buf, uint16_t sequence_len)
-{
-    if (text->emoji_path == NULL || sequence_len == 0)
-    {
-        return false;
-    }
-
-    char file_path[100] = {0};
-    snprintf(file_path, sizeof(file_path), "%s", text->emoji_path);
-    gui_unicode_append_emoji_file_name(unicode_buf, sequence_len, file_path);
-
-    uint8_t *addr = (uint8_t *)gui_vfs_get_file_address(file_path);
-    if (addr == NULL)
-    {
-        return false;
-    }
-
-    chr->dot_addr = addr;
-    chr->char_w = text->font_height;
-    chr->char_h = text->font_height;
-    chr->is_emoji = 1;
-#if ENABLE_FONT_V3_TYPO
-    chr->advance = chr->char_w;
-    chr->bearing_y = baseline_px;
-#else
-    (void)baseline_px;
-#endif
-    return true;
-}
-
-gui_emoji_load_result_t gui_font_try_load_emoji(mem_char_t *chr, gui_text_t *text,
-                                                int16_t baseline_px, uint32_t *unicode_buf,
-                                                uint32_t *p_uni_i, uint32_t unicode_len)
-{
-    uint32_t uni_i = *p_uni_i;
-    gui_emoji_sequence_t sequence;
-
-    if (!gui_unicode_resolve_emoji(&unicode_buf[uni_i], unicode_len - uni_i, &sequence))
-    {
-        return GUI_EMOJI_LOAD_NOT_EMOJI;
-    }
-
-    if (sequence.presentation == GUI_EMOJI_PRESENTATION_TEXT)
-    {
-        *p_uni_i += sequence.selector_len;
-        return GUI_EMOJI_LOAD_NOT_EMOJI;
-    }
-
-    /* A sequence renders as one cell either way, so the modifiers and joiners are
-     * consumed even when no color resource exists. Leaving them in the stream
-     * would resolve each one on its own and emit extra substitute glyphs. */
-    *p_uni_i += sequence.sequence_len - 1;
-
-    if (load_emoji_resource(chr, text, baseline_px, &unicode_buf[uni_i], sequence.sequence_len))
-    {
-        return GUI_EMOJI_LOAD_DONE;
-    }
-
-    return GUI_EMOJI_LOAD_MISSING;
-}
-
-/**
  * @brief Try to load a single glyph from a specific BMP font.
  *
  * Handles all combinations of crop/non-crop, address/offset index,
@@ -891,11 +821,9 @@ void gui_font_get_dot_info(gui_text_t *text)
     const bool substitute_missing = gui_text_substitute_enabled(text);
 
     /* Build typography context once per text widget (V3 vs V1 detection) */
-    int16_t emoji_baseline_px = 0;
 #if ENABLE_FONT_V3_TYPO
     gui_font_typo_context_t typo_ctx = gui_font_bmp_get_typo_context(font, text->font_height);
     int16_t chr_h;
-    emoji_baseline_px = typo_ctx.baseline_px;
 
     if (typo_ctx.is_v3)
     {
@@ -923,7 +851,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                 chr[chr_i].w = 0;
                 chr[chr_i].h = chr_h;
                 uint32_t offset = 0;
-                gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                 if (chr[chr_i].unicode == 0x0D)
                 {
                     chr[chr_i].char_w = text->font_height / 4;
@@ -944,17 +871,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                     line_flag ++;
                     chr[chr_i].char_w = 0;
                     chr[chr_i].char_h = 0;
-                }
-                else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                             unicode_buf, &uni_i,
-                                                             unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
-                {
-                    if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
-                        gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
-                                                     &line_byte) != 0)
-                    {
-                        continue;
-                    }
                 }
                 else
                 {
@@ -1039,7 +955,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].w = 0;
                     chr[chr_i].h = chr_h;
                     uint32_t offset = 0;
-                    gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                     if (chr[chr_i].unicode == 0x0D)
                     {
                         chr[chr_i].char_w = text->font_height / 4;
@@ -1060,17 +975,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                         line_flag ++;
                         chr[chr_i].char_w = 0;
                         chr[chr_i].char_h = 0;
-                    }
-                    else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                                 unicode_buf, &uni_i,
-                                                                 unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
-                    {
-                        if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
-                            gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
-                                                         &line_byte) != 0)
-                        {
-                            continue;
-                        }
                     }
                     else
                     {
@@ -1168,7 +1072,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                 chr[chr_i].w = aliened_font_size;
                 chr[chr_i].h = text->font_height;
                 uint16_t offset = 0;
-                gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                 if (chr[chr_i].unicode == 0x0D)
                 {
                     chr[chr_i].char_w = text->font_height / 4;
@@ -1189,17 +1092,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                     line_flag ++;
                     chr[chr_i].char_w = 0;
                     chr[chr_i].char_h = 0;
-                }
-                else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                             unicode_buf, &uni_i,
-                                                             unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
-                {
-                    if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
-                        gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
-                                                     &line_byte) != 0)
-                    {
-                        continue;
-                    }
                 }
                 else
                 {
@@ -1246,7 +1138,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[chr_i].h = text->font_height;
                     chr[chr_i].char_w = text->font_height / 2;
                     chr[chr_i].char_h = text->font_height;
-                    gui_emoji_load_result_t emoji_rc = GUI_EMOJI_LOAD_NOT_EMOJI;
                     if (chr[chr_i].unicode == 0x0A)
                     {
                         line_flag ++;
@@ -1260,17 +1151,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_h = text->font_height / 4;
                     }
 #endif
-                    else if ((emoji_rc = gui_font_try_load_emoji(&chr[chr_i], text, emoji_baseline_px,
-                                                                 unicode_buf, &uni_i,
-                                                                 unicode_len)) != GUI_EMOJI_LOAD_NOT_EMOJI)
-                    {
-                        if (emoji_rc == GUI_EMOJI_LOAD_MISSING &&
-                            gui_font_bmp_resolve_missing(text, &chr[chr_i], substitute_missing,
-                                                         &line_byte) != 0)
-                        {
-                            continue;
-                        }
-                    }
                     else
                     {
                         int32_t index = font_index_bsearch_bmp(table_offset, index_area_size, chr[chr_i].unicode);
@@ -1448,7 +1328,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     bool wordwrap = text->wordwrap || text->arabic || text->hebrew;
     bool need_rtl = false;
 
-    /* Build typo context: dispatch by file_type (BMP vs TTF) */
+    /* Build typo context from the BMP header; other font types fall back to V1. */
 #if ENABLE_FONT_V3_TYPO
     gui_font_typo_context_t typo_ctx = {0};
     uint8_t font_file_type = 0;
@@ -1475,10 +1355,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 typo_ctx = gui_font_bmp_get_typo_context(
                                (GUI_FONT_HEAD_BMP *)header_ptr, text->font_height);
             }
-            else if (font_file_type == FONT_FILE_TTF_FLAG)
+            else
             {
-                typo_ctx = gui_font_ttf_get_typo_context(
-                               (GUI_FONT_HEAD_TTF *)header_ptr, text->font_height);
+                gui_log("Warning! file_type 0x%02x is not a bitmap font, only bitmap fonts are supported.\n",
+                        font_file_type);
             }
         }
     }
@@ -2130,15 +2010,13 @@ void gui_font_mem_unload(gui_text_t *text)
         {
             for (int i = 0; i < text->font_len; i++)
             {
-                if (chr[i].dot_addr && !chr[i].is_emoji &&
+                if (chr[i].dot_addr &&
                     !font_glyph_cache_contains(chr[i].dot_addr))
                 {
                     gui_free(chr[i].dot_addr);
                 }
             }
         }
-        /* Free decoded emoji buffers before the cells holding them. */
-        gui_font_free_emoji_cache(text);
         gui_free(text->data);
         text->data = NULL;
     }
@@ -2154,14 +2032,13 @@ void gui_font_mem_destroy(gui_text_t *text)
         {
             for (int i = 0; i < text->font_len; i++)
             {
-                if (chr[i].dot_addr && !chr[i].is_emoji &&
+                if (chr[i].dot_addr &&
                     !font_glyph_cache_contains(chr[i].dot_addr))
                 {
                     gui_free(chr[i].dot_addr);
                 }
             }
         }
-        gui_font_free_emoji_cache(text);
         gui_free(text->data);
         text->data = NULL;
     }
@@ -2242,84 +2119,6 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t render_
 
     font_glyph_render(&df, &glyph);
 }
-void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data)
-{
-    if (data == NULL)
-    {
-        return;
-    }
-
-    /* Blit the ARGB8888 cell inline instead of spawning a child gui_img:
-     * creating a widget mid-draw corrupted the heap. */
-    gui_dispdev_t *dc = gui_get_dc();
-
-    float scale = (text->emoji_size != 0)
-                  ? (float)(chr->char_w) / (float)(text->emoji_size)
-                  : 1.0f;
-
-    draw_img_t img;
-    memset(&img, 0, sizeof(img));
-    img.data = data;
-    /* Emoji bins carry per-pixel alpha; SRC_OVER honors it (IMG_FILTER_BLACK
-     * would drop pure-black pixels). */
-    img.blend_mode = IMG_SRC_OVER_MODE;
-    img.opacity_value = (text->base.parent != NULL)
-                        ? text->base.parent->opacity_value : UINT8_MAX;
-
-    /* Scale the cell to the glyph box and place it at the glyph's
-     * absolute position. */
-    matrix_identity(&img.matrix);
-    matrix_translate(chr->x, chr->y, &img.matrix);
-    matrix_scale(scale, scale, &img.matrix);
-    memcpy(&img.inverse, &img.matrix, sizeof(img.inverse));
-    matrix_inverse(&img.inverse);
-
-    const gui_rgb_data_head_t *head = (const gui_rgb_data_head_t *)data;
-    if (head->compress && chr->buf == NULL)
-    {
-        struct acc_engine *acc = gui_get_acc();
-        if (acc != NULL && acc->idu != NULL && acc->idu->load != NULL && acc->idu->release != NULL)
-        {
-            chr->buf = acc->idu->load(data);
-            if (chr->buf == NULL && dc->section_count == 0)
-            {
-                gui_log("emoji U+%04X: idu_load failed, blitting compressed data\n", chr->unicode);
-            }
-        }
-    }
-    if (head->compress && chr->buf != NULL)
-    {
-        img.data = chr->buf;
-    }
-
-    draw_img_load_scale(&img, IMG_SRC_MEMADDR);
-    draw_img_new_area(&img, NULL);
-    gui_acc_blit_to_dc(&img, dc, NULL);
-}
-
-void gui_font_free_emoji_cache(gui_text_t *text)
-{
-    mem_char_t *chr = text->data;
-    if (chr == NULL)
-    {
-        return;
-    }
-
-    struct acc_engine *acc = gui_get_acc();
-    if (acc == NULL || acc->idu == NULL || acc->idu->release == NULL)
-    {
-        return;
-    }
-
-    for (uint16_t i = 0; i < text->font_len; i++)
-    {
-        if (chr[i].is_emoji && chr[i].buf != NULL)
-        {
-            acc->idu->release(chr[i].buf);
-            chr[i].buf = NULL;
-        }
-    }
-}
 
 void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
@@ -2343,16 +2142,9 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
     outcolor.color.rgba.a = text->color.color.rgba.a * text->base.parent->opacity_value / 0xff;
     for (uint16_t i = 0; i < text->active_font_len; i++)
     {
-        if (chr[i].is_emoji)
-        {
-            gui_font_draw_emoji(text, chr + i, chr[i].dot_addr);
-        }
-        else
-        {
-            uint8_t chr_render_mode = chr[i].render_mode ? chr[i].render_mode : render_mode;
-            rtk_draw_unicode(chr + i, outcolor, chr_render_mode, rect,
-                             text->font_blend_mode);
-        }
+        uint8_t chr_render_mode = chr[i].render_mode ? chr[i].render_mode : render_mode;
+        rtk_draw_unicode(chr + i, outcolor, chr_render_mode, rect,
+                         text->font_blend_mode);
     }
 
 #if 0 /* Enable to print glyph cache stats per draw call */
