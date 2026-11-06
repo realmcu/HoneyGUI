@@ -667,8 +667,15 @@ void gui_scroll_text_start(gui_scroll_text_t *_this)
 
 void gui_scroll_text_resume(gui_scroll_text_t *_this)
 {
+    uint32_t now = gui_ms_get();
+
+    if (!_this->scrolling && _this->cur_time_ms != 0)
+    {
+        _this->init_time_ms += now - _this->cur_time_ms;
+    }
+
+    _this->cur_time_ms = now;
     _this->scrolling = true;
-    _this->init_time_ms += gui_ms_get() - _this->cur_time_ms;
     gui_fb_change();
 }
 
