@@ -81,6 +81,9 @@ typedef struct imdc_file_header
 } imdc_file_header_t;
 /* imdc_file_header struct end*/
 
+/* Compression algorithms; the field is 2 bits wide, others are rejected. */
+#define IMDC_ALGORITHM_RLE 0
+
 typedef struct imdc_file
 {
     imdc_file_header_t header;

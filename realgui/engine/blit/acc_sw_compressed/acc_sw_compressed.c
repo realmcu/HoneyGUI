@@ -166,6 +166,25 @@ bool is_identity_matrix(gui_matrix_t *matrix)
            (matrix->m[2][0] == 0) && (matrix->m[2][1] == 0);
 }
 
+/**
+ * @brief Locate the compression header of a compressed image.
+ *
+ * I8 images carry a palette between the image header and the compression
+ * header; every other format places it right after the image header.
+ */
+static const imdc_file_header_t *get_imdc_header(const draw_img_t *image)
+{
+    const uint8_t *data = image->data;
+    uintptr_t offset = sizeof(gui_rgb_data_head_t);
+
+    if (((const gui_rgb_data_head_t *)data)->type == I8)
+    {
+        uint32_t clut_count = *(const uint32_t *)(data + offset);
+        offset += sizeof(uint32_t) + (((clut_count >> 16) + 1) * 4);
+    }
+    return (const imdc_file_header_t *)(data + offset);
+}
+
 void handle_image_blend_mode(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     switch (image->blend_mode)
@@ -189,6 +208,14 @@ void sw_acc_blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *re
 {
     if (image == NULL || image->data == NULL || dc == NULL) { return; }
     if (image->img_w <= 0 || image->img_h <= 0) { return; }
+
+    const imdc_file_header_t *imdc = get_imdc_header(image);
+    if (imdc->algorithm_type.algorithm != IMDC_ALGORITHM_RLE)
+    {
+        gui_log("Unsupported compression algorithm: %d (only RLE supported)\n",
+                imdc->algorithm_type.algorithm);
+        return;
+    }
 
     if (!is_identity_matrix(&image->matrix))
     {

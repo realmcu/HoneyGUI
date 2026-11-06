@@ -12,8 +12,6 @@ extern void sw_acc_init(void);
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 extern void sw_acc_deinit(void);
 
-extern void *gui_acc_decode(void *in);
-
 static gui_blit_ops_t sw_acc_blit_ops =
 {
     .init = sw_acc_init,
@@ -21,16 +19,9 @@ static gui_blit_ops_t sw_acc_blit_ops =
     .deinit = sw_acc_deinit,
 };
 
-static const gui_idu_ops_t idu_ops =
-{
-    .load = gui_acc_decode,
-    .release = gui_free,
-};
-
 static acc_engine_t acc =
 {
     .blit = &sw_acc_blit_ops,
-    .idu = &idu_ops,
 };
 
 void gui_port_acc_init(void)

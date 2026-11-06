@@ -54,42 +54,11 @@ typedef struct gui_blit_ops
     void (*deinit)(void);
 } gui_blit_ops_t;
 
-typedef struct gui_jpeg_ops
-{
-    void (*init)(void);
-    void *(*load)(void *input, int len, int *w, int *h, int *channel);
-    void (*release)(void *data);
-    void *(*compress)(void *input, int w, int h, int bpp,
-                      int quality, int buf_len, int *out_len);
-    void (*free)(void *data);
-    void (*deinit)(void);
-} gui_jpeg_ops_t;
-
-typedef struct gui_png_ops
-{
-    void (*init)(void);
-    void *(*load)(void *input, int len, int *w, int *h, int *channel);
-    void (*release)(void *data);
-    void (*deinit)(void);
-} gui_png_ops_t;
-
-typedef struct gui_idu_ops
-{
-    void (*init)(void);
-    void *(*load)(void *input);
-    void (*release)(void *data);
-    void (*deinit)(void);
-} gui_idu_ops_t;
-
-
 /* acc_engine_t struct define start */
 typedef struct acc_engine
 {
     const gui_blit_ops_t *blit;
     void (*fb_clear)(uint8_t *addr, gui_color_t color, uint32_t len);
-    const gui_jpeg_ops_t *jpeg;
-    const gui_png_ops_t *png;
-    const gui_idu_ops_t *idu;
     bool enable_thread_sync;
     void *cache_mem;
     uint32_t cache_size;

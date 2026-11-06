@@ -33,6 +33,32 @@ typedef struct
 #endif
 } gui_raster_params_t;
 
+/**
+ * @brief Whether the generic rasteriser can read this pixel format.
+ *
+ * Every format reaching this path must have a decoder in gui_get_source_color;
+ * the ones without a decoder there are refused instead of being rasterised.
+ */
+static bool is_supported_pixel_format(char input_type)
+{
+    switch (input_type)
+    {
+    case RGB565:
+    case ARGB8565:
+    case ARGB8888:   /* produced by frozen geometry gradients */
+    case PALETTE:    /* produced by the frozen GIF widget */
+    case A8:
+    case ALPHAMASK:
+    case A4:
+    case A2:
+    case A1:
+    case I8:
+        return true;
+    default:
+        return false;
+    }
+}
+
 static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
                                  uint8_t *source_alpha,
                                  uintptr_t image_base, uint32_t image_off, char input_type, uint8_t *palette_data,
@@ -501,6 +527,13 @@ void sw_acc_blit_generic(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 
     gui_rgb_data_head_t *head = image->data;
     char input_type = head->type;
+
+    if (!is_supported_pixel_format(input_type))
+    {
+        gui_log("Unsupported image format: %d\n", input_type);
+        return;
+    }
+
     int16_t source_w = image->img_w, source_h = image->img_h;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3, opacity_value = image->opacity_value;
     uint8_t *writebuf = dc->frame_buf;

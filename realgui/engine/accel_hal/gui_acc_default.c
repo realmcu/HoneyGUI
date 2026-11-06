@@ -14,7 +14,6 @@
 
 #ifdef CONFIG_REALTEK_GUI_ACCELERATOR_SW
 #include "acc_sw_entry.h"
-#include "acc_sw_idu.h"
 
 static const gui_blit_ops_t sw_blit_ops =
 {
@@ -23,17 +22,9 @@ static const gui_blit_ops_t sw_blit_ops =
     .deinit = sw_acc_deinit,
 };
 
-extern void *gui_acc_decode(void *in);
-static const gui_idu_ops_t sw_idu_ops =
-{
-    .load = gui_acc_decode,
-    .release = gui_free,
-};
-
 static acc_engine_t sw_acc =
 {
     .blit = &sw_blit_ops,
-    .idu = &sw_idu_ops,
 };
 #endif
 

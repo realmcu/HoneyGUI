@@ -40,7 +40,6 @@ typedef enum
     ARGB8565     = 1,  /* 24-bit: bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha, packed*/
     RGB888       = 3,  /* 24-bit: bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red */
     ARGB8888     = 4,  /* 32-bit: bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[31:24] for Alpha */
-    XRGB8888     = 5,  /* 32-bit: bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[31:24] for X (unused or fixed 0xFF) */
 
     /* Luma / mask / indexed formats */
     BINARY       = 6,  /* 1-bit monochrome (black/white) */
@@ -48,13 +47,10 @@ typedef enum
     ALPHAMASK    = 9,  /* Alpha-only mask (default 8 bits) */
     PALETTE      = 10, /* Indexed color using a palette (CLUT) */
 
-    /* Encoded image container formats */
-    BMP          = 11, /* BMP image file format */
+    /* No decoder in nano: the identifiers are kept so a resource produced by
+     * the master toolchain still names its own format in the rejection log. */
     JPEG         = 12, /* JPEG image file format */
     PNG          = 13, /* PNG image file format */
-    GIF          = 14, /* GIF image file format */
-
-    RTKARGB8565  = 15, /* Planar: [A 8bpp plane][RGB565 plane], not interleaved */
 
     /* Grayscale subtypes (luminance only) */
     GRAY1        = BINARY, /* 1 bpp grayscale (2 levels) */
@@ -65,14 +61,7 @@ typedef enum
     A4           = 0x31,   /* 4 bpp alpha (16 levels) */
     A2           = 0x32,   /* 2 bpp alpha (4 levels) */
     A1           = 0x33,   /* 1 bpp alpha (2 levels) */
-    X8           = 0x34,   /* 8 bpp X (256 levels) */
-    X4           = 0x35,   /* 4 bpp X (16 levels) */
-    X2           = 0x36,   /* 2 bpp X (4 levels) */
-    X1           = 0x37,   /* 1 bpp X (2 levels) */
     I8           = 0x38,   /* 8 bpp indexed (256 levels) */
-    I4           = 0x39,   /* 4 bpp indexed (16 levels) */
-    I2           = 0x3a,   /* 2 bpp indexed (4 levels) */
-    I1           = 0x3b,   /* 1 bpp indexed (2 levels) */
 } GUI_FormatType;
 /* GUI_FormatType structure end*/
 
@@ -108,7 +97,6 @@ typedef enum
 void draw_img_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
 bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect);
 gui_rgb_data_head_t draw_img_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
-uint32_t draw_img_get_pixel_byte(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
 void draw_img_cache(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *path);
 void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *path);
 bool draw_img_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,

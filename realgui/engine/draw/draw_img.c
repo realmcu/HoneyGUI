@@ -7,8 +7,6 @@
 #include "draw_img.h"
 #include <string.h>
 #include <math.h>
-#include "acc_sw_jpeg.h"
-#include "acc_sw_png.h"
 #include "gui_vfs.h"
 
 void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
@@ -56,18 +54,18 @@ gui_rgb_data_head_t draw_img_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE sr
         if (!file)
         {
             gui_log("open file fail:%s !\n", (char *)img->data);
+            return head;
         }
         gui_vfs_read(file, &head, sizeof(head));
         gui_vfs_close(file);
     }
-    else if (src_mode == IMG_SRC_FTL)
-    {
-        uint32_t base = (uintptr_t)img->data;
-        gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
-    }
     else if (src_mode == IMG_SRC_MEMADDR)
     {
         memcpy(&head, img->data, sizeof(head));
+    }
+    else
+    {
+        gui_log("Unsupported image source mode: %d\n", (int)src_mode);
     }
 
     return head;
@@ -80,29 +78,6 @@ void draw_img_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
     img->img_w = head.w;
     img->img_h = head.h;
 }
-uint32_t draw_img_get_pixel_byte(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
-{
-    struct gui_rgb_data_head head = {0};
-    head = draw_img_get_header(img, src_mode);
-    if (head.type == RGB565)
-    {
-        return 2;
-    }
-    else if (head.type == RGB888)
-    {
-        return 3;
-    }
-    else if (head.type == ARGB8565)
-    {
-        return 3;
-    }
-    else if (head.type == ARGB8888)
-    {
-        return 4;
-    }
-    return 0;
-}
-
 bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 {
     gui_point3f_t pox = {0};
@@ -223,151 +198,44 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode, const char
     {
         return;
     }
-    if (src_mode == IMG_SRC_FILESYS)
+    switch (src_mode)
     {
-        const void *data = gui_vfs_get_file_address(path);
-        if (!data)
+    case IMG_SRC_FILESYS:
         {
-            /* Fallback: read file into memory */
-            gui_vfs_file_t *f = gui_vfs_open(path, GUI_VFS_READ);
-            GUI_ASSERT(f != NULL);
-            gui_vfs_seek(f, 0, GUI_VFS_SEEK_END);
-            int size = gui_vfs_tell(f);
-
-            if (size <= 0)
+            /* Only directly mappable files are supported; anything else has to
+             * be read into RAM, which nano does not do. */
+            const void *data = gui_vfs_get_file_address(path);
+            if (data == NULL)
             {
-                gui_vfs_close(f);
-                return;
+                gui_log("Image file is not memory-mappable: %s\n", path);
+                image->data = NULL;
+                break;
             }
-
-            gui_vfs_seek(f, 0, GUI_VFS_SEEK_SET);
-            data = gui_malloc(size);
-            GUI_ASSERT(data != NULL);
-            gui_vfs_read(f, (void *)data, size);
-            gui_vfs_close(f);
+            image->data = (uint8_t *)data;
+            break;
         }
-        image->data = (uint8_t *)data;
-
-        return;
-    }
-    else if (src_mode == IMG_SRC_FTL)
-    {
-        gui_rgb_data_head_t head;
-        uint32_t base = (uintptr_t)image->data;
-        gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
-        uint8_t *data = NULL;
-        if (head.compress == true)
+    case IMG_SRC_MEMADDR:
         {
-            uint32_t end = 0;
-            gui_ftl_read(base + sizeof(gui_rgb_data_head_t) + sizeof(imdc_file_header_t) + 4 * (head.h),
-                         (uint8_t *)&end, 4);
-            uint32_t size = end  + sizeof(gui_rgb_data_head_t);
-            data = (uint8_t *)gui_malloc(size);
-            GUI_ASSERT(data != NULL);
-            gui_ftl_read(base, data, size);
-        }
-        else
-        {
-            draw_img_get_header(image, src_mode);
-            uint8_t pixel_byte = draw_img_get_pixel_byte(image, src_mode);
-            uint32_t size = head.w * head.h * pixel_byte;
-            data = (uint8_t *)gui_malloc(size);
-            GUI_ASSERT(data != NULL);
-            gui_ftl_read(base, data, size);
-        }
-        image->data = data;
-
-        return;
-    }
-    else if (src_mode == IMG_SRC_MEMADDR)
-    {
-
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
-        gui_jpeg_file_head_t *jpeg = image->data;
-
-        if (head->type == JPEG)
-        {
-            int w = 0;
-            int h = 0;
-            int channel = 0;
-            image->data = gui_acc_jpeg_load(jpeg->jpeg, jpeg->size, &w, &h, &channel);
-            image->img_w = w;
-            image->img_h = h;
-            //gui_log("JPEG image caching is not supported.\n");
-            return;
-        }
-        else if (head->type == PNG)
-        {
-            gui_png_file_head_t *png = image->data;
-            int w = 0;
-            int h = 0;
-            int channel = 0;
-            image->data = gui_acc_png_load(png->png, png->size, &w, &h, &channel);
-            image->img_w = w;
-            image->img_h = h;
-            return;
-        }
-        else if (head->compress)
-        {
-            struct acc_engine *acc = gui_get_acc();
-            if (acc != NULL && acc->idu != NULL && acc->idu->load != NULL
-                && acc->idu->release != NULL)
+            gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
+            if (head->type == JPEG || head->type == PNG)
             {
-                void *decoded = acc->idu->load(image->data);
-                if (decoded != NULL)
-                {
-                    image->data = decoded;
-                }
+                gui_log("Unsupported image format: JPEG/PNG has no decoder in nano\n");
+                image->data = NULL;
             }
+            /* RLE images are used in place; the compressed data is decoded per
+             * pixel during blit. */
+            break;
         }
-        return;
+    default:
+        gui_log("Unsupported image source mode: %d\n", (int)src_mode);
+        break;
     }
-
 }
 
 void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode, const char *path)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    if (dc->section_count != dc->section_total - 1)
-    {
-        return;
-    }
-    if (src_mode == IMG_SRC_FILESYS)
-    {
-        /* Only free if data is not XIP address */
-        if (path && gui_vfs_get_file_address(path) == img->data)
-        {
-            return;  /* XIP, do not free */
-        }
-        gui_free(img->data);
-    }
-    else if (src_mode == IMG_SRC_FTL)
-    {
-        gui_free(img->data);
-    }
-    else if (src_mode == IMG_SRC_MEMADDR)
-    {
-        if (img->data == NULL)
-        {
-            return;
-        }
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
-        if (head->png)
-        {
-            gui_acc_png_free(img->data);
-        }
-        else if (head->jpeg)
-        {
-            gui_acc_jpeg_release(img->data);
-        }
-        else if (head->idu)
-        {
-            struct acc_engine *acc = gui_get_acc();
-            if (acc != NULL && acc->idu != NULL && acc->idu->release != NULL)
-            {
-                acc->idu->release(img->data);
-            }
-        }
-    }
+    (void)img;
+    (void)src_mode;
+    (void)path;
 }
 
