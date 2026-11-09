@@ -77,8 +77,6 @@ typedef enum
     IMG_2D_SW_FIX_A8_FG, //fixed fg
     IMG_2D_SW_FIX_A8_BGFG, //fixed fg and bg
     IMG_PLUS_DARKER, //darken blend: min(blended, background)
-    IMG_RASTER_HORIZONTAL, // ROI src-over horizontal direction
-    IMG_RASTER_VERTICAL, // ROI src-over vertical direction
     IMG_SRC_MODE, //opaque write of source with RGB scaled by opacity_value (brightness), no background blend
 } BLEND_MODE_TYPE;
 /* BLEND_MODE_TYPE structure end*/

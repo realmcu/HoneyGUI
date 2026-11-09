@@ -71,11 +71,10 @@ static void gui_view_adjust_list(gui_obj_t *old, gui_obj_t *new)
 
 static inline void gui_view_free_bg_img(gui_view_t *_this)
 {
-    if (_this->bg_img != NULL)
+    if (_this->bg_img.data != NULL)
     {
-        gui_free(_this->bg_img->data);
-        gui_free(_this->bg_img);
-        _this->bg_img = NULL;
+        gui_free(_this->bg_img.data);
+        memset(&_this->bg_img, 0, sizeof(draw_img_t));
     }
 }
 
@@ -383,18 +382,12 @@ static void gui_view_generate_bg_data(gui_view_t *_this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    _this->bg_img = gui_malloc(sizeof(draw_img_t));
-    GUI_ASSERT(_this->bg_img != NULL);
-    memset(_this->bg_img, 0x00, sizeof(draw_img_t));
-
-    _this->bg_img->img_w = dc->screen_width;
-    _this->bg_img->img_h = dc->screen_height;
-    _this->bg_img->data = gui_rle_solid_color_create(dc->screen_width, dc->screen_height,
-                                                     _this->bg_color);
-    _this->bg_img->blend_mode = IMG_BYPASS_MODE;
-    _this->bg_img->opacity_value = _this->opacity;
-
-    // gui_log("%s generate bg_img\n", _this->obj.name);
+    _this->bg_img.img_w = dc->screen_width;
+    _this->bg_img.img_h = dc->screen_height;
+    _this->bg_img.data = gui_rle_solid_color_create(dc->screen_width, dc->screen_height,
+                                                    _this->bg_color);
+    _this->bg_img.blend_mode = IMG_BYPASS_MODE;
+    _this->bg_img.opacity_value = _this->opacity;
 }
 
 static void gui_view_prepare(gui_obj_t *obj)
@@ -479,16 +472,16 @@ static void gui_view_prepare(gui_obj_t *obj)
     if (g_Release != g_Target)
     {
         gui_fb_change();
-        if (_this->bg_color.color.argb_full != 0xFF000000 && _this->bg_img == NULL)
+        if (_this->bg_color.color.argb_full != 0xFF000000 && _this->bg_img.data == NULL)
         {
             gui_view_generate_bg_data(_this);
         }
-        if (_this->bg_img != NULL)
+        if (_this->bg_img.data != NULL)
         {
             gui_set_bg_color(gui_rgb(0, 0, 0));
-            _this->bg_img->rel_x = obj->draw_x;
-            _this->bg_img->rel_y = obj->draw_y;
-            draw_img_new_area(_this->bg_img, NULL);
+            _this->bg_img.rel_x = obj->draw_x;
+            _this->bg_img.rel_y = obj->draw_y;
+            draw_img_new_area(&_this->bg_img, NULL);
         }
     }
 }
@@ -498,9 +491,9 @@ static void gui_view_draw(gui_obj_t *obj)
     gui_view_t *_this = (gui_view_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
-    if (_this->bg_img != NULL && gui_obj_is_hidden(obj) == false)
+    if (_this->bg_img.data != NULL && gui_obj_is_hidden(obj) == false)
     {
-        gui_acc_blit_to_dc(_this->bg_img, dc, NULL);
+        gui_acc_blit_to_dc(&_this->bg_img, dc, NULL);
     }
 }
 

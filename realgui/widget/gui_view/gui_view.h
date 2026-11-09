@@ -65,7 +65,11 @@ typedef struct gui_view
     const struct gui_view_descriptor *descriptor;
     struct gui_view_on_event **on_event;
 
-    draw_img_t *bg_img;
+    /* Solid background drawn only while a transition is in flight. Embedded
+     * rather than heaped so a switch never allocates on the animation path;
+     * a NULL bg_img.data means it has not been generated. */
+    draw_img_t bg_img;
+
     gui_color_t bg_color;
 } gui_view_t;
 

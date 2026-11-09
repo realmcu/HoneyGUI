@@ -15,11 +15,11 @@ bool draw_img_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t 
                           int32_t *x_start, int32_t *x_end, int32_t *y_start, int32_t *y_end)
 {
     (void)rect;
-    int16_t image_x = image->img_target_x;
-    int16_t image_y = image->img_target_y;
+    int16_t image_x = image->rel_x;
+    int16_t image_y = image->rel_y;
 
-    int16_t image_w = image->img_target_w ;
-    int16_t image_h = image->img_target_h ;
+    int16_t image_w = (int16_t)image->img_w;
+    int16_t image_h = (int16_t)image->img_h;
 
     *x_start = _UI_MAX(image_x, dc->section.x1);
     *x_end = _UI_MIN(image_x + image_w - 1, dc->section.x2);
@@ -86,10 +86,6 @@ bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
         draw_img_acc_prepare_cb(img, rect);
     }
 
-    img->img_target_x = img->rel_x;
-    img->img_target_y = img->rel_y;
-    img->img_target_w = img->img_w;
-    img->img_target_h = img->img_h;
     return true;
 }
 

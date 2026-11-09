@@ -24,28 +24,22 @@ extern "C" {
 
 
 
+/* Everything the blit stage needs to place one image on screen. The blit code
+ * lives in engine/ and must not see widget headers, so this is the boundary
+ * type: widgets fill it, engine reads it. */
 typedef struct draw_img
 {
+    void *data;
     uint16_t img_w;
     uint16_t img_h;
-    int16_t img_target_x; //display start X
-    int16_t img_target_y;  //display start Y
-    uint16_t img_target_w;
-    uint16_t img_target_h;
-    void *data;
     /* Target position relative to the top-left of the section being drawn:
      * source pixel (sx, sy) lands at (sx + rel_x, sy + rel_y) on screen. */
     int16_t rel_x;
     int16_t rel_y;
-    uint8_t opacity_value;
-    uint32_t checksum : 8;
-    uint32_t blend_mode : 5;
-    uint32_t high_quality : 1;
     uint32_t fg_color_set;  //A8 image set color
     uint32_t bg_color_fix;  //bg color fix for A8 image
-    uint8_t alpha_mix;      //alpha mix for A8 image
-    void *acc_user;
-    float raster_prog;
+    uint8_t opacity_value;
+    uint8_t blend_mode;     // BLEND_MODE_TYPE
 } draw_img_t;
 
 

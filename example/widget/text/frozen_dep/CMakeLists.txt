@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: MIT
 #
 
-# Tests that use gui_geometry and gui_list as scaffolding. Both are frozen in
-# nano, so these build only when both are enabled.
+# Tests that use gui_geometry and gui_list as scaffolding. Both are deleted in
+# nano, so these never build; the sources stay for reference only.
 if(CONFIG_REALTEK_BUILD_EXAMPLE_TEXT_WIDGET AND
         CONFIG_REALTEK_GUI_WIDGET_GEOMETRY AND
         CONFIG_REALTEK_GUI_WIDGET_LIST)

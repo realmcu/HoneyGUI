@@ -34,7 +34,7 @@ extern "C" {
 typedef struct gui_img
 {
     gui_obj_t base;                    /* Base object structure. */
-    draw_img_t *draw_img;              /* Drawing image structure. */
+    draw_img_t draw;                   /* Per-frame drawing state, rebuilt in OBJ_PRE_PROCESS. */
 
     void *src_data;                    /* Image source pointer (type determined by storage_type). */
 
@@ -45,9 +45,9 @@ typedef struct gui_img
     uint32_t opacity_value    : 8;        /* Opacity value (0-255). */
     uint32_t blend_mode       : 5;        /* Blend mode. */
     uint32_t storage_type     : 3;        /* Storage type: e.g., file system, flash, etc. */
-    uint32_t high_quality     : 1;        /* High quality rendering flag. */
     uint32_t need_clip        : 1;        /* Clipping flag. */
     uint32_t free_on_destroy  : 1;        /* Free src_data on destroy if true. */
+    uint32_t draw_ready       : 1;        /* draw was rebuilt this frame. */
     uint8_t checksum;                  /* Checksum for change detection. */
     uint8_t animate_array_length;      /* Animation array length. */
 } gui_img_t;
@@ -198,14 +198,6 @@ gui_img_t *gui_img_create_from_fs(void       *parent,
                                   int16_t     y,
                                   int16_t     w,
                                   int16_t     h);
-
-/**
- * @brief Set the image's quality.
- *
- * @param _this Image widget pointer.
- * @param high_quality True for high quality rendering, false otherwise.
- */
-void gui_img_set_quality(gui_img_t *_this, bool high_quality);
 
 /**
  * @brief Deprecated!

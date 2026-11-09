@@ -10,8 +10,7 @@ src = Glob('*.c')
 
 # These tests use gui_geometry and gui_list as scaffolding: coloured frames for
 # the layout alignment grid, and a scrolling list for the language picker. Both
-# are frozen in nano, so the tests ship with the source but stay out of the
-# default build.
+# are deleted in nano, so these never build; the sources stay for reference.
 if GetDepend(['CONFIG_REALTEK_BUILD_EXAMPLE_TEXT_WIDGET']) and \
         GetDepend(['CONFIG_REALTEK_GUI_WIDGET_GEOMETRY']) and \
         GetDepend(['CONFIG_REALTEK_GUI_WIDGET_LIST']):

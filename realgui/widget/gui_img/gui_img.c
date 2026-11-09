@@ -55,12 +55,14 @@ static void gui_img_prepare(gui_obj_t *obj)
 {
     uint8_t last;
     gui_img_t *_this;
+    draw_img_t *draw;
     touch_info_t *tp;
     GUI_UNUSED(tp);
 
     GUI_ASSERT(obj != NULL);
 
     _this = (gui_img_t *)obj;
+    draw = &_this->draw;
     tp = tp_get_info();
 
     if (gui_obj_out_screen(obj))
@@ -68,16 +70,14 @@ static void gui_img_prepare(gui_obj_t *obj)
         return;
     }
 
-    _this->draw_img = gui_malloc(sizeof(draw_img_t));
-    GUI_ASSERT(_this->draw_img != NULL);
-    memset(_this->draw_img, 0x00, sizeof(draw_img_t));
+    memset(draw, 0x00, sizeof(draw_img_t));
+    _this->draw_ready = true;
 
-    _this->draw_img->data = _this->src_data;
-    _this->draw_img->blend_mode = _this->blend_mode;
-    _this->draw_img->high_quality = _this->high_quality;
-    _this->draw_img->opacity_value = obj->parent->opacity_value * _this->opacity_value / UINT8_MAX;
-    _this->draw_img->fg_color_set = _this->fg_color_set;
-    _this->draw_img->bg_color_fix = _this->bg_color_fix;
+    draw->data = _this->src_data;
+    draw->blend_mode = _this->blend_mode;
+    draw->opacity_value = obj->parent->opacity_value * _this->opacity_value / UINT8_MAX;
+    draw->fg_color_set = _this->fg_color_set;
+    draw->bg_color_fix = _this->bg_color_fix;
 
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
@@ -89,13 +89,13 @@ static void gui_img_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, "touch");
 
-    _this->draw_img->rel_x = obj->draw_x;
-    _this->draw_img->rel_y = obj->draw_y;
+    draw->rel_x = obj->draw_x;
+    draw->rel_y = obj->draw_y;
 
-    draw_img_load_scale(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
+    draw_img_load_scale(draw, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
 
 
-    draw_img_new_area(_this->draw_img, NULL);
+    draw_img_new_area(draw, NULL);
 
 
     last = _this->checksum;
@@ -124,13 +124,19 @@ static void gui_img_draw_cb(gui_obj_t *obj)
     GUI_ASSERT(obj != NULL);
 
     gui_img_t *_this = (gui_img_t *)obj;
+    draw_img_t *draw = &_this->draw;
     struct gui_dispdev *dc = gui_get_dc();
+
+    if (!_this->draw_ready)
+    {
+        return;
+    }
 
     // cache img to buffer
 
-    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
+    draw_img_cache(draw, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
 
-    if (_this->draw_img->data == NULL)
+    if (draw->data == NULL)
     {
         return;
     }
@@ -138,19 +144,19 @@ static void gui_img_draw_cb(gui_obj_t *obj)
     {
         gui_rect_t rect = {0};
         gui_obj_get_clip_rect(obj->parent, &rect);
-        gui_acc_blit_to_dc(_this->draw_img, dc, &rect);
+        gui_acc_blit_to_dc(draw, dc, &rect);
     }
     else
     {
         // gui_rect_t rect = {0};
         // gui_obj_get_clip_rect(obj, &rect);
         // gui_acc_blit_to_dc(_this->draw_img, dc, &rect);
-        gui_acc_blit_to_dc(_this->draw_img, dc, NULL);
+        gui_acc_blit_to_dc(draw, dc, NULL);
     }
 
 
     // release img if cached
-    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
+    draw_img_free(draw, (IMG_SOURCE_MODE_TYPE)_this->storage_type, _this->src_data);
 
 }
 /**
@@ -168,14 +174,11 @@ static void gui_img_end(gui_obj_t *obj)
 
     gui_img_t *_this = (gui_img_t *)obj;
 
-    if (_this->draw_img != NULL)
+    _this->draw_ready = false;
+
+    if (draw_img_acc_end_cb != NULL)
     {
-        if (draw_img_acc_end_cb != NULL)
-        {
-            draw_img_acc_end_cb(_this->draw_img);
-        }
-        gui_free(_this->draw_img);
-        _this->draw_img = NULL;
+        draw_img_acc_end_cb(&_this->draw);
     }
 }
 
@@ -291,7 +294,6 @@ static void gui_img_ctor(gui_img_t            *_this,
 
     _this->storage_type = storage_type;
     _this->free_on_destroy = false;  /* Default: external memory, don't free */
-    _this->high_quality = false;
     _this->need_clip = false;
     _this->fg_color_set = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
     _this->bg_color_fix = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
@@ -529,7 +531,6 @@ uint16_t gui_img_get_height(gui_img_t *_this)
 
 void gui_img_refresh_size(gui_img_t *_this)
 {
-    // gui_image_load_scale(_this->draw_img);
     _this->base.w = gui_img_get_width(_this);
     _this->base.h = gui_img_get_height(_this);
 }
@@ -538,7 +539,7 @@ void gui_img_refresh_draw_data(gui_img_t  *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(this->src_data != NULL);
-    this->draw_img->data = this->src_data;
+    this->draw.data = this->src_data;
 }
 
 void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)
@@ -546,13 +547,6 @@ void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)
     GUI_ASSERT(_this != NULL);
 
     _this->blend_mode = mode;
-}
-
-void gui_img_set_quality(gui_img_t *_this, bool high_quality)
-{
-    GUI_ASSERT(_this != NULL);
-
-    _this->high_quality = high_quality;
 }
 
 void gui_img_set_attribute(gui_img_t  *_this,
@@ -642,12 +636,9 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
         _this->storage_type = storage_type;
     }
 
-    /* Sync draw_img->data if already allocated (e.g. timer callback between prepare and draw) */
-    if (_this->draw_img != NULL)
-    {
-        gui_img_refresh_draw_data(_this);
-    }
-
+    /* Keep the draw state in step for a source change that lands between
+     * OBJ_PRE_PROCESS and OBJ_PROCESS, e.g. from a timer callback. */
+    gui_img_refresh_draw_data(_this);
 }
 
 const uint8_t *gui_img_get_image_data(gui_img_t  *_this)
