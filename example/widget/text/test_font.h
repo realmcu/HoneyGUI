@@ -72,15 +72,19 @@ void scroll_text_widget_example(void);
 
 void text_font_rendering_test(void);
 void text_font_layout_test(void);
-void text_multi_language_test(void);
 void text_font_scroll_function_test(void);
 void text_font_scroll_loop_test(void);
 void text_wordwrap_test(void);
 void text_measure_test(void);
-void text_clip_test(void);
 void text_font_typo_rendering_test(void);
 void text_font_fallback_test(void);
 void text_missing_glyph_test(void);
+
+/* Built only when gui_geometry and gui_list are enabled (see frozen_dep/). */
+#if defined(CONFIG_REALTEK_GUI_WIDGET_GEOMETRY) && defined(CONFIG_REALTEK_GUI_WIDGET_LIST)
+void text_multi_language_test(void);
+void text_clip_test(void);
+#endif
 
 #ifdef __cplusplus
 }

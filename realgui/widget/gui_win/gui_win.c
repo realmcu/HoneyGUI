@@ -9,7 +9,6 @@
  *============================================================================*/
 #include <string.h>
 #include "guidef.h"
-#include "gui_matrix.h"
 #include "gui_obj.h"
 #include "gui_win.h"
 
@@ -41,49 +40,14 @@ static void gui_win_input_process(gui_obj_t *obj)
     (void)obj;
 }
 
-static void gui_win_apply_rotation(gui_obj_t *obj, gui_win_t *this)
-{
-    if (this->degrees == 0.0f)
-    {
-        return;
-    }
-
-    float cx = obj->w / 2.0f;
-    float cy = obj->h / 2.0f;
-
-    matrix_translate(cx, cy, obj->matrix);
-    matrix_rotate(this->degrees, obj->matrix);
-    matrix_translate(-cx, -cy, obj->matrix);
-}
-
-static void gui_win_apply_scale(gui_obj_t *obj, gui_win_t *this)
-{
-    if (this->scale == 1.0f && this->scale_y == 1.0f)
-    {
-        return;
-    }
-
-    float cx = obj->w / 2.0f;
-    float cy = obj->h / 2.0f;
-
-    matrix_translate(cx, cy, obj->matrix);
-    matrix_scale(this->scale, this->scale_y, obj->matrix);
-    matrix_translate(-cx, -cy, obj->matrix);
-}
-
 static void prepare(gui_obj_t *obj)
 {
     // touch_info_t *tp = tp_get_info();
     // kb_info_t *kb = kb_get_info();
     gui_win_t *this = (void *)obj;
-    GUI_UNUSED(this);
-
-    gui_win_apply_rotation(obj, this);
-    gui_win_apply_scale(obj, this);
 
     obj->opacity_value = obj->opacity_value * this->opacity_value / UINT8_MAX;
 
-    matrix_translate(-this->compensate_x, -this->compensate_y, obj->matrix);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
@@ -95,7 +59,6 @@ static void prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_UP_SLIDE_QUICK, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
-    matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);
 }
 
 static void gui_win_end(gui_obj_t *obj)
@@ -147,8 +110,6 @@ void gui_win_ctor(gui_win_t  *this,
     GET_BASE(this)->has_post_process_cb = true;
     GET_BASE(this)->type = WINDOW;
     this->opacity_value = UINT8_MAX;
-    this->scale = 1.0f;
-    this->scale_y = 1.0f;
 }
 
 /*============================================================================*
@@ -240,27 +201,6 @@ gui_win_t *gui_win_create(void       *parent,
     return this;
 }
 
-void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical)
-{
-    if (win == NULL)
-    {
-        // Handle error: window structure is NULL
-        gui_log("Cannot set_scale_rate: win is NULL\n");
-        return;
-    }
-    win->scale = scale_rate_horizontal;
-    win->scale_y = scale_rate_vertical;
-}
-void gui_win_set_rotation(gui_win_t *win, float degrees)
-{
-    if (win == NULL)
-    {
-        // Handle error: window structure is NULL
-        gui_log("Cannot set rotation: win is NULL\n");
-        return;
-    }
-    win->degrees = degrees;
-}
 void gui_win_set_scope(gui_win_t *win, bool enable)
 {
     if (win == NULL)

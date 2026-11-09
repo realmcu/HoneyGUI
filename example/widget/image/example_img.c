@@ -55,13 +55,8 @@ void img_tp_long_pressed_cb(void *obj, gui_event_t *e)
 
 void img_timer_cb(void *param)
 {
-    static float angle = 0;
-    gui_img_t *img = (gui_img_t *)param;
-
-    gui_img_rotation(img, angle++);
-
-    gui_log("Handler[img] timer cb, [angle=%f]render time: %d ms!\n", (double)angle,
-            gui_fb_render_time_ms());
+    GUI_UNUSED(param);
+    gui_log("Handler[img] timer cb, render time: %d ms!\n", gui_fb_render_time_ms());
 }
 
 
@@ -72,12 +67,12 @@ static int app_init(void)
 
     gui_dirty_border_enable(true);
 
-    // gui_img_t *img = gui_img_create_from_fs(gui_obj_get_root(),  "img_1_test", "/pc/example/application/screen_410_502/root_image/root/UI/cellular_menu_card.bin", 0, 0, 0, 0);
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_test", addr, 0, 0, 0, 0);
 
-    gui_img_set_focus(img, gui_img_get_width(img) / 2, gui_img_get_height(img) / 2);
-    gui_img_rotation(img, 0.0f);
-    gui_img_translate(img, dc->screen_width / 2, dc->screen_height / 2);
+    /* Centre the image without the transform API removed in nano. */
+    gui_img_set_pos(img,
+                    (int16_t)((dc->screen_width - img->base.w) / 2),
+                    (int16_t)((dc->screen_height - img->base.h) / 2));
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_tp_clicked_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_tp_double_clicked_cb, GUI_EVENT_TOUCH_DOUBLE_CLICKED,

@@ -20,7 +20,7 @@ static void a8_2_a8_1d_bypass(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *
 
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        uint32_t source_off = (i + m12) * source_w + x_start + m02;
+        uint32_t source_off = (i - rel_y) * source_w + x_start - rel_x;
         uint32_t des_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
                            dc->section.x1;
         memcpy((uint8_t *)writebuf + des_off, (uint8_t *)(uintptr_t)image_base + source_off, len);
@@ -105,48 +105,8 @@ static void a8_2_a8_1d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     }
 }
 
-static void a8_2_a8_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
-{
-    GUI_UNUSED(image);
-    GUI_UNUSED(dc);
-    GUI_UNUSED(rect);
-    GUI_ASSERT(0);
-}
-
-static void a8_2_a8_3d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
-{
-    GUI_UNUSED(image);
-    GUI_UNUSED(dc);
-    GUI_UNUSED(rect);
-    GUI_ASSERT(0);
-}
-
 void a8_2_a8(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
-
-    float m00 = image->matrix.m[0][0];
-    float m01 = image->matrix.m[0][1];
-    float m10 = image->matrix.m[1][0];
-    float m11 = image->matrix.m[1][1];
-    float m20 = image->matrix.m[2][0];
-    float m21 = image->matrix.m[2][1];
-    float m22 = image->matrix.m[2][2];
-
-    if ((m00 == 1) && (m11 == 1) &&
-        (m01 == 0) && (m10 == 0) &&
-        (m20 == 0) && (m21 == 0) &&
-        (m22 == 1))
-    {
-        a8_2_a8_1d(image, dc, rect);
-    }
-    else if ((image->matrix.m[2][2] == 1) && (image->matrix.m[2][0] == 0) &&
-             (image->matrix.m[2][1] == 0))
-    {
-        a8_2_a8_2d(image, dc, rect);
-    }
-    else
-    {
-        a8_2_a8_3d(image, dc, rect);
-    }
+    a8_2_a8_1d(image, dc, rect);
 }
 

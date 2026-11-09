@@ -6,7 +6,6 @@
 
 #include <string.h>
 #include "guidef.h"
-#include "gui_matrix.h"
 #include "gui_fb.h"
 #include "gui_obj.h"
 
@@ -72,80 +71,8 @@ static bool obj_is_active(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 
-    if (gui_obj_out_screen(obj))
-    {
-        obj->active = false;
-        return false;
-    }
-
-    gui_point3f_t p[4] =
-    {
-        {0, 0, 1},
-        {obj->w, 0, 1},
-        {0, obj->h, 1},
-        {obj->w, obj->h, 1}
-    };
-
-    float x_min = 0.0f;
-    float x_max = 0.0f;
-    float y_min = 0.0f;
-    float y_max = 0.0f;
-
-
-    matrix_multiply_point(obj->matrix, p);
-    x_min = p->x;
-    x_max = p->x;
-    y_min = p->y;
-    y_max = p->y;
-    matrix_multiply_point(obj->matrix, p + 1);
-    matrix_multiply_point(obj->matrix, p + 2);
-    matrix_multiply_point(obj->matrix, p + 3);
-
-    for (uint32_t i = 1; i < 3; i++)
-    {
-        gui_point3f_t *point = p + i;
-        if (point->x < x_min)
-        {
-            x_min = point->x;
-        }
-    }
-
-    for (uint32_t i = 1; i < 3; i++)
-    {
-        gui_point3f_t *point = p + i;
-        if (point->x > x_max)
-        {
-            x_max = point->x;
-        }
-    }
-
-    for (uint32_t i = 1; i < 3; i++)
-    {
-        gui_point3f_t *point = p + i;
-        if (point->y < y_min)
-        {
-            y_min = point->y;
-        }
-    }
-
-    for (uint32_t i = 1; i < 3; i++)
-    {
-        gui_point3f_t *point = p + i;
-        if (point->y > y_max)
-        {
-            y_max = point->y;
-        }
-    }
-
-    if ((x_min < (int)gui_get_screen_width()) && (x_max > 0) && \
-        (y_min < (int)gui_get_screen_height()) && (y_max > 0))
-    {
-        obj->active = true;
-        return true;
-    }
-    obj->active = false;
-
-    return false;
+    obj->active = !gui_obj_out_screen(obj);
+    return obj->active;
 }
 
 static void obj_input_process(gui_obj_t *object)
@@ -161,11 +88,8 @@ static void obj_input_process(gui_obj_t *object)
         {
             continue;
         }
-        if (obj->parent->matrix)
-        {
-            memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
-        }
-        matrix_translate(obj->x, obj->y, obj->matrix);
+        obj->abs_x = (int16_t)(obj->parent->abs_x + obj->x);
+        obj->abs_y = (int16_t)(obj->parent->abs_y + obj->y);
         if (obj->has_input_process_cb)
         {
             obj->obj_cb(obj, OBJ_INPUT_PROCESS);
@@ -194,11 +118,12 @@ static void obj_draw_prepare(gui_obj_t *object)
 
         obj->opacity_value = obj->parent->opacity_value;
 
-        if (obj->parent->matrix)
-        {
-            memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
-        }
-        matrix_translate(obj->x, obj->y, obj->matrix);
+        obj->abs_x = (int16_t)(obj->parent->abs_x + obj->x);
+        obj->abs_y = (int16_t)(obj->parent->abs_y + obj->y);
+        /* Built on the parent's draw position, so a parent transition carries
+         * down to its children. */
+        obj->draw_x = (int16_t)(obj->parent->draw_x + obj->x);
+        obj->draw_y = (int16_t)(obj->parent->draw_y + obj->y);
 
         if (obj->has_pre_process_cb)
         {
@@ -258,7 +183,6 @@ static void obj_draw_end(gui_obj_t *obj)
             obj->obj_cb(obj, OBJ_POST_PROCESS);
         }
 
-        matrix_identity(obj->matrix);
         obj->active = false;
 
         obj_draw_end(obj);

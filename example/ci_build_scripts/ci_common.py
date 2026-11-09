@@ -68,18 +68,12 @@ CONFIG_FILES = (
 
 DEMO_CONFIGS = (
     ("REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET", "Image Widget Demo", "widget"),
-    ("REALTEK_BUILD_EXAMPLE_GIF_WIDGET", "GIF Widget Demo", "widget"),
     ("REALTEK_BUILD_EXAMPLE_TEXT_WIDGET", "Text Widget Demo", "widget"),
     ("REALTEK_BUILD_EXAMPLE_SYSVAL_REQUEST",
      "System Value Request Demo", "sysval"),
     ("REALTEK_BUILD_EXAMPLE_SYSVAL_SUBSCRIBE",
      "System Value Subscription Demo", "sysval"),
     ("REALTEK_BUILD_REAL_VIEW", "View Demo", "widget"),
-    ("REALTEK_BUILD_EXAMPLE_LIST_WIDGET", "List Widget Demo", "widget"),
-    ("REALTEK_BUILD_REAL_LITE_ARC", "Geometry ARC Demo", "widget"),
-    ("REALTEK_BUILD_REAL_LITE_RECT", "Geometry RECT Demo", "widget"),
-    ("REALTEK_BUILD_REAL_LITE_CIRCLE", "Geometry CIRCLE Demo", "widget"),
-    ("REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET", "QRCode Widget Demo", "widget"),
     ("REALTEK_BUILD_GUI_466_466_DEMO", "GUI Demo 466x466", "application"),
     ("REALTEK_BUILD_GUI_240_240_DEMO", "GUI Demo 240x240", "application"),
 )

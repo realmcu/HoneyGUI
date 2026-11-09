@@ -20,7 +20,6 @@ extern "C" {
 #include "gui_fb.h"
 #include "gui_obj.h"
 #include "gui_img.h"
-#include "gui_matrix.h"
 
 /*============================================================================*
  *                         Types
@@ -41,56 +40,8 @@ typedef enum
     SWITCH_IN_FROM_TOP_USE_TRANSLATION, ///< Switch in from top with transition effect.
     SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION, ///< Switch in from bottom with transition effect.
 
-    SWITCH_IN_FROM_LEFT_USE_REDUCTION = 0x0200, ///< Switch in from left with reduction effect.
-    SWITCH_IN_FROM_RIGHT_USE_REDUCTION, ///< Switch in from right with reduction effect.
-    SWITCH_IN_FROM_TOP_USE_REDUCTION, ///< Switch in from top with reduction effect.
-    SWITCH_IN_FROM_BOTTOM_USE_REDUCTION, ///< Switch in from bottom with reduction effect.
-    SWITCH_OUT_TO_LEFT_USE_REDUCTION, ///< Switch out to left with reduction effect.
-    SWITCH_OUT_TO_RIGHT_USE_REDUCTION, ///< Switch out to right with reduction effect.
-    SWITCH_OUT_TO_TOP_USE_REDUCTION, ///< Switch out to top with reduction effect.
-    SWITCH_OUT_TO_BOTTOM_USE_REDUCTION, ///< Switch out to bottom with reduction effect.
-
-    SWITCH_IN_FROM_LEFT_USE_CUBE = 0x0300, ///< Switch in from left with cube effect.
-    SWITCH_IN_FROM_RIGHT_USE_CUBE, ///< Switch in from right with cube effect.
-    SWITCH_IN_FROM_TOP_USE_CUBE, ///< Switch in from top with cube effect.
-    SWITCH_IN_FROM_BOTTOM_USE_CUBE, ///< Switch in from bottom with cube effect.
-
-    SWITCH_OUT_TO_LEFT_USE_CUBE, ///< Switch out to left with cube effect.
-    SWITCH_OUT_TO_RIGHT_USE_CUBE, ///< Switch out to right with cube effect.
-    SWITCH_OUT_TO_TOP_USE_CUBE, ///< Switch out to top with cube effect.
-    SWITCH_OUT_TO_BOTTOM_USE_CUBE, ///< Switch out to bottom with cube effect.
-
-    SWITCH_IN_FROM_LEFT_USE_ROTATE = 0x0400, ///< Switch in from left with rotate effect.
-    SWITCH_IN_FROM_RIGHT_USE_ROTATE, ///< Switch in from right with rotate effect.
-    SWITCH_IN_FROM_TOP_USE_ROTATE, ///< Switch in from top with rotate effect.
-    SWITCH_IN_FROM_BOTTOM_USE_ROTATE, ///< Switch in from bottom with rotate effect.
-
-    SWITCH_OUT_TO_LEFT_USE_ROTATE, ///< Switch out to left with rotate effect.
-    SWITCH_OUT_TO_RIGHT_USE_ROTATE, ///< Switch out to right with rotate effect.
-    SWITCH_OUT_TO_TOP_USE_ROTATE, ///< Switch out to top with rotate effect.
-    SWITCH_OUT_TO_BOTTOM_USE_ROTATE, ///< Switch out to bottom with rotate effect.
-
     SWITCH_OUT_NONE_ANIMATION = 0x0500, ///< No animation.
-    SWITCH_OUT_ANIMATION_ZOOM,
-    SWITCH_OUT_ANIMATION_FADE,
-    SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
-    SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
-    SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT,       // scale to top left
-    SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_RIGHT,      // scale to top right
-    SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT,      // scale from top left
-    SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_RIGHT,     // scale from top right
     SWITCH_IN_NONE_ANIMATION,           ///< No animation.
-    SWITCH_IN_ANIMATION_ZOOM,
-    SWITCH_IN_ANIMATION_FADE,
-    SWITCH_IN_ANIMATION_MOVE_FADE,
-    SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT,
-    SWITCH_IN_ANIMATION_MOVE_FROM_LEFT,
-    SWITCH_IN_ANIMATION_BOUNCE_FROM_RIGHT,
-
-    SWITCH_IN_ANIMATION_RASTER_HORIZONTAL,         ///< Switch in with raster effect. Only support when use_snapshot is true.
-    SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE,
-    SWITCH_IN_ANIMATION_RASTER_VERTICAL,         ///< Switch in with raster effect.
-    SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE,
 
 } VIEW_SWITCH_STYLE;
 /* VIEW_SWITCH_STYLE enum end*/
@@ -116,8 +67,6 @@ typedef struct gui_view
 
     draw_img_t *bg_img;
     gui_color_t bg_color;
-
-    gui_obj_t *obj_temp;
 } gui_view_t;
 
 /* gui_view_descriptor start*/
@@ -134,11 +83,6 @@ typedef struct gui_view_descriptor
     /* If set, the view is kept resident (not destroyed on switch-out) and is
        pre-created when registered. */
     uint8_t keep          : 1;
-    /* If set, the view is rendered from a cached snapshot during switch in/out.
-       Requires extra RAM for the snapshot buffer. */
-    uint8_t use_snapshot  : 1;
-    /* Double pointer to the snapshot buffer in RAM (same pattern as pView). */
-    void **snapshot_data;
 } gui_view_descriptor_t;
 /* gui_view_descriptor end*/
 
@@ -207,11 +151,6 @@ const gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
 gui_view_t *gui_view_get(const char *name);
 
 /**
- * @brief Clear all view's snap shot data.
- */
-void gui_view_clear_all_snapshot_data(void);
-
-/**
  * @brief Switches the current GUI view to a new view based on the specified event.
  *
  * This function handles the transition between GUI views. It takes the current
@@ -275,18 +214,6 @@ gui_view_t *gui_view_get_current(void);
  * @return Next view pointer.
  */
 gui_view_t *gui_view_get_next(void);
-
-/**
- * @brief Update snap shot.
- * @param _this Pointer to view.
- */
-void gui_view_update_snapshot_async(gui_view_t *_this);
-
-/**
- * @brief Enable pre-cache snap shot. Need to be called before gui_view_create.
- * @param enable True to enable pre-cache, False to disable. Default is true.
- */
-void gui_view_enable_precache_snapshot(bool enable);
 
 /**
  * @brief Set view background color. Default is black.

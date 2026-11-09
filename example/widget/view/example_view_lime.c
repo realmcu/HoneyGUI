@@ -22,7 +22,7 @@
 
 static void app_ui_view_lime_design(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_lime_design, NULL, false);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_lime_design, NULL);
 
 static void img_cb(void *obj, gui_event_t *e)
 {
@@ -30,8 +30,8 @@ static void img_cb(void *obj, gui_event_t *e)
     GUI_UNUSED(e);
 
     gui_view_switch_direct(gui_view_get("lime_view"), "blue_view",
-                           SWITCH_OUT_ANIMATION_ZOOM,
-                           SWITCH_IN_ANIMATION_ZOOM);
+                           SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
 }
 
 static void app_ui_view_lime_design(gui_view_t *view)

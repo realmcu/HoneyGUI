@@ -30,11 +30,10 @@ void rle_cover_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
 
     imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
     uint8_t line_buf[BYTE_PIXEL_RGB565 * source_w];
-    gui_matrix_t *inverse = &image->inverse;
 
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        int y = i + inverse->m[1][2];
+        int y = i - image->rel_y;
         int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
                         dc->section.x1;
         uncompressed_rle_rgb565(file, y, line_buf);
@@ -42,7 +41,7 @@ void rle_cover_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
 
         for (int32_t j = x_start; j <= x_end; j++)
         {
-            int x = j + inverse->m[0][2];
+            int x = j - image->rel_x;
             uint16_t pixel = *((uint16_t *)(uintptr_t)line_buf + x);
             writebuf[write_off] = pixel;
             write_off++;

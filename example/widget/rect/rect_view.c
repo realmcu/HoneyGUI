@@ -15,8 +15,8 @@ static void app_rect_design(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
     gui_view_set_animate_step(view, 500);
     gui_view_switch_on_event(view, "rect_round_view",
-                             SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
+                             SWITCH_OUT_NONE_ANIMATION,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
     gui_rect_create(parent, "bg", 0, 0, 480, 480, 0, gui_rgba(255, 200, 200, 255));
     gui_rect_create(parent, "geometry2", 100, 200, 200, 200, 20, gui_rgba(0, 255, 0, 200));

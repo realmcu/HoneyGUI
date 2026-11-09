@@ -119,14 +119,6 @@ typedef struct gui_png_file_head
     uint8_t *png;
 } gui_png_file_head_t;
 
-typedef struct gui_gif_file_head
-{
-    gui_rgb_data_head_t img_header;
-    uint32_t size;
-    uint32_t dummy; // for alignment issue
-    uint8_t gif[1024];
-
-} gui_gif_file_head_t;
 typedef struct gui_palette_file
 {
     gui_rgb_data_head_t img_header;

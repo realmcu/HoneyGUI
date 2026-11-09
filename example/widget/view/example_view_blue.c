@@ -24,7 +24,7 @@
 static void switch_in_cb(gui_view_t *view);
 static void switch_out_cb(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, true, switch_in_cb, switch_out_cb, true);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, true, switch_in_cb, switch_out_cb);
 
 static void img_cb(void *obj, gui_event_t *e)
 {
@@ -50,17 +50,17 @@ static void switch_in_cb(gui_view_t *view)
     gui_img_set_mode(img, IMG_BYPASS_MODE);
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_view_switch_on_event(view, "yellow_view", SWITCH_OUT_TO_RIGHT_USE_CUBE,
-                             SWITCH_IN_FROM_LEFT_USE_CUBE,
+    gui_view_switch_on_event(view, "yellow_view", SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, "white_view", SWITCH_OUT_TO_LEFT_USE_CUBE,
-                             SWITCH_IN_FROM_RIGHT_USE_CUBE,
+    gui_view_switch_on_event(view, "white_view", SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
     gui_view_switch_on_event(view, "yellow_view",
                              SWITCH_INIT_STATE,
-                             SWITCH_IN_ANIMATION_RASTER_VERTICAL_REVERSE,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_view_switch_on_event(view, "lime_view", SWITCH_OUT_TO_TOP_USE_TRANSLATION,
@@ -68,14 +68,13 @@ static void switch_in_cb(gui_view_t *view)
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
     gui_view_switch_on_event(view, "white_view", SWITCH_INIT_STATE,
-                             SWITCH_IN_ANIMATION_RASTER_HORIZONTAL,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 }
 
 
 static int app_init(void)
 {
-    gui_view_enable_precache_snapshot(false);
     gui_view_create(gui_obj_get_root(), CURRENT_VIEW_NAME, 0, 0, 0, 0);
     return 0;
 }

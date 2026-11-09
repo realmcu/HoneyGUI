@@ -89,7 +89,6 @@ typedef struct gui_text
     void *content;
     void *data;
     void *path;
-    gui_matrix_t *matrix;
 
     uint16_t len;
     uint16_t font_len;
@@ -369,13 +368,6 @@ void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE
  */
 void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
 
-/**
- * @brief Set text matrix.
- * @note
- * @param this_widget Text widget pointer.
- * @param matrix Matrix pointer.
- */
-void gui_text_set_matrix(gui_text_t *this_widget, gui_matrix_t *matrix);
 
 /**
  * @brief Enable the cross-frame glyph bitmap cache.

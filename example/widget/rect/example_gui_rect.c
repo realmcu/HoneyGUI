@@ -85,8 +85,8 @@ void example_rect_gradient(void *parent)
 
 static void app_rect_round_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, "rect_view", SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
+    gui_view_switch_on_event(view, "rect_view", SWITCH_OUT_NONE_ANIMATION,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
     gui_view_set_animate_step(view, 500);
     uint8_t alpha = 200;

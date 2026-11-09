@@ -12,7 +12,6 @@
 
 #include "guidef.h"
 #include "gui_api.h"
-#include "gui_matrix.h"
 
 
 #ifdef __cplusplus

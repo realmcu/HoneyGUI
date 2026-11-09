@@ -63,11 +63,6 @@ static void gui_img_prepare(gui_obj_t *obj)
     _this = (gui_img_t *)obj;
     tp = tp_get_info();
 
-    matrix_translate(_this->t_x, _this->t_y, obj->matrix);
-    matrix_rotate(_this->degrees, obj->matrix);
-    matrix_scale(_this->scale_x, _this->scale_y, obj->matrix);
-    matrix_translate(-_this->f_x, -_this->f_y, obj->matrix);
-
     if (gui_obj_out_screen(obj))
     {
         return;
@@ -94,10 +89,9 @@ static void gui_img_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, "touch");
 
-    memcpy(&_this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    memcpy(&_this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
+    _this->draw_img->rel_x = obj->draw_x;
+    _this->draw_img->rel_y = obj->draw_y;
 
-    matrix_inverse(&_this->draw_img->inverse);
     draw_img_load_scale(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
 
 
@@ -297,13 +291,6 @@ static void gui_img_ctor(gui_img_t            *_this,
 
     _this->storage_type = storage_type;
     _this->free_on_destroy = false;  /* Default: external memory, don't free */
-    _this->f_x = 0;
-    _this->f_y = 0;
-    _this->t_x = 0;
-    _this->t_y = 0;
-    _this->scale_x = 1;
-    _this->scale_y = 1;
-    _this->degrees = 0;
     _this->high_quality = false;
     _this->need_clip = false;
     _this->fg_color_set = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
@@ -330,28 +317,10 @@ static void gui_img_ctor(gui_img_t            *_this,
     obj->h = gui_img_get_height(_this);
 
     gui_rgb_data_head_t head = gui_img_get_header(_this);
-    if (head.type == PNG)
+    if (head.resize != 0)
     {
-        _this->blend_mode = IMG_SRC_OVER_MODE;
-    }
-    if (head.resize == 0)
-    {
-        gui_img_scale(_this, 1, 1);
-    }
-    else if (head.resize == 1) //unsigned char resize:2;//0-no resize;1-50%(x&y);2-70%;3-80%
-    {
-        gui_img_scale(_this, 2, 2);
-        gui_log("resize image!! \n");
-    }
-    else if (head.resize == 2)
-    {
-        gui_img_scale(_this, 10.0f / 7.0f, 10.0f / 7.0f);
-        gui_log("resize image!! \n");
-    }
-    else if (head.resize == 3)
-    {
-        gui_img_scale(_this, 10.0f / 8.0f, 10.0f / 8.0f);
-        gui_log("resize image!! \n");
+        /* Non-1:1 scaling needs the matrix transform nano dropped. */
+        gui_log("Unsupported image resize mode: %d (only 1:1 supported)\n", head.resize);
     }
     if (storage_type == IMG_SRC_FILESYS)
     {
@@ -691,85 +660,6 @@ void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)
     _this->opacity_value = opacity_value;
 }
 
-
-void gui_img_set_focus(gui_img_t *_this, float f_x, float f_y)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-
-    _this->f_x = f_x;
-    _this->f_y = f_y;
-}
-
-
-void gui_img_rotation(gui_img_t *_this, float degrees)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-
-    _this->degrees = degrees;
-}
-
-void gui_img_scale(gui_img_t *_this, float scale_x, float scale_y)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    _this->scale_x = scale_x;
-    _this->scale_y = scale_y;
-}
-
-void gui_img_translate(gui_img_t *_this, float t_x, float t_y)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    _this->t_x = t_x;
-    _this->t_y = t_y;
-}
-float gui_img_get_scale_x(gui_img_t *_this)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->scale_x;
-}
-float gui_img_get_scale_y(gui_img_t *_this)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->scale_y;
-}
-float gui_img_get_degrees(gui_img_t *_this)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->degrees;
-}
-float gui_img_get_c_x(gui_img_t *_this)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->f_x;
-
-}
-float gui_img_get_c_y(gui_img_t *_this)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->f_y;
-}
-float gui_img_get_t_x(gui_img_t *_this)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->t_x;
-}
-float gui_img_get_t_y(gui_img_t *_this)
-{
-    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
-    return _this->t_y;
-}
-
-void gui_img_skew_x(gui_img_t *_this, float degrees)
-{
-    (void)_this;
-    (void)degrees;
-
-}
-
-void gui_img_skew_y(gui_img_t *_this, float degrees)
-{
-    (void)_this;
-    (void)degrees;
-}
 
 void gui_img_a8_recolor(gui_img_t *_this, uint32_t fg_color_set)
 {

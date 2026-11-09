@@ -33,8 +33,10 @@ typedef struct draw_img
     uint16_t img_target_w;
     uint16_t img_target_h;
     void *data;
-    gui_matrix_t matrix; //seems can remove by howie
-    gui_matrix_t inverse;
+    /* Target position relative to the top-left of the section being drawn:
+     * source pixel (sx, sy) lands at (sx + rel_x, sy + rel_y) on screen. */
+    int16_t rel_x;
+    int16_t rel_y;
     uint8_t opacity_value;
     uint32_t checksum : 8;
     uint32_t blend_mode : 5;

@@ -22,7 +22,7 @@
 
 static void app_ui_view_white_design(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_white_design, NULL, true);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_white_design, NULL);
 
 static void img_cb(void *obj, gui_event_t *e)
 {
@@ -42,13 +42,13 @@ static void app_ui_view_white_design(gui_view_t *view)
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_TO_RIGHT_USE_CUBE,
-                             SWITCH_IN_FROM_LEFT_USE_CUBE,
+    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
     gui_view_switch_on_event(view, "yellow_view",
-                             SWITCH_OUT_TO_LEFT_USE_ROTATE,
-                             SWITCH_IN_FROM_RIGHT_USE_ROTATE,
+                             SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
     gui_view_switch_on_event(view, "blue_view",
@@ -62,7 +62,7 @@ static void app_ui_view_white_design(gui_view_t *view)
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
     gui_view_switch_on_event(view, "blue_view", SWITCH_INIT_STATE,
-                             SWITCH_IN_ANIMATION_RASTER_HORIZONTAL_REVERSE,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 }
 /* view white end*/

@@ -49,11 +49,6 @@ static void gui_obj_destroy_cb(gui_obj_t *obj)
         gui_dirty_set_region(&obj->last_render_rect);
     }
 
-    if (obj->matrix != NULL)
-    {
-        gui_free(obj->matrix);
-    }
-
     if (obj->has_destroy_cb)
     {
         obj->obj_cb(obj, OBJ_DESTROY);
@@ -154,11 +149,6 @@ void gui_obj_tree_free(void *obj)
     else
     {
         gui_log("obj %s parent equal NULL!\n", object->name);
-        if (object->matrix != NULL)
-        {
-            gui_free(object->matrix);
-            object->matrix = NULL;
-        }
         if (object->event_dsc != NULL)
         {
             gui_free(object->event_dsc);

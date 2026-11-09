@@ -159,13 +159,6 @@ void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 }
 
 
-bool is_identity_matrix(gui_matrix_t *matrix)
-{
-    return (matrix->m[0][0] == 1) && (matrix->m[1][1] == 1) && (matrix->m[2][2] == 1) &&
-           (matrix->m[0][1] == 0) && (matrix->m[1][0] == 0) &&
-           (matrix->m[2][0] == 0) && (matrix->m[2][1] == 0);
-}
-
 /**
  * @brief Locate the compression header of a compressed image.
  *
@@ -214,12 +207,6 @@ void sw_acc_blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *re
     {
         gui_log("Unsupported compression algorithm: %d (only RLE supported)\n",
                 imdc->algorithm_type.algorithm);
-        return;
-    }
-
-    if (!is_identity_matrix(&image->matrix))
-    {
-        sw_acc_blit_generic(image, dc, rect);
         return;
     }
 

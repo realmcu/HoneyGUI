@@ -21,7 +21,7 @@
 
 static void app_ui_view_yellow_design(gui_view_t *view);
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL, true);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL);
 
 static void app_ui_view_yellow_design(gui_view_t *view)
 {
@@ -31,12 +31,12 @@ static void app_ui_view_yellow_design(gui_view_t *view)
     gui_img_set_mode(img, IMG_BYPASS_MODE);
 
     gui_view_switch_on_event(view, "white_view",
-                             SWITCH_OUT_TO_RIGHT_USE_ROTATE,
-                             SWITCH_IN_FROM_LEFT_USE_ROTATE,
+                             SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_TO_LEFT_USE_CUBE,
-                             SWITCH_IN_FROM_RIGHT_USE_CUBE,
+    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
     gui_view_switch_on_event(view, "white_view",
@@ -46,11 +46,11 @@ static void app_ui_view_yellow_design(gui_view_t *view)
 
     gui_view_switch_on_event(view, "blue_view",
                              SWITCH_INIT_STATE,
-                             SWITCH_IN_ANIMATION_RASTER_VERTICAL,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_BOUNCE_FROM_RIGHT,
+    gui_view_switch_on_event(view, "blue_view", SWITCH_OUT_NONE_ANIMATION,
+                             SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_CLICKED);
 
 }

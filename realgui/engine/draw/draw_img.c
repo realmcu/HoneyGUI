@@ -6,7 +6,6 @@
 
 #include "draw_img.h"
 #include <string.h>
-#include <math.h>
 #include "gui_vfs.h"
 
 void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
@@ -80,113 +79,17 @@ void draw_img_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
 }
 bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 {
-    gui_point3f_t pox = {0};
-    float x_min = 0.0f;
-    float x_max = 0.0f;
-    float y_min = 0.0f;
-    float y_max = 0.0f;
-
-    float x1 = 0;
-    float y1 = 0;
-    float x2 = 0;
-    float y2 = 0;
-
-    if (rect == NULL)
-    {
-        x1 = 0;
-        y1 = 0;
-        x2 = img->img_w - 1;
-        y2 = img->img_h - 1;
-    }
-    else
-    {
-        x1 = _UI_MAX(0, rect->x1);
-        y1 = _UI_MAX(0, rect->y1);
-        x2 = _UI_MIN(img->img_w - 1, rect->x2);
-        y2 = _UI_MIN(img->img_h - 1, rect->y2);
-    }
-
-    pox.x = x1;
-    pox.y = y1;
-    pox.z = 1.0f;
-    matrix_multiply_point(&img->matrix, &pox);
-    x_min = pox.x;
-    x_max = pox.x;
-    y_min = pox.y;
-    y_max = pox.y;
-
-    pox.x = x2;
-    pox.y = y1;
-    pox.z = 1.0f;
-    matrix_multiply_point(&img->matrix, &pox);
-    if (x_min > pox.x)
-    {
-        x_min = pox.x;
-    }
-    if (x_max < pox.x)
-    {
-        x_max = pox.x;
-    }
-    if (y_min > pox.y)
-    {
-        y_min = pox.y;
-    }
-    if (y_max < pox.y)
-    {
-        y_max = pox.y;
-    }
-
-    pox.x = x2;
-    pox.y = y2;
-    pox.z = 1.0f;
-    matrix_multiply_point(&img->matrix, &pox);
-    if (x_min > pox.x)
-    {
-        x_min = pox.x;
-    }
-    if (x_max < pox.x)
-    {
-        x_max = pox.x;
-    }
-    if (y_min > pox.y)
-    {
-        y_min = pox.y;
-    }
-    if (y_max < pox.y)
-    {
-        y_max = pox.y;
-    }
-
-    pox.x = x1;
-    pox.y = y2;
-    pox.z = 1.0f;
-    matrix_multiply_point(&img->matrix, &pox);
-    if (x_min > pox.x)
-    {
-        x_min = pox.x;
-    }
-    if (x_max < pox.x)
-    {
-        x_max = pox.x;
-    }
-    if (y_min > pox.y)
-    {
-        y_min = pox.y;
-    }
-    if (y_max < pox.y)
-    {
-        y_max = pox.y;
-    }
+    (void)rect;
 
     if (draw_img_acc_prepare_cb != NULL)
     {
         draw_img_acc_prepare_cb(img, rect);
     }
 
-    img->img_target_x = (int16_t)x_min;
-    img->img_target_y = (int16_t)y_min;
-    img->img_target_w = ceilf(x_max) - (int16_t)x_min + 1;
-    img->img_target_h = ceilf(y_max) - (int16_t)y_min + 1;
+    img->img_target_x = img->rel_x;
+    img->img_target_y = img->rel_y;
+    img->img_target_w = img->img_w;
+    img->img_target_h = img->img_h;
     return true;
 }
 

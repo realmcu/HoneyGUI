@@ -74,12 +74,11 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uintptr_t)(image->data);
     imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
 
-    gui_matrix_t *inverse = &image->inverse;
-    int x = x_start + inverse->m[0][2];
+    int x = x_start - image->rel_x;
 
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        int y = i + inverse->m[1][2];
+        int y = i - image->rel_y;
         int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
                         dc->section.x1;
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;

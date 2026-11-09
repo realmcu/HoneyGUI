@@ -73,12 +73,12 @@ void text_widget_example(void)
  * | 2 | scroll_text_widget_example()     | Horizontal (SCROLL_X) and vertical (SCROLL_Y) auto-scrolling text        |
  * | 3 | text_font_rendering_test()       | Swipeable views: bitmap 1/2/4/8-bit, typography, benchmark               |
  * | 4 | text_font_layout_test()          | Swipeable views: single-line, multi-line, scroll, vertical, RTL          |
- * | 5 | text_multi_language_test()       | Language list with per-language rendering (AR, EN, ZH, TH, HE)           |
+ * | 5 | text_multi_language_test()       | Language list with per-language rendering (needs gui_list)               |
  * | 6 | text_font_scroll_function_test() | Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes      |
  * | 7 | text_font_scroll_loop_test()     | Scroll loop (marquee) for X/Y forward and reverse directions             |
  * | 8 | text_wordwrap_test()             | Word-wrap with oversized word break protection                           |
  * | 9 | text_measure_test()              | Layout measure: single-line and multi-line metrics                       |
- * |10 | text_clip_test()                 | Partial text display using win clip (top/bottom/right/center)            |
+ * |10 | text_clip_test()                 | Partial text display using win clip (needs gui_rect)                    |
  * |11 | text_font_typo_rendering_test()  | Typography rendering: bitmap baseline and line height                    |
  * |12 | text_font_fallback_test()        | Mixed-language fallback: CJK+EN in one string with priority chain        |
  * |13 | text_missing_glyph_test()        | Missing glyph: skip vs substitute chain                                  |
@@ -93,12 +93,12 @@ static int app_init(void)
     // scroll_text_widget_example();    /* [2] Scroll text             */
     // text_font_rendering_test();      /* [3] Font rendering styles   */
     // text_font_layout_test();         /* [4] Text layout modes       */
-    // text_multi_language_test();      /* [5] Multi-language support  */
+    // text_multi_language_test();      /* [5] Needs gui_list          */
     // text_font_scroll_function_test();/* [6] Scroll function control */
     // text_font_scroll_loop_test();    /* [7] Scroll loop (marquee)   */
     // text_wordwrap_test();            /* [8] Word-wrap & break test  */
     // text_measure_test();             /* [9] Layout measure test     */
-    // text_clip_test();                /* [10] Text clip/partial show */
+    // text_clip_test();                /* [10] Needs gui_rect         */
     // text_font_typo_rendering_test(); /* [11] Typography bitmap      */
     // text_font_fallback_test();       /* [12] Mixed-lang fallback    */
     // text_missing_glyph_test();       /* [13] Missing glyph modes    */

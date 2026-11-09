@@ -8,7 +8,6 @@
  *                        Header Files
  *============================================================================*/
 #include "gui_text.h"
-#include "gui_matrix.h"
 #include "font_mem.h"
 #include "tp_algo.h"
 #include "gui_fb.h"
@@ -93,11 +92,6 @@ static void gui_text_font_unload(gui_text_t *text)
 
 static void gui_text_font_destroy(gui_text_t *text)
 {
-    if (text->matrix)
-    {
-        gui_free(text->matrix);
-    }
-
     switch (text->font_type)
     {
     case GUI_FONT_SRC_BMP:
@@ -132,17 +126,11 @@ static void gui_text_input_process(gui_obj_t *obj)
 static void gui_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
-    gui_point3f_t point = {0, 0, 1};
     uint8_t last;
 
     /* --- Lightweight section: always runs (even when hidden) --- */
-    if (this->matrix)
-    {
-        matrix_multiply(obj->matrix, this->matrix);
-    }
-    matrix_multiply_point(obj->matrix, &point);
-    this->offset_x = point.x;
-    this->offset_y = point.y;
+    this->offset_x = obj->draw_x;
+    this->offset_y = obj->draw_y;
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
@@ -182,32 +170,14 @@ static void gui_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
     while (o->parent != NULL)
     {
         o = o->parent;
-        if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+        if ((o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope) ||
+            o->type == LIST || o->type == LIST_NOTE)
         {
-            gui_win_t *win_scope = (void *)o;
-            int scopex = win_scope->base.matrix->m[0][2];
-            int scopey = win_scope->base.matrix->m[1][2];
-            int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
-            int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
-
             text->scope = 1;
-            rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
-            rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
-            rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
-            rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
-        }
-        else if (o->type == LIST || o->type == LIST_NOTE)
-        {
-            int scopex = o->matrix->m[0][2];
-            int scopey = o->matrix->m[1][2];
-            int scopew = o->matrix->m[0][0] * o->w;
-            int scopeh = o->matrix->m[1][1] * o->h;
-
-            text->scope = 1;
-            rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
-            rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
-            rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
-            rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+            rect->xboundleft = _UI_MAX(o->draw_x, rect->xboundleft);
+            rect->xboundright = _UI_MIN(o->draw_x + o->w - 1, rect->xboundright);
+            rect->yboundtop = _UI_MAX(o->draw_y, rect->yboundtop);
+            rect->yboundbottom = _UI_MIN(o->draw_y + o->h - 1, rect->yboundbottom);
         }
     }
 }
@@ -629,16 +599,6 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
 void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
 {
     this->charset = charset;
-}
-
-void gui_text_set_matrix(gui_text_t *this, gui_matrix_t *matrix)
-{
-    if (this->matrix == NULL)
-    {
-        this->matrix = gui_malloc(sizeof(struct gui_matrix));
-        GUI_ASSERT(this->matrix != NULL);
-    }
-    memcpy(this->matrix, matrix, sizeof(gui_matrix_t));
 }
 
 void gui_text_set_cache(gui_text_t *this, bool enable)

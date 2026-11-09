@@ -103,11 +103,6 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
 
 static void gui_scroll_text_font_destroy(gui_text_t *text)
 {
-    if (text->matrix)
-    {
-        gui_free(text->matrix);
-    }
-
     switch (text->font_type)
     {
     case GUI_FONT_SRC_BMP:
@@ -130,32 +125,14 @@ static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
     while (o->parent != NULL)
     {
         o = o->parent;
-        if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+        if ((o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope) ||
+            o->type == LIST || o->type == LIST_NOTE)
         {
-            gui_win_t *win_scope = (void *)o;
-            int scopex = win_scope->base.matrix->m[0][2];
-            int scopey = win_scope->base.matrix->m[1][2];
-            int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
-            int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
-
             text->scope = 1;
-            rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
-            rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
-            rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
-            rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
-        }
-        else if (o->type == LIST || o->type == LIST_NOTE)
-        {
-            int scopex = o->matrix->m[0][2];
-            int scopey = o->matrix->m[1][2];
-            int scopew = o->matrix->m[0][0] * o->w;
-            int scopeh = o->matrix->m[1][1] * o->h;
-
-            text->scope = 1;
-            rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
-            rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
-            rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
-            rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+            rect->xboundleft = _UI_MAX(o->draw_x, rect->xboundleft);
+            rect->xboundright = _UI_MIN(o->draw_x + o->w - 1, rect->xboundright);
+            rect->yboundtop = _UI_MAX(o->draw_y, rect->yboundtop);
+            rect->yboundbottom = _UI_MIN(o->draw_y + o->h - 1, rect->yboundbottom);
         }
     }
 }
@@ -164,7 +141,6 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
     gui_scroll_text_t *text = (gui_scroll_text_t *)obj;
     gui_text_t *_this = &text->base;
-    gui_point3f_t point = {0, 0, 1};
 
     if (!gui_obj_is_hidden(GUI_BASE(_this)))
     {
@@ -194,9 +170,8 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
 
-    matrix_multiply_point(obj->matrix, &point);
-    _this->offset_x = point.x;
-    _this->offset_y = point.y;
+    _this->offset_x = obj->draw_x;
+    _this->offset_y = obj->draw_y;
 
     if (_this->len == 0)
     {

@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "gui_obj.h"
-#include "gui_matrix.h"
 #include "gui_api.h"
 #include "def_type.h"
 #include "gui_dirty_region.h"
@@ -33,14 +32,6 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_matrix_t matrix =
-{
-    .m = {
-        {1, 0, 0},
-        {0, 1, 0},
-        {0, 0, 1}
-    }
-};
 static gui_obj_t root =
 {
     .name = "screen",
@@ -52,7 +43,6 @@ static gui_obj_t root =
     .child_list = {&(root.child_list), &(root.child_list)},
     .brother_list = {&(root.brother_list), &(root.brother_list)},
     .create_done = true,
-    .matrix = &matrix,
 };
 
 static gui_obj_t fake_root =
@@ -66,7 +56,6 @@ static gui_obj_t fake_root =
     .child_list = {&(fake_root.child_list), &(fake_root.child_list)},
     .brother_list = {&(fake_root.brother_list), &(fake_root.brother_list)},
     .create_done = true,
-    .matrix = &matrix,
 };
 
 static gui_obj_t kb_root =
@@ -80,7 +69,6 @@ static gui_obj_t kb_root =
     .child_list = {&(kb_root.child_list), &(kb_root.child_list)},
     .brother_list = {&(kb_root.brother_list), &(kb_root.brother_list)},
     .create_done = true,
-    .matrix = &matrix,
 };
 
 /*============================================================================*
@@ -165,10 +153,10 @@ void gui_obj_ctor(gui_obj_t  *_this,
     _this->w = w;
     _this->h = h;
     _this->opacity_value = UINT8_MAX;
-    _this->matrix = gui_malloc(sizeof(struct gui_matrix));
-    GUI_ASSERT(_this->matrix != NULL);
-
-    matrix_identity(_this->matrix);
+    _this->abs_x = x;
+    _this->abs_y = y;
+    _this->draw_x = x;
+    _this->draw_y = y;
     _this->magic = GUI_MAGIC_NUMBER;
 
     _this->last_render_rect.x1 = 0;
@@ -226,41 +214,12 @@ void gui_obj_show(void *obj, bool enable)
 
 bool gui_obj_out_screen(gui_obj_t *obj)
 {
-    float m00 = obj->matrix->m[0][0];
-    float m01 = obj->matrix->m[0][1];
-    float m02 = obj->matrix->m[0][2];
-    float m10 = obj->matrix->m[1][0];
-    float m11 = obj->matrix->m[1][1];
-    float m12 = obj->matrix->m[1][2];
-    float m20 = obj->matrix->m[2][0];
-    float m21 = obj->matrix->m[2][1];
-    float m22 = obj->matrix->m[2][2];
-
-    if ((m01 == 0)
-        && (m10 == 0)
-        && (m20 == 0)
-        && (m21 == 0)
-        && (m22 == 1)) //scale and translate, no rotate
+    if ((obj->abs_x >= (int)gui_get_screen_width())
+        || (obj->abs_x + obj->w <= 0)
+        || (obj->abs_y >= (int)gui_get_screen_height())
+        || (obj->abs_y + obj->h <= 0))
     {
-        float x_min = m02;
-        float x_max = m02 + m00 * obj->w;
-        float y_min = m12;
-        float y_max = m12 + m11 * obj->h;
-
-        if (y_min > y_max)
-        {
-            float temp = y_min;
-            y_min = y_max;
-            y_max = temp;
-        }
-
-        if ((x_min > (int)gui_get_screen_width())
-            || (x_max < 0)
-            || (y_min > (int)gui_get_screen_height())
-            || (y_max < 0))
-        {
-            return true;
-        }
+        return true;
     }
     return false;
 }
@@ -347,64 +306,10 @@ void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *w,
                       int16_t   *h)
 {
-    gui_point3f_t p[4] =
-    {
-        {0, 0, 1},
-        {obj->w - 1, 0, 1},
-        {0, obj->h - 1, 1},
-        {obj->w - 1, obj->h - 1, 1}
-    };
-
-    float x_min = 0.0f, x_max = 0.0f, y_min = 0.0f, y_max = 0.0f;
-
-    matrix_multiply_point(obj->matrix, p);
-    x_min = p->x;
-    x_max = p->x;
-    y_min = p->y;
-    y_max = p->y;
-
-    matrix_multiply_point(obj->matrix, p + 1);
-    matrix_multiply_point(obj->matrix, p + 2);
-    matrix_multiply_point(obj->matrix, p + 3);
-
-    for (uint8_t i = 1; i < 4; i++)
-    {
-        gui_point3f_t *point = p + i;
-
-        if (point->x < x_min)
-        {
-            x_min = point->x;
-        }
-
-        if (point->x > x_max)
-        {
-            x_max = point->x;
-        }
-
-        if (point->y < y_min)
-        {
-            y_min = point->y;
-        }
-
-        if (point->y > y_max)
-        {
-            y_max = point->y;
-        }
-    }
-
-    /* Expand by 1px on each side: int16 truncation of matrix-transformed
-     * corners loses sub-pixel coverage (anti-aliasing writes outside the
-     * truncated AABB). The expansion guarantees no edge residue during
-     * rotation/translation when the bbox is consumed as a redraw region. */
-    int16_t ix_min = (int16_t)x_min - 1;
-    int16_t iy_min = (int16_t)y_min - 1;
-    int16_t ix_max = (int16_t)x_max + 1;
-    int16_t iy_max = (int16_t)y_max + 1;
-
-    *x = ix_min;
-    *y = iy_min;
-    *w = (int16_t)(ix_max - ix_min + 1);
-    *h = (int16_t)(iy_max - iy_min + 1);
+    *x = obj->abs_x;
+    *y = obj->abs_y;
+    *w = obj->w;
+    *h = obj->h;
 }
 
 bool gui_obj_in_rect(gui_obj_t *obj,
@@ -413,7 +318,7 @@ bool gui_obj_in_rect(gui_obj_t *obj,
                      int16_t    w,
                      int16_t    h)
 {
-    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
+    int16_t m_x, m_y, m_w, m_h;
 
     gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
 

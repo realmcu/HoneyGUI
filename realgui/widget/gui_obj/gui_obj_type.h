@@ -134,6 +134,16 @@ typedef struct _gui_obj_t
     int16_t w;
     int16_t h;
 
+    /* Absolute layout position, recomputed once per frame from the parent
+     * chain before any callback runs. This is what hit testing uses. */
+    int16_t abs_x;
+    int16_t abs_y;
+    /* Absolute draw position. Normally equals abs_x/abs_y; a view transition
+     * shifts it away from the layout position so an in-flight slide does not
+     * move the input hit area. Always write it as abs + (own offset). */
+    int16_t draw_x;
+    int16_t draw_y;
+
     gui_node_list_t  child_list;
     gui_node_list_t  brother_list;
 
@@ -161,7 +171,6 @@ uint32_t hidden                     :
     gui_event_dsc_t   *event_dsc;
     struct _gui_obj_t **suppress_conflict_obj_list; //chrild obj list that has the same event
 
-    gui_matrix_t *matrix;
     gui_obj_timer_t *timer;
     void *user_data;
     gui_rect_t last_render_rect;

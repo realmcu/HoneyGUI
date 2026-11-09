@@ -8,7 +8,6 @@
  *                        Header Files
  *============================================================================*/
 #include <stdio.h>
-#include <math.h>
 #include <stdint.h>
 #include "acc_sw_generic.h"
 //#define HONEYGUI_SUPPORT_DITHER
@@ -46,7 +45,7 @@ static bool is_supported_pixel_format(char input_type)
     case RGB565:
     case ARGB8565:
     case ARGB8888:   /* produced by frozen geometry gradients */
-    case PALETTE:    /* produced by the frozen GIF widget */
+    case PALETTE:    /* produced by the frozen geometry span cache */
     case A8:
     case ALPHAMASK:
     case A4:
@@ -538,7 +537,6 @@ void sw_acc_blit_generic(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3, opacity_value = image->opacity_value;
     uint8_t *writebuf = dc->frame_buf;
     uint32_t blend_mode = image->blend_mode;
-    gui_matrix_t *inverse = &image->inverse;
 
     gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL, 0
 #ifdef HONEYGUI_SUPPORT_DITHER
@@ -573,11 +571,8 @@ void sw_acc_blit_generic(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     {
         for (int32_t j = x_start; j <= x_end; j++)
         {
-            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
-            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = roundf(X / Z);
-            int y = roundf(Y / Z);
+            int x = j - image->rel_x;
+            int y = i - image->rel_y;
 
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
 
