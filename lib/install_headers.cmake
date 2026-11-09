@@ -38,52 +38,10 @@ list(APPEND HEADER_FILES ${TMP_HEADERS})
 file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/sysval/*.h")
 list(APPEND HEADER_FILES ${TMP_HEADERS})
 
-file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/nanovg/base/*.h")
-list(APPEND HEADER_FILES ${TMP_HEADERS})
-
-file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/nanovg/agge/*.h")
-list(APPEND HEADER_FILES ${TMP_HEADERS})
-
-file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/ezXML/*.h")
-list(APPEND HEADER_FILES ${TMP_HEADERS})
-
-file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/gifdec/*.h")
-list(APPEND HEADER_FILES ${TMP_HEADERS})
-
-# Lite3D headers - conditionally included based on config
-if(DEFINED CONFIG_REALTEK_BUILD_LITE3D AND CONFIG_REALTEK_BUILD_LITE3D)
-    file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/Lite3D/widget/*.h")
-    list(APPEND HEADER_FILES ${TMP_HEADERS})
-
-endif()
-
-# H264 decoder headers - conditionally included based on config
-if(DEFINED CONFIG_REALTEK_H264_DECODER AND CONFIG_REALTEK_H264_DECODER)
-    file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/h264bsd/inc/*.h")
-    list(APPEND HEADER_FILES ${TMP_HEADERS})
-endif()
-
-# Particle system headers - conditionally included based on config
-if(DEFINED CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM AND CONFIG_REALTEK_BUILD_PARTICLE_SYSTEM)
-    file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/particle/*.h")
-    list(APPEND HEADER_FILES ${TMP_HEADERS})
-endif()
-
 # Letter shell headers - conditionally included based on config
 if(DEFINED CONFIG_REALTEK_BUILD_LETTER_SHELL AND CONFIG_REALTEK_BUILD_LETTER_SHELL)
     file(GLOB_RECURSE TMP_HEADERS "${REALGUI_DIR}/3rd/letter_shell/*.h")
     list(APPEND HEADER_FILES ${TMP_HEADERS})
 endif()
 
-# Lite3D vendors its own gui_version.h, which lands on the same
-# include/gui_version.h as realgui/gui_version.h: the copy that won depended on
-# the install order, so two builds of the same source shipped different version
-# headers. The engine compiles with realgui/gui_version.h, so drop the other.
-list(FILTER HEADER_FILES EXCLUDE REGEX "/3rd/Lite3D/widget/gui_version[.]h$")
-
 install(FILES ${HEADER_FILES} DESTINATION include)
-
-# Box2D directory installation - conditionally included
-if(DEFINED CONFIG_REALTEK_BUILD_GUI_BOX2D AND CONFIG_REALTEK_BUILD_GUI_BOX2D)
-    install(DIRECTORY "${REALGUI_DIR}/3rd/box2d/include/box2d" DESTINATION include)
-endif()

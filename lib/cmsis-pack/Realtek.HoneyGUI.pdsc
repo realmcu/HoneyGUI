@@ -255,10 +255,6 @@
         <file category="header" name="widget/gui_progressbar.h"/>
         <file category="sourceC" name="widget/gui_px.c"/>
         <file category="header" name="widget/gui_px.h"/>
-        <file category="sourceC" name="widget/gui_qbcode.c"/>
-        <file category="header" name="widget/gui_qbcode.h"/>
-        <file category="sourceC" name="widget/gui_qrcode_gen.c"/>
-        <file category="header" name="widget/gui_qrcode_gen.h"/>
         <file category="sourceC" name="widget/gui_return.c"/>
         <file category="header" name="widget/gui_return.h"/>
         <file category="sourceC" name="widget/gui_scroll_text.c"/>

@@ -69,6 +69,7 @@ CONFIG_FILES = (
 DEMO_CONFIGS = (
     ("REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET", "Image Widget Demo", "widget"),
     ("REALTEK_BUILD_EXAMPLE_TEXT_WIDGET", "Text Widget Demo", "widget"),
+    ("REALTEK_BUILD_EXAMPLE_LIST_WIDGET", "List Widget Demo", "widget"),
     ("REALTEK_BUILD_EXAMPLE_SYSVAL_REQUEST",
      "System Value Request Demo", "sysval"),
     ("REALTEK_BUILD_EXAMPLE_SYSVAL_SUBSCRIBE",

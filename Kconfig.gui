@@ -29,17 +29,17 @@ config REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
     help
       HoneyGUI Base Demo - Image Widget
 
-config REALTEK_BUILD_EXAMPLE_GIF_WIDGET
-    bool "GIF Widget Demo"
-    select REALTEK_GUI_WIDGET_GIF
-    help
-      HoneyGUI Base Demo - GIF Widget (Animated GIF support)
-
 config REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
     bool "Text Widget Demo"
     select REALTEK_GUI_WIDGET_VIEW
     help
       HoneyGUI Base Demo - Text Widget
+
+config REALTEK_BUILD_EXAMPLE_LIST_WIDGET
+    bool "List Widget Demo"
+    select REALTEK_GUI_WIDGET_LIST
+    help
+      HoneyGUI Base Demo - List Widget
 
 config REALTEK_BUILD_EXAMPLE_SYSVAL_REQUEST
     bool "System Value Request Demo"
@@ -58,12 +58,6 @@ config REALTEK_BUILD_REAL_VIEW
     select REALTEK_GUI_WIDGET_VIEW
     help
       HoneyGUI View Demo
-
-config REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET
-    bool "QRCode Widget Demo"
-    select REALTEK_GUI_WIDGET_QBCODE
-    help
-      HoneyGUI QRCode Widget Demo
 
 config REALTEK_BUILD_GUI_466_466_DEMO
     bool "GUI Demo 466x466"
@@ -125,13 +119,12 @@ config REALTEK_GUI_WIDGET_VIEW
     bool "gui_view - view container, button, transitions"
     default y
 
-config REALTEK_GUI_WIDGET_GIF
-    bool "gui_gif - animated GIF"
+config REALTEK_GUI_WIDGET_LIST
+    bool "gui_list - scrollable list"
     default y
-
-config REALTEK_GUI_WIDGET_QBCODE
-    bool "gui_qbcode - barcode / QR code"
-    default y
+    help
+      Scrollable list. nano keeps the CLASSIC, CIRCLE and FADE styles; the
+      scale and rotation styles went away with the matrix transform.
 
 endmenu
 

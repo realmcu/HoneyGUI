@@ -15,7 +15,4 @@ if(CONFIG_REALTEK_BUILD_EXAMPLE_TEXT_WIDGET)
         DRV_LCD_HEIGHT=480
         DRV_PIXEL_BITS=16
     )
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/frozen_dep/CMakeLists.txt)
-        add_subdirectory(frozen_dep)
-    endif()
 endif()

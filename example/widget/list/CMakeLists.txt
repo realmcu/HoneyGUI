@@ -4,9 +4,10 @@
 # SPDX-License-Identifier: MIT
 #
 
-if(CONFIG_REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET)
-    file(GLOB SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
-    target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+if(CONFIG_REALTEK_BUILD_EXAMPLE_LIST_WIDGET)
+    target_sources(${GUI_TARGET_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/example_list.c
+    )
     target_include_directories(${GUI_TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
     )
