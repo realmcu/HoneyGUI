@@ -160,26 +160,6 @@ gui_img_t *gui_img_create_from_mem(void       *parent,
                                    int16_t     h);
 
 /**
- * @brief Create an image widget from memory address.
- * @note Create an image widget and set attribute.
- * @param parent Father widget it nested in.
- * @param name Widget name.
- * @param ftl Not xip address, use ftl address.
- * @param x X-axis coordinate of the widget.
- * @param y Y-axis coordinate of the widget.
- * @param w Width of the widget.
- * @param h Height of the widget.
- * @return Widget object pointer.
- */
-gui_img_t *gui_img_create_from_ftl(void       *parent,
-                                   const char *name,
-                                   void       *ftl,
-                                   int16_t     x,
-                                   int16_t     y,
-                                   int16_t     w,
-                                   int16_t     h);
-
-/**
  * @brief Create an image widget from filesystem.
  *
  * @param parent Father widget it nested in.
@@ -215,7 +195,7 @@ void gui_img_set_image_data(gui_img_t *_this, const uint8_t *image_data_pointer)
  *
  * @param _this Pointer to the image widget.
  * @param file_pointer Pointer to the image data or file path string.
- * @param storage_type Storage type: IMG_SRC_MEMADDR, IMG_SRC_FTL, or IMG_SRC_FILESYS.
+ * @param storage_type Storage type: IMG_SRC_MEMADDR or IMG_SRC_FILESYS.
  */
 void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t storage_type);
 

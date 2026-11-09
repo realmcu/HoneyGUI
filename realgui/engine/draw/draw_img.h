@@ -86,7 +86,6 @@ typedef enum
 {
     IMG_SRC_MEMADDR = 0,
     IMG_SRC_FILESYS,
-    IMG_SRC_FTL,
 } IMG_SOURCE_MODE_TYPE;
 /* IMG_SOURCE_MODE_TYPE enum end*/
 

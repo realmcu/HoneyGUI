@@ -229,11 +229,6 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
         gui_vfs_read(fd, &head, sizeof(head));
         gui_vfs_close(fd);
     }
-    else if (_this->storage_type == IMG_SRC_FTL)
-    {
-        uintptr_t base = (uintptr_t)_this->src_data;
-        gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
-    }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
         memcpy(&head, _this->src_data, sizeof(head));
@@ -408,31 +403,6 @@ gui_img_t *gui_img_create_from_mem(void       *parent,
     return _this;
 }
 
-gui_img_t *gui_img_create_from_ftl(void       *parent,
-                                   const char *name,
-                                   void       *ftl,
-                                   int16_t     x,
-                                   int16_t     y,
-                                   int16_t     w,
-                                   int16_t     h)
-{
-    GUI_ASSERT(parent != NULL);
-
-    gui_img_t *_this = gui_malloc(sizeof(gui_img_t));
-    GUI_ASSERT(_this != NULL);
-    memset(_this, 0x00, sizeof(gui_img_t));
-    gui_img_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_FTL, ftl, x, y, w, h);
-
-    gui_list_init(&(GET_BASE(_this)->child_list));
-    if ((GET_BASE(_this)->parent) != NULL)
-    {
-        gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list), &(GET_BASE(_this)->brother_list));
-    }
-    GET_BASE(_this)->create_done = true;
-
-    return _this;
-}
-
 
 gui_img_t *gui_img_create_from_fs(void       *parent,
                                   const char *name,
@@ -480,13 +450,6 @@ uint16_t gui_img_get_width(gui_img_t *_this)
         gui_vfs_close(fd);
         return head.w;
     }
-    else if (_this->storage_type == IMG_SRC_FTL)
-    {
-        struct gui_rgb_data_head head;
-        uintptr_t base = (uintptr_t)_this->src_data;
-        gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
-        return head.w;
-    }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->src_data;
@@ -511,13 +474,6 @@ uint16_t gui_img_get_height(gui_img_t *_this)
 
         gui_vfs_read(fd, &head, sizeof(head));
         gui_vfs_close(fd);
-        return head.h;
-    }
-    else if (_this->storage_type == IMG_SRC_FTL)
-    {
-        struct gui_rgb_data_head head;
-        uintptr_t base = (uintptr_t)_this->src_data;
-        gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.h;
     }
     else if (_this->storage_type == IMG_SRC_MEMADDR)
@@ -586,7 +542,7 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(file_pointer != NULL);
-    GUI_ASSERT(storage_type <= IMG_SRC_FTL);
+    GUI_ASSERT(storage_type <= IMG_SRC_FILESYS);
 
     /* Free old src_data if we own it */
     if (_this->free_on_destroy && _this->src_data != NULL)
