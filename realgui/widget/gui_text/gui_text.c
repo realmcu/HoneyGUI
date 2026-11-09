@@ -423,13 +423,6 @@ void gui_text_set_line_height(gui_text_t *this, int16_t line_height)
     this->line_height = line_height;
 }
 
-void gui_text_set_space_width(gui_text_t *this, uint16_t space_width)
-{
-    GUI_ASSERT(this != NULL);
-    this->space_width = space_width;
-    this->layout_refresh = true;
-}
-
 void gui_text_set_missing_glyph_mode_global(gui_missing_glyph_mode_t mode)
 {
     if (mode != GUI_MISSING_GLYPH_INHERIT)
@@ -501,20 +494,6 @@ void gui_text_rendermode_set(gui_text_t *this, uint8_t rendermode)
         this->content_refresh = true;
     }
     this->rendermode = mode;
-}
-
-void gui_text_bold_set(gui_text_t *this, uint8_t bold_weight, BOLD_MODE bold_mode)
-{
-    GUI_ASSERT(this != NULL);
-    if (this->bold_weight != bold_weight || this->bold_mode != bold_mode)
-    {
-        /* Dilation margin grows the glyph bitmap, so a resident cross-frame cache
-         * would be read back at the wrong dimensions. Force a rebuild. */
-        this->content_refresh = true;
-    }
-    this->bold_weight = bold_weight;
-    this->bold_mode = bold_mode;
-    this->layout_refresh = true;
 }
 
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
@@ -599,15 +578,6 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
 void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
 {
     this->charset = charset;
-}
-
-void gui_text_set_cache(gui_text_t *this, bool enable)
-{
-    this->font_cache_enable = enable;
-    /* Force a full rebuild so the policy applies next frame; the rebuild frees
-     * any resident static cache and nulls chr[].buf, so font_cache_static
-     * self-heals (NULL buf short-circuits the hit path). */
-    this->content_refresh = true;
 }
 
 void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)

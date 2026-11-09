@@ -34,15 +34,6 @@ typedef enum
 } FONT_SRC_TYPE;
 
 /**
- * @brief Bold mode for text rendering (1-bit field)
- */
-typedef enum
-{
-    BOLD_HORIZONTAL = 0,   /**< Horizontal only, ~7x faster than BOLD_FULL */
-    BOLD_FULL       = 1,   /**< Horizontal + vertical */
-} BOLD_MODE;
-
-/**
  * @brief Behavior for a code point missing from the primary font and every
  *        registered fallback font (2-bit field)
  */

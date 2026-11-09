@@ -110,13 +110,10 @@ typedef struct gui_text
     int8_t extra_letter_spacing;
     int8_t extra_line_spacing;
     int16_t line_height;            /**< explicit line height (0 = use default) */
-    uint16_t space_width;           /**< fallback space width (0 = use default) */
-    uint8_t bold_weight;
 
     bool layout_refresh    : 1;
     bool content_refresh   : 1;
     bool inputable         : 1;
-    bool ispasswd          : 1;
     bool wordwrap          : 1;
     bool scope             : 1;
     bool scope_self        : 1;  /**< scope set by gui_text_set_scope */
@@ -125,9 +122,6 @@ typedef struct gui_text
     bool thai              : 1;
     bool hebrew            : 1;
     uint8_t rendermode     : 2;
-    uint8_t bold_mode      : 1;  /**< 0=BOLD_HORIZONTAL (fast), 1=BOLD_FULL */
-    bool font_cache_enable : 1; /**< cross-frame glyph bitmap cache (identity/translate only) */
-    bool font_cache_static : 1; /**< internal: chr[].buf currently holds a cross-frame static cache */
     uint8_t missing_glyph_mode : 2; /**< gui_missing_glyph_mode_t, 0 = inherit global */
 
 } gui_text_t;
@@ -260,13 +254,6 @@ void gui_text_extra_line_spacing_set(gui_text_t *this_widget, int8_t extra_line_
  */
 void gui_text_set_line_height(gui_text_t *this_widget, int16_t line_height);
 
-/**
- * @brief Set the fallback space width for fonts without a space glyph.
- *
- * @param this_widget Text box widget pointer.
- * @param space_width Space width in pixels. 0 = use the default approximation.
- */
-void gui_text_set_space_width(gui_text_t *this_widget, uint16_t space_width);
 
 /**
  * @brief Set the global behavior for code points with no glyph anywhere.
@@ -313,14 +300,6 @@ void gui_text_substitute_chain_set(const uint32_t *cps, uint8_t n);
  */
 void gui_text_rendermode_set(gui_text_t *this_widget, uint8_t rendermode);
 
-/**
- * @brief Set text bold weight and mode.
- *
- * @param this_widget Text box widget pointer.
- * @param bold_weight Bold weight. 0 = normal, 1-8 = bold levels.
- * @param bold_mode Bold mode: BOLD_HORIZONTAL (fast) or BOLD_FULL.
- */
-void gui_text_bold_set(gui_text_t *this_widget, uint8_t bold_weight, BOLD_MODE bold_mode);
 
 /**
  * @brief Move the text widget.
@@ -369,18 +348,6 @@ void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE
 void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
 
 
-/**
- * @brief Enable the cross-frame glyph bitmap cache.
- *
- * Keeps rasterized glyph bitmaps alive across frames instead of freeing them
- * each frame, trading resident memory for CPU. Only effective for identity or
- * pure-translate transforms.
- *
- * @param this_widget Text widget pointer.
- * @param enable true to keep glyph bitmaps across frames, false (default) to
- *               free them each frame.
- */
-void gui_text_set_cache(gui_text_t *this_widget, bool enable);
 
 /**
  * @brief Set text content.
