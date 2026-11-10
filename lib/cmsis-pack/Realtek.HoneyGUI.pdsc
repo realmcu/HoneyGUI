@@ -1,81 +1,106 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<package schemaVersion="1.7.37" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.37/schema/PACK.xsd">
-
-  <!-- Package Information -->
+<?xml version="1.0" ?>
+<package xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.7.37" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.37/schema/PACK.xsd">
   <vendor>Realtek</vendor>
   <name>HoneyGUI</name>
   <description>A simple example CMSIS package for HoneyGUI.</description>
   <url>https://docs.realmcu.com/gui/en/latest/index.html</url>
   <license>LICENSE</license>
-  
-  <!-- Keywords -->
   <keywords>
     <keyword>CMSIS</keyword>
     <keyword>GUI</keyword>
     <keyword>HoneyGUI</keyword>
   </keywords>
-
-  <!-- Releases -->
   <releases>
-    <release date="2025-01-21" version="2.0.1" tag="v2.0.2" url="https://docs.realmcu.com/gui/en/latest/index.html">- Something About HoneyGUI</release>
+    <release date="2025-01-21" version="2.0.2" tag="v2.0.2" url="https://docs.realmcu.com/gui/en/latest/index.html">- Something About HoneyGUI</release>
   </releases>
-
-  <!-- Components -->
   <components>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="app" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>The Essential services of HoneyGUI (without extra content).</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="3rd" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI 3rd code, optional.</description>
       <files>
-        <file category="sourceC" name="app/gui_app.c"/>
-        <file category="header" name="app/gui_app.h"/>
+        <file category="other" name="3rd/THIRD_PARTY_LICENSES.md"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="core" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="letter_shell" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI 3rd/letter_shell code, optional.</description>
+      <files>
+        <file category="sourceC" name="3rd/letter_shell/honeygui_cmd.c"/>
+        <file category="sourceC" name="3rd/letter_shell/honeygui_cmd_listener.c"/>
+        <file category="sourceC" name="3rd/letter_shell/honeygui_cmd_vfs.c"/>
+        <file category="sourceC" name="3rd/letter_shell/shell.c"/>
+        <file category="header" name="3rd/letter_shell/shell.h"/>
+        <file category="header" name="3rd/letter_shell/shell_cfg.h"/>
+        <file category="sourceC" name="3rd/letter_shell/shell_companion.c"/>
+        <file category="sourceC" name="3rd/letter_shell/shell_ext.c"/>
+        <file category="header" name="3rd/letter_shell/shell_ext.h"/>
+        <file category="sourceC" name="3rd/letter_shell/shell_fs.c"/>
+        <file category="header" name="3rd/letter_shell/shell_fs.h"/>
+        <file category="sourceC" name="3rd/letter_shell/shell_port.c"/>
+        <file category="header" name="3rd/letter_shell/shell_port.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="core" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
       <description>HoneyGUI core code, optional.</description>
       <files>
+        <file category="other" name="core/AGENTS.md"/>
         <file category="header" name="core/def_color.h"/>
+        <file category="header" name="core/def_compiler.h"/>
+        <file category="header" name="core/def_engine.h"/>
         <file category="header" name="core/def_event.h"/>
+        <file category="header" name="core/def_fb.h"/>
         <file category="header" name="core/def_file.h"/>
+        <file category="header" name="core/def_fs.h"/>
         <file category="header" name="core/def_image.h"/>
+        <file category="header" name="core/def_input.h"/>
         <file category="header" name="core/def_list.h"/>
+        <file category="header" name="core/def_msg.h"/>
+        <file category="header" name="core/def_os.h"/>
         <file category="header" name="core/def_type.h"/>
         <file category="header" name="core/def_vg.h"/>
+        <file category="header" name="core/guidef.h"/>
+        <file category="sourceC" name="core/gui_math.c"/>
+        <file category="header" name="core/gui_math.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="dc" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>The Essential services of HoneyGUI (without extra content).</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="dc" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI dc code, optional.</description>
       <files>
+        <file category="sourceC" name="dc/gui_dirty_border.c"/>
+        <file category="header" name="dc/gui_dirty_border.h"/>
+        <file category="sourceC" name="dc/gui_dirty_region.c"/>
+        <file category="header" name="dc/gui_dirty_region.h"/>
         <file category="sourceC" name="dc/gui_fb.c"/>
         <file category="header" name="dc/gui_fb.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="DOM" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>HoneyGUI DOM code, optional.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="engine" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI engine code, optional.</description>
       <files>
-        <file category="sourceC" name="DOM/XML_DOM.c"/>
+        <file category="other" name="engine/AGENTS.md"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="engine" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>The Essential services of HoneyGUI (without extra content).</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="accel_hal" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI engine/accel_hal code, optional.</description>
       <files>
-        <file category="sourceC" name="engine/acc_init.c"/>
-        <file category="header" name="engine/acc_init.h"/>
-        <file category="sourceC" name="engine/blit/acc_sw_uncompressed.c"/>
-        <file category="header" name="engine/blit/acc_sw_uncompressed.h"/>
+        <file category="sourceC" name="engine/accel_hal/acc_api.c"/>
+        <file category="header" name="engine/accel_hal/acc_api.h"/>
+        <file category="sourceC" name="engine/accel_hal/gui_acc_default.c"/>
+        <file category="header" name="engine/accel_hal/gui_acc_default.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="blit" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI engine/blit code, optional.</description>
+      <files>
         <file category="sourceC" name="engine/blit/acc_sw_entry.c"/>
         <file category="header" name="engine/blit/acc_sw_entry.h"/>
-        <file category="sourceC" name="engine/acc_sw_basegeo.c"/>
-        <file category="sourceC" name="engine/acc_sw_blend.c"/>
-        <file category="header" name="engine/acc_sw_blend.h"/>
-        <file category="sourceC" name="engine/acc_sw_bypass.c"/>
-        <file category="header" name="engine/acc_sw_bypass.h"/>
-        <file category="header" name="engine/acc_sw_bypass_matrix.h"/>
-        <file category="sourceC" name="engine/acc_sw_cover.c"/>
-        <file category="header" name="engine/acc_sw_cover.h"/>
-        <file category="sourceC" name="engine/acc_sw_filter.c"/>
-        <file category="header" name="engine/acc_sw_filter.h"/>
-        <file category="header" name="engine/acc_sw_filter_matrix.h"/>
         <file category="sourceC" name="engine/blit/acc_sw_generic.c"/>
         <file category="header" name="engine/blit/acc_sw_generic.h"/>
+        <file category="sourceC" name="engine/blit/acc_sw_uncompressed.c"/>
+        <file category="header" name="engine/blit/acc_sw_uncompressed.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="acc_sw_compressed" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI engine/blit/acc_sw_compressed code, optional.</description>
+      <files>
         <file category="sourceC" name="engine/blit/acc_sw_compressed/acc_sw_compressed.c"/>
         <file category="header" name="engine/blit/acc_sw_compressed/acc_sw_compressed.h"/>
         <file category="sourceC" name="engine/blit/acc_sw_compressed/acc_sw_rle_bypass.c"/>
@@ -84,87 +109,106 @@
         <file category="header" name="engine/blit/acc_sw_compressed/acc_sw_rle_cover.h"/>
         <file category="sourceC" name="engine/blit/acc_sw_compressed/acc_sw_rle_filter.c"/>
         <file category="header" name="engine/blit/acc_sw_compressed/acc_sw_rle_filter.h"/>
-        <file category="header" name="engine/acc_sw_source_over.h"/>
-        <file category="sourceC" name="engine/acc_vg_lite.c"/>
-        <file category="sourceC" name="engine/draw_font.c"/>
-        <file category="header" name="engine/draw_font.h"/>
-        <file category="sourceC" name="engine/draw_img.c"/>
-        <file category="header" name="engine/draw_img.h"/>
-        <file category="header" name="engine/draw_path.h"/>
-        <file category="sourceC" name="engine/font_freetype.c"/>
-        <file category="header" name="engine/font_freetype.h"/>
-        <file category="sourceC" name="engine/font_mem.c"/>
-        <file category="header" name="engine/font_mem.h"/>
-        <file category="sourceC" name="engine/font_mem_img.c"/>
-        <file category="header" name="engine/font_mem_img.h"/>
-        <file category="sourceC" name="engine/font_mem_matrix.c"/>
-        <file category="header" name="engine/font_mem_matrix.h"/>
-        <file category="sourceC" name="engine/font_stb.c"/>
-        <file category="header" name="engine/font_stb.h"/>
-        <file category="sourceC" name="engine/font_ttf.c"/>
-        <file category="header" name="engine/font_ttf.h"/>
-        <file category="sourceC" name="engine/gui_matrix.c"/>
-        <file category="header" name="engine/gui_matrix.h"/>
-        <file category="header" name="engine/ppev2_sim.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="ppe-rtl8773e" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>An hardware acceleration from Realtek-HoneyGUI.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="color" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI engine/blit/color code, optional.</description>
       <files>
-        <file category="sourceC" name="engine/hw_acc/rtl8773e/acc_rtk_ppe.c"/>
+        <file category="sourceC" name="engine/blit/color/a8_2_a8.c"/>
+        <file category="header" name="engine/blit/color/a8_2_a8.h"/>
+        <file category="sourceC" name="engine/blit/color/a8_2_rgb565.c"/>
+        <file category="header" name="engine/blit/color/a8_2_rgb565.h"/>
+        <file category="header" name="engine/blit/color/acc_sw_define.h"/>
+        <file category="sourceC" name="engine/blit/color/argb8565_2_rgb565.c"/>
+        <file category="header" name="engine/blit/color/argb8565_2_rgb565.h"/>
+        <file category="sourceC" name="engine/blit/color/rgb565_2_rgb565.c"/>
+        <file category="header" name="engine/blit/color/rgb565_2_rgb565.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="ppe-rtl87x2g" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description> An hardware acceleration from Realtek-HoneyGUI.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="draw" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI engine/draw code, optional.</description>
       <files>
-        <file category="sourceC" name="engine/hw_acc/rtl87x2g/acc_rtk_ppe.c"/>
+        <file category="sourceC" name="engine/draw/draw_font.c"/>
+        <file category="header" name="engine/draw/draw_font.h"/>
+        <file category="sourceC" name="engine/draw/draw_img.c"/>
+        <file category="header" name="engine/draw/draw_img.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="input" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>HoneyGUI input algorithms and interfaces, including keyboard, touchpad, and wheel algorithms.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="font" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI engine/font code, optional.</description>
+      <files>
+        <file category="header" name="engine/font/default_font.h"/>
+        <file category="sourceC" name="engine/font/font_glyph_cache.c"/>
+        <file category="header" name="engine/font/font_glyph_cache.h"/>
+        <file category="sourceC" name="engine/font/font_lib_manager.c"/>
+        <file category="header" name="engine/font/font_lib_manager.h"/>
+        <file category="sourceC" name="engine/font/font_mem.c"/>
+        <file category="header" name="engine/font/font_mem.h"/>
+        <file category="sourceC" name="engine/font/font_rendering_utils.c"/>
+        <file category="header" name="engine/font/font_rendering_utils.h"/>
+        <file category="header" name="engine/font/font_types.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="input" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI input code, optional.</description>
       <files>
         <file category="sourceC" name="input/kb_algo.c"/>
         <file category="header" name="input/kb_algo.h"/>
         <file category="sourceC" name="input/tp_algo.c"/>
         <file category="header" name="input/tp_algo.h"/>
-        <file category="sourceC" name="input/tp_algo_v2.c"/>
         <file category="sourceC" name="input/wheel_algo.c"/>
         <file category="header" name="input/wheel_algo.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="misc" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>HoneyGUI miscellaneous components featuring TLSF memory management algorithms.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="tlsf" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI misc/tlsf code, optional.</description>
       <files>
         <file category="sourceC" name="misc/tlsf/tlsf.c"/>
         <file category="header" name="misc/tlsf/tlsf.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="SaaA" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>HoneyGUI SaaA: Source code for various IoT and Smart Home functionalities, including Bluetooth, FileSystem, GPIO, and WiFi support.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="vfs" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI misc/vfs code, optional.</description>
       <files>
-        <file category="sourceC" name="SaaA/frontend_launcher.c"/>
-        <file category="sourceC" name="SaaA/js_bt.c"/>
-        <file category="sourceC" name="SaaA/js_extern_io.c"/>
-        <file category="header" name="SaaA/js_extern_io.h"/>
-        <file category="sourceC" name="SaaA/js_filesystem.c"/>
-        <file category="sourceC" name="SaaA/js_gpio.c"/>
-        <file category="sourceC" name="SaaA/js_init.c"/>
-        <file category="sourceC" name="SaaA/js_key.c"/>
-        <file category="sourceC" name="SaaA/js_matter.c"/>
-        <file category="sourceC" name="SaaA/js_mesh.c"/>
-        <file category="sourceC" name="SaaA/js_smarthome.c"/>
-        <file category="header" name="SaaA/js_user.h"/>
-        <file category="sourceC" name="SaaA/js_wifi.c"/>
-        <file category="sourceC" name="SaaA/js_ui/js_ui.c"/>
+        <file category="sourceC" name="misc/vfs/gui_vfs.c"/>
+        <file category="header" name="misc/vfs/gui_vfs.h"/>
+        <file category="sourceC" name="misc/vfs/gui_vfs_generic.c"/>
+        <file category="header" name="misc/vfs/gui_vfs_generic.h"/>
+        <file category="sourceC" name="misc/vfs/gui_vfs_posix.c"/>
+        <file category="sourceC" name="misc/vfs/gui_vfs_ramfs.c"/>
+        <file category="header" name="misc/vfs/gui_vfs_ramfs.h"/>
+        <file category="sourceC" name="misc/vfs/gui_vfs_romfs.c"/>
+        <file category="other" name="misc/vfs/RAMFS_README.md"/>
+        <file category="other" name="misc/vfs/README.md"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="server" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="romfs" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI misc/vfs/romfs code, optional.</description>
+      <files>
+        <file category="sourceC" name="misc/vfs/romfs/hg_romfs.c"/>
+        <file category="header" name="misc/vfs/romfs/hg_romfs.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="server" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
       <description>HoneyGUI server code, optional.</description>
       <files>
-        <file category="sourceC" name="server/gui_api.c"/>
         <file category="header" name="server/gui_api.h"/>
+        <file category="sourceC" name="server/gui_api_acc.c"/>
+        <file category="header" name="server/gui_api_acc.h"/>
+        <file category="sourceC" name="server/gui_api_color.c"/>
+        <file category="header" name="server/gui_api_color.h"/>
+        <file category="sourceC" name="server/gui_api_dc.c"/>
+        <file category="header" name="server/gui_api_dc.h"/>
+        <file category="sourceC" name="server/gui_api_ftl.c"/>
+        <file category="header" name="server/gui_api_ftl.h"/>
+        <file category="sourceC" name="server/gui_api_indev.c"/>
+        <file category="header" name="server/gui_api_indev.h"/>
+        <file category="sourceC" name="server/gui_api_os.c"/>
+        <file category="header" name="server/gui_api_os.h"/>
         <file category="sourceC" name="server/gui_components_init.c"/>
         <file category="header" name="server/gui_components_init.h"/>
+        <file category="sourceC" name="server/gui_listener.c"/>
+        <file category="header" name="server/gui_listener.h"/>
         <file category="sourceC" name="server/gui_message.c"/>
         <file category="header" name="server/gui_message.h"/>
         <file category="sourceC" name="server/gui_pm.c"/>
@@ -172,148 +216,79 @@
         <file category="header" name="server/gui_server.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="widget" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>HoneyGUI widget code, optional.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="sysval" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI sysval code, optional.</description>
       <files>
-        <file category="header" name="widget/guidef.h"/>
-        <file category="sourceC" name="widget/gui_3d.c"/>
-        <file category="header" name="widget/gui_3d.h"/>
-        <file category="sourceC" name="widget/gui_barcode_gen.c"/>
-        <file category="header" name="widget/gui_barcode_gen.h"/>
-        <file category="sourceC" name="widget/gui_button.c"/>
-        <file category="header" name="widget/gui_button.h"/>
-        <file category="sourceC" name="widget/gui_calendar.c"/>
-        <file category="header" name="widget/gui_calendar.h"/>
-        <file category="sourceC" name="widget/gui_canvas.c"/>
-        <file category="header" name="widget/gui_canvas.h"/>
-        <file category="sourceC" name="widget/gui_canvas_arc.c"/>
-        <file category="header" name="widget/gui_canvas_arc.h"/>
-        <file category="sourceC" name="widget/gui_canvas_img.c"/>
-        <file category="sourceC" name="widget/gui_canvas_rect.c"/>
-        <file category="header" name="widget/gui_canvas_rect.h"/>
-        <file category="sourceC" name="widget/gui_canvas_round_rect.c"/>
-        <file category="header" name="widget/gui_canvas_round_rect.h"/>
-        <file category="sourceC" name="widget/gui_card.c"/>
-        <file category="header" name="widget/gui_card.h"/>
-        <file category="sourceC" name="widget/gui_cardview.c"/>
-        <file category="header" name="widget/gui_cardview.h"/>
-        <file category="sourceC" name="widget/gui_circle.c"/>
-        <file category="header" name="widget/gui_circle.h"/>
-        <file category="sourceC" name="widget/gui_colorwheel.c"/>
-        <file category="header" name="widget/gui_colorwheel.h"/>
-        <file category="sourceC" name="widget/gui_combo.c"/>
-        <file category="header" name="widget/gui_combo.h"/>
-        <file category="sourceC" name="widget/gui_cube.c"/>
-        <file category="header" name="widget/gui_cube.h"/>
-        <file category="sourceC" name="widget/gui_curtain.c"/>
-        <file category="header" name="widget/gui_curtain.h"/>
-        <file category="sourceC" name="widget/gui_curtainview.c"/>
-        <file category="header" name="widget/gui_curtainview.h"/>
-        <file category="sourceC" name="widget/gui_eq.c"/>
-        <file category="header" name="widget/gui_eq.h"/>
-        <file category="sourceC" name="widget/gui_fps.c"/>
-        <file category="header" name="widget/gui_fps.h"/>
-        <file category="sourceC" name="widget/gui_gallery.c"/>
-        <file category="header" name="widget/gui_gallery.h"/>
-        <file category="sourceC" name="widget/gui_grid.c"/>
-        <file category="header" name="widget/gui_grid.h"/>
-        <file category="sourceC" name="widget/gui_image_array.c"/>
-        <file category="header" name="widget/gui_image_array.h"/>
-        <file category="sourceC" name="widget/gui_img.c"/>
-        <file category="header" name="widget/gui_img.h"/>
-        <file category="sourceC" name="widget/gui_img_live.c"/>
-        <file category="header" name="widget/gui_img_live.h"/>
-        <file category="sourceC" name="widget/gui_img_scope.c"/>
-        <file category="header" name="widget/gui_img_scope.h"/>
-        <file category="sourceC" name="widget/gui_img_stb.c"/>
-        <file category="header" name="widget/gui_img_stb.h"/>
-        <file category="sourceC" name="widget/gui_keyboard.c"/>
-        <file category="header" name="widget/gui_keyboard.h"/>
-        <file category="sourceC" name="widget/gui_map.c"/>
-        <file category="header" name="widget/gui_map.h"/>
-        <file category="sourceC" name="widget/gui_menu_cellular.c"/>
-        <file category="header" name="widget/gui_menu_cellular.h"/>
-        <file category="sourceC" name="widget/gui_multi_level.c"/>
-        <file category="header" name="widget/gui_multi_level.h"/>
-        <file category="sourceC" name="widget/gui_obj.c"/>
-        <file category="header" name="widget/gui_obj.h"/>
-        <file category="sourceC" name="widget/gui_page.c"/>
-        <file category="header" name="widget/gui_page.h"/>
-        <file category="sourceC" name="widget/gui_pagelist.c"/>
-        <file category="header" name="widget/gui_pagelist.h"/>
-        <file category="sourceC" name="widget/gui_pagelistview.c"/>
-        <file category="header" name="widget/gui_pagelistview.h"/>
-        <file category="sourceC" name="widget/gui_pagelist_new.c"/>
-        <file category="header" name="widget/gui_pagelist_new.h"/>
-        <file category="sourceC" name="widget/gui_perspective.c"/>
-        <file category="header" name="widget/gui_perspective.h"/>
-        <file category="sourceC" name="widget/gui_pinyinIME.c"/>
-        <file category="header" name="widget/gui_pinyinIME.h"/>
-        <file category="sourceC" name="widget/gui_prism_mirror3d.c"/>
-        <file category="header" name="widget/gui_prism_mirror3d.h"/>
-        <file category="sourceC" name="widget/gui_progressbar.c"/>
-        <file category="header" name="widget/gui_progressbar.h"/>
-        <file category="sourceC" name="widget/gui_px.c"/>
-        <file category="header" name="widget/gui_px.h"/>
-        <file category="sourceC" name="widget/gui_return.c"/>
-        <file category="header" name="widget/gui_return.h"/>
-        <file category="sourceC" name="widget/gui_scroll_text.c"/>
-        <file category="header" name="widget/gui_scroll_text.h"/>
-        <file category="sourceC" name="widget/gui_scroll_wheel.c"/>
-        <file category="header" name="widget/gui_scroll_wheel.h"/>
-        <file category="sourceC" name="widget/gui_scroll_wheel_new.c"/>
-        <file category="header" name="widget/gui_scroll_wheel_new.h"/>
-        <file category="sourceC" name="widget/gui_seekbar.c"/>
-        <file category="header" name="widget/gui_seekbar.h"/>
-        <file category="sourceC" name="widget/gui_simple_img.c"/>
-        <file category="header" name="widget/gui_simple_img.h"/>
-        <file category="sourceC" name="widget/gui_slider.c"/>
-        <file category="header" name="widget/gui_slider.h"/>
-        <file category="sourceC" name="widget/gui_soccer.c"/>
-        <file category="header" name="widget/gui_soccer.h"/>
-        <file category="sourceC" name="widget/gui_svg.c"/>
-        <file category="header" name="widget/gui_svg.h"/>
-        <file category="sourceC" name="widget/gui_switch.c"/>
-        <file category="header" name="widget/gui_switch.h"/>
-        <file category="sourceC" name="widget/gui_tab.c"/>
-        <file category="header" name="widget/gui_tab.h"/>
-        <file category="sourceC" name="widget/gui_tabview.c"/>
-        <file category="header" name="widget/gui_tabview.h"/>
-        <file category="header" name="widget/gui_tabview_internal.h"/>
-        <file category="sourceC" name="widget/gui_tab_cube.c"/>
-        <file category="sourceC" name="widget/gui_tab_fade.c"/>
-        <file category="sourceC" name="widget/gui_tab_reduction.c"/>
-        <file category="sourceC" name="widget/gui_tab_reduction_fade.c"/>
-        <file category="sourceC" name="widget/gui_tab_rotate.c"/>
-        <file category="sourceC" name="widget/gui_text.c"/>
-        <file category="header" name="widget/gui_text.h"/>
-        <file category="sourceC" name="widget/gui_turn_table.c"/>
-        <file category="header" name="widget/gui_turn_table.h"/>
-        <file category="sourceC" name="widget/gui_u8g2.c"/>
-        <file category="header" name="widget/gui_u8g2.h"/>
-        <file category="sourceC" name="widget/gui_watchface_gradient.c"/>
-        <file category="header" name="widget/gui_watchface_gradient.h"/>
-        <file category="sourceC" name="widget/gui_watch_gradient_spot.c"/>
-        <file category="header" name="widget/gui_watch_gradient_spot.h"/>
-        <file category="sourceC" name="widget/gui_wave.c"/>
-        <file category="header" name="widget/gui_wave.h"/>
-        <file category="sourceC" name="widget/gui_wheel_list.c"/>
-        <file category="header" name="widget/gui_wheel_list.h"/>
-        <file category="sourceC" name="widget/gui_widget_template.c"/>
-        <file category="header" name="widget/gui_widget_template.h"/>
-        <file category="sourceC" name="widget/gui_win.c"/>
-        <file category="header" name="widget/gui_win.h"/>
-        <file category="header" name="widget/realgui.h"/>
+        <file category="sourceC" name="sysval/gui_sysval.c"/>
+        <file category="header" name="sysval/gui_sysval.h"/>
+        <file category="header" name="sysval/gui_sysval_adapter.h"/>
+        <file category="header" name="sysval/gui_sysval_keys.h"/>
       </files>
     </component>
-    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="widget-3d" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
-      <description>HoneyGUI widget/3d code, optional.</description>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="widget" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI widget code, optional.</description>
       <files>
-        <file category="sourceC" name="widget/3d/def_3d.c"/>
-        <file category="header" name="widget/3d/def_3d.h"/>
+        <file category="other" name="widget/AGENTS.md"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="gui_img" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI widget/gui_img code, optional.</description>
+      <files>
+        <file category="sourceC" name="widget/gui_img/gui_img.c"/>
+        <file category="header" name="widget/gui_img/gui_img.h"/>
+        <file category="sourceC" name="widget/gui_img/gui_img_api.c"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="gui_list" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI widget/gui_list code, optional.</description>
+      <files>
+        <file category="sourceC" name="widget/gui_list/gui_list.c"/>
+        <file category="header" name="widget/gui_list/gui_list.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="gui_obj" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI widget/gui_obj code, optional.</description>
+      <files>
+        <file category="sourceC" name="widget/gui_obj/gui_obj.c"/>
+        <file category="header" name="widget/gui_obj/gui_obj.h"/>
+        <file category="sourceC" name="widget/gui_obj/gui_obj_event.c"/>
+        <file category="header" name="widget/gui_obj/gui_obj_event.h"/>
+        <file category="sourceC" name="widget/gui_obj/gui_obj_focus.c"/>
+        <file category="header" name="widget/gui_obj/gui_obj_focus.h"/>
+        <file category="sourceC" name="widget/gui_obj/gui_obj_suppress.c"/>
+        <file category="header" name="widget/gui_obj/gui_obj_suppress.h"/>
+        <file category="sourceC" name="widget/gui_obj/gui_obj_timer.c"/>
+        <file category="sourceC" name="widget/gui_obj/gui_obj_tree.c"/>
+        <file category="header" name="widget/gui_obj/gui_obj_tree.h"/>
+        <file category="header" name="widget/gui_obj/gui_obj_type.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="gui_text" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI widget/gui_text code, optional.</description>
+      <files>
+        <file category="sourceC" name="widget/gui_text/gui_scroll_text.c"/>
+        <file category="header" name="widget/gui_text/gui_scroll_text.h"/>
+        <file category="sourceC" name="widget/gui_text/gui_text.c"/>
+        <file category="header" name="widget/gui_text/gui_text.h"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="gui_view" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI widget/gui_view code, optional.</description>
+      <files>
+        <file category="sourceC" name="widget/gui_view/gui_view.c"/>
+        <file category="header" name="widget/gui_view/gui_view.h"/>
+        <file category="header" name="widget/gui_view/gui_view_api.h"/>
+        <file category="sourceC" name="widget/gui_view/gui_view_descriptor.c"/>
+        <file category="header" name="widget/gui_view/gui_view_instance.h"/>
+        <file category="sourceC" name="widget/gui_view/gui_view_transition.c"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.2" Cgroup="realgui" Csub="gui_win" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+      <description>HoneyGUI widget/gui_win code, optional.</description>
+      <files>
+        <file category="sourceC" name="widget/gui_win/gui_win.c"/>
+        <file category="header" name="widget/gui_win/gui_win.h"/>
       </files>
     </component>
   </components>
-  <!-- <conditions>
-  </conditions> -->
 </package>

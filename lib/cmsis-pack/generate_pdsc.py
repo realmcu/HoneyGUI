@@ -44,12 +44,13 @@ def create_pdsc(vendor, name, version, description, release_date, url, license_n
         # condition_u8g2 = SubElement(conditions, "condition", id="CONFIG_REALTEK_BUILD_U8G2")
 
         exclude_files = {"SConscript", "acc_arm_2d.c", "acc_sw_ppe_sim.c"}
-        exclude_extensions = {".txt", ".png", ".bmp", ".bin", ".jpg", ".svg", ".js", ".rtkprj", ".rtkui", ".rtkres", ".bak"}
-        exclude_csub = {"resource", "emoji", "font", "system", "box", "demo", "BAK",
-                        "root_image_800_480", "screen_480_480 WIFI", "screen_480_480", "screen_480_320", "screen_480_272",
-                        "screen_456_280", "root_image_hongkong", "screen_410_502_lvgl", "root_image_chargebox",
-                        "root_image_hongkong_bee4", "screen_320_240_sbee2", "screen_320_240", "root_image_8762g", "root_image"}
-        exclude_dirs = {"example", "build", "output", "web"}
+        exclude_extensions = {".txt", ".png", ".bmp", ".bin", ".jpg", ".svg", ".js", ".rtkprj", ".rtkui", ".rtkres", ".bak",
+                              ".o", ".d", ".a", ".map", ".lst"}
+        # Only "resource": the rest of the old list named directories that no
+        # longer exist. "font" must not be here -- engine/font/ holds the BMP
+        # font renderer that gui_text needs, not just font assets.
+        exclude_csub = {"resource"}
+        exclude_dirs = {"example", "build", "output", "web", "install", "temp"}
 
         for root, dirs, files in os.walk(directory):
             if root == directory or any(excluded in root for excluded in exclude_dirs):
@@ -94,15 +95,19 @@ def create_pdsc(vendor, name, version, description, release_date, url, license_n
         xml_str = tostring(package, 'utf-8')
         pretty_xml_str = minidom.parseString(xml_str).toprettyxml(indent="  ")
 
-        pdsc_filename = f"{vendor}.{sanitized_name}.pdsc"
+        pdsc_filename = os.path.join(SCRIPT_DIR, f"{vendor}.{sanitized_name}.pdsc")
 
-        with open(pdsc_filename, "w", encoding="utf-8") as pdsc_file:
+        with open(pdsc_filename, "w", encoding="utf-8", newline="\n") as pdsc_file:
             pdsc_file.write(pretty_xml_str)
 
         print(f"{pdsc_filename} generated successfully.")
 
     except Exception as e:
         print(f"An error occurred: {e}")
+        raise
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REALGUI_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, "..", "..", "realgui"))
 
 create_pdsc(
     vendor="Realtek",
@@ -112,5 +117,5 @@ create_pdsc(
     release_date="2025-01-21",
     url="https://docs.realmcu.com/gui/en/latest/index.html",
     license_name="LICENSE",
-    directory="./"
+    directory=REALGUI_DIR
 )

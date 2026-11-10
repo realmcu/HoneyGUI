@@ -30,16 +30,14 @@ DEFAULT_ARGS=()
 # Default: empty (all folders)
 #
 PACK_DIRS="
-  ../../realgui/app
+  ../../realgui/3rd
   ../../realgui/core
   ../../realgui/dc
-  ../../realgui/DOM
-  ../../realgui/example
   ../../realgui/engine
   ../../realgui/input
   ../../realgui/misc
-  ../../realgui/SaaA
   ../../realgui/server
+  ../../realgui/sysval
   ../../realgui/widget
 "
 
