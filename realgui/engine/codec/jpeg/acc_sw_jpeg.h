@@ -41,7 +41,15 @@ void gui_acc_jpeg_release(void *decoded);
  * @param pixels      Source pixels, laid out as @p bpp describes.
  * @param w           Width in pixels.
  * @param h           Height in pixels.
- * @param bpp         Bits per pixel (24 for RGB888, 32 for ARGB8888).
+ * @param bpp         Bits per pixel:
+ *                      16  packed RGB565, one 16-bit little-endian word per
+ *                          pixel (r:5 g:6 b:5). This is the layout the display
+ *                          controller and gui_img_tree_convert_to_img() produce,
+ *                          so a screenshot can be encoded without first being
+ *                          expanded to 24/32 bpp.
+ *                      24  RGB888
+ *                      32  ARGB8888
+ *                    Anything else is rejected.
  * @param quality     1..100. Values outside the range are rejected.
  * @param buff_sz     Hard ceiling on the returned block, in bytes. 0 means "no
  *                    ceiling". With a container shape, a non-zero value that

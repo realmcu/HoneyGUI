@@ -147,6 +147,7 @@ void *gui_acc_jpeg_compress(void *input, int w, int h, int bpp,
     }
 
     int channel = 0;
+    int src565 = 0;
     size_t cap;
     size_t limit;
     unsigned char *buf;
@@ -154,7 +155,16 @@ void *gui_acc_jpeg_compress(void *input, int w, int h, int bpp,
     const int JPEG_HEAD_SIZE = (int)sizeof(gui_jpeg_file_head_t) -
                                (int)sizeof(((gui_jpeg_file_head_t *)0)->jpeg);
 
-    channel = (bpp == 24) ? 3 : ((bpp == 32) ? 4 : 0);
+    if (bpp == 16)
+    {
+        /* 2 bytes per pixel; channel only drives the size estimate below. */
+        src565 = 1;
+        channel = 2;
+    }
+    else
+    {
+        channel = (bpp == 24) ? 3 : ((bpp == 32) ? 4 : 0);
+    }
 
     if (input == NULL || w <= 0 || h <= 0 || channel == 0 || out_len == NULL)
     {
@@ -195,7 +205,8 @@ void *gui_acc_jpeg_compress(void *input, int w, int h, int bpp,
     const int min_len = (GUI_STBIW_JPEG_HEADER > 0) ? JPEG_HEAD_SIZE : 2;
 
     if (!gui_stbi_write_jpg_to_func(jpeg_write_sink_cb, &sink,
-                                    w, h, channel, input, quality)
+                                    w, h, src565 ? GUI_STBIW_JPG_SRC_RGB565 : channel,
+                                    input, quality)
         || sink.oom || sink.len < min_len)
     {
         gui_log("gui_acc_jpeg_compress: encode failed\n");

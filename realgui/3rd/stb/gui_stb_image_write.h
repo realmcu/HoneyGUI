@@ -359,6 +359,10 @@ GUI_STBIWDEF void gui_stbi_flip_vertically_on_write(int flip_boolean);
 #define GUI_STBIW_SWAP_RB 1
 #endif
 
+/* comp value selecting packed RGB565 input (r:5 g:6 b:5, low byte first).
+ * 16 avoids the 1..4 channel counts; 2 is grey+alpha. Unaffected by GUI_STBIW_SWAP_RB. */
+#define GUI_STBIW_JPG_SRC_RGB565  16
+
 /*
  * JPEG resource header. When encoding a JPEG to be stored as a GUI resource,
  * reserve room for the container the decoder expects, so the result can be
@@ -1826,6 +1830,29 @@ static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf, int *bitCnt
     return DU[0];
 }
 
+/* Fetch one source pixel as 8-bit r/g/b. `ofs` is a byte offset; dR/dG/dB are
+ * unused for the 565 layout. */
+static void stbiw__jpg_fetch_rgb(const unsigned char *data, int ofs, int comp,
+                                 const unsigned char *dR, const unsigned char *dG,
+                                 const unsigned char *dB,
+                                 float *r, float *g, float *b)
+{
+    if (comp == GUI_STBIW_JPG_SRC_RGB565)
+    {
+        unsigned int v = (unsigned int)data[ofs] | ((unsigned int)data[ofs + 1] << 8);
+
+        *r = (float)((v >> 11) & 0x1F) * (255.0f / 31.0f);
+        *g = (float)((v >>  5) & 0x3F) * (255.0f / 63.0f);
+        *b = (float)(v        & 0x1F) * (255.0f / 31.0f);
+    }
+    else
+    {
+        *r = dR[ofs];
+        *g = dG[ofs];
+        *b = dB[ofs];
+    }
+}
+
 static int gui_stbi_write_jpg_core(stbi__write_context *s, int width, int height, int comp,
                                    const void *data, int quality)
 {
@@ -1908,10 +1935,15 @@ static int gui_stbi_write_jpg_core(stbi__write_context *s, int width, int height
                                 };
 
     int row, col, i, k, subsample;
+    int src565;          /* input is packed RGB565 rather than 'comp' bytes/px */
+    int pixbytes;        /* bytes per input pixel, used to advance row bases */
     float fdtbl_Y[64], fdtbl_UV[64];
     unsigned char YTable[64], UVTable[64];
 
-    if (!data || !width || !height || comp > 4 || comp < 1)
+    src565 = (comp == GUI_STBIW_JPG_SRC_RGB565) ? 1 : 0;
+    pixbytes = src565 ? 2 : comp;
+
+    if (!data || !width || !height || (!src565 && (comp > 4 || comp < 1)))
     {
         return 0;
     }
@@ -1945,7 +1977,7 @@ static int gui_stbi_write_jpg_core(stbi__write_context *s, int width, int height
      * the caller writes type/w/h/size, since only it knows what the resource is.
      */
 #if GUI_STBIW_JPEG_HEADER > 0
-    if (comp == 3 || comp == 4)
+    if (comp == 3 || comp == 4 || src565)
     {
         static const unsigned char zero_head[GUI_STBIW_JPEG_HEADER];
         s->func(s->context, (void *)zero_head, GUI_STBIW_JPEG_HEADER);
@@ -1986,16 +2018,15 @@ static int gui_stbi_write_jpg_core(stbi__write_context *s, int width, int height
         int DCY = 0, DCU = 0, DCV = 0;
         int bitBuf = 0, bitCnt = 0;
         // comp == 2 is grey+alpha (alpha is ignored)
-        /*
-         * Luma is order-independent but chroma is not, so the three base
-         * pointers have to name the semantic channel rather than the byte
-         * offset. GUI_STBIW_R/B follow GUI_STBIW_SWAP_RB; green is slot 1 in
-         * both layouts. The YCbCr arithmetic below is then fed r/g/b in the
-         * usual sense no matter which way the caller's buffer is stored.
-         */
+        /* Base pointers name the semantic channel, following GUI_STBIW_SWAP_RB.
+         * 565 has none, so they are unused there (see stbiw__jpg_fetch_rgb). */
         int ofsG = comp > 2 ? 1 : 0;
         const unsigned char *dataR, *dataG, *dataB;
-        if (comp > 2)
+        if (src565)
+        {
+            dataR = dataG = dataB = (const unsigned char *)data;
+        }
+        else if (comp > 2)
         {
             const unsigned char *data0 = (const unsigned char *)data;
             dataR = data0 + (GUI_STBIW_SWAP_RB ? 2 : 0);
@@ -2019,12 +2050,14 @@ static int gui_stbi_write_jpg_core(stbi__write_context *s, int width, int height
                         // row >= height => use last input row
                         int clamped_row = (row < height) ? row : height - 1;
                         int base_p = (stbi__flip_vertically_on_write ? (height - 1 - clamped_row) : clamped_row) * width *
-                                     comp;
+                                     pixbytes;
                         for (col = x; col < x + 16; ++col, ++pos)
                         {
                             // if col >= width => use pixel from last input column
-                            int p = base_p + ((col < width) ? col : (width - 1)) * comp;
-                            float r = dataR[p], g = dataG[p], b = dataB[p];
+                            int p = base_p + ((col < width) ? col : (width - 1)) * pixbytes;
+                            float r, g, b;
+                            stbiw__jpg_fetch_rgb((const unsigned char *)data, p, comp,
+                                                 dataR, dataG, dataB, &r, &g, &b);
                             Y[pos] = +0.29900f * r + 0.58700f * g + 0.11400f * b - 128;
                             U[pos] = -0.16874f * r - 0.33126f * g + 0.50000f * b;
                             V[pos] = +0.50000f * r - 0.41869f * g - 0.08131f * b;
@@ -2066,12 +2099,14 @@ static int gui_stbi_write_jpg_core(stbi__write_context *s, int width, int height
                         // row >= height => use last input row
                         int clamped_row = (row < height) ? row : height - 1;
                         int base_p = (stbi__flip_vertically_on_write ? (height - 1 - clamped_row) : clamped_row) * width *
-                                     comp;
+                                     pixbytes;
                         for (col = x; col < x + 8; ++col, ++pos)
                         {
                             // if col >= width => use pixel from last input column
-                            int p = base_p + ((col < width) ? col : (width - 1)) * comp;
-                            float r = dataR[p], g = dataG[p], b = dataB[p];
+                            int p = base_p + ((col < width) ? col : (width - 1)) * pixbytes;
+                            float r, g, b;
+                            stbiw__jpg_fetch_rgb((const unsigned char *)data, p, comp,
+                                                 dataR, dataG, dataB, &r, &g, &b);
                             Y[pos] = +0.29900f * r + 0.58700f * g + 0.11400f * b - 128;
                             U[pos] = -0.16874f * r - 0.33126f * g + 0.50000f * b;
                             V[pos] = +0.50000f * r - 0.41869f * g - 0.08131f * b;
