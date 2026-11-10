@@ -1,0 +1,675 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
+ * File      : tp_algo.c
+ */
+
+#ifndef RTK_TP_ALGO_V2
+//#include <string.h>
+#include "gui_server.h"
+#include "guidef.h"
+#include "gui_api.h"
+#include <stdlib.h>
+#include "tp_algo.h"
+
+
+#ifdef ENABLE_MONKEY_TEST
+#define RTK_TP_DEBUG
+#else
+//#define RTK_TP_DEBUG
+#endif
+
+#ifdef RTK_TP_DEBUG
+
+#define TP_LOG(format, ...) gui_log(format, ##__VA_ARGS__)
+
+#else
+
+#define TP_LOG(format, ...)
+
+#endif
+
+//static bool new_touch = true;
+static uint32_t start_tick;
+static struct gui_touch_port_data x_min_record = {0};
+static struct gui_touch_port_data y_min_record = {0};
+static struct gui_touch_port_data x_max_record = {0};
+static struct gui_touch_port_data y_max_record = {0};
+static struct gui_touch_port_data first_record = {0};
+
+typedef enum _TOUCH_DIR
+{
+    TOUCH_NONE,
+    TOUCH_HORIZONTAL,
+    TOUCH_VERTICAL,
+} TOUCH_DIR;
+static TOUCH_DIR touch_direct = TOUCH_NONE;
+
+static touch_info_t tp;
+
+static uint32_t up_cnt = 0;
+static uint32_t down_cnt = 0;
+static bool long_button_flag = false;
+
+#define MULTI_CLICK_INTERVAL_MS   300  // Maximum time between clicks
+#define MULTI_CLICK_POSITION_THR  20  // Maximum position deviation between clicks
+static uint32_t click_cnt = 0;
+static uint32_t last_click_time = 0;
+static int16_t last_click_x = 0;
+static int16_t last_click_y = 0;
+
+static bool tp_left_moved_flag = false;
+static bool tp_right_moved_flag = false;
+static bool tp_up_moved_flag = false;
+static bool tp_down_moved_flag = false;
+
+static void tp_do_reset(void)
+{
+    down_cnt = 0;
+    memset(&tp, 0, sizeof(tp));
+    tp_left_moved_flag = false;
+    tp_right_moved_flag = false;
+    tp_up_moved_flag = false;
+    tp_down_moved_flag = false;
+}
+
+static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
+{
+    uint8_t tp_local_event = 0;
+    tp.pressed = false;
+    tp.released = false;
+    if (raw_data->event == GUI_TOUCH_EVENT_DOWN)
+    {
+        tp_local_event = GUI_TOUCH_EVENT_DOWN;
+        up_cnt = 0;
+        down_cnt++;
+        if (down_cnt == 1)
+        {
+            long_button_flag = false;
+            tp.pressed = true;
+            tp.pressing = true;
+            TP_LOG("=====START DOWN====== tick = %d\n", raw_data->timestamp_ms);
+        }
+    }
+    else
+    {
+        up_cnt++;
+        if (down_cnt == 0)
+        {
+            tp.type = TOUCH_INVALID;
+        }
+
+        if ((up_cnt == 1) && (down_cnt > 0))
+        {
+            tp_local_event = GUI_TOUCH_EVENT_UP;
+            down_cnt = 0;
+            tp.released = true;
+            tp.pressing = false;
+            TP_LOG("=====END UP====== tick = %d\n", raw_data->timestamp_ms);
+        }
+        if (up_cnt == 2)
+        {
+            tp_do_reset();
+        }
+        tp.left_moved = false;
+        tp.right_moved = false;
+        tp.up_moved = false;
+        tp.down_moved = false;
+        return tp_local_event;
+    }
+
+    if (down_cnt == 1)
+    {
+        start_tick = raw_data->timestamp_ms;
+        x_min_record = *raw_data;
+        x_max_record = *raw_data;
+        y_min_record = *raw_data;
+        y_max_record = *raw_data;
+        first_record = *raw_data;
+        tp.type = TOUCH_INVALID;
+        touch_direct = TOUCH_NONE;
+    }
+    else
+    {
+        if (raw_data->x_coordinate < x_min_record.x_coordinate)
+        {
+            x_min_record = *raw_data;
+        }
+        if (raw_data->y_coordinate < y_min_record.y_coordinate)
+        {
+            y_min_record = *raw_data;
+        }
+        if (raw_data->x_coordinate > x_max_record.x_coordinate)
+        {
+            x_max_record = *raw_data;
+        }
+        if (raw_data->y_coordinate > y_max_record.y_coordinate)
+        {
+            y_max_record = *raw_data;
+        }
+    }
+    tp.deltaX = raw_data->x_coordinate - first_record.x_coordinate;
+    tp.deltaY = raw_data->y_coordinate - first_record.y_coordinate;
+    tp.x = first_record.x_coordinate;
+    tp.y = first_record.y_coordinate;
+    return tp_local_event;
+}
+
+static bool tp_judge_same_point(void)
+{
+    if (
+        ((x_max_record.x_coordinate - x_min_record.x_coordinate) >= SAME_POINT_THR) || \
+        ((y_max_record.y_coordinate - y_min_record.y_coordinate) >= SAME_POINT_THR)
+    )
+    {
+        TP_LOG("tp_judge_same_point delta_x: %d , delta_y: %d , return FALSE!!",
+               x_max_record.x_coordinate - x_min_record.x_coordinate,
+               y_max_record.y_coordinate - y_min_record.y_coordinate);
+        return false;
+    }
+    else
+    {
+        TP_LOG("tp_judge_same_point delta_x: %d , delta_y: %d , return TRUE!!",
+               x_max_record.x_coordinate - x_min_record.x_coordinate,
+               y_max_record.y_coordinate - y_min_record.y_coordinate);
+        return true;
+    }
+}
+
+static bool tp_judge_short_press(struct gui_touch_port_data *raw_data)
+{
+    struct gui_indev *indev = gui_get_indev();
+    if ((raw_data->timestamp_ms - start_tick) > indev->short_button_time_ms)
+    {
+        return false;
+    }
+    return true;
+}
+
+static bool tp_judge_long_press(struct gui_touch_port_data *raw_data)
+{
+    struct gui_indev *indev = gui_get_indev();
+    if ((raw_data->timestamp_ms - start_tick) > indev->long_button_time_ms)
+    {
+        return true;
+    }
+    return false;
+}
+
+static bool tp_judge_quick_x_left_slide(struct gui_touch_port_data *raw_data)
+{
+    struct gui_indev *indev = gui_get_indev();
+    if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
+    {
+        if (abs(tp.deltaX) >= abs(tp.deltaY))
+        {
+            if (tp.deltaX < 0)
+            {
+                tp.type = TOUCH_LEFT_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_LEFT_SLIDE_QUICK, %d \n", __LINE__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static bool tp_judge_quick_x_right_slide(struct gui_touch_port_data *raw_data)
+{
+    struct gui_indev *indev = gui_get_indev();
+    if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
+    {
+        if (abs(tp.deltaX) >= abs(tp.deltaY))
+        {
+            if (tp.deltaX > 0)
+            {
+                tp.type = TOUCH_RIGHT_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_RIGHT_SLIDE_QUICK, %d \n", __LINE__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static bool tp_judge_quick_y_down_slide(struct gui_touch_port_data *raw_data)
+{
+    struct gui_indev *indev = gui_get_indev();
+    if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
+    {
+        if (abs(tp.deltaX) < abs(tp.deltaY))
+        {
+            if (tp.deltaY > 0)
+            {
+                tp.type = TOUCH_DOWN_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_DOWN_SLIDE_QUICK, %d \n", __LINE__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static bool tp_judge_quick_y_up_slide(struct gui_touch_port_data *raw_data)
+{
+    struct gui_indev *indev = gui_get_indev();
+    if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
+    {
+        if (abs(tp.deltaX) < abs(tp.deltaY))
+        {
+            if (tp.deltaY < 0)
+            {
+                tp.type = TOUCH_UP_SLIDE_QUICK;
+                TP_LOG("type = TOUCH_UP_SLIDE_QUICK, %d \n", __LINE__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static bool tp_judge_slow_x_left_slide(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp.type == TOUCH_HOLD_X)
+    {
+        if (abs(tp.deltaX) > (int)(gui_get_screen_width() / 2))
+        {
+            if (tp.deltaX < 0)
+            {
+                tp.type = TOUCH_LEFT_SLIDE;
+                TP_LOG("type = TOUCH_LEFT_SLIDE, %d \n", __LINE__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+static bool tp_judge_slow_x_right_slide(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp.type == TOUCH_HOLD_X)
+    {
+        if (abs(tp.deltaX) > (int)(gui_get_screen_width() / 2))
+        {
+            if (tp.deltaX > 0)
+            {
+                tp.type = TOUCH_RIGHT_SLIDE;
+                TP_LOG("type = TOUCH_RIGHT_SLIDE, %d \n", __LINE__);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+static bool tp_judge_slow_x_orign_slide(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp.type == TOUCH_HOLD_X)
+    {
+        if (abs(tp.deltaX) <= (int)(gui_get_screen_width() / 2))
+        {
+            tp.type = TOUCH_ORIGIN_FROM_X;
+            TP_LOG("type = TOUCH_ORIGIN_FROM_X\n");
+            return true;
+        }
+    }
+    return false;
+}
+static bool tp_judge_slow_y_down_slide(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp.type == TOUCH_HOLD_Y)
+    {
+        if (abs(tp.deltaY) > (int)(gui_get_screen_height() / 2))
+        {
+            if (tp.deltaY > 0)
+            {
+                tp.type = TOUCH_DOWN_SLIDE;
+                TP_LOG("type = TOUCH_DOWN_SLIDE\n");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+static bool tp_judge_slow_y_up_slide(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp.type == TOUCH_HOLD_Y)
+    {
+        if (abs(tp.deltaY) > (int)(gui_get_screen_height() / 2))
+        {
+            if (tp.deltaY < 0)
+            {
+                tp.type = TOUCH_UP_SLIDE;
+                TP_LOG("type = TOUCH_UP_SLIDE\n");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+static bool tp_judge_slow_y_orign_slide(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp.type == TOUCH_HOLD_Y)
+    {
+        if (abs(tp.deltaY) <= (int)(gui_get_screen_height() / 2))
+        {
+            tp.type = TOUCH_ORIGIN_FROM_Y;
+            TP_LOG("type = TOUCH_ORIGIN_FROM_Y\n");
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool tp_judge_hold_x(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp_judge_same_point() == true)
+    {
+        return false;
+    }
+
+    if (touch_direct == TOUCH_NONE)
+    {
+        if (abs(tp.deltaX) >= abs(tp.deltaY))
+        {
+            touch_direct = TOUCH_HORIZONTAL;
+            tp.type = TOUCH_HOLD_X;
+            TP_LOG("type = TOUCH_HOLD_X \n");
+            return true;
+        }
+    }
+    else if (touch_direct == TOUCH_HORIZONTAL)
+    {
+        tp.type = TOUCH_HOLD_X;
+        TP_LOG("type = TOUCH_HOLD_X \n");
+        return true;
+    }
+
+    return false;
+}
+static bool tp_judge_hold_y(struct gui_touch_port_data *raw_data)
+{
+    (void)raw_data;
+    if (tp_judge_same_point() == false)
+    {
+        if (touch_direct == TOUCH_NONE)
+        {
+            if (abs(tp.deltaX) < abs(tp.deltaY))
+            {
+                touch_direct = TOUCH_VERTICAL;
+                tp.type = TOUCH_HOLD_Y;
+                TP_LOG("type = TOUCH_HOLD_Y \n");
+                return true;
+            }
+        }
+        else if (touch_direct == TOUCH_VERTICAL)
+        {
+            tp.type = TOUCH_HOLD_Y;
+            TP_LOG("type = TOUCH_HOLD_Y \n");
+            return true;
+        }
+    }
+    return false;
+}
+static bool tp_judge_long_pressed(struct gui_touch_port_data *raw_data)
+{
+    if ((tp_judge_same_point() == true) && (tp_judge_long_press(raw_data) == true) &&
+        (long_button_flag == false))
+    {
+        long_button_flag = true;
+        tp.type = TOUCH_LONG;
+        TP_LOG("type = TOUCH_LONG \n");
+        return true;
+    }
+    return false;
+}
+
+static bool tp_judge_short_click(struct gui_touch_port_data *raw_data)
+{
+    if ((tp_judge_same_point() == true) && (tp_judge_short_press(raw_data) == true))
+    {
+        if (click_cnt == 0)
+        {
+            last_click_x = tp.x;
+            last_click_y = tp.y;
+            click_cnt++;
+        }
+        else if ((abs(tp.x - last_click_x) <= MULTI_CLICK_POSITION_THR) &&
+                 (abs(tp.y - last_click_y) <= MULTI_CLICK_POSITION_THR)) // Is same click position
+        {
+            click_cnt++;
+        }
+        else // Not same click position, a new click
+        {
+            click_cnt = 1;
+            last_click_x = tp.x;
+            last_click_y = tp.y;
+        }
+        last_click_time = gui_ms_get();
+        TP_LOG("type = TOUCH_SHORT \n");
+        return true;
+    }
+    click_cnt = 0;
+    return false;
+}
+
+static void tp_judge_move_state(void)
+{
+    if (tp_judge_same_point() == true)
+    {
+        return;
+    }
+
+    if (touch_direct == TOUCH_NONE)
+    {
+        if (abs(tp.deltaX) >= abs(tp.deltaY))
+        {
+            touch_direct = TOUCH_HORIZONTAL;
+        }
+        else
+        {
+            touch_direct = TOUCH_VERTICAL;
+        }
+    }
+
+
+    if ((tp_left_moved_flag == false) && (tp.deltaX < 0) && (touch_direct == TOUCH_HORIZONTAL))
+    {
+        tp_left_moved_flag = true;
+        tp.left_moved = true;
+
+        //clear other flag
+        tp_right_moved_flag = false;
+        tp_down_moved_flag = false;
+        tp_up_moved_flag = false;
+        tp.right_moved = false;
+        tp.down_moved = false;
+        tp.up_moved = false;
+    }
+    else
+    {
+        tp.left_moved = false;
+    }
+    if ((tp_right_moved_flag == false) && (tp.deltaX > 0) && (touch_direct == TOUCH_HORIZONTAL))
+    {
+        tp_right_moved_flag = true;
+        tp.right_moved = true;
+
+        //clear other flag
+        tp_left_moved_flag = false;
+        tp_down_moved_flag = false;
+        tp_up_moved_flag = false;
+        tp.left_moved = false;
+        tp.down_moved = false;
+        tp.up_moved = false;
+    }
+    else
+    {
+        tp.right_moved = false;
+    }
+    if ((tp_up_moved_flag == false) && (tp.deltaY < 0) && (touch_direct == TOUCH_VERTICAL))
+    {
+        tp_up_moved_flag = true;
+        tp.up_moved = true;
+
+        //clear other flag
+        tp_left_moved_flag = false;
+        tp_right_moved_flag = false;
+        tp_down_moved_flag = false;
+        tp.left_moved = false;
+        tp.right_moved = false;
+        tp.down_moved = false;
+    }
+    else
+    {
+        tp.up_moved = false;
+    }
+    if ((tp_down_moved_flag == false) && (tp.deltaY > 0) && (touch_direct == TOUCH_VERTICAL))
+    {
+        tp_down_moved_flag = true;
+        tp.down_moved = true;
+
+        //clear other flag
+        tp_left_moved_flag = false;
+        tp_right_moved_flag = false;
+        tp_up_moved_flag = false;
+        tp.left_moved = false;
+        tp.right_moved = false;
+        tp.up_moved = false;
+    }
+    else
+    {
+        tp.down_moved = false;
+    }
+
+}
+
+
+struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
+{
+
+    GUI_ASSERT(raw_data != NULL);
+    uint8_t flag = tp_judge_relese_or_press(raw_data);
+
+
+    if (flag == GUI_TOUCH_EVENT_DOWN)
+    {
+        tp_judge_move_state();
+
+
+        if (tp_judge_hold_x(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_hold_y(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_long_pressed(raw_data) == true)
+        {
+
+        }
+        else
+        {
+            TP_LOG("not cache tp down \n");
+        }
+    }
+    else if (flag == GUI_TOUCH_EVENT_UP)
+    {
+        if (tp_judge_short_click(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_quick_x_left_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_quick_x_right_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_quick_y_down_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_quick_y_up_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_slow_x_left_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_slow_x_right_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_slow_x_orign_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_slow_y_down_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_slow_y_up_slide(raw_data) == true)
+        {
+
+        }
+        else if (tp_judge_slow_y_orign_slide(raw_data) == true)
+        {
+
+        }
+        else
+        {
+            TP_LOG("not cache tp up \n");
+        }
+    }
+    else // When no touch, judge continous click
+    {
+        if (click_cnt && gui_ms_get() - last_click_time >= MULTI_CLICK_INTERVAL_MS)
+        {
+            tp.x = last_click_x;
+            tp.y = last_click_y;
+            switch (click_cnt)
+            {
+            case 1:
+                tp.type = TOUCH_SHORT;
+                break;
+            case 2:
+                tp.type = TOUCH_DOUBLE;
+                break;
+            case 3:
+                tp.type = TOUCH_TRIPLE;
+                break;
+            default:
+                gui_log("Click too many times!!!\n");
+                break;
+            }
+            click_cnt = 0;
+        }
+        else
+        {
+            tp.x = 0;
+            tp.y = 0;
+        }
+    }
+    //gui_log("tp.type:%d\n",tp.type);
+    return &tp;
+
+}
+
+touch_info_t *tp_get_info(void)
+{
+    return &tp;
+}
+#endif

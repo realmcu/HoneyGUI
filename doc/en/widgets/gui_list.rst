@@ -1,0 +1,144 @@
+.. _List:
+
+=====================
+List
+=====================
+
+The list widget is a container for any number of list note, horizontally or vertically. And each note, which is dynamic created for saving memory and CPU usage, can have other widgets added to it, such as text widgets, image widgets, etc. Users can swipe up, down, left, or right to access other widgets added to the list note.
+
+.. figure:: https://foruda.gitee.com/images/1745465574757113257/5e8ee605_10737458.gif
+   :align: center
+   :width: 400
+
+   Vertical Classic List
+
+
+Usage
+--------
+Create List Widget
+~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_create` function can be used to create a list widget, in which the scroll bar is optional, and the next level of the list widget can only be a note widget. In ``note_design``, the corresponding child widget could be designed according to the ``index`` of the list widget to dynamically create the note widget. The total length of the list widget is determined by the number of note added, the length of the note, and the space between the tables; as more tables are added, the length increases.
+
+
+Set List Widget Style
+~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_style` function can be used to set list moving style. The default is ``LIST_CLASSIC``, and the available styles include the following:
+
+
+.. literalinclude:: ../../../realgui/widget/gui_list/gui_list.h
+   :language: c
+   :start-after: /* LIST_STYLE enum start*/
+   :end-before: /* LIST_STYLE enum end*/
+
+
+Set List Widget Deceleration Factor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_factor` function can be used to set list deceleration factor.
+
+
+Set List Widget Offset
+~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_offset` function can be used to set list offset of position.
+
+
+Set List Widget Scroll Bar Color
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_bar_color` function can be used to set scroll bar color of list widget.
+
+
+Set List Widget Note Number
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_note_num` function can be used to set note number of list widget.
+
+
+Set Card Style Stacking Position
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_card_stack_location` function can be used to set card style stacking position.
+
+
+Set Circle Style Radius
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_circle_radius` function can be used to set circle style radius.
+
+
+Set List Widget Out Scope
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_out_scope` function can be used to set list widget out scope.
+
+
+Set List Widget Auto Align
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_auto_align` function can be used to set list widget auto align.
+
+
+Set List Widget Inertia
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_inertia` function can be used to set list widget inertia.
+
+Set List Widget Loop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_enable_loop` function can be used to set list widget loop. When the total length of the list widget is greater than the width or height of the list widget, the loop effect will be enabled.
+
+Set List Widget Area Display
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_enable_area_display` function can be used to enable area display of list widget. When the starting point of the list widget is not at the edge of the screen, enabling area display can limit the note to a more reasonable area than the entire screen for dynamically creating.
+
+
+Set List Widget Keep Note Alive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_keep_note_alive` function can be used to set list widget keep note alive. By default, the parameter is set to ``false`` for dynamic creating, and the memory and CPU usage will be saved.
+
+
+Example
+---------
+
+.. literalinclude:: ../../../example/widget/list/example_list.c
+   :language: c
+   :start-after: /* gui list widget example start*/
+   :end-before: /* gui list widget example end*/
+
+
+.. list-table::
+   :widths: 33 33 33
+
+   * - .. figure:: https://foruda.gitee.com/images/1745398396237626690/156a4565_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Circle Style
+
+     - .. figure:: https://foruda.gitee.com/images/1750920685777460993/280f951c_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Card Style
+
+     - .. figure:: https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif
+          :width: 100%
+          :align: center
+
+          Horizontal Zoom Style
+
+   * - .. figure:: https://foruda.gitee.com/images/1745819904731135543/290c9d96_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Fan Style
+
+     - .. figure:: https://foruda.gitee.com/images/1750916286131886532/8af671b7_10737458.gif
+          :width: 100%
+          :align: center
+
+          Vertical Helix Style
+
+     - .. figure:: https://foruda.gitee.com/images/1745890329636631265/cef196cd_10737458.gif
+          :width: 100%
+          :align: center
+          
+          Vertical Curl Style
+
+API
+-----
+
+.. doxygenfile:: gui_list.h
+

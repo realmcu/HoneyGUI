@@ -1,0 +1,480 @@
+Software Accelerate
+=====================
+
+Overall Flow Chart
+-------------------
+
+The flowchart depicts the image resource processing flow accelerated by software. When processing images, different processing methods are selected based on the compression status and type of image:
+
+- **Cover**: Write the source image data directly to the corresponding position in the frame buffer. Do not perform any processing, just overwrite it.
+- **Bypass**: Write the source image data directly to the corresponding position in the frame buffer. Bypass mode is incapable of handling the transparency of images. It applies a global opacity value to the entire image, thereby affecting the overall transparency. When it comes to creating transparency effects, bypass mode is more space-efficient compared to source_over mode.
+- **Filter black**: The filtering technique effectively sifts out pixel data with a value of zero from the originating image data, which essentially means that black pixels are precluded from being inscribed into the frame buffer. This mechanism induces much swifter refresh dynamics. Pixels of any color other than black undergo the standard processing method and are duly recorded into the frame buffer.
+- **Source_over**: A blending method that combines image color data and frame buffer pixel color data to calculate the final color based on the ``opacity_value`` value Sa, and writes it to the corresponding location in the frame buffer. The formula is ((255 - Sa) * D + Sa * S) / 255), where ``Sa`` is the ``opacity_value`` of the original image, ``D`` is the frame buffer pixel data, and ``S`` is the source image pixel data.
+
+.. figure:: https://foruda.gitee.com/images/1726135723241666402/b6cb0cbc_13671125.png
+       :align: center
+       :width: 1200px
+       :name: sw_acc
+        
+       Software Acceleration
+
+- The ``img_type`` can be obtained from the ``head`` of the image, where the structure of the image head is as follows.
+
+.. literalinclude:: ../../../realgui/core/def_file.h
+   :language: c
+   :start-after: /* gui_rgb_data_head struct start*/
+   :end-before: /* gui_rgb_data_head struct end*/
+
+- The value of ``img_type`` is depicted in the enum below. If the value is ``IMDC_COMPRESS``, it indicates that the image is compressed and enters the :term:`RLE` processing flow; otherwise, it enters the no RLE processing flow.
+
+.. literalinclude:: ../../../realgui/engine/draw/draw_img.h
+   :language: c
+   :start-after: /* GUI_FormatType structure start*/
+   :end-before: /* GUI_FormatType structure end*/
+
+- Execute the corresponding blit process based on different ``blend_mode``.
+
+.. literalinclude:: ../../../realgui/engine/draw/draw_img.h
+   :language: c
+   :start-after: /* BLEND_MODE_TYPE structure start*/
+   :end-before: /* BLEND_MODE_TYPE structure end*/
+
+
+- When the image is compressed, it is necessary to obtain the compression header from the address of the compressed data. The ``algorithm_type`` parameter of this header contains the actual image type. The types of compressed images are described in the ``imdc_src_type`` struct.
+
+.. literalinclude:: ../../../realgui/core/def_file.h
+   :language: c
+   :start-after: /* imdc_file_header struct start*/
+   :end-before: /* imdc_file_header struct end*/
+
+.. literalinclude:: ../../../realgui/core/def_file.h
+   :language: c
+   :start-after: /* imdc_src_type struct start*/
+   :end-before: /* imdc_src_type struct end*/
+
+
+Overview No RLE Cover Mode
+---------------------------
+
+The following flow describes the cover mode process for No RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135750546602965/e70749d0_13671125.png
+       :align: center
+       :width: 800px
+       :name: Cover_mode_path
+        
+       Cover Mode Path
+
+- If the matrix is an identity matrix, a blit process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
+- The ``dc_bytes_per_pixel`` is pixel bytes of  display device, calculated as ``dc->bit_depth >> 3``, where ``bit_depth`` is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
+
+No RLE Cover
+~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer in cover mode. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135919132573906/4e4cb2fd_13671125.png
+       :align: center
+       :width: 400px
+       :name: Cover_blit_2_rgb565
+        
+       Cover_blit_2_rgb565
+
+No RLE Cover Matrix
+~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer using cover mode with matrix operations. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135926171202621/00c62b0c_13671125.png
+       :align: center
+       :width: 550px
+       :name: Cover_matrix_blit_2_rgb565
+        
+       Cover_matrix_blit_2_rgb565
+
+Overview No RLE Bypass Mode
+----------------------------
+
+The following flow describes the bypass mode process for No RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135755236374806/661c982d_13671125.png
+       :align: center
+       :width: 800px
+       :name: Bypass_mode_path
+        
+       Bypass_mode_path
+
+- If the matrix is an identity matrix, a blit process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
+- The ``dc_bytes_per_pixel`` is pixel bytes of  display device, calculated as ``dc->bit_depth >> 3``, where ``bit_depth`` is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
+
+No RLE Bypass Mode
+~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer in bypass mode . Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135755236374806/661c982d_13671125.png
+       :align: center
+       :width: 900px
+       :name: Bypass_blit_2_rgb565
+        
+       Bypass_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type``.
+2. Based on the ``opacity_value`` , execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0 , the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255 , convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255 , perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255) . Write the blended result to the frame buffer.
+
+No RLE Bypass Matrix
+~~~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer using blend mode with matrix operations. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135932315321260/e1dc02cc_13671125.png
+       :align: center
+       :width: 900px
+       :name: Bypass_matrix_blit_2_rgb565
+        
+       Bypass_matrix_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type``.
+2. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+3. Based on the ``opacity_value``, execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
+Overview No RLE Filter
+-----------------------
+
+The following flow describes the filter mode process for No RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135914549506931/43192327_13671125.png
+       :align: center
+       :width: 900px
+       :name: Filter_mode_path
+        
+       Filter_mode_path
+
+No RLE Filter
+~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer using filter mode. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135936809407977/178a3356_13671125.png
+       :align: center
+       :width: 900px
+       :name: Filter_blit_2_rgb565
+        
+       Filter_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type``.
+2. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+3. Based on the ``opacity_value`` , execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
+No RLE Filter Matrix
+~~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer using filter mode with matrix operations . Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135941645383326/65173b6c_13671125.png
+       :align: center
+       :width: 900
+       :name: Filter_matrix_blit_2_rgb565
+        
+       Filter_matrix_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type``.
+2. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+3. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+4. Based on the ``opacity_value``, execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
+Overview No RLE Source_over
+----------------------------
+
+The following flow describes the source_over mode process for No RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135811742209771/c8bad88f_13671125.png
+       :align: center
+       :width: 1000px
+       :name: Alpha_mode_path
+        
+       Alpha_mode_path
+
+
+No RLE Alpha No Matrix
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer using source_over mode. Taking the target device image type as RGB565 and the source image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135946825496906/bafaabe5_13671125.png
+       :align: center
+       :width: 500px
+       :name: Alpha_blit_2_rgb565
+        
+       Alpha_blit_2_rgb565
+
+Based on the ``opacity_value`` , execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform ``rgb565_fast_blending`` to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+No RLE Alpha Matrix
+~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing uncompressed images to a frame buffer using source_over mode with matrix operations. Taking the target device image type as RGB565 and the source image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726135953438894385/7422d479_13671125.png
+       :align: center
+       :width: 500px
+       :name: Alpha_matrix_blit_2_rgb565
+        
+       Alpha_matrix_blit_2_rgb565
+
+1. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+2. Based on the ``opacity_value``, execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform ``rgb565_fast_blending`` to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+Overview RLE Cover Mode
+------------------------
+
+The following flow describes the cover mode process for RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135823311485058/2b8f94bf_13671125.png
+       :align: center
+       :width: 800px
+       :name: Rle_cover_mode_path
+        
+       RLE_cover_mode_path
+
+RLE Cover No Matrix
+~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in cover mode. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136024470398285/83f66a60_13671125.png
+       :align: center
+       :width: 700px
+       :name: Rle_cover_blit_2_rgb565
+        
+       RLE_cover_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. Write the pixel result to the frame buffer.
+
+RLE Cover Matrix
+~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in cover mode with matrix operations . Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136030945132846/70e37d28_13671125.png
+       :align: center
+       :width: 700px
+       :name: Rle_cover_matrix_blit_2_rgb565
+        
+       RLE_cover_matrix_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. Write the pixel result to the frame buffer.
+
+Overview RLE Bypass Mode
+-------------------------
+
+The following flow describes the bypass mode process for RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135816836257523/3224601d_13671125.png
+       :align: center
+       :width: 800px
+       :name: Rle_bypass_mode_path
+        
+       Rle_bypass_mode_path
+
+RLE Bypass No Matrix
+~~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in bypass mode . Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136019654689664/085ffd2a_13671125.png
+       :align: center
+       :width: 900px
+       :name: Rle_bypass_blit_2_rgb565
+        
+       RLE_bypass_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. Based on the ``opacity_value``, execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
+RLE Bypass Matrix
+~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in bypass mode with matrix operations. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136035401068218/cd9d0da1_13671125.png
+       :align: center
+       :width: 45%
+       :name: Rle_bypass_matrix_blit_2_rgb565
+        
+       RLE_bypass_matrix_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. Based on the ``opacity_value``, execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
+Overview RLE Filter
+--------------------
+
+The following flow describes the filter mode process for RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135828203631320/cee92853_13671125.png
+       :align: center
+       :width: 800px
+       :name: Rle_filter_mode_path
+        
+       RLE_filter_mode_path
+
+RLE Filter
+~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in filter mode. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136039315952991/89ee16cb_13671125.png
+       :align: center
+       :width: 900px
+       :name: Rle_filter_blit_2_rgb565
+        
+       RLE_filter_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+4. Based on the ``opacity_value``, execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
+RLE Filter Matrix
+~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in filter mode with matrix operations. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136044246530066/3cb24841_13671125.png
+       :align: center
+       :width: 900px
+       :name: fig-rle_filter_matrix_blit_2_rgb565
+        
+       RLE_filter_matrix_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+5. Based on the ``opacity_value`` , execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
+Overview RLE Source_over
+------------------------
+
+The following flow describes the source_over mode process for RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+.. figure:: https://foruda.gitee.com/images/1726135833249440419/4bf65309_13671125.png
+       :align: center
+       :width: 900px
+       :name: Rle_alpha_mode_path
+        
+       RLE_alpha_mode_path
+
+RLE Source_over No Matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in source_over mode. Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136052909602952/42461659_13671125.png
+       :align: center
+       :width: 900px
+       :name: fig-rle_alpha_blit_2_rgb565
+
+       RLE_alpha_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. Based on the ``opacity_value`` , execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the ``opacity_value`` is 255: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding do blend operation and write the blend result to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform the appropriate blending operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+RLE Source_over Matrix
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The following flowchart describes the process of writing compressed images to a frame buffer in source_over mode with matrix operations . Taking the target device image type as RGB565 as an example.
+
+.. figure:: https://foruda.gitee.com/images/1726136052909602952/42461659_13671125.png
+       :align: center
+       :width: 900px
+       :name: Rle_alpha_matrix_blit_2_rgb565
+        
+       RLE_alpha_matrix_blit_2_rgb565
+
+1. Perform different processing steps based on the ``img_type`` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. Based on the ``opacity_value`` , execute the corresponding operation to write image pixels into the framebuffer.
+
+  - If the ``opacity_value`` is 0, the image is not displayed and the process is break.
+  - If the opacity value level is 255: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding do blend operation and write the blend result to the frame buffer.
+  - If the ``opacity_value`` is between 0 and 255, perform the appropriate blending operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+
+.. note:: 
+   In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+
+Support Input Type and Output Type
+-----------------------------------
+
+.. csv-table:: 
+  :header: Input type, Output type
+  :stub-columns: 1
+  :align: center
+  :name: Image source input/output type
+
+  RGB565, RGB565
+  RGB888, RGB888
+  ARGB8888, RLE_ARGB8888
+  ARGB8565, ARGB8565
+  RLE_RGB565, RLE_RGB565
+  RLE_RGB888, RLE_RGB888
+  RLE_ARGB8888, RLE_ARGB8888
+  RLE_ARGB8565, RLE_ARGB8565
+

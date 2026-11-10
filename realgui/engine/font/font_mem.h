@@ -1,0 +1,347 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#ifndef __FONT_MEM_H__
+#define __FONT_MEM_H__
+
+#include "guidef.h"
+#include "gui_api.h"
+#include "draw_font.h"
+#include "gui_text.h"
+#include "font_rendering_utils.h"
+#include "font_lib_manager.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define FONT_MALLOC_PSRAM(x)  gui_malloc(x)
+#define FONT_FREE_PSRAM(x)  gui_free(x)
+
+#define FONT_FILE_BMP_FLAG 0x01
+
+typedef struct
+{
+    uint8_t char_y;
+    uint8_t baseline;
+    uint8_t char_w;
+    uint8_t char_h;
+} GUI_CHAR_HEAD;
+
+/*============================================================================*
+ *                V3 Typography Types (Standard Typography Model)
+ *============================================================================*/
+#if ENABLE_FONT_V3_TYPO
+
+/** @brief Typography metrics from V3 header extension fields (font units) */
+typedef struct
+{
+    int16_t ascender;        /**< font ascender (positive, font units) */
+    int16_t descender;       /**< font descender (negative, font units) */
+    int16_t line_gap;        /**< font lineGap (font units) */
+    uint16_t units_per_em;   /**< font design units per em */
+} gui_font_typo_metrics_t;
+
+/**
+ * @brief V3.2 per-glyph header (bearing-based, 10 bytes packed).
+ *
+ * All metrics are 16-bit to match the uint16 font_size: an 8-bit layout
+ * overflowed for large fonts (bearing_y past ~110px, width/advance past
+ * 255px), which truncated char_w and skewed the rendered glyph because the
+ * packed bitmap row stride no longer matched the header width.
+ */
+#pragma pack(push, 1)
+typedef struct
+{
+    int16_t bearing_x;       /**< horizontal bearing from origin to glyph left (pixels) */
+    int16_t bearing_y;       /**< vertical bearing from baseline to glyph top (pixels) */
+    uint16_t width;          /**< tight bbox width (pixels) */
+    uint16_t height;         /**< tight bbox height (pixels) */
+    uint16_t advance;        /**< horizontal advance width (pixels) */
+} GUI_BMP_GLYPH_HEAD_V2;
+#pragma pack(pop)
+
+/** @brief Pixel-level typography layout parameters */
+typedef struct
+{
+    int16_t baseline;        /**< baseline Y offset in pixels (= ascent_px) */
+    int16_t ascent_px;       /**< ascender in pixels */
+    int16_t descent_px;      /**< |descender| in pixels */
+    int16_t line_height;     /**< default line height in pixels */
+} gui_font_typo_layout_t;
+
+/** @brief Typography context, computed once per text widget */
+typedef struct
+{
+    bool is_v3;                          /**< true if V3 font detected */
+    int16_t baseline_px;                 /**< baseline Y offset (pixels), 0 for V1 */
+    int16_t default_line_height;         /**< default line height (pixels) */
+    gui_font_typo_metrics_t metrics;     /**< raw metrics (valid only when is_v3=true) */
+} gui_font_typo_context_t;
+
+#endif /* ENABLE_FONT_V3_TYPO */
+
+typedef struct
+{
+    uint8_t *font_file;
+    uint16_t font_size;
+    FONT_SRC_MODE type;
+    uint8_t *data;
+} MEM_FONT_LIB;
+
+#pragma pack(1)
+/*
+ * On-disk BMP font header. The byte layout is stable across all versions
+ * because "version + font_size" always spans 5 bytes (offset 2..6), so
+ * render_mode and every field after it keep identical offsets:
+ *   - V1/V2/V3.0 : version[4] (offset 2-5) + font_size uint8  (offset 6)
+ *   - V3.2+      : version[3] (offset 2-4) + font_size uint16  (offset 5-6, LE)
+ * The font_size member below is only valid for the legacy 1-byte layout.
+ * ALWAYS read the size via gui_font_bmp_font_size(); never touch the
+ * font_size member directly, since its offset/width depends on the version.
+ */
+typedef struct
+{
+    uint8_t head_length;                /*font file head length*/
+    uint8_t file_type;                  /*0x1-FONT_FILE_BMP_FLAG is font file*/
+    uint8_t version[4];                 /*version: [0]=major [1]=minor [2]=revision*/
+    uint8_t font_size;                  /*legacy 1-byte size; use gui_font_bmp_font_size()*/
+    uint8_t render_mode;                /*support 1/2/4/8*/
+    uint8_t bold :          1;          /*bold*/
+    uint8_t italic :        1;          /*italic*/
+    uint8_t scan_mode :     1;          /*scan_mode*/
+    uint8_t index_method :  1;          /*0 offset ; 1 address*/
+    uint8_t crop :          1;          /*enable crop can crop font file*/
+    uint8_t rsvd :          3;          /*rsvd*/
+    uint32_t index_area_size;           /*length of index area*/
+    uint8_t font_name_length;           /*length of font name*/
+    uint8_t *font_name;
+} GUI_FONT_HEAD_BMP;
+
+#pragma pack()
+
+/**
+ * @brief Whether a BMP font header uses the V3.2+ typography layout.
+ *
+ * V3.2 introduced a 3-byte version followed by a uint16 font_size
+ * (offset 5-6) plus per-glyph bearing data. Everything older - including
+ * V1, V2 and the early V3.0 fonts - uses version[4] + uint8 font_size
+ * (offset 6). The discriminator is therefore "version >= 3.2.0".
+ */
+static inline bool gui_font_bmp_is_v32(const GUI_FONT_HEAD_BMP *header)
+{
+    const uint8_t *b = (const uint8_t *)header;
+    return (b[2] > 3) || (b[2] == 3 && b[3] >= 2);
+}
+
+/**
+ * @brief Read the font size from a BMP header, honoring the version layout.
+ *
+ * @param header Pointer to the BMP font header (raw bytes, any version).
+ * @return Font size in pixels (uint16; supports > 255 for V3.2+ fonts).
+ */
+static inline uint16_t gui_font_bmp_font_size(const GUI_FONT_HEAD_BMP *header)
+{
+    const uint8_t *b = (const uint8_t *)header;
+    if (gui_font_bmp_is_v32(header))
+    {
+        return (uint16_t)(b[5] | (b[6] << 8));   /* V3.2+: uint16 LE @ offset 5-6 */
+    }
+    return header->font_size;                     /* V1/V2/V3.0: uint8 @ offset 6 */
+}
+
+#if ENABLE_FONT_V3_TYPO
+/**
+ * @brief Parse typography metrics from a V3 binary font header.
+ *
+ * @param header Pointer to the font header.
+ * @param out_metrics Output typography metrics (populated on success).
+ * @return true if V3 metrics were successfully parsed, false for V1 or invalid data.
+ */
+bool gui_font_bmp_parse_typo_metrics(const GUI_FONT_HEAD_BMP *header,
+                                     gui_font_typo_metrics_t *out_metrics);
+
+/**
+ * @brief Calculate pixel-level typography layout from font metrics.
+ *
+ * @param metrics Typography metrics (from V3 header).
+ * @param font_size Font size in pixels (em-size).
+ * @return Computed layout parameters.
+ */
+gui_font_typo_layout_t gui_font_typo_calc_layout(const gui_font_typo_metrics_t *metrics,
+                                                 uint16_t font_size);
+
+/**
+ * @brief Build typography context from font header.
+ *
+ * For V3 headers, populates all fields from extension data.
+ * For V1 headers, returns is_v3=false with baseline_px=0 and default_line_height=font_size.
+ *
+ * @param header Pointer to the font header (raw bytes, any version).
+ * @param font_size Font size in pixels (uint16, supports > 255).
+ * @return Typography context for layout use.
+ */
+gui_font_typo_context_t gui_font_bmp_get_typo_context(const GUI_FONT_HEAD_BMP *header,
+                                                      uint16_t font_size);
+#endif /* ENABLE_FONT_V3_TYPO */
+
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list.
+ *
+ * @param font_bin_addr Binary file address of this font type.
+ * @return Font library index.
+ */
+uint8_t gui_font_mem_init(uint8_t *font_bin_addr);
+
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list.
+ *
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
+ */
+uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr);
+
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list.
+ *
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
+ */
+uint8_t gui_font_mem_init_fs(uint8_t *font_bin_addr);
+
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list.
+ *
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
+ */
+uint8_t gui_font_mem_init_mem(uint8_t *font_bin_addr);
+
+/**
+ * @brief Destroy this font type in font list.
+ *
+ * @param font_bin_addr Font file address.
+ * @return Font library index.
+ */
+uint8_t gui_font_mem_delete(uint8_t *font_bin_addr);
+
+/**
+ * @brief Preprocessing of bitmap fonts using internal engines.
+ *
+ * @param text Widget pointer.
+ * @param rect Widget boundary.
+ */
+void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect);
+
+/**
+ * @brief Drawing of bitmap fonts using internal engine.
+ *
+ * @param text Widget pointer.
+ * @param rect Widget boundary.
+ */
+void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect);
+
+/**
+ * @brief Post-processing work for drawing bitmap fonts using internal engines.
+ *
+ * @param text Widget pointer.
+ */
+void gui_font_mem_unload(gui_text_t *text);
+
+/**
+ * @brief GUI_FONT_SRC_BMP text widget destroy function.
+ *
+ * @param text Widget pointer.
+ */
+void gui_font_mem_destroy(gui_text_t *text);
+
+/**
+ * @brief Get the font library node by size.
+ *
+ * @param font_size Font size.
+ * @return Font library node pointer, or NULL if not found.
+ */
+FONT_LIB_NODE *get_fontlib_by_size(uint16_t font_size);
+
+/**
+ * @brief Get the font library node by name.
+ *
+ * @param font_file Font file.
+ * @return Font library node pointer, or NULL if not found.
+ */
+FONT_LIB_NODE *get_fontlib_by_name(uint8_t *font_file);
+
+/**
+ * @brief Text layout by mode.
+ *
+ * @param text Widget pointer.
+ * @param rect Widget boundary.
+ */
+void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect);
+
+/**
+ * @brief Get dot information by utf-8 or utf-16.
+ *
+ * @param text Widget pointer.
+ */
+void gui_font_get_dot_info(gui_text_t *text);
+
+/**
+ * @brief Search for a glyph in all registered BMP fonts (fallback).
+ * Iterates font_lib nodes with matching font_size, ordered by priority,
+ * skipping the primary font. Only searches BMP type fonts.
+ *
+ * @param unicode Unicode code point to search.
+ * @param font_size Font size to match.
+ * @param skip_file Primary font file to skip (already searched).
+ * @param out_chr Output character info (populated on success).
+ * @param out_line_byte Output line byte width.
+ * @return 0 on success, -1 if not found in any fallback BMP font.
+ */
+int gui_font_bmp_fallback_search(uint32_t unicode, uint16_t font_size,
+                                 uint8_t *skip_file, mem_char_t *out_chr,
+                                 int32_t *out_line_byte);
+
+
+/**
+ * @brief Load a substitute glyph for a code point missing from every font.
+ *
+ * On success out_chr holds the substitute glyph but keeps the original unicode,
+ * so word wrap and the glyph cache still key off the character the text
+ * actually contains.
+ *
+ * @param unicode Original code point that could not be resolved.
+ * @param font_size Font size to match.
+ * @param out_chr Output character info (populated on success).
+ * @param out_line_byte Output line byte width.
+ * @return 0 on success, -1 if no candidate has a glyph.
+ */
+int gui_font_bmp_substitute_search(uint32_t unicode, uint16_t font_size,
+                                   mem_char_t *out_chr, int32_t *out_line_byte);
+
+/**
+ * @brief Resolve a code point absent from the primary BMP font.
+ *
+ * Runs the fallback font chain, then the substitute chain when enabled.
+ *
+ * @param text Text widget, supplies font size and the primary font to skip.
+ * @param out_chr Character cell holding the code point to resolve.
+ * @param substitute Whether substitution is enabled for this widget.
+ * @param out_line_byte Output line byte width.
+ * @return 0 when out_chr holds a drawable glyph, -1 when the cell must be dropped.
+ */
+int gui_font_bmp_resolve_missing(gui_text_t *text, mem_char_t *out_chr,
+                                 bool substitute, int32_t *out_line_byte);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+

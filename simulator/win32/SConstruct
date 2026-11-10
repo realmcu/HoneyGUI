@@ -1,0 +1,127 @@
+import os
+import sys
+import subprocess
+import platform
+import uuid
+import menu_config
+from SCons.Script import *
+
+# Get project root directory (two levels above simulator/win32)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.getcwd()))
+TOOL_ROOT = os.path.join(PROJECT_ROOT, 'tool/scons-tool')
+EXAMPLE_ROOT = os.path.join(PROJECT_ROOT, 'example')
+
+sys.path.append(TOOL_ROOT)
+sys.path.append(EXAMPLE_ROOT)
+try:
+    from building import *
+except:
+    print('Cannot found Scons tool root directory, please check TOOL_ROOT')
+    exit(-1)
+
+is_windows_target = menu_config.TARGET_OS == 'windows'
+TARGET = 'gui.exe' if is_windows_target else 'gui'
+print(f"Host: {sys.platform}, target: {menu_config.TARGET_OS}, output: {TARGET}")
+
+# Environment setup
+env_params = {
+    'CC': menu_config.CC,
+    'AS': menu_config.AS,
+    'AR': menu_config.AR,
+    'CFLAGS': menu_config.CFLAGS,
+    'CXX': menu_config.CXX,
+    'CXXFLAGS': menu_config.CXXFLAGS,
+    'LINK': menu_config.LINK,
+    'LINKFLAGS': menu_config.LFLAGS,
+    'OBJCOPY': menu_config.OBJCPY,
+    'WINDRES': menu_config.WINDRES,
+    'TARGET_OS': menu_config.TARGET_OS,
+    'ENV': os.environ.copy(),
+}
+
+if is_windows_target and sys.platform == 'win32':
+    env = Environment(tools=['mingw'], **env_params)
+else:
+    env = Environment(tools=['default'], PROGSUFFIX='', **env_params)
+
+# Define HoneyGUI simulator macro for PC simulation environment
+env.Append(CPPDEFINES=['_HONEYGUI_SIMULATOR_'])
+
+RTK_GUI_ENGINE = os.path.join(PROJECT_ROOT, 'realgui')
+GUI_EXAMPLE = os.path.join(PROJECT_ROOT, 'example')
+GUI_SIM_LIBS = os.path.join(PROJECT_ROOT, 'lib/sim')
+PLATFORM = menu_config.PLATFORM
+
+Export('PLATFORM', 'TOOL_ROOT', 'RTK_GUI_ENGINE', 'env')
+
+print("CC:", env['CC'])
+print("CFLAGS:", env['CFLAGS'])
+print("CXXFLAGS:", env['CXXFLAGS'])
+print("LINKFLAGS:", env['LINKFLAGS'])
+print('TOOL ROOT =', TOOL_ROOT)
+print('HoneyGUI ENGINE ROOT =', RTK_GUI_ENGINE)
+
+def compile_resource(rc_file, output_file):
+    windres = env.WhereIs(env['WINDRES']) or env['WINDRES']
+    subprocess.run([windres, rc_file, '-O', 'coff', '-o', output_file],
+                   check=True, env=env['ENV'])
+    print(f'Successfully compiled {rc_file} to {output_file}')
+
+# Prepare building environment
+objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
+
+# Compile resource file on Windows
+if is_windows_target:
+    compile_resource('version.rc', 'version.o')
+    objs.append('version.o')
+
+# Set spawn: save & load long param as temp file
+def ourspawn(sh, escape, cmd, args, e):
+    filename = str(uuid.uuid4())
+    cmdline = cmd + " " + ' '.join(args[1:])
+    if len(cmdline) > 16 * 1024:
+        with open(filename, 'w') as f:
+            f.write(' '.join(args[1:]).replace('\\', '/'))
+        cmdline = cmd + " @" + filename
+    
+    proc = subprocess.Popen(cmdline, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE, shell=False, env=e)
+    data, err = proc.communicate()
+    rv = proc.wait()
+    
+    def res_output(_output, _s):
+        if len(_s):
+            if isinstance(_s, str):
+                _output(_s)
+            elif isinstance(_s, bytes):
+                _output(str(_s, 'UTF-8'))
+            else:
+                _output(str(_s))
+    
+    res_output(sys.stderr.write, err)
+    res_output(sys.stdout.write, data)
+    if os.path.isfile(filename):
+        os.remove(filename)
+    return rv
+
+if is_windows_target and sys.platform == 'win32':
+    env['SPAWN'] = ourspawn
+
+# Include app SConscripts
+for path in [RTK_GUI_ENGINE, GUI_EXAMPLE, GUI_SIM_LIBS]:
+    sconscript = os.path.join(path, 'SConscript')
+    if os.path.exists(sconscript):
+        objs.extend(SConscript(sconscript))
+
+# Platform-specific libraries
+if is_windows_target:
+    env.Append(LIBS=[
+        'mingw32', 'SDL2main', 'SDL2', 'user32', 'gdi32', 'winmm',
+        'imm32', 'ole32', 'oleaut32', 'version', 'uuid', 'advapi32',
+        'setupapi', 'shell32', 'dinput8', 'opengl32', 'm'
+    ])
+else:  # Linux/WSL
+    env.Append(LIBS=['SDL2', 'GL', 'pthread', 'm', 'dl'])
+
+# Build
+DoBuilding(TARGET, objs)

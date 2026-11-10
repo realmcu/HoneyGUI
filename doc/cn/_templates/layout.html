@@ -1,0 +1,86 @@
+{% extends "!layout.html" %}
+
+{% if is_github_pages and pagename == master_doc %}
+{% set docstitle = "" %}
+{% endif %}
+
+
+{% block extrahead %}
+{{ super() }}
+
+{% if is_github_pages %}
+<meta name="description" content="{{ social_description | e }}">
+<meta name="theme-color" content="#07182b">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HoneyGUI">
+<meta property="og:title" content="HoneyGUI Documentation">
+<meta property="og:description" content="{{ social_description | e }}">
+<meta property="og:url" content="{{ pageurl }}">
+<meta property="og:image" content="{{ social_baseurl }}_static/image/honeygui-social.png">
+<meta property="og:image:secure_url" content="{{ social_baseurl }}_static/image/honeygui-social.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HoneyGUI embedded GUI framework documentation">
+<meta property="og:locale" content="{{ social_locale }}">
+<meta property="og:locale:alternate" content="{{ social_locale_alternate }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HoneyGUI Documentation">
+<meta name="twitter:description" content="{{ social_description | e }}">
+<meta name="twitter:image" content="{{ social_baseurl }}_static/image/honeygui-social.png">
+{% endif %}
+
+<!-- <script type="text/javascript">
+    window.sdktype = "{{ SDK | e }}";
+</script> -->
+<script type="text/javascript">
+    window.isMultilingual = "{{ is_multilingual | e }}";
+    window.isMultitarget = "{{ is_multitarget | e }}";
+    window.leftNavWidth = "{{ left_nav_width | e }}";
+    window.chatAIBase = "{{ chat_aibase | e }}";
+
+    const topTopHoverImage = new Image();
+    topTopHoverImage.src = "{{ pathto('_static/image/totop-hover.png', 1) }}";
+    const aiaskHoverImage = new Image();
+    aiaskHoverImage.src = "{{ pathto('_static/image/aiask-hover.png', 1) }}";
+</script>
+{% endblock %}
+
+
+{%- block extrabody %}
+    <div id="imgModal" class="img-modal">
+        <span class="img-modal-close">&times;</span>
+        <img class="img-in-modal" id="imgInModal">
+    </div>
+
+    <div id="back-to-top" onclick="backToTop()"></div>
+{% endblock %}
+
+
+{% block sidebartitle %}
+    {%- set _logo_url = logo_url|default(pathto('_static/' + (logo or ""), 1)) %}
+    {%- set _root_doc = root_doc|default(master_doc) %}
+    {%- set _logo_link = logo_link if (logo_link is defined and logo_link) else pathto(_root_doc) %}
+    <a href="{{ _logo_link }}"{% if not theme_logo_only %} class="icon icon-home"{% endif %}>
+        {% if not theme_logo_only %}{{ project }}{% endif %}
+        {%- if logo or logo_url %}
+            <img src="{{ _logo_url }}" class="logo" alt="{{ _('Logo') }}"/>
+        {%- endif %}
+    </a>
+
+    {# Rewrite versions selector #}
+    {% if theme_display_version %}
+        {% if is_multitarget %}
+        <div class="target-container">
+            <select name="target-selector" id="target-selector" onchange="onTargetChange()">
+            </select>
+        </div>
+        {% endif %}
+        <div class="version-container">
+            <select name="version-selector" id="version-selector" onchange="onVersionChange()">
+            </select>
+        </div>
+    {%- endif %}
+
+    {%- include "searchbox.html" %}
+{% endblock %}

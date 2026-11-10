@@ -1,0 +1,265 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+#!/usr/bin/env python3
+
+import sys
+import os
+import re
+import time
+import shutil
+import json
+from conf_common import exclude_patterns
+
+
+# Change to script directory for consistency
+doc_path = os.path.dirname(os.path.abspath(__file__))
+os.chdir(doc_path)
+gui_path = os.path.join(doc_path, "..")
+
+jenkinsBuild_home = os.environ.get("jenkinsScript_abspath", "")
+JenkinsBuild_doc_Dir = os.path.join(jenkinsBuild_home, "release/doc")
+
+version = os.getenv("Release_Version", "").strip()
+
+def cmd(s):
+  print("")
+  print(s)
+  print("-------------------------------------")
+  r = os.system(s)
+  if r != 0:
+    print("Exit build due to previous error")
+    exit(-1)
+
+def download_tools(language_path):
+  tool_jira_id = "BTSOCGUI-213"
+  print("Release build, need downd tools from {}".format(tool_jira_id))
+  download_tool_list = list()
+  for file_name in ["ImageConverter", "Font Convert Tool", "GlassTool"]:
+    tool_list = Jira().find_packages_from_jira(tool_jira_id, file_name)
+    if not tool_list:
+      sys.exit("Cannot find {} in {}".format(file_name, tool_jira_id))
+    Jira().download_attachements_by_jira_id(tool_jira_id, tool_list[0], language_path, check_status=True)
+    download_tool_list.append(tool_list[0])
+  return download_tool_list
+
+def add_download_link(download_tool_list, language_path):
+  if len(download_tool_list) != 3:
+    sys.exit("Invalid tool list: {}".format(download_tool_list))
+  print("Start add download link")
+  
+  # Add download link to tool/index.rst
+  index_file = os.path.join(language_path, "tool/index.rst")
+  if not os.path.exists(index_file):
+    sys.exit("Cannot find index file: {}".format(index_file))
+  with open(index_file, mode='r', newline='', errors='surrogateescape') as fd:
+    stream = fd.read()
+    download_link = '''
+
+Image Convert Tool: :download:`Image Convert Tool <../{}>`
+
+Font Convert Tool: :download:`Font Convert Tool <../{}>`
+
+'''.format(download_tool_list[0], download_tool_list[1])
+    stream = re.sub(r'(.. Add tool downlod link here)', lambda objs: objs.group(1) + "\r\n" + download_link, stream, count=0, flags=re.M)
+  with open(index_file, mode='w+', newline='', errors='surrogateescape') as fd:
+    fd.write(stream)
+  
+  # Add download link to widgets/gui_glass.rst
+  glass_file = os.path.join(language_path, "widgets/gui_glass.rst")
+  if os.path.exists(glass_file):
+    with open(glass_file, mode='r', newline='', errors='surrogateescape') as fd:
+      stream = fd.read()
+      # Replace the placeholder download link with actual file
+      stream = stream.replace('GlassTool.zip', download_tool_list[2])
+    with open(glass_file, mode='w+', newline='', errors='surrogateescape') as fd:
+      fd.write(stream)
+
+def record_doc_generate_time(index_path):
+  nighty_date = time.strftime("%Y-%m-%d", time.localtime())
+  record_comment = "\n\n{} update by jenkins\n\n".format(nighty_date)
+  index_md = os.path.join(index_path, r'index.rst')
+  with open(index_md, mode='r', newline='', errors='surrogateescape') as fd:
+      stream = fd.read()
+      stream = re.sub(r'(=============\n)', lambda objs: objs.group(1) + record_comment, stream, count=1, flags=re.M)
+  with open(index_md, mode='w+', newline='', errors='surrogateescape') as fd:
+      fd.write(stream)
+
+def update_md(language):
+  # !!! remember add _en and _cn files into exclude pattern
+  rename_file_list = [(os.path.join(doc_path, language.lower(), f'404/README.rst'), os.path.join(doc_path, language.lower(), 'page-not-found.rst')),]
+  for src, dest in rename_file_list:
+    if os.path.exists(src):
+      if os.path.exists(dest): 
+        os.remove(dest)
+      shutil.copy2(src, dest)
+      print(f"Copy {src} to {dest}")
+      os.remove(src)
+
+#Enter pipenv
+#cmd("pipenv shell")
+cmd("pipenv sync")
+
+clean = 0
+trans = 0
+skip_latex = False
+skip_doxygen = False
+mutil_version = False
+release_build = False
+archive = False
+record_time = False
+args = sys.argv[1:]
+if len(args) >= 1:
+  if "clean" in args: clean = 1
+  if "skip_latex" in args: skip_latex = True
+  if "skip_doxygen" in args: skip_doxygen = True
+  if "mutil_version" in args: mutil_version = True
+  if "release_build" in args: release_build = True
+  if "Archive" in args: archive = True
+  if "record_time" in args: record_time = True
+
+output_path = "output"
+html_out = output_path + "/html_out"
+cn_html_out = r'cn'
+en_html_out = r'en'
+latex_out = "latex_out"
+rst_src_out = "rst_src"
+rst_split_src_out = "rst_split_src"
+print("")
+print("****************")
+print("Building")
+print("****************")
+if clean:
+  os.chdir(doc_path)
+  cmd("rm -rf " + output_path)
+  cmd("mkdir " + output_path)
+
+if not skip_doxygen:
+  doxyxml_path = os.path.join(doc_path, "doxyxml")
+  os.chdir(doxyxml_path)
+  print("Running doxygen")
+  cmd("doxygen Doxyfile")
+
+
+# Generate jeba dict
+os.chdir(doc_path)
+cmd("python generate_jieba_dict.py ./cn ./cn/word_dict.txt")
+
+# Add si summary content
+if version:
+  sys.path.append(JenkinsBuild_doc_Dir)
+  from ai_summary.add_ai_summary_src import *
+  add_raw_html_to_rst(doc_path, os.path.join(doc_path, "script/ai_summary_config.txt"))
+
+# BUILD HTML
+os.chdir(doc_path)
+sdk_name = "gui"
+
+if archive:
+  version = "v0.1.test"
+  os.environ["COPY_RST_FILES"] = "true"
+  os.environ["SDK_Name"] = sdk_name
+  
+en_cn_build = [(" -c ./en en ./{}/{} -D language=en".format(html_out, en_html_out), 'en'), (" -c ./cn cn ./{}/{} -D language=zh_CN".format(html_out, cn_html_out), 'cn')]
+for l, p in en_cn_build:
+  l_doc_path = os.path.join(doc_path, p)
+
+  os.environ['current_sdk_type'] = sdk_name
+  os.environ['current_language'] = p
+
+  update_md(p)
+  
+  # BUILD PDF
+  if not skip_latex:
+    # Silly workaround to include the more or less correct PDF download link in the PDF
+    #cmd("cp -f " + lang +"/latex/HoneyGUI.pdf HoneyGUI.pdf | true")
+    os.chdir(l_doc_path)
+    latex_out_path = os.path.join(doc_path, output_path, latex_out)
+    if os.path.exists(latex_out_path):
+      shutil.rmtree(latex_out_path)
+    os.makedirs(latex_out_path)
+    cmd("pipenv run sphinx-build -b latex . {}".format(latex_out_path))
+
+    # Generate PDF
+    cmd("cd {} && latexmk -xelatex 'HoneyGUI.tex'".format(latex_out_path))
+    # Copy the result PDF to the main directory to make it available for the HTML build
+    cmd("cd {} && cp -f 'HoneyGUI.pdf' '../../{}/HoneyGUI.pdf'".format(latex_out_path, p))
+  else:
+    print("skipping latex build as requested")
+
+  if record_time:
+    record_doc_generate_time(l_doc_path)
+
+  os.chdir(doc_path)
+  if release_build:
+    sys.path.append(os.path.join(os.path.dirname(__file__), "../script"))
+    from jira_helper import *
+    download_tool_list = download_tools(l_doc_path)
+    add_download_link(download_tool_list, l_doc_path)
+  print("Current path: {}".format(os.getcwd()))
+
+  cmd_line = "pipenv run sphinx-build -b html -j 8"
+  ep = ''
+  exclude_patterns_ins = []
+  exclude_patterns_ins.extend(exclude_patterns)
+  if "en" in p:
+    html_out_path = os.path.join(doc_path, html_out, en_html_out)
+    exclude_patterns_ins.append('cn')
+  elif "cn" in p:
+    html_out_path = os.path.join(doc_path, html_out, cn_html_out)
+    exclude_patterns_ins.append('en')
+  print("exclude_patterns_ins:",exclude_patterns_ins)
+  ep = ",".join(exclude_patterns_ins)
+  if os.path.exists(html_out_path):
+    shutil.rmtree(html_out_path)
+  os.makedirs(html_out_path)
+  cmd_line += l
+  print("ep:", ep)
+  cmd_line += " -D exclude_patterns=" + f'"{ep}"'
+  print(cmd_line)
+  cmd(cmd_line)
+
+  # update lnk map file
+  if version:
+    #parse api reference html content
+    # rel_api_path = r"API_Reference"
+    # api_reference_html_path = os.path.join(html_out_path, rel_api_path)
+    # api_reference_content_path = os.path.join(rst_src_out, sdk_name, l, rel_api_path)
+    # os.makedirs(api_reference_content_path)
+    # sys.path.append(JenkinsBuild_doc_Dir)
+    # from parse_html import *
+    # parse_html(api_reference_html_path, api_reference_content_path)
+
+    # move rst src file to rst_src_out
+    doc_source_path = os.path.join(html_out_path, "doc_source")
+    doc_split_source_path = os.path.join(html_out_path, "rst_split_source")
+    doc_src_zip = "{}-{}-{}-src".format(sdk_name, version, p)
+    doc_split_src_zip = "{}-{}-{}-split-src".format(sdk_name, version, p)
+    doc_html_zip = "{}-{}-{}-html".format(sdk_name, version, p)
+    if os.path.exists(doc_split_source_path):
+      anchor_file = os.path.join(html_out_path, "anchors.json")
+      shutil.copy2(anchor_file, doc_split_source_path)
+      shutil.make_archive(base_name=doc_split_src_zip, format='zip', root_dir=doc_split_source_path)
+      shutil.rmtree(doc_split_source_path)
+    if os.path.exists(doc_source_path):
+      link_map_file = os.path.join(html_out_path, "link_map.json")
+      shutil.copy2(link_map_file, doc_source_path)
+      shutil.make_archive(base_name=doc_src_zip, format='zip', root_dir=doc_source_path)
+      shutil.make_archive(base_name=doc_html_zip, format='zip', root_dir=html_out_path)
+      shutil.rmtree(doc_source_path)
+  else:
+    sys.path.append(JenkinsBuild_doc_Dir)
+    from push import replace_version_js
+    version_list_file = "https://docsqa.realmcu.com/version_test.txt"
+    version_js = os.path.join(html_out_path, r"_static\js\versions.js")
+    replace_version_js(version_js, version_list_file)
+
+shutil.copytree(os.path.join(doc_path, html_out), os.path.join(doc_path, html_out + "_" + sdk_name))
+
+if archive:
+  os.chdir(gui_path)
+  doc_zip_name = "doc-{}".format(os.environ['BRANCH_NAME'].replace("/", "-"))
+  shutil.make_archive(base_name=doc_zip_name, format='zip', root_dir=os.path.join(doc_path, html_out))
+  print(f"doc zip name: {doc_zip_name}")

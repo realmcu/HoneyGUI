@@ -1,0 +1,4 @@
+# Python dependencies for extract_desc_v2.py
+numpy>=1.20.0
+tinyobjloader>=2.0.0rc10
+pygltflib>=1.16.0

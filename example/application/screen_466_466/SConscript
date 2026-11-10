@@ -1,0 +1,25 @@
+# for module compiling
+import os
+import sys
+
+from building import *
+
+cwd = GetCurrentDir()
+inc = [cwd, os.path.join(cwd, 'root_image')]
+src = Glob('*.c') + Glob('*.cpp')
+
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI_466_466_DEMO']):
+    CPPDEFINES = ['DRV_LCD_WIDTH=466']
+    CPPDEFINES += ['DRV_LCD_HEIGHT=466']
+    CPPDEFINES += ['DRV_PIXEL_BITS=32']
+    CPPDEFINES += ['DRV_LCD_CORNER_RADIUS=-1']
+    objs = DefineGroup('example/application', src, depend = [''], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
+    list = os.listdir(cwd)
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+else:
+    objs = []
+
+Return('objs')

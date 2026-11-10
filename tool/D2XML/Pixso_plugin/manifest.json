@@ -1,0 +1,9 @@
+{
+  "id": "1712338",
+  "name": "D2XML",
+  "ui": "dist/ui.html",
+  "main": "dist/main.js",
+  "editor_type": [
+    "pixso"
+  ]
+}

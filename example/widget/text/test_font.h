@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
+#ifndef __TEXT_FONT_H__
+#define __TEXT_FONT_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include "string.h"
+#include "stdio.h"
+#include "stdlib.h"
+
+#include "guidef.h"
+#include "gui_obj.h"
+#include "gui_server.h"
+#include "gui_components_init.h"
+#include "gui_text.h"
+#include "gui_view.h"
+#include "gui_view_instance.h"
+#include "gui_scroll_text.h"
+
+#include "gui_api_dc.h"
+#include "gui_api_os.h"
+
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+extern void *font32b1;
+extern void *font32b2;
+extern void *font32b4;
+extern void *font32b8;
+
+extern void *fontnoto;
+extern void *fontnotoarabic;
+extern void *fontnotojp;
+extern void *fontnotokr;
+extern void *fontnotothai;
+extern void *fontnotohebrew;
+
+
+extern void *fontharmonysc;
+/*============================================================================*
+ *                           Functions
+ *============================================================================*/
+
+void font_file_init(void);
+
+void text_widget_example(void);
+void scroll_text_widget_example(void);
+
+void text_font_rendering_test(void);
+void text_font_layout_test(void);
+void text_font_scroll_function_test(void);
+void text_font_scroll_loop_test(void);
+void text_wordwrap_test(void);
+void text_measure_test(void);
+void text_font_typo_rendering_test(void);
+void text_font_fallback_test(void);
+void text_missing_glyph_test(void);
+
+/* Built only when gui_geometry and gui_list are enabled (see frozen_dep/). */
+#if defined(CONFIG_REALTEK_GUI_WIDGET_GEOMETRY) && defined(CONFIG_REALTEK_GUI_WIDGET_LIST)
+void text_multi_language_test(void);
+void text_clip_test(void);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

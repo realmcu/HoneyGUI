@@ -1,0 +1,34 @@
+# for module compiling
+import os
+Import('TOOL_ROOT')
+Import('RTK_GUI_ENGINE')
+
+from building import *
+
+cwd = GetCurrentDir()
+
+
+src = Split("""
+""")
+
+
+
+
+
+path = [cwd]
+
+src = ['main.c']
+
+
+CPPPATH = [cwd, 
+           RTK_GUI_ENGINE + '/example/root_image/']
+objs = DefineGroup('application', src, depend = [''], CPPPATH = CPPPATH)
+
+
+list = os.listdir(cwd)
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+Return('objs')

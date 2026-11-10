@@ -1,0 +1,87 @@
+# HoneyGUI Development Guidelines
+
+**Generated:** 2026-03-23 | **v2.1.1.0** | **Branch:** master
+
+## Overview
+
+Embedded GUI framework for Realtek microcontrollers (RTL8762, RTL8773). C library with PC simulator + embedded ports. Supports C/C++ API and HML/XML low-code development.
+
+## Structure
+
+    realgui/           # Core GUI engine
+    +-- core/          # Event system, object model (def_*.h)
+    +-- widget/        # 21 widget components (gui_*.c)
+    +-- engine/        # Rendering, fonts, codecs
+    +-- dc/            # Display controller
+    +-- input/         # Touch/keyboard handling
+    +-- 3rd/           # Third-party (Arm2D, box2d, stb, h264bsd)
+    +-- server/        # GUI server components
+
+    example/          # Demo applications by screen resolution
+    simulator/        # Simulators
+    +-- win32/        # Windows/Linux PC simulator (SDL)
+    +-- web/          # Browser simulator (Emscripten)
+    +-- keil/         # Keil MDK simulator projects (ac5/, ac6/)
+    lib/              # Prebuilt toolchain libraries
+    tool/             # Development tools (image/video converters)
+
+## Build
+
+    # SCons (primary)
+    cd simulator/win32 && scons
+
+    # CMake (alternative)
+    cd simulator/win32 && mkdir build && cd build && cmake -G "MinGW Makefiles" .. && mingw32-make
+
+    # Configure app
+    cd simulator/win32 && menuconfig ../../Kconfig.gui
+
+## Key Conventions
+
+- **Logging**: gui_log() not printf() - include gui_api_os.h
+- **File I/O**: VFS API - include gui_vfs.h
+- **Shell commands**: realgui/3rd/letter_shell/ with SHELL_EXPORT_CMD()
+- **Platform macros**: #if defined(_WIN32) || defined(__linux__)
+- **Widget prefix**: gui_ for implementations, gui_ headers
+- **Event types**: GUI_EVENT_* in realgui/core/def_event.h
+- **HML tags**: hg_ prefix (e.g., <hg_view>, <hg_button>)
+
+## Git
+
+- **Commit prefix**: `GUI:` (subject target <=50 chars, hard limit 72;
+  body wrap at 72 chars/line)
+- **Gerrit push**: `git push origin HEAD:refs/for/master`. Gerrit warns on
+  subjects >50 chars; treat the warning as an error -- amend the subject
+  and re-push before landing.
+- **ASCII-only**: Commit messages and files outside
+  `script/ci-check-config.py:ignore_file_encoding` must be pure 7-bit
+  ASCII. Replace typography such as `<= -- -> ...` for Unicode
+  equivalents; CI fails on any multibyte byte.
+
+## Anti-Patterns (DO NOT)
+
+- Define __ARM_2D_CFG_FORCED_FIXED_POINT_TRANSFORM__ in arm_2d_features.h:158
+- Use virtual screen flag in arm_2d_types.h:636
+- Free cached geometry buffers in gui_circle.c:923, gui_rect.c:1047
+- Edit auto-generated files (cconfig.h, scons-tool/*.py)
+- Use stb_truetype on untrusted font files (no security guarantee)
+
+## Testing
+
+    cd example/ci_build_scripts && python all_build.py   # Every stage
+    python widget_build_by_scons.py                     # example/widget, SCons
+    python widget_build_by_cmake.py                     # example/widget, CMake
+    python application_build_by_scons.py                # example/application, SCons
+    python application_build_by_cmake.py                # example/application, CMake
+    python lib_build_by_cmake.py --tools gcc            # lib/, host gcc only
+
+Each demo uses one checked-in minimal dependency config. `all_build.py` runs
+the application and widget demo configs with SCons and CMake.
+
+## Platform Ports
+
+- simulator/win32/: MinGW-w64 or Linux GCC, SDL2
+- simulator/web/: Emscripten, browser
+- simulator/keil/ac5/ac6/: Keil ARM MDK
+- zephyr/: Zephyr RTOS integration
+- lib/: Prebuilt for gcc, armcc, armclang, arm-none-eabi-gcc

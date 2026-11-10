@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
+#ifndef __DEF_FILE_H__
+#define __DEF_FILE_H__
+
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "def_color.h"
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+
+/* gui_rgb_data_head struct start*/
+typedef struct gui_rgb_data_head
+{
+    unsigned char scan : 1;
+    unsigned char align : 1;
+    unsigned char resize: 2; //0-no resize;1-50%(x&y);2-70%;3-80%
+    unsigned char compress: 1;
+    unsigned char jpeg: 1;
+    unsigned char idu: 1;
+    unsigned char png : 1;
+    char type;
+    short w;
+    short h;
+    char version;
+    char rsvd2;
+} gui_rgb_data_head_t;
+/* gui_rgb_data_head struct end*/
+
+typedef struct _gui_rect_file_head
+{
+    struct gui_rgb_data_head head;
+    gui_color_t color;
+} gui_rect_file_head_t;
+
+/* imdc_src_type struct start*/
+typedef enum
+{
+    IMDC_SRC_1BIT = 0x00,
+    IMDC_SRC_2BIT = 0x01,
+    IMDC_SRC_4BIT = 0x02,
+    IMDC_SRC_8BIT = 0x03,
+    IMDC_SRC_16BIT = 0x04,
+    IMDC_SRC_24BIT = 0x05,
+    IMDC_SRC_32BIT = 0x06,
+} imdc_src_type;
+/* imdc_src_type struct end*/
+
+/* imdc_file_header struct start*/
+typedef struct imdc_file_header
+{
+    struct
+    {
+        uint8_t algorithm: 2;
+        uint8_t feature_1: 2;
+        uint8_t feature_2: 2;
+        uint8_t pixel_bytes: 2;
+    } algorithm_type;
+    uint8_t reserved[3];
+    uint32_t raw_pic_width;
+    uint32_t raw_pic_height;
+} imdc_file_header_t;
+/* imdc_file_header struct end*/
+
+/* Compression algorithms; the field is 2 bits wide, others are rejected. */
+#define IMDC_ALGORITHM_RLE 0
+
+typedef struct imdc_file
+{
+    imdc_file_header_t header;
+    uint32_t compressed_addr[1024];
+
+} imdc_file_t;
+
+typedef struct gui_img_file
+{
+    gui_rgb_data_head_t img_header;
+    union
+    {
+        imdc_file_t imdc_file;
+        uint32_t unzip_data[1024];
+    } data;
+
+} gui_img_file_t;
+
+typedef struct gui_jpeg_file_head
+{
+    gui_rgb_data_head_t img_header;
+    uint32_t size;
+    uint32_t dummy; // for alignment issue
+    uint8_t jpeg[1024];
+
+} gui_jpeg_file_head_t;
+
+/* PNG resource: GUI header, byte count, then the PNG file stream. */
+typedef struct gui_png_file_head
+{
+    gui_rgb_data_head_t img_header;
+    uint32_t size;
+    uint8_t *png;
+} gui_png_file_head_t;
+
+typedef struct gui_palette_file
+{
+    gui_rgb_data_head_t img_header;
+    uint8_t *palette_index;
+    uint8_t *palette_data;
+
+} gui_palette_file_t;
+
+#pragma pack(1)
+
+typedef struct imdc_rgb565_node
+{
+    uint8_t len;
+    uint16_t pixel16;  //rgb565
+} imdc_rgb565_node_t;
+typedef struct imdc_argb8565_node
+{
+    uint8_t len;
+    uint16_t pixel;  //argb8565
+    uint8_t alpha;
+} imdc_argb8565_node_t;
+typedef struct imdc_rgb888_node
+{
+    uint8_t len;
+    uint8_t pixel_b;  //rgb888
+    uint8_t pixel_g;
+    uint8_t pixel_r;
+} imdc_rgb888_node_t;
+typedef struct imdc_argb8888_node
+{
+    uint8_t len;
+    uint32_t pixel32;    //argb8888
+} imdc_argb8888_node_t;
+typedef struct imdc_u8_node
+{
+    uint8_t len;
+    uint8_t value;       // a8/i8: alpha value or palette index
+} imdc_u8_node_t;
+#pragma pack()
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

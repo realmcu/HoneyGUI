@@ -1,0 +1,110 @@
+# HoneyGUI 3D Model Tool
+
+Convert OBJ and GLTF 3D models with textures to HoneyGUI binary format.
+
+## Usage
+
+### Step 1: Prepare Files
+
+Copy your model files to the `3D-tool` directory:
+
+```
+tool/3D-tool/
+├── extract_desc.exe          (tool)
+├── extract_desc.py           (tool)
+├── your_model.obj            ← Your model
+├── your_model.mtl            ← Your model
+├── texture1.png              ← Your textures
+└── texture2.png              ← Your textures
+```
+
+### Step 2: Run the Tool
+
+Open command prompt in the `3D-tool` directory and run:
+
+**Windows:**
+```cmd
+extract_desc.exe your_model.obj
+```
+
+**Or use Python version:**
+```cmd
+python extract_desc.py your_model.obj
+```
+
+### Step 3: Choose Texture Conversion
+
+The tool will ask if you want to convert textures:
+
+```
+========================================
+HoneyGUI 3D Model Descriptor Generator
+========================================
+
+Do you want to convert PNG textures to bin format? [Y/n]: 
+```
+
+- Press **Enter** or type **Y** - Auto-convert all PNG files to .bin
+- Type **N** - Skip conversion (if already converted or no textures)
+
+### Output
+
+After processing, you'll get:
+
+```
+tool/3D-tool/
+├── your_model.obj
+├── your_model.mtl
+├── texture1.png
+├── texture1.bin              ← Generated
+├── texture2.png
+├── texture2.bin              ← Generated
+├── desc_your_model.bin       ← Use this in your app
+└── desc_your_model.txt       ← C array version
+```
+
+
+## Supported Formats
+
+- **Models:** OBJ, GLTF
+- **Textures:** PNG (auto-converted to optimal format)
+- **Output:** Binary descriptor + texture binaries
+
+## Manual Texture Conversion
+
+If you need to convert textures separately, use one of these methods:
+
+### Method 1: Python Script
+```bash
+python convert_textures.py
+```
+
+Options:
+```bash
+python convert_textures.py -d ./textures    # Convert textures in specific directory
+python convert_textures.py -f RGB565        # Force specific format
+```
+
+### Method 2: Manual Command
+```bash
+# Convert single file
+python ../image-convert-tool/image_converter.py -i texture.png -o texture.bin -f auto
+
+# Convert all PNG files (Linux/Mac)
+for file in *.png; do
+    python ../image-convert-tool/image_converter.py -i "$file" -o "${file%.png}.bin" -f auto
+done
+
+# Convert all PNG files (Windows PowerShell)
+Get-ChildItem *.png | ForEach-Object {
+    python ..\image-convert-tool\image_converter.py -i $_.Name -o "$($_.BaseName).bin" -f auto
+}
+```
+
+## Notes
+
+- All files must be in the `3D-tool` directory
+- Textures are auto-detected as ARGB8888 or RGB565
+- The tool uses `../image-convert-tool/image_converter.py` for conversion
+- Binary format is compatible with existing HoneyGUI applications
+- Texture conversion is optional - the tool will prompt you when needed

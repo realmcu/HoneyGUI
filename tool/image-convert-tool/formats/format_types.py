@@ -1,0 +1,59 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
+"""
+HoneyGUI Image Format Types
+定义所有图片格式和压缩算法的常量
+"""
+
+# GUI_FormatType enum values (must match draw_img.h)
+FORMAT_RGB565 = 0
+FORMAT_ARGB8565 = 1
+FORMAT_RGB888 = 3
+FORMAT_ARGB8888 = 4
+FORMAT_XRGB8888 = 5
+FORMAT_BINARY = 6
+FORMAT_GRAY = 7
+FORMAT_ALPHAMASK = 9  # Alpha-only mask (A8)
+FORMAT_PALETTE = 10
+
+# Alias for convenience
+FORMAT_A8 = FORMAT_ALPHAMASK
+
+# Compression algorithm types
+COMPRESS_NONE = 0
+COMPRESS_RLE = 0
+COMPRESS_FASTLZ = 1
+COMPRESS_YUV_FASTLZ = 2
+COMPRESS_YUV = 3
+
+# Pixel bytes mapping
+PIXEL_BYTES_2 = 0  # RGB565, ARGB8565
+PIXEL_BYTES_3 = 1  # RGB888
+PIXEL_BYTES_4 = 2  # ARGB8888
+PIXEL_BYTES_1 = 3  # A8, GRAY
+
+# Format to pixel bytes mapping
+FORMAT_TO_PIXEL_BYTES = {
+    FORMAT_RGB565: PIXEL_BYTES_2,
+    FORMAT_ARGB8565: PIXEL_BYTES_2,
+    FORMAT_RGB888: PIXEL_BYTES_3,
+    FORMAT_ARGB8888: PIXEL_BYTES_4,
+    FORMAT_XRGB8888: PIXEL_BYTES_4,
+    FORMAT_ALPHAMASK: PIXEL_BYTES_1,
+    FORMAT_GRAY: PIXEL_BYTES_1,
+}
+
+# Format to bytes per pixel (actual)
+FORMAT_TO_BPP = {
+    FORMAT_RGB565: 2,
+    FORMAT_ARGB8565: 3,
+    FORMAT_RGB888: 3,
+    FORMAT_ARGB8888: 4,
+    FORMAT_XRGB8888: 4,
+    FORMAT_ALPHAMASK: 1,
+    FORMAT_GRAY: 1,
+}

@@ -1,0 +1,11 @@
+{
+    "sequence_config": {
+        "HoneyGUI_CMD": {
+            "CI": "HoneyGUI.xml",
+            "Nightly": "HoneyGUI.xml",
+            "Release": "HoneyGUI.xml",
+            "Local": "HoneyGUI.xml",
+            "FreeStyle": "HoneyGUI.xml"
+        }
+    }
+}

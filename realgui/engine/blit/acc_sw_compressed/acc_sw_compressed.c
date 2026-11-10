@@ -1,0 +1,225 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include "draw_img.h"
+#include <stdio.h>
+#include <stdint.h>
+#include "acc_sw_compressed.h"
+#include "acc_sw_generic.h"
+#include "acc_sw_rle_bypass.h"
+#include "acc_sw_rle_cover.h"
+#include "acc_sw_rle_filter.h"
+#include <math.h>
+
+
+
+void uncompressed_rle_line(imdc_file_t *file, uint32_t line, int16_t x, int16_t w, uint8_t *buf)
+{
+#if 0
+    uint32_t start = (uint32_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+
+    uint16_t *linebuf = (uint16_t *)buf;
+    uint16_t section = 0;
+    for (uint32_t addr = start; addr < end; addr = addr + sizeof(imdc_rgb565_node_t))
+    {
+        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)addr;
+
+        uint16_t right = section + node->len;
+        uint16_t left = section;
+
+        if ((left < x) && (right < x))
+        {
+            ;
+        }
+        else if ((left > (x + w)) && (right > (x + w)))
+        {
+            break;
+        }
+        else if ((left < x) && (right > x))
+        {
+            gui_memset16(linebuf, node->pixel16, right - x);
+            linebuf++;
+        }
+        else if ((left < (x + w)) && (right > (x + w)))
+        {
+            gui_memset16(linebuf, node->pixel16, 1);
+            linebuf++;
+        }
+        else if ((left < x) && (right > (x + w)))
+        {
+            gui_memset16(linebuf, node->pixel16, 1);
+            linebuf++;
+        }
+        else
+        {
+            gui_memset16(linebuf, node->pixel16, node->len);
+            linebuf = linebuf + node->len;
+        }
+
+        section = section + node->len;
+
+    }
+#endif
+    uint8_t linebuf[1024 * 2];
+    uncompressed_rle_rgb565(file, line, linebuf);
+    memcpy(buf, linebuf + x * 2, w * 2);
+}
+
+void uncompressed_rle_rect(imdc_file_t *file, int16_t x, int16_t y, int16_t w, int16_t h,
+                           uint8_t *buf)
+{
+    for (int16_t i = 0; i < h; i++)
+    {
+        uncompressed_rle_line(file, i + y, x, w, buf + i * 2 * w);
+    }
+}
+
+
+
+void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
+{
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
+    uint32_t start = (uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uintptr_t)file + file->compressed_addr[line + 1];
+    uint16_t *linebuf = (uint16_t *)buf;
+
+    // gui_log("file->compressed_addr[%d] %d\n", line, file->compressed_addr[line]);
+    for (uint32_t addr = start; addr < end;)
+    {
+        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)(uintptr_t)addr;
+        // gui_log("%d 0x%x\n", node->len, node->pixel16);
+        gui_memset16(linebuf, node->pixel16, node->len);
+
+        addr = addr + sizeof(imdc_rgb565_node_t);
+        linebuf = linebuf + node->len;
+    }
+}
+void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
+{
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
+    uint32_t start = (uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uintptr_t)file + file->compressed_addr[line + 1];
+    uint8_t *linebuf = (uint8_t *)buf;
+
+    for (uint32_t addr = start; addr < end;)
+    {
+        imdc_argb8565_node_t *node = (imdc_argb8565_node_t *)(uintptr_t)addr;
+        for (uint32_t i = 0; i < node->len; i++)
+        {
+            linebuf[i * 3 + 0] = node->pixel & 0xff;
+            linebuf[i * 3 + 1] = (node->pixel >> 8) & 0xff;
+            linebuf[i * 3 + 2] = node->alpha;
+        }
+        addr = addr + sizeof(imdc_argb8565_node_t);
+        linebuf = linebuf + node->len * 3;
+    }
+}
+void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
+{
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
+    uint32_t start = (uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uintptr_t)file + file->compressed_addr[line + 1];
+    uint8_t *linebuf = (uint8_t *)buf;
+
+    for (uint32_t addr = start; addr < end;)
+    {
+        imdc_rgb888_node_t *node = (imdc_rgb888_node_t *)(uintptr_t)addr;
+        for (uint32_t i = 0; i < node->len; i++)
+        {
+            linebuf[i * 3]     = node->pixel_b;
+            linebuf[i * 3 + 1] = node->pixel_g;
+            linebuf[i * 3 + 2] = node->pixel_r;
+        }
+        addr = addr + sizeof(imdc_rgb888_node_t);
+        linebuf = linebuf + node->len * 3;
+    }
+}
+void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
+{
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
+    uint32_t start = (uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uintptr_t)file + file->compressed_addr[line + 1];
+    uint32_t *linebuf = (uint32_t *)buf;
+
+    for (uint32_t addr = start; addr < end;)
+    {
+        imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)(uintptr_t)addr;
+        gui_memset32(linebuf, node->pixel32, node->len);
+
+        addr = addr + sizeof(imdc_argb8888_node_t);
+        linebuf = linebuf + node->len;
+    }
+}
+
+
+/**
+ * @brief Locate the compression header of a compressed image.
+ *
+ * I8 images carry a palette between the image header and the compression
+ * header; every other format places it right after the image header.
+ */
+static const imdc_file_header_t *get_imdc_header(const draw_img_t *image)
+{
+    const uint8_t *data = image->data;
+    uintptr_t offset = sizeof(gui_rgb_data_head_t);
+
+    if (((const gui_rgb_data_head_t *)data)->type == I8)
+    {
+        uint32_t clut_count = *(const uint32_t *)(data + offset);
+        offset += sizeof(uint32_t) + (((clut_count >> 16) + 1) * 4);
+    }
+    return (const imdc_file_header_t *)(data + offset);
+}
+
+void handle_image_blend_mode(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    switch (image->blend_mode)
+    {
+    case IMG_COVER_MODE:
+        rle_cover_blit_2_rgb565(image, dc, rect);
+        break;
+    case IMG_BYPASS_MODE:
+        rle_bypass_blit_2_rgb565(image, dc, rect);
+        break;
+    case IMG_FILTER_BLACK:
+        rle_filter_blit_2_rgb565(image, dc, rect);
+        break;
+    default:
+        // Handle other cases if necessary
+        sw_acc_blit_generic(image, dc, rect);
+        break;
+    }
+}
+void sw_acc_blit_compressed(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    if (image == NULL || image->data == NULL || dc == NULL) { return; }
+    if (image->img_w <= 0 || image->img_h <= 0) { return; }
+
+    const imdc_file_header_t *imdc = get_imdc_header(image);
+    if (imdc->algorithm_type.algorithm != IMDC_ALGORITHM_RLE)
+    {
+        gui_log("Unsupported compression algorithm: %d (only RLE supported)\n",
+                imdc->algorithm_type.algorithm);
+        return;
+    }
+
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+    gui_rgb_data_head_t *head = image->data;
+    char img_type = head->type;
+    uint8_t opacity = image->opacity_value;
+
+    if ((dc_bytes_per_pixel == 2) && (img_type == RGB565) && (opacity == 255) && (rect == NULL))
+    {
+        handle_image_blend_mode(image, dc, rect);
+        return;
+    }
+
+    sw_acc_blit_generic(image, dc, rect);
+}

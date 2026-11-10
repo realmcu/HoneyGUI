@@ -1,0 +1,51 @@
+{% extends "!search.html" %}
+
+{% block footer %}
+    {{ super() }}
+  
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 获取查询参数中的 'q'
+            const urlParams = new URLSearchParams(window.location.search);
+            var query = urlParams.get('q');
+
+            // 如果查询参数存在
+            if (query) {
+                // 去除首末空白字符
+                query = query.trim().toLowerCase();
+
+                // 将所有非字母和数字字符替换为空格，并避免连续空格
+                const encodedQuery = encodeURIComponent(query.replace(/[^a-zA-Z0-9]+/g, ' ').trim());
+
+                function processLinks() {
+                    const links = document.querySelectorAll("#search-results a");
+                    links.forEach(link => {
+                        const href = new URL(link.href);
+                        // 手动构建最终的 URL，避免自动编码造成的问题
+                        let searchstring =  `?highlight=${encodedQuery}`;
+                        href.search = searchstring;
+                        link.href = href.toString();
+                    });
+                }
+
+                // 使用 MutationObserver 监听 #search-results 的变化
+                const targetNode = document.getElementById("search-results");
+                if (targetNode) {
+                    const observer = new MutationObserver((mutationsList) => {
+                        for (const mutation of mutationsList) {
+                            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                                processLinks();
+                            }
+                        }
+                    });
+
+                    // 开始观察目标节点
+                    observer.observe(targetNode, { childList: true, subtree: true });
+
+                    // 初次调用以处理已加载的链接
+                    processLinks();
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,192 @@
+.. _圆弧 (Geometry Arc):
+
+圆弧 (Geometry Arc)
+========================
+
+概述
+----
+
+圆弧控件是一个轻量级的 :term:`GUI` 绘图组件，专门用于在用户界面中绘制圆弧和圆环图形。该控件提供了简洁易用的 :term:`API` ，支持自定义圆弧的起始角度、结束角度、线宽、颜色等属性，能够满足各种圆弧绘制需求。
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1766129069269773340/db7572e4_13406851.png" width= "400" /></div>
+   <br>
+
+核心功能
+--------
+
+.. list-table::
+   :header-rows: 1
+
+   * - 描述
+     - API 
+   * - 创建控件
+     - :cpp:any:`gui_arc_create`  
+   * - 设置位置
+     - :cpp:any:`gui_arc_set_position` 
+   * - 设置半径
+     - :cpp:any:`gui_arc_set_radius`
+   * - 设置颜色
+     - :cpp:any:`gui_arc_set_color`
+   * - 设置不透明度
+     - :cpp:any:`gui_arc_set_opacity`
+   * - 设置起始角度
+     - :cpp:any:`gui_arc_set_start_angle`
+   * - 设置结束角度
+     - :cpp:any:`gui_arc_set_end_angle`
+   * - 设置线宽
+     - :cpp:any:`gui_arc_set_line_width`
+   * - 注册点击事件回调
+     - :cpp:any:`gui_arc_on_click`
+   * - 旋转变换
+     - :cpp:any:`gui_arc_rotate`
+   * - 缩放变换
+     - :cpp:any:`gui_arc_scale`
+   * - 平移变换
+     - :cpp:any:`gui_arc_translate`
+   * - 设置角度渐变
+     - :cpp:any:`gui_arc_set_angular_gradient`
+   * - 添加渐变色点
+     - :cpp:any:`gui_arc_add_gradient_stop`
+   * - 清除渐变色
+     - :cpp:any:`gui_arc_clear_gradient`
+
+圆弧组功能
+----------
+
+.. list-table::
+   :header-rows: 1
+
+   * - 描述
+     - API 
+   * - 创建圆弧组
+     - :cpp:any:`gui_arc_group_create`  
+   * - 添加圆弧到组
+     - :cpp:any:`gui_arc_group_add_arc` 
+   * - 设置圆弧渐变
+     - :cpp:any:`gui_arc_group_set_gradient`
+   * - 添加渐变色点
+     - :cpp:any:`gui_arc_group_add_gradient_stop`
+
+角度说明
+--------
+
+圆弧的角度系统采用标准的数学坐标系：
+
+- **0°**: 3点钟方向（正东方向）
+- **90°**: 6点钟方向（正南方向）
+- **180°**: 9点钟方向（正西方向）
+- **270°**: 12点钟方向（正北方向）
+
+渐变色填充
+----------
+
+圆弧控件支持角度渐变色填充，可以沿着圆弧的角度方向实现平滑的颜色过渡效果。
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1767061805476727891/be89d853_13406851.png" width= "400" /></div>
+   <br>
+
+**渐变色工作原理**
+
+- 渐变色沿圆弧的角度方向线性插值
+- 支持最多 8 个颜色停止点（color stops）
+- 颜色停止点的位置用 0.0 ~ 1.0 的归一化值表示，其中 0.0 对应起始角度，1.0 对应结束角度
+- 像素颜色通过在相邻颜色停止点之间进行线性插值计算得出
+- 采用角度渐变（Angular Gradient）方式，沿圆弧的角度方向平滑过渡
+
+**使用步骤**
+
+1. 创建圆弧控件
+2. 调用 :cpp:any:`gui_arc_set_angular_gradient` 设置渐变范围
+3. 调用 :cpp:any:`gui_arc_add_gradient_stop` 添加颜色停止点（至少需要 2 个）
+4. 可选：调用 :cpp:any:`gui_arc_clear_gradient` 清除渐变设置
+
+**关键要点**
+
+- **无缝循环**: 对于完整圆环（0° 到 360°），起始颜色和结束颜色应相同，以实现无缝的颜色循环
+- **颜色插值**: 支持 RGBA 颜色空间的线性插值，包括透明度通道
+- **性能优化**: 采用颜色查找表（LUT）预计算，确保高效的渲染性能
+
+特性亮点
+--------
+
+- **高性能**: 采用优化的绘制算法，确保流畅的渲染性能
+- **抗锯齿**: 支持边缘抗锯齿，提供平滑的视觉效果
+- **灵活配置**: 支持自定义角度范围、线宽和颜色
+- **轻量级**: 内存占用小，适合嵌入式系统和资源受限环境
+- **圆环支持**: 当起始角度和结束角度相差360°时，自动绘制完整圆环
+- **矩阵变换**: 支持旋转、缩放、平移等矩阵变换操作，实现复杂的圆弧变换效果
+- **批量渲染**: 圆弧组控件支持将多个静态圆弧批量渲染到单个缓冲区，提升渲染性能
+
+圆弧组控件
+----------
+
+圆弧组控件专为批量渲染多个静态圆弧而设计，通过将多个圆弧合并到单个缓冲区中，显著减少硬件传输操作，提升渲染性能。
+
+**性能优势**
+
+- **减少传输开销**: 将多个圆弧合并到一个缓冲区，减少 :term:`DMA` / :term:`GPU` 传输调用次数
+- **优化静态内容**: 特别适合不经常变化的背景圆弧
+- **内存高效**: 多个圆弧共享单个缓冲区
+
+**应用场景**
+
+- 活动圆环（健身追踪显示）
+- 多层进度指示器
+- 带有多个圆形元素的仪表盘背景
+- 静态装饰性圆弧图案
+
+**限制说明**
+
+- 每组最多支持 8 个圆弧（可通过 MAX_ARCS_IN_GROUP 配置）
+- 组内所有圆弧共享同一缓冲区并一起渲染
+- 最适合静态或不经常变化的内容
+
+应用场景
+--------
+
+圆弧控件适用于以下场景：
+
+- **进度指示器**: 用于显示加载进度、电池电量等
+- **仪表盘**: 构建速度表、温度计等仪表界面
+- **数据可视化**: 展示比例数据、统计图表
+- **用户界面装饰**: 作为界面的装饰元素
+- **状态指示**: 表示系统状态、连接状态等
+- **变换动画**: 利用旋转、缩放、平移实现复杂的圆弧动画效果
+
+配置说明
+--------
+
+要使用圆弧控件，需要在配置文件中启用相应的宏定义：
+
+通过 ``menuconfig`` 启用 Kconfig 选项：
+
+.. code-block:: shell
+
+   cd simulator/win32
+   menuconfig ../../Kconfig.gui
+
+选择 ``Geometry ARC Demo`` ( ``CONFIG_REALTEK_BUILD_REAL_LITE_ARC`` )，保存到 ``simulator/win32/.config``。
+
+.. code-block:: c
+
+   #define CONFIG_REALTEK_BUILD_REAL_LITE_ARC 1
+
+完整示例
+--------
+
+.. literalinclude:: ../../../example/widget/arc/example_gui_arc.c
+   :language: c
+   :start-after: /* gui arc example start */
+   :end-before: /* gui arc example end */
+
+API
+-------
+.. doxygenfile:: gui_arc.h
+
+.. doxygenfile:: gui_arc_group.h

@@ -1,0 +1,1026 @@
+/* =========== Define common variables =========== */
+body {
+    --md-left-sider-width: 350px;
+    --md-right-contents-width: 250px;
+}
+/* =========== Define common variables =========== */
+
+/* =========== Render Common Style =========== */
+html,body {
+	width: 100%;
+    height: 100%;
+}
+footer {
+    margin-top: 28px;
+}
+p {
+    margin: 16px 0 3px;
+    line-height: 28px;
+}
+/* =========== Render Common Style =========== */
+
+
+/* ======== Render Main Content Style ========= */
+.wy-grid-for-nav.prevent-manipulation {
+    /* overflow: hidden; */
+    touch-action: none;
+}
+.wy-nav-content-wrap {
+    overflow-x: auto;
+}
+.wy-breadcrumbs {
+    text-align: left;
+    padding: 24px 24px 0;
+}
+.wy-nav-content a:visited {
+    color: #2980b9;
+}
+.rst-content div, 
+.rst-content p {
+    text-align: justify;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+/* ===== Fixed breadcrumb navigation ===== */
+.rst-content > div[role="navigation"] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 10;
+}
+.rst-content .line-block {
+    margin-bottom: 0;
+}
+
+/* 解决 iOS 设备对完全透明（不可见）元素的交互行为设计为无响应的问题 */
+.rst-content .code-block-caption .headerlink, 
+.rst-content .eqno .headerlink, 
+.rst-content .toctree-wrapper>p.caption .headerlink, 
+.rst-content dl dt .headerlink, 
+.rst-content h1 .headerlink, 
+.rst-content h2 .headerlink, 
+.rst-content h3 .headerlink, 
+.rst-content h4 .headerlink, 
+.rst-content h5 .headerlink, 
+.rst-content h6 .headerlink, 
+.rst-content p.caption 
+.headerlink, 
+.rst-content p .headerlink, 
+.rst-content table>caption .headerlink {
+    opacity: 0.02;
+}
+/* --------- Render sm-screen Style --------- */
+@media screen and (min-width: 769px) {
+    /* ----- left sider ----- */
+    .wy-nav-side {
+        width: var(--md-left-sider-width);
+        padding-bottom: 0;
+    }
+    .wy-side-scroll,
+    .wy-side-nav-search,
+    .wy-menu-vertical {
+        width: 100%;
+    }
+
+    /* ----- main content ----- */
+    .wy-nav-content-wrap {
+        margin-left: var(--md-left-sider-width);
+        background:rgba(0,0,0,.05);
+    }
+    .wy-nav-content {
+        /*width: calc(100% - var(--md-right-contents-width));*/
+        max-width: 100%;
+        min-width: 500px;
+        margin:0;
+        padding: 0 3.2% 1.618em;
+        background:#fff;
+    }
+    /* ----- right contents ----- */
+    .contents {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: var(--md-right-contents-width);
+        height: 100%;
+        overflow: auto;
+        padding-left: 30px;
+        background-color: #f3f3f3; 
+        z-index: 999;
+        /* 可以添加更多样式来改变目录栏的外观，例如背景色、宽度、间距等 */
+    }
+
+    /* 添加导航拖拽组件 */
+    .resize-handle-left,
+    .resize-handle-right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        cursor: col-resize;
+        border-left: 1px solid #d0d0d0;
+        background-color: #fff;
+    }
+    /* 左侧导航拖拽组件 */
+    .resize-handle-left {
+        right: 0;
+    }
+    /* 右侧导航拖拽组件 */
+    .resize-handle-right {
+        left: 0;
+    }
+}
+/* --------- Render sm-screen Style --------- */
+
+/* --------- Render xs-screen Style --------- */
+@media screen and (max-width: 768px) {
+    .resize-handle-left, 
+    .resize-handle-right {
+        display: none;
+    }
+
+    /* fixed top nav setting */
+    .wy-nav-side.shift,
+    .wy-grid-for-nav {
+        top: 60px;
+    }
+    .wy-nav-top {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+    }
+    .wy-nav-top i {
+        float: right;
+    }
+
+    .wy-nav-content-wrap.shift {
+        position: initial;
+        height: auto;
+    }
+    .wy-nav-content-wrap .wy-nav-content {
+        padding-top: 0;
+    }
+    .rst-content > div[role="navigation"] {
+        background-color: #fcfcfc;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .wy-breadcrumbs li.wy-breadcrumbs-aside {
+        display: block;
+    }
+}
+/* --------- Render xs-screen Style --------- */
+/* ======== Render Main Content Style ========= */
+
+/* =========== Render Sider Style ============ */
+#rtd-search-form {
+    position: relative;
+}
+#rtd-search-form .rtd-search-btn, #rtd-search-form .rtd-clear-btn {
+    border: none;
+    background-color: transparent;
+    position: absolute;
+    top: 4px;
+}
+#rtd-search-form .rtd-search-btn {
+    right: 10px;
+    margin-top: 0 !important;
+}
+#rtd-search-form .rtd-clear-btn {
+    display: none;
+    right: 32px;
+}
+#rtd-search-form input[name="q"] {
+    padding-right: 62px;
+}
+#rtd-search-form input[name="q"]:not(:placeholder-shown) ~ .rtd-clear-btn {
+    display: inline-block;
+}
+/* div[role="search"] style */
+.wy-side-nav-search > a, .wy-side-nav-search > a:hover {
+    display: block;
+    width: 146px;
+    margin: .8em auto 1.8em;
+    background: #fff;
+    border-radius: 2px;
+}
+.wy-side-nav-search>a img.logo {
+    width: 56%;
+}
+li[class*="toctree-"] * {
+    font-size: 14px !important;
+}
+.always-expand-toc button::before {
+    content: "\f147" !important;
+}
+
+.wy-menu-vertical li[class*="toctree-"].current,
+.wy-menu-vertical li[class*="toctree-"].current > a,
+.wy-menu-vertical li[class*="toctree-"].current li[class*="toctree-"]>a {
+    background: white;
+}
+.wy-menu-vertical li.current>a, .wy-menu-vertical li.on a {
+    color: #004d88;
+}
+/* =========== Render Sider Style ============ */
+
+/* ====== Render version selector style ====== */
+.target-container, .version-container {
+    text-align: center;
+}
+#target-selector, #version-selector {
+    width: 200px;
+    margin: -6px auto 16px;
+    border-radius:4px;
+}
+/* ====== Render version selector style ====== */
+
+
+/* ============ Render Title Style ============ */
+h1, h2, h3, h4, h5, h6 {
+	-webkit-transition: text-shadow 0.5s linear;
+	-moz-transition: text-shadow 0.5s linear;
+	-ms-transition: text-shadow 0.5s linear;
+	-o-transition: text-shadow 0.5s linear;
+	transition: text-shadow 0.5s linear;
+	margin-right: 15px;
+	font-family: Arial,sans-serif;
+    margin: 24px 0;
+}
+
+/* 禁止标题自动编号 */
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+    content: none !important;
+}
+
+.rst-content h1 {
+    font-size: 38px;
+    font-weight: 400;
+}
+.rst-content h2 {
+    font-size: 32px;
+	font-weight: 400;
+	margin-top: 48px;
+	margin-bottom: 32px;
+}
+.rst-content h3 {
+    font-size: 28px;
+	font-weight: 400;
+	margin-top: 42px;
+	margin-bottom: 28px;
+}
+.rst-content h4 {
+    font-size: 24px;
+	font-weight: 400;
+	margin-top: 36px;
+	margin-bottom: 24px;
+}
+.rst-content h5 {
+    font-size: 20px;
+	font-weight: 400;
+	margin-top: 30px;
+	margin-bottom: 20px;
+}
+.rst-content h6 {
+    font-size: 18px;
+	font-weight: 400;
+	margin-top: 24px;
+	margin-bottom: 18px;
+}
+/* ============ Render Title Style ============ */
+
+
+/* ========= Render Image Style ========= */
+figcaption, figcaption p{
+    font: italic 14px arial,sans-serif;
+    text-align: center !important;
+}
+figcaption p{
+    margin-top: 0;
+    padding: .5em 0;
+    text-align: center !important;
+}
+.rst-content img{
+    height: auto !important;
+    cursor: pointer;
+    margin-top: 10px;
+    -webkit-tap-highlight-color: transparent;
+}
+.img-border {
+    border: 1px solid #000;
+}
+/* ========= Render Image Style ========= */
+
+/* ======= Render List Style ======== */
+.rst-content section ol li>* {
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+.rst-content section ol li>p,
+.rst-content section ol li>p:last-child,
+.rst-content section ul li>p,
+.rst-content section ul li>p:last-child {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+/* ---------- Ordered Lists ---------- */
+/* 一级有序列表 */
+.rst-content section ol li,
+.rst-content section ol.arabic li,
+.rst-content section ul li ol li,
+.rst-content section ul li ol.arabic li {
+    list-style-type: decimal;
+}
+.rst-content .admonition ol li,
+.rst-content .admonition ul li ol li {
+    list-style-type: decimal !important;
+}
+/* 二级有序列表 */
+.rst-content section ol li ol li,
+.rst-content section ol.arabic li ol li,
+.rst-content section ul li ol li ol li,
+.rst-content section ul li ol.arabic li ol li {
+    list-style-type: lower-latin;
+}
+.rst-content .admonition ol li ol li,
+.rst-content .admonition ul li ol li ol li {
+    list-style-type: lower-latin !important;
+}
+/* 三级有序列表 */
+.rst-content section ol li ol li ol li,
+.rst-content section ul ol li ol li ol li,
+.rst-content section ol.arabic li ol li ol li,
+.rst-content section ul ol.arabic li ol li ol li {
+    list-style-type: lower-roman;
+}
+.rst-content .admonition ol li ol li ol li,
+.rst-content .admonition ul ol li ol li ol li {
+    list-style-type: lower-roman !important;
+}
+/* 四级有序列表 */
+.rst-content section ol li ol li ol li ol li,
+.rst-content section ul ol li ol li ol li ol li,
+.rst-content section ol.arabic li ol li ol li ol li,
+.rst-content section ul ol.arabic li ol li ol li ol li {
+    list-style-type: lower-greek;
+}
+.rst-content .admonition ol li ol li ol li ol li,
+.rst-content .admonition ul ol li ol li ol li ol li {
+    list-style-type: lower-greek !important;
+}
+
+/* ---------- Unordered Lists ---------- */
+/* 一级无序列表 */
+.rst-content section ul li,
+.rst-content section ol li ul li,
+.rst-content section ol.arabic li ul li {
+    list-style-type: disc;
+}
+.rst-content .admonition ul li,
+.rst-content .admonition ol li ul li {
+    list-style-type: disc !important;
+}
+/* 二级无序列表 */
+.rst-content section ul li ul li,
+.rst-content section ol ul li ul li,
+.rst-content section ol.arabic ul li ul li {
+    list-style-type: circle;
+}
+.rst-content .admonition ul li ul li,
+.rst-content .admonition ol ul li ul li {
+    list-style-type: circle !important;
+}
+/* 三级无序列表 */
+.rst-content section ul li ul li ul li,
+.rst-content section ol ul li ul li ul li,
+.rst-content section ol.arabic ul li ul li ul li {
+    list-style-type: square;
+}
+.rst-content .admonition ul li ul li ul li,
+.rst-content .admonition ol ul li ul li ul li {
+    list-style-type: square !important;
+}
+/* 四级无序列表 */
+.rst-content section ul li ul li ul li ul li,
+.rst-content section ol ul li ul li ul li ul li,
+.rst-content section ol.arabic ul li ul li ul li ul li {
+    list-style-type: none;
+    position: relative;
+    margin-left: 0;
+    padding-left: 1em;
+}
+.rst-content section ul li ul li ul li ul li::before,
+.rst-content section ol ul li ul li ul li ul li::before,
+.rst-content section ol.arabic ul li ul li ul li ul li::before {
+    content: "-";
+    position: absolute;
+    left: 0;
+}
+
+.rst-content section ol,
+.rst-content section ol.arabic,
+.rst-content section ul {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+}
+
+/* rst output list */
+html.writer-html5 .rst-content dl.field-list {
+    grid-template-columns: auto 1fr;
+}
+html.writer-html5 .rst-content dl.field-list dt,
+html.writer-html5 .rst-content dl.field-list dd {
+  overflow-wrap: break-word; /* 长词换行 */
+  word-wrap: break-word;     /* 确保兼容性 */
+  overflow: hidden;          /* 防止溢出 */
+  text-overflow: ellipsis;   /* 可选：在溢出时显示省略号 */
+}
+html.writer-html5 .rst-content dl.field-list>dt {
+    padding-top: 3px;
+}
+
+/* ---------- See-Also Lists ---------- */
+#doxygen-group-list-section ul li,
+#doxygen-group-list-section ~ ul li {
+    background-color: #f0f2f4;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+#doxygen-group-list-section ul li a::after,
+#doxygen-group-list-section ~ ul li a::after {
+    content: 'Doxygen';
+    display: inline-block;
+    background-color: #6ab0de;
+    color: #fff;
+    padding: 0 8px;
+    border-radius: 16px;
+    margin-left: 10px;
+    font-size: 0.875em;
+    font-weight: bold;
+}
+/* ======= Render List Style ======== */
+
+
+/* ========= Render Code Block Style ========= */
+.highlight {
+    background:rgba(223, 233, 243,0.4);
+}
+.rst-content code, .rst-content tt, code {
+    white-space: normal;
+    font-size: 12px;
+}
+.rtk-inline-code,
+.rst-content code {
+    border:1px solid #e1e4e5;
+    background-color: rgba(223, 233, 243,0.4);
+}
+.rtk-inline-code {
+    padding: 4px 5px;
+    font-weight: 700;
+}
+.rst-content code {
+    color: #e74c3c;
+}
+.rst-content code.xref {
+    color: unset;
+}
+.rst-content div[class^=highlight], .rst-content pre.literal-block {
+    margin: 1px 0 12px;
+}
+.rst-content dl dd {
+    margin-right: 12px;
+}
+.rst-content dl dd p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+dl.c.unexpanded dd, dl.cpp.unexpanded dd {
+    display: none;
+}
+.rtk-api-expansion-button {
+    padding: 4px;
+}
+.rtk-api-expansion-button::before {
+    font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+    display: inline-block;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+.expanded .rtk-api-expansion-button::before {
+    content: "\f0d7 \00a0";
+}
+.unexpanded .rtk-api-expansion-button::before {
+    content: "\f0da \00a0";
+}
+.rst-content .guilabel {   /* 解决guilabel重叠的问题 */
+    line-height: 1.3rem
+}
+.rst-content p>kbd.kbd {   /* 解决在平板微信中不显示kbd指令渲染效果的问题 */
+    color: inherit;
+    font-size: 80%;
+    background-color: #fff;
+    border: 1px solid #a6a6a6;
+    border-radius: 4px;
+    box-shadow: 0 2px grey;
+    padding: 2.4px 6px;
+    margin: auto 0;
+}
+.rst-content dl > dt.sig.sig-object.cpp:not([id]) {
+    display: none;
+}
+.rst-content dl > dt.sig.sig-object.cpp:not([id]) + dd {
+    margin-left: 0;
+}
+/* code copy button style */
+button.copybtn {
+    opacity: 1;
+}
+button.copybtn.o-tooltip--left:after {  /* 隐藏代码复制按钮组件自带的文字提示 */
+    display: none;
+}
+html.writer-html4 .rst-content dl:not(.docutils)>dt, 
+html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple)>dt {
+    color: inherit;
+}
+html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple) dl:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple) > dt:not([class]) {
+    border-left: none;
+    background: transparent;
+}
+dl.macro span.sig-name + span.pre,
+dl.macro span.sig-name + span.sig-paren,
+dl.macro span.sig-name + a.reference {
+    margin-left: 15px;
+}
+dl.macro span.sig-name ~ span.pre,
+dl.macro span.sig-name ~ span.sig-paren,
+dl.macro span.sig-name ~ span.n,
+dl.macro span.sig-name ~ p {
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+    color: darkcyan;
+}
+/* ========= Render Code Block Style ========= */
+
+/* =========== Render Math Style =========== */
+.math {
+    font-size: 14px;
+}
+/* =========== Render Math Style =========== */
+
+/* ============ Render Table Style ============ */
+.wy-table-responsive {
+    /* width: 100%;
+  	overflow: auto; */
+}
+.full-width-table {
+    width: 100%;       /* 指定:class: full-width-table的表格宽度为全屏*/
+}
+table, th, td {
+    border: 1px solid #e1e4e5;
+}
+table {
+    border-collapse:collapse;
+	margin: 0 auto;
+	max-width: 100%;
+	word-break: normal;
+	margin-top: 4px;
+    margin-bottom: 10px;
+}
+.rst-content table.docutils caption {
+    line-height: 17px;       /* 修正表格标题换行时行间距过小*/
+}
+.wy-table-responsive table td, 
+.wy-table-responsive table th {
+    /* 设置单元格中的文字自动换行 */
+    white-space: normal;
+}
+table th {
+    background-color: #ecf7f8;
+}
+.rst-content table ul {
+    margin-bottom: 0;
+}
+.rst-content table.docutils caption {
+    padding: .5em 0;
+    font-size: 14px;
+    color: #404040;
+}
+html.writer-html5 .rst-content table.docutils td>p, 
+html.writer-html5 .rst-content table.docutils th>p {
+    margin-top: 0;
+}
+table code {
+    line-height: 22px; /* 修正表格中代码块换行重叠 */
+}
+table td kbd {
+    line-height: 23px; /* 修正表格中kbd换行重叠 */
+}
+/* ============ Render Table Style ============ */
+
+
+/* ========= Render Quote Block Style ========= */
+/*
+blockquote {
+    background-color: #F7F8FB;
+    border-left: 2px solid #9CAFD4;
+    margin: 0 24px 0 4px;
+    padding: 0 12px 0 16px;
+}
+blockquote p {
+    margin-bottom: 4px;
+}
+*/
+/* ========= Render Quote Block Style ========= */
+
+/* ========= Render Tab Style ========= */
+.sphinx-tabs::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height:1px;
+    border: none;
+    border-top: 1px solid #e1e4e5;
+    margin: 8px 0 12px;
+    padding: 0;
+}
+/* ========= Render Tab Style ========= */
+
+
+/* ========= Render Note Style ========= */
+html.writer-html5 .rst-content dl.field-list {
+    grid-template-columns: auto 1fr;
+}
+html.writer-html5 .rst-content dl.field-list dt,
+html.writer-html5 .rst-content dl.field-list dd {
+  overflow-wrap: break-word; /* 长词换行 */
+  word-wrap: break-word;     /* 确保兼容性 */
+  overflow: hidden;          /* 防止溢出 */
+  text-overflow: ellipsis;   /* 可选：在溢出时显示省略号 */
+}
+.rst-content .admonition, 
+.rst-content .admonition-todo, 
+.rst-content .attention, 
+.rst-content .caution, 
+.rst-content .danger, 
+.rst-content .error, 
+.rst-content .hint, 
+.rst-content .important, 
+.rst-content .note, 
+.rst-content .seealso, 
+.rst-content .tip, 
+.rst-content .warning, 
+.wy-alert {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* ========= Render Note Style ========= */
+
+
+/* ========= Render added-api & deprecared-api Style ========= */
+section[id*="added-api"] dd dl,
+section[id*="deprecated-api"] dd dl {
+    background-color: rgba(223, 233, 243,0.3);
+    padding: 8px 8px 0px;
+    border: 1px solid #b4c2de;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+section[id*="added-api"] dd dl > dt.sig.sig-object.cpp:not([id]),
+section[id*="deprecated-api"] dd dl > dt.sig.sig-object.cpp:not([id]) {
+    display: block;
+}
+
+.highlight-eval_rst,
+section[id*="added-api"] .highlight-cpp,
+section[id*="deprecated-api"] .highlight-cpp {
+    display: none;
+}
+/* ========= Render added-api & deprecared-api Style ========= */
+
+
+/* ========= Render text color ========= */
+/* 需同步在conf.py中添加 */
+.red-text {
+    color: red;
+}
+.hide-text {
+    display: none;
+}
+.dt-highlighted {
+    background: #f1c40f !important;
+}
+/* ========= Render text color ========= */
+
+/* ========= Render text style ========= */
+/* 需同步在conf.py中添加 */
+.bold {
+    font-weight: bold;
+}
+.italic {
+    font-style: italic;
+}
+.bolditalic {
+    font-style: italic;
+    font-weight: bold;
+}
+/* ========= Render text style ========= */
+
+/* ==== Render back-to-top icon style ==== */
+#back-to-top {
+    position: fixed;
+    bottom: 90px;
+    right: 21px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    text-align: center;
+    border: none;
+    border-radius: 50%;
+    background: url('../image/totop.png') center center / cover no-repeat;
+    box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.5);
+    cursor: pointer;
+    z-index: 900;
+    /* transition: all .3s ease-out; */
+}
+#back-to-top:hover {
+    background: url('../image/totop-hover.png') center center / cover no-repeat;
+}
+/* ==== Render back-to-top icon style ==== */
+
+
+/* ====== Render image modal style ====== */
+/* 禁用点击图片跳转到图片地址的效果 */
+a.no-cursor-link {
+    cursor: default;
+}
+.img-modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 1000;
+    overflow: auto;
+    touch-action: pan-x pan-y;
+}
+.img-in-modal {
+    max-width: 100vmin;
+    max-height: 100vmin;
+    object-fit: contain;
+    transform: translate(0, 0) scale(1);
+    transform-origin: top left;
+    /* transition: transform 0.5s ease-in-out; */
+}
+.img-modal-close {
+    position: fixed;
+    top: 2%;
+    right: 4%;
+    color: darkred;
+    font-size: 46px;
+    font-weight: bold;
+    transition: 0.3s;
+    z-index: 1001;
+}
+.img-modal-close:hover,
+.img-modal-close:focus {
+    color: #e60000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ====== Render image modal style ====== */
+
+
+/* ====== Render Mermaid Diagram Font ====== */
+/* 统一 mermaid 图文字字体与字号，覆盖 RTD 主题的 Lato 字体栈。
+   同时作用于 SVG <text> 与 htmlLabels 的 foreignObject 两条渲染路径。 */
+.mermaid text,
+.mermaid .nodeLabel,
+.mermaid .edgeLabel,
+.mermaid .label,
+.mermaid span,
+.mermaid foreignObject div {
+    font-family: "Calibri", Arial, sans-serif !important;
+    /* 12pt = 16px，与 RTD 正文字号对齐；!important 为字号的最终决定项，
+       覆盖各图 init 中的 fontSize 设置。 */
+    font-size: 12pt !important;
+}
+/* :align: center 在老版 sphinxcontrib-mermaid 不生效，CSS 兜底让图水平居中 */
+.mermaid {
+    text-align: center;
+}
+.mermaid svg {
+    display: block;
+    margin: 0 auto;
+    /* useMaxWidth:false 让图按原生像素渲染(多图尺寸一致)，但超宽图会横向撑破页宽。
+       这条上限让放得下的图保持原生尺寸、放不下的自动缩到页宽内，既一致又不溢出。 */
+    max-width: 100% !important;
+    height: auto !important;
+}
+/* 箭头小一点：mermaid 没有箭头大小配置项，CSS 把箭头标记缩到 70%。
+   箭尖钉在线尾：End 标记箭尖在右、Start 标记箭尖在左，分别以那一侧为缩放原点。 */
+.mermaid marker path {
+    transform: scale(0.7);
+    transform-box: fill-box;
+    transform-origin: center;
+}
+.mermaid marker[id*="End"] path {
+    transform-origin: right center;
+}
+.mermaid marker[id*="Start"] path {
+    transform-origin: left center;
+}
+/* 子图(subgraph)框：ELK 把子图渲染成 <rect class="subgraph ... node">（不是 dagre 的 .cluster），
+   还给灰色实心底、忽略源码里的 style xx fill:none。这里强制成透明底 + 深钢蓝虚线，
+   对齐公司原图的虚线分组框。.cluster 那几条留给 dagre 兜底。 */
+.mermaid rect.subgraph,
+.mermaid .subgraphs rect,
+.mermaid .cluster rect,
+.mermaid g.cluster > rect {
+    fill: none !important;
+    stroke: #3C6F9D !important;
+    stroke-width: 1px !important;
+    stroke-dasharray: 5 5 !important;
+}
+/* 时序图圆角：mermaid sequence 没有角色框/分节条圆角的配置项，
+   用 CSS 给 <rect class="actor"> 和 <rect class="note">（分节橙条）设 rx/ry
+   （SVG 几何属性，现代浏览器认 CSS 写法），对齐 wiki「框图用圆角矩形」。 */
+.mermaid rect.actor,
+.mermaid .actor-top,
+.mermaid .actor-bottom,
+.mermaid rect.note {
+    rx: 6px !important;
+    ry: 6px !important;
+}
+/* 时序图 alt/loop/opt 分支框：框边线 + 标签框描黑、分支标签加粗，让结构分隔更清楚。
+   仅作用于 loop/alt/opt 关键字渲染出的元素，当前图未用到时无副作用。
+   如需与主题统一，可把 #000000 换成连接线色 #3C6F9D。 */
+.mermaid .loopLine {
+    stroke: #000000 !important;
+}
+.mermaid .labelBox {
+    stroke: #000000 !important;
+}
+.mermaid .labelText,
+.mermaid .labelText tspan,
+.mermaid .loopText,
+.mermaid .loopText tspan {
+    font-weight: bold !important;
+}
+/* 分层架构图取消所有连接线：ELK 渲染器不认 ~~~ 隐形边、也不吃 linkStyle stroke:none，
+   会把本该隐形的布局脚手架边画成实线。这类图本就不要任何可见连线，故给它套专属外层 class
+   （RST 端 .. container:: arch-noline），用 CSS 把这一张图里的所有「边组」整体隐藏。
+   只作用于 .arch-noline 这张，其他流程图的可见箭头完全不受影响；
+   节点框/子图框在 .nodes / .clusters 里、class 不含 "edge"，不会被误伤。 */
+.arch-noline .mermaid .edgePaths,
+.arch-noline .mermaid .edgeLabels,
+.arch-noline .mermaid g.edges,
+.arch-noline .mermaid g[class*="edge"] {
+    display: none !important;
+}
+/* ====== Render Mermaid Diagram Font ====== */
+
+/* ====== Render ai summary style ====== */
+#AISummaryButton {
+    margin-bottom: 12px;
+    padding: 6px 10px;
+    background-color: #e6f6f9;
+    border: 1px solid #0068B6;
+    border-radius: 5px;
+    color: #0068B6;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+}
+#AISummaryButton.disabled-button {
+    background-color: #f0f0f0;
+    border: 1px solid #e6e6e6;
+    color: grey;
+    cursor: not-allowed;
+}
+.ai-summary-header {
+    padding: 8px 10px;
+    background-color: #2980b9;
+    color: #fff;
+    font-size: 105%;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+}
+.ai-summary-content {
+    min-height: 40px;
+    background-color: #f8f8f8;
+    font-size: 18px;
+    line-height: 28px;
+    color: #212529;
+    text-align: left !important;
+}
+/* ---- ai summary text header ---- */
+.ai-summary-content h1,
+.ai-summary-content h2,
+.ai-summary-content h3,
+.ai-summary-content h4,
+.ai-summary-content h5,
+.ai-summary-content h6 {
+    font-weight: 600;
+    margin: 5px 0;
+}
+.ai-summary-content h1 {
+    font-size: 110%;
+}
+.ai-summary-content h2 {
+    font-size: 108%;
+}
+.ai-summary-content h3 {
+    font-size: 105%;
+}
+.ai-summary-content h4,
+.ai-summary-content h5,
+.ai-summary-content h6 {
+    font-size: 100%;
+}
+/* ---- ai summary text header ---- */
+
+.ai-summary-text-box {
+    max-height: 420px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.ai-summary-text {
+    margin: 18px 20px;
+    line-height: 26px;
+}
+
+/* ---- ai summary text list ---- */
+.ai-summary-text ul,
+.ai-summary-text ol {
+    padding-inline-start: 1.5em;
+}
+/* 一级无序列表 */
+.ai-summary-text ul,
+.ai-summary-text ol ul {
+    list-style-type: disc;
+}
+/* 二级无序列表 */
+.ai-summary-text ul ul,
+.ai-summary-text ol ul ul {
+    list-style-type: circle;
+}
+/* 三级无序列表 */
+.ai-summary-text ul ul ul {
+    list-style-type: square;
+}
+/* 一级有序列表 */
+.ai-summary-text ol,
+.ai-summary-text ul ol {
+    list-style-type: decimal;
+}
+/* 二级有序列表 */
+.ai-summary-text ol ol,
+.ai-summary-text ul ol ol {
+    list-style-type: lower-latin;
+}
+/* 三级有序列表 */
+.ai-summary-text ol ol ol {
+    list-style-type: lower-roman;
+}
+.ai-summary-text li {
+    list-style-type: inherit;
+}
+/* ---- ai summary text list ---- */
+
+.text-hidden {
+    display: none;
+}
+.text-loading {
+    width: 10px;
+    height: 10px;
+    background-color: #2980b9;
+    border-radius: 100%;
+    animation: loadingCircle infinite 1s linear;
+}
+/* 闪烁动画 */
+@keyframes loadingCircle {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+/* ====== Render ai summary style ====== */

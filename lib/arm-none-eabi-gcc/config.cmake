@@ -1,0 +1,12 @@
+#
+# Copyright (c) 2026, Realtek Semiconductor Corporation
+#
+# SPDX-License-Identifier: MIT
+#
+
+set(CONFIG_REALTEK_HONEYGUI y)
+set(CONFIG_REALTEK_GUI_WIDGET_OBJ y)
+set(CONFIG_REALTEK_GUI_WIDGET_IMG y)
+set(CONFIG_REALTEK_GUI_WIDGET_WIN y)
+set(CONFIG_REALTEK_GUI_WIDGET_TEXT y)
+set(CONFIG_REALTEK_GUI_WIDGET_VIEW y)

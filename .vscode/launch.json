@@ -1,0 +1,60 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "g++.exe build and debug active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/simulator/win32/gui${command:pickPlatform}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "DEBUGINFOD_URLS",
+                    "value": ""
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "windows": {
+                "program": "${workspaceFolder}\\simulator\\win32\\gui.exe",
+                "miDebuggerPath": "gdb.exe"
+            },
+            "linux": {
+                "program": "${workspaceFolder}/simulator/win32/gui",
+                "cwd": "${workspaceFolder}/simulator/win32",
+                "miDebuggerPath": "/usr/bin/gdb",
+                "miDebuggerArgs": "-iex 'set debuginfod enabled off' -iex 'set debuginfod urls \"\"' -iex 'set auto-solib-add off'"
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disable debuginfod downloads",
+                    "text": "-gdb-set debuginfod enabled off",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Clear debuginfod URLs",
+                    "text": "-gdb-set debuginfod urls \"\"",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disable auto solib add",
+                    "text": "-gdb-set auto-solib-add off",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Clear debug file directory",
+                    "text": "-gdb-set debug-file-directory \"\"",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "g++.exe build active file"
+        }
+    ]
+}

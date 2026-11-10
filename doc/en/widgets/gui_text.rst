@@ -1,0 +1,327 @@
+.. _Text:
+
+=====
+Text
+=====
+
+The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen. In order to draw text, the font file can be a standard .ttf file or a customized .bin file.
+
+Features
+---------
+
+Text widgets can support the following features.
+
++ UTF-8/UTF16/UTF-32 support
++ Multi language support
++ Text typesetting support
++ Word wrap and texts scrolling
++ Anti-aliasing
++ Multi fonts support
++ Multi font sizes support
++ Thirty-two bit true color support
++ Emoji support
++ Custom animation effects support
++ Supports bitmap fonts and vector fonts
++ Self-developed font files support
+
+.. note::
+    Multilingual support covers standard Latin character languages (such as English, French), major Asian languages (such as Chinese, Japanese, Korean), and languages requiring complex character rendering (such as Arabic, Persian, Thai, etc., including transformed, combined, or modified character texts).
+
+.. note::
+    Only certain chips support vector fonts.
+
+Usage
+-----
+
+Using functions to load font files and display text.
+
+Font Files
+~~~~~~~~~~~~~~
+To render text, font files containing font information need to be loaded into the system.
+
+Font files can be generated using the Realtek font converter, and there are two types: bitmap fonts and vector fonts. Font files can be pre-initialized, allowing the font to be automatically retrieved by the control's font size for rendering, or unique fonts can be set individually for text controls.
+
+To initialize custom bin font files, you need to choose to call either :cpp:any:`gui_font_mem_init_mem` or :cpp:any:`gui_font_mem_init_ftl` based on the system's file reading method.
+
+Create Text Widget
+~~~~~~~~~~~~~~~~~~~
+To create a text widget, you can use :cpp:any:`gui_text_create`, The coordinates on the screen and text box size have been identified after create. These attributes also can be modified whenever you want.
+
+.. note::
+    The size of the text box should be larger than the string to be shown; out-of-range text will be hidden.
+
+Set Text Attributes
+~~~~~~~~~~~~~~~~~~~~
+
+Set Text
+^^^^^^^^^
+To add some texts or characters to a text widget and set text attributes with :cpp:any:`gui_text_set`.
+
+.. note::
+    The text length must be less than or equal to the set character length. For bitmap fonts, the text font size must match the size of the loaded font file; for vector fonts, the font size can be set dynamically.
+
+Font Type
+^^^^^^^^^^
+The text widget supports font type setting. Developers can call :cpp:any:`gui_text_type_set` to set the font source. You can set the address of font files and specify the font source mode.
+
+Text Content
+^^^^^^^^^^^^^
+This interface can be used to set the content that needs to be displayed by the text widget :cpp:any:`gui_text_content_set`.
+
+Text Encoding
+^^^^^^^^^^^^^^
+The text widget supports input formats in UTF-8, UTF-16, and UTF-32 encodings simultaneously. Developers can use :cpp:any:`gui_text_encoding_set` to change the encoding format.
+
+Convert to Img
+^^^^^^^^^^^^^^^
+By using this function :cpp:any:`gui_text_convert_to_img`, the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
+
+.. note::
+    Because the content and font size information of the text widget is needed, it should be called after set text. If the content, font size, position, and other attributes of the text have been modified, you need to reuse this interface for conversion.
+
+Text Color
+^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_color_set` to set the text color.
+
+Font Size
+^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_size_set` to set the font size. For vector fonts using FreeType, width and height can be set separately; for bitmap fonts, only the height parameter is effective as the font size.
+
+Word Wrap
+^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_wordwrap_set` to enable or disable automatic word wrapping for English words.
+
+Letter and Line Spacing
+^^^^^^^^^^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_extra_letter_spacing_set` to set extra letter spacing, and :cpp:any:`gui_text_extra_line_spacing_set` to set extra line spacing.
+
+Matrix Transformation
+^^^^^^^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_set_matrix` to set a transformation matrix for the text widget, enabling effects like rotation and scaling. Using :cpp:any:`gui_text_use_matrix_by_img` enables image-based matrix rendering, suitable for complex transformations.
+
+Minimum Scale
+^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_set_min_scale` to set the minimum scale ratio for text.
+
+Font Render Mode
+^^^^^^^^^^^^^^^^^
+For vector fonts, developers can use the function :cpp:any:`gui_text_rendermode_set` to set the rasterization render mode (1/2/4/8).
+
+Font Source Mode
+^^^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_font_mode_set` to set the font source mode, such as loading fonts from memory address, FTL, or file system.
+
+Bold Setting
+^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_bold_set` to set the bold weight and bold mode for text. Bold weight ranges from 0 (normal) to 8 (boldest), and bold mode supports horizontal bold (fast) and omnidirectional bold.
+
+.. note::
+    Bold functionality is only effective for TTF vector fonts; bitmap fonts do not support this setting.
+
+Emoji
+^^^^^
+Developers can use the function :cpp:any:`gui_text_emoji_set` to set the path and size of emoji image files. Requires use with a file system.
+
+Text Modes
+^^^^^^^^^^^
+The text control currently supports 36 types of layout modes, including the following categories:
+
+ + Single-line layout modes (3 types): Suitable for scenarios displaying only one line of text, such as single-line centered, left-aligned, right-aligned, etc.
+ + Multi-line layout modes (3 types): Used for displaying multiple lines of text, supporting various arrangements like multi-line centered, multi-line left-aligned, multi-line right-aligned, etc.
+ + Single-line middle layout modes (3 types): Single-line text vertically centered, supporting left-aligned, centered, and right-aligned.
+ + Multi-line middle layout modes (3 types): Multi-line text vertically centered, supporting left-aligned, centered, and right-aligned.
+ + Single-line bottom layout modes (3 types): Single-line text anchored to the bottom edge, supporting left-aligned, centered, and right-aligned.
+ + Multi-line bottom layout modes (3 types): Multi-line text anchored to the bottom edge, supporting left-aligned, centered, and right-aligned.
+ + Scrolling layout modes (6 types): Ideal for displaying content that exceeds the display area by scrolling, including horizontal scrolling (top and middle) and vertical scrolling.
+ + Vertical layout modes (6 types): Supports vertical text display from top to bottom, and can also be used as a general layout method for rotated text, including top alignment, middle alignment, and bottom alignment.
+ + RTL (right-to-left) layout modes (6 types): Designed for languages written from right to left, such as Arabic and Hebrew, supporting corresponding layout modes.
+
+Each layout mode can be selected based on the actual application scenario to meet diverse text display needs. Use :cpp:any:`gui_text_mode_set` to set the text layout mode.
+
+Top and middle modes truncate the text at the widget's bottom edge. Bottom modes instead anchor the last line to that edge, so when the content is taller than the widget the top of the text is clipped rather than the end.
+
+All type setting modes are as follows.
+
+.. table:: Text Mode
+   :widths: 20 20 20 20 20
+   :align: center
+   :name: Text_Mode_Table
+
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | Type                   | Line Type     | X Direction      | Y Direction                   | Widget                   |
+   +========================+===============+==================+===============================+==========================+
+   | `LEFT`                 | Single-line   | Left             | Top                           | Text widget (Default)    |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `CENTER`               | Single-line   | Center           | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RIGHT`                | Single-line   | Right            | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_LEFT`           | Multi-line    | Left             | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_CENTER`         | Multi-line    | Center           | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_RIGHT`          | Multi-line    | Right            | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MID_LEFT`             | Single-line   | Left             | Mid                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MID_CENTER`           | Single-line   | Center           | Mid                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MID_RIGHT`            | Single-line   | Right            | Mid                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_MID_LEFT`       | Multi-line    | Left             | Mid                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_MID_CENTER`     | Multi-line    | Center           | Mid                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_MID_RIGHT`      | Multi-line    | Right            | Mid                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `BOT_LEFT`             | Single-line   | Left             | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `BOT_CENTER`           | Single-line   | Center           | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `BOT_RIGHT`            | Single-line   | Right            | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_BOT_LEFT`       | Multi-line    | Left             | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_BOT_CENTER`     | Multi-line    | Center           | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_BOT_RIGHT`      | Multi-line    | Right            | Bottom                        | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_X`             | Single-line   | Right to Left    | Top                           | Scroll text widget       |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_X_REVERSE`     | Single-line   | Left to Right    | Top                           | Scroll text widget       |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_X_MID`         | Single-line   | Right to Left    | Mid                           | Scroll text widget       |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_X_MID_REVERSE` | Single-line   | Left to Right    | Mid                           | Scroll text widget       |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_Y`             | Multi-line    | Left             | Bottom to Top                 | Scroll text widget       |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_Y_REVERSE`     | Multi-line    | Right            | Top to Bottom                 | Scroll text widget       |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_LEFT_TOP`    | Multi-line    | Left             | Top to Bottom, top aligned    | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_LEFT_MID`    | Multi-line    | Left             | Top to Bottom, middle aligned | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_LEFT_BOT`    | Multi-line    | Left             | Top to Bottom, bottom aligned | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_RIGHT_TOP`   | Multi-line    | Right            | Bottom to Top, top aligned    | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_RIGHT_MID`   | Multi-line    | Right            | Bottom to Top, middle aligned | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_RIGHT_BOT`   | Multi-line    | Right            | Bottom to Top, bottom aligned | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_RIGHT`            | Multi-line    | Right            | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_CENTER`           | Multi-line    | Center           | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_LEFT`             | Multi-line    | Left             | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_MULTI_RIGHT`      | Multi-line    | Right            | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_MULTI_CENTER`     | Multi-line    | Center           | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_MULTI_LEFT`       | Multi-line    | Left             | Top                           | Text widget              |
+   +------------------------+---------------+------------------+-------------------------------+--------------------------+
+
+.. literalinclude:: ../../../realgui/widget/gui_text/gui_text.h
+   :language: c
+   :start-after: /* TEXT_MODE start */
+   :end-before: /* TEXT_MODE end */
+
+Text Move
+^^^^^^^^^^
+
+It is possible to use this function :cpp:any:`gui_text_move` to move text to a specified location.
+
+Text Layout Measurement
+^^^^^^^^^^^^^^^^^^^^^^^^
+Developers can call :cpp:any:`gui_text_layout_measure` to obtain text layout information before rendering. This function triggers the full font loading and layout pipeline, writing results back to the following widget fields:
+
+- ``char_width_sum``: Total pixel width of text content (single-line width or sum of all character widths in multi-line mode)
+- ``char_height_sum``: Total pixel height of all laid-out lines
+- ``char_line_sum``: Number of lines after layout
+- ``active_font_len``: Number of characters visible within the bounding box
+- ``font_len``: Total character count (including clipped ones)
+
+This function supports all font types (BMP/TTF/STB/MAT) and all layout modes, correctly handling word wrap, word break protection, letter spacing, line spacing, and complex text shaping for Arabic, Thai, Hebrew, etc.
+
+.. note::
+    Must be called after setting text content and font attributes (e.g., ``gui_text_set``, ``gui_text_mode_set``, etc.).
+
+Scope Clipping
+^^^^^^^^^^^^^^^
+Developers can use the function :cpp:any:`gui_text_set_scope` to set a clip scope on the text widget. Only the portion of text inside the scope rectangle will be drawn. The coordinates are relative to the text widget's own top-left corner.
+
+Additionally, :cpp:any:`gui_text_set_scope_absolute` can be used to set the clip scope using absolute screen coordinates.
+
+Example
+--------
+
+The text widget provides multiple examples and test cases located in ``example/widget/text/``. Enable the desired test in ``app_init`` of ``example_text.c``.
+
+.. list-table:: Example List
+   :widths: 5 35 60
+   :header-rows: 1
+   :align: center
+
+   * - #
+     - Function
+     - Description
+   * - 1
+     - ``text_widget_example()``
+     - Basic text widget with click event and timer callback
+   * - 2
+     - ``scroll_text_widget_example()``
+     - Horizontal (SCROLL_X) and vertical (SCROLL_Y) auto-scroll
+   * - 3
+     - ``custom_font_rendering_demo()``
+     - Custom font engine with user-defined load/draw/unload/destroy
+   * - 4
+     - ``text_font_rendering_test()``
+     - Swipeable views: bitmap (1/2/4/8-bit), vector, bold, matrix, img, bench
+   * - 5
+     - ``text_font_layout_test()``
+     - Swipeable views: single-line, multi-line, scroll, vertical, RTL
+   * - 6
+     - ``text_multi_language_test()``
+     - Language list with per-language rendering (AR, EN, ZH, TH, HE)
+   * - 7
+     - ``text_font_scroll_function_test()``
+     - Scroll X/Y/reverse with stop/reset/pause/resume and alignment modes
+   * - 8
+     - ``text_font_scroll_loop_test()``
+     - Scroll loop (marquee) for X/Y forward and reverse directions
+   * - 9
+     - ``text_font_source_mode_test()``
+     - 3x4 grid: source (MEMADDR/FTL/FILESYS) x type (BMP/IMG/MAT/TTF)
+   * - 10
+     - ``text_wordwrap_test()``
+     - Word wrap with oversized word break protection
+   * - 11
+     - ``text_measure_test()``
+     - Layout measure: BMP/TTF single-line and multi-line metrics
+   * - 12
+     - ``text_clip_test()``
+     - Partial text display using win clip (top/bottom/right/center)
+   * - 13
+     - ``text_font_typo_rendering_test()``
+     - Typography rendering: bitmap + vector baseline/line-height (swipeable)
+   * - 14
+     - ``text_font_fallback_test()``
+     - Mixed-language fallback: CJK+EN in one string with priority chain
+
+Simple Text Widget (Example 1: text_widget_example)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Basic text widget with click event and periodic timer callback.
+
+.. literalinclude:: ../../../example/widget/text/example_text.c
+   :language: c
+   :start-after: /* gui text widget example start*/
+   :end-before: /* gui text widget example end*/
+
+
+API
+-----
+
+.. doxygenfile:: gui_text.h
+

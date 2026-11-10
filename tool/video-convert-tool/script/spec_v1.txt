@@ -1,0 +1,63 @@
+
+
+编写一个 python 实现的视频转换工具：基于已有的转换方式来重新实现，输入常见类型的视频，转换为定制格式的文件，转换过程不依赖使用外部程序如 ffmpeg 等。
+
+输入：常见的视频格式，如 mp4 格式。能够解析识别输入视频的信息，如宽高，帧率帧数等信息
+输出：先转换为以下类型视频，再使用脚本后处理
+1. mjpeg 视频：每帧图片使用 yuv420 baseline 编码，使用 script/mkMJPEG.py 脚本打包为视频；
+
+2. avi 封装的 mjpeg 视频：avi 视频无音频，视频帧使用 MJPEG 格式，转换完成后依次使用 script/procAVI_no_audio_first.py 和 script/procAVI_no_audio_second.py 处理；
+
+3. h264 视频：转换编码为 h264 视频，再使用 script/h264_pack.py 处理打包；
+
+
+用户参数：用户可设置输出视频的帧率，视频质量。包含 mjpeg 的视频则可以通过配置编码 jpeg 质量来设置视频质量。
+
+注意：
+1. 转换时参考已有的转换命令，以适配同样的解码器
+2. 不对视频做画面裁剪和拉伸等；
+3. h264视频画面尺寸宽高均需对齐到 16，不足的填充黑色
+
+
+以下为已有的使用 ffmpeg 处理转换：
+
+// mp4 -> avi
+ffmpeg -i input.mp4 -an -r 25 -vcodec mjpeg -pix_fmt yuvj420p -q:v 1 output.avi
+
+// mp4->h264
+ffmpeg -r 30 -i birds.mp4 -c:v libx264 -x264-params "cabac=0:ref=3:deblock=1:0:0:analyse=0x1:0x111:me=hex:subme=7:psy=1:psy_rd=1.0:0.0:mixed_ref=1:me_range=16:chroma_me=1:trellis=1:8x8dct=0:deadzone-inter=21:deadzone-intra=11:fast_pskip=1:chroma_qp_offset=-2:threads=11:lookahead_threads=1:sliced_threads=0:nr=0:decimate=1:interlaced=0:bluray_compat=0:constrained_intra=0:bframes=0:weightp=0:keyint=40:min-keyint=4:scenecut=40:intra_refresh=0:rc_lookahead=40:mbtree=1:crf=23:qcomp=0.60:qpmin=0:qpmax=69:qpstep=4:ipratio=1.40:aq-mode=1:aq-strength=1.00" -an -f rawvideo birds.h264
+
+
+现在进行新版本开发：
+
+1. 新版本使用系统环境中的 ffmpeg 工具转换（兼容 linux 和 windows 环境），而非 dll 等
+
+2. 转换步骤仍为第一步使用工具转换，第二步脚本后处理
+
+2. ffmpeg 的转换 cmd 参考如下：
+
+# 视频转 mjpeg, 先采样帧，再使用脚本打包
+
+# 视频采样
+
+ffmpeg -i test.mp4 -r 24 -vf "format=yuvj420p" -q:v 5
+
+mjpeg_frame/frame_%04d.jpg
+
+-i input.mp4 # 源视频
+
+-r 24 # 帧率采样(每秒24帧，改成想要的帧率如 -r 30 可每秒 30 帧)
+
+-vf "format=yuvj420p" # 确保JPEG使用YUV420P色彩空间
+
+-q:v 5 # 画质(1~31，1最好，越大越差；推荐1~10之间调节)
+
+jpg/frame_%04d.jpg # 输出路径和命名模式
+
+# 视频转 avi
+
+ffmpeg -i input.mp4 -an -r 25 -vcodec mjpeg -pix_fmt yuvj420p -q:v 1 output.avi-i input.mp4 ：输入文件-an ：无音频输出（AVI播放器会检测到音轨数量是0，表现为无可选音轨，通常是灰色不可选）-r 25 ：目标帧率（25，可改成其他想要的帧率）-vcodec mjpeg ：视频编解码器为MJPEG-pix_fmt yuvj420p ：像素格式为YUV 4:2:0-q:v 5 ：画质指数（1–31，1为最高画质，数字越小质量越高，推荐2-8调节）output.avi ：输出文件名及格式
+
+// mp4->h264
+
+ffmpeg -r 30 -i birds.mp4 -c:v libx264 -x264-params "cabac=0:ref=3:deblock=1:0:0:analyse=0x1:0x111:me=hex:subme=7:psy=1:psy_rd=1.0:0.0:mixed_ref=1:me_range=16:chroma_me=1:trellis=1:8x8dct=0:deadzone-inter=21:deadzone-intra=11:fast_pskip=1:chroma_qp_offset=-2:threads=11:lookahead_threads=1:sliced_threads=0:nr=0:decimate=1:interlaced=0:bluray_compat=0:constrained_intra=0:bframes=0:weightp=0:keyint=40:min-keyint=4:scenecut=40:intra_refresh=0:rc_lookahead=40:mbtree=1:crf=23:qcomp=0.60:qpmin=0:qpmax=69:qpstep=4:ipratio=1.40:aq-mode=1:aq-strength=1.00" -an -f rawvideo birds.h264

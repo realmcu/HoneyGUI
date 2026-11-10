@@ -1,0 +1,245 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
+#ifndef __GUI_SCROLL_TEXT_H__
+#define __GUI_SCROLL_TEXT_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <string.h>
+#include "guidef.h"
+#include "gui_text.h"
+
+
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+
+/** @brief  card structure */
+typedef struct gui_scroll_text
+{
+    gui_text_t base;
+    uint32_t init_time_ms;
+    uint32_t cur_time_ms;
+    uint32_t duration_time_ms;
+    uint32_t start_delay_ms;
+    gui_text_rect_t draw_rect;
+    uint16_t start_value;
+    uint16_t end_value;
+    uint16_t cnt_value;
+    uint16_t loop_gap;
+    uint16_t interval_time_ms;
+    uint16_t scroll_pause_ms;
+    int16_t loop_shift_x;
+    int16_t loop_shift_y;
+    TEXT_MODE fallback_mode;
+    bool scrolling;
+    bool loop;
+} gui_scroll_text_t;
+
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
+
+/**
+ * @brief Creat a scroll text widget.
+ * @note Scroll text widget can show horizontal and vertical scroll text.
+ * @note Text scrolls when the text width plus its start/end padding exceeds
+ *       the text box width; otherwise it stands still and is aligned by
+ *       gui_scroll_text_non_scroll_align_set.
+ * @note Scroll and text properties need to be set by gui_scroll_text_scroll_set and gui_scroll_text_set.
+ * @param parent The father widget which the scroll text nested in.
+ * @param name The widget's name.
+ * @param x The X-axis coordinate of the text box.
+ * @param y The Y-axis coordinate of the text box.
+ * @param w The width of the text box.
+ * @param h The height of the text box.
+ * @return Return the widget object pointer: gui_scroll_text_t*
+ *
+ */
+gui_scroll_text_t *gui_scroll_text_create(void       *parent,
+                                          const char *name,
+                                          int16_t     x,
+                                          int16_t     y,
+                                          int16_t     w,
+                                          int16_t     h);
+
+/**
+ * @brief Set the text scroll property of the scroll text box.
+ *
+ * @param this the scroll text widget pointer.
+ * @param mode the mode of this scroll text widget, SCROLL_X or SCROLL_Y.
+ * @param start_value the number of pixels to the left of the text in the first frame.
+ *                    Also counts toward the scroll threshold, so short text can
+ *                    be made to scroll by padding it with blank space.
+ * @param end_value the number of pixels to the right of the text at the last frame.
+ * @param interval_time_ms the time for one loop.
+ * @param duration_time_ms the total time that text scrolling lasts.
+ * @return void
+ *
+ */
+void gui_scroll_text_scroll_set(gui_scroll_text_t *_this,
+                                TEXT_MODE          mode,
+                                uint16_t           start_value,
+                                uint16_t           end_value,
+                                uint16_t           interval_time_ms,
+                                uint32_t           duration_time_ms);
+
+/**
+* @brief set the string in a scroll text box widget.
+* @note
+* @param this the scroll text box widget pointer.
+* @param text the scroll text string.
+* @param text_type text type.
+* @param color the text's color.
+* @param length the text string's length.
+* @param font_size the text string's font size.
+* @return void
+*
+*/
+void gui_scroll_text_set(gui_scroll_text_t *_this,
+                         void              *text,
+                         FONT_SRC_TYPE      text_type,
+                         gui_color_t        color,
+                         uint16_t           length,
+                         uint16_t           font_size);
+
+/** * @brief set font encoding
+ * @note utf-8 or unicode
+ * @param this the scroll text box widget pointer
+ * @param encoding_type encoding_type
+ */
+void gui_scroll_text_encoding_set(gui_scroll_text_t *_this, TEXT_CHARSET charset);
+
+/**
+ * @brief set font type
+ * @note The type must match the font size!
+ * @param this the scroll text widget pointer
+ * @param font_source the addr of .ttf or .bin
+ * @param font_mode font source mode
+ */
+void gui_scroll_text_type_set(gui_scroll_text_t *_this, void *font_source, FONT_SRC_MODE font_mode);
+
+/**
+ * @brief set content of text widget
+ *
+ * @param this the scroll text widget pointer
+ * @param text the text string
+ * @param length the text string's length
+ */
+void gui_scroll_text_content_set(gui_scroll_text_t *_this, void *text, uint16_t length);
+
+/**
+ * @brief set scroll text skip frame
+ *
+ * @param skip_frame The number of frames that need to be skipped.
+ * If the value is 2, then scrolling text will skip two frames and scroll one frame.
+ */
+void gui_scroll_text_skip_frame_set(uint8_t skip_frame);
+
+/**
+ * @brief Reset scrolling effects
+ *
+ * @param this the scroll text widget pointer
+ */
+void gui_scroll_text_reset(gui_scroll_text_t *_this);
+
+/**
+ * @brief Stop scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_stop(gui_scroll_text_t *_this);
+
+/**
+ * @brief Pause scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_pause(gui_scroll_text_t *_this);
+
+/**
+ * @brief Resume scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_resume(gui_scroll_text_t *_this);
+
+/**
+ * @brief Start scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_start(gui_scroll_text_t *_this);
+
+/**
+ * @brief Set non-scroll alignment mode when text width is less than textbox width
+ *
+ * @param _this the scroll text widget pointer
+ * @param mode the alignment mode to use when not scrolling (LEFT, CENTER, RIGHT, etc.)
+ */
+void gui_scroll_text_non_scroll_align_set(gui_scroll_text_t *_this, TEXT_MODE mode);
+
+/**
+ * @brief Enable marquee-style loop scrolling
+ * @note When enabled, text wraps around seamlessly like a marquee.
+ *       The gap_pixel parameter controls the spacing between the tail and head of the text.
+ *
+ * @param _this the scroll text widget pointer
+ * @param enable true to enable loop scrolling, false to disable
+ * @param gap_pixel pixel gap between the end and the repeated start of the text
+ */
+void gui_scroll_text_loop_set(gui_scroll_text_t *_this, bool enable, uint16_t gap_pixel);
+
+/**
+ * @brief Set pause time between scroll cycles
+ * @note After each complete scroll cycle, the text pauses for the specified duration
+ *       before starting the next cycle. Default is 0 (no pause).
+ *
+ * @param _this the scroll text widget pointer
+ * @param pause_ms pause duration in milliseconds, 0 means no pause
+ */
+void gui_scroll_text_scroll_pause_set(gui_scroll_text_t *_this, uint16_t pause_ms);
+
+/**
+ * @brief Set a start delay before scrolling begins.
+ * @note After creation/reset, the text stays still at its start position for
+ *       delay_ms, then begins scrolling from the beginning. The delay is
+ *       re-applied on every reset()/start(). Default is 0 (no delay).
+ *
+ * @param _this the scroll text widget pointer
+ * @param delay_ms delay in milliseconds before scrolling starts
+ */
+void gui_scroll_text_start_delay_set(gui_scroll_text_t *_this, uint32_t delay_ms);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

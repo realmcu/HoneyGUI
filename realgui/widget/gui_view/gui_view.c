@@ -1,0 +1,851 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <string.h>
+#include "guidef.h"
+#include "acc_api.h"
+#include "gui_server.h"
+#include "gui_obj.h"
+#include "tp_algo.h"
+#include "gui_view.h"
+#include "gui_view_api.h"
+
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define TRIGGER_MOVE_REGION_RATION          0.2f
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+static gui_view_t *g_CurrentView = NULL;
+static gui_view_t *g_PreView = NULL;
+static gui_view_t *g_NextView = NULL;
+
+static bool g_SurpressEvent = false;
+static bool g_SurpressTP = true;
+static int16_t g_Release = 0;
+static int16_t g_Target = 0;
+
+static bool g_TriggerMove = false; // whether trigger move event
+static int16_t g_Offset = 0; // offset of the g_Release
+static bool g_TriggerMoveRegion = false;
+
+static bool g_SwitchDone = false;
+static bool g_AutoMove = false; // whether auto moveMove
+static bool g_MoveStyle = false; // true: move by scroll continuously, false: move by trigger once
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+static void gui_view_adjust_list(gui_obj_t *old, gui_obj_t *new)
+{
+    gui_node_list_t *list1 = &old->brother_list;
+    gui_node_list_t *list2 = &new->brother_list;
+
+    // Get adjacent pointers
+    gui_node_list_t *list1_next = list1->next;
+    gui_node_list_t *list2_prev = list2->prev;
+    gui_node_list_t *list2_next = list2->next;
+
+    // If node2 is already immediately after node1, no action needed
+    if (list1_next == list2) { return; }
+
+    //Remove node2 from its original position
+    list2_prev->next = list2_next;
+    list2_next->prev = list2_prev;
+
+    //Insert node2 after node1
+    list2->next = list1_next;
+    list2->prev = list1;
+    list1_next->prev = list2;
+    list1->next = list2;
+}
+
+static inline void gui_view_free_bg_img(gui_view_t *_this)
+{
+    if (_this->bg_img.data != NULL)
+    {
+        gui_free(_this->bg_img.data);
+        memset(&_this->bg_img, 0, sizeof(draw_img_t));
+    }
+}
+
+static void gui_view_hidden(gui_view_t *_this)
+{
+    if (_this == NULL) { return; }
+
+    gui_obj_t *obj = GUI_BASE(_this);
+    gui_obj_hidden(obj, true);
+    if (!_this->descriptor->keep)
+    {
+        gui_obj_tree_free_async(_this);
+    }
+    else
+    {
+        gui_log("%s hide\n", obj->name);
+        gui_view_free_bg_img(_this);
+    }
+}
+
+static void gui_view_switch_done(void *obj)
+{
+    if (g_Target != 0) // change view
+    {
+        // gui_log("obj name = %s, g_Release = %d!\n", ((gui_obj_t *)obj)->name, g_Release);
+        gui_view_t *old_view = g_CurrentView;
+        g_CurrentView = g_NextView;
+        gui_view_hidden(old_view);
+        if (old_view->descriptor->keep)
+        {
+            g_PreView = old_view;
+            if (g_NextView->opacity != UINT8_MAX) //decrease time of processing PreView
+            {
+                gui_obj_hidden(&g_PreView->base, false);
+            }
+            else
+            {
+                gui_obj_hidden(&g_PreView->base, true);
+            }
+        }
+        else
+        {
+            g_PreView = NULL;
+        }
+    }
+    else
+    {
+        gui_view_hidden(g_NextView);
+    }
+
+    gui_view_free_bg_img(g_CurrentView);
+
+    /* set bg_color instead of draw bg_img */
+    if (g_PreView && g_CurrentView->opacity != UINT8_MAX &&
+        gui_obj_is_hidden(GUI_BASE(g_PreView)) == false)
+    {
+        gui_set_bg_color(g_PreView->bg_color);
+    }
+    else
+    {
+        gui_set_bg_color(g_CurrentView->bg_color);
+    }
+    g_AutoMove = false;
+    g_SwitchDone = true;
+    g_Release = 0;
+    g_Target = 0;
+    g_NextView = NULL;
+    g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
+    gui_obj_move(&g_CurrentView->base, 0, 0);
+    g_CurrentView->base.draw_x = g_CurrentView->base.abs_x;
+    g_CurrentView->base.draw_y = g_CurrentView->base.abs_y;
+
+    gui_fb_change();
+    gui_obj_delete_timer(obj);
+
+    // gui_log("current view name = %s\n", g_CurrentView->base.name);
+}
+
+/*============================================================================*
+ *         next is the private function for on event cb
+ *============================================================================*/
+
+static void gui_view_released_cb(void *obj, gui_event_t *e)
+{
+    (void)e;
+
+    touch_info_t *tp = tp_get_info();
+    gui_view_t *_this = (gui_view_t *)obj;
+    gui_obj_t *o = (gui_obj_t *)_this;
+    // gui_log("name = %s, detalX = %d, detalY = %d\n", o->name, tp->deltaX, tp->deltaY);
+
+    g_SurpressTP = true;
+    g_SurpressEvent = true;
+
+    switch (tp->type)
+    {
+    case TOUCH_LEFT_SLIDE:
+        if (g_Release > -o->w / 2)
+        {
+            g_Target = 0;
+        }
+        break;
+    case TOUCH_RIGHT_SLIDE:
+        if (g_Release < o->w / 2)
+        {
+            g_Target = 0;
+        }
+        break;
+    case TOUCH_UP_SLIDE:
+        if (g_Release > -o->h / 2)
+        {
+            g_Target = 0;
+        }
+        break;
+    case TOUCH_DOWN_SLIDE:
+        if (g_Release < o->h / 2)
+        {
+            g_Target = 0;
+        }
+        break;
+    case TOUCH_LEFT_SLIDE_QUICK:
+        g_Target = -o->w;
+        break;
+    case TOUCH_RIGHT_SLIDE_QUICK:
+        g_Target = o->w;
+        break;
+    case TOUCH_UP_SLIDE_QUICK:
+        g_Target = -o->h;
+        break;
+    case TOUCH_DOWN_SLIDE_QUICK:
+        g_Target = o->h;
+        break;
+
+    default:
+        g_Target = 0;
+        break;
+    }
+    gui_obj_hidden(GUI_BASE(g_NextView), false);
+
+    // gui_log("g_Target = %d\n", g_Target);
+    g_Offset = 0;
+    g_TriggerMove = false;
+    g_AutoMove = true;
+    g_MoveStyle = true;
+}
+
+static void gui_view_pressing_cb(void *obj, gui_event_t *e)
+{
+    (void)obj;
+    (void)e;
+
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_event_code_t trigger_event = g_CurrentView->current_event_code;
+
+    if (trigger_event == GUI_EVENT_TOUCH_MOVE_LEFT)
+    {
+        g_Release = tp->deltaX < 0 ? tp->deltaX : 0;
+
+        if (abs(g_Release) > dc->screen_width)
+        {
+            g_Release = -dc->screen_width;
+        }
+    }
+    else if (trigger_event == GUI_EVENT_TOUCH_MOVE_RIGHT)
+    {
+        g_Release = tp->deltaX > 0 ? tp->deltaX : 0;
+
+        if (abs(g_Release) > dc->screen_width)
+        {
+            g_Release = dc->screen_width;
+        }
+    }
+    else if (trigger_event == GUI_EVENT_TOUCH_MOVE_UP)
+    {
+        g_Release = tp->deltaY < 0 ? tp->deltaY : 0;
+
+        if (abs(g_Release) > dc->screen_height)
+        {
+            g_Release = -dc->screen_height;
+        }
+    }
+    else if (trigger_event == GUI_EVENT_TOUCH_MOVE_DOWN)
+    {
+        g_Release = tp->deltaY > 0 ? tp->deltaY : 0;
+
+        if (abs(g_Release) > dc->screen_height)
+        {
+            g_Release = dc->screen_height;
+        }
+    }
+    // gui_log("delta = %d\n", g_Release);
+    if (abs(g_Release) < abs(g_Offset))
+    {
+        g_Release = 0;
+        return;
+    }
+    g_Release -= g_Offset;
+    g_TriggerMove = false;
+    gui_obj_hidden(GUI_BASE(g_NextView), false);
+
+    // gui_log("g_release = %d\n", g_Release);
+}
+
+static void gui_view_on_event_prepare(gui_obj_t *obj, gui_event_t *e)
+{
+    gui_view_t *next_view_rec = g_NextView;
+    gui_view_on_event_t *on_event = e->user_data;
+    g_NextView = gui_view_create(obj->parent, on_event->descriptor->name, 0, 0, 0, 0);
+    if (g_NextView != next_view_rec)
+    {
+        gui_view_hidden(next_view_rec);
+    }
+    if (g_PreView && g_NextView != g_PreView)
+    {
+        gui_view_hidden(g_PreView);
+        g_PreView = NULL;
+    }
+
+    g_NextView->current_transition_style = on_event->switch_in_style;
+    g_CurrentView->current_transition_style = on_event->switch_out_style;
+    g_NextView->current_event_code = e->code;
+    g_CurrentView->current_event_code = e->code;
+
+    if (on_event->switch_in_style == SWITCH_INIT_STATE) // cover CurrentView
+    {
+        gui_view_adjust_list(GUI_BASE(g_NextView), obj);
+    }
+    else
+    {
+        gui_obj_hidden(GUI_BASE(g_NextView), true);
+    }
+}
+
+static void gui_view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t *e)
+{
+    if (g_TriggerMoveRegion)
+    {
+        touch_info_t *tp = tp_get_info();
+        int16_t region_x0 = obj->w * TRIGGER_MOVE_REGION_RATION;
+        int16_t region_x1 = obj->w * (1 - TRIGGER_MOVE_REGION_RATION);
+        int16_t region_y0 = obj->h * TRIGGER_MOVE_REGION_RATION;
+        int16_t region_y1 = obj->h * (1 - TRIGGER_MOVE_REGION_RATION);
+        /* Allow trigger move region event only when touch point is in the region. */
+        if ((e->code == GUI_EVENT_TOUCH_MOVE_LEFT && tp->x < region_x1) ||
+            (e->code == GUI_EVENT_TOUCH_MOVE_RIGHT && tp->x > region_x0) ||
+            (e->code == GUI_EVENT_TOUCH_MOVE_UP && tp->y < region_y1) ||
+            (e->code == GUI_EVENT_TOUCH_MOVE_DOWN && tp->y > region_y0))
+        {
+            return;
+        }
+    }
+
+    gui_view_on_event_prepare(obj, e);
+
+    g_SurpressTP = false;
+    g_TriggerMove = true;
+    g_Offset = 0;
+
+    switch (e->code)
+    {
+    case GUI_EVENT_TOUCH_MOVE_LEFT:
+        g_Target = -obj->w;
+        break;
+    case GUI_EVENT_TOUCH_MOVE_RIGHT:
+        g_Target = obj->w;
+        break;
+    case GUI_EVENT_TOUCH_MOVE_UP:
+        g_Target = -obj->h;
+        break;
+    case GUI_EVENT_TOUCH_MOVE_DOWN:
+        g_Target = obj->h;
+        break;
+
+    default:
+        break;
+    }
+
+    // gui_log("gui_view_on_event_trigger_move_cb next view name = %s\n", g_NextView->base.name);
+}
+
+static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t *e)
+{
+    gui_view_on_event_prepare(obj, e);
+    gui_obj_hidden(GUI_BASE(g_NextView), false);
+
+    g_Release = g_CurrentView->animate_step; //prevent new view abnormal display of the first frame
+    g_Target = obj->h;
+
+    g_SurpressEvent = true;
+    g_SurpressTP = true;
+    g_AutoMove = true;
+    g_MoveStyle = false;
+
+    if (e->code == GUI_EVENT_INVALID &&
+        g_NextView->current_transition_style >= SWITCH_OUT_NONE_ANIMATION)
+    {
+        g_NextView->base.x = gui_get_screen_width();
+    }
+
+    // gui_log("gui_view_on_event_cb\n");
+}
+
+static void gui_view_generate_bg_data(gui_view_t *_this)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+
+    _this->bg_img.img_w = dc->screen_width;
+    _this->bg_img.img_h = dc->screen_height;
+    _this->bg_img.data = gui_rle_solid_color_create(dc->screen_width, dc->screen_height,
+                                                    _this->bg_color);
+    _this->bg_img.blend_mode = IMG_BYPASS_MODE;
+    _this->bg_img.opacity_value = _this->opacity;
+}
+
+static void gui_view_prepare(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+
+    GUI_UNUSED(dc);
+    GUI_UNUSED(tp);
+
+    gui_view_t *_this = (gui_view_t *)obj;
+    obj->opacity_value = _this->opacity;
+
+    if (_this == g_CurrentView)
+    {
+        if (!g_SurpressEvent)
+        {
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN, "touch");
+            g_SwitchDone = false;
+
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LEFT_SLIDE_QUICK, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RIGHT_SLIDE_QUICK, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_UP_SLIDE_QUICK, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOWN_SLIDE_QUICK, "touch");
+        }
+
+        if (g_AutoMove)
+        {
+            if (g_MoveStyle)
+            {
+                if (g_Release != g_Target)
+                {
+                    const float factor = 0.4f;
+                    int16_t distance = g_Target - g_Release;
+                    int delta = (int16_t)(distance * factor); //exponential decay
+                    if (delta == 0)
+                    {
+                        delta = (distance > 0) ? 1 : -1;
+                    }
+                    g_Release += delta;
+                }
+                else
+                {
+                    gui_view_switch_done(obj);
+                }
+            }
+            else
+            {
+                g_Release += _this->animate_step;
+                if (g_Release >= g_Target)
+                {
+                    gui_view_switch_done(obj);
+                }
+            }
+        }
+
+        if (!g_SurpressTP)
+        {
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL, "touch");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED, "touch");
+
+            /* When list gets SCROLL event, update offset */
+            if (g_TriggerMove)
+            {
+                if (tp->type == TOUCH_HOLD_X)      {g_Offset = tp->deltaX;}
+                else if (tp->type == TOUCH_HOLD_Y) {g_Offset = tp->deltaY;}
+            }
+        }
+    }
+
+    if (_this->current_transition_style != SWITCH_INIT_STATE)
+    {
+        gui_view_transition(_this, abs(g_Release));
+    }
+
+    if (g_Release != g_Target)
+    {
+        gui_fb_change();
+        if (_this->bg_color.color.argb_full != 0xFF000000 && _this->bg_img.data == NULL)
+        {
+            gui_view_generate_bg_data(_this);
+        }
+        if (_this->bg_img.data != NULL)
+        {
+            gui_set_bg_color(gui_rgb(0, 0, 0));
+            _this->bg_img.rel_x = obj->draw_x;
+            _this->bg_img.rel_y = obj->draw_y;
+            draw_img_new_area(&_this->bg_img, NULL);
+        }
+    }
+}
+
+static void gui_view_draw(gui_obj_t *obj)
+{
+    gui_view_t *_this = (gui_view_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    if (_this->bg_img.data != NULL && gui_obj_is_hidden(obj) == false)
+    {
+        gui_acc_blit_to_dc(&_this->bg_img, dc, NULL);
+    }
+}
+
+static void gui_view_destroy(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_view_t *_this = (gui_view_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    GUI_UNUSED(_this);
+    GUI_UNUSED(obj);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(dc);
+
+    gui_view_free_bg_img(_this);
+
+    for (uint32_t i = 0; i < _this->on_event_num; i++)
+    {
+        gui_free(_this->on_event[i]);
+        _this->on_event[i] = NULL;
+    }
+
+    if (_this->on_event != NULL)
+    {
+        gui_free(_this->on_event);
+    }
+
+    if (_this->descriptor->on_switch_out != NULL)
+    {
+        _this->descriptor->on_switch_out(_this);
+    }
+    *_this->descriptor->pView = NULL;
+
+    if (_this == g_CurrentView)
+    {
+        g_CurrentView = NULL;
+    }
+    else if (_this == g_NextView)
+    {
+        g_NextView = NULL;
+    }
+
+}
+
+static void gui_view_end(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_view_t *_this = (gui_view_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    GUI_UNUSED(_this);
+    GUI_UNUSED(obj);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(dc);
+
+    if (_this == g_CurrentView && g_SwitchDone)
+    {
+        g_SurpressEvent = false;
+    }
+}
+
+static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PRE_PROCESS:
+            {
+                gui_view_prepare(obj);
+            }
+            break;
+        case OBJ_PROCESS:
+            {
+                gui_view_draw(obj);
+            }
+            break;
+        case OBJ_POST_PROCESS:
+            {
+                gui_view_end(obj);
+            }
+            break;
+        case OBJ_DESTROY:
+            {
+                gui_view_destroy(obj);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+gui_view_t *gui_view_create(void       *parent,
+                            const char *name,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h)
+{
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(name);
+
+    if (descriptor == NULL)
+    {
+        gui_log("View '%s' not registered\n", name);
+        GUI_ASSERT(0);
+        return NULL;
+    }
+
+    /* Existing instance: re-attach and show it rather than allocating a new one. */
+    if (*descriptor->pView) // don't recreate view whether keep set or not
+    {
+        gui_view_t *_this = *descriptor->pView;
+
+        gui_obj_t *obj = (gui_obj_t *)_this;
+        obj->parent = parent;
+        gui_obj_hidden(obj, false);
+        obj->x = 0;
+        obj->y = 0;
+        gui_list_remove(&obj->brother_list);
+        if (GET_BASE(parent)->child_list.next == &GET_BASE(parent)->child_list)
+        {
+            gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list), &(GET_BASE(_this)->brother_list));
+            g_CurrentView = _this;
+            gui_set_bg_color(g_CurrentView->bg_color);
+        }
+        else
+        {
+            gui_view_adjust_list(GET_BASE(g_CurrentView), obj);
+        }
+        gui_log("show %s\n", obj->name);
+
+        return _this;
+    }
+
+    /* No instance yet: allocate and initialise a fresh view object. */
+    gui_view_t *_this = gui_malloc(sizeof(gui_view_t));
+    GUI_ASSERT(_this != NULL);
+    memset(_this, 0, sizeof(gui_view_t));
+    _this->descriptor = descriptor;
+    _this->animate_step = 40;
+    _this->opacity = UINT8_MAX;
+    _this->bg_color.color.argb_full = 0xFF000000;
+    if (w == 0)
+    {
+        w = (int)gui_get_screen_width();
+    }
+
+    if (h == 0)
+    {
+        h = (int)gui_get_screen_height();
+    }
+
+    gui_obj_ctor(&_this->base, parent, descriptor->name, x, y, w, h);
+
+    GET_BASE(_this)->obj_cb = gui_view_cb;
+    GET_BASE(_this)->has_input_process_cb = true;
+    GET_BASE(_this)->has_pre_process_cb = true;
+    GET_BASE(_this)->has_process_cb = true;
+    GET_BASE(_this)->has_post_process_cb = true;
+    GET_BASE(_this)->has_destroy_cb  = true;
+    GET_BASE(_this)->type = VIEW;
+    GET_BASE(_this)->create_done = true;
+    gui_list_init(&(GET_BASE(_this)->child_list));
+
+    if ((GET_BASE(_this)->parent) != NULL)
+    {
+        gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list), &(GET_BASE(_this)->brother_list));
+    }
+
+    *descriptor->pView = _this;
+
+    descriptor->on_switch_in(_this);
+    gui_log("create %s\n", GET_BASE(_this)->name);
+
+    if (g_CurrentView == NULL && parent != gui_obj_get_fake_root())
+    {
+        g_CurrentView = _this;
+        g_SurpressEvent = false;
+        g_SurpressTP = true;
+        g_SwitchDone = false;
+        g_AutoMove = false;
+        gui_set_bg_color(g_CurrentView->bg_color);
+    }
+    return _this;
+}
+
+void gui_view_switch_on_event(gui_view_t *_this,
+                              const char *target_view_name,
+                              VIEW_SWITCH_STYLE switch_out_style,
+                              VIEW_SWITCH_STYLE switch_in_style,
+                              gui_event_code_t event_code)
+{
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(target_view_name);
+
+    if (descriptor == NULL)
+    {
+        gui_log("View '%s' not registered\n", target_view_name);
+        GUI_ASSERT(0);
+        return;
+    }
+
+    bool update_event_dec = false; //update same event_code or new event_code flag
+    bool update_on_event = false; //update same event_code or new event_code flag
+
+    gui_obj_t *obj = (gui_obj_t *)_this;
+    gui_event_dsc_t *event_dsc = NULL;
+    gui_view_on_event_t *on_event = NULL;
+
+    uint32_t i = 0;
+    uint32_t j = 0;
+
+    //check for obj event_dsc
+    for (i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        event_dsc = obj->event_dsc + i;
+        if (event_dsc->filter == event_code)
+        {
+            update_event_dec = true;
+            break;
+        }
+    }
+
+    //check for view on_event
+    for (j = 0; j < _this->on_event_num; j++)
+    {
+        on_event = _this->on_event[j];
+        if (on_event->event_code == event_code)
+        {
+            update_on_event = true;
+            break;
+        }
+    }
+
+    if ((update_on_event == true) && (update_event_dec == true))
+    {
+        obj->event_dsc[i].user_data = on_event;
+        _this->on_event[j]->switch_out_style = switch_out_style;
+        _this->on_event[j]->switch_in_style = switch_in_style;
+        _this->on_event[j]->descriptor = descriptor;
+
+        if (event_code == 0)
+        {
+            gui_event_t e =
+            {
+                .code = event_code,
+                .user_data = on_event
+            };
+            gui_view_on_event_change_cb(obj, &e);
+        }
+        return;
+    }
+
+    on_event = gui_malloc(sizeof(gui_view_on_event_t));
+    GUI_ASSERT(on_event != NULL);
+    on_event->descriptor = descriptor;
+    on_event->switch_out_style = switch_out_style;
+    on_event->switch_in_style = switch_in_style;
+    on_event->event_code = event_code;
+    _this->on_event = gui_realloc(_this->on_event,
+                                  sizeof(gui_view_on_event_t *) * (_this->on_event_num + 1));
+    _this->on_event[_this->on_event_num] = on_event;
+    _this->on_event_num++;
+    GUI_ASSERT(_this->on_event_num < EVENT_NUM_MAX);
+
+    if (event_code == 0)
+    {
+        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_change_cb, event_code, on_event);
+        gui_event_t e =
+        {
+            .code = event_code,
+            .user_data = on_event
+        };
+        gui_view_on_event_change_cb(obj, &e);
+        return;
+    }
+
+    if (event_code == GUI_EVENT_TOUCH_MOVE_DOWN ||
+        event_code == GUI_EVENT_TOUCH_MOVE_UP ||
+        event_code == GUI_EVENT_TOUCH_MOVE_LEFT ||
+        event_code == GUI_EVENT_TOUCH_MOVE_RIGHT)
+    {
+        gui_obj_add_event_cb(_this, gui_view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
+        gui_obj_add_event_cb(_this, gui_view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
+        gui_obj_add_event_cb(_this, gui_view_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
+        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_trigger_move_cb, event_code,
+                             on_event);
+    }
+    else
+    {
+        gui_obj_add_event_cb(_this, (gui_event_cb_t)gui_view_on_event_change_cb, event_code, on_event);
+    }
+}
+
+void gui_view_switch_direct(gui_view_t *_this, const char *target_view_name,
+                            VIEW_SWITCH_STYLE switch_out_style,
+                            VIEW_SWITCH_STYLE switch_in_style)
+{
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(target_view_name);
+
+    if (descriptor == NULL)
+    {
+        gui_log("View '%s' not registered\n", target_view_name);
+        GUI_ASSERT(0);
+        return;
+    }
+
+    if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor)
+    {
+        return;
+    }
+    gui_view_switch_on_event(_this, target_view_name, switch_out_style, switch_in_style,
+                             GUI_EVENT_INVALID);
+}
+
+void gui_view_set_animate_step(gui_view_t *_this, uint16_t step)
+{
+    if (step > _this->base.h)
+    {
+        step = _this->base.h;
+    }
+    _this->animate_step = step;
+}
+
+gui_view_t *gui_view_get_current(void)
+{
+    return g_CurrentView;
+}
+
+gui_view_t *gui_view_get_next(void)
+{
+    return g_NextView;
+}
+
+void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity)
+{
+    _this->opacity = opacity;
+}
+
+void gui_view_set_bg_color(gui_view_t *_this, gui_color_t color)
+{
+    _this->bg_color = color;
+    if (_this == g_CurrentView)
+    {
+        gui_set_bg_color(color);
+    }
+}
+
+void gui_view_enable_trigger_move_region(bool enable)
+{
+    g_TriggerMoveRegion = enable;
+}

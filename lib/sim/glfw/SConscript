@@ -1,0 +1,22 @@
+from building import *
+import sys
+
+cwd = GetCurrentDir()
+
+src = []
+libs = ['']
+libpath = []
+include = []
+
+if sys.platform == 'win32':
+    # glfw is not used on Windows, SDL2 is used instead
+    pass
+else:  # Linux/WSL - use system glfw or skip if not needed
+    # glfw is optional, comment out if not using
+    # libs += ['glfw']
+    pass
+
+
+objs = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
+
+Return('objs')

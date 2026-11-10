@@ -1,0 +1,458 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <string.h>
+#include <stdio.h>
+#include "gui_obj.h"
+#include "gui_api.h"
+#include "def_type.h"
+#include "gui_dirty_region.h"
+
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+static gui_obj_t root =
+{
+    .name = "screen",
+    .parent = NULL,
+    .x = 0,
+    .y = 0,
+    .opacity_value = UINT8_MAX,
+    .magic = GUI_MAGIC_NUMBER,
+    .child_list = {&(root.child_list), &(root.child_list)},
+    .brother_list = {&(root.brother_list), &(root.brother_list)},
+    .create_done = true,
+};
+
+static gui_obj_t fake_root =
+{
+    .name = "fake_root",
+    .parent = NULL,
+    .x = 0,
+    .y = 0,
+    .opacity_value = UINT8_MAX,
+    .magic = GUI_MAGIC_NUMBER,
+    .child_list = {&(fake_root.child_list), &(fake_root.child_list)},
+    .brother_list = {&(fake_root.brother_list), &(fake_root.brother_list)},
+    .create_done = true,
+};
+
+static gui_obj_t kb_root =
+{
+    .name = "keyboard_root",
+    .parent = NULL,
+    .x = 0,
+    .y = 0,
+    .opacity_value = UINT8_MAX,
+    .magic = GUI_MAGIC_NUMBER,
+    .child_list = {&(kb_root.child_list), &(kb_root.child_list)},
+    .brother_list = {&(kb_root.brother_list), &(kb_root.brother_list)},
+    .create_done = true,
+};
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+
+
+static size_t safe_strlen(const char *str, size_t max_len)
+{
+    if (str == NULL) { return 0; }
+
+    size_t len = 0;
+    while (len < max_len && str[len] != '\0')
+    {
+        len++;
+    }
+
+    return len;
+}
+
+static bool is_string(const char *str, size_t max_len)
+{
+    if (str == NULL) { return 0; }
+    size_t len = safe_strlen(str, max_len);
+    if (len < max_len)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+/*============================================================================*
+*                           Public Functions
+*============================================================================*/
+
+gui_obj_t *gui_obj_get_root(void)
+{
+    return &root;
+}
+
+gui_obj_t *gui_obj_get_fake_root(void)
+{
+    return &fake_root;
+}
+
+gui_obj_t *gui_obj_get_kb_root(void)
+{
+    return &kb_root;
+}
+
+void gui_obj_ctor(gui_obj_t  *_this,
+                  gui_obj_t  *parent,
+                  const char *name,
+                  int16_t     x,
+                  int16_t     y,
+                  int16_t     w,
+                  int16_t     h)
+{
+    GUI_ASSERT(parent != NULL);
+
+    _this->parent = parent;
+
+    if (!name)
+    {
+        name = "_default_widget";
+    }
+
+    _this->name = name;
+    _this->x = x;
+    _this->y = y;
+
+    if (w == 0)
+    {
+        w = (int)gui_get_screen_width();
+    }
+
+    if (h == 0)
+    {
+        h = (int)gui_get_screen_height();
+    }
+
+    _this->w = w;
+    _this->h = h;
+    _this->opacity_value = UINT8_MAX;
+    _this->abs_x = x;
+    _this->abs_y = y;
+    _this->draw_x = x;
+    _this->draw_y = y;
+    _this->magic = GUI_MAGIC_NUMBER;
+
+    _this->last_render_rect.x1 = 0;
+    _this->last_render_rect.y1 = 0;
+    _this->last_render_rect.x2 = -1;
+    _this->last_render_rect.y2 = -1;
+}
+
+gui_obj_t *gui_obj_create(void       *parent,
+                          const char *name,
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h)
+{
+    gui_obj_t *this = gui_malloc(sizeof(gui_obj_t));
+    GUI_ASSERT(this != NULL);
+    memset(this, 0, sizeof(gui_obj_t));
+    gui_obj_ctor(this, parent, name, x, y, w, h);
+
+    gui_list_init(&(this->child_list));
+    if ((this->parent) != ((void *)0))
+    {
+        gui_list_insert_before(&(this->parent->child_list), &(this->brother_list));
+    }
+    this->create_done = true;
+
+    return this;
+}
+
+uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint32_t len)
+{
+    uint8_t crc = seed;
+
+    for (uint32_t i = 0; i < len; i++)
+    {
+        crc += *(data++);
+    }
+
+    return crc;
+}
+
+
+
+void gui_obj_show(void *obj, bool enable)
+{
+    GUI_ASSERT(obj != NULL);
+    GUI_ASSERT((GET_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    gui_log("[DEPRECATED] gui_obj_show() is deprecated, use gui_obj_hidden() instead.\n");
+    gui_obj_hidden(GET_BASE(obj), !enable);
+}
+
+
+
+
+bool gui_obj_out_screen(gui_obj_t *obj)
+{
+    if ((obj->abs_x >= (int)gui_get_screen_width())
+        || (obj->abs_x + obj->w <= 0)
+        || (obj->abs_y >= (int)gui_get_screen_height())
+        || (obj->abs_y + obj->h <= 0))
+    {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief Calculate the clipping rectangle of a GUI object relative to its top-level ancestor.
+ *
+ * @param obj The GUI object for which the clipping rectangle is calculated.
+ * @param rect The output rectangle that will contain the calculated clipping area.
+ */
+void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect)
+{
+#define MAX_OBJ_LIST 20
+    gui_obj_t *obj_list[MAX_OBJ_LIST] = {NULL};
+    gui_rect_t rect_list[MAX_OBJ_LIST];
+    gui_rect_t clip_rect_list[MAX_OBJ_LIST];
+
+    uint32_t i = 0;
+    uint32_t j = 0;
+    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
+    {
+        if (i >= MAX_OBJ_LIST)
+        {
+            GUI_ASSERT(NULL != NULL);
+            break;
+        }
+        obj_list[i++] = o;
+    }
+
+    for (uint32_t k = 0; k < i / 2; k++)
+    {
+        gui_obj_t *temp = obj_list[k];
+        obj_list[k] = obj_list[i - 1 - k];
+        obj_list[i - 1 - k] = temp;
+    }
+
+
+    rect_list[0].x1 = obj_list[0]->x;
+    rect_list[0].y1 = obj_list[0]->y;
+    rect_list[0].x2 = obj_list[0]->x + obj_list[0]->w - 1;
+    rect_list[0].y2 = obj_list[0]->y + obj_list[0]->h - 1;
+
+    memcpy(&clip_rect_list[0], &rect_list[0], sizeof(rect_list[0]));
+
+    rect->x1 = clip_rect_list[0].x1;
+    rect->y1 = clip_rect_list[0].y1;
+    int16_t w = clip_rect_list[0].x2 - clip_rect_list[0].x1;
+    int16_t h = clip_rect_list[0].y2 - clip_rect_list[0].y1;
+
+    for (j = 1; j < i; j++)
+    {
+        rect_list[j].x1 = obj_list[j]->x + rect_list[j - 1].x1;
+        rect_list[j].y1 = obj_list[j]->y + rect_list[j - 1].y1;
+        rect_list[j].x2 = obj_list[j]->x + rect_list[j - 1].x1 + obj_list[j]->w - 1;
+        rect_list[j].y2 = obj_list[j]->y + rect_list[j - 1].y1 + obj_list[j]->h - 1;
+
+        clip_rect_list[j].x1 = _UI_MAX(rect_list[j - 1].x1, rect_list[j].x1);
+        clip_rect_list[j].y1 = _UI_MAX(rect_list[j - 1].y1, rect_list[j].y1);
+        clip_rect_list[j].x2 = _UI_MIN(rect_list[j - 1].x2, rect_list[j].x2);
+        clip_rect_list[j].y2 = _UI_MIN(rect_list[j - 1].y2, rect_list[j].y2);
+
+        rect->x1 = _UI_MAX(rect->x1, clip_rect_list[j].x1);
+        rect->y1 = _UI_MAX(rect->y1, clip_rect_list[j].y1);
+        w = _UI_MIN(w, clip_rect_list[j].x2 - clip_rect_list[j].x1);
+        h = _UI_MIN(h, clip_rect_list[j].y2 - clip_rect_list[j].y1);
+    }
+
+    if (w < 0)
+    {
+        w = 0;
+    }
+    if (h < 0)
+    {
+        h = 0;
+    }
+
+    rect->x2 = rect->x1 + w;
+    rect->y2 = rect->y1 + h;
+}
+
+void gui_obj_get_area(gui_obj_t *obj,
+                      int16_t   *x,
+                      int16_t   *y,
+                      int16_t   *w,
+                      int16_t   *h)
+{
+    *x = obj->abs_x;
+    *y = obj->abs_y;
+    *w = obj->w;
+    *h = obj->h;
+}
+
+bool gui_obj_in_rect(gui_obj_t *obj,
+                     int16_t    x,
+                     int16_t    y,
+                     int16_t    w,
+                     int16_t    h)
+{
+    int16_t m_x, m_y, m_w, m_h;
+
+    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
+
+    if ((m_x < x + w) && (m_x + m_w > x) &&
+        (m_y < y + h) && (m_y + m_h > y))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y)
+{
+    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
+
+    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
+
+    if ((m_x < x)
+        && ((m_x + m_w) > x)
+        && (m_y < y)
+        && ((m_y + m_h) > y))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool gui_obj_point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y)
+{
+    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
+
+    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
+    int circle_w = (float)m_w / 1.41421356f;
+    int circle_h = (float)m_h / 1.41421356f;
+    //gui_log("%d,%d,%d,%d\n",m_x, m_y, m_w, circle_w);
+    m_x += (m_w - circle_w) / 2;
+    m_y += (m_h - circle_h) / 2;
+    m_w = circle_w;
+    m_h = circle_h;
+    if ((m_x < x)
+        && ((m_x + m_w) > x)
+        && (m_y < y)
+        && ((m_y + m_h) > y))
+    {
+        return true;
+    }
+
+    return false;
+}
+void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y)
+{
+    GUI_ASSERT(obj != NULL);
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    GUI_ASSERT(absolute_x) // cppcheck-suppress unknownMacro
+    GUI_ASSERT(absolute_y)
+    gui_obj_t *o = obj;
+    *absolute_x = o->x;
+    *absolute_y = o->y;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+        *absolute_x += o->x;
+        *absolute_y += o->y;
+    }
+}
+// gui_obj_skip_* functions are implemented in gui_obj_suppress.c
+
+gui_obj_t *gui_get_root(gui_obj_t *object)
+{
+    gui_obj_t *o = object;
+
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+    if (o->type == SCREEN)
+    {
+        return o;
+    }
+    return 0;
+
+}
+
+
+void gui_obj_hidden(gui_obj_t *obj, bool hidden)
+{
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    if (obj->hidden == hidden)
+    {
+        return;
+    }
+    obj->hidden = hidden;
+    /* Visibility flipped -- request a dirty pass so obj_track_dirty_region
+     * either erases the obj's last rect (show->hide) or re-registers it
+     * (hide->show). Without this, direct dirty-region rendering leaves
+     * ghosts of just-hidden widgets on the LCD. */
+    gui_obj_set_dirty(obj);
+}
+
+bool gui_obj_is_hidden(gui_obj_t *obj)
+{
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    return obj->hidden;
+}
+
+#define MAX_WIDGET_NAME_LENGTH 128
+const char *gui_widget_name(gui_obj_t *widget, const char *name)
+{
+    GUI_ASSERT((GUI_BASE(widget)->magic == GUI_MAGIC_NUMBER));
+    if (is_string(name, MAX_WIDGET_NAME_LENGTH + 1))
+    {
+        widget->name = name;
+    }
+    return widget->name;
+
+}
+
+void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y)
+{
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    obj->x = x;
+    obj->y = y;
+}
+void gui_obj_move(gui_obj_t *obj, int x, int y)
+{
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
+    obj->x = x;
+    obj->y = y;
+}
+
+
+
+
+
+

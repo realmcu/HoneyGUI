@@ -1,0 +1,131 @@
+# HoneyGUI Configuration
+
+menuconfig REALTEK_HONEYGUI
+    bool "Enable HoneyGUI Framework"
+    default n
+    select REALTEK_GUI_WIDGET_OBJ
+    select REALTEK_GUI_WIDGET_IMG
+    select REALTEK_GUI_WIDGET_WIN
+    select REALTEK_GUI_WIDGET_TEXT
+    help
+      Enable Realtek HoneyGUI graphics framework
+
+      The four selected widgets are the mandatory core of this release; see
+      "HoneyGUI Widget Configuration" for why they cannot be turned off yet.
+
+if REALTEK_HONEYGUI
+
+choice
+    prompt "Select HoneyGUI Demo"
+    default REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+    optional
+    depends on !REALTEK_BUILD_HONEYGUI_APP
+    help
+      Select one demo to build (mutually exclusive, or select none).
+      Cannot be selected when Build HoneyGUI APP is enabled.
+
+config REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+    bool "Image Widget Demo"
+    help
+      HoneyGUI Base Demo - Image Widget
+
+config REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
+    bool "Text Widget Demo"
+    select REALTEK_GUI_WIDGET_VIEW
+    help
+      HoneyGUI Base Demo - Text Widget
+
+config REALTEK_BUILD_EXAMPLE_LIST_WIDGET
+    bool "List Widget Demo"
+    select REALTEK_GUI_WIDGET_LIST
+    help
+      HoneyGUI Base Demo - List Widget
+
+config REALTEK_BUILD_EXAMPLE_SYSVAL_REQUEST
+    bool "System Value Request Demo"
+    help
+      HoneyGUI system value request demo showing standard
+      platform-independent values through the asynchronous sysval API.
+
+config REALTEK_BUILD_EXAMPLE_SYSVAL_SUBSCRIBE
+    bool "System Value Subscription Demo"
+    help
+      HoneyGUI system value subscription demo showing how a screen consumes
+      values published by the platform.
+
+config REALTEK_BUILD_REAL_VIEW
+    bool "View Demo"
+    select REALTEK_GUI_WIDGET_VIEW
+    help
+      HoneyGUI View Demo
+
+config REALTEK_BUILD_GUI_466_466_DEMO
+    bool "GUI Demo 466x466"
+    select REALTEK_GUI_WIDGET_VIEW
+    help
+      HoneyGUI Demo for 466x466 resolution
+
+config REALTEK_BUILD_GUI_240_240_DEMO
+    bool "GUI Demo 240x240"
+    help
+      HoneyGUI Demo for 240x240 resolution
+
+endchoice
+
+menu "HoneyGUI Feature Configuration"
+
+config REALTEK_BUILD_LETTER_SHELL
+    bool "Enable LetterShell"
+    default y
+    help
+      HoneyGUI Enable LetterShell
+
+config REALTEK_BUILD_MONKEY_TEST
+    bool "Enable Monkey Test Log"
+    default n
+    help
+      HoneyGUI Enable Monkey Test Log
+
+endmenu
+
+menu "HoneyGUI Widget Configuration"
+
+config REALTEK_GUI_WIDGET_OBJ
+    bool "gui_obj - base object (mandatory)"
+    help
+      Base object every widget inherits from. Locked on: core, server, dc
+      and input all depend on it.
+
+config REALTEK_GUI_WIDGET_IMG
+    bool "gui_img - image display (mandatory in this release)"
+    help
+      Locked on: gui_text depends on gui_img. Becomes optional once
+      engine/font is decoupled from gui_text.
+
+config REALTEK_GUI_WIDGET_WIN
+    bool "gui_win - window (mandatory in this release)"
+    help
+      Locked on: gui_text.h includes gui_win.h. Becomes optional once
+      engine/font is decoupled from gui_text.
+
+config REALTEK_GUI_WIDGET_TEXT
+    bool "gui_text - text rendering (mandatory in this release)"
+    help
+      Locked on: the whole engine/font API is expressed in terms of
+      gui_text_t (font_mem.h, font_ttf.h, font_stb.h, font_custom.h,
+      font_mem_img.h, font_mem_matrix.h).
+
+config REALTEK_GUI_WIDGET_VIEW
+    bool "gui_view - view container, button, transitions"
+    default y
+
+config REALTEK_GUI_WIDGET_LIST
+    bool "gui_list - scrollable list"
+    default y
+    help
+      Scrollable list. nano keeps the CLASSIC, CIRCLE and FADE styles; the
+      scale and rotation styles went away with the matrix transform.
+
+endmenu
+
+endif # CONFIG_REALTEK_HONEYGUI

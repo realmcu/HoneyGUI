@@ -1,0 +1,91 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <string.h>
+#include "guidef.h"
+#include "gui_server.h"
+#include "gui_obj.h"
+#include "gui_view.h"
+#include "gui_components_init.h"
+
+
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+#define MAX_VIEW_NUM 100
+static const gui_view_descriptor_t *descriptor_list[MAX_VIEW_NUM];
+static uint32_t descriptor_count = 0;
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor)
+{
+    GUI_ASSERT(MAX_VIEW_NUM > descriptor_count);
+    descriptor_list[descriptor_count] = descriptor;
+    descriptor_count++;
+}
+
+gui_view_t *gui_view_get(const char *name)
+{
+    const gui_view_descriptor_t *descriptor = gui_view_descriptor_get(name);
+    if (descriptor == NULL || descriptor->pView == NULL || *(descriptor->pView) == NULL)
+    {
+        GUI_ASSERT(0);
+        return NULL;
+    }
+    return *(descriptor->pView);
+}
+
+const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
+{
+    for (uint32_t i = 0; i < descriptor_count; i++)
+    {
+        if (strcmp(descriptor_list[i]->name, name) == 0)
+        {
+            return descriptor_list[i];
+        }
+    }
+    return NULL;
+}
+
+static int gui_view_create_during_init(void)
+{
+    for (uint32_t i = 0; i < descriptor_count; i++)
+    {
+        if (descriptor_list[i]->keep == 1)
+        {
+            gui_view_create((void *)gui_obj_get_fake_root(), descriptor_list[i]->name, 0, 0, 0, 0);
+            gui_log("Pre-create '%s' view, File: %s, Function: %s\n", descriptor_list[i]->name, __FILE__,
+                    __func__);
+        }
+    }
+    return 0;
+}
+static GUI_INIT_VIEW_CREATE(gui_view_create_during_init);

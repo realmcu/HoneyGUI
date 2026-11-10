@@ -1,0 +1,22 @@
+{% extends "!breadcrumbs.html" %}
+
+{% block breadcrumbs %}
+    {%- set _root_doc = root_doc|default(master_doc) %}
+    {%- set _proj_link = proj_link if (proj_link is defined and proj_link) else pathto(_root_doc) %}
+    <li><a href="{{ _proj_link }}" class="icon icon-home" aria-label="Home"></a></li>
+    {%- for doc in parents %}
+        <li class="breadcrumb-item"><a href="{{ doc.link | e }}">{{ doc.title }}</a></li>
+    {%- endfor %}
+    <li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %}
+
+{% block breadcrumbs_aside %}
+    {% if is_multilingual %}
+        <li class="wy-breadcrumbs-aside">
+            <a href="#" id="toEN">EN</a>/<a href="#" id="toCN">中文</a>
+        </li>
+    {% endif %}
+
+    {{ super() }}
+
+{% endblock %}

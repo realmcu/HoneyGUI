@@ -1,0 +1,72 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+
+#include "guidef.h"
+#include "gui_api_indev.h"
+#include "gui_api_os.h"
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+
+
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+
+static struct gui_indev *indev = NULL;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+void gui_indev_info_register(struct gui_indev *info)
+{
+    indev = info;
+}
+
+struct gui_indev *gui_get_indev(void)
+{
+    return indev;
+}
+
+void ext_button_set_indicate(void (*callback)(void))
+{
+    if (indev->ext_button_indicate)
+    {
+        indev->ext_button_indicate(callback);
+    }
+}
+
+gui_touch_port_data_t *touchpad_get_data(void)
+{
+    if (indev->tp_get_data)
+    {
+        return indev->tp_get_data();
+    }
+    GUI_ASSERT(NULL != NULL);
+    return NULL;
+}
+
+gui_wheel_port_data_t *wheel_get_data(void)
+{
+    if (indev->wheel_get_port_data)
+    {
+        return indev->wheel_get_port_data();
+    }
+    GUI_ASSERT(NULL != NULL);
+    return NULL;
+}

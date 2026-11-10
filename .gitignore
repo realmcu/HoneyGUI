@@ -1,0 +1,136 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Backed files
+*.bak
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+*.pyc
+.gitignore
+simulator/keil/ac5/RTE/*
+simulator/keil/ac5/build/*
+simulator/keil/ac5/HoneyGUI.uvguix.*
+simulator/keil/ac6/RTE/*
+simulator/keil/ac6/build/*
+simulator/keil/ac6/HoneyGUI.uvguix.*
+lib/RTE/*
+lib/build/*
+lib/gui_engine.uvguix.*
+*.dblite
+
+# Generated config headers
+simulator/win32/hgconfig.h
+simulator/win32/cconfig.h
+hgconfig.h
+
+# Build artifacts
+*.map
+*.bin
+gui
+gui.exe
+
+# Python cache
+__pycache__/
+*.pyc
+
+# SCons build files
+.sconsign.dblite
+.sconf_temp/
+
+doc/doxyxml/html
+doc/doxyxml/xml
+doc/output
+doc/build
+doc/_build
+doc/**/word_dict.txt
+doc/**/_static/js/ga_config.js
+doxygen_graphviz/_build
+
+# editor config
+.vscode/
+
+# Build output directories
+simulator/win32/build/
+simulator/web/build/
+simulator/web/files.js
+lib/emscripten/build/
+lib/emscripten/install/
+simulator/keil/ac5/build/
+simulator/keil/ac6/build/
+lib/build/
+doc/build/
+doc/_build/
+doxygen_graphviz/_build/
+
+# Executables and binaries
+simulator/win32/gui.bin
+simulator/win32/gui
+simulator/win32/gui.exe
+
+# tool
+tool/D2XML/MasterGo_plugin/node_modules/
+tool/D2XML/Pixso_plugin/node_modules/
+
+# CI build scripts: scratch build tree and per-stage reports
+/.ci-build/
+example/ci_build_scripts/test_report.txt
+example/ci_build_scripts/build_errors*.log
+
+# other
+build/
+.omo/
+.kiro
+/.codex-build/
+/docs/
+/.dev/
+AGENTS.md
+realgui/3rd/sim_experimental/sdl_sim.bin
+realgui/3rd/sim_experimental/sdl_sim

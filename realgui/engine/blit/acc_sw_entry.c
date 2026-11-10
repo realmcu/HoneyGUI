@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include "acc_sw_entry.h"
+#include "acc_sw_compressed.h"
+#include "acc_sw_uncompressed.h"
+
+static void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
+{
+    (void)image;
+    (void)rect;
+}
+
+static void sw_acc_end_cb(draw_img_t *image)
+{
+    (void)image;
+}
+
+void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    if (image == NULL || image->data == NULL)
+    {
+        return;
+    }
+
+    gui_rgb_data_head_t *header = (gui_rgb_data_head_t *)image->data;
+
+    if (header->compress)
+    {
+        sw_acc_blit_compressed(image, dc, rect);
+    }
+    else
+    {
+        sw_acc_blit_uncompressed(image, dc, rect);
+    }
+}
+
+void sw_acc_init(void)
+{
+    draw_img_acc_prepare_cb = sw_acc_prepare_cb;
+    draw_img_acc_end_cb = sw_acc_end_cb;
+}
+
+void sw_acc_deinit(void)
+{
+    extern void (* draw_img_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
+    extern void (* draw_img_acc_end_cb)(struct draw_img * image);
+    if (draw_img_acc_prepare_cb == sw_acc_prepare_cb)
+    {
+        draw_img_acc_prepare_cb = NULL;
+    }
+    if (draw_img_acc_end_cb == sw_acc_end_cb)
+    {
+        draw_img_acc_end_cb = NULL;
+    }
+}
+
+gui_blit_ops_t sw_acc_blit_ops =
+{
+    .init = sw_acc_init,
+    .process = sw_acc_blit,
+    .deinit = sw_acc_deinit,
+};

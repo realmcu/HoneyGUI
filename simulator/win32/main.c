@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2026, Realtek Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include "gui_server.h"
+#include "unistd.h"
+#include "time.h"
+
+
+
+
+#define LOG_VERSION_NUM                "x.x.x"
+#define COMPILE_TIME                    __DATE__", "__TIME__
+#define PROJECT_NAME                   "HoneyGUI Simulator"
+#define COMPANY_NAME                   "Realtek Semiconductor Corporation"
+
+/* Assets directory given on the command line ("gui <dir>"), NULL if none */
+const char *asset_dir = NULL;
+
+
+int main(int argc, char **argv)
+{
+    setvbuf(stdout, NULL, _IONBF,
+            0);// add for vstudio debug console output issue,vscode plugin used to debug
+
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+    {
+        printf("current working directory: %s\n", cwd);
+    }
+
+    if (argc > 1)
+    {
+        asset_dir = argv[1];
+    }
+    printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", \
+           COMPANY_NAME, \
+           PROJECT_NAME, \
+           COMPILE_TIME);
+
+
+    gui_server_init();
+
+    while (1)
+    {
+        time_t now;
+        now = time(NULL);
+        printf("World Time: %.*s\n", 25, ctime(&now));
+        sleep(1000);
+    }
+
+    return 0;
+}
+
+

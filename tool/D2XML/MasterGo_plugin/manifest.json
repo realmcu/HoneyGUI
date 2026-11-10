@@ -1,0 +1,17 @@
+{
+  "name": "D2XML",
+  "id": 171233830918980,
+  "main": "dist/main.js",
+  "ui": "dist/index.html",
+  "editor_type": [
+    "canvas",
+    "devMode",
+    "mastergo"
+  ],
+  "capabilities": [
+    "inspect"
+  ],
+  "permissions": [
+    "current_page" 
+  ]
+}
