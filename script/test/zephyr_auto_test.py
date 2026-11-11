@@ -11,6 +11,7 @@ import log
 import json
 import sys
 import queue
+import platform
 import threading
 from slave_property import *
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -49,6 +50,9 @@ class ZephyrAutoTest():
             bee1_controller.test_cut_restart(interval=0)
 
     def run_test(self):
+        current_dir = os.getcwd()
+        parent_dir = os.path.dirname(current_dir)
+        os.environ['WORKON_HOME'] = parent_dir
         mpcli = slave_property_parse(self.project, self.branch, self.chip_type, 'MPCLI', 'role', 'DUT1', part_number=self.part_number)
         download_port = mpcli['COM']
         origin_path = os.getcwd()
@@ -69,9 +73,30 @@ class ZephyrAutoTest():
         log_path = log.get_log_dir(module = self.module)
  
         integrationTester_config = slave_property_parse(self.project, self.branch, self.chip_type, 'IntegrationTester', 'role', 'ALL', part_number=self.part_number)
-        cmd = ['python', integrationTester_config["path"]]
+        # 处理平台相关配置
+        system = platform.system().lower()
+        if system in ("windows", "linux"):
+            venv_dir = os.path.join(integrationTester_config["path"], f"venv-{system}")
+            pipfile_path = os.path.join(venv_dir, "Pipfile")
+            lock_path = os.path.join(venv_dir, "Pipfile.lock")
+
+            try:
+                for src in [pipfile_path, lock_path]:
+                    shutil.copy2(src, os.getcwd())
+                    print(f"copy {os.path.basename(src)} to {os.getcwd()}")
+            except FileNotFoundError as e:
+                sys.exit(f"配置文件不存在: {str(e)}")
+        else:
+            sys.exit(f"not supported platform: {system}")
+
+        subprocess.check_call([sys.executable, "-m", "pipenv", "sync"],
+                              universal_newlines=True, stderr=subprocess.STDOUT)
+
+        cmd = [sys.executable, "-m", "pipenv", "run", "python", integrationTester_config["path"]]
         cmd.extend(["--testType", self.test_type])
         if self.module in ["HoneyGUI_Zephyr"]:
+            cmd.extend(["--module", "HoneyGUI_SW_RESET", "--skipDownloadBin"])
+        elif self.module in ["HoneyGUI_CMD"]:
             cmd.extend(["--module", "HoneyGUI"])
         else:
             cmd.extend(["--module", self.module])
@@ -81,6 +106,7 @@ class ZephyrAutoTest():
         cmd.extend(["--xmlPath", integrationTester_config["sequence"]])
         cmd.extend(["--devConfigFile", integrationTester_config["config"]])
 
+        result = True
         try:
             print(" ".join(cmd), flush=True)
             subprocess.check_call(cmd, universal_newlines=True, stderr=subprocess.STDOUT)
