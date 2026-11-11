@@ -46,7 +46,14 @@
                 const sim = await startHoneyGUI({ createModule: globalThis.createHoneyGUI, canvas, files });
                 canvas.style.width = `${sim.width * 2}px`;
                 canvas.style.height = `${sim.height * 2}px`;
-                status.textContent = `${sim.width} x ${sim.height}`;
+                /* The default configuration builds the engine only, with no
+                 * demo application, so an empty canvas is the expected result
+                 * rather than a failure. Say so instead of leaving the page
+                 * looking broken. */
+                status.textContent = Object.keys(files).length
+                    ? `${sim.width} x ${sim.height}`
+                    : `${sim.width} x ${sim.height} -- no demo application in this build ` +
+                      '(see "Choosing the demo application" in doc/GUI-APP/Web/index.rst)';
                 globalThis.honeyguiSim = sim;
             } catch (error) {
                 status.textContent = `Failed to start: ${error}`;

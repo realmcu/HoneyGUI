@@ -101,7 +101,8 @@ else()
 endif()
 
 add_subdirectory(../../realgui realgui)
-add_subdirectory(../../example example)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../lib/add_example_demos.cmake)
+gui_add_example_demos()
 add_subdirectory(../../lib/sim sim)
 add_subdirectory(port port)
 

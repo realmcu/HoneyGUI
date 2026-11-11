@@ -69,7 +69,7 @@ menuconfig ../../Kconfig.gui
 This generates a `.config` file that both build systems read. Available applications include:
 - Watch Turnkey Demo (410x502) - default watch application
 - GUI Demo (800x480) - dashboard application
-- Various screen-specific applications (240x240, 466x466, etc.)
+- Various screen-specific applications (410x502, 466x466, 480x272, 800x480, etc.)
 
 ## Architecture
 

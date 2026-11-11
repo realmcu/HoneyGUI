@@ -249,12 +249,6 @@ config REALTEK_BUILD_EMBEDED_TEST
     help
       HoneyGUI embedded test
 
-config REALTEK_BUILD_GUI_240_240_DEMO
-    bool "GUI Demo 240x240"
-    help
-      HoneyGUI Demo for 240x240 resolution
-
-
 config REALTEK_BUILD_GUI_800_480_DEMO
     bool "GUI Demo 800x480"
     select REALTEK_GUI_WIDGET_VIEW

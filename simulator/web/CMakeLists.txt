@@ -13,18 +13,18 @@
 # "python simulator/web/pack_files.py" once, then open
 # simulator/web/index.html by double-clicking it.
 #
-# The demo is selected the same way as simulator/win32, through
-# simulator/web/.config. simulator/web/files.json lists the runtime files the
-# demo reads (its romfs image); update it and re-run pack_files.py after
-# selecting a different demo.
+# The default .config selects no demo application: the build is the engine and
+# the HML runtime, which is what the designer preview needs. A demo is one
+# Kconfig choice away (see below) and needs its romfs listed in
+# simulator/web/files.json, which is empty by default.
 #
 # Options:
 #   WEB_SIM_CONFIG       .config to use instead of simulator/web/.config, for
-#                        example simulator/web/.config_engine (all widgets and
-#                        the HML runtime, no demo app, no letter_shell which
-#                        needs a GNU linker script). With the HML runtime the
-#                        engine can also run designer HML directly, without a
-#                        compiled project (web_sim_load_hml(), see web_sim.h).
+#                        example one of the CI configs under
+#                        example/ci_build_scripts/configs/ to build a demo.
+#                        With the HML runtime the engine can also run designer
+#                        HML directly, without a compiled project
+#                        (web_sim_load_hml(), see web_sim.h).
 #   WEB_SIM_MAIN_MODULE  build the engine as a main module that can load a
 #                        project compiled separately as a side module at run
 #                        time (-sSIDE_MODULE). Implies position independent
@@ -102,7 +102,8 @@ add_executable(${GUI_TARGET_NAME} main.c)
 target_compile_definitions(${GUI_TARGET_NAME} PRIVATE _HONEYGUI_SIMULATOR_)
 
 add_subdirectory(../../realgui realgui)
-add_subdirectory(../../example example)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../lib/add_example_demos.cmake)
+gui_add_example_demos()
 add_subdirectory(port port)
 
 get_property(GUI_BINARY_RESOURCES GLOBAL PROPERTY GUI_BINARY_RESOURCES)

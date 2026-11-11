@@ -58,7 +58,7 @@ Windows、Linux、macOS 加载同一个预编译 wasm，不因平台差异产生
 
 然后打开 ``simulator/web/index.html``。
 
-上述流程使用仓库自带的示例配置（240x240 的 ``screen_240_240``）。更换配置见 `选择要运行的示例程序`_；预览设计器导出的工程见 `设计器界面预览`_；嵌入自有网页见 `嵌入到自己的网页`_。
+上述流程使用仓库自带的默认配置：包含引擎与 HML 运行时，**不含示例程序**，因此打开页面后画面是空的。这就是设计器预览所使用的引擎；想直接看到编译进引擎的示例程序，见 `选择要运行的示例程序`_。预览设计器导出的工程见 `设计器界面预览`_；嵌入自有网页见 `嵌入到自己的网页`_。
 
 .. _安装 emsdk:
 
@@ -120,25 +120,23 @@ Python 随 :ref:`入门指南` 安装；CMake 与 Ninja 可通过包管理器安
    > cd simulator/web
    > menuconfig ../../Kconfig.gui
 
-生成的 ``.config`` 决定引擎包含的控件与内置示例程序。仓库提供两份：
+生成的 ``.config`` 决定引擎包含的控件与内置示例程序。仓库自带的默认 ``.config`` 包含全部控件与 HML 运行时、不含示例程序：打开后画面为空，设计器预览即使用此引擎。
 
-.. list-table::
-   :header-rows: 1
-   :widths: 30 70
-
-   * - 配置
-     - 用途
-   * - ``.config``\ （默认）
-     - 240x240 示例程序，用于验证浏览器仿真链路
-   * - ``.config_engine``
-     - 全部控件与 HML 运行时，不含示例程序。**预览设计器工程使用此配置**
-
-更换配置后重新构建：
+示例程序只差一个 Kconfig 选项。任意一份 CI 配置都会选中一个，例如 466x466 示例：
 
 .. code-block:: shell
 
    > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine
+       -DWEB_SIM_CONFIG=example/ci_build_scripts/configs/application/.config_realtek_build_gui_466_466_demo
+   > cmake --build simulator/web/build
+
+示例程序从 romfs 镜像读取资源，因此执行 ``pack_files.py`` 之前须把该镜像列入 ``simulator/web/files.json``。该文件默认为空。
+
+用 ``menuconfig`` 改过配置后，重新构建的命令不变（默认读取 ``.config``）：
+
+.. code-block:: shell
+
+   > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja
    > cmake --build simulator/web/build
 
 在浏览器里打开
@@ -152,11 +150,13 @@ Python 随 :ref:`入门指南` 安装；CMake 与 Ninja 可通过包管理器安
 
 然后打开 ``simulator/web/index.html``。
 
+默认配置不含示例程序，因此画布是空的、页面只显示分辨率，这是预期结果而非故障。选中示例程序或加载设计器工程（见 `设计器界面预览`_）后页面才有内容。
+
 窗口内的操作对应关系：鼠标拖动为滑动手势，点击为触摸，滚轮为列表滚动，Home / Back / Menu / Power 按钮为硬件按键。
 
 .. note::
 
-   ``files.js`` 由 ``files.json`` 中列出的文件打包生成，内容取决于 ``.config`` 选定的示例程序。更换示例程序后，需修改 ``files.json`` 并重新执行 ``pack_files.py``。``files.js`` 不入库。
+   ``files.js`` 由 ``files.json`` 中列出的文件打包生成，该文件默认为空。选中的示例程序需要把它的 romfs 镜像列进去；更换示例程序后需修改 ``files.json`` 并重新执行 ``pack_files.py``。``files.js`` 不入库。
 
 打包成可分发的引擎
 ~~~~~~~~~~~~~~~~~~
@@ -166,7 +166,6 @@ Python 随 :ref:`入门指南` 安装；CMake 与 Ninja 可通过包管理器安
 .. code-block:: shell
 
    > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine \
        -DWEB_SIM_MAIN_MODULE=ON
    > cmake --build simulator/web/build
    > cmake --install simulator/web/build --prefix <安装目录>
@@ -213,10 +212,10 @@ Python 随 :ref:`入门指南` 安装；CMake 与 Ninja 可通过包管理器安
    页面编码不正确。``gui.js`` 中内嵌的是 UTF-8 文本形式的 wasm，页面须声明 ``<meta charset="UTF-8">``。
 
 提示 ``This engine was built without the HML runtime``
-   引擎配置未启用 HML 运行时。使用 ``-DWEB_SIM_CONFIG=simulator/web/.config_engine`` 重新构建。
+   引擎配置未启用 HML 运行时。使用默认的 ``simulator/web/.config`` 构建即可，它已包含。
 
 引擎启动但界面空白
-   检查 ``files.json`` 中的路径是否存在，并重新执行 ``pack_files.py``。
+   默认配置不含示例程序，这是预期结果。若要看到编译进引擎的示例，按 `选择要运行的示例程序`_ 选中一个。若已选中示例，则检查 ``files.json`` 中的路径是否存在，并重新执行 ``pack_files.py``。
 
 设计器界面预览
 --------------
@@ -230,12 +229,11 @@ Python 随 :ref:`入门指南` 安装；CMake 与 Ninja 可通过包管理器安
 
 **第一步：准备引擎**
 
-必须用带 HML 运行时的配置（``.config_engine`` 已包含）：
+默认的 ``simulator/web/.config`` 就是该引擎：全部控件、HML 运行时、不含示例程序。
 
 .. code-block:: shell
 
    > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine \
        -DWEB_SIM_MAIN_MODULE=ON
    > cmake --build simulator/web/build
    > cmake --install simulator/web/build --prefix out
@@ -322,7 +320,7 @@ HML 中按名称引用的业务函数（``functionName``、定时器 ``callback`
 ~~~~~~~~
 
 提示 ``This engine was built without the HML runtime``
-   引擎未启用 ``CONFIG_REALTEK_BUILD_XML_LOADER``，需使用 ``.config_engine`` 重新构建。
+   引擎未启用 ``CONFIG_REALTEK_BUILD_XML_LOADER``。使用默认的 ``simulator/web/.config`` 构建即可，它已包含。
 
 界面元素错位或图片缺失
    HML 中的资源路径按 ``assets/resource/xxx.png`` → ``/resource/xxx.bin`` 的规则解析。确认图片已由设计器转换为 ``.bin``，且子目录一致。
@@ -473,15 +471,14 @@ HoneyGUI 仓库只提供引擎和页面宿主代码，不托管在线站点。�
 
 .. code-block:: shell
 
-   > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine
+   > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja
    > cmake --build simulator/web/build
 
 产物是单个 ``simulator/web/build/gui.js``\ （wasm 已内嵌），配 ``simulator/web/web_sim.js`` 使用。
 
 .. note::
 
-   ``-DWEB_SIM_CONFIG`` 不可省略。默认的 ``.config`` 未编入 HML 运行时，页面会报 ``This engine was built without the HML runtime``，或不显示任何界面。
+   默认的 ``.config`` 已编入 HML 运行时，这一步需要它。若用 ``-DWEB_SIM_CONFIG`` 指向未编入 HML 运行时的配置，页面会报 ``This engine was built without the HML runtime``。
 
 仅在引擎需要更新时重做本步骤。修改界面不需要重新编译引擎，但需重新执行后续步骤。
 

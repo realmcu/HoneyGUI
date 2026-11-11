@@ -58,7 +58,7 @@ In that activated shell, run from the repository root:
 
 Then double-click ``simulator/web/index.html``. That is it.
 
-This uses the checked-in demo configuration (the 240x240 ``screen_240_240`` demo). Switching configurations is in `Choosing the demo application`_; previewing an exported designer project is in `Designer UI Preview`_; embedding in your own page is in `Embed in Your Own Page`_.
+This uses the checked-in default configuration, which builds the engine and the HML runtime with **no demo application**, so the page opens showing an empty screen. That is the engine the designer preview runs on; to see a compiled demo instead, select one in `Choosing the demo application`_. Previewing an exported designer project is in `Designer UI Preview`_; embedding in your own page is in `Embed in Your Own Page`_.
 
 .. _Install emsdk:
 
@@ -120,25 +120,23 @@ Choosing the demo application
    > cd simulator/web
    > menuconfig ../../Kconfig.gui
 
-The generated ``.config`` decides which widgets the engine contains and which demo application is built in. Two are checked in:
+The generated ``.config`` decides which widgets the engine contains and which demo application, if any, is built in. The default ``.config`` is checked in and builds all widgets plus the HML runtime with no demo application: the page opens on an empty screen, which is what the designer preview runs on.
 
-.. list-table::
-   :header-rows: 1
-   :widths: 30 70
-
-   * - Configuration
-     - Purpose
-   * - ``.config``\ (default)
-     - The 240x240 demo, used to confirm the browser pipeline works
-   * - ``.config_engine``
-     - All widgets plus the HML runtime, no demo application. **This is the one for designer project preview**
-
-To rebuild with a different configuration:
+A demo application is one Kconfig choice away. Any of the CI configurations selects one, for example the 466x466 demo:
 
 .. code-block:: shell
 
    > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine
+       -DWEB_SIM_CONFIG=example/ci_build_scripts/configs/application/.config_realtek_build_gui_466_466_demo
+   > cmake --build simulator/web/build
+
+A demo reads its resources from a romfs image, so ``simulator/web/files.json`` has to list that image before ``pack_files.py`` is run. It is empty by default.
+
+Rebuilding after ``menuconfig`` is the same command, since the default ``.config`` is read automatically:
+
+.. code-block:: shell
+
+   > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja
    > cmake --build simulator/web/build
 
 Opening it in a browser
@@ -152,11 +150,13 @@ Opening it in a browser
 
 Then double-click ``simulator/web/index.html``.
 
+With the default configuration there is no demo, so the canvas stays empty and the page reports the screen size; that is the expected result, not a failure. The page is useful once a demo is selected or a project is loaded (see `Designer UI Preview`_).
+
 In the window: drag acts as a swipe, click as a touch, the wheel scrolls lists, and the Home / Back / Menu / Power buttons act as hardware keys.
 
 .. note::
 
-   ``files.js`` is packed from the files listed in ``files.json`` and depends on the demo selected in ``.config``. After changing the demo, update ``files.json`` and re-run ``pack_files.py``. ``files.js`` is not checked in.
+   ``files.js`` is packed from the files listed in ``files.json``, which is empty by default. A selected demo needs its romfs image listed there; update ``files.json`` and re-run ``pack_files.py`` after changing the demo. ``files.js`` is not checked in.
 
 Packaging a distributable engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +166,6 @@ To ship the preview inside a tool so that users need no emsdk, prebuild the engi
 .. code-block:: shell
 
    > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine \
        -DWEB_SIM_MAIN_MODULE=ON
    > cmake --build simulator/web/build
    > cmake --install simulator/web/build --prefix <install dir>
@@ -213,10 +212,10 @@ The page reports ``Failed to start`` or stays black
   Page encoding. The wasm inside ``gui.js`` is UTF-8 text, so the page must declare ``<meta charset="UTF-8">``.
 
 ``This engine was built without the HML runtime``
-  The configuration has the HML runtime off. Rebuild with ``-DWEB_SIM_CONFIG=simulator/web/.config_engine``.
+  The configuration has the HML runtime off. Build with the default ``simulator/web/.config``, which has it.
 
 The engine runs but the screen is blank
-  Check that the paths in ``files.json`` exist, then re-run ``pack_files.py``.
+  Expected with the default configuration, which has no demo application. Select one in `Choosing the demo application`_ to see a compiled demo. If a demo is selected, check that the paths in ``files.json`` exist, then re-run ``pack_files.py``.
 
 Designer UI Preview
 -------------------
@@ -230,12 +229,11 @@ Procedure
 
 **Step 1: prepare the engine**
 
-A configuration with the HML runtime is required (``.config_engine`` already includes it):
+The default ``simulator/web/.config`` already is this engine: all widgets, the HML runtime and no demo application.
 
 .. code-block:: shell
 
    > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine \
        -DWEB_SIM_MAIN_MODULE=ON
    > cmake --build simulator/web/build
    > cmake --install simulator/web/build --prefix out
@@ -322,7 +320,7 @@ Troubleshooting
 ~~~~~~~~~~~~~~~
 
 ``This engine was built without the HML runtime``
-  The engine does not have ``CONFIG_REALTEK_BUILD_XML_LOADER``. Rebuild with ``.config_engine``.
+  The engine does not have ``CONFIG_REALTEK_BUILD_XML_LOADER``. Build with the default ``simulator/web/.config``, which has it.
 
 Elements are misplaced or images are missing
   HML asset paths resolve as ``assets/resource/xxx.png`` -> ``/resource/xxx.bin``. Check that the designer converted the images to ``.bin`` and that the subdirectories match.
@@ -473,15 +471,14 @@ Hosting it yourself, step by step
 
 .. code-block:: shell
 
-   > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja \
-       -DWEB_SIM_CONFIG=simulator/web/.config_engine
+   > emcmake cmake -S simulator/web -B simulator/web/build -G Ninja
    > cmake --build simulator/web/build
 
 The output is a single ``simulator/web/build/gui.js``\ (the wasm is embedded), used together with ``simulator/web/web_sim.js``.
 
 .. note::
 
-   ``-DWEB_SIM_CONFIG`` is not optional. The default ``.config`` has no HML runtime, and the page then reports ``This engine was built without the HML runtime``, or shows nothing at all.
+   The default ``.config`` has the HML runtime, which this needs. If ``-DWEB_SIM_CONFIG`` points at a configuration without it, the page reports ``This engine was built without the HML runtime``.
 
 This step only has to be redone when the engine changes. **Changing the UI does not need a rebuild**, but the steps below have to be repeated.
 

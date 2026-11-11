@@ -104,7 +104,6 @@ DEMO_CONFIGS = (
     ("REALTEK_BUILD_REAL_BOX2D", "Box2D Demo", "widget"),
     ("REALTEK_BUILD_GUI_410_502_DEMO", "GUI Demo 410x502", "application"),
     ("REALTEK_BUILD_GUI_466_466_DEMO", "GUI Demo 466x466", "application"),
-    ("REALTEK_BUILD_GUI_240_240_DEMO", "GUI Demo 240x240", "application"),
     ("REALTEK_BUILD_GUI_800_480_DEMO", "GUI Demo 800x480", "application"),
     ("REALTEK_BUILD_HML_DESIGNER",
      "HML Designer Application", "application"),

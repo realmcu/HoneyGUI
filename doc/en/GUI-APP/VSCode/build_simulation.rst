@@ -135,7 +135,6 @@ Project Configuration File
 
 Supported resolutions:
 
-* ``240x240`` - Small round watch
 * ``410x502`` - Standard smartwatch
 * ``466x466`` - Large screen watch
 * ``480x272`` - Landscape device
