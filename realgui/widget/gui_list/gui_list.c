@@ -999,15 +999,26 @@ static void gui_list_pressing_cb(void *object, gui_event_t *e)
     // Limiting the range of movement
     if (!_this->loop)
     {
+        bool limited = false;
         if (_this->offset > offset_max)
         {
             _this->offset = offset_max;
-            g_Limit = true;
+            limited = true;
         }
         else if (_this->offset < offset_min)
         {
             _this->offset = offset_min;
-            g_Limit = true;
+            limited = true;
+        }
+
+        if (limited)
+        {
+            int tp_delta = (_this->dir == HORIZONTAL) ? tp->deltaX : tp->deltaY;
+            _this->hold = _this->offset - tp_delta;
+            if (gui_view_get_next() != NULL)
+            {
+                g_Limit = true;
+            }
         }
     }
 
