@@ -4,11 +4,11 @@
 VSCode 插件资源转换工具
 ============================
 
-HoneyGUI Visual Designer 中内置了一套完整的资源转换工具，可以将各种格式的资源文件转换为嵌入式设备可用的二进制格式。这些工具采用纯 JavaScript/TypeScript 实现，集成在插件的编译流程中，无需额外安装 Python 环境或独立工具。
+HoneyDesigner 中内置了一套完整的资源转换工具，可以将各种格式的资源文件转换为嵌入式设备可用的二进制格式。转换逻辑采用纯 JavaScript/TypeScript 实现；生成 romfs 时会调用 Python 脚本，因此需要安装 Python。无需额外安装独立转换工具。
 
 .. note::
   
-   本章节介绍的是 HoneyGUI Visual Designer VSCode 插件内置的资源转换工具，与传统的独立转换工具（exe 程序）不同：
+   本章节介绍的是 HoneyDesigner VSCode 插件内置的资源转换工具，与传统的独立转换工具（exe 程序）不同：
    
    - **VSCode 插件工具**：集成在插件中，自动化转换，可视化配置，支持图像、3D 模型、视频、字体、玻璃效果。
    - **独立工具**：需要单独下载和运行的 exe 程序，手动操作，详见 :ref:`图像转换工具` 和 :ref:`字体转换工具`。
@@ -16,7 +16,7 @@ HoneyGUI Visual Designer 中内置了一套完整的资源转换工具，可以�
 工具概述
 -----------------
 
-HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
+HoneyDesigner 插件的资源转换工具支持以下资源类型：
 
 - **图像转换**：:term:`PNG`、JPEG、BMP、GIF → bin 文件
 - **3D 模型转换**：OBJ、GLTF → 描述符 bin 文件
@@ -29,7 +29,7 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
 快速开始
 -----------------
 
-.. figure:: https://foruda.gitee.com/images/1770691129178222517/6964fad9_13408154.png
+.. figure:: https://foruda.gitee.com/images/1794386229150013396/96d5681d_13408154.png
    :align: center
    :width: 800px
 
@@ -37,24 +37,25 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
 
 **步骤 1：打开插件面板**
 
-1. 在 VSCode 左侧活动栏中，点击 **HoneyGUI Visual Designer** 插件图标。
-2. 插件侧边栏会显示 **WELCOME** 区域和 **ENVIRONMENT** 区域。
+1. 在 VSCode 左侧活动栏中，点击 **HoneyDesigner** 插件图标。
+2. 插件侧边栏会显示 **欢迎** 区域和 **环境** 区域。
 
-**步骤 2：检查环境（可选）**
+**步骤 2：检查环境**
 
-资源转换工具本身不需要额外的环境依赖，但如果需要对视频进行裁剪或缩放，需要安装 FFmpeg。
+资源转换本身不需要额外依赖；生成 romfs 需要 Python，视频裁剪或缩放需要 FFmpeg。
 
-可以在 **ENVIRONMENT** 区域查看 FFmpeg 是否已安装：
+可以在 **环境** 区域查看依赖状态：
 
-- ✅ **FFmpeg**：可选，仅视频裁剪/缩放时需要
+- **Python**：生成 romfs 时需要
+- **FFmpeg**：可选，仅视频裁剪/缩放时需要
 
 **步骤 3：打开资源转换工具**
 
-在 **WELCOME** 区域，点击 :guilabel:`Resource Conversion Tools` 按钮，打开资源转换工具面板。
+在 **欢迎** 区域，点击 :guilabel:`资源转换工具` 按钮，打开资源转换工具面板。
 
 **步骤 4：选择输出目录**
 
-1. 在资源转换工具面板中，点击 :guilabel:`Select Directory` 按钮。
+1. 在资源转换工具面板中，点击 :guilabel:`选择目录` 按钮。
 2. 选择一个目录作为资源转换的输出位置。
 3. 插件会在选择的目录下自动创建 ``origin`` 文件夹，存放原始资源文件和配置。
 4. ``origin`` 文件夹中会生成 ``conversion.json`` 配置文件，保存所有资源的转换配置。
@@ -83,30 +84,30 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
    - 玻璃效果：效果区域（0-100%）、效果强度（0-100%）
 
 
-**步骤 7：设置 Base Address**
+**步骤 7：设置基地址**
 
-在开始转换前，需要设置 Base Address（基地址）：
+在开始转换前，需要设置基地址（Base Address）：
 
-1. 在工具面板中找到 **Base Address** 输入框。
+1. 在工具面板中找到 **基地址** 输入框。
 2. 填入资源在设备内存中的起始地址（十六进制格式，如 ``0x704D1000``）。
-3. Base Address 用于生成 romfs 文件系统时计算资源的内存地址。
+3. 基地址用于生成 romfs 文件系统时计算资源的内存地址。
 
 .. note::
-   Base Address 的值取决于您的设备内存布局和固件配置。请参考设备的内存映射文档或固件配置文件。
+   基地址的值取决于您的设备内存布局和固件配置。请参考设备的内存映射文档或固件配置文件。
 
 **步骤 8：开始转换**
 
-1. 配置完所有资源和 Base Address 后，点击右下角的 :guilabel:`Start Convert` 按钮。
+1. 配置完所有资源和基地址后，点击右下角的 :guilabel:`开始转换` 按钮。
 2. 插件会自动执行以下操作：
 
    - 转换所有资源文件为二进制格式。
    - 打包资源到 romfs 文件系统。
-   - 生成 :file:`app_romfs.bin`、 :file:`app_romfs.c` 和 :file:`ui_resource.h`。
+   - 生成 :file:`app_romfs_<baseAddr>.bin`、 :file:`app_romfs.c` 和 :file:`ui_resource.h`。
 
 3. 转换完成后，在输出目录中生成以下文件：
 
    - ``资源 bin 文件``：每个资源对应的二进制文件（如 :file:`image.bin`、 :file:`font.bin`）。
-   - :file:`app_romfs.bin`：打包后的 romfs 文件系统镜像。
+   - :file:`app_romfs_<baseAddr>.bin`：打包后的 romfs 文件系统镜像。
    - :file:`app_romfs.c`：romfs 的 C 语言数组形式（可直接编译到程序中）。
    - :file:`ui_resource.h`：包含资源地址偏移宏定义（支持直接内存地址访问）。
 
@@ -186,11 +187,11 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
    - **压缩方式**：无压缩、RLE、FastLZ、YUV。
    - **YUV 参数** （如选择 YUV 压缩）：采样模式、模糊位数、二次压缩。
 
-4. **开始转换**：点击右下角的 :guilabel:`Start Convert` 按钮。
+4. **开始转换**：点击右下角的 :guilabel:`开始转换` 按钮。
 5. **查看输出**：转换后的文件在输出目录中：
 
    - ``图片名.bin``：转换后的图片二进制文件。
-   - ``app_romfs.bin``：打包后的文件系统。
+   - ``app_romfs_<baseAddr>.bin``：打包后的文件系统。
    - ``app_romfs.c``：C 数组形式。
    - ``ui_resource.h``：地址偏移宏定义。
 
@@ -219,12 +220,12 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
 1. **拖拽模型**：将 3D 模型文件（ ``.obj`` 或 ``.gltf``）拖拽到工具面板。
 2. **拖拽纹理**：如果有纹理图片，也一并拖拽到面板中。
 3. **查看配置**：在右侧属性栏查看模型信息（通常无需额外配置）。
-4. **开始转换**：点击右下角的 :guilabel:`Start Convert` 按钮。
+4. **开始转换**：点击右下角的 :guilabel:`开始转换` 按钮。
 5. **查看输出**：转换后的文件在输出目录中：
 
    - ``desc_xxx.bin`` 或 ``gltf_desc_xxx.bin``：模型描述符。
    - ``纹理名.bin``：纹理图片的二进制文件。
-   - ``app_romfs.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
+   - ``app_romfs_<baseAddr>.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
 
 注意事项：
 
@@ -275,11 +276,11 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
    - **裁剪参数** （可选）：x, y, width, height。
    - **缩放参数** （可选）：width, height, 是否保持宽高比。
 
-4. **开始转换**：点击右下角的 :guilabel:`Start Convert` 按钮。
+4. **开始转换**：点击右下角的 :guilabel:`开始转换` 按钮。
 5. **查看输出**：转换后的文件在输出目录中：
 
    - ``视频名.mjpeg`` （或 ``.avi``、 ``.h264``）：转换后的视频文件。
-   - ``app_romfs.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
+   - ``app_romfs_<baseAddr>.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
 
 
 性能提示：
@@ -348,11 +349,11 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
    - **字符集**：可多选（ASCII、GB2312、GBK、CP932、KSX1001 等）。
    - **裁剪模式**：自动、启用、禁用。
 
-4. **开始转换**：点击右下角的 :guilabel:`Start Convert` 按钮。
+4. **开始转换**：点击右下角的 :guilabel:`开始转换` 按钮。
 5. **查看输出**：转换后的文件在输出目录中：
 
    - ``font.bin``：转换后的字体二进制文件。
-   - ``app_romfs.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
+   - ``app_romfs_<baseAddr>.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
 
 文件大小评估
 ^^^^^^^^^^^^^^^^^
@@ -402,11 +403,11 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
    - **效果强度**：0-100%（默认 50%）
 
 5. **预览效果**：可以实时预览玻璃效果的模糊结果。
-6. **开始转换**：点击右下角的  :guilabel:`Start Convert`  按钮。
+6. **开始转换**：点击右下角的  :guilabel:`开始转换`  按钮。
 7. **查看输出**：转换后的文件在输出目录中：
 
    - ``效果名.bin``：转换后的玻璃效果二进制文件。
-   - ``app_romfs.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
+   - ``app_romfs_<baseAddr>.bin``、 ``app_romfs.c`` 和 ``ui_resource.h``：打包文件。
 
 
 资源目录结构
@@ -421,14 +422,14 @@ HoneyGUI Visual Designer 插件的资源转换工具支持以下资源类型：
     │   ├── conversion.json        # 转换配置文件
     │   └── [资源文件]             # 拖拽进来的原始资源
     ├── [资源名].bin               # 转换后的资源二进制文件
-    ├── app_romfs.bin              # 打包后的 romfs 文件系统
+    ├── app_romfs_<baseAddr>.bin              # 打包后的 romfs 文件系统
     ├── app_romfs.c                # romfs 的 C 数组形式
     └── ui_resource.h              # 资源地址偏移宏定义
 
 **输出文件说明**：
 
 - ``资源 bin 文件``：每个资源转换后的二进制文件，可单独使用。
-- ``app_romfs.bin``：所有资源打包成的文件系统镜像，用于烧录到设备。
+- ``app_romfs_<baseAddr>.bin``：所有资源打包成的文件系统镜像，用于烧录到设备。
 - ``app_romfs.c``：romfs 的 C 语言数组，可直接编译到固件中。
 - ``ui_resource.h``：包含资源地址偏移宏定义，支持直接内存地址访问。
 

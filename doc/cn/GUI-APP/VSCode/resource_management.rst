@@ -1,433 +1,241 @@
 资源管理
 ========
 
-HoneyGUI Visual Designer 提供了内置的资源转换工具，用于将图片、3D 模型等资源转换为 HoneyGUI 支持的二进制格式。这些工具采用纯 JavaScript/TypeScript 实现，无需安装 Python 环境。关于该工具的详细使用方法，请参见 :ref:`VSCode插件资源转换`。
+HoneyDesigner 在左侧 **Assets** 标签页中管理项目资源，并在编译或仿真前将其转换为目标引擎格式。转换由内置的 JavaScript/TypeScript 工具完成，资源转换本身不依赖 Python。详细用法见 :ref:`VSCode 插件资源转换工具 <VSCode插件资源转换>`。
 
-概述
-----
-
-``tools/`` 目录包含了纯 JavaScript/TypeScript 实现的 HoneyGUI 转换工具，用于替代 SDK 中的 Python 工具。
-
-为什么需要 JS 版本?
--------------------
-
-问题
-~~~~
-
-* 用户需要安装 Python 环境
-* 需要安装 numpy、PIL、pygltflib 等依赖包
-* 不同系统环境配置复杂
-* 启动 Python 解释器有性能开销
-
-解决方案
-~~~~~~~~
-
-* ✅ 纯 JS/TS 实现，无需 Python
-* ✅ 插件自包含，开箱即用
-* ✅ 性能提升 25-40%
-* ✅ 统一技术栈，易于维护
-
-功能对比
---------
+资源类型
+---------
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 15 15 40
+   :widths: 22 28 50
 
-   * - 功能
-     - Python 版本
-     - JS 版本
-     - 状态
-   * - PNG → bin
-     - ✅
-     - ✅
-     - 完成
-   * - JPEG → bin
-     - ✅
-     - ✅
-     - 完成
-   * - RGB565
-     - ✅
-     - ✅
-     - 完成
-   * - RGB888
-     - ✅
-     - ✅
-     - 完成
-   * - ARGB8888
-     - ✅
-     - ✅
-     - 完成
-   * - ARGB8565
-     - ✅
-     - ✅
-     - 完成
-   * - A8
-     - ✅
-     - ✅
-     - 完成
-   * - OBJ 解析
-     - ✅
-     - ✅
-     - 完成
-   * - GLTF 解析
-     - ✅
-     - ✅
-     - 完成
-   * - RLE 压缩
-     - ✅
-     - ✅
-     - 完成
-   * - FastLZ 压缩
-     - ✅
-     - ✅
-     - 完成
-   * - YUV 压缩
-     - ✅
-     - ⏳
-     - 计划中
+   * - 类型
+     - 扩展名
+     - 说明
+   * - 图片
+     - ``png``、``jpg``、``jpeg``、``gif``、``bmp``、``webp``
+     - 可转换为 RGB565、RGB888、ARGB 等格式
+   * - SVG
+     - ``svg``
+     - 矢量图资源
+   * - 视频
+     - ``mp4``、``avi``、``mov``、``mkv``、``webm``
+     - 转换为 MJPEG、AVI、H264 等格式
+   * - 3D 模型
+     - ``gltf``、``glb``、``obj``
+     - HoneyGUI 3D 控件使用
+   * - 字体
+     - ``ttf``、``otf``、``woff``、``woff2``
+     - 转换为点阵字体或按目标引擎处理
+   * - Glass
+     - ``glass``
+     - 玻璃/模糊效果参数文件
+   * - Lottie
+     - ``json``、``lottie``
+     - Lottie 动画
+   * - TRMap
+     - ``trmap``
+     - 纹理映射资源
 
+依赖说明
+---------
 
-工具目录结构
-------------
+* 图片、字体、SVG、3D 模型、Glass 等资源由扩展内置的 TypeScript/JavaScript 工具转换。
+* Lottie 和 TRMap 资源在构建时由插件处理，部分情况下直接拷贝。
+* 视频转换需要 FFmpeg。未安装 FFmpeg 时会跳过视频资源。
+* romfs 打包仍使用 Python 脚本。
 
-.. code-block:: text
+.. _romfs-packaging-cn:
 
-   tools/
-   ├── image-converter/       # 图像转换模块
-   │   ├── compress/          # 压缩算法
-   │   │   ├── base.ts        # 压缩基类
-   │   │   ├── fastlz.ts      # FastLZ 压缩
-   │   │   ├── rle.ts         # RLE 压缩
-   │   │   ├── yuv.ts         # YUV 采样压缩
-   │   │   └── index.ts       # 导出
-   │   ├── types.ts           # 格式定义
-   │   ├── headers.ts         # 二进制头部
-   │   ├── pixel-converter.ts # 像素转换
-   │   └── converter.ts       # 主转换器
-   ├── model-converter/       # 3D 模型转换模块
-   │   ├── types.ts           # 模型类型
-   │   ├── obj-parser.ts      # OBJ 解析器
-   │   ├── obj-converter.ts   # OBJ 转换器
-   │   ├── gltf-parser.ts     # GLTF 解析器
-   │   └── gltf-converter.ts  # GLTF 转换器
-   ├── font-converter/        # 字体转换模块
-   ├── image-to-jpeg-converter/ # JPEG 转换模块
-   ├── glass-generator/       # Glass 效果生成
-   ├── video-converter-ts/    # 视频转换模块
-   ├── examples/              # 使用示例
-   ├── tests/                 # 测试用例
-   └── index.ts               # 统一导出
+romfs 打包
+-----------
 
-图像资源管理
-------------
+HoneyGUI 项目在构建时会自动完成 romfs 打包，不需要手动运行打包脚本。流程如下：
 
-支持的图像格式
-~~~~~~~~~~~~~~
+1. 收集 HML 引用的资源，或按 ``alwaysConvert`` 配置收集资源。
+2. 将资源转换为目标格式的 ``.bin`` 文件，输出到 ``build/assets/``。
+3. 使用 ``project.json`` 中的 ``romfsBaseAddr`` 作为基地址，打包为 ``build/app_romfs_<baseAddr>.bin``。
+4. 生成资源地址宏头文件（如 ``ui_resource.h``），供固件按地址直接访问资源。
 
-**输入格式**:
+资源转换工具面板单独执行转换时，输出目录以面板中选择的目录为准；项目构建则统一写入 ``build/app_romfs_<baseAddr>.bin``。
 
-* :term:`PNG` （推荐）
-* JPEG/JPG
+图片格式
+---------
 
-**输出格式**:
-
-* RGB565 - 16 位颜色，无透明度
-* RGB888 - 24 位真彩色，无透明度
-* ARGB8888 - 32 位真彩色，完整透明度
-* ARGB8565 - 24 位混合格式 (RGB565 + 8 位 Alpha)
-* A8 - 8 位灰度/透明度
-
-图像转换流程
-~~~~~~~~~~~~
-
-1. 将图片文件 (PNG/JPEG) 放入 ``assets/images/`` 目录
-2. 构建项目时自动转换为 ``.bin`` 格式
-3. 在 HML 中引用： ``src="assets/images/logo.bin"``
-
-手动转换图像
-~~~~~~~~~~~~
-
-在插件中使用：
-
-.. code-block:: typescript
-
-   import { ImageConverter, PixelFormat } from './tools';
-
-   // 创建转换器
-   const imageConverter = new ImageConverter();
-
-   // 转换图像
-   await imageConverter.convert(
-       'assets/icon.png',      // 输入文件
-       'build/assets/icon.bin', // 输出文件
-       'auto'                   // 自动选择格式
-   );
-
-   // 指定格式转换
-   await imageConverter.convert(
-       'assets/logo.png',
-       'build/assets/logo.bin',
-       'ARGB8888'              // 使用 32 位格式
-   );
-
-像素格式选择指南
-~~~~~~~~~~~~~~~~
+支持的输出格式：
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 20 60
+   :widths: 22 18 60
 
    * - 格式
-     - 文件大小
+     - 每像素
      - 适用场景
-   * - RGB565
-     - 最小（2 字节/像素）
-     - 不需要透明度的图标、背景
-   * - RGB888
-     - 中等（3 字节/像素）
-     - 高质量图片，无透明需求
-   * - ARGB8888
-     - 最大（4 字节/像素）
-     - 需要透明度的图标、UI 元素
-   * - ARGB8565
-     - 中等（3 字节/像素）
-     - 平衡透明度和文件大小
-   * - A8
-     - 最小（1 字节/像素）
-     - 单色图标、遮罩
+   * - ``RGB565``
+     - 2 字节
+     - 无透明度的图标、背景，体积最小
+   * - ``RGB888``
+     - 3 字节
+     - 高质量无透明图片
+   * - ``ARGB8565``
+     - 3 字节
+     - 需要透明度且希望控制体积
+   * - ``ARGB8888``
+     - 4 字节
+     - 完整透明度，质量最高
+   * - ``A8``
+     - 1 字节
+     - 8 位透明度/灰度遮罩
+   * - ``A4`` / ``A2`` / ``A1``
+     - 0.5 / 0.25 / 0.125 字节
+     - 低位数透明度遮罩
+   * - ``I8``
+     - 1 字节
+     - 256 色索引图
 
-.. tip::
-   使用 ``auto`` 模式让转换器根据图像特性自动选择最优格式：
+压缩方式：
 
-   * 有透明通道 → ARGB8888
-   * 无透明通道 → RGB565
+* ``none``：不压缩。
+* ``rle``：游程压缩。
+* ``fastlz``：FastLZ 无损压缩。
+* ``yuv``：YUV 有损压缩，可配置采样、模糊位数和 FastLZ 二次压缩。
+* ``jpeg``：JPEG 有损压缩，可配置采样、质量和背景色。
+* ``adaptive``：自动比较 FastLZ、RLE 和不压缩，选择最小结果。
 
-3D 模型资源管理
----------------
+转换设置可以在单个文件或文件夹上配置，并支持从父文件夹继承。
 
-支持的模型格式
-~~~~~~~~~~~~~~
+视频格式
+---------
 
-**当前支持**:
+支持的目标格式：
 
-* OBJ (Wavefront Object) - ✅ 已实现
-* GLTF (GL Transmission Format) - ✅ 已实现
+* ``MJPEG``
+* ``AVI``
+* ``H264``
+* ``MSV1``
+* ``Cinepak``
 
-OBJ 模型转换
-~~~~~~~~~~~~
+可配置：
 
-OBJ 转换流程：
+* 质量
+* 帧率
+* 缩放（按像素或按百分比）
+* 裁剪（宽、高、位置）
+* 裁剪和缩放的先后顺序
+* GIF 是否按视频处理
 
-1. 将 ``.obj`` 和 ``.mtl`` 文件放入 ``assets/models/`` 目录
-2. 构建时自动转换为 HoneyGUI 二进制格式
-3. 生成 ``desc_{modelName}.bin`` 和 ``desc_{modelName}.txt``
+视频转换依赖 FFmpeg。转换结果会作为资源打包到 build 目录。
 
-手动转换 OBJ:
+字体
+-----
 
-.. code-block:: typescript
+* 将 ``ttf``、``otf``、``woff``、``woff2`` 放入 ``assets/``。
+* 在 ``hg_label`` 中使用 ``fontFile`` 引用，路径以 ``/`` 开头，例如 ``/NotoSansSC-Medium.ttf``。
+* 可以按字符集转换，只保留项目实际使用的字符，减少固件体积。
+* 字体必须位于 ``assets/`` 目录中，否则设备上无法加载。
 
-   import { OBJConverter } from './tools';
+3D 模型
+--------
 
-   // 创建转换器
-   const objConverter = new OBJConverter();
+* 支持 OBJ、GLTF、GLB。
+* 模型纹理图片会一起参与资源转换。
+* ``hg_3d`` 使用 ``modelPath`` 引用模型，例如 ``assets/models/cube.bin``。
+* 建议控制顶点数和面片数，避免超出嵌入式设备性能。
 
-   // 转换模型
-   objConverter.convert(
-       'assets/model.obj',              // 输入 OBJ 文件
-       'build/assets/desc_model.bin',   // 输出二进制文件
-       'build/assets/desc_model.txt'    // 输出文本描述
-   );
+Glass、Lottie 和 TRMap
+-----------------------
 
-模型优化建议
-~~~~~~~~~~~~
+* ``hg_glass`` 使用 ``.glass`` 参数文件生成玻璃/模糊效果。
+* ``hg_lottie`` 使用 JSON 或 ``.lottie`` 动画文件。
+* ``trmap`` 用于纹理映射资源。
 
-* **顶点数量**: 控制在 10000 以内 （嵌入式设备限制）
-* **面片数量**: 尽量使用三角面，避免复杂多边形
-* **材质**: 使用简单材质，避免复杂着色器
-* **纹理**: 压缩纹理图片，使用适当的分辨率
+使用流程
+---------
 
-字体资源管理
-------------
+1. 把资源放入项目的 ``assets/`` 目录。
+2. 打开左侧 **Assets** 标签页。
+3. 选择图片、视频、模型、字体等资源，配置目标格式和压缩方式。
+4. 把图片等资源直接拖到画布，或手动在组件属性中填写路径。
+5. 执行代码生成或编译仿真，插件自动转换资源。
 
-字体格式
-~~~~~~~~
-
-HoneyGUI 支持以下字体格式：
-
-* TTF (TrueType Font)
-* BIN （预转换的二进制字体）
-
-字体转换
-~~~~~~~~
-
-使用 HoneyGUI SDK 的字体工具转换：
-
-.. code-block:: bash
-
-   # 使用 SDK 工具
-   cd /path/to/HoneyGUI/tool/font
-   python font_convert.py input.ttf output.bin --size 16
-
-.. note::
-   字体转换目前仍使用 SDK 提供的 Python 工具。VSCode 插件会在未来版本中集成 JS 版本的字体转换器。
-
-在 HML 中使用字体：
+资源路径
+---------
 
 .. code-block:: xml
 
-   <hg_text id="title" x="10" y="10" w="200" h="30"
-            text="Hello"
-            fontFamily="assets/fonts/arial_16.bin"
-            fontSize="16"/>
+   <!-- 正确：图片以 assets/ 开头 -->
+   <hg_image id="img_logo" x="20" y="20" width="120" height="120"
+             src="assets/images/logo.png" />
 
-资源打包
---------
+   <!-- 正确：字体以 / 开头，相对 assets/ -->
+   <hg_label id="lbl_title" x="20" y="160" width="240" height="40"
+             text="Hello" fontFile="/NotoSansSC-Medium.ttf" fontSize="24" />
 
-ROM 文件系统
-~~~~~~~~~~~~
+   <!-- 正确：3D 模型 -->
+   <hg_3d id="model_cube" x="40" y="40" width="320" height="320"
+          modelPath="assets/models/cube.bin" />
 
-HoneyGUI 使用 ROM 文件系统管理资源：
+不要使用本机绝对路径，例如 ``/home/user/project/assets/logo.png``。
 
-1. 所有资源放在 ``assets/`` 目录
-2. 构建时使用 ``mkromfs`` 工具打包
-3. 生成 ``root.bin`` 文件包含所有资源
-4. 嵌入式设备从 Flash 加载
+转换配置
+---------
 
-打包流程：
+资源转换配置保存在项目中，用于记录每个文件或文件夹的目标格式。主要能力：
 
-.. code-block:: bash
+* 按文件夹继承转换设置。
+* 智能打包：只转换 HML 实际引用的资源和 ``alwaysConvert`` 中列出的资源。
+* 全量打包：转换 ``assets/`` 下的全部资源。
+* 可以单独转换某个资源，也可以随构建流程自动转换。
 
-   # 自动打包 （在构建过程中）
-   cd win32_sim
-   scons
+LVGL 资源配置
+--------------
 
-   # 手动打包
-   cd /path/to/HoneyGUI/tool/mkromfs
-   ./mkromfs assets/ root.bin
+LVGL 项目可以选择：
 
-资源路径规范
-~~~~~~~~~~~~
+* ``c-array``：资源编译为 C 数组，链接进固件。
+* ``external-bin``：资源打包为 romfs，运行时从外部存储加载。
 
-在 HML 中引用资源时使用相对路径：
+HoneyGUI 项目会生成 romfs 资源，并通过构建流程打包。
 
-.. code-block:: xml
+最佳实践
+---------
 
-   <!-- 正确 -->
-   <hg_image src="assets/images/logo.bin"/>
-   <hg_text fontFamily="assets/fonts/arial.bin"/>
-   <hg_3d modelSrc="assets/models/cube.bin"/>
-
-   <!-- 错误 - 不要使用绝对路径 -->
-   <hg_image src="/home/user/project/assets/images/logo.bin"/>
-
-性能数据
---------
-
-JS/TS 工具 vs Python 工具性能对比：
-
-.. list-table::
-   :header-rows: 1
-   :widths: 40 20 20 20
-
-   * - 操作
-     - Python
-     - JS/TS
-     - 提升
-   * - 64x64 PNG → RGB565
-     - 50ms
-     - 30ms
-     - 40%
-   * - OBJ 解析（1000 顶点）
-     - 80ms
-     - 60ms
-     - 25%
-   * - 启动时间
-     - 200ms
-     - 5ms
-     - 97%
-
-使用建议
---------
-
-资源优化
-~~~~~~~~
-
-1. **图像优化**:
-
-   * 使用合适的分辨率（避免过大的图片）
-   * 选择正确的像素格式
-   * 考虑使用压缩
-
-2. **模型优化**:
-
-   * 简化几何体（减少顶点和面片）
-   * 使用低分辨率纹理
-   * 移除不必要的细节
-
-3. **字体优化**:
-
-   * 只包含需要的字符集
-   * 使用适当的字体大小
-   * 考虑使用位图字体替代矢量字体
-
-资源管理最佳实践
-~~~~~~~~~~~~~~~~
-
-* **目录组织**: 按类型分类资源 (images/, models/, fonts/)
-* **命名规范**: 使用清晰的文件名 (logo.png, button_bg.png)
-* **版本控制**: 将源文件 (PNG, OBJ) 加入 Git，生成的 .bin 文件加入 .gitignore
-* **资源清单**: 维护资源列表文档，记录用途和格式
+* 图片使用合适的分辨率和最低可接受格式。
+* 有透明需求时优先使用 ``ARGB8565`` 或 ``ARGB8888``。
+* 不需要透明度时优先使用 ``RGB565``。
+* 字体只保留项目需要的字符集。
+* 视频使用合适的分辨率、帧率和质量，避免资源过大。
+* 源文件纳入版本控制，生成文件放入 ``build/`` 并由构建流程管理。
+* 使用清晰的文件名，例如 ``logo.png``、``btn_normal.png``。
 
 故障排查
---------
+---------
 
-常见问题
-~~~~~~~~
+**图片转换失败**
 
-**问题 1: 图像转换失败**
+* 检查文件是否损坏。
+* 确认扩展名和实际格式一致。
+* 检查输出目录权限。
 
-.. code-block:: text
+**视频没有转换**
 
-   Error: Failed to convert image
+* 安装 FFmpeg 并加入 ``PATH``。
+* 检查视频编码是否受支持。
 
-解决方案：
+**字体显示异常**
 
-* 检查图像文件是否损坏
-* 确认文件格式（仅支持 PNG/JPEG）
-* 检查文件权限
+* 确认字体位于 ``assets/``。
+* 确认 ``fontFile`` 以 ``/`` 开头。
+* 确认字符集包含实际显示的文字。
 
-**问题 2: 模型加载失败**
+**模型加载失败**
 
-.. code-block:: text
-
-   Error: Failed to parse OBJ file
-
-解决方案：
-
-* 检查 OBJ 文件语法
-* 确认 MTL 文件路径正确
-* 验证顶点数据完整性
-
-**问题 3: 字体显示异常**
-
-解决方案：
-
-* 确认字体文件格式正确
-* 检查字体文件路径
-* 验证字符集是否包含需要的字符
-
-调试技巧
-~~~~~~~~
-
-1. **查看转换日志**: 构建时查看控制台输出
-2. **验证二进制文件**: 使用十六进制编辑器检查文件头
-3. **测试小文件**: 先用小文件测试转换流程
-4. **对比输出**: 与 Python 工具输出对比验证正确性
+* 检查模型和纹理文件是否完整。
+* 确认 ``modelPath`` 指向转换后的资源。
 
 下一步
-------
+-------
 
-* 学习 :doc:`code_generation` 了解如何在代码中使用资源
 * 查看 :doc:`build_simulation` 了解完整的构建流程
 * 参考 :doc:`deployment` 了解资源在嵌入式设备上的部署

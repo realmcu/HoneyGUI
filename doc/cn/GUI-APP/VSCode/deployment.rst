@@ -1,560 +1,171 @@
 嵌入式部署
 ==========
 
-本文档描述 HoneyGUI Visual Designer 项目到嵌入式平台的部署方案，包括三种不同的部署方式及其适用场景。
+本文介绍如何把 HoneyDesigner 项目集成到固件，以及 HoneyGUI 和 LVGL 两种目标的部署方式。
 
 概述
-----
+-----
 
-HoneyGUI Visual Designer 设计器支持多种部署方式，可以根据项目需求选择最合适的方案：
+当前插件把 HML 设计转换为 **C 代码**，并通过资源转换和 romfs 打包生成固件可用的资源。插件不提供“运行时 HML(XML) 解析”或“HML 二进制描述文件”导出入口。
 
 .. list-table::
    :header-rows: 1
-   :widths: 15 20 15 20 30
-
-   * - 方案
-     - 导出格式
-     - 固件改动
-     - 资源占用
-     - 适用场景
-   * - 方案一
-     - C 代码
-     - 每次都要
-     - 最小
-     - 资源受限、UI 固定
-   * - 方案二
-     - HML (XML)
-     - 不需要
-     - 中等 (~10KB 解析器)
-     - 需要 OTA 更新 UI
-   * - 方案三
-     - HML (BIN)
-     - 不需要
-     - 小 (~2KB 解析器)
-     - 需要 OTA + 资源受限
-
-方案一： 生成 C 代码
--------------------
-
-描述
-~~~~
-
-设计器将 HML 设计转换为 C 代码，直接编译到固件中。这是最常用的方式。
-
-导出产物
-~~~~~~~~
-
-.. code-block:: text
-
-   export/c/
-   ├── ui/
-   │   ├── main_ui.h           # UI 声明
-   │   └── main_ui.c           # UI 实现
-   ├── callbacks/
-   │   ├── main_callbacks.h    # 回调声明
-   │   └── main_callbacks.c    # 回调实现（保护区）
-   └── assets/
-       └── *.bin               # 二进制资源
-
-生成代码示例
-~~~~~~~~~~~~
-
-.. code-block:: c
-
-   // main_ui.c
-   #include "main_ui.h"
-
-   gui_obj_t *button1 = NULL;
-   gui_obj_t *label1 = NULL;
-
-   void main_ui_create(gui_obj_t *parent) {
-       gui_obj_t *view = gui_view_create(parent, "main_view", 0, 0, 480, 272);
-
-       button1 = gui_button_create(view, "button1", 10, 10, 100, 40);
-       gui_button_set_text(button1, "Click");
-       gui_obj_set_event_cb(button1, GUI_EVENT_CLICK, on_button1_click);
-
-       label1 = gui_text_create(view, "label1", 10, 60, 200, 30);
-       gui_text_set_text(label1, "Hello");
-   }
-
-优点
-~~~~
-
-* ROM / :term:`RAM` 占用最小
-* 执行速度最快
-* 调试方便（可单步跟踪）
-* 事件处理灵活（纯 C 代码）
-
-缺点
-~~~~
-
-* 改 :term:`UI` 必须重新编译固件
-* 无法 OTA 更新界面
-
-适用场景
-~~~~~~~~
-
-* 资源受限的 MCU (Flash < 256KB)
-* UI 设计定型后不再改动
-* 对启动速度要求高
-
-部署步骤
-~~~~~~~~
-
-1. **生成代码**:
-
-   在 VSCode 中点击 :guilabel:`生成代码` 按钮，生成 C 代码文件。
-
-2. **集成到固件项目**:
-
-   将 ``src/`` 目录下的文件复制到固件项目中：
-
-   .. code-block:: bash
-
-      # 假设固件项目在 /path/to/firmware
-      cp -r src/ui /path/to/firmware/app/gui/
-      cp -r src/callbacks /path/to/firmware/app/gui/
-      cp -r src/user /path/to/firmware/app/gui/
-      cp src/*Entry.c /path/to/firmware/app/
-
-3. **添加资源文件**:
-
-   .. code-block:: bash
-
-      cp -r assets/*.bin /path/to/firmware/resources/
-
-4. **修改构建脚本**:
-
-   在固件的 Makefile 或 CMakeLists.txt 中添加源文件：
-
-   .. code-block:: cmake
-
-      # CMakeLists.txt 示例
-      file(GLOB GUI_SOURCES
-           "app/gui/ui/*.c"
-           "app/gui/callbacks/*.c"
-           "app/gui/user/*.c"
-           "app/*Entry.c")
-
-      target_sources(firmware PRIVATE ${GUI_SOURCES})
-
-5. **编译固件**:
-
-   .. code-block:: bash
-
-      cd /path/to/firmware
-      mkdir build && cd build
-      cmake ..
-      make
-
-6. **烧录固件**:
-
-   使用对应平台的烧录工具将固件烧录到设备。
-
-方案二： 生成 HML (XML)
------------------------
-
-描述
-~~~~
-
-设计器导出 HML 文件 (XML 格式)，嵌入式设备运行时解析并创建 UI。
-
-导出产物
-~~~~~~~~
-
-.. code-block:: text
-
-   export/hml/
-   ├── ui/
-   │   └── main.hml            # HML 文件
-   ├── assets/
-   │   ├── images/             # 图片资源
-   │   └── fonts/              # 字体资源
-   └── manifest.json           # 资源清单
-
-HML 文件示例
-~~~~~~~~~~~~
-
-.. code-block:: xml
-
-   <?xml version="1.0" encoding="UTF-8"?>
-   <hg_screen id="main_screen" w="480" h="272">
-     <hg_view id="main_view" x="0" y="0" w="480" h="272">
-       <hg_button id="button1" x="10" y="10" w="100" h="40"
-                  text="Click"
-                  onClick="on_button1_click" />
-       <hg_text id="label1" x="10" y="60" w="200" h="30"
-                text="Hello"
-                fontSize="16"
-                color="#FFFFFF" />
-     </hg_view>
-   </hg_screen>
-
-嵌入式侧实现
-~~~~~~~~~~~~
-
-需要集成 XML 解析器（推荐 ezxml，约 10KB）:
-
-.. code-block:: c
-
-   #include "ezxml.h"
-   #include "gui_hml_loader.h"
-
-   // 加载 HML 文件
-   gui_obj_t *ui = gui_hml_load("/flash/ui/main.hml");
-
-   // 回调函数注册表 (固件中预编译)
-   const callback_entry_t g_callbacks[] = {
-       {"on_button1_click", on_button1_click},
-       {"on_button1_long_press", on_button1_long_press},
-       {NULL, NULL}
-   };
-
-事件绑定机制
-~~~~~~~~~~~~
-
-HML 中声明事件绑定：
-
-.. code-block:: xml
-
-   <hg_button id="btn1" onClick="on_btn1_click" />
-
-固件中实现回调：
-
-.. code-block:: c
-
-   void on_btn1_click(gui_obj_t *obj) {
-       // 复杂业务逻辑
-       ble_send_data(...);
-       update_status(...);
-   }
-
-优点
-~~~~
-
-* UI 布局可 OTA 更新
-* 可读性好，便于调试
-* 支持数据绑定 (``text="{data.title}"``)
-
-缺点
-~~~~
-
-* 需要 XML 解析器 (~10KB ROM)
-* 解析速度较慢
-* 运行时内存占用较大
-
-适用场景
-~~~~~~~~
-
-* 需要 OTA 更新 UI
-* Flash 充足 (> 256KB)
-* 开发调试阶段
-
-推荐 XML 解析器
-~~~~~~~~~~~~~~~
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 20 60
-
-   * - 解析器
-     - ROM
-     - 特点
-   * - ezxml
-     - ~10KB
-     - DOM 模式，API 简洁
-   * - yxml
-     - ~3KB
-     - SAX 流式，零动态内存
-   * - mxml
-     - ~30KB
-     - 功能完整
-
-方案三： 生成 HML (BIN)
------------------------
-
-描述
-~~~~
-
-设计器将 HML 编译为二进制格式，嵌入式设备直接加载，无需 XML 解析。
-
-导出产物
-~~~~~~~~
-
-.. code-block:: text
-
-   export/bin/
-   ├── ui/
-   │   └── main.bin            # 二进制 UI 描述
-   ├── assets/
-   │   └── *.bin               # 二进制资源
-   └── manifest.bin            # 二进制资源清单
-
-二进制格式设计
-~~~~~~~~~~~~~~
-
-.. code-block:: c
-
-   // 文件头
-   struct hml_bin_header {
-       uint32_t magic;            // 0x484D4C42 "HMLB"
-       uint16_t version;          // 格式版本
-       uint16_t component_count;  // 组件数量
-       uint32_t string_table_offset;  // 字符串表偏移
-       uint32_t data_offset;      // 数据区偏移
-   };
-
-   // 组件描述
-   struct hml_bin_component {
-       uint8_t  type;             // 组件类型 (HG_BUTTON=1, HG_TEXT=2...)
-       uint8_t  parent_index;     // 父组件索引
-       uint16_t id_offset;        // ID 字符串偏移
-       int16_t  x, y, w, h;       // 位置和尺寸
-       uint16_t props_count;      // 属性数量
-       uint32_t props_offset;     // 属性数据偏移
-       uint16_t events_count;     // 事件数量
-       uint32_t events_offset;    // 事件数据偏移
-   };
-
-   // 属性描述
-   struct hml_bin_prop {
-       uint16_t key_offset;       // 属性名偏移
-       uint16_t value_offset;     // 属性值偏移
-       uint8_t  value_type;       // 值类型 (STRING=0, INT=1, FLOAT=2...)
-   };
-
-   // 事件描述
-   struct hml_bin_event {
-       uint8_t  event_type;       // 事件类型 (CLICK=1, LONG_PRESS=2...)
-       uint16_t handler_offset;   // 处理函数名偏移
-   };
-
-嵌入式侧实现
-~~~~~~~~~~~~
-
-二进制加载器（约 2KB）:
-
-.. code-block:: c
-
-   #include "gui_hml_bin_loader.h"
-
-   // 直接内存映射加载
-   gui_obj_t *ui = gui_hml_bin_load("/flash/ui/main.bin");
-
-   // 或从内存加载
-   extern const uint8_t main_ui_bin[];
-   gui_obj_t *ui = gui_hml_bin_load_mem(main_ui_bin);
-
-优点
-~~~~
-
-* 解析器极小 (~2KB ROM)
-* 加载速度快（可直接内存映射）
-* UI 可 OTA 更新
-* 文件体积比 XML 小
-
-缺点
-~~~~
-
-* 不可读，调试困难
-* 需要设计器支持编译
-* 格式升级需要兼容处理
-
-适用场景
-~~~~~~~~
-
-* 资源受限但需要 OTA
-* 对启动速度有要求
-* 产品发布阶段
-
-事件处理机制（通用）
--------------------
-
-三种方案都采用 **函数名绑定** 机制：
-
-设计器中配置事件
-~~~~~~~~~~~~~~~~
-
-在属性面板中为组件配置事件处理函数名。
-
-导出时生成回调骨架
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: c
-
-   // main_callbacks.c （首次生成，后续保护）
-
-   /* @protected start on_button1_click */
-   void on_button1_click(gui_obj_t *obj) {
-       // TODO: 实现点击逻辑
-   }
-   /* @protected end on_button1_click */
-
-   /* @protected start on_button1_long_press */
-   void on_button1_long_press(gui_obj_t *obj) {
-       // TODO: 实现长按逻辑
-   }
-   /* @protected end on_button1_long_press */
-
-固件中注册回调表
-~~~~~~~~~~~~~~~~
-
-.. code-block:: c
-
-   // callback_registry.c
-   #include "main_callbacks.h"
-
-   const callback_entry_t g_callbacks[] = {
-       {"on_button1_click", on_button1_click},
-       {"on_button1_long_press", on_button1_long_press},
-       // ... 其他回调
-       {NULL, NULL}
-   };
-
-   // 查找回调函数
-   void *find_callback(const char *name) {
-       for (int i = 0; g_callbacks[i].name; i++) {
-           if (strcmp(g_callbacks[i].name, name) == 0) {
-               return g_callbacks[i].func;
-           }
-       }
-       return NULL;
-   }
-
-数据绑定（方案二、三支持）
--------------------------
-
-HML 中使用数据绑定
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: xml
-
-   <hg_text id="title" text="{data.title}" />
-   <hg_text id="battery" text="{data.battery}%" />
-   <hg_image id="icon" src="{data.icon_path}" />
-
-嵌入式侧绑定数据
-~~~~~~~~~~~~~~~~
-
-.. code-block:: c
-
-   // 定义数据结构
-   typedef struct {
-       char title[32];
-       int battery;
-       char icon_path[64];
-   } ui_data_t;
-
-   // 绑定数据
-   ui_data_t data = {"消息通知", 85, "/assets/msg.bin"};
-   gui_hml_bind_data(ui, &data);
-
-方案选择指南
-------------
-
-.. mermaid::
-
-   graph TD
-       Q1{需要 OTA 更新 UI?}
-       Q2{Flash 充足?}
-       A1[方案一: C 代码]
-       A2[方案二: HML<br/>调试方便]
-       A3[方案三: BIN<br/>体积小]
-
-       Q1 -->|否| A1
-       Q1 -->|是| Q2
-       Q2 -->|是| A2
-       Q2 -->|否| A3
-
-性能和资源对比
+   :widths: 20 30 50
+
+   * - 目标引擎
+     - 主要产物
+     - 部署方式
+   * - HoneyGUI
+     - C 代码、Entry.c、SConscript、romfs
+     - 集成到固件工程，或通过 UART 下载 romfs
+   * - LVGL
+     - C 代码、资源描述、romfs
+     - c-array 或 external-bin
+
+HoneyGUI 部署
 --------------
 
-.. list-table::
-   :header-rows: 1
-   :widths: 20 20 20 20 20
+生成产物
+~~~~~~~~~
 
-   * - 指标
-     - 方案一 (C)
-     - 方案二 (XML)
-     - 方案三 (BIN)
-     - 说明
-   * - ROM 占用
-     - 最小
-     - +10KB
-     - +2KB
-     - 解析器大小
-   * - 启动速度
-     - 最快
-     - 慢
-     - 快
-     - 需要解析时间
-   * - OTA 支持
-     - ✗
-     - ✓
-     - ✓
-     - 是否可远程更新
-   * - 调试难度
-     - 低
-     - 低
-     - 高
-     - 可读性
-   * - 文件大小
-     - N/A
-     - 大
-     - 中
-     - UI 描述文件
+.. code-block:: text
 
-开发建议
---------
+   src/
+   ├── MyProjectEntry.c
+   ├── SConscript
+   ├── ui/
+   ├── callbacks/
+   └── user/
 
-开发阶段
-~~~~~~~~
+   build/
+   ├── assets/
+   ├── app_romfs_<baseAddr>.bin
+   ├── app_romfs.c
+   └── ui_resource.h
 
-* 使用 **方案一 (C 代码)** 在 :term:`PC` 模拟器上快速迭代
-* 使用 VSCode 插件的构建和模拟功能
-* 利用保护区保留自定义逻辑
+关键文件：
 
-测试阶段
-~~~~~~~~
+* ``src/{ProjectName}Entry.c``：项目入口，包含受保护的入口代码区。
+* ``src/ui``：UI 创建代码，每次生成覆盖。
+* ``src/callbacks``：事件回调代码，保留保护区。
+* ``src/user``：用户代码，只生成一次。
+* ``build/app_romfs_<baseAddr>.bin``：可下载到 Flash 的资源镜像。
 
-* 根据项目需求选择最终方案
-* 如需 OTA，切换到 **方案二 (XML)** 进行测试
-* 验证资源占用和性能指标
+集成到固件
+~~~~~~~~~~~
 
-发布阶段
-~~~~~~~~
+1. 在插件中生成代码。
+2. 把 ``src/ui``、``src/callbacks``、``src/user`` 和 ``src/{ProjectName}Entry.c`` 加入固件工程。
+3. 把 ``src/SConscript`` 或其中的源文件列表并入固件构建系统。
+4. 按固件工程的方式加入源文件和头文件路径。
+5. 确保 ``{ProjectName}Entry.c`` 参与编译；其中的 ``GUI_INIT_APP_EXPORT(app_init)`` 会注册启动初始化。
 
-* 资源充足： 使用 **方案二 (XML)** 保持灵活性
-* 资源受限： 使用 **方案三 (BIN)** 或 **方案一 (C)**
-* 确保所有回调函数实现完整
+.. note::
+   固件工程可能使用 SCons、Keil、IAR 或其他构建系统。生成的 ``src/SConscript`` 可直接用于 SCons 工程；其他工程请按现有方式加入上述源文件和头文件路径。
+
+资源打包
+~~~~~~~~~
+
+HoneyGUI 项目构建时会：
+
+1. 扫描 HML 引用的图片、字体、视频、模型等资源。
+2. 把源资源转换为目标格式。
+3. 生成 ``build/assets/``。
+4. 打包为 ``build/app_romfs_<baseAddr>.bin``。
+
+``<baseAddr>`` 来自 ``project.json`` 的 ``romfsBaseAddr``，例如 ``0x704D1000``。
+
+打包流程和输出文件的详细说明见 :ref:`romfs 打包 <romfs-packaging-cn>`。
+
+UART 下载
+~~~~~~~~~~
+
+1. 先执行一次完整编译，确保 ``build/app_romfs_<baseAddr>.bin`` 存在。
+2. 点击工具栏的 :guilabel:`下载`，或使用 **快捷操作** 视图的 :guilabel:`下载`。
+3. 选择串口、波特率、芯片类型和烧录地址。
+4. 下载完成后重启开发板。
+
+``project.json`` 中可以保存 UART 配置：
+
+.. code-block:: json
+
+   {
+     "romfsBaseAddr": "0x704D1000",
+     "uart": {
+       "port": "COM3",
+       "baudRate": 115200,
+       "chipType": "RTL87X3E"
+     }
+   }
+
+支持的芯片类型以插件当前配置为准，常见值包括 ``RTL87X3E``、``RTL87X3EP``、``RTL87X3D``、``RTL87X3G``。
+
+LVGL 部署
+----------
+
+生成产物
+~~~~~~~~~
+
+.. code-block:: text
+
+   src/lvgl/
+   ├── {name}_lvgl_ui.c/h
+   ├── {name}_lvgl_callbacks.c/h
+   ├── lvgl_generated_ui.c/h
+   ├── ui_resource.h
+   └── lv_img_dsc_list.c/h
+
+资源部署模式
+~~~~~~~~~~~~~
+
+在资源面板中为图片或文件夹选择部署方式：
+
+* ``c-array``：资源编译为 C 数组，链接进固件。适合资源较小、希望减少外部文件的场景。
+* ``external-bin``：资源打包为 romfs，通过 ``ui_resource.h`` 和 ``lv_img_dsc_list.c/h`` 在运行时访问。适合资源较多、希望单独更新资源的场景。
+
+集成步骤：
+
+1. 在 ``project.json`` 中设置 ``"targetEngine": "lvgl"``。
+2. 生成代码。
+3. 把 ``src/lvgl`` 加入固件工程。
+4. 如果使用 ``external-bin``，把生成的 romfs 和资源描述文件一起加入固件。
+5. 在固件启动时调用 ``lvgl_generated_ui_create()``。
+
+资源路径
+---------
+
+* 图片：``assets/...``
+* 字体：``/...``（相对 ``assets/``）
+* 3D 模型：相对 ``assets/``
+* 不要在 HML 中写本机绝对路径。
 
 常见问题
---------
+---------
 
-Q: 如何在三种方案间切换?
-~~~~~~~~~~~~~~~~~~~~~~~~~
+**能否导出 HML XML 或 HML BIN 在设备上解析？**
 
-A: 设计器生成代码时可以选择导出格式。已有项目可以重新导出为不同格式。
+当前插件不提供这两个导出入口。插件生成的是 C 代码和资源镜像。
 
-Q: 方案二和方案三可以混用吗?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**更新 UI 是否需要重新编译固件？**
 
-A: 可以。例如开发时使用 XML，发布时编译为 BIN。两者数据结构兼容。
+使用 C 代码方案时需要重新编译固件。资源镜像可以单独通过 UART 更新，但 UI 结构代码仍在固件中。
 
-Q: OTA 更新 UI 安全吗?
-~~~~~~~~~~~~~~~~~~~~~~
+**如何切换 HoneyGUI 和 LVGL？**
 
-A: 需要在固件中实现签名验证机制，确保 UI 文件来源可信。
+修改 ``project.json`` 的 ``targetEngine``，清理旧生成目录后重新生成代码。
 
-Q: 性能差异有多大?
-~~~~~~~~~~~~~~~~~~
+**OTA 更新安全吗？**
 
-A: 方案一最快（直接执行），方案三次之（简单解析），方案二最慢 (XML 解析)。实际差异取决于 UI 复杂度，通常在几十毫秒级别。
+需要在固件侧实现签名校验和版本校验。插件不负责设备端 OTA 安全策略。
 
-下一步
-------
+**为什么下载时提示 romfs 不存在？**
 
-* 查看 :doc:`code_generation` 了解代码生成细节
-* 学习 :doc:`build_simulation` 在 PC 上测试
-* 参考 :doc:`resource_management` 优化资源使用
+先执行完整编译，确认 ``build/app_romfs_<baseAddr>.bin`` 已生成，并检查 ``romfsBaseAddr`` 是否一致。
+
+开发建议
+---------
+
+* 开发阶段使用 PC 仿真快速迭代。
+* 发布前确认所有 ``callFunction`` 回调已在 ``custom_functions`` 或 ``src/user`` 中实现。
+* 资源较大时优先使用压缩格式和合适的分辨率。
+* 固件集成后保留生成的入口文件和保护区，避免覆盖用户代码。

@@ -4,11 +4,11 @@
 VSCode Plugin Resource Conversion Tool
 ========================================
 
-HoneyGUI Visual Designer includes a complete set of resource conversion tools that can convert various resource file formats into binary formats usable by embedded devices. These tools are implemented in pure JavaScript/TypeScript and integrated into the plugin's compilation process, requiring no additional Python environment or standalone tools.
+HoneyDesigner includes a complete set of resource conversion tools that can convert various resource file formats into binary formats usable by embedded devices. The conversion logic is implemented in pure JavaScript/TypeScript; generating romfs invokes a Python script, so Python is required. No separate conversion tools are needed.
 
 .. note::
   
-   This chapter introduces the resource conversion tools built into the HoneyGUI Visual Designer VSCode plugin, which differ from traditional standalone conversion tools (exe programs):
+   This chapter introduces the resource conversion tools built into the HoneyDesigner VSCode plugin, which differ from traditional standalone conversion tools (exe programs):
    
    - **VSCode Plugin Tools**: Integrated into the plugin, automated conversion, visual configuration, supports images, 3D models, videos, fonts, and glass effects.
    - **Standalone Tools**: Separate exe programs that need to be downloaded and run manually. See :ref:`Image Convert Tool` and :ref:`Font Convert Tool` for details.
@@ -16,7 +16,7 @@ HoneyGUI Visual Designer includes a complete set of resource conversion tools th
 Tool Overview
 -----------------
 
-The resource conversion tools in HoneyGUI Visual Designer plugin support the following resource types:
+The resource conversion tools in the HoneyDesigner plugin support the following resource types:
 
 - **Image Conversion**: :term:`PNG`, JPEG, BMP, GIF → bin files
 - **3D Model Conversion**: OBJ, GLTF → descriptor bin files
@@ -29,7 +29,7 @@ The resource conversion tools in HoneyGUI Visual Designer plugin support the fol
 Quick Start
 -----------------
 
-.. figure:: https://foruda.gitee.com/images/1770691129178222517/6964fad9_13408154.png
+.. figure:: https://foruda.gitee.com/images/1794386229150013396/96d5681d_13408154.png
    :align: center
    :width: 800px
 
@@ -37,16 +37,17 @@ Quick Start
 
 **Step 1: Open Plugin Panel**
 
-1. In the VSCode activity bar on the left, click the **HoneyGUI Visual Designer** plugin icon.
+1. In the VSCode activity bar on the left, click the **HoneyDesigner** plugin icon.
 2. The plugin sidebar will display the **WELCOME** area and **ENVIRONMENT** area.
 
-**Step 2: Check Environment (Optional)**
+**Step 2: Check Environment**
 
-The resource conversion tool itself does not require additional environment dependencies, but if you need to crop or scale videos, FFmpeg must be installed.
+The conversion step itself has no additional dependencies; generating romfs requires Python, and video cropping or scaling requires FFmpeg.
 
-You can check if FFmpeg is installed in the **ENVIRONMENT** area:
+Check the dependency status in the **ENVIRONMENT** area:
 
-- ✅ **FFmpeg**: Optional, only required for video cropping/scaling
+- **Python**: required when generating romfs
+- **FFmpeg**: optional, only required for video cropping/scaling
 
 **Step 3: Open Resource Conversion Tool**
 
@@ -101,12 +102,12 @@ Before starting conversion, you need to set the Base Address:
 
    - Convert all resource files to binary format.
    - Package resources into romfs file system.
-   - Generate :file:`app_romfs.bin`, :file:`app_romfs.c`, and :file:`ui_resource.h`.
+   - Generate :file:`app_romfs_<baseAddr>.bin`, :file:`app_romfs.c`, and :file:`ui_resource.h`.
 
 3. After conversion is complete, the following files are generated in the output directory:
 
    - ``Resource bin files``: Binary files for each resource (e.g., :file:`image.bin`, :file:`font.bin`).
-   - :file:`app_romfs.bin`: Packaged romfs file system image.
+   - :file:`app_romfs_<baseAddr>.bin`: Packaged romfs file system image.
    - :file:`app_romfs.c`: C language array form of romfs (can be compiled directly into the program).
    - :file:`ui_resource.h`: Contains resource address offset macro definitions (supports direct memory address access).
 
@@ -190,7 +191,7 @@ After opening the resource conversion tool panel following the steps in :ref:`Qu
 5. **View Output**: Converted files in the output directory:
 
    - ``imagename.bin``: Converted image binary file.
-   - ``app_romfs.bin``: Packaged file system.
+   - ``app_romfs_<baseAddr>.bin``: Packaged file system.
    - ``app_romfs.c``: C array form.
    - ``ui_resource.h``: Address offset macro definitions.
 
@@ -224,7 +225,7 @@ After opening the resource conversion tool panel following the steps in :ref:`Qu
 
    - ``desc_xxx.bin`` or ``gltf_desc_xxx.bin``: Model descriptor.
    - ``texturename.bin``: Binary file of texture image.
-   - ``app_romfs.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
+   - ``app_romfs_<baseAddr>.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
 
 Notes:
 
@@ -279,7 +280,7 @@ After opening the resource conversion tool panel following the steps in :ref:`Qu
 5. **View Output**: Converted files in the output directory:
 
    - ``videoname.mjpeg`` (or ``.avi``, ``.h264``): Converted video file.
-   - ``app_romfs.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
+   - ``app_romfs_<baseAddr>.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
 
 
 Performance Tips:
@@ -352,7 +353,7 @@ After opening the resource conversion tool panel following the steps in :ref:`Qu
 5. **View Output**: Converted files in the output directory:
 
    - ``font.bin``: Converted font binary file.
-   - ``app_romfs.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
+   - ``app_romfs_<baseAddr>.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
 
 File Size Estimation
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -406,7 +407,7 @@ After opening the resource conversion tool panel following the steps in :ref:`Qu
 7. **View Output**: Converted files in the output directory:
 
    - ``effectname.bin``: Converted glass effect binary file.
-   - ``app_romfs.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
+   - ``app_romfs_<baseAddr>.bin``, ``app_romfs.c``, and ``ui_resource.h``: Package files.
 
 
 Resource Directory Structure
@@ -421,14 +422,14 @@ After successful resource conversion, the plugin will automatically create the f
     │   ├── conversion.json        # Conversion configuration file
     │   └── [resource files]       # Original resources dragged in
     ├── [resourcename].bin         # Converted resource binary files
-    ├── app_romfs.bin              # Packaged romfs file system
+    ├── app_romfs_<baseAddr>.bin              # Packaged romfs file system
     ├── app_romfs.c                # C array form of romfs
     └── ui_resource.h              # Resource address offset macro definitions
 
 **Output File Description**:
 
 - ``Resource bin files``: Binary files after each resource conversion, can be used separately.
-- ``app_romfs.bin``: File system image packaged from all resources, used for flashing to device.
+- ``app_romfs_<baseAddr>.bin``: File system image packaged from all resources, used for flashing to device.
 - ``app_romfs.c``: C language array of romfs, can be compiled directly into firmware.
 - ``ui_resource.h``: Contains resource address offset macro definitions, supports direct memory address access.
 

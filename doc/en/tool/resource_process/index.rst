@@ -6,7 +6,7 @@ Resource processing tools are used to convert various resource file formats (ima
 
 **VSCode Plugin Resource Conversion Tool**
 
-An integrated solution built into the HoneyGUI Visual Designer plugin:
+An integrated solution built into the HoneyDesigner plugin:
 
 - **Features**: Resource conversion + automatic packaging
 - **Characteristics**: Visual interface, drag-and-drop operation, one-click conversion and packaging

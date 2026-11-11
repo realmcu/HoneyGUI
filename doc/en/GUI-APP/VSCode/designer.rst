@@ -1,435 +1,471 @@
 Designer Usage
 ==============
 
-HoneyGUI Visual Designer provides an intuitive visual design environment with drag-and-drop operations, real-time preview, and a rich component library.
+HoneyDesigner provides a visual canvas, a components and assets panel, a properties panel, and a view navigation graph.
 
-Designer Interface
--------------------
+Layout
+------
 
-Interface Layout
-~~~~~~~~~~~~~~~~
-
-The designer uses a classic four-area layout:
+The designer has four main areas:
 
 .. figure:: resource/design-ui.png
    :align: center
    :width: 900px
 
-   Designer Interface Layout
+   Designer interface
 
-1. **Toolbar** (Top)
+1. **Toolbar** (top)
 
-   * Save, undo, redo buttons
-   * Code generation and build/simulation buttons
-   * Grid settings, view switching and other auxiliary tools
+   * Save, undo, and redo.
+   * Alignment, distribution, guides, canvas background, and fit-to-content.
+   * View relations, preview language, and project configuration selection.
+   * Generate code, compile and simulate, debug, stop, UART download, and clean.
 
-2. **Sidebar** (Left, with Tab switching)
+2. **Components and Assets Panel** (left)
 
-   * **Tab 1 - Component Library**: All available HoneyGUI components
-   * **Tab 2 - Assets Panel**: Images, fonts, videos and other resources in the project
-   * **Tab 3 - Component Tree**: Component hierarchy of the current interface
+   * **Component Library**: available components and categories.
+   * **Assets**: images, fonts, videos, models, and other resources.
+   * **Component Tree**: hierarchy of the current page.
 
-3. **Canvas** (Center)
+3. **Canvas** (center)
 
-   * Design area showing the actual interface
-   * Supports zoom (25% - 800%)
-   * Supports pan and grid snapping
+   * Drop, select, move, resize, align, and box-select components.
+   * Mouse wheel zooms around the pointer.
+   * Smart guides and grid snapping are supported.
 
-4. **Properties Panel** (Right)
+4. **Properties Panel** (right)
 
-   * Edit properties of the selected component
-   * Includes position, size, color, text, events, etc.
+   * **Properties**: edit the selected component's properties.
+   * **Events**: configure event actions.
 
-Toolbar Features
-~~~~~~~~~~~~~~~~
+Toolbar
+-------
 
-Common Operations
-"""""""""""""""""
-
-* **Save**: Save current design to HML file (``Ctrl+S``)
-* **Undo**: Undo last operation (``Ctrl+Z``), supports 50-step history
-* **Redo**: Redo undone operations (``Ctrl+Y``)
-* **Generate Code**: Convert HML files to C code
-* **Build and Simulate**: Start complete build and simulation workflow
-
-View Tools
-""""""""""
-
-* **Zoom**: Adjust canvas display scale (25% - 800%)
-
-  * Zoom in: ``Ctrl`` + ``+``
-  * Zoom out: ``Ctrl`` + ``-``
-  * Reset: ``Ctrl`` + ``0``
-
-* **Grid Settings**: Configure grid size and snapping
-
-  * Default grid size: 8px
-  * Modifiable in settings: ``honeygui.ui.gridSize``
-
-* **View Switch**: Switch to other HML view files
-
-Component Library
-------------------
-
-Component Categories
-~~~~~~~~~~~~~~~~~~~~
-
-HoneyGUI provides rich components in the following categories:
-
-Container Components
-""""""""""""""""""""
-
-* **hg_view**: View container for organizing interface layout
-* **hg_window**: Window container with multi-window management support
-* **hg_canvas**: Custom drawing canvas (TODO)
-* **hg_list**: List container with scrolling support
-* **hg_menu_cellular**: Cellular menu container
-
-Basic Controls
-""""""""""""""
-
-* **hg_button**: Button with text and icon support
-* **hg_label**: Text label with multi-line text support
-* **hg_image**: Image display supporting multiple formats
-
-Input Controls
-""""""""""""""
-
-* **hg_input**: Text input box
-* **hg_checkbox**: Checkbox (TODO)
-* **hg_radio**: Radio button (TODO)
-
-Graphic Controls
-""""""""""""""""
-
-* **hg_arc**: Arc shape
-* **hg_circle**: Circle shape
-* **hg_rect**: Rectangle shape
-* **hg_svg**: SVG graphics
-* **hg_glass**: Glass effect
-* **hg_particle**: Particle effect
-
-Multimedia Components
-"""""""""""""""""""""
-
-* **hg_video**: Video player
-* **hg_gif**: GIF animation
-* **hg_3d**: 3D model display
-* **hg_lottie**: Lottie animation
-
-Using Components
-~~~~~~~~~~~~~~~~
-
-Adding Components
-"""""""""""""""""
-
-1. Find the desired component in the left component library
-2. Click and drag to the canvas
-3. Release the mouse, and the component will be added at the current position
-4. The component will automatically snap to the grid (if enabled)
-
-.. tip::
-   Hold ``Shift`` key to disable grid snapping for pixel-perfect positioning.
-
-Adding from Assets Panel
-""""""""""""""""""""""""
-
-For image resources, you can drag directly from the assets panel:
-
-1. Switch to **Tab 2 - Assets Panel**
-2. Drag an image to the canvas
-3. An ``hg_image`` component will be automatically created with the image path set
-
-Canvas Operations
-------------------
-
-Selecting Components
-~~~~~~~~~~~~~~~~~~~~
-
-Single Selection
-""""""""""""""""
-
-* Click on a component in the canvas to select it
-* Selected component shows a blue border and control points
-
-Multiple Selection
-""""""""""""""""""
-
-* Hold ``Ctrl`` key and click multiple components in sequence
-* Or hold left mouse button and drag to create a selection rectangle
-
-Moving Components
-~~~~~~~~~~~~~~~~~
-
-* Drag the selected component to a new position
-* When multiple are selected, all selected components move together
-* Reference lines appear during movement to assist alignment
-
-Resizing
-~~~~~~~~
-
-* After selecting a component, drag the control points on the edges
-* Eight control points correspond to eight directions
-* Hold ``Shift`` key for proportional scaling
-
-Alignment and Distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-After selecting multiple components, use alignment and distribution tools:
-
-* **Align Left**: Align all components' left edges
-* **Align Right**: Align all components' right edges
-* **Align Top**: Align all components' top edges
-* **Align Bottom**: Align all components' bottom edges
-* **Align Center Horizontally**: Center all components horizontally
-* **Align Center Vertically**: Center all components vertically
-* **Distribute Horizontally**: Evenly distribute horizontal spacing
-* **Distribute Vertically**: Evenly distribute vertical spacing
-
-Component Layers
-~~~~~~~~~~~~~~~~
-
-Right-click menu provides layer adjustment options:
-
-* **Bring to Front**: Move component to topmost layer
-* **Send to Back**: Move component to bottommost layer
-* **Bring Forward**: Move up one layer
-* **Send Backward**: Move down one layer
-
-Component Tree
----------------
-
-The component tree is located in **Tab 3** on the left, showing the component hierarchy of the current interface.
-
-Tree Structure
+Common Actions
 ~~~~~~~~~~~~~~
 
-* Parent components can contain multiple child components
-* Child components can be further nested
-* Drag components to change parent-child relationships
+* **Save**: ``Ctrl+S``.
+* **Undo/Redo**: ``Ctrl+Z`` / ``Ctrl+Y`` or ``Ctrl+Shift+Z``.
+* **Generate code**: ``Ctrl+G``.
+* **Compile and simulate**: starts resource conversion, code generation, compilation, and simulation.
+* **Debug simulation**: runs under GDB.
+* **Run without code generation**: skips code generation.
+* **Stop**: stops the running simulator.
+* **UART download**: flashes romfs to the board.
+* **Clean**: removes build output.
+
+View Tools
+~~~~~~~~~~
+
+* **Show/hide guides**.
+* **Align and distribute**: available when two or more components are selected.
+* **Canvas background color**.
+* **Fit all content**: scales content to the viewport, and the effective zoom range is about 10% to 500%.
+* **View relations**: inspect and edit page transitions.
+* **Preview language**: switch the project locale used by the canvas, and see :ref:`Localization Preview <designer-localization-preview-en>` for setup.
+* **Project configuration**: switch between ``config/*.json`` files.
+
+.. _designer-localization-preview-en:
+
+Localization Preview
+~~~~~~~~~~~~~~~~~~~~
+
+The language dropdown in the toolbar only switches the preview language. To display translated text, set up the project first:
+
+1. Open the project menu at the far left of the toolbar and choose **I18n Manager**, then add the locales the project supports. The default locale cannot be removed.
+2. Create keys in **I18n Manager**, or edit the existing ``i18n/strings.json`` catalog.
+3. In the Properties panel, set ``i18nKey`` on text components to reference a catalog entry. Components without ``i18nKey`` keep using their own ``text``.
+4. Use the toolbar language dropdown to switch the preview language. The canvas updates immediately.
+
+The selected preview language is stored as ``activeLocale`` in ``i18n/strings.json`` and saved with the project. Code generation writes the text for the current preview language into the generated C code; generating immediately after switching uses the new locale.
+
+If an entry has no translation for the current locale, the canvas falls back to the default locale, then the component ``text``, then the component name. Use the **Missing Translation** filter in **I18n Manager** to find entries that still need translation.
+
+Project Configurations
+~~~~~~~~~~~~~~~~~~~~~~
+
+Projects can keep multiple ``project.json`` variants under ``config/``:
+
+* Switch them from the toolbar project-configuration selector.
+* Switching updates the active project configuration and regenerates code.
+* Useful for maintaining different resolutions, pixel modes, or target engines.
+
+AI Collaboration Assets
+^^^^^^^^^^^^^^^^^^^^^^^
+
+AI collaboration assets can be enabled when creating a project. They include:
+
+* ``.claude/skills/honeygui-designer/``: HML design skill and references.
+* ``AGENTS.md``: AI agent entry point.
+
+Set ``"aiAssets": false`` in ``project.json`` to disable them; the extension cleans up distributed assets.
+
+View Navigation Graph
+~~~~~~~~~~~~~~~~~~~~~
+
+The view relations button opens a graph of ``switchView`` transitions:
+
+* Nodes represent views.
+* Edges represent transitions.
+* Edges can be created, edited, or removed.
+* Layout is stored in ``.honeygui/nav-layout.json``.
+
+The graph is useful for finding dangling transitions and understanding complex page flows.
+
+Components and Assets Panel
+----------------------------
+
+Component Library
+~~~~~~~~~~~~~~~~~
+
+Categories
+^^^^^^^^^^
+
+**Containers**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Component
+     - Purpose
+   * - ``hg_view``
+     - Page/view container for organizing one screen; cannot be nested inside another ``hg_view``.
+   * - ``hg_window``
+     - Window container for dialogs, overlays, or independent windows.
+   * - ``hg_list``
+     - Scrollable list container that manages a set of list items.
+   * - ``hg_menu_cellular``
+     - Cellular/grid menu container for icon-grid navigation.
+
+**Basic Controls**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Component
+     - Purpose
+   * - ``hg_button``
+     - Button with text, images, click callbacks, and optional toggle state.
+   * - ``hg_label``
+     - Text label with font, color, gradient, multi-line, and scrolling options.
+   * - ``hg_image``
+     - Image control with cropping, scaling, and display settings.
+
+**Input Controls (LVGL Only)**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Component
+     - Purpose
+   * - ``hg_input``
+     - Text input field for user input.
+   * - ``hg_checkbox``
+     - Checkbox for multiple selection.
+   * - ``hg_radio``
+     - Radio button for mutually exclusive selection within a group.
+   * - ``hg_switch``
+     - Switch control for toggling between on and off.
+   * - ``hg_slider``
+     - Slider for continuous value adjustment.
+   * - ``hg_progressbar``
+     - Progress bar for showing task progress.
+
+**Graphics**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Component
+     - Purpose
+   * - ``hg_progress``
+     - Multi-mode progress component supporting linear, segmented, arc, gauge, and loading modes.
+   * - ``hg_arc``
+     - Arc control for arcs, ring progress, or gauge elements.
+   * - ``hg_circle``
+     - Circle control for circles, rings, glow, and shadow effects.
+   * - ``hg_rect``
+     - Rectangle control for rectangles, rounded corners, borders, glow, and shadows.
+   * - ``hg_svg``
+     - SVG control for scalable vector graphics.
+   * - ``hg_glass``
+     - Glass/blur effect control that refracts or blurs the background along a shape path.
+   * - ``hg_particle``
+     - Particle effect control for effects such as fireworks or snow.
+   * - ``hg_qbcode``
+     - QR/barcode control that generates a code from its content.
+
+**Multimedia**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Component
+     - Purpose
+   * - ``hg_video``
+     - Video playback control with cropping, scaling, and autoplay.
+   * - ``hg_streaming``
+     - Streaming control that displays JPEG, RAW, or H.264 frames in real time.
+   * - ``hg_gif``
+     - GIF animation control.
+   * - ``hg_3d``
+     - 3D model control for OBJ/GLTF and similar models.
+   * - ``hg_lottie``
+     - Lottie animation control for JSON-based vector animations.
+
+Engine support:
+
+* **HoneyGUI** does not support input controls (``hg_input``, ``hg_checkbox``, ``hg_radio``, ``hg_switch``, ``hg_slider``, ``hg_progressbar``).
+* **LVGL** does not support ``hg_menu_cellular``, ``hg_progress``, ``hg_glass``, ``hg_particle``, ``hg_video``, ``hg_streaming`` and ``hg_3d``.
+* The library automatically hides components unsupported by the current ``targetEngine``.
+
+The following controls are not listed directly in the main library:
+
+* ``hg_time_label``: time label that displays the current time in a configured format.
+* ``hg_timer_label``: timer label for stopwatch or countdown display.
+* ``hg_list_item``: list item container managed by ``hg_list``, representing one row in a list.
+
+Adding Components
+^^^^^^^^^^^^^^^^^
+
+1. Drag a control from the component library onto the canvas.
+2. Drag images and other assets from the **Assets** panel onto the canvas to create the corresponding image or video controls.
+
+After placement, drag the control to snap it to the edges and centers of the parent container or sibling components. Smart guides appear while snapping. Use the guides button in the toolbar to show or hide the guide lines.
+
+Assets
+~~~~~~
+
+The Assets panel manages images, fonts, videos, 3D models, and other project resources. You can:
+
+* Import, rename, and delete assets.
+* Configure conversion settings for images, fonts, videos, and other assets.
+* Drag assets onto the canvas to create the corresponding image or video controls.
+
+Component Tree
+~~~~~~~~~~~~~~
+
+The **Component Tree** area on the left shows the hierarchy of the current page:
 
 .. code-block:: text
 
-   main_view (hg_view)
-   ├── header (hg_view)
-   │   ├── title (hg_label)
-   │   └── logo (hg_image)
-   ├── content (hg_view)
-   │   ├── btn1 (hg_button)
-   │   ├── btn2 (hg_button)
-   │   └── list (hg_list)
-   └── footer (hg_view)
+   view_home (hg_view)
+   ├── lbl_title (hg_label)
+   ├── img_logo (hg_image)
+   └── btn_next (hg_button)
 
-Tree Operations
-~~~~~~~~~~~~~~~
+Operations:
 
-* **Click**: Select component (canvas highlights synchronously)
-* **Drag**: Change component parent-child relationship or order
-* **Right-click**: Show context menu
+* Click a node to select the component; the canvas highlights it.
+* Drag nodes to change parent/child relationships or order.
+* Right-click for the context menu.
+* Click the arrow to expand or collapse.
 
-  * Copy, paste, delete
-  * Rename component ID
-  * Adjust layers
+.. note::
+   ``hg_view`` must not contain another ``hg_view``. Use the ``switchView`` event action for page changes.
 
-* **Expand/Collapse**: Click the arrow before the node
+Canvas
+------
 
-.. tip::
-   Use the component tree to easily manage complex nested structures, especially when components overlap on the canvas.
+Selection
+~~~~~~~~~
+
+* Click a component to select it.
+* Hold ``Ctrl`` and click to multi-select.
+* Drag on empty canvas space to box-select.
+* Press ``Esc`` to clear the selection.
+
+Move and Resize Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Drag a component to move it.
+* Drag one of the eight handles to resize.
+* Arrow keys move 1 pixel; ``Shift`` + arrow keys move 10 pixels.
+* Multi-selected components move together.
+
+Zoom and Pan the Canvas
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* Mouse wheel zooms around the pointer.
+* ``Space`` + drag pans the canvas.
+* **Fit all content** scales the design to the viewport.
+
+Align and Distribute
+~~~~~~~~~~~~~~~~~~~~
+
+With two or more components selected:
+
+* Align left, right, top, or bottom.
+* Center horizontally or vertically.
+* Distribute horizontally or vertically.
+
+Shortcuts:
+
+* ``Ctrl+Shift+L/R/T/B/H``: align left/right/top/bottom/horizontal center.
+* ``Ctrl+Shift+D``: distribute horizontally.
+* ``Ctrl+Alt+D``: distribute vertically.
+
+Context Menu
+~~~~~~~~~~~~
+
+Canvas component context menu:
+
+* **Go to Slot Function**: jump to the callback.
+* **Copy for AI**: copy component context for an AI agent.
+* **Bring to Front / Send to Back**: adjust component stacking.
+* **Bring Forward / Send Backward**: move one layer at a time.
+* **Lock / Unlock**: lock or unlock the component.
+* **Delete**: delete the component.
+
+Use keyboard shortcuts or the component tree for copy, cut, and paste. Rename components in the Properties panel.
 
 Properties Panel
------------------
+----------------
 
-The properties panel is located on the right, displaying all configurable properties of the selected component.
+The Properties panel has two sections: Basic Properties and Events.
 
 Basic Properties
 ~~~~~~~~~~~~~~~~
 
-Properties common to all components:
+.. figure:: resource/property.png
+   :align: center
+   :width: 300px
 
-* **ID**: Unique identifier of the component
+   Properties panel
 
-  * Must be unique
-  * Can only contain letters, numbers, underscores
-  * Used for code generation and event binding
+The Properties panel is grouped by category:
 
-* **Position and Size**
-
-  * ``x``: Horizontal position (relative to parent)
-  * ``y``: Vertical position (relative to parent)
-  * ``w``: Width
-  * ``h``: Height
-
-* **Visibility**
-
-  * ``visible``: Whether visible
-  * ``opacity``: Opacity (0-255)
-
-* **Rotation and Scale**
-
-  * ``rotation``: Rotation angle
-  * ``scaleX``: Horizontal scale ratio
-  * ``scaleY``: Vertical scale ratio
+* **Basic Info**: name, ID, parent.
+* **Layout**: X, Y, width, height.
+* **State**: visible, enabled, locked, show overflow.
+* **Content**: text, image path, value, placeholder, and related fields.
+* **Font**: font file, size, type, render mode.
+* **Style**: color, background, border, radius, gradient, glow, shadow.
+* **Transform**: rotation, scale, opacity, pivot.
+* **Rendering**: blend mode, clipping, high quality.
+* **Interaction**: button state, movable, click behavior.
+* **Behavior**: timers, animations, special behavior.
+* **Advanced**: entry page, resident memory, switch functions.
 
 Specific Properties
-~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^
 
-Different components have different specific properties:
+Specific properties vary by component. The following lists key properties for common components; the full groups are shown in the Properties panel.
 
-hg_button
-"""""""""
+**hg_button**
 
-* ``text``: Button text
-* ``color``: Text color
-* ``toggleMode``: Whether it is a toggle button
-* ``imageOn``: Image path for on state
-* ``imageOff``: Image path for off state
+* ``text``: button label
+* ``color``: text color
+* ``toggleMode``: whether the button has two states
+* ``imageOn`` / ``imageOff``: image paths for the on/off states
+* ``clickCallback``: click callback function
 
-hg_label
-""""""""
+**hg_label**
 
-* ``text``: Text content (multi-line supported)
-* ``fontSize``: Font size
-* ``color``: Font color
-* ``fontFile``: Font file path
-* ``hAlign``: Horizontal alignment (LEFT, CENTER, RIGHT)
-* ``vAlign``: Vertical alignment (TOP, MID)
-* ``letterSpacing``: Letter spacing
-* ``lineSpacing``: Line spacing
-* ``wordWrap``: Whether to auto wrap
+* ``text``: text content, with multi-line support
+* ``fontSize`` / ``fontFile``: font size and font file
+* ``color``: text color
+* ``hAlign`` / ``vAlign``: horizontal/vertical alignment (``LEFT``, ``CENTER``, ``RIGHT``; ``TOP``, ``MID``, ``BOTTOM``)
+* ``letterSpacing`` / ``lineSpacing``: letter and line spacing
+* ``wordWrap`` / ``wordBreak``: wrapping and word breaking
+* ``i18nKey``: references a project localization key
 
-hg_image
-""""""""
+**hg_image**
 
-* ``src``: Image file path
+* ``src``: image file path
+* ``visible``: whether the image is visible
 
-hg_arc / hg_circle / hg_rect
-"""""""""""""""""""""""""""""
+**hg_arc**
 
-* ``color`` / ``fillColor``: Color
-* ``opacity``: Opacity (0-255)
-* ``useGradient``: Whether to enable gradient
+* ``radius``: radius
+* ``startAngle`` / ``endAngle``: start and end angles
+* ``strokeWidth``: stroke width
+* ``color``: color
+* ``opacity``: opacity (0-255)
+* ``useGradient``: enables a gradient
 
-Event Properties
-~~~~~~~~~~~~~~~~
+**hg_circle**
 
-Components can configure event responses:
+* ``radius``: radius
+* ``fillColor`` / ``strokeColor``: fill and stroke colors
+* ``strokeWidth``: stroke width
+* ``opacity``: opacity (0-255)
+* ``useGradient`` / ``gradientType``: gradient switch and type
+* ``glowEnabled`` / ``shadowEnabled``: glow and shadow switches
 
-* **onClick**: Click event
-* **onLongPress**: Long press event
-* **onSwipe**: Swipe event
-* **onChange**: Value change event
+**hg_rect**
 
-See :doc:`Event System <event_system>` chapter for details.
+* ``borderRadius``: corner radius
+* ``fillColor`` / ``strokeColor``: fill and stroke colors
+* ``strokeWidth``: stroke width
+* ``opacity``: opacity (0-255)
+* ``useGradient`` / ``gradientDirection``: gradient switch and direction
+* ``glowEnabled`` / ``shadowEnabled``: glow and shadow switches
+* ``buttonMode``: button effect (``none``, ``dual-state``, ``opacity``)
 
-Color Picker
-~~~~~~~~~~~~
+Other components (input, switch, slider, list, video, 3D, Lottie, and others) also have their own properties. Glow and shadow are supported only by HoneyGUI.
 
-For color properties, the properties panel provides a color picker:
+Events
+~~~~~~
 
-* Click the color square to open the picker
-* Supports RGB, HSL color modes
-* Can directly input hexadecimal color values (e.g., ``#FF0000``)
-* Supports transparency settings
+.. figure:: resource/event.png
+   :align: center
+   :width: 300px
+
+   Events panel
+
+The Events panel configures:
+
+* Event type.
+* Action type and parameters.
+* Key name, message name, and function name.
+* Timer control targets.
+
+See :doc:`Event System <event_system>` for details.
 
 Keyboard Shortcuts
--------------------
+------------------
 
-Editing Operations
-~~~~~~~~~~~~~~~~~~
+Editing:
 
-* ``Ctrl+S``: Save
-* ``Ctrl+Z``: Undo
-* ``Ctrl+Y``: Redo
-* ``Ctrl+C``: Copy
-* ``Ctrl+V``: Paste
-* ``Ctrl+X``: Cut
-* ``Delete``: Delete selected component
+* ``Ctrl+S``: save.
+* ``Ctrl+Z``: undo.
+* ``Ctrl+Y`` or ``Ctrl+Shift+Z``: redo.
+* ``Ctrl+C`` / ``Ctrl+X`` / ``Ctrl+V``: copy/cut/paste.
+* ``Ctrl+D``: duplicate.
+* ``Delete``: delete.
 
-View Operations
-~~~~~~~~~~~~~~~
+Selection:
 
-* ``Ctrl`` + ``+``: Zoom in canvas
-* ``Ctrl`` + ``-``: Zoom out canvas
-* ``Ctrl`` + ``0``: Reset zoom
-* ``Space`` + drag: Pan canvas
+* ``Ctrl`` + click: multi-select.
+* ``Esc``: clear selection.
 
-Selection Operations
-~~~~~~~~~~~~~~~~~~~~
+Nudge:
 
-* ``Ctrl`` + click: Multi-select
-* ``Ctrl`` + ``A``: Select all
-* ``Esc``: Deselect
+* Arrow keys: move 1 pixel.
+* ``Shift`` + arrow keys: move 10 pixels.
 
-Precise Positioning
-~~~~~~~~~~~~~~~~~~~
+Other:
 
-* ``Arrow keys``: Move component 1 pixel
-* ``Shift`` + arrow keys: Move component 10 pixels
-* ``Shift`` + drag: Disable grid snapping
-
-Context Menu
--------------
-
-Right-clicking a component on the canvas displays a context menu:
-
-Component Operations
-~~~~~~~~~~~~~~~~~~~~
-
-* **Copy** (``Ctrl+C``)
-* **Paste** (``Ctrl+V``)
-* **Delete** (``Delete``)
-* **Rename**: Modify component ID
-
-Layer Adjustment
-~~~~~~~~~~~~~~~~
-
-* **Bring to Front**
-* **Send to Back**
-* **Bring Forward**
-* **Send Backward**
-
-Component Organization
-~~~~~~~~~~~~~~~~~~~~~~
-
-* **Group as Container**: Put multiple components into a new ``hg_view``
-* **Ungroup**: Remove child components from container
-
-Code Operations
-~~~~~~~~~~~~~~~
-
-* **View Generated Code**: Preview C code corresponding to this component
-* **Copy Code**: Copy generated code to clipboard
+* ``Ctrl+G``: generate code.
+* ``F5``: preview.
+* ``Space`` + drag: pan the canvas.
 
 Best Practices
----------------
+--------------
 
-Component Naming
-~~~~~~~~~~~~~~~~
-
-* Use meaningful IDs: ``login_button`` instead of ``button1``
-* Follow naming conventions: use lowercase letters and underscores
-* Avoid special characters and non-ASCII characters
-
-Layout Tips
-~~~~~~~~~~~
-
-* Use containers (``hg_view``) to organize related components
-* Make good use of grid snapping to maintain alignment
-* Use component tree to manage complex nesting
-
-Performance Optimization
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Avoid overly deep component nesting (recommended max 5 layers)
-* For large interfaces, consider splitting into multiple HML files
-* Hide invisible components to reduce rendering overhead
-
-Collaborative Development
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Regularly save and sync HML files
-* Use version control (like Git) to manage HML files
-* Avoid multiple people editing the same HML file simultaneously
+* Use meaningful IDs such as ``btn_login`` instead of ``button1``.
+* Never nest ``hg_view``.
+* Use ``hg_view`` for pages and ``hg_window`` for dialogs.
+* Split complex interfaces into multiple HML files.
+* Keep component IDs unique across the project.
+* Put event logic in protected callback regions or ``src/user``.
+* Save and commit HML files regularly.
 
 Next Steps
 ----------

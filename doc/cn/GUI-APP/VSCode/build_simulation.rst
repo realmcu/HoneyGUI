@@ -1,15 +1,47 @@
 编译与仿真
 ==========
 
-本文档介绍如何构建和运行 HoneyGUI Visual Designer 项目，包括开发环境配置、构建流程和模拟测试。
+本文介绍如何在 :term:`PC` 上编译和运行 HoneyDesigner 项目，以及 HoneyGUI 与 LVGL 两种引擎的构建差异。
 
 概述
-----
+-----
 
-HoneyGUI Visual Designer 支持在 :term:`PC` 上模拟运行，无需嵌入式硬件即可快速开发和测试 :term:`GUI` 应用。项目使用 SCons 构建系统，支持 Windows、Linux 和 WSL 环境。
+插件在项目根目录生成 ``build/`` 构建目录，并自动完成资源转换、代码生成、编译和仿真器启动。HoneyGUI 使用 SCons，LVGL 使用 CMake。
 
 开发环境要求
 ------------
+
+通用软件：
+
+* **VSCode**: 代码编辑器
+
+  * 推荐版本： 1.80.0 或更高
+  * 下载： https://code.visualstudio.com/
+  * 安装 HoneyDesigner 插件
+
+* **Python**: 3.9.7 或更高版本
+
+  * 下载： https://www.python.org/downloads/
+
+* **SCons**: 构建工具
+
+  .. code-block:: bash
+
+     pip install scons==4.4.0
+
+通用可选软件：
+
+* **CMake**: 3.31.2 或更高（LVGL 项目需要）
+
+  * 下载： https://cmake.org/download/
+
+* **FFmpeg**: 视频转换需要
+
+  * 下载： https://ffmpeg.org/download.html
+
+* **Git**: 从模板创建项目时需要
+
+  * 下载： https://git-scm.com/downloads
 
 Windows
 ~~~~~~~
@@ -22,329 +54,236 @@ Windows
   * 安装路径： ``C:\mingw64`` （默认）
   * 下载： https://sourceforge.net/projects/mingw-w64/
 
-* **Python**: 3.9.7 或更高版本
-
-  * 下载： https://www.python.org/downloads/
-
-* **SCons**: 构建工具
-
-  .. code-block:: bash
-
-     pip install scons==4.4.0
-
-* **kconfiglib**: 配置工具
-
-  .. code-block:: bash
-
-     pip install kconfiglib
-
-* **VSCode**: 代码编辑器
-
-  * 下载： https://code.visualstudio.com/
-  * 安装 HoneyGUI Visual Designer 插件
-
-可选软件：
-
-* **CMake**: 3.31.2 或更高（如果使用 CMake 构建）
-
-  .. code-block:: bash
-
-     pip install cmake
+* **SDL2**: 已随仓库提供，无需单独安装
 
 Linux/WSL
-~~~~~~~~~
-
-必需软件：
+~~~~~~~~~~
 
 .. code-block:: bash
 
    # Ubuntu/Debian
    sudo apt-get update
    sudo apt-get install build-essential python3 python3-pip libsdl2-dev
+   pip3 install scons==4.4.0
 
-   # 安装 Python 工具
-   pip3 install scons==4.4.0 kconfiglib
+Linux/WSL 使用系统 ``gcc``/``g++``，SDL2 由 ``libsdl2-dev`` 提供。WSL 需要 WSLg 或 X Server 才能显示仿真窗口。
 
 环境变量配置
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
-**Windows**:
+**Windows**
 
-确保 MinGW-w64 的 ``bin`` 目录在 PATH 中：
+构建脚本 ``menu_config.py`` 通过 ``PATH`` 查找 ``gcc``，找不到时会直接报错，因此 ``C:\mingw64\bin`` 必须在 ``PATH`` 中。可先在当前 CMD 窗口临时添加：
 
-.. code-block:: bash
+.. code-block:: bat
 
-   # 检查编译器
-   gcc --version
-   g++ --version
-
-   # 如果找不到,添加到 PATH
    set PATH=C:\mingw64\bin;%PATH%
 
-**Linux/WSL**:
+要永久生效，请在“系统属性 → 环境变量”中编辑用户或系统 ``PATH``，然后重新打开终端和 VSCode。检查配置：
 
 .. code-block:: bash
 
-   # 检查编译器
    gcc --version
+   g++ --version
+   mingw32-make --version
 
-   # 检查 SDL2
+**Linux/WSL**
+
+系统 GCC 由 ``build-essential`` 安装，通常无需额外配置。检查：
+
+.. code-block:: bash
+
+   gcc --version
    pkg-config --libs sdl2
 
-项目结构
---------
+如果 SDL2 不在系统默认路径，CMake 可通过 ``SDL2_INCLUDE_DIR`` 和 ``SDL2_LIB_DIR`` 指定头文件和库目录。
 
-HoneyGUI Visual Designer 项目的标准结构：
+**FFmpeg**
+
+需要视频转换时，将 FFmpeg 的 ``bin`` 目录加入 ``PATH``；否则视频资源会被跳过。
+
+环境检查
+~~~~~~~~~
+
+1. 打开 HoneyDesigner 侧边栏的 **环境** 视图。
+2. 查看 Python、SCons、GCC、SDL2、FFmpeg 状态。
+3. 点击刷新按钮或执行 ``刷新环境检查``。
+4. 使用视图中的安装入口安装缺失项。
+
+项目结构
+---------
 
 .. code-block:: text
 
    my_project/
-   ├── project.json          # 项目配置文件
-   ├── ui/                   # HML 设计文件
-   │   ├── main/
-   │   │   └── main.hml
-   │   └── settings/
-   │       └── settings.hml
-   ├── assets/               # 资源文件
-   │   ├── images/          # 图片资源
-   │   ├── fonts/           # 字体资源
-   │   └── models/          # 3D 模型
-   ├── src/                  # 生成的 C 代码
-   │   ├── {ProjectName}Entry.c
+   ├── project.json
+   ├── ui/
+   │   └── MyProjectMain.hml
+   ├── src/
+   │   ├── MyProjectEntry.c
    │   ├── SConscript
-   │   ├── ui/              # UI 代码
-   │   ├── callbacks/       # 回调代码
-   │   └── user/            # 用户代码
-   └── win32_sim/           # 模拟器目录（构建后）
+   │   ├── ui/
+   │   ├── callbacks/
+   │   ├── user/
+   │   └── lvgl/                # LVGL 项目
+   ├── assets/
+   └── build/                   # 插件生成的构建目录
 
-项目配置文件
-------------
+``win32_sim/`` 不是用户项目目录。插件会把一套固定的 PC 仿真工程骨架复制到 ``build/``，包括 SCons/CMake 构建脚本、``main.c`` 入口、``port/`` 平台适配层（显示、输入、音频、文件系统和 OS）、链接脚本，以及 Windows 下使用的 SDL2 静态库。用户只需要维护 ``ui/``、``src/``、``assets/`` 和 ``project.json``；``build/`` 是生成目录，可以删除后重新生成。
 
-``project.json`` 定义项目的基本信息：
+项目配置
+---------
+
+``project.json`` 示例：
 
 .. code-block:: json
 
    {
+     "$schema": "HoneyGUI",
+     "type": "Designer",
      "name": "MyWatchApp",
+     "appId": "com.example.mywatch",
      "version": "1.0.0",
-     "description": "My smart watch application",
      "resolution": "410x502",
-     "author": "Your Name",
-     "license": "MIT"
+     "cornerRadius": 20,
+     "targetEngine": "honeygui",
+     "pixelMode": "RGB565",
+     "minSdk": "1.0",
+     "mainHmlFile": "ui/MyWatchAppMain.hml",
+     "romfsBaseAddr": "0x704D1000",
+     "aiAssets": true,
+     "uart": {
+       "port": "COM3",
+       "baudRate": 115200,
+       "chipType": "RTL87X3E"
+     }
    }
 
-支持的分辨率：
+常用字段：
 
-* ``410x502`` - 标准智能手表
-* ``466x466`` - 大屏手表
-* ``480x272`` - 横屏设备
-* ``800x480`` - 平板/车机
+* ``resolution``：屏幕分辨率，格式为 ``WxH``。
+* ``cornerRadius``：``0`` 矩形，``-1`` 圆形，正数为圆角半径。
+* ``targetEngine``：``honeygui`` 或 ``lvgl``。
+* ``pixelMode``：``RGB565``、``RGB888``、``ARGB8888``。
+* ``romfsBaseAddr``：romfs 在 Flash 中的基地址。
+* ``uart``：UART 下载配置。
 
 构建流程
---------
+---------
 
-使用 VSCode 插件构建
-~~~~~~~~~~~~~~~~~~~~
+构建项目
+~~~~~~~~~
 
-1. **打开项目**: 在 VSCode 中打开 HoneyGUI Visual Designer 项目文件夹
+**使用插件构建：**
 
-2. **生成代码**:
+1. 打开项目中的 HML 文件。
+2. 点击工具栏的 :guilabel:`仿真`，或在命令面板执行 ``HoneyDesigner: 编译仿真``。
+3. 插件默认依次执行资源转换、代码生成、编译和仿真器启动。
+4. 如需跳过某个阶段，点击 :guilabel:`仿真` 按钮右侧的下拉箭头，在 **仿真流程** 中取消勾选对应项。
 
-   * 点击工具栏的 :guilabel:`生成代码` 按钮
-   * 或使用命令面板： ``Ctrl+Shift+P`` → ``HoneyGUI: Generate Code``
+插件相关命令：
 
-3. **配置应用**:
+* ``HoneyDesigner: Debug Simulation``：调试模式启动。
+* ``HoneyDesigner: Run Simulation Without Code Generation``：跳过代码生成。
+* ``HoneyDesigner: Stop Simulation``：停止仿真。
+* 工具栏 :guilabel:`清理` 或 **快捷操作** 视图的 :guilabel:`清理`：清理构建产物。
 
-   * 使用命令： ``HoneyGUI: Configure Application``
-   * 选择要运行的应用
+**手动构建：**
 
-4. **构建项目**:
-
-   * 使用命令： ``HoneyGUI: Build Project``
-   * 或在终端中执行：
-
-     .. code-block:: bash
-
-        cd win32_sim
-        scons
-
-5. **运行模拟器**:
-
-   * 使用命令： ``HoneyGUI: Run Simulator``
-   * 或手动执行：
-
-     .. code-block:: bash
-
-        # Windows
-        ./win32_sim/gui.exe
-
-        # Linux/WSL
-        ./win32_sim/gui
-
-使用命令行构建
-~~~~~~~~~~~~~~
-
-**完整构建流程**:
+插件推荐使用工具栏或命令完成构建。需要手动排查时，可以先执行代码生成，然后进入 ``build/`` 运行 SCons：
 
 .. code-block:: bash
 
-   # 1. 进入模拟器目录
-   cd win32_sim
-
-   # 2. 配置应用 （可选）
-   menuconfig ../Kconfig.gui
-
-   # 3. 构建项目
-   scons
-
-   # 4. 运行
-   cd ..
-   ./win32_sim/gui.exe  # Windows
-   ./win32_sim/gui      # Linux/WSL
-
-**清理构建**:
-
-.. code-block:: bash
-
-   cd win32_sim
-   scons -c
-
-**调试模式**:
-
-.. code-block:: bash
-
-   # 跳过严格检查,方便开发调试
-   set DEBUG_MODE=1        # Windows
-   export DEBUG_MODE=1     # Linux/WSL
-   scons
-
-构建配置
---------
-
-应用配置 (Menuconfig)
-~~~~~~~~~~~~~~~~~~~~~
-
-在构建前配置要运行的应用：
-
-.. code-block:: bash
-
-   cd win32_sim
-   menuconfig ../Kconfig.gui
-
-配置界面允许选择：
-
-* 预设应用（手表演示、GUI 演示等）
-* 屏幕分辨率
-* 功能开关
-
-配置保存在 ``.config`` 文件中，SCons 和 CMake 都会读取。
-
-编译器标志
-~~~~~~~~~~
-
-**默认编译器标志**（严格模式）:
-
-* ``-Wall``: 启用所有警告
-* ``-Werror``: 将警告视为错误
-* ``-O2``: 优化级别 2
-
-**调试模式标志** (``DEBUG_MODE=1``):
-
-* ``-g``: 生成调试信息
-* ``-O0``: 不优化，方便调试
-* 不使用 ``-Werror``
-
-使用 CMake 构建（可选）
-------------------------
-
-HoneyGUI 也支持 CMake 构建系统：
-
-.. code-block:: bash
-
-   cd win32_sim
-   mkdir build
    cd build
+   scons
 
-   # Windows (MinGW)
-   cmake -G "MinGW Makefiles" ..
-   mingw32-make -j 32
+LVGL 项目使用 CMake：
 
-   # Linux
-   cmake ..
-   make -j 8
+.. code-block:: bash
 
-   # 运行
-   cd ../..
-   ./win32_sim/build/gui.exe  # Windows
-   ./win32_sim/build/gui      # Linux
+   cd lvgl-pc
+   cmake -S . -B build
+   cmake --build build -j4
 
-运行模拟器
-----------
+构建产物
+~~~~~~~~~
 
-启动模拟器
-~~~~~~~~~~
+无论使用插件还是手动构建，主要产物如下：
+
+HoneyGUI：
+
+* Windows：``build/gui.exe``
+* Linux/WSL：``build/gui``
+* 资源：``build/assets/``
+* romfs：``build/app_romfs_<baseAddr>.bin``
+
+LVGL：
+
+* 工程：``lvgl-pc/``
+* 可执行文件：``lvgl-pc/build/lvgl_pc.exe`` 或 ``lvgl-pc/build/lvgl_pc``
+
+调试
+-----
+
+* 使用 ``HoneyDesigner: Debug Simulation`` 启动调试会话。
+* Windows 下需要 GDB，通常随 MinGW 一起安装。
+* 也可以在 ``launch.json`` 中配置 ``cppdbg``，程序路径指向 ``build/gui.exe``。
+
+示例：
+
+.. code-block:: json
+
+   {
+     "version": "0.2.0",
+     "configurations": [
+       {
+         "name": "Debug HoneyGUI",
+         "type": "cppdbg",
+         "request": "launch",
+         "program": "${workspaceFolder}/build/gui.exe",
+         "cwd": "${workspaceFolder}",
+         "MIMode": "gdb",
+         "miDebuggerPath": "C:/mingw64/bin/gdb.exe"
+       }
+     ]
+   }
+
+运行仿真器
+-----------
+
+启动仿真器
+~~~~~~~~~~~
+
+使用插件启动：
+
+1. 点击工具栏的 :guilabel:`仿真`，或执行 ``HoneyDesigner: 编译仿真``。
+2. 如果代码已经生成，可执行 ``HoneyDesigner: Run Simulation Without Code Generation`` 跳过代码生成直接启动。
+
+也可以手动运行：
 
 .. code-block:: bash
 
    # Windows
-   ./win32_sim/gui.exe
+   ./build/gui.exe
 
    # Linux/WSL
-   ./win32_sim/gui
+   ./build/gui
 
-模拟器窗口将显示您设计的 GUI 界面。
+LVGL 项目的可执行文件位于 ``lvgl-pc/build/lvgl_pc.exe`` 或 ``lvgl-pc/build/lvgl_pc``。
 
 交互方式
-~~~~~~~~
+~~~~~~~~~
 
-* **鼠标左键**: 模拟触摸点击
-* **鼠标拖动**: 模拟滑动手势
-* **鼠标长按**: 模拟长按操作
-* **键盘 ESC**: 退出模拟器
-* **窗口关闭**: 退出模拟器
-
-调试技巧
-~~~~~~~~
-
-1. **查看日志**: 模拟器会输出调试信息到控制台
-
-2. **使用 GDB 调试** (Linux):
-
-   .. code-block:: bash
-
-      gdb ./win32_sim/gui
-      (gdb) run
-      (gdb) break main
-      (gdb) continue
-
-3. **Visual Studio Code 调试** (Windows):
-
-   配置 ``launch.json``:
-
-   .. code-block:: json
-
-      {
-        "version": "0.2.0",
-        "configurations": [
-          {
-            "name": "Debug HoneyGUI",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/win32_sim/gui.exe",
-            "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "miDebuggerPath": "C:/mingw64/bin/gdb.exe"
-          }
-        ]
-      }
+* **鼠标左键**：模拟触摸点击。
+* **鼠标拖动**：模拟滑动手势。
+* **鼠标长按**：模拟长按。
+* **Esc**：退出仿真器。
+* **关闭窗口**：退出仿真器。
 
 常见问题
---------
+---------
 
-构建错误
-~~~~~~~~
-
-**错误：找不到 gcc**
+**找不到 gcc**
 
 .. code-block:: text
 
@@ -352,134 +291,50 @@ HoneyGUI 也支持 CMake 构建系统：
 
 解决方案：
 
-* 确认已安装 MinGW-w64
-* 检查 PATH 环境变量
-* 重新启动终端/VSCode
+* 安装 MinGW-w64 或 GCC。
+* 把编译器 ``bin`` 目录加入 ``PATH``。
+* 重启终端和 VSCode。
 
-**错误：SDL2 库缺失**
+**找不到 SDL2**
 
 .. code-block:: text
 
    fatal error: SDL2/SDL.h: No such file or directory
 
-解决方案 (Linux):
+解决方案：
 
 .. code-block:: bash
 
    sudo apt-get install libsdl2-dev
 
-**错误：Python 模块缺失**
-
-.. code-block:: text
-
-   ModuleNotFoundError: No module named 'SCons'
-
-解决方案：
+**SCons 模块缺失**
 
 .. code-block:: bash
 
-   pip install scons==4.4.0 kconfiglib
+   pip install scons==4.4.0
 
-运行错误
-~~~~~~~~
+**无法启动仿真器**
 
-**错误：无法启动模拟器**
+* Windows：确认显卡/OpenGL 环境正常。
+* Linux：确认 SDL2 已安装。
+* WSL：需要配置 X Server 或使用 WSLg。
 
-.. code-block:: text
+**资源文件找不到**
 
-   Failed to initialize SDL
-
-解决方案：
-
-* Windows: 确认系统支持 OpenGL
-* Linux: 检查 SDL2 库安装
-* WSL: 需要配置 X Server（如 VcXsrv）
-
-**错误：资源文件找不到**
-
-.. code-block:: text
-
-   Error loading image: assets/logo.bin
-
-解决方案：
-
-* 确认资源文件已转换为 ``.bin`` 格式
-* 检查文件路径是否正确
-* 重新构建项目
+* 先执行资源转换。
+* 检查 HML 中的资源路径是否以 ``assets/`` 或字体 ``/`` 开头。
+* 重新执行完整构建。
 
 性能优化
---------
+---------
 
-构建速度优化
-~~~~~~~~~~~~
-
-1. **并行编译**:
-
-   .. code-block:: bash
-
-      # SCons
-      scons -j 8  # 使用 8 个线程
-
-      # CMake
-      make -j 8
-
-2. **增量构建**: 只修改部分文件后，构建系统自动只重新编译改动的文件
-
-3. **使用 ccache** (Linux):
-
-   .. code-block:: bash
-
-      sudo apt-get install ccache
-      export CC="ccache gcc"
-      export CXX="ccache g++"
-
-运行性能优化
-~~~~~~~~~~~~
-
-1. **资源优化**: 使用合适的图片格式和分辨率
-
-2. **代码优化**: 避免在频繁调用的回调中执行耗时操作
-
-3. **编译优化**: 发布版本使用 ``-O2`` 或 ``-O3`` 优化级别
-
-持续集成
---------
-
-在 CI/CD 流水线中构建 HoneyGUI 项目：
-
-.. code-block:: yaml
-
-   # GitHub Actions 示例
-   name: Build HoneyGUI
-   on: [push, pull_request]
-
-   jobs:
-     build:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: actions/checkout@v2
-
-         - name: Install dependencies
-           run: |
-             sudo apt-get update
-             sudo apt-get install -y build-essential libsdl2-dev python3-pip
-             pip3 install scons==4.4.0 kconfiglib
-
-         - name: Build project
-           run: |
-             cd win32_sim
-             scons
-
-         - name: Archive artifacts
-           uses: actions/upload-artifact@v2
-           with:
-             name: gui-binary
-             path: win32_sim/gui
+* 使用增量构建，只修改少量文件时不需要清理全部产物。
+* 图片和视频使用合适的分辨率、格式和压缩方式。
+* 避免在频繁触发的回调中执行耗时操作。
+* 发布版本使用优化级别构建。
+* LVGL 项目可以调整 CMake 构建并行度。
 
 下一步
-------
+-------
 
-* 学习 :doc:`code_generation` 了解代码生成流程
-* 查看 :doc:`event_system` 实现交互逻辑
-* 参考 :doc:`resource_management` 管理项目资源
 * 阅读 :doc:`deployment` 了解嵌入式部署方案

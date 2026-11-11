@@ -1,175 +1,110 @@
 代码生成
 ========
 
-本文档描述 HoneyGUI Visual Designer 的代码生成功能，包括架构设计、使用方法和实现细节。
+本文介绍 HoneyDesigner 的双引擎代码生成流程、产物结构和保护区机制。
 
 概述
-----
+-----
 
-从 HML 设计器生成调用 HoneyGUI :term:`API` 的 C 代码，实现可视化设计到嵌入式 :term:`GUI` 代码的转换。
+设计器把 HML 转换为目标引擎的 C 代码。目标引擎由 ``project.json`` 的 ``targetEngine`` 决定：
+
+* ``honeygui``：生成 HoneyGUI API 调用代码，使用 SCons 构建。
+* ``lvgl``：生成 LVGL API 调用代码，使用 CMake 构建。
 
 代码生成流程
-------------
+-------------
 
 .. code-block:: text
 
-   HML文件 → 解析器 → 组件树 → C代码生成器 → HoneyGUI API调用代码
+   HML 文件
+     -> HML 解析器
+     -> 组件树 / 事件 / 定时器
+     -> CodeGeneratorFactory
+     -> HoneyGuiCCodeGenerator 或 LvglCCodeGenerator
+     -> src/ 下的 C 代码
 
-架构设计
---------
+架构
+-----
 
-核心组件
-~~~~~~~~
+核心模块：
 
-.. code-block:: text
+* ``CodeGeneratorFactory``：根据 ``targetEngine`` 选择生成器。
+* ``HoneyGuiCCodeGenerator``：生成 HoneyGUI UI、回调、用户代码和 SConscript。
+* ``LvglCCodeGenerator``：生成 LVGL UI、回调、入口文件和资源描述。
+* ``EntryFileGenerator``：生成 HoneyGUI 项目入口 ``{ProjectName}Entry.c``。
+* ``SConscriptGenerator``：生成 ``src/SConscript``。
 
-   CodeGenerator（服务层）
-     ├─ 扫描项目中的所有 HML 文件
-     ├─ 生成项目入口文件 (EntryFileGenerator)
-     ├─ 生成构建脚本 (SConscriptGenerator)
-     └─ 为每个 HML 生成代码 (HoneyGuiCCodeGenerator)
+生成命令
+---------
 
-   EntryFileGenerator（独立工具）
-     └─ 生成 {ProjectName}Entry.c
+* 工具栏 :guilabel:`生成代码`。
+* 命令面板：``HoneyDesigner: 生成代码``。
+* 快捷键：``Ctrl+G``。
+* 编译仿真流程中也可以勾选“生成代码”。
 
-   SConscriptGenerator（独立工具）
-     └─ 生成 src/SConscript
+生成时会扫描项目 ``ui/`` 目录下的所有 HML 文件。
 
-   HoneyGuiCCodeGenerator（核心生成器）
-     ├─ 生成 {hmlFileName}_ui.h
-     ├─ 生成 {hmlFileName}_ui.c
-     ├─ 生成 {hmlFileName}_callbacks.h
-     ├─ 生成 {hmlFileName}_callbacks.c（含保护区）
-     ├─ 生成 {hmlFileName}_user.h
-     └─ 生成 {hmlFileName}_user.c
-
-文件命名和目录规则
-------------------
-
-命名规则
-~~~~~~~~
-
-* 使用 HML 文件名作为生成文件的基础名称
-* 例如： ``main.hml`` → ``main.h``, ``main.c``, ``main_callbacks.h``, ``main_callbacks.c``
-
-目录映射
-~~~~~~~~
-
-* HML 文件在 ``ui/xxx/`` 目录 → C 代码生成到 ``src/`` 目录的对应子目录
-* 每个 HML 文件生成到独立的子目录
-* 例如： ``ui/main/main.hml`` → ``src/ui/main_ui.c``, ``src/callbacks/main_callbacks.c``, ``src/user/main_user.c``
-* 自动创建不存在的子目录
-
-生成文件结构
-~~~~~~~~~~~~
+HoneyGUI 产物
+--------------
 
 .. code-block:: text
 
-   project/
+   src/
+   ├── {ProjectName}Entry.c      # 项目入口，含保护区
+   ├── SConscript                # 构建脚本，每次生成
    ├── ui/
-   │   ├── main/
-   │   │   └── main.hml
-   │   └── settings/
-   │       └── settings.hml
-   └── src/
-       ├── {ProjectName}Entry.c    # 项目入口文件
-       ├── SConscript              # 构建脚本
-       ├── ui/                     # UI代码（每次覆盖）
-       │   ├── main_ui.h
-       │   ├── main_ui.c
-       │   ├── settings_ui.h
-       │   └── settings_ui.c
-       ├── callbacks/              # 回调代码（保护区）
-       │   ├── main_callbacks.h
-       │   ├── main_callbacks.c
-       │   ├── settings_callbacks.h
-       │   └── settings_callbacks.c
-       └── user/                   # 用户代码（只生成一次）
-           ├── main_user.h
-           ├── main_user.c
-           ├── settings_user.h
-           └── settings_user.c
+   │   ├── {name}_ui.h           # 每次覆盖
+   │   └── {name}_ui.c           # 每次覆盖
+   ├── callbacks/
+   │   ├── {name}_callbacks.h    # 声明，重新生成
+   │   └── {name}_callbacks.c    # 重新生成，保留保护区
+   └── user/
+       ├── {name}_user.h         # 只生成一次
+       └── {name}_user.c         # 只生成一次
 
-使用方法
---------
+命名规则：
 
-生成代码
-~~~~~~~~
+* ``{name}`` 是 HML 文件名去掉扩展名，例如 ``dashboard.hml`` -> ``dashboard_ui.c``。
+* 所有 HML 的 UI 代码统一输出到 ``src/ui``，不再按原目录层级生成。
+* 不同目录下的 HML 如果文件名相同，会生成同名 C 文件，因此建议项目内保持 HML basename 唯一。
+* HML basename 应使用合法 C 标识符字符。
 
-1. 在设计器中打开任意 HML 文件
-2. 点击工具栏的 :guilabel:`生成代码`
-3. 自动扫描项目中所有 HML 文件并生成代码
-4. 显示生成进度和结果
-
-**生成内容**:
-
-* 所有设计稿的 C 代码文件
-* 项目入口文件 ``{ProjectName}Entry.c``
-* 构建脚本 ``SConscript``
-
-**快捷方式**:
-
-* 命令面板： ``Ctrl+Shift+P`` → ``HoneyGUI: Generate Code``
-* 工具栏按钮：点击 :guilabel:`生成代码`
-
-代码保护区
+LVGL 产物
 ----------
 
-保护区语法
-~~~~~~~~~~
+.. code-block:: text
 
-.. code-block:: c
+   src/lvgl/
+   ├── {name}_lvgl_ui.c/h
+   ├── {name}_lvgl_callbacks.c/h
+   ├── lvgl_generated_ui.c/h     # 多页面入口
+   ├── ui_resource.h             # external-bin 资源宏
+   └── lv_img_dsc_list.c/h       # external-bin 图片描述
 
-   /* @protected start unique_id */
-   // 这里的代码在重新生成时会被保留
-   /* @protected end unique_id */
+LVGL 资源有两种部署方式：
 
-示例
-~~~~
-
-**首次生成**:
-
-.. code-block:: c
-
-   /* @protected start custom_functions */
-   // Custom functions
-   /* @protected end custom_functions */
-
-**用户修改后**:
-
-.. code-block:: c
-
-   /* @protected start custom_functions */
-   void on_start_click(void *obj, gui_event_t *e) {
-       printf("Starting application...\n");
-   }
-   /* @protected end custom_functions */
-
-**重新生成后**: 保护区内的代码被保留，其他代码更新。
+* ``c-array``：图片和字体编译为 C 数组，链接进固件。
+* ``external-bin``：资源打包为 romfs，运行时从外部存储加载。
 
 生成的代码结构
---------------
+---------------
+
+以 HoneyGUI 为例，一个 HML 文件会生成 UI 头文件、UI 实现文件和回调文件。LVGL 生成的文件结构类似，只是使用 LVGL API 和 ``{name}_lvgl_*`` 命名。
 
 头文件 (.h)
 ~~~~~~~~~~~
 
 .. code-block:: c
 
-   #ifndef MAIN_H
-   #define MAIN_H
+   #ifndef DASHBOARD_UI_H
+   #define DASHBOARD_UI_H
 
-   #include "gui_api.h"
+   #include "gui_obj.h"
+   #include "gui_view_instance.h"
 
-   // 组件声明
-   extern gui_obj_t *mainView;
-   extern gui_obj_t *titleLabel;
-   extern gui_obj_t *startButton;
-
-   // 初始化函数
-   void main_init(void);
-
-   // 更新函数
-   void main_update(void);
+   // 组件句柄声明
+   extern gui_obj_t *lbl_title;
+   extern gui_obj_t *btn_next;
 
    #endif
 
@@ -178,111 +113,106 @@
 
 .. code-block:: c
 
-   #include "main.h"
-   #include "main_callbacks.h"
+   #include "dashboard_ui.h"
+   #include "../callbacks/dashboard_callbacks.h"
 
-   // 组件定义
-   gui_obj_t *mainView = NULL;
-   gui_obj_t *titleLabel = NULL;
-   gui_obj_t *startButton = NULL;
+   gui_obj_t *lbl_title = NULL;
+   gui_obj_t *btn_next = NULL;
 
-   // 视图切换回调(switch_in)
-   static void main_view_switch_in(gui_view_t *view)
+   static void view_home_switch_in(gui_view_t *view)
    {
-       // 注册事件
-       gui_view_switch_on_event(view, "screen2", SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
-                                SWITCH_IN_FROM_RIGHT_USE_TRANSLATION, GUI_EVENT_TOUCH_MOVE_LEFT);
-
-       // 创建子组件
-       titleLabel = gui_text_create(view, "titleLabel", 10, 10, 460, 40);
-       // ...
+       // 创建子组件并注册 switchView 事件
    }
 
-   GUI_VIEW_INSTANCE("mainView", false, main_view_switch_in, main_view_switch_out);
+   GUI_VIEW_INSTANCE("view_home", false, view_home_switch_in, view_home_switch_out, false);
 
 回调文件 (_callbacks.h / _callbacks.c)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c
 
-   // main_callbacks.c
-   #include "main_callbacks.h"
-
-   void on_btn1_click(void *obj, gui_event_t *e)
+   void on_btn_next_click(void *obj, gui_event_t *e)
    {
        GUI_UNUSED(obj);
        GUI_UNUSED(e);
-       // TODO: Implement event handling logic
+       // 事件回调主体，重新生成时覆盖
    }
 
    /* @protected start custom_functions */
-   // Custom functions
+   void on_next_click(void *obj, gui_event_t *e)
+   {
+       // 用户业务逻辑
+   }
    /* @protected end custom_functions */
 
-注意事项
---------
+``{name}_user.c/h`` 只生成一次，入口文件和 ``SConscript`` 会随项目重新生成；保护区和更新规则见下一节。
 
-1. **目录结构**: HML 文件必须在 ``ui/`` 目录下的子目录中
-2. **文件命名**: HML 文件名应使用有效的 C 标识符
-3. **保护区**: 不要手动修改保护区标记
-4. **重新生成**: 修改 HML 后重新生成，用户代码会被保留
-5. **多文件**: 每个 HML 独立生成，互不影响
+代码保护区
+-----------
 
-视图切换实现
-------------
-
-对于 ``hg_view`` 组件的视图切换 (switchView)，代码生成器不再生成独立的回调函数，而是利用 HoneyGUI SDK 的 ``GUI_VIEW_INSTANCE`` 宏和 ``gui_view_switch_on_event`` 函数在 ``switch_in`` 回调中直接注册。这大大简化了代码结构，并减少了不必要的保护区。
-
-示例
-~~~~
-
-HML 文件中配置的视图切换事件：
-
-.. code-block:: xml
-
-   <hg_view id="main_view" x="0" y="0" w="480" h="272">
-       <events>
-           <event type="onSwipeLeft">
-               <action type="switchView" target="screen2"
-                       switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
-                       switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION" />
-           </event>
-       </events>
-   </hg_view>
-
-生成的 C 代码：
+生成器识别两种保护区标记：
 
 .. code-block:: c
 
-   static void main_view_switch_in(gui_view_t *view)
+   /* @protected start custom_functions */
+   /* 用户代码 */
+   /* @protected end custom_functions */
+
+.. code-block:: c
+
+   /* USER CODE BEGIN custom_functions */
+   /* 用户代码 */
+   /* USER CODE END custom_functions */
+
+各目录行为：
+
+* ``src/ui``：每次生成覆盖，不要手动修改。
+* ``src/callbacks``：文件重新生成，但保护区内容保留。
+* ``src/user``：只生成一次，之后完全由用户维护。
+* ``src/{ProjectName}Entry.c``：重新生成，但包含入口保护区。
+
+.. warning::
+   事件回调函数主体不是保护区，会随 HML 变化重新生成。业务逻辑请写在 ``custom_functions`` 中，并通过 ``callFunction`` 调用。
+
+视图切换
+---------
+
+``hg_view`` 上的 ``switchView`` 不生成独立回调，而是在 ``GUI_VIEW_INSTANCE`` 的 ``switch_in`` 回调中注册：
+
+.. code-block:: c
+
+   static void view_main_switch_in(gui_view_t *view)
    {
-       // 注册左滑跳转事件
-       gui_view_switch_on_event(view, "screen2",
+       gui_view_switch_on_event(view, "view_settings",
                                 SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                                 SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
                                 GUI_EVENT_TOUCH_MOVE_LEFT);
-
-       // 创建子组件...
    }
 
-   GUI_VIEW_INSTANCE("main_view", false, main_view_switch_in, main_view_switch_out);
+   GUI_VIEW_INSTANCE("view_main", false, view_main_switch_in, view_main_switch_out, false);
 
-构建生成的代码
---------------
+注意 ``GUI_VIEW_INSTANCE`` 当前使用 5 个参数，最后一个参数用于快照开关。
 
-生成代码后，可以使用 SCons 构建系统编译项目：
+多 HML 项目
+------------
 
-.. code-block:: bash
+* 每个 HML 独立生成 ``{name}_ui.c``、``{name}_callbacks.c``、``{name}_user.c``。
+* 多个 HML 生成一个项目入口文件和一份 ``SConscript``。
+* ``switchView`` 可以跨 HML 文件跳转，目标按 view id 或 name 解析。
+* 组件 ID 建议在项目内全局唯一，生成代码会作为 C 全局变量名使用。
 
-   cd win32_sim
-   scons
+注意事项
+---------
 
-详细的构建和模拟说明请参考 :doc:`build_simulation`。
+1. HML 文件应放在项目 ``ui/`` 目录下。
+2. HML basename 使用合法 C 标识符字符。
+3. 不要修改保护区标记。
+4. 修改 HML 后重新生成，保护区内的用户代码会保留。
+5. 切换 ``targetEngine`` 后旧的生成目录不会自动清理，建议先清理再重新生成。
 
 下一步
-------
+-------
 
-* 了解 :doc:`event_system` 学习如何处理组件事件
 * 学习 :doc:`resource_management` 管理项目资源
 * 查看 :doc:`build_simulation` 了解如何构建和运行
 * 参考 :doc:`deployment` 了解嵌入式部署方案

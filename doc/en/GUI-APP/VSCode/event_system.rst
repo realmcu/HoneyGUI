@@ -1,553 +1,275 @@
 Event System
-============
+=============
 
-The HoneyGUI Visual Designer event system adopts the **Event-Action** pattern, allowing users to configure event responses for components in the designer without writing code to implement common interaction logic.
+HoneyDesigner uses an **Event-Action** model. When a component fires an event, one or more actions run in order, so common interactions do not require hand-written C code.
 
 Core Concepts
 -------------
 
-Event
-~~~~~
+* **Event**: a component is clicked, long-pressed, swiped, receives a key, becomes visible, becomes hidden, or receives a message.
+* **Action**: page switching, message publishing, calling a C function, or controlling a timer.
+* **Message**: a global broadcast mechanism for decoupled component communication.
 
-Interactive behavior triggered by components.
-
-Action
-~~~~~~
-
-Operations executed after an event is triggered. An event can be configured with multiple actions that execute in sequence.
-
-Message
-~~~~~~~
-
-A global broadcast mechanism where components can send messages and other components can listen and respond.
-
-UI Design Changes
------------------
-
-Unified Property Panel Tabs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The original view switch functionality has been unified into the Event-Action system:
-
-.. figure:: resource/property.png
-   :align: center
-   :width: 300px
-
-   Properties Panel
-
-* **Properties**: Basic component attributes (position, size, style, etc.)
-* **Events**: Event-Action configuration (includes original view switch functionality)
+Use the **Events** tab in the property panel to configure events and actions. Use the **Properties** tab for component properties.
 
 Event Types
 -----------
 
-Common Events (Supported by All Components)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Common Events
+~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 20 60
+   :widths: 22 22 56
 
-   * - Event Name
+   * - Event
      - Identifier
      - Description
    * - Click
      - ``onClick``
-     - Triggered when released after clicking
-   * - Long Press
+     - Fires on click release
+   * - Long press
      - ``onLongPress``
-     - Triggered when held beyond threshold time
-   * - Touch Down
+     - Fires after the long-press threshold
+   * - Touch down
      - ``onTouchDown``
-     - Triggered when finger touches down
-   * - Touch Up
+     - Fires when the finger touches down
+   * - Touch up
      - ``onTouchUp``
-     - Triggered when finger lifts up
+     - Fires on release; supports ``checkReleaseArea``
 
-Swipe Events (Supported by Container Components)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Key Events
+~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 20 40 20
+   :widths: 22 22 56
 
-   * - Event Name
+   * - Event
      - Identifier
      - Description
-     - Supported Components
-   * - Swipe Left
+   * - Key short press
+     - ``onKeyShortPress``
+     - Requires ``keyName``
+   * - Key long press
+     - ``onKeyLongPress``
+     - Requires ``keyName``
+
+``keyName`` values: ``Home``, ``Back``, ``Menu``, ``Power``, or a custom name.
+
+Swipe Events
+~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 22 56
+
+   * - Event
+     - Identifier
+     - Description
+   * - Swipe left
      - ``onSwipeLeft``
-     - Triggered by left swipe
-     - hg_view, hg_window
-   * - Swipe Right
+     - Swipe toward the left
+   * - Swipe right
      - ``onSwipeRight``
-     - Triggered by right swipe
-     - hg_view, hg_window
-   * - Swipe Up
+     - Swipe toward the right
+   * - Swipe up
      - ``onSwipeUp``
-     - Triggered by upward swipe
-     - hg_view, hg_window
-   * - Swipe Down
+     - Swipe upward
+   * - Swipe down
      - ``onSwipeDown``
-     - Triggered by downward swipe
-     - hg_view, hg_window
+     - Swipe downward
+   * - Quick swipe left
+     - ``onSwipeLeftQuick``
+     - Fast swipe from the left edge
+   * - Quick swipe right
+     - ``onSwipeRightQuick``
+     - Fast swipe from the right edge
+   * - Quick swipe up
+     - ``onSwipeUpQuick``
+     - Fast swipe from the top edge
+   * - Quick swipe down
+     - ``onSwipeDownQuick``
+     - Fast swipe from the bottom edge
 
-State Events (Supported by Specific Components)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+State, Lifecycle, and Message Events
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 20 40 20
+   :widths: 22 22 56
 
-   * - Event Name
+   * - Event
      - Identifier
      - Description
-     - Supported Components
-   * - Value Change
+   * - Value change
      - ``onValueChange``
-     - Triggered when value changes
-     - hg_slider, hg_progressbar, hg_input
-   * - Checked Change
+     - Fires when a value changes
+   * - Checked change
      - ``onCheckedChange``
-     - Checked state change
-     - hg_checkbox, hg_switch, hg_radio
-
-Lifecycle Events (Supported by Container Components)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 20 40 20
-
-   * - Event Name
-     - Identifier
-     - Description
-     - Supported Components
+     - Fires when checked state changes
    * - Show
      - ``onShow``
-     - Triggered when component is shown
-     - hg_view, hg_window
+     - ``hg_view`` only
    * - Hide
      - ``onHide``
-     - Triggered when component is hidden
-     - hg_view, hg_window
-
-Message Events (Supported by All Components)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 20 60
-
-   * - Event Name
-     - Identifier
-     - Description
-   * - Message Listener
+     - ``hg_view`` only
+   * - Message
      - ``onMessage``
-     - Triggered when specified message is received
+     - Fires for a matching ``message``
 
 Component Supported Events
 ---------------------------
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 70
+   :widths: 28 72
 
-   * - Component Type
-     - Supported Events
-   * - hg_view
-     - onClick, onLongPress, onTouchDown, onTouchUp, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onShow, onHide, onMessage
-   * - hg_window
-     - onClick, onLongPress, onTouchDown, onTouchUp, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onShow, onHide, onMessage
-   * - hg_button
-     - onClick, onLongPress, onTouchDown, onTouchUp, onMessage
-   * - hg_image
-     - onClick, onLongPress, onTouchDown, onTouchUp, onMessage
-   * - hg_label
-     - onClick, onLongPress, onMessage
-   * - hg_switch
-     - onClick, onCheckedChange, onMessage
-   * - hg_checkbox
-     - onClick, onCheckedChange, onMessage
-   * - hg_radio
-     - onClick, onCheckedChange, onMessage
-   * - hg_slider
-     - onClick, onValueChange, onMessage
-   * - hg_progressbar
-     - onClick, onValueChange, onMessage
-   * - hg_input
-     - onClick, onValueChange, onMessage
-   * - hg_video
-     - onClick, onLongPress, onMessage
-   * - hg_3d
-     - onClick, onLongPress, onMessage
+   * - Component
+     - Supported events
+   * - ``hg_view``
+     - click, longPress, touchDown, touchUp, key, swipe, quick swipe, show, hide, message
+   * - ``hg_window``
+     - click, longPress, touchDown, touchUp, key, message
+   * - ``hg_button``, ``hg_image``
+     - click, longPress, touchDown, touchUp, key, message
+   * - ``hg_label``
+     - click, longPress, key, message
+   * - ``hg_switch``, ``hg_checkbox``, ``hg_radio``
+     - click, checkedChange, key, message
+   * - ``hg_slider``, ``hg_progressbar``, ``hg_input``
+     - click, valueChange, key, message
+   * - ``hg_list``
+     - click, longPress, swipe, quick swipe, key, message
+   * - Other graphics and multimedia controls
+     - click, longPress, key, message by default; the property panel is authoritative
 
 Action Types
-------------
+-------------
 
-View Switch Actions
-~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 20 30 30
-
-   * - Action Name
-     - Identifier
-     - Parameters
-     - Description
-   * - Switch View
-     - ``switchView``
-     - target, switchOutStyle, switchInStyle
-     - View switch with animation
-
-**switchOutStyle Options**:
-
-* Translation: ``SWITCH_OUT_TO_LEFT/RIGHT/TOP/BOTTOM_USE_TRANSLATION``
-* Cube: ``SWITCH_OUT_TO_LEFT/RIGHT/TOP/BOTTOM_USE_CUBE``
-* Others: ``SWITCH_OUT_NONE_ANIMATION``, ``SWITCH_OUT_ANIMATION_FADE``
-
-**switchInStyle Options**:
-
-* Translation: ``SWITCH_IN_FROM_LEFT/RIGHT/TOP/BOTTOM_USE_TRANSLATION``
-* Cube: ``SWITCH_IN_FROM_LEFT/RIGHT/TOP/BOTTOM_USE_CUBE``
-* Others: ``SWITCH_IN_NONE_ANIMATION``, ``SWITCH_IN_ANIMATION_FADE``
-
-Message Actions
-~~~~~~~~~~~~~~~
+An event can run multiple actions in order. Common actions:
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 20 20 40
+   :widths: 22 30 48
 
-   * - Action Name
-     - Identifier
-     - Parameters
+   * - Action
+     - Key parameters
      - Description
-   * - Send Message
-     - ``sendMessage``
-     - message
-     - Broadcast message
+   * - ``switchView``
+     - ``target``, ``switchOutStyle``, ``switchInStyle``
+     - Switches pages; one event can contain at most one ``switchView``
+   * - ``sendMessage``
+     - ``message``
+     - Broadcasts a message for other components
+   * - ``callFunction``
+     - ``functionName``
+     - Calls a C function in the ``custom_functions`` protected region
+   * - ``controlTimer``
+     - ``timerTargets``
+     - Starts, stops, or resets timers on other components
 
-Custom Actions
-~~~~~~~~~~~~~~
+Actions are declared with ``<action>`` in HML; an event can contain multiple actions:
 
-.. list-table::
-   :header-rows: 1
-   :widths: 20 20 20 40
+.. code-block:: xml
 
-   * - Action Name
-     - Identifier
-     - Parameters
-     - Description
-   * - Call Function
-     - ``callFunction``
-     - functionName
-     - Call user-defined C function
+   <event type="onClick">
+       <action type="switchView" target="view_page2" />
+       <action type="callFunction" functionName="on_next_click" />
+   </event>
+
+See :doc:`HML File Format <hml_format>` for switch styles and ``controlTimer`` JSON parameters, and :doc:`Code Generation <code_generation>` for callback implementation.
 
 Message System
 --------------
 
-Concept
-~~~~~~~
-
-The message system provides a decoupled communication mechanism between components:
-
-* **Sender**: Broadcasts messages through ``sendMessage`` action
-* **Receiver**: Listens for messages through ``onMessage`` event
-
-Use Cases
-~~~~~~~~~
-
-1. **Cross-view Communication**: Operations in view A affect display in view B
-2. **Global State Sync**: Multiple components respond to the same state change
-3. **Module Decoupling**: Avoid direct references between components
-
-Data Structures
----------------
-
-Event Configuration in HML
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Button Click to Jump**:
+The sender broadcasts with ``sendMessage``, and the receiver subscribes with ``onMessage``:
 
 .. code-block:: xml
 
-   <hg_button id="btn1" x="10" y="10" w="100" h="40" text="Click">
-     <events>
-       <event type="onClick">
-         <action type="switchView" target="screen2" />
-       </event>
-     </events>
+   <!-- Sender -->
+   <hg_button id="btn_refresh" x="20" y="20" width="120" height="40" text="Refresh">
+       <events>
+           <event type="onClick">
+               <action type="sendMessage" message="refresh_data" />
+           </event>
+       </events>
    </hg_button>
 
-**View Swipe Switch (original view_switch functionality)**:
-
-.. code-block:: xml
-
-   <hg_view id="main_view" x="0" y="0" w="480" h="272">
-     <events>
-       <event type="onSwipeLeft">
-         <action type="switchView" target="screen2"
-                 switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
-                 switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION" />
-       </event>
-     </events>
-   </hg_view>
-
-TypeScript Type Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: typescript
-
-   // Event types
-   type EventType =
-     // Common events
-     | 'onClick' | 'onLongPress' | 'onTouchDown' | 'onTouchUp'
-     // Swipe events
-     | 'onSwipeLeft' | 'onSwipeRight' | 'onSwipeUp' | 'onSwipeDown'
-     // State events
-     | 'onValueChange' | 'onCheckedChange'
-     // Lifecycle events
-     | 'onShow' | 'onHide'
-     // Message events
-     | 'onMessage';
-
-   // Action types
-   type ActionType =
-     // View switch (with animation)
-     | 'switchView'
-     // Message
-     | 'sendMessage'
-     // Custom
-     | 'callFunction';
-
-   // Action definition
-   interface Action {
-     type: ActionType;
-     target?: string;           // Target component/view ID
-     message?: string;          // Message name (for sendMessage)
-     functionName?: string;     // Function name (for callFunction)
-     // switchView specific
-     switchOutStyle?: string;   // Exit animation
-     switchInStyle?: string;    // Enter animation
-   }
-
-   // Event definition
-   interface EventConfig {
-     type: EventType;
-     message?: string;          // Only needed for onMessage event
-     actions: Action[];
-   }
-
-C Code Generation Implementation
----------------------------------
-
-View Switch (switchView)
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-No independent callback function is generated; instead, registration is done directly in the ``switch_in`` callback of the ``GUI_VIEW_INSTANCE`` macro using ``gui_view_switch_on_event``:
-
-.. code-block:: c
-
-   static void main_view_switch_in(gui_view_t *view)
-   {
-       // Register left swipe event
-       gui_view_switch_on_event(view, "screen2",
-                                SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
-                                SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
-                                GUI_EVENT_TOUCH_MOVE_LEFT);
-
-       // Create child components...
-   }
-
-   GUI_VIEW_INSTANCE("main_view", false, main_view_switch_in, main_view_switch_out);
-
-Other Events
-~~~~~~~~~~~~
-
-Callback functions are generated and bound when components are created:
-
-.. code-block:: c
-
-   // ui/main_ui.c
-   gui_obj_add_event_cb(btn1, on_btn1_click, GUI_EVENT_CLICKED, NULL);
-
-   // callbacks/main_callbacks.c
-   /* @protected start on_btn1_click */
-   void on_btn1_click(gui_obj_t *obj) {
-       // User implementation logic
-   }
-   /* @protected end on_btn1_click */
-
-UI Design
----------
-
-Property Panel - Events Tab
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. figure:: resource/event.png
-   :align: center
-   :width: 300px
-
-   Events Panel
-
-Practical Examples
-------------------
-
-Example 1: Button Click to Jump
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Scenario**: Click :guilabel:`Next` button to jump to page 2
-
-**HML Configuration**:
-
-.. code-block:: xml
-
-   <hg_button id="next_btn" x="190" y="200" w="100" h="40" text="Next">
-     <events>
-       <event type="onClick">
-         <action type="switchView" target="page2"
-                 switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
-                 switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION" />
-       </event>
-     </events>
-   </hg_button>
-
-**Generated C Code**:
-
-.. code-block:: c
-
-   // Generate callback in callbacks file
-   void on_next_btn_click(gui_obj_t *obj) {
-       gui_switch_app(gui_current_app(), gui_app_get_by_name("page2"));
-   }
-
-Example 2: Swipe Left to Switch View
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Scenario**: Swipe left on main view to enter settings view
-
-**HML Configuration**:
-
-.. code-block:: xml
-
-   <hg_view id="main_view" x="0" y="0" w="480" h="272">
-     <events>
-       <event type="onSwipeLeft">
-         <action type="switchView" target="settings"
-                 switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
-                 switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION" />
-       </event>
-     </events>
-   </hg_view>
-
-**Generated C Code**:
-
-.. code-block:: c
-
-   static void main_view_switch_in(gui_view_t *view)
-   {
-       gui_view_switch_on_event(view, "settings",
-                                SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
-                                SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
-                                GUI_EVENT_TOUCH_MOVE_LEFT);
-       // ...
-   }
-
-Example 3: Message Communication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Scenario**: Button sends message, other components listen and respond
-
-**Sender HML**:
-
-.. code-block:: xml
-
-   <hg_button id="refresh_btn" x="10" y="10" w="100" h="40" text="Refresh">
-     <events>
-       <event type="onClick">
-         <action type="sendMessage" message="refresh_data" />
-       </event>
-     </events>
-   </hg_button>
-
-**Receiver HML**:
-
-.. code-block:: xml
-
-   <hg_label id="data_label" x="10" y="60" w="200" h="30" text="Data">
-     <events>
-       <event type="onMessage" message="refresh_data">
-         <action type="callFunction" functionName="on_refresh_data" />
-       </event>
-     </events>
+   <!-- Receiver -->
+   <hg_label id="lbl_data" x="20" y="80" width="240" height="40" text="Data">
+       <events>
+           <event type="onMessage" message="refresh_data">
+               <action type="callFunction" functionName="on_refresh_data" />
+           </event>
+       </events>
    </hg_label>
 
-Example 4: Custom Function Call
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generated code uses ``gui_msg_publish`` to broadcast and ``gui_msg_subscribe`` to subscribe. See :doc:`Code Generation <code_generation>` for details.
 
-**Scenario**: Button click executes complex business logic
+Generated Code
+--------------
 
-**HML Configuration**:
+Event callbacks are generated under ``src/callbacks/``. Their bodies are overwritten on regeneration, so business logic belongs in the ``custom_functions`` protected region or under ``src/user``.
+
+See :doc:`Code Generation <code_generation>` for callback signatures, generated ``switchView`` calls, and code protection details.
+
+Examples
+--------
+
+Button Click Switches Page
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: xml
 
-   <hg_button id="save_btn" x="10" y="10" w="100" h="40" text="Save">
-     <events>
-       <event type="onClick">
-         <action type="callFunction" functionName="save_settings" />
-       </event>
-     </events>
+   <hg_button id="btn_next" x="20" y="200" width="120" height="48" text="Next">
+       <events>
+           <event type="onClick">
+               <action type="switchView" target="view_page2" />
+           </event>
+       </events>
    </hg_button>
 
-**User Implementation**:
+Swipe to Switch Pages
+~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: c
+.. code-block:: xml
 
-   // callbacks/main_callbacks.c
-   /* @protected start save_settings */
-   void save_settings(gui_obj_t *obj) {
-       // Read various settings
-       bool wifi_enabled = get_wifi_switch_state();
-       int brightness = get_brightness_value();
+   <hg_view id="view_page1" x="0" y="0" width="480" height="272" entry="true">
+       <events>
+           <event type="onSwipeLeft">
+               <action type="switchView" target="view_page2"
+                       switchOutStyle="SWITCH_OUT_TO_LEFT_USE_TRANSLATION"
+                       switchInStyle="SWITCH_IN_FROM_RIGHT_USE_TRANSLATION" />
+           </event>
+       </events>
+   </hg_view>
 
-       // Save to flash
-       flash_write_config(wifi_enabled, brightness);
+Key Event
+~~~~~~~~~
 
-       // Show notification
-       show_toast("Settings saved");
-   }
-   /* @protected end save_settings */
+.. code-block:: xml
+
+   <hg_view id="view_main" x="0" y="0" width="480" height="272" entry="true">
+       <events>
+           <event type="onKeyShortPress" keyName="Back">
+               <action type="callFunction" functionName="on_back_key" />
+           </event>
+       </events>
+   </hg_view>
 
 Best Practices
 --------------
 
-Event Naming Conventions
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Use clear function names: ``on_save_click``, ``handle_login``
-* Include event type: ``on_button_click``, ``on_slider_change``
-* Describe business logic: ``save_user_settings``, ``refresh_data``
-
-Performance Optimization
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Avoid time-consuming operations in frequently triggered events
-* Use message system to decouple complex interactions
-* Properly use debouncing and throttling
-
-Debugging Tips
-~~~~~~~~~~~~~~
-
-* Add log output in callback functions
-* Use breakpoints to verify event flow
-* Check generated C code to confirm event binding
+* Use clear function names such as ``on_save_click`` and ``on_back_key``.
+* Avoid long-running work in frequently triggered events.
+* Prefer messages for cross-page communication.
+* Verify that every ``switchView`` target exists.
+* Keep complex logic in ``src/user`` or ``custom_functions`` so HML stays readable.
 
 Next Steps
 ----------
 
 * Learn :doc:`code_generation` to understand code generation mechanism
-* See :doc:`hml_format` to understand HML file format
 * Refer to :doc:`build_simulation` to build and test applications
 * Read :doc:`deployment` for embedded deployment solutions

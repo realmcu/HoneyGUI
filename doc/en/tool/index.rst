@@ -10,7 +10,7 @@ This chapter is divided into two main parts:
 
 Part 1: Resource Processing Tools
 
-- VSCode Plugin Tools: Integrated in HoneyGUI Visual Designer, visual interface, drag-and-drop operation, automatic conversion and packaging.
+- VSCode Plugin Tools: Integrated in HoneyDesigner, visual interface, drag-and-drop operation, automatic conversion and packaging.
 - Standalone Conversion Tools: Standalone exe programs, including Image Conversion Tool and Font Conversion Tool.
 - Packing Tool: Script-based packaging of generated resources.
 

@@ -220,7 +220,7 @@ The engine runs but the screen is blank
 Designer UI Preview
 -------------------
 
-Use case: the UI has been designed with :doc:`HoneyGUI Visual Designer <../VSCode/index>` and needs to be viewed in a browser, without compiling the project's C code for that.
+Use case: the UI has been designed with :doc:`HoneyDesigner <../VSCode/index>` and needs to be viewed in a browser, without compiling the project's C code for that.
 
 The browser simulator's engine has the HML runtime built in, so it parses and renders the designer's ``ui/*.xml`` directly. Changing the UI requires neither a rebuild nor a compiler download.
 

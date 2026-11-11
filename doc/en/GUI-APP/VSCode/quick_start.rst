@@ -1,114 +1,118 @@
 Quick Start
 ===========
 
-This chapter introduces how to install the HoneyGUI Visual Designer plugin and create your first :term:`GUI` application.
+This chapter shows how to install HoneyDesigner, create a project, generate code, and run the first simulation.
 
-Installation Requirements
---------------------------
+Requirements
+------------
 
-Software Environment
-~~~~~~~~~~~~~~~~~~~~
+Required software:
 
-* **VSCode**: Version 1.60.0 or higher
-* **Python**: 3.9.7 or higher
-* **SCons**: 4.4.0 (install via ``pip install scons==4.4.0``)
-* **kconfiglib**: Install via ``pip install kconfiglib``
+* **VSCode**: 1.80.0 or later.
+* **Python**: 3.9.7 or later, used by romfs packaging and build helper scripts.
+* **SCons**: 4.4.0, install with ``pip install scons==4.4.0``.
+* **GCC/MinGW**: MinGW-w64 8.1.0 or later on Windows; system GCC on Linux/WSL.
+* **SDL2**: on Linux/WSL use ``sudo apt-get install libsdl2-dev``.
+* **Git**: required when creating a project from a template.
 
-**Windows Platform**:
+Optional software:
 
-* MinGW-w64 (recommended version 8.1.0), installed at ``C:\mingw64``
-* CMake 3.31.2+ (optional, for CMake build)
-
-**Linux/WSL Platform**:
-
-* GCC toolchain
-* SDL2 development libraries: ``sudo apt-get install libsdl2-dev``
-
-Installing the Plugin
-----------------------
-
-Method 1: Install from VSCode Marketplace
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Open VSCode
-2. Click the Extensions icon in the activity bar (or press ``Ctrl+Shift+X``)
-3. Type ``HoneyGUI Visual Designer`` in the search box
-4. Click the :guilabel:`Install` button
-
-Method 2: Install from VSIX File
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Download the plugin's ``.vsix`` file
-2. In VSCode, open the Extensions panel
-3. Click the :guilabel:`...` menu in the top right corner
-4. Select :guilabel:`Install from VSIX...`
-5. Choose the downloaded VSIX file
-
-Environment Check
-------------------
-
-After installation, the plugin will automatically check the development environment:
-
-1. Open VSCode Command Palette (or press ``Ctrl+Shift+P``)
-2. Type and execute ``HoneyGUI: Check Environment``
-3. View the terminal output to confirm all dependencies are installed
+* **FFmpeg**: required for video conversion. Videos are skipped when it is missing.
+* **CMake**: required for LVGL simulation.
 
 .. note::
-   If the environment check fails, install missing dependencies according to the error messages.
+   The current release no longer requires ``kconfiglib`` or a manual ``menuconfig`` step. The build scripts generate a fixed configuration automatically.
+
+Installing the Extension
+------------------------
+
+From the Marketplace
+~~~~~~~~~~~~~~~~~~~~
+
+1. Open VSCode.
+2. Open the Extensions view and search for ``HoneyDesigner``.
+3. Click :guilabel:`Install`.
+
+From a VSIX File
+~~~~~~~~~~~~~~~~
+
+1. Download the ``.vsix`` file from the :guilabel:`Download Extension` link on the Marketplace page, or use the offline package provided by the team.
+2. Open the ``...`` menu in the Extensions view.
+3. Select :guilabel:`Install from VSIX...`.
+4. Choose the downloaded ``.vsix`` file.
+
+Environment Check
+-----------------
+
+1. Click the HoneyDesigner icon in the activity bar.
+2. Check Python, SCons, GCC, SDL2, and FFmpeg in the **ENVIRONMENT** view.
+3. Click the refresh button, or run ``HoneyDesigner: Refresh Environment Check`` from the Command Palette.
+4. Install missing items from the view or use the displayed commands.
 
 Creating Your First Project
 ----------------------------
 
-Using Project Templates
-~~~~~~~~~~~~~~~~~~~~~~~
+1. Click :guilabel:`New Project` in the HoneyDesigner sidebar.
+2. Choose **Create empty project** or **Create template project**.
+3. Enter the project name, save location, APP ID, and related fields.
 
-1. Click the HoneyGUI icon in the VSCode activity bar
-2. Click the :guilabel:`New Project` button in the sidebar
-3. Select a project template:
+Empty projects can configure:
 
-   * **Blank Project**: Design interface from scratch
-   * **Watch Project**: Smartwatch interface template (410x502)
-   * **Dashboard Project**: Dashboard interface template (800x480)
+* Resolution
+* Screen shape (rectangle, circle, rounded rectangle)
+* Target engine (HoneyGUI or LVGL)
+* Minimum SDK
+* Pixel mode
+* Romfs base address
+* Whether to enable AI collaboration assets
 
-4. Enter the project name
-5. Choose the project save location
-6. The plugin will automatically create the project structure and initialize it
+Available templates:
+
+* Smart Watch
+* Car Dashboard
+* Chat Bot
+* Rotary Knob
+* Settings
+* E-Badge
+
+.. note::
+   Templates are cloned from Git repositories, so the first template project requires network access and ``git``. Empty projects do not require network access.
 
 .. figure:: resource/create-project.png
    :align: center
    :width: 900px
 
-   Create New Project
+   Create Project
 
 Project Structure
 ~~~~~~~~~~~~~~~~~
 
-The created project contains the following structure:
-
 .. code-block:: text
 
    my-project/
-   ├── project.json          # Project configuration file
-   ├── ui/                   # HML interface files directory
-   │   └── main.hml          # Main interface
-   ├── src/                  # Generated C code
-   │   ├── ui/               # UI structure code (auto-generated)
-   │   ├── callbacks/        # Callback function framework (generated once)
-   │   └── user/             # User code (manually written)
-   ├── assets/               # Resource files directory
-   │   ├── images/           # Image resources
-   │   ├── fonts/            # Font resources
-   │   └── videos/           # Video resources
-   └── SConstruct            # SCons build script
+   ├── project.json              # Project configuration
+   ├── ui/                       # HML design files
+   │   └── MyProjectMain.hml
+   ├── src/                      # Generated C code
+   │   ├── MyProjectEntry.c      # Project entry with protected regions
+   │   ├── SConscript            # HoneyGUI build script
+   │   ├── ui/                   # UI code, overwritten on every generation
+   │   ├── callbacks/            # Callback code with protected regions
+   │   ├── user/                 # User code, generated once
+   │   └── lvgl/                 # LVGL output directory
+   ├── assets/                   # Images, fonts, videos, models, and other resources
+   ├── i18n/strings.json         # Optional project localization catalog
+   ├── config/                   # Optional alternate project.json configurations
+   ├── .claude/skills/           # Optional AI collaboration assets
+   ├── AGENTS.md                 # Optional AI agent entry point
+   └── build/                    # Build and simulation output
 
 Designing Interface
 --------------------
 
 Opening the Designer
 ~~~~~~~~~~~~~~~~~~~~
-
-1. Double-click an ``.hml`` file in the VSCode file explorer
-2. The designer will open in the editor area, displaying the visual design interface
+Double-click an ``.hml`` file in the Explorer. You can also right-click it and choose :guilabel:`Open with HoneyGUI Designer`.
 
 .. figure:: resource/design-ui.png
    :align: center
@@ -119,34 +123,30 @@ Opening the Designer
 Designer Interface Overview
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* **Toolbar**: Provides common operations like save, undo, redo
-* **Component Library** (left): Contains all available HoneyGUI components
-* **Canvas** (center): Design area showing the actual interface
-* **Component Tree** (top right): Shows the component hierarchy of the current interface
-* **Property Panel** (bottom right): Edit properties of the selected component
+* **Toolbar**: save, undo, redo, alignment, distribution, code generation, simulation, debug, stop, and download.
+* **Left panel**: Tab 1 Component Library, Tab 2 Assets, Tab 3 Component Tree.
+* **Canvas**: drop, select, move, resize, align, and box-select components.
+* **Right panel**: Properties and Events tabs.
 
 Adding Components
-~~~~~~~~~~~~~~~~~
+-----------------
 
-1. Select a component from the left component library (e.g., ``hg_button``)
-2. Drag it to the canvas center
-3. Release the mouse, and the component will be added to the interface
-4. Modify component properties in the right property panel:
-
-   * Position and size
-   * Text content
-   * Colors and styles
-   * Event bindings
+1. Select a control in the component library and drag it onto the canvas.
+2. Adjust position, size, text, colors, fonts, and related properties in the Properties tab.
+3. Configure click, long-press, swipe, key, message, or timer actions in the Events tab.
+4. Drag images and other assets from the Assets panel directly onto the canvas.
 
 Basic Operations
 ~~~~~~~~~~~~~~~~
 
-* **Select component**: Click on a component in the canvas
-* **Move component**: Drag the selected component
-* **Resize**: Drag the control points on the component edges
-* **Delete component**: Press ``Delete`` key after selection
-* **Copy/Paste**: ``Ctrl+C`` / ``Ctrl+V``
-* **Undo/Redo**: ``Ctrl+Z`` / ``Ctrl+Y``
+* **Select**: click a component; hold ``Ctrl`` and click to multi-select.
+* **Box select**: drag on empty canvas space.
+* **Move**: drag the component; arrow keys move 1 pixel, ``Shift`` + arrow keys move 10 pixels.
+* **Resize**: drag one of the eight handles.
+* **Delete**: press ``Delete``.
+* **Copy/Paste**: ``Ctrl+C`` / ``Ctrl+V``.
+* **Undo/Redo**: ``Ctrl+Z`` / ``Ctrl+Y`` or ``Ctrl+Shift+Z``.
+* **Generate code**: ``Ctrl+G``.
 
 Generating Code
 ----------------
@@ -156,79 +156,85 @@ Automatic Code Generation
 
 After completing the design, the plugin will automatically generate C code:
 
-1. Click the :guilabel:`Generate Code` button in the toolbar, or use the command palette:
+1. Click :guilabel:`Generate Code`, or run ``HoneyDesigner: Generate Code``.
+2. The extension scans every HML file under the project ``ui/`` directory.
+3. It selects the HoneyGUI or LVGL generator from ``targetEngine`` in ``project.json``.
 
-   .. code-block:: text
+HoneyGUI output:
 
-      Ctrl+Shift+P → HoneyGUI: Generate Code
+* ``src/ui/{name}_ui.c/h``: overwritten on every generation.
+* ``src/callbacks/{name}_callbacks.c/h``: regenerated while preserving protected regions.
+* ``src/user/{name}_user.c/h``: generated once only.
+* ``src/{ProjectName}Entry.c``: project entry file.
+* ``src/SConscript``: build script.
 
-2. The plugin will scan all HML files in the ``ui/`` directory
-3. Automatically generate the following files:
+LVGL output:
 
-   * ``src/ui/*.c`` - UI structure code (regenerated each time)
-   * ``src/callbacks/*.c`` - Callback function framework (generated only once)
-   * ``src/user/*.c`` - User code (manually written, never overwritten)
+* ``src/lvgl/{name}_lvgl_ui.c/h``
+* ``src/lvgl/{name}_lvgl_callbacks.c/h``
+* ``src/lvgl/lvgl_generated_ui.c/h``
+* ``src/lvgl/ui_resource.h`` and ``lv_img_dsc_list.c/h`` in external-bin mode
 
-Code Protection Zones
-~~~~~~~~~~~~~~~~~~~~~
+Protected Regions
+~~~~~~~~~~~~~~~~~
 
-Generated callback code contains protection zone markers where users can add custom logic:
+Put custom functions inside the protected region of the callback file:
 
 .. code-block:: c
 
    /* @protected start custom_functions */
-   // Add your code here
-   void on_button_click(void *obj, gui_event_t *e) {
-       printf("Button clicked!\n");
+   void my_custom_handler(void *obj, gui_event_t *e)
+   {
+       GUI_UNUSED(obj);
+       GUI_UNUSED(e);
    }
    /* @protected end custom_functions */
 
 .. warning::
-   Code outside protection zones will be overwritten during regeneration. Always write custom code inside protection zones.
+   * Event callback bodies are regenerated. Do not edit them directly.
+   * Implement custom logic in ``custom_functions`` and invoke it with the ``callFunction`` event action.
+   * UI code is overwritten on every generation. Do not edit it manually.
 
 Build and Simulation
----------------------
+--------------------
 
-Building the Project
-~~~~~~~~~~~~~~~~~~~~
+1. Click :guilabel:`Simulate`, or run ``HoneyDesigner: Compile & Simulate``.
+2. By default, the extension converts resources, generates code, compiles, and starts the simulator in that order.
+3. To skip a stage, open the dropdown to the right of :guilabel:`Simulate` and clear the corresponding item under **Simulation Flow**. The selection is remembered.
 
-1. Click the :guilabel:`Simulate` button in the toolbar
-2. Or use the command palette: ``HoneyGUI: Build and Simulate``
-3. The plugin will automatically:
-
-   * Convert resource files (images, fonts, etc.)
-   * Compile C code (using SCons)
-   * Launch the simulator
+The HoneyGUI executable is written to ``build/gui.exe`` on Windows or ``build/gui`` on Linux. LVGL projects use CMake and write the executable to ``lvgl-pc/build/lvgl_pc.exe`` or ``lvgl_pc``.
 
 .. figure:: resource/compile.png
    :align: center
    :width: 900px
 
-   Build and Simulation
+   Build and simulation
 
-Running the Simulator
-~~~~~~~~~~~~~~~~~~~~~
+Other simulation commands:
 
-After successful compilation, the simulator window will pop up automatically, displaying the designed interface.
-
-* **Mouse operations**: Simulate touchscreen
-* **Keyboard operations**: Support some shortcuts
-* **Real-time debugging**: Debug via GDB or printf
+* ``HoneyDesigner: Debug Simulation`` starts a debug session.
+* ``HoneyDesigner: Run Simulation Without Code Generation`` skips code generation.
+* ``HoneyDesigner: Stop Simulation`` stops the running simulator.
 
 Common Issues
-~~~~~~~~~~~~~
+-------------
 
-**Build Failure**:
+**Compiler not found**
 
-1. Check if environment variables are configured correctly
-2. Verify MinGW/GCC path is correct
-3. Review error messages in the terminal output
+* Verify that MinGW/GCC is installed and available on ``PATH``.
+* Restart the terminal and VSCode.
 
-**Simulator Won't Start**:
+**SDL2 missing**
 
-1. Check if SDL2 library is installed
-2. On Linux: ``sudo apt-get install libsdl2-dev``
-3. On Windows: Ensure MinGW includes SDL2 library
+* On Linux/WSL run ``sudo apt-get install libsdl2-dev``.
+
+**Videos are not converted**
+
+* Install FFmpeg and add it to ``PATH``.
+
+**Template creation fails**
+
+* Verify that Git is installed and that the Gitee/GitHub repository is reachable.
 
 Next Steps
 ----------

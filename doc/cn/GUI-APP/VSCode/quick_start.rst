@@ -1,28 +1,27 @@
 快速开始
 ========
 
-本章节介绍如何安装 HoneyGUI Visual Designer 插件并创建第一个 :term:`GUI` 应用程序。
+本章介绍如何安装 HoneyDesigner、创建项目并完成第一次代码生成和仿真。
 
-安装要求
+环境要求
 ---------
 
-软件环境
-~~~~~~~~
+必需软件：
 
-* **VSCode**：版本 1.60.0 或更高
-* **Python**：3.9.7 或更高版本
-* **SCons**：4.4.0 （通过 ``pip install scons==4.4.0`` 安装）
-* **kconfiglib**：通过 ``pip install kconfiglib`` 安装
+* **VSCode**：1.80.0 或更高版本。
+* **Python**：3.9.7 或更高，用于 romfs 打包和构建辅助脚本。
+* **SCons**：4.4.0，通过 ``pip install scons==4.4.0`` 安装。
+* **GCC/MinGW**：Windows 推荐 MinGW-w64 8.1.0 或更高；Linux/WSL 使用系统 GCC。
+* **SDL2**：Linux/WSL 需要 ``sudo apt-get install libsdl2-dev``。
+* **Git**：从模板创建项目时需要。
 
-**Windows 平台**：
+可选软件：
 
-* MinGW-w64 （推荐 8.1.0 版本），安装路径 ``C:\mingw64``
-* CMake 3.31.2+ （可选，用于 CMake 构建方式）
+* **FFmpeg**：视频转换需要；未安装时视频资源会被跳过。
+* **CMake**：LVGL 项目仿真需要。
 
-**Linux/WSL 平台**：
-
-* GCC 工具链
-* SDL2 开发库： ``sudo apt-get install libsdl2-dev``
+.. note::
+   当前版本不再依赖 ``kconfiglib``，也不需要手动运行 ``menuconfig``。构建脚本会自动生成固定配置。
 
 安装插件
 ---------
@@ -30,76 +29,83 @@
 方法一：从 VSCode 市场安装
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. 打开 VSCode
-2. 点击左侧活动栏的扩展图标（或按 ``Ctrl+Shift+X``）
-3. 在搜索框中输入 ``HoneyGUI Visual Designer``
-4. 点击 :guilabel:`安装` 按钮
+1. 打开 VSCode。
+2. 打开扩展面板，搜索 ``HoneyDesigner``。
+3. 点击 :guilabel:`安装`。
 
-方法二：从 VSIX 文件安装
-~~~~~~~~~~~~~~~~~~~~~~~~~
+方法二：从 VSIX 安装
+~~~~~~~~~~~~~~~~~~~~~
 
-1. 下载插件的 ``.vsix`` 文件
-2. 在 VSCode 中，打开扩展面板
-3. 点击右上角的 :guilabel:`...` 菜单
-4. 选择 :guilabel:`从 VSIX 安装...`
-5. 选择下载的 VSIX 文件
+1. 从 Marketplace 插件页面的 :guilabel:`Download Extension` 下载 ``.vsix`` 文件，或使用提供的离线安装包。
+2. 打开扩展面板右上角的 ``...`` 菜单。
+3. 选择 :guilabel:`从 VSIX 安装...`。
+4. 选择下载好的 ``.vsix`` 文件。
 
 环境检查
 ---------
 
-安装完成后，插件会自动检查开发环境：
-
-1. 打开 VSCode 命令面板（或按 ``Ctrl+Shift+P``）
-2. 输入并执行 ``HoneyGUI: Check Environment``
-3. 查看终端输出，确认所有依赖项已安装
-
-.. note::
-   如果环境检查失败，请根据错误提示安装缺失的依赖项。
+1. 点击活动栏的 HoneyDesigner 图标。
+2. 在 **环境** 视图中查看 Python、SCons、GCC、SDL2、FFmpeg 状态。
+3. 点击刷新按钮，或在命令面板执行 ``刷新环境检查``。
+4. 缺失项可以直接使用视图中的安装入口，或按提示安装。
 
 创建第一个项目
 ---------------
 
-使用项目模板
-~~~~~~~~~~~~
+1. 在 HoneyDesigner 侧边栏点击 :guilabel:`新建项目`。
+2. 选择 :guilabel:`创建空白项目` 或 :guilabel:`从模板创建项目`。
+3. 填写项目名称、保存位置、APP ID 等信息。
 
-1. 点击 VSCode 左侧活动栏的 HoneyGUI 图标
-2. 在侧边栏中点击 :guilabel:`新建项目` 按钮
-3. 选择项目模板：
+空项目可配置：
 
-   * **空白项目**：从零开始设计界面
-   * **Watch 项目**：智能手表界面模板 (410x502)
-   * **Dashboard 项目**：仪表盘界面模板 (800x480)
+* 分辨率
+* 屏幕形状（矩形、圆形、圆角）
+* 目标引擎（HoneyGUI 或 LVGL）
+* 最低 SDK
+* 像素模式
+* Romfs 基地址
+* 是否启用 AI 协作资产
 
-4. 输入项目名称
-5. 选择项目保存位置
-6. 插件会自动创建项目结构并初始化
+可用模板：
+
+* Smart Watch
+* Car Dashboard
+* Chat Bot
+* Rotary Knob
+* Settings
+* E-Badge
+
+.. note::
+   模板通过 Git 仓库克隆，首次创建需要网络和 ``git``。空项目不需要网络。
 
 .. figure:: resource/create-project.png
    :align: center
    :width: 900px
 
-   创建新项目
+   创建项目
 
 项目结构
 ~~~~~~~~~
 
-创建后的项目包含以下结构：
-
 .. code-block:: text
 
    my-project/
-   ├── project.json          # 项目配置文件
-   ├── ui/                   # HML 界面文件目录
-   │   └── main.hml          # 主界面
-   ├── src/                  # 生成的 C 代码
-   │   ├── ui/               # UI 结构代码（自动生成）
-   │   ├── callbacks/        # 回调函数（自动生成框架）
-   │   └── user/             # 用户代码（手动编写）
-   ├── assets/               # 资源文件目录
-   │   ├── images/           # 图片资源
-   │   ├── fonts/            # 字体资源
-   │   └── videos/           # 视频资源
-   └── SConstruct            # SCons 构建脚本
+   ├── project.json              # 项目配置
+   ├── ui/                       # HML 设计文件
+   │   └── MyProjectMain.hml
+   ├── src/                      # 生成的 C 代码
+   │   ├── MyProjectEntry.c      # 项目入口（含保护区）
+   │   ├── SConscript            # HoneyGUI 构建脚本
+   │   ├── ui/                   # UI 代码，每次生成覆盖
+   │   ├── callbacks/            # 回调代码，保留保护区
+   │   ├── user/                 # 用户代码，只生成一次
+   │   └── lvgl/                 # LVGL 项目的生成目录
+   ├── assets/                   # 图片、字体、视频、模型等资源
+   ├── i18n/strings.json         # 可选，项目多语言文本
+   ├── config/                   # 可选，多套 project.json 配置
+   ├── .claude/skills/           # 可选，AI 协作资产
+   ├── AGENTS.md                 # 可选，AI 代理入口
+   └── build/                    # 编译和仿真产物设计界面
 
 设计界面
 ---------
@@ -107,8 +113,7 @@
 打开设计器
 ~~~~~~~~~~
 
-1. 在 VSCode 文件浏览器中双击 ``.hml`` 文件
-2. 设计器会在编辑器区域打开，显示可视化设计界面
+在资源管理器中双击 ``.hml`` 文件即可打开设计器。也可以右键选择 :guilabel:`用 HoneyDesigner 打开`。
 
 .. figure:: resource/design-ui.png
    :align: center
@@ -119,34 +124,30 @@
 设计器界面说明
 ~~~~~~~~~~~~~~
 
-* **工具栏**：提供保存、撤销、重做等常用操作
-* **组件库** （左侧）：包含所有可用的 HoneyGUI 组件
-* **画布** （中央）：设计区域，显示实际界面效果
-* **组件树** （右上）：显示当前界面的组件层级结构
-* **属性面板** （右下）：编辑选中组件的属性
+* **工具栏**：保存、撤销、重做、对齐、分布、代码生成、编译仿真、调试、停止、下载等。
+* **左侧面板**：Tab 1 组件库、Tab 2 资源、Tab 3 组件树。
+* **画布**：拖放组件、选择、移动、缩放、对齐和框选。
+* **右侧面板**：Properties / Events 两个标签页。
 
 添加组件
-~~~~~~~~
+---------
 
-1. 从左侧组件库中选择一个组件（如 ``hg_button``）
-2. 拖动到画布中间
-3. 松开鼠标，组件会添加到界面上
-4. 在右侧属性面板中修改组件属性：
-
-   * 位置和尺寸
-   * 文本内容
-   * 颜色和样式
-   * 事件绑定
+1. 在组件库选择控件并拖到画布。
+2. 在右侧属性面板调整位置、尺寸、文本、颜色、字体等。
+3. 在 Events 标签页配置点击、长按、滑动、按键、消息或定时器动作。
+4. 图片等资源可以从资源面板直接拖到画布。
 
 基本操作
-~~~~~~~~
+~~~~~~~~~
 
-* **选择组件**：点击画布中的组件
-* **移动组件**：拖动选中的组件
-* **调整尺寸**：拖动组件边缘的控制点
-* **删除组件**：选中后按 ``Delete`` 键
-* **复制粘贴**： ``Ctrl+C`` / ``Ctrl+V``
-* **撤销重做**： ``Ctrl+Z`` / ``Ctrl+Y``
+* **选择**：点击组件；按住 ``Ctrl`` 点击可多选。
+* **框选**：在画布空白处按住鼠标左键拖出选择框。
+* **移动**：拖动组件；方向键移动 1 像素，``Shift`` + 方向键移动 10 像素。
+* **调整尺寸**：拖动八个控制点。
+* **删除**：按 ``Delete``。
+* **复制/粘贴**：``Ctrl+C`` / ``Ctrl+V``。
+* **撤销/重做**：``Ctrl+Z`` / ``Ctrl+Y`` 或 ``Ctrl+Shift+Z``。
+* **生成代码**：``Ctrl+G``。
 
 生成代码
 ---------
@@ -156,79 +157,86 @@
 
 设计完成后，插件会自动生成 C 代码：
 
-1. 点击工具栏的 :guilabel:`生成代码` 按钮，或使用命令面板：
+1. 点击工具栏的 :guilabel:`生成代码`，或在命令面板执行 ``HoneyDesigner: 生成代码``。
+2. 插件会扫描项目 ``ui/`` 目录下的所有 HML 文件。
+3. 根据 ``project.json`` 的 ``targetEngine`` 选择 HoneyGUI 或 LVGL 生成器。
 
-   .. code-block:: text
+HoneyGUI 主要产物：
 
-      Ctrl+Shift+P → HoneyGUI: Generate Code
+* ``src/ui/{name}_ui.c/h``：每次生成覆盖。
+* ``src/callbacks/{name}_callbacks.c/h``：重新生成，保留保护区。
+* ``src/user/{name}_user.c/h``：只生成一次。
+* ``src/{ProjectName}Entry.c``：项目入口。
+* ``src/SConscript``：构建脚本。
 
-2. 插件会扫描 ``ui/`` 目录下的所有 HML 文件
-3. 自动生成以下文件：
+LVGL 主要产物：
 
-   * ``src/ui/*.c`` - UI 结构代码（每次重新生成）
-   * ``src/callbacks/*.c`` - 回调函数框架（仅首次生成）
-   * ``src/user/*.c`` - 用户代码（手动编写，永不覆盖）
+* ``src/lvgl/{name}_lvgl_ui.c/h``
+* ``src/lvgl/{name}_lvgl_callbacks.c/h``
+* ``src/lvgl/lvgl_generated_ui.c/h``
+* ``src/lvgl/ui_resource.h``
+* ``lv_img_dsc_list.c/h`` （external-bin 模式）
 
 代码保护区
-~~~~~~~~~~
+~~~~~~~~~~~
 
-生成的回调代码包含保护区标记，用户可以在保护区内添加自定义逻辑：
+回调文件中的自定义函数应写在保护区中：
 
 .. code-block:: c
 
    /* @protected start custom_functions */
-   // 在这里添加您的代码
-   void on_button_click(void *obj, gui_event_t *e) {
-       printf("Button clicked!\n");
+   void my_custom_handler(void *obj, gui_event_t *e)
+   {
+       GUI_UNUSED(obj);
+       GUI_UNUSED(e);
    }
    /* @protected end custom_functions */
 
 .. warning::
-   保护区外的代码会在重新生成时被覆盖，请务必将自定义代码写在保护区内。
+   * 事件回调函数本身会重新生成，不要直接修改函数主体。
+   * 需要自定义逻辑时，在 ``custom_functions`` 中实现函数，并在 HML 事件中使用 ``callFunction`` 调用。
+   * UI 代码每次生成都会覆盖，不要手动修改。
 
-编译仿真
----------
+编译与仿真
+-----------
 
-编译项目
-~~~~~~~~
+1. 点击工具栏的 :guilabel:`仿真`，或在命令面板执行 ``HoneyDesigner: 编译仿真``。
+2. 插件默认依次执行资源转换、代码生成、编译和仿真器启动。
+3. 如需跳过某个阶段，点击 :guilabel:`仿真` 按钮右侧的下拉箭头，在 **仿真流程** 中取消勾选对应项；配置会保留到下次修改。
 
-1. 点击工具栏的 :guilabel:`仿真` 按钮
-2. 或使用命令面板： ``HoneyGUI: Build and Simulate``
-3. 插件会自动执行：
-
-   * 转换资源文件（图片、字体等）
-   * 编译 C 代码（使用 SCons）
-   * 启动仿真器
+HoneyGUI 项目的可执行文件位于 ``build/gui.exe`` （Windows）或  ``build/gui`` （Linux）。LVGL 项目使用 CMake，输出位于 ``lvgl-pc/build/lvgl_pc.exe`` 或 ``lvgl_pc``。
 
 .. figure:: resource/compile.png
    :align: center
    :width: 900px
 
-   编译仿真
+   编译与仿真
 
-运行仿真器
-~~~~~~~~~~
+其他仿真命令：
 
-编译成功后，仿真器窗口会自动弹出，显示设计的界面。
-
-* **鼠标操作**：模拟触摸屏
-* **键盘操作**：支持部分快捷键
-* **实时调试**：可以通过 GDB 或 printf 调试
+* ``HoneyDesigner: Debug Simulation``：以调试方式启动。
+* ``HoneyDesigner: Run Simulation Without Code Generation``：跳过代码生成直接运行。
+* ``HoneyDesigner: Stop Simulation``：停止当前仿真。
 
 常见问题
-~~~~~~~~~
+---------
 
-**编译失败**：
+**找不到编译器**
 
-1. 检查环境变量是否正确配置
-2. 确认 MinGW/GCC 路径是否正确
-3. 查看终端输出的错误信息
+* 确认 MinGW/GCC 已安装并加入 ``PATH``。
+* 重启终端和 VSCode。
 
-**仿真器无法启动**：
+**SDL2 缺失**
 
-1. 检查 SDL2 库是否已安装
-2. 在 Linux 上： ``sudo apt-get install libsdl2-dev``
-3. 在 Windows 上：确认 MinGW 包含 SDL2 库
+* Linux/WSL 执行 ``sudo apt-get install libsdl2-dev``。
+
+**视频资源没有转换**
+
+* 安装 FFmpeg 并加入 ``PATH``。
+
+**模板创建失败**
+
+* 确认已安装 Git，并能访问对应的 Gitee/GitHub 仓库。
 
 下一步
 -------
