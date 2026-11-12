@@ -1,7 +1,7 @@
 编译与仿真
 ==========
 
-本文介绍如何在 :term:`PC` 上编译和运行 HoneyDesigner 项目，以及 HoneyGUI 与 LVGL 两种引擎的构建差异。
+本章介绍如何在 :term:`PC` 上编译和运行 HoneyDesigner 项目，以及 HoneyGUI 与 LVGL 两种引擎的构建差异。
 
 概述
 -----

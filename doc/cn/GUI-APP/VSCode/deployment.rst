@@ -1,7 +1,7 @@
 嵌入式部署
 ==========
 
-本文介绍如何把 HoneyDesigner 项目集成到固件，以及 HoneyGUI 和 LVGL 两种目标的部署方式。
+本章介绍如何把 HoneyDesigner 项目集成到固件，以及 HoneyGUI 和 LVGL 两种目标的部署方式。
 
 概述
 -----
