@@ -18,6 +18,20 @@ void *gui_acc_jpeg_load(void *input, int len, int *w, int *h, int *channel);
 void gui_acc_jpeg_release(void *decoded);
 
 /**
+ * @brief Output pixel format of the software JPEG path.
+ *
+ * Returns the same value gui_rgb_data_head_t.type carries: RGB565 or RGB888,
+ * which is also the value the decoder stamps into the header of every buffer it
+ * returns. Widgets must ask this instead of inferring the format from "is a
+ * hardware jpeg op registered" -- that stops holding once the software backend
+ * can be either format.
+ *
+ * The format itself is a build-time decision: JD_FORMAT in tjpgdcnf.h, or
+ * -DJD_FORMAT=0 on the command line for RGB888.
+ */
+char gui_acc_jpeg_get_output(void);
+
+/**
  * @brief Encode a pixel buffer into JPEG.
  *
  * THE RETURNED SHAPE DEPENDS ON THE BUILD, mirroring how the encoder itself was

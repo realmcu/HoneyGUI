@@ -25,33 +25,271 @@
 #define STBI_FREE(p)              gui_free(p)
 #include "gui_stb_image.h"
 
+/*============================================================================*
+ *                        Software decode backends
+ *
+ *  JPEG_SW_BACKEND selects who decodes when no hardware jpeg ops are
+ *  registered:
+ *
+ *      0   stb_image -- float IDCT
+ *      1   tjpgd     -- integer IDCT, ~4.7 KB of code and 3.5 KB of workspace;
+ *                       decodes MCU row by MCU row, so no full-size component
+ *                       planes are ever materialised (default)
+ *
+ *  tjpgd only understands baseline JPEG. Anything it refuses (progressive,
+ *  arithmetic coding, a broken stream) falls back to stb in the caller, so no
+ *  image that used to draw can disappear because of this switch.
+ *============================================================================*/
+#define JPEG_SW_BACKEND   1
+
+#if JPEG_SW_BACKEND == 1
+#include "tjpgd.h"
+#endif
+
+/*============================================================================*
+ *                    Output pixel format of the software path
+ *
+ *  JD_FORMAT in tjpgdcnf.h is the single switch, and it is a build-time one:
+ *
+ *    JD_FORMAT 1  -> RGB565, 2 bytes/px (default). HoneyGUI's color_rgb565_t
+ *                    keeps b in the low bits, tjpgd packs R5G6B5, they agree.
+ *    JD_FORMAT 0  -> RGB888, 3 bytes/px. HoneyGUI's RGB888 is BGR in memory
+ *                    (core/def_color.h: { b, g, r }) and tjpgd stores B,G,R.
+ *
+ *  Override with -DJD_FORMAT=0 instead of editing the header. Either way the
+ *  packing happens inside the decoder -- tjpgd folds RGB565 in mcu_output()'s
+ *  scratch buffer -- so nothing re-walks the finished frame. The stb fallback
+ *  converts only when tjpgd refused the stream.
+ *============================================================================*/
+#if (JPEG_SW_BACKEND == 1) && defined(JD_FORMAT) && (JD_FORMAT == 1)
+#define JPEG_SW_DEFAULT_565  1
+#else
+#define JPEG_SW_DEFAULT_565  0
+#endif
+
+/* Resolved once, so both backends and the image header always agree. */
+#define JPEG_SW_FORMAT   ((JPEG_SW_DEFAULT_565 != 0) ? RGB565 : RGB888)
+#define JPEG_SW_BPP      ((JPEG_SW_DEFAULT_565 != 0) ? 2u : 3u)
+
+/* Format of every buffer this file returns, in the same vocabulary as the
+ * image header. Callers ask instead of inferring it from "is a hardware jpeg op
+ * registered", which stops holding once the backend can be either format. */
+char gui_acc_jpeg_get_output(void)
+{
+    return (JPEG_SW_DEFAULT_565 != 0) ? RGB565 : RGB888;
+}
+
+#if JPEG_SW_BACKEND == 1
+
+typedef struct
+{
+    const uint8_t *src;      /* encoded stream passed to gui_acc_jpeg_load() */
+    size_t         len;
+    size_t         pos;      /* read cursor inside src                        */
+    uint8_t       *dst;      /* first output pixel, i.e. just past the header  */
+    uint32_t       stride;   /* bytes per output row                           */
+    uint8_t        bpp;      /* 2 for RGB565, 3 for RGB888, per frame         */
+} jpeg_tjpgd_io_t;
+
+/* tjpgd pulls the bitstream through this in 512-byte gulps (JD_SZBUF). A short
+ * read is how it learns the stream ended. */
+static size_t jpeg_tjpgd_in(JDEC *jd, uint8_t *buff, size_t nbyte)
+{
+    jpeg_tjpgd_io_t *io = (jpeg_tjpgd_io_t *)jd->device;
+    size_t left = io->len - io->pos;
+
+    if (nbyte > left)
+    {
+        nbyte = left;
+    }
+    if (buff != NULL && nbyte > 0u)
+    {
+        memcpy(buff, io->src + io->pos, nbyte);
+    }
+    io->pos += nbyte;
+    return nbyte;
+}
+
+/* One MCU rectangle per call. Rows go to the final stride, not the MCU width,
+ * so a partially covered rect at the right edge still lands correctly. */
+static int jpeg_tjpgd_out(JDEC *jd, void *bitmap, JRECT *rect)
+{
+    jpeg_tjpgd_io_t *io = (jpeg_tjpgd_io_t *)jd->device;
+    const uint8_t *src = (const uint8_t *)bitmap;
+    uint32_t row_bytes = (uint32_t)(rect->right - rect->left + 1u) * io->bpp;
+    uint8_t *dst = io->dst + (uint32_t)rect->top * io->stride +
+                   (uint32_t)rect->left * io->bpp;
+    uint32_t y;
+
+    for (y = rect->top; y <= rect->bottom; y++)
+    {
+        /* The decoder already emits the layout the engine expects (see the
+         * format notes above), so rows are plain copies. */
+        memcpy(dst, src, row_bytes);
+        dst += io->stride;
+        src += row_bytes;
+    }
+    return 1;   /* non-zero: keep decoding */
+}
+
+static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
+{
+    /* tjpgd only needs the pool between jd_prepare and jd_decomp. Keeping it
+     * static puts the 3.5 KB of tables in DTCM instead of the heap, and avoids
+     * a 3.5 KB stack frame in the GUI task. One decoder runs at a time. */
+    static uint32_t pool[(TJPGD_WORKSPACE_SIZE + 3) / 4];
+    JDEC     jd;
+    jpeg_tjpgd_io_t io;
+    JRESULT  rc;
+    uint8_t *img;
+    gui_rgb_data_head_t *head;
+    size_t   px_bytes;
+    char     format;
+
+    if (input == NULL || len <= 0)
+    {
+        return NULL;
+    }
+
+    memset(&jd, 0, sizeof(jd));
+    memset(&io, 0, sizeof(io));
+    io.src = (const uint8_t *)input;
+    io.len = (size_t)len;
+    format = JPEG_SW_FORMAT;
+    io.bpp = JPEG_SW_BPP;
+
+    rc = jd_prepare(&jd, jpeg_tjpgd_in, pool, sizeof(pool), &io);
+    if (rc != JDR_OK || jd.width == 0u || jd.height == 0u)
+    {
+        /* One-shot: if the stream is a sampling layout tjpgd cannot handle
+         * (4:4:0, progressive, ...) every frame lands here, and the caller
+         * falls back to stb. Printing once avoids drowning the log at 25 fps. */
+        static bool warned = false;
+        if (!warned)
+        {
+            warned = true;
+            gui_log("tjpgd: prepare failed rc=%d -- falling back to stb\n", (int)rc);
+        }
+        return NULL;
+    }
+
+    px_bytes = (size_t)jd.width * (size_t)jd.height * io.bpp;
+    img = (uint8_t *)gui_malloc(sizeof(gui_rgb_data_head_t) + px_bytes);
+    if (img == NULL)
+    {
+        gui_log("tjpgd: out of memory (%u bytes)\n",
+                (unsigned)(sizeof(gui_rgb_data_head_t) + px_bytes));
+        return NULL;
+    }
+
+    io.dst    = img + sizeof(gui_rgb_data_head_t);
+    io.stride = (uint32_t)jd.width * io.bpp;
+
+    rc = jd_decomp(&jd, jpeg_tjpgd_out, 0);
+    if (rc != JDR_OK)
+    {
+        static bool warned = false;
+        if (!warned)
+        {
+            warned = true;
+            gui_log("tjpgd: decomp failed rc=%d (%ux%u)\n", (int)rc, jd.width, jd.height);
+        }
+        gui_free(img);
+        return NULL;
+    }
+
+    head = (gui_rgb_data_head_t *)img;
+    memset(head, 0x00, sizeof(*head));
+    head->type = format;
+    head->w    = (short)jd.width;
+    head->h    = (short)jd.height;
+    head->jpeg = true;
+
+    if (w)       { *w = (int)jd.width; }
+    if (h)       { *h = (int)jd.height; }
+    if (channel) { *channel = (int)io.bpp; }
+
+    return img;
+}
+#endif /* JPEG_SW_BACKEND */
+
+/* stb_image keeps its own allocation discipline: it reserves the header bytes
+ * for us (STB_GUI_IMG_HEADER), so the buffer can be handed out as-is. */
+static void *jpeg_load_stb(void *input, int len, int *w, int *h, int *channel)
+{
+    unsigned char *img_data;
+    gui_rgb_data_head_t *head;
+
+    img_data = gui_stbi_load_from_memory(input, len, w, h, channel, 0);
+    if (img_data == NULL)
+    {
+        gui_log("Failed to load JPEG image from memory!\n");
+        return NULL;
+    }
+
+    /* When RGB565 is requested but stb only produces RGB888 (B,G,R on this
+     * fork), pack downwards in place, last pixel first: the destination index
+     * (2i) always trails the source index (3i), so nothing is overwritten
+     * before it is read. This runs only when tjpgd rejected the stream, so the
+     * hot path never pays for it. */
+    if ((JPEG_SW_FORMAT == RGB565) && *w > 0 && *h > 0)
+    {
+        uint8_t *base = img_data + sizeof(gui_rgb_data_head_t);
+        size_t   n = (size_t)(*w) * (size_t)(*h);
+        uint8_t       *s = base + n * 3u;
+        uint8_t       *d = base + n * 2u;
+
+        while (n--)
+        {
+            uint8_t b, g, r;
+
+            s -= 3;
+            b = s[0];
+            g = s[1];
+            r = s[2];
+            d -= 2;
+            d[0] = (uint8_t)((b >> 3) | ((g & 0x1Cu) << 3));          /* GGGBBBBB */
+            d[1] = (uint8_t)(((g & 0xE0u) >> 5) | ((r & 0xF8u) >> 0)); /* RRRRRGGG */
+        }
+        if (channel)
+        {
+            *channel = 2;
+        }
+    }
+
+    head = (gui_rgb_data_head_t *)img_data;
+    memset(head, 0x00, sizeof(gui_rgb_data_head_t));
+    head->type = JPEG_SW_FORMAT;
+    head->w = (short) * w;
+    head->h = (short) * h;
+    head->compress = false; // Not compressed
+    head->jpeg = true;
+
+    return img_data;
+}
+
 void *gui_acc_jpeg_load(void *input, int len, int *w, int *h, int *channel)
 {
     struct acc_engine *acc = gui_get_acc();
+
     if (acc != NULL && acc->jpeg != NULL && acc->jpeg->load != NULL)
     {
         return acc->jpeg->load(input, len, w, h, channel);
     }
-    else
+
+#if JPEG_SW_BACKEND == 1
     {
-        // Fallback to software decoding if no hardware acceleration is available
-        unsigned char *img_data = gui_stbi_load_from_memory(input, len, w, h, channel, 0);
-        if (img_data == NULL)
+        void *img = jpeg_load_tjpgd(input, len, w, h, channel);
+        if (img != NULL)
         {
-            gui_log("Failed to load JPEG image from memory!\n");
-            return NULL;
+            return img;
         }
-
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img_data;
-        memset(head, 0x00, sizeof(gui_rgb_data_head_t));
-        head->type = RGB888; // Assuming RGB888 format for JPEG
-        head->w = *w;
-        head->h = *h;
-        head->compress = false; // Not compressed
-        head->jpeg = true;
-
-        return img_data;
     }
+#endif
+
+    /* stb_image: the historical path, and the safety net for streams tjpgd
+     * refuses (it is baseline-only). */
+    return jpeg_load_stb(input, len, w, h, channel);
 }
 
 void gui_acc_jpeg_release(void *decoded)
@@ -70,8 +308,6 @@ void gui_acc_jpeg_release(void *decoded)
         }
     }
 }
-
-
 
 #define GUI_STB_IMAGE_WRITE_IMPLEMENTATION
 
@@ -135,7 +371,6 @@ static void jpeg_write_sink_cb(void *context, void *data, int size)
     memcpy(m->buf + m->len, data, (size_t)size);
     m->len += size;
 }
-
 
 void *gui_acc_jpeg_compress(void *input, int w, int h, int bpp,
                             int quality, int buf_len, int *out_len)

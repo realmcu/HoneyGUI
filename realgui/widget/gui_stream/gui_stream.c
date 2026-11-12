@@ -142,12 +142,14 @@ static bool stream_decode_frame(gui_stream_t *this, const stp_frame_t *f,
                 return false;
             }
             /* The loader leaves a valid image header in front of the pixels.
-             * Fix it up for already-decoded data, mirroring gui_video: the
-             * acc backend yields RGB565, the software fallback yields RGB888. */
+             * Fix it up for already-decoded data: the hardware ops yield
+             * RGB565, and the software backend's format comes from the decoder
+             * itself (tjpgd is built for RGB565, stb for RGB888), so ask rather
+             * than assume. */
             {
                 gui_rgb_data_head_t *ph = (gui_rgb_data_head_t *)out;
                 ph->type = (gui_get_acc() && gui_get_acc()->jpeg && gui_get_acc()->jpeg->load)
-                           ? (char)RGB565 : (char)RGB888;
+                           ? (char)RGB565 : gui_acc_jpeg_get_output();
                 ph->jpeg = false;
             }
             *out_jpeg = out;

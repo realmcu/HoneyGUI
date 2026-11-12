@@ -2202,7 +2202,9 @@ static void video_build_header(gui_video_t *this)
         }
         else
         {
-            this->header.type = 0x03; // RGB888
+            /* Software backend: its format is a build-time choice (tjpgd packs
+             * RGB565, stb delivers RGB888). Ask instead of assuming. */
+            this->header.type = gui_acc_jpeg_get_output();
         }
     }
     else if (this->img_type == VIDEO_TYPE_H264)
