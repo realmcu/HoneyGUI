@@ -1034,6 +1034,11 @@ gd_rewind(gd_GIF *gif)
     clear_canvas_background(gif, 0, 0, gif->width, gif->height);
     gif->palette = &gif->gct;
     memset(&gif->gce, 0, sizeof(gif->gce));
+
+    gif->fx = 0;
+    gif->fy = 0;
+    gif->fw = 0;
+    gif->fh = 0;
     gif->frame_index = 0;
     if (gif->is_mem)
     {
