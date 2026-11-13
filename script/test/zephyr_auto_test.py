@@ -70,6 +70,9 @@ class ZephyrAutoTest():
         if not download_bin_res:
             return False
         self.result_queue.queue.clear()
+        bee1_controller = Bee1Controller(self.project, self.branch, self.chip_type, "DUT1", self.module, self.part_number)
+        bee1_controller.test_cut_disable_all_controller_GPIO_pins()
+        bee1_controller.test_cut_restart(interval=1)
         log_path = log.get_log_dir(module = self.module)
  
         integrationTester_config = slave_property_parse(self.project, self.branch, self.chip_type, 'IntegrationTester', 'role', 'ALL', part_number=self.part_number)
@@ -95,12 +98,15 @@ class ZephyrAutoTest():
         cmd = [sys.executable, "-m", "pipenv", "run", "python", integrationTester_config["path"]]
         cmd.extend(["--testType", self.test_type])
         if self.module in ["HoneyGUI_Zephyr"]:
-            cmd.extend(["--module", "HoneyGUI_SW_RESET", "--skipDownloadBin"])
+            trace_path = os.path.join(os.environ["WORKSPACE"], "SRC", self.module, "bin")
+            cmd.extend(["--module", "HoneyGUI_SW_RESET", "--skipDownloadBin", "--tracePath", trace_path])
         elif self.module in ["HoneyGUI_CMD"]:
             cmd.extend(["--module", "HoneyGUI"])
         else:
             cmd.extend(["--module", self.module])
         cmd.extend(["--IC", self.chip_type])
+        if self.part_number:
+            cmd.extend(["--partNumber", self.part_number])
         cmd.extend(["--bankType", "BANK0"])
         cmd.extend(["--logDir", log_path])
         cmd.extend(["--xmlPath", integrationTester_config["sequence"]])
