@@ -386,6 +386,11 @@ void app_init(void) {
 - RAMFS: Read/write filesystem in RAM, supports XIP for zero-copy access
 - Memory management: `gui_vfs_load_file()` returns allocated memory that must be freed
 - Mount order: Earlier mounts have higher priority for path matching
+- Multiple ROMFS images: each `gui_vfs_mount_romfs()` call allocates its own
+  backend, so several images can be mounted under different prefixes (e.g.
+  `/rom` plus `/emoji`). A path always resolves against its prefix's image.
+- Legacy `hg_open()` / `hg_opendir()` use the single default root set by the
+  most recent `hg_romfs_mount()`. Go through VFS to reach more than one image.
 
 ## See Also
 

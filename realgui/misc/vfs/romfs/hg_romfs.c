@@ -23,7 +23,7 @@
 #define FS_EINVAL 22
 #endif
 
-// default romfs address
+// default root for the legacy hg_open()/hg_opendir(); see hg_open_at()
 static void *romfs_addr = NULL;
 
 void hg_romfs_mount(void *addr)
@@ -254,21 +254,28 @@ static int romfs_open(struct romfs_fd *file)
     return 0;
 }
 
-intptr_t hg_open(const char *file, int flags, ...)
+intptr_t hg_open_at(void *romfs_root, const char *file, int flags)
 {
     int result;
     struct romfs_fd *fd;
 
+    if (romfs_root == NULL)
+    {
+        return -1;
+    }
+
     /* allocate a fd */
     fd = gui_malloc(sizeof(struct romfs_fd));
-    if (fd)
+    if (fd == NULL)
     {
-        fd->flags = flags;
-        fd->size  = 0;
-        fd->pos   = 0;
-        fd->data  = (void *)romfs_addr;
-        fd->path = (char *)file;
+        return -1;
     }
+
+    fd->flags = flags;
+    fd->size  = 0;
+    fd->pos   = 0;
+    fd->data  = romfs_root;
+    fd->path = (char *)file;
 
     result = romfs_open(fd);
     if (result < 0)
@@ -278,6 +285,11 @@ intptr_t hg_open(const char *file, int flags, ...)
     }
 
     return (intptr_t)fd;
+}
+
+intptr_t hg_open(const char *file, int flags, ...)
+{
+    return hg_open_at(romfs_addr, file, flags);
 }
 
 int hg_close(intptr_t fd)
@@ -392,14 +404,14 @@ int hg_closedir(HG_DIR *d)
  *
  * @return the HG_DIR pointer of directory, NULL on open directory failed.
  */
-HG_DIR *hg_opendir(const char *name)
+HG_DIR *hg_opendir_at(void *romfs_root, const char *name)
 {
     intptr_t fd;
     HG_DIR *t;
 
     t = NULL;
 
-    fd = hg_open(name, O_RDONLY | O_DIRECTORY);
+    fd = hg_open_at(romfs_root, name, O_RDONLY | O_DIRECTORY);
     if (fd >= 0)
     {
         /* open successfully */
@@ -421,6 +433,12 @@ HG_DIR *hg_opendir(const char *name)
 
     return NULL;
 }
+
+HG_DIR *hg_opendir(const char *name)
+{
+    return hg_opendir_at(romfs_addr, name);
+}
+
 static int dfs_romfs_getdents(struct romfs_fd *file, struct hg_dirent *dirp, uint32_t count)
 {
     size_t index;

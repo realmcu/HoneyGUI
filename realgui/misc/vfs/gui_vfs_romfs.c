@@ -21,21 +21,20 @@
 #define F_GETADDR 100  /* Custom fcntl command to get file address */
 #endif
 
-/* ROMFS backend data */
+/* One backend per mount point */
 typedef struct
 {
+    void *root;             /* struct romfs_dirent * this mount resolves against */
     const void *base_addr;
     uint32_t base_offset;
 } romfs_backend_t;
-
-/* Global backend (simplified for single ROMFS instance) */
-static romfs_backend_t *g_romfs_backend = NULL;
 
 /* ROMFS VFS operations */
 
 static void *romfs_vfs_open(const char *path, gui_vfs_mode_t mode, void *user_data)
 {
-    (void)user_data;
+    romfs_backend_t *backend = (romfs_backend_t *)user_data;
+    if (backend == NULL) { return NULL; }
 
     /* ROMFS is read-only */
     GUI_ASSERT(mode == GUI_VFS_READ);
@@ -52,8 +51,7 @@ static void *romfs_vfs_open(const char *path, gui_vfs_mode_t mode, void *user_da
         path = full_path;
     }
 
-    /* Use hg_open from hg_romfs */
-    intptr_t fd = hg_open(path, 0);
+    intptr_t fd = hg_open_at(backend->root, path, 0);
 
     if (full_path) { gui_free(full_path); }
 
@@ -104,7 +102,8 @@ static const void *romfs_vfs_get_addr(void *file, size_t *size)
 
 static void *romfs_vfs_opendir(const char *path, void *user_data)
 {
-    (void)user_data;
+    romfs_backend_t *backend = (romfs_backend_t *)user_data;
+    if (backend == NULL) { return NULL; }
 
     /* Add leading slash if missing or empty */
     char *full_path = NULL;
@@ -125,7 +124,7 @@ static void *romfs_vfs_opendir(const char *path, void *user_data)
         path = full_path;
     }
 
-    void *dir = hg_opendir(path);
+    void *dir = hg_opendir_at(backend->root, path);
 
     if (full_path) { gui_free(full_path); }
 
@@ -152,7 +151,8 @@ static int romfs_vfs_closedir(void *dir)
 
 static int romfs_vfs_stat(const char *path, gui_vfs_stat_t *stat, void *user_data)
 {
-    (void)user_data;
+    romfs_backend_t *backend = (romfs_backend_t *)user_data;
+    if (backend == NULL) { return -1; }
 
     /* Add leading slash if missing */
     char *full_path = NULL;
@@ -165,7 +165,7 @@ static int romfs_vfs_stat(const char *path, gui_vfs_stat_t *stat, void *user_dat
         path = full_path;
     }
 
-    intptr_t fd = hg_open(path, 0);
+    intptr_t fd = hg_open_at(backend->root, path, 0);
 
     if (fd == -1)
     {
@@ -205,36 +205,46 @@ static const gui_vfs_ops_t romfs_vfs_ops =
 
 /**
  * @brief Mount ROMFS
- * @param prefix Mount point (e.g., "/rom")
- * @param base_addr ROMFS base address
+ *
+ * Each call allocates its own backend, so several images can be mounted under
+ * different prefixes at the same time.
+ *
+ * @param prefix Mount point (e.g., "/rom", "/emoji")
+ * @param base_addr ROMFS base address (the root dirent to resolve against)
  * @param base_offset Base offset for address calculation
  * @return 0 on success, -1 on error
  */
 int gui_vfs_mount_romfs(const char *prefix, const void *base_addr, uint32_t base_offset)
 {
-    if (g_romfs_backend)
+    if (prefix == NULL || base_addr == NULL)
     {
-        gui_free(g_romfs_backend);
+        gui_log("[VFS] ROMFS mount failed: invalid parameters\n");
+        return -1;
     }
 
-    g_romfs_backend = (romfs_backend_t *)gui_malloc(sizeof(romfs_backend_t));
-    if (!g_romfs_backend)
+    romfs_backend_t *backend = (romfs_backend_t *)gui_malloc(sizeof(romfs_backend_t));
+    if (!backend)
     {
         gui_log("[VFS] ROMFS mount failed: out of memory\n");
         return -1;
     }
 
-    g_romfs_backend->base_addr = base_addr;
-    g_romfs_backend->base_offset = base_offset;
+    backend->root = (void *)base_addr;
+    backend->base_addr = base_addr;
+    backend->base_offset = base_offset;
 
-    /* Mount ROMFS using hg_romfs */
+    /* Only keeps the legacy hg_*() API satisfied; the backend above does not
+     * read this global. */
     hg_romfs_mount((void *)base_addr);
 
-    int ret = gui_vfs_mount(prefix, &romfs_vfs_ops, g_romfs_backend);
-    if (ret == 0)
+    int ret = gui_vfs_mount(prefix, &romfs_vfs_ops, backend);
+    if (ret != 0)
     {
-        gui_log("[VFS] ROMFS mounted at %s (addr: %p, offset: 0x%08x)\n",
-                prefix, base_addr, base_offset);
+        gui_free(backend);
+        return -1;
     }
-    return ret;
+
+    gui_log("[VFS] ROMFS mounted at %s (addr: %p, offset: 0x%08x)\n",
+            prefix, base_addr, base_offset);
+    return 0;
 }

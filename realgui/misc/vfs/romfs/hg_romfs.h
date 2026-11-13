@@ -95,10 +95,15 @@ struct hg_stat
 };
 
 /* HoneyGUI ROMFS Public API */
+
+/* Set the default ROMFS root used by the legacy hg_*() entry points below.
+ * Only one default root exists; use the *_at() variants for several images. */
 void hg_romfs_mount(void *addr);
 
 /* File operations */
 intptr_t hg_open(const char *file, int flags, ...);
+/* Same as hg_open() against an explicit ROMFS root (struct romfs_dirent *). */
+intptr_t hg_open_at(void *romfs_root, const char *file, int flags);
 int hg_close(intptr_t fd);
 off_t hg_lseek(intptr_t fd, off_t offset, int whence);
 int hg_read(intptr_t fd, void *buf, size_t len);
@@ -108,6 +113,8 @@ int hg_fstat(intptr_t fildes, struct hg_stat *buf);
 
 /* Directory operations */
 HG_DIR *hg_opendir(const char *name);
+/* Same as hg_opendir() but against an explicit ROMFS root. */
+HG_DIR *hg_opendir_at(void *romfs_root, const char *name);
 int hg_closedir(HG_DIR *d);
 struct hg_dirent *hg_readdir(HG_DIR *d);
 
