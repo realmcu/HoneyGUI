@@ -9,9 +9,11 @@
  * @brief Standard HoneyGUI system value keys and value contracts.
  *
  * Standard keys use lower-case ASCII path segments separated by '/'. A key
- * describes observable state rather than an action. Each key has one fixed
- * gui_sysval_type_t, listed as "Type" below; a set with any other type is
- * rejected. A successful set returns the value that took effect.
+ * normally describes observable state. Write-only request keys are the
+ * exception: each successful write starts an operation, including two
+ * identical writes in succession. Each key has one fixed gui_sysval_type_t,
+ * listed as "Type" below; a set with any other type is rejected. A successful
+ * state set returns the value that took effect.
  *
  * Declaring a key does not register it. An adapter registers only the keys
  * its platform supports; a request for any other key is rejected with
@@ -819,8 +821,8 @@ extern "C" {
  *============================================================================*/
 
 /**
- * Playback state of the connected music source, such as the phone. Play,
- * pause and skip are not part of this catalog.
+ * Playback state of the connected music source, such as the phone. Transport
+ * controls use GUI_SYSVAL_KEY_MEDIA_REQUEST.
  *
  * Access: Read-only
  * Type: GUI_SYSVAL_TYPE_STR
@@ -856,6 +858,73 @@ extern "C" {
  * Encoding: UTF-8
  */
 #define GUI_SYSVAL_KEY_MEDIA_MUSIC_ARTIST "media/music/artist"
+
+/**
+ * One-shot media transport request.
+ *
+ * Access: Write-only
+ * Type: GUI_SYSVAL_TYPE_STR
+ * Encoding: "play", "pause", "toggle", "next" or "previous"
+ *
+ * This is a request key rather than state: every successful write starts the
+ * operation, including two identical writes in succession.
+ */
+#define GUI_SYSVAL_KEY_MEDIA_REQUEST "media/request"
+
+#define GUI_SYSVAL_MEDIA_STATE_UNAVAILABLE "unavailable"
+#define GUI_SYSVAL_MEDIA_STATE_STOPPED "stopped"
+#define GUI_SYSVAL_MEDIA_STATE_PLAYING "playing"
+#define GUI_SYSVAL_MEDIA_STATE_PAUSED "paused"
+
+
+/*============================================================================*
+ *                         Phone
+ *============================================================================*/
+
+/**
+ * Hands-free call state.
+ *
+ * Access: Read-only
+ * Type: GUI_SYSVAL_TYPE_STR
+ * Encoding: "unavailable", "incoming", "outgoing", "active" or "idle"
+ */
+#define GUI_SYSVAL_KEY_PHONE_STATE "phone/state"
+
+/**
+ * Caller or dialled number. Empty when no number is available.
+ *
+ * Access: Read-only
+ * Type: GUI_SYSVAL_TYPE_STR
+ */
+#define GUI_SYSVAL_KEY_PHONE_NUMBER "phone/number"
+
+/**
+ * Call audio route.
+ *
+ * Access: Read/write
+ * Type: GUI_SYSVAL_TYPE_STR
+ * Encoding: "device", "phone" or "unavailable"
+ */
+#define GUI_SYSVAL_KEY_PHONE_AUDIO_ROUTE "phone/audio_route"
+
+/**
+ * One-shot call request. A dial request appends the number after "dial:".
+ *
+ * Access: Write-only
+ * Type: GUI_SYSVAL_TYPE_STR
+ * Encoding: "answer", "hangup" or "dial:<number>"
+ */
+#define GUI_SYSVAL_KEY_PHONE_REQUEST "phone/request"
+
+#define GUI_SYSVAL_PHONE_ROUTE_DEVICE "device"
+#define GUI_SYSVAL_PHONE_ROUTE_PHONE "phone"
+#define GUI_SYSVAL_PHONE_ROUTE_UNAVAILABLE "unavailable"
+
+#define GUI_SYSVAL_PHONE_STATE_UNAVAILABLE "unavailable"
+#define GUI_SYSVAL_PHONE_STATE_INCOMING "incoming"
+#define GUI_SYSVAL_PHONE_STATE_OUTGOING "outgoing"
+#define GUI_SYSVAL_PHONE_STATE_ACTIVE "active"
+#define GUI_SYSVAL_PHONE_STATE_IDLE "idle"
 
 
 /*============================================================================*
