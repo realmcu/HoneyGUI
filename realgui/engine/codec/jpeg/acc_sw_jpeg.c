@@ -32,9 +32,11 @@
  *  registered:
  *
  *      0   stb_image -- float IDCT
- *      1   tjpgd     -- integer IDCT, ~4.7 KB of code and 3.5 KB of workspace;
- *                       decodes MCU row by MCU row, so no full-size component
- *                       planes are ever materialised (default)
+ *      1   tjpgd     -- integer IDCT, ~4.7 KB of code; its workspace is a
+ *                       static pool in DTCM sized by TJPGD_WORKSPACE_SIZE,
+ *                       which follows JD_FASTDECODE (9.6 KB at the default
+ *                       level 2); decodes MCU row by MCU row, so no full-size
+ *                       component planes are ever materialised (default)
  *
  *  tjpgd only understands baseline JPEG. Anything it refuses (progressive,
  *  arithmetic coding, a broken stream) falls back to stb in the caller, so no
@@ -135,8 +137,9 @@ static int jpeg_tjpgd_out(JDEC *jd, void *bitmap, JRECT *rect)
 static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
 {
     /* tjpgd only needs the pool between jd_prepare and jd_decomp. Keeping it
-     * static puts the 3.5 KB of tables in DTCM instead of the heap, and avoids
-     * a 3.5 KB stack frame in the GUI task. One decoder runs at a time. */
+     * static puts the workspace (TJPGD_WORKSPACE_SIZE, 9.6 KB at the default
+     * JD_FASTDECODE level) in DTCM instead of the heap, and avoids a stack
+     * frame of that size in the GUI task. One decoder runs at a time. */
     static uint32_t pool[(TJPGD_WORKSPACE_SIZE + 3) / 4];
     JDEC     jd;
     jpeg_tjpgd_io_t io;

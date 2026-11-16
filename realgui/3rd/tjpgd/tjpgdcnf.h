@@ -34,7 +34,9 @@
 /  1: Enable
 */
 
-#define JD_FASTDECODE   1
+#ifndef JD_FASTDECODE
+#define JD_FASTDECODE   2
+#endif
 /* Optimization level
 /  0: Basic optimization. Suitable for 8/16-bit MCUs.
 /     Workspace of 3100 bytes needed.
