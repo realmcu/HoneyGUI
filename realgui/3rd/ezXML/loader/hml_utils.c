@@ -70,6 +70,63 @@ gui_color_t hml_attr_color(ezxml_t node, const char *name, uint32_t def)
     return color;
 }
 
+static int hml_attr_clamped(ezxml_t node, const char *name, int min, int max, int def)
+{
+    int v = hml_attr_int(node, name, def);
+    return v < min ? min : (v > max ? max : v);
+}
+
+/** RGB of attribute name with opacity as alpha */
+static gui_color_t hml_effect_color(ezxml_t node, const char *name, uint32_t def_rgb, int opacity)
+{
+    gui_color_t color;
+    color.color.argb_full = (hml_parse_argb(ezxml_attr(node, name), def_rgb) & 0x00FFFFFFu)
+                            | ((uint32_t)opacity << 24);
+    return color;
+}
+
+/* Defaults and limits follow the designer's src/shared/geometryEffects.ts */
+bool hml_attr_glow(ezxml_t node, hml_glow_t *glow)
+{
+    if (!hml_attr_bool(node, "glowEnabled", false)) { return false; }
+    int opacity = hml_attr_clamped(node, "glowOpacity", 0, 255, 128);
+    int blur = hml_attr_clamped(node, "glowBlur", 0, 32, 12);
+    if (opacity == 0 || blur == 0) { return false; }
+
+    glow->color = hml_effect_color(node, "glowColor", 0xFFFFFF, opacity);
+    glow->blur = (uint8_t)blur;
+    return true;
+}
+
+bool hml_attr_shadow(ezxml_t node, hml_shadow_t *shadow)
+{
+    // In gui_shadow_dir_t order
+    static const char *const directions[] =
+    {
+        "top-left", "top", "top-right",
+        "left", "center", "right",
+        "bottom-left", "bottom", "bottom-right",
+    };
+
+    if (!hml_attr_bool(node, "shadowEnabled", false)) { return false; }
+    int opacity = hml_attr_clamped(node, "shadowOpacity", 0, 255, 128);
+    int blur = hml_attr_clamped(node, "shadowBlur", 0, 32, 12);
+    if (opacity == 0 || blur == 0) { return false; }
+
+    shadow->color = hml_effect_color(node, "shadowColor", 0x000000, opacity);
+    shadow->blur = blur;
+    shadow->spread = hml_attr_clamped(node, "shadowSpread", 0, 32, 0);
+    shadow->distance = hml_attr_clamped(node, "shadowDistance", 0, 64, 4);
+
+    const char *dir = hml_attr_str(node, "shadowDirection", "bottom-right");
+    shadow->direction = 8;
+    for (int i = 0; i < 9; i++)
+    {
+        if (strcmp(dir, directions[i]) == 0) { shadow->direction = i; break; }
+    }
+    return true;
+}
+
 void hml_set_asset_root(const char *root)
 {
     if (!root) { root = ""; }

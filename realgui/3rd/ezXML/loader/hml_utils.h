@@ -24,6 +24,35 @@ bool hml_attr_bool(ezxml_t node, const char *name, bool def);
 /** Parse "#RRGGBB", "#AARRGGBB", "0xAARRGGBB" or "AARRGGBB" into ARGB8888. */
 uint32_t hml_parse_argb(const char *val, uint32_t def);
 
+/** Outer glow of hg_rect / hg_circle. */
+typedef struct
+{
+    gui_color_t color;      /**< Glow colour; alpha is glowOpacity. */
+    uint8_t blur;           /**< glowBlur, 1..32. */
+} hml_glow_t;
+
+/** Drop shadow of hg_rect / hg_circle. */
+typedef struct
+{
+    gui_color_t color;      /**< Shadow colour; alpha is shadowOpacity. */
+    int blur;               /**< shadowBlur, 1..32. */
+    int spread;             /**< shadowSpread, 0..32. */
+    int direction;          /**< shadowDirection as a gui_shadow_dir_t value. */
+    int distance;           /**< shadowDistance, 0..64. */
+} hml_shadow_t;
+
+/**
+ * Read glowEnabled / glowColor / glowOpacity / glowBlur, following the
+ * designer's resolveGlow(): false when the glow is off or would draw nothing.
+ */
+bool hml_attr_glow(ezxml_t node, hml_glow_t *glow);
+
+/**
+ * Read shadowEnabled / shadowColor / shadowOpacity / shadowBlur / shadowSpread /
+ * shadowDirection / shadowDistance, following the designer's resolveShadow().
+ */
+bool hml_attr_shadow(ezxml_t node, hml_shadow_t *shadow);
+
 /**
  * Resolve a designer asset path to the converted file in the mounted resource
  * tree, following the designer code generator:

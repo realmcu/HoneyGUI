@@ -62,5 +62,22 @@ gui_obj_t *hml_create_canvas(gui_obj_t *parent, ezxml_t node)
         hml_json_free(stops);
     }
 
+    // Configure the shadow before set_shadow(), which builds the mask
+    hml_shadow_t shadow;
+    if (hml_attr_shadow(node, &shadow))
+    {
+        gui_rect_set_shadow_color(rect, shadow.color);
+        gui_rect_set_shadow_blur(rect, shadow.blur);
+        gui_rect_set_shadow_spread(rect, shadow.spread);
+        gui_rect_set_shadow_direction(rect, (gui_shadow_dir_t)shadow.direction, shadow.distance);
+        gui_rect_set_shadow(rect);
+    }
+
+    hml_glow_t glow;
+    if (hml_attr_glow(node, &glow))
+    {
+        gui_rect_set_glow(rect, glow.color, glow.blur);
+    }
+
     return (gui_obj_t *)rect;
 }
