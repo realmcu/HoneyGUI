@@ -230,29 +230,26 @@ static void *jpeg_load_stb(void *input, int len, int *w, int *h, int *channel)
         return NULL;
     }
 
-    /* When RGB565 is requested but stb only produces RGB888 (B,G,R on this
-     * fork), pack downwards in place, last pixel first: the destination index
-     * (2i) always trails the source index (3i), so nothing is overwritten
-     * before it is read. This runs only when tjpgd rejected the stream, so the
-     * hot path never pays for it. */
+    /* stb only produces RGB888 (B,G,R on this fork), so re-pack to RGB565 in
+     * place. This shrinks 3 bytes/px into 2, and pixel i owns bytes [3i,3i+3)
+     * as source but [2i,2i+2) as destination: walking i upwards, a write never
+     * touches a byte the loop has yet to read. Walking downwards re-reads
+     * pixels this loop already packed, which corrupts all but the last third.
+     * Only reached when tjpgd rejected the stream. */
     if ((JPEG_SW_FORMAT == RGB565) && *w > 0 && *h > 0)
     {
         uint8_t *base = img_data + sizeof(gui_rgb_data_head_t);
         size_t   n = (size_t)(*w) * (size_t)(*h);
-        uint8_t       *s = base + n * 3u;
-        uint8_t       *d = base + n * 2u;
+        size_t   i;
 
-        while (n--)
+        for (i = 0; i < n; i++)
         {
-            uint8_t b, g, r;
+            uint8_t b = base[i * 3 + 0];
+            uint8_t g = base[i * 3 + 1];
+            uint8_t r = base[i * 3 + 2];
 
-            s -= 3;
-            b = s[0];
-            g = s[1];
-            r = s[2];
-            d -= 2;
-            d[0] = (uint8_t)((b >> 3) | ((g & 0x1Cu) << 3));          /* GGGBBBBB */
-            d[1] = (uint8_t)(((g & 0xE0u) >> 5) | ((r & 0xF8u) >> 0)); /* RRRRRGGG */
+            base[i * 2 + 0] = (uint8_t)((b >> 3) | ((g & 0x1Cu) << 3));          /* GGGBBBBB */
+            base[i * 2 + 1] = (uint8_t)(((g & 0xE0u) >> 5) | ((r & 0xF8u) >> 0)); /* RRRRRGGG */
         }
         if (channel)
         {
