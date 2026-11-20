@@ -221,7 +221,7 @@ float gui_glass_get_t_y(gui_glass_t *_this);
  * @param glass_data_pointer Pointer to the glass data to be set to the widget.
  *                            The data should persist as long as the widget needs it or until it is explicitly updated.
  */
-void gui_glass_set_data(gui_glass_t *_this, const uint8_t *glass_data_pointer);
+void gui_glass_set_image_data(gui_glass_t *_this, const uint8_t *glass_data_pointer);
 
 /**
  * @brief Gets the glass data from a specified glass widget.
@@ -232,7 +232,7 @@ void gui_glass_set_data(gui_glass_t *_this, const uint8_t *glass_data_pointer);
  *
  * @return Pointer to the glass data currently set in the widget. If no glass data is set, the result may be `NULL`.
  */
-const uint8_t *gui_glass_get_data(gui_glass_t *_this);
+const uint8_t *gui_glass_get_image_data(gui_glass_t *_this);
 
 /**
  * @brief Enable long pressing event on glass widget.
@@ -246,7 +246,7 @@ void gui_glass_enable_pressing_envent(gui_glass_t *_this);
  *
  * @param _this Pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
  */
-void gui_glass_enable_click_envent(gui_glass_t *_this);
+void gui_glass_enable_click_event(gui_glass_t *_this);
 
 
 

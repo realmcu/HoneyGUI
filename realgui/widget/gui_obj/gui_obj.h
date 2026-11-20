@@ -158,14 +158,6 @@ bool gui_obj_in_rect(gui_obj_t *obj,
                      int16_t    h);
 
 /**
- * @brief Enable all short click actions from parent object to the root object.
- *
- * @param obj Root of the widget tree.
- */
-void gui_obj_enable_this_parent_short(gui_obj_t *obj);
-
-
-/**
  * @brief Get the area of this_widget obj.
  *
  * @param obj Pointer to the GUI object.
@@ -266,27 +258,6 @@ bool gui_obj_is_hidden(gui_obj_t *obj);
 const char *gui_widget_name(gui_obj_t *widget, const char *name);
 
 /**
- * @brief Update touch pad speed vertical.
- *
- * This function updates the current speed and records the speed change history.
- *
- * @param speed Pointer to the current speed, which will be updated by the function.
- * @param speed_recode Array to record speed changes, which will be updated by the function.
- */
-void gui_update_speed(int *speed, int speed_recode[]);
-
-/**
- * @brief Inertial calculation.
- *
- * This function performs inertial calculations based on the current speed, end speed, and offset.
- *
- * @param speed Pointer to the current speed, which will be updated by the function.
- * @param end_speed Target end speed.
- * @param offset Pointer to the offset, which will be updated by the function.
- */
-void gui_inertial(int *speed, int end_speed, int *offset);
-
-/**
  * @brief Get widget count.
  */
 uint32_t gui_get_obj_count(void);
@@ -300,39 +271,6 @@ uint32_t gui_get_obj_count(void);
  * @param y Y coordinate to set.
  */
 void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y);
-
-/**
- * @brief API to create a widget tree structure from an XML file and associate it with a parent widget.
- *
- * @param xml Path to the XML file to be parsed.
- * @param parent_widget Parent widget to which the tree structure is to be associated.
- */
-void gui_dom_create_tree_nest(const char *xml, gui_obj_t *parent_widget);
-
-/**
- * @brief Extracts the preview image file path from an XML file.
- *
- * This function parses the given XML file and attempts to find the preview
- * image file path by looking for specific tags within the XML.
- *
- * @param xml_file Path to the XML file to be parsed.
- * @return String containing the path to the preview image file. If the XML
- *         file cannot be loaded or the preview image file path cannot be found,
- *         returns NULL.
- */
-char *gui_dom_get_preview_image_file(const char *xml);
-
-/**
- * @brief Update the speed based on displacement.
- *
- * This function updates the speed value based on the given displacement.
- * It also uses a speed record array to achieve this.
- *
- * @param speed Pointer to the speed variable to update.
- * @param speed_recode Array holding the speed records.
- * @param displacement Displacement value to consider for speed update.
- */
-void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displacement);
 
 /**
  * @brief Move a widget object to specified coordinates.
