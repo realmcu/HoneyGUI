@@ -32,11 +32,12 @@
  *  registered:
  *
  *      0   stb_image -- float IDCT
- *      1   tjpgd     -- integer IDCT, ~4.7 KB of code; its workspace is a
- *                       static pool in DTCM sized by TJPGD_WORKSPACE_SIZE,
- *                       which follows JD_FASTDECODE (9.6 KB at the default
- *                       level 2); decodes MCU row by MCU row, so no full-size
- *                       component planes are ever materialised (default)
+ *      1   tjpgd     -- integer IDCT, ~4.7 KB of code; its workspace is
+ *                       allocated from the GUI heap on demand and sized by
+ *                       TJPGD_WORKSPACE_SIZE, which follows JD_FASTDECODE
+ *                       (9.6 KB at the default level 2); decodes MCU row by
+ *                       MCU row, so no full-size component planes are ever
+ *                       materialised (default)
  *
  *  tjpgd only understands baseline JPEG. Anything it refuses (progressive,
  *  arithmetic coding, a broken stream) falls back to stb in the caller, so no
@@ -136,11 +137,8 @@ static int jpeg_tjpgd_out(JDEC *jd, void *bitmap, JRECT *rect)
 
 static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
 {
-    /* tjpgd only needs the pool between jd_prepare and jd_decomp. Keeping it
-     * static puts the workspace (TJPGD_WORKSPACE_SIZE, 9.6 KB at the default
-     * JD_FASTDECODE level) in DTCM instead of the heap, and avoids a stack
-     * frame of that size in the GUI task. One decoder runs at a time. */
-    static uint32_t pool[(TJPGD_WORKSPACE_SIZE + 3) / 4];
+    const size_t pool_size = TJPGD_WORKSPACE_SIZE;
+    void    *pool;
     JDEC     jd;
     jpeg_tjpgd_io_t io;
     JRESULT  rc;
@@ -154,6 +152,24 @@ static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
         return NULL;
     }
 
+    /* tjpgd only needs the pool between jd_prepare and jd_decomp. Allocate it
+     * from the GUI heap on demand: a static pool would reserve its full size
+     * even when hardware JPEG handles every image and this path is never used.
+     *
+     * Trade-off: unlike a static object, gui_malloc gives us no control over
+     * the workspace placement (for example, DTCM); its location depends on the
+     * GUI allocator.
+     *
+     * howie comment
+     */
+    pool = gui_malloc(pool_size);
+    if (pool == NULL)
+    {
+        gui_log("tjpgd: workspace allocation failed (%u bytes)\n",
+                (unsigned)pool_size);
+        return NULL;
+    }
+
     memset(&jd, 0, sizeof(jd));
     memset(&io, 0, sizeof(io));
     io.src = (const uint8_t *)input;
@@ -161,7 +177,7 @@ static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
     format = JPEG_SW_FORMAT;
     io.bpp = JPEG_SW_BPP;
 
-    rc = jd_prepare(&jd, jpeg_tjpgd_in, pool, sizeof(pool), &io);
+    rc = jd_prepare(&jd, jpeg_tjpgd_in, pool, pool_size, &io);
     if (rc != JDR_OK || jd.width == 0u || jd.height == 0u)
     {
         /* One-shot: if the stream is a sampling layout tjpgd cannot handle
@@ -173,6 +189,7 @@ static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
             warned = true;
             gui_log("tjpgd: prepare failed rc=%d -- falling back to stb\n", (int)rc);
         }
+        gui_free(pool);
         return NULL;
     }
 
@@ -182,6 +199,7 @@ static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
     {
         gui_log("tjpgd: out of memory (%u bytes)\n",
                 (unsigned)(sizeof(gui_rgb_data_head_t) + px_bytes));
+        gui_free(pool);
         return NULL;
     }
 
@@ -198,8 +216,11 @@ static void *jpeg_load_tjpgd(void *input, int len, int *w, int *h, int *channel)
             gui_log("tjpgd: decomp failed rc=%d (%ux%u)\n", (int)rc, jd.width, jd.height);
         }
         gui_free(img);
+        gui_free(pool);
         return NULL;
     }
+
+    gui_free(pool);
 
     head = (gui_rgb_data_head_t *)img;
     memset(head, 0x00, sizeof(*head));
