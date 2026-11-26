@@ -858,6 +858,14 @@ void gui_view_switch_on_event(gui_view_t *_this,
             };
             gui_view_on_event_change_cb(obj, &e);
         }
+        else if (event_code == GUI_EVENT_TOUCH_MOVE_DOWN ||
+                 event_code == GUI_EVENT_TOUCH_MOVE_UP ||
+                 event_code == GUI_EVENT_TOUCH_MOVE_LEFT ||
+                 event_code == GUI_EVENT_TOUCH_MOVE_RIGHT)
+        {
+            /* For move event, switch_out_style must be not none animation */
+            GUI_ASSERT(switch_out_style != SWITCH_OUT_NONE_ANIMATION);
+        }
         return;
     }
 
@@ -890,6 +898,9 @@ void gui_view_switch_on_event(gui_view_t *_this,
         event_code == GUI_EVENT_TOUCH_MOVE_LEFT ||
         event_code == GUI_EVENT_TOUCH_MOVE_RIGHT)
     {
+        /* For move event, switch_out_style must be not none animation */
+        GUI_ASSERT(switch_out_style != SWITCH_OUT_NONE_ANIMATION);
+
         gui_obj_add_event_cb(_this, gui_view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
         gui_obj_add_event_cb(_this, gui_view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
         gui_obj_add_event_cb(_this, gui_view_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
