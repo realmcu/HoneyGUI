@@ -670,11 +670,18 @@ void gui_img_set_src(gui_img_t  *_this, const uint8_t *file_pointer, uint32_t st
         _this->storage_type = storage_type;
     }
 
-    /* Sync draw_img->data if already allocated (e.g. timer callback between prepare and draw) */
+    /* prepare() runs before the caller's timer, so draw_img still carries the
+     * old source and the target rect derived from it. Rebuild both here. */
     if (_this->draw_img != NULL)
     {
-        gui_img_refresh_draw_data(_this);
+        _this->draw_img->data = _this->src_data;
+        draw_img_load_scale(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
+        draw_img_new_area(_this->draw_img, NULL);
     }
+
+    /* Unconditional: the whole-struct checksum in gui_img_prepare() misses a
+     * swap that lands on a reused heap address. */
+    gui_fb_change();
 
 }
 
