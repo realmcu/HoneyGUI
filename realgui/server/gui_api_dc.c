@@ -104,3 +104,12 @@ void gui_display_off(void)
         dc->lcd_power_off();
     }
 }
+
+void gui_display_init(void)
+{
+    gui_log("gui_display_init \n");
+    if (dc->lcd_init)
+    {
+        dc->lcd_init();
+    }
+}

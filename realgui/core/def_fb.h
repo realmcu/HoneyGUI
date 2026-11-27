@@ -72,6 +72,7 @@ typedef struct gui_dispdev
     uint32_t (*get_lcd_us)(void);
     void (*reset_lcd_timer)(void);
     void (*lcd_te_wait)(void);
+    void (*lcd_init)(void);
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
     void (*lcd_draw_sync)(void);

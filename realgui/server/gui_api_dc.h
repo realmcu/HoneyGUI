@@ -42,6 +42,7 @@ uint32_t gui_get_screen_height(void);
 
 void gui_display_on(void);
 void gui_display_off(void);
+void gui_display_init(void);
 
 int gui_flash_boost(void);
 int gui_flash_boost_disable(void);
